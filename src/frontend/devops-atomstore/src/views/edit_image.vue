@@ -124,6 +124,16 @@
                         </bk-select>
                     </bk-form-item>
                 </template>
+                <bk-form-item label="Dockerfile Type" :required="true" property="dockerFileType" class="h32" :rules="[requireRule]" ref="dockerFileType">
+                    <bk-radio-group v-model="form.dockerFileType" @change="form.dockerFileContent = ''">
+                        <bk-radio value="INPUT" class="mr12"> {{ $t('store.手动录入') }} </bk-radio>
+                        <bk-radio value="GIT_OA_LINK"> {{ $t('store.从工蜂自动同步') }} </bk-radio>
+                    </bk-radio-group>
+                </bk-form-item>
+                <bk-form-item label="Dockerfile" :required="true" property="dockerFileContent" :rules="[requireRule]" ref="dockerFileContent">
+                    <bk-input v-model="form.dockerFileContent" v-show="form.dockerFileType === 'GIT_OA_LINK'"></bk-input>
+                    <section class="dockerfile" v-show="form.dockerFileType === 'INPUT'" @click="freshCodeMirror"></section>
+                </bk-form-item>
                 <div class="version-msg">
                     <p class="form-title"> {{ $t('store.版本信息') }} </p>
                     <hr class="cut-line">
@@ -163,6 +173,11 @@
     import { toolbars } from '@/utils/editor-options'
     import selectLogo from '@/components/common/selectLogo'
 
+    import CodeMirror from 'codemirror'
+    import 'codemirror/mode/yaml/yaml'
+    import 'codemirror/lib/codemirror.css'
+    import 'codemirror/theme/3024-night.css'
+
     export default {
         components: {
             selectLogo
@@ -180,6 +195,8 @@
                     description: '',
                     logoUrl: '',
                     imageSourceType: 'BKDEVOPS',
+                    dockerFileType: 'INPUT',
+                    dockerFileContent: '',
                     imageRepoUrl: '',
                     imageRepoName: '',
                     imageTag: '',
@@ -220,6 +237,17 @@
                     trigger: 'blur'
                 },
                 logoErr: false,
+                codeMirrorCon: {
+                    lineNumbers: true,
+                    height: '400px',
+                    tabMode: 'indent',
+                    mode: 'yaml',
+                    theme: '3024-night',
+                    cursorHeight: 0.85,
+                    autoRefresh: true,
+                    autofocus: true
+                },
+                codeEditor: {},
                 toolbars
             }
         },
@@ -245,10 +273,24 @@
                     }
                 },
                 immediate: true
+            },
+
+            'form.dockerFileType' (val) {
+                if (val === 'INPUT') {
+                    const isExitCodeMirror = document.querySelector('.CodeMirror')
+                    if (!isExitCodeMirror) {
+                        const ele = document.querySelector('.dockerfile')
+                        this.codeEditor = CodeMirror(ele, this.codeMirrorCon)
+                    }
+                    this.codeEditor.setValue('')
+                    setTimeout(() => {
+                        this.codeEditor.refresh()
+                    }, 0)
+                }
             }
         },
 
-        created () {
+        mounted () {
             this.getImageDetail()
         },
 
@@ -263,6 +305,11 @@
                 'requestTicketList',
                 'requestReleaseImage'
             ]),
+
+            freshCodeMirror () {
+                this.codeEditor.refresh()
+                this.codeEditor.focus()
+            },
 
             changeShowAgentType (option) {
                 const settings = option.settings || {}
@@ -321,6 +368,10 @@
                     this.form.description = this.form.description || this.$t('store.imageMdDesc')
                     this.originVersion = res.version
                     this.form.labelIdList = res.labelList.map(x => x.id)
+                    const ele = document.querySelector('.dockerfile')
+                    this.codeEditor = CodeMirror(ele, this.codeMirrorCon)
+                    this.codeEditor.setValue(this.form.dockerFileContent || '')
+
                     switch (res.imageStatus) {
                         case 'INIT':
                             this.form.releaseType = 'NEW'
@@ -425,6 +476,18 @@
         overflow: hidden;
     }
 
+    .dockerfile {
+        height: 400px;
+        overflow: auto;
+        background: black;
+        /deep/ .CodeMirror {
+            font-family: Consolas, "Courier New", monospace;
+            line-height: 1.5;
+            padding: 10px;
+            height: auto;
+        }
+    }
+
     .button-padding {
         padding-left: 125px;
     }
@@ -439,6 +502,10 @@
 
     .lh30 {
         line-height: 30px;
+    }
+
+    .mt10 {
+        margin-top: 10px;
     }
 
     .edit-content {
