@@ -127,12 +127,10 @@
                 <bk-form-item label="Dockerfile Type" :required="true" property="dockerFileType" class="h32" :rules="[requireRule]" ref="dockerFileType">
                     <bk-radio-group v-model="form.dockerFileType" @change="form.dockerFileContent = ''">
                         <bk-radio value="INPUT" class="mr12"> {{ $t('store.手动录入') }} </bk-radio>
-                        <bk-radio value="GIT_OA_LINK"> {{ $t('store.从工蜂自动同步') }} </bk-radio>
                     </bk-radio-group>
                 </bk-form-item>
                 <bk-form-item label="Dockerfile" :required="true" property="dockerFileContent" :rules="[requireRule]" ref="dockerFileContent">
-                    <bk-input v-model="form.dockerFileContent" v-show="form.dockerFileType === 'GIT_OA_LINK'"></bk-input>
-                    <section class="dockerfile" v-show="form.dockerFileType === 'INPUT'" @click="freshCodeMirror"></section>
+                    <section class="dockerfile" @click="freshCodeMirror"></section>
                 </bk-form-item>
                 <div class="version-msg">
                     <p class="form-title"> {{ $t('store.版本信息') }} </p>
@@ -273,20 +271,6 @@
                     }
                 },
                 immediate: true
-            },
-
-            'form.dockerFileType' (val) {
-                if (val === 'INPUT') {
-                    const isExitCodeMirror = document.querySelector('.CodeMirror')
-                    if (!isExitCodeMirror) {
-                        const ele = document.querySelector('.dockerfile')
-                        this.codeEditor = CodeMirror(ele, this.codeMirrorCon)
-                    }
-                    this.codeEditor.setValue('')
-                    setTimeout(() => {
-                        this.codeEditor.refresh()
-                    }, 0)
-                }
             }
         },
 
@@ -411,6 +395,7 @@
                         })
                 }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
                     this.isLoading = false
+                    setTimeout(() => this.codeEditor.refresh(), 100)
                     if (VERSION_TYPE === 'ee') this.form.imageSourceType = 'THIRD'
                 })
             },
