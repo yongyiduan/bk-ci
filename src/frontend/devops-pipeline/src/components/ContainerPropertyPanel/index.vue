@@ -441,8 +441,10 @@
 
             changeResourceType (name, val) {
                 this.imageRecommend = true
+                const defaultAgentType = (name === 'buildType' && ['THIRD_PARTY_AGENT_ID', 'THIRD_PARTY_AGENT_ENV'].includes(val) && !this.agentType) ? { agentType: 'ID' } : {}
                 this.handleContainerChange('dispatchType', Object.assign({
                     ...this.container.dispatchType,
+                    ...defaultAgentType,
                     imageVersion: '',
                     value: '',
                     imageCode: '',
