@@ -2751,10 +2751,10 @@ binary-extensions@^1.0.0:
   resolved "http://r.tnpm.oa.com/binary-extensions/download/binary-extensions-1.13.1.tgz#598afe54755b2868a5330d2aff9d4ebb53209b65"
   integrity sha1-WYr+VHVbKGilMw0q/51Ou1Mgm2U=
 
-bk-magic-vue@2.1.7:
-  version "2.1.7"
-  resolved "http://r.tnpm.oa.com/@tencent/bk-magic-vue/download/@tencent/bk-magic-vue-2.1.7.tgz#b9448fb0c381782f927bf6fb39909451e0221fe8"
-  integrity sha1-uUSPsMOBeC+Se/b7OZCUUeAiH+g=
+bk-magic-vue@2.1.8:
+  version "2.1.8"
+  resolved "http://r.tnpm.oa.com/@tencent/bk-magic-vue/download/@tencent/bk-magic-vue-2.1.8.tgz#e02264de4a9caf3dcb5f6d2748e61d3f24a08e44"
+  integrity sha1-4CJk3kqcrz3LX20nSOYdPySgjkQ=
 
 block-stream@*:
   version "0.0.9"
