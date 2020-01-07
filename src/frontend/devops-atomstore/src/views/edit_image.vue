@@ -105,13 +105,13 @@
                 </template>
                 <template v-else>
                     <bk-form-item :label="$t('store.源镜像库地址')" property="imageRepoUrl" :desc="$t('store.请输入源镜像库地址。若源为 docker hub，可留空不填')">
-                        <bk-input v-model="form.imageRepoUrl" :placeholder="$t('store.请输入源镜像库地址，如 csighub.tencentyun.com')"></bk-input>
+                        <bk-input v-model="form.imageRepoUrl" :placeholder="$t('store.imageRepoUrl')"></bk-input>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.源镜像名称')" property="imageRepoName" :required="true" :rules="[requireRule]" ref="imageRepoName">
                         <bk-input v-model="form.imageRepoName" :placeholder="$t('store.请输入源镜像名称，如 XXX/XXXX')"></bk-input>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.源镜像Tag')" property="imageTag" :desc="$t('store.请不要使用可变功能的Tag（如latest），避免镜像变更导致关联流水线不能正常执行')" :required="true" :rules="[requireRule, latestRule]" ref="imageTag">
-                        <bk-input v-model="form.imageTag" :placeholder="$t('store.请输入源镜像Tag，如 enterprise-6.0.3')"></bk-input>
+                        <bk-input v-model="form.imageTag" :placeholder="$t('store.imageTag')"></bk-input>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.凭证')" property="ticketId" :desc="$t('store.若为私有镜像，请提供凭证，用于流水线执行时拉取镜像')">
                         <bk-select v-model="form.ticketId" searchable :placeholder="$t('store.请选择凭证')">
