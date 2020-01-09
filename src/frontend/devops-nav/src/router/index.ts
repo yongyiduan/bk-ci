@@ -92,6 +92,8 @@ function isAmdModule (currentPage: subService): boolean {
 }
 
 const createRouter = (store: any, dynamicLoadModule: any, i18n: any) => {
+    counterUser() // 统计用户信息
+    uploadBKCounter(1) // 统计蓝鲸访问信息
     const router = new Router({
         mode: 'history',
         routes: routes
