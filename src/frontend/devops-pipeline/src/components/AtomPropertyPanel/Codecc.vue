@@ -598,6 +598,15 @@
                     } finally {
                         this.isLoading = false
                     }
+                } else {
+                    this.$bkInfo({
+                        subTitle: '暂无编译加速任务，点击去新建任务',
+                        closeIcon: false,
+                        confirmFn: this.goRegist,
+                        cancelFn: () => {
+                            this.banAllBooster = false
+                        }
+                    })
                 }
             },
             async initData () {
