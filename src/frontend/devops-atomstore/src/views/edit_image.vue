@@ -353,9 +353,6 @@
                     this.form.description = this.form.description || this.$t('store.imageMdDesc')
                     this.originVersion = res.version
                     this.form.labelIdList = res.labelList.map(x => x.id)
-                    const ele = document.querySelector('.dockerfile')
-                    this.codeEditor = CodeMirror(ele, this.codeMirrorCon)
-                    this.codeEditor.setValue(this.form.dockerFileContent || '')
 
                     switch (res.imageStatus) {
                         case 'INIT':
@@ -395,8 +392,13 @@
                         })
                 }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
                     this.isLoading = false
-                    setTimeout(() => this.codeEditor.refresh(), 100)
                     if (VERSION_TYPE === 'ee') this.form.imageSourceType = 'THIRD'
+                    this.$nextTick(() => {
+                        const ele = document.querySelector('.dockerfile')
+                        this.codeEditor = CodeMirror(ele, this.codeMirrorCon)
+                        this.codeEditor.setValue(this.form.dockerFileContent || '')
+                    })
+                    setTimeout(() => this.codeEditor.refresh(), 300)
                 })
             },
 
