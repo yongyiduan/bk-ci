@@ -57,15 +57,6 @@ const imageVisibleRange = () => import(/* webpackChunkName: 'tplVisibleRange' */
 const imageMemberManage = () => import(/* webpackChunkName: 'imageMemberManage' */ '@/views/imageDetail/memberManage.vue') // 镜像成员管理
 const imageEdit = () => import(/* webpackChunkName: 'imageEdit' */ '@/views/imageDetail/edit.vue') // 编辑镜像详情
 
-const editImage = () => import(/* webpackChunkName: 'editImage' */ '@/views/edit_image.vue') // 上架镜像
-const imageProgress = () => import(/* webpackChunkName: 'imageProgress' */ '@/views/imageProgress.vue') // 镜像进度
-const imageDatailIndex = () => import(/* webpackChunkName: 'imageDatailIndex' */ '@/views/imageDetail/index.vue') // 镜像详情总览
-const imageDetail = () => import(/* webpackChunkName: 'imageDetail' */ '@/views/imageDetail/detail.vue') // 镜像详情页面
-const imageOverview = () => import(/* webpackChunkName: 'imageOverview' */ '@/views/imageDetail/overView.vue') // 镜像概览
-const imageSettings = () => import(/* webpackChunkName: 'imageSettings' */ '@/views/imageDetail/settings.vue') // 镜像设置
-const imageMemberManage = () => import(/* webpackChunkName: 'imageMemberManage' */ '@/views/imageDetail/memberManage.vue') // 镜像成员管理
-const imageEdit = () => import(/* webpackChunkName: 'imageEdit' */ '@/views/imageDetail/edit.vue') // 编辑镜像详情
-
 const routes = [
     {
         path: 'store',
