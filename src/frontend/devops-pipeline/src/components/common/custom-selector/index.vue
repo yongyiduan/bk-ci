@@ -440,6 +440,7 @@
 <style lang="scss" scoped>
     @import '../../../scss/conf';
     .staff-selector {
+        position: relative;
         border: 1px solid $fontLigtherColor;
         .select-tags {
             position: relative;
