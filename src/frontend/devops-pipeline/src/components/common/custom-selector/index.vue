@@ -1,11 +1,11 @@
 <template>
-    <div class="bk-tag-selector staff-selector" :class="{ 'disable-status': disabled }">
+    <div class="staff-selector" :class="{ 'disable-status': disabled }">
         <span class="staff-placeholder" v-if="!selectedList.length && !value.length">{{ placeholder }}</span>
         <div class="select-tags" @click="toEdit">
             <div class="select-editor" ref="selectEditor">
                 <span class="tag-info" @click="selectInfo($event, entry)" v-for="(entry, index) in selectedList" :key="index">{{ entry }}</span>
                 <input type="text" ref="staffInput" id="staffInput"
-                    class="bk-tag-input form-input"
+                    class="form-input"
                     autocomplete="off"
                     :name="name"
                     :value="value"
