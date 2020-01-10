@@ -372,6 +372,11 @@
         background: black;
     }
 
+    .plugin-yaml {
+        height: 400px;
+        background: black;
+    }
+
     .store-main {
         height: calc(100vh - 93px);
         margin-left: calc(100vw - 100%);
@@ -414,6 +419,10 @@
         }
         .comment-empty {
             margin-top: 70px;
+        }
+        /deep/ .CodeMirror {
+            min-height: 300px;
+            height: auto;
         }
     }
 

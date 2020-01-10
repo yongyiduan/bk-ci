@@ -117,15 +117,12 @@
                     }
                     this.$store.dispatch('store/updateImageMemInfo', userInfo)
                 })
-            },
 
             hanldeEnterprise () {
                 if (VERSION_TYPE === 'ee') {
                     this.sideMenuList[0].list[2].children.splice(1, 1)
                 }
             }
-        }
-    }
 </script>
 
 <style lang="scss">
