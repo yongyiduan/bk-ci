@@ -19,8 +19,7 @@
                 </div>
             </div>
             <div class="sub_header_right">
-                <a class="develop-guide-link" target="_blank"
-                    :href="docsLink"> {{ $t('store.插件指引') }} </a>
+                <a class="develop-guide-link" target="_blank" :href="docsLink"> {{ $t('store.插件指引') }} </a>
             </div>
         </div>
         <div class="release-progress-content" v-show="showContent">

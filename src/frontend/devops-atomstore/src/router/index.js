@@ -421,6 +421,70 @@ const routes = [
                 ]
             },
             {
+                path: 'image/:imageCode',
+                name: 'imageDatailIndex',
+                component: imageDatailIndex,
+                children: [
+                    {
+                        path: 'overview',
+                        name: 'imageOverview',
+                        component: imageOverview,
+                        meta: {
+                            title: '概览',
+                            logo: 'store',
+                            header: '研发商店',
+                            to: 'atomHome'
+                        }
+                    },
+                    {
+                        path: 'detail',
+                        name: 'imageDetail',
+                        component: imageDetail,
+                        meta: {
+                            title: '详情',
+                            logo: 'store',
+                            header: '研发商店',
+                            to: 'atomHome'
+                        }
+                    },
+                    {
+                        path: 'edit',
+                        name: 'imageEdit',
+                        component: imageEdit,
+                        meta: {
+                            title: '编辑',
+                            logo: 'store',
+                            header: '研发商店',
+                            to: 'atomHome'
+                        }
+                    },
+                    {
+                        path: 'settings',
+                        name: 'imageSettings',
+                        component: imageSettings,
+                        meta: {
+                            title: '设置',
+                            logo: 'store',
+                            header: '研发商店',
+                            to: 'atomHome'
+                        },
+                        children: [
+                            {
+                                path: 'member',
+                                name: 'imageMemberManage',
+                                component: imageMemberManage,
+                                meta: {
+                                    title: '成员管理',
+                                    logo: 'store',
+                                    header: '研发商店',
+                                    to: 'atomHome'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 path: 'install',
                 name: 'install',
                 component: install,
