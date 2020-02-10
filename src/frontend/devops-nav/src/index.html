@@ -185,7 +185,7 @@
                     return ''    
                 } else {
                     var res = location.pathname.match(reg)
-                    return res ? res[1] : ''
+                    return res && res[1] !== '0' ? res[1] : ''
                 }
                 
             } catch (e) {
@@ -253,7 +253,7 @@
                     
                     if (children[j].name.indexOf('CodeCC') > -1) {  // 临时兼容正式环境灰度
                         children[j] = Object.assign(children[j], {
-                            "link_new" : "/codecc/0",
+                            "link_new" : "/codecc/",
                             "iframe_url" : CODECC_PREFIX + "/codecc/",
                             "project_id_type" : "path",
                         })
