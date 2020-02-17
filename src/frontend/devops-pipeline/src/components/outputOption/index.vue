@@ -40,7 +40,7 @@
                 'checkHasCodecc': 'soda/getHasAtomCheck'
             }),
             hasCodecc () {
-                return this.checkHasCodecc(this.curPipeline.stages, 'linuxPaasCodeCCScript') || this.checkHasCodecc(this.curPipeline.stages, 'CodeccCheckAtom')
+                return this.checkHasCodecc(this.curPipeline.stages, 'linuxPaasCodeCCScript')
             },
             buildNo () {
                 return this.$route.params.buildNo
