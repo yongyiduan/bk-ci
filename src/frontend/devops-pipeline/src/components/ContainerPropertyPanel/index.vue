@@ -285,7 +285,7 @@
             imageTypeList () {
                 return [
                     { label: this.$t('editPage.fromList'), value: 'BKSTORE' },
-                    { label: this.$t('editPage.fromHand'), value: 'THIRD', hidden: this.buildResourceType === 'PUBLIC_DEVCLOUD' }
+                    { label: this.$t('editPage.fromHand'), value: 'THIRD' }
                 ]
             },
             appEnvs () {
