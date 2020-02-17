@@ -352,7 +352,7 @@
                 return Array.isArray(this.atomVersionList) && this.atomVersionList.length > 0
             },
             AtomComponent () {
-                if (this.atomCode === 'CodeccCheckAtomDebug' || this.atomCode === 'CodeccCheckAtom') {
+                if (this.atom.htmlTemplateVersion === '1.2' || this.atomCode === 'CodeccCheckAtomDebug' || this.atomCode === 'CodeccCheckAtom') {
                     return RemoteAtom
                 }
                 if (this.isNewAtomTemplate(this.atom.htmlTemplateVersion)) {
