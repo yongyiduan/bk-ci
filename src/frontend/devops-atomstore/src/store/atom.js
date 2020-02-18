@@ -211,7 +211,10 @@ export const actions = {
      * 上架/升级流水线插件
      */
     editAtom ({ commit }, { projectCode, params, initProject }) {
-        return vue.$ajax.put(`${prefix}/user/market/desk/atom?projectCode=${projectCode}`, params, { headers: { 'X-DEVOPS-PROJECT-ID': initProject } })
+        window.X_DEVOPS_PROJECT_ID = initProject
+        const execRes = /X-DEVOPS-PROJECT-ID=([^;]+)/.exec(document.cookie) || []
+        const originProjectId = execRes[1] || initProject
+        return vue.$ajax.put(`${prefix}/user/market/desk/atom?projectCode=${projectCode}`, params).finally(() => (window.X_DEVOPS_PROJECT_ID = originProjectId))
     },
 
     /**
