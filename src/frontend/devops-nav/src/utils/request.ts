@@ -25,7 +25,7 @@ request.interceptors.request.use(config => {
     if (/(\/?ms\/backend|\/?backend)/.test(config.url)) {
         return config   
     }
-    // @ts-ignore
+
     const routePid = window.X_DEVOPS_PROJECT_ID || getCurrentPid()
     return {
         ...config,
