@@ -26,12 +26,12 @@ request.interceptors.request.use(config => {
         return config   
     }
 
-    const routePid = window.X_DEVOPS_PROJECT_ID || getCurrentPid()
+    const routePid = getCurrentPid()
     return {
         ...config,
         headers: routePid ? {
-            ...(config.headers || {}),
-            'X-DEVOPS-PROJECT-ID': routePid
+            'X-DEVOPS-PROJECT-ID': routePid,
+            ...(config.headers || {})
         } : config.headers
     };
   }, function (error) {

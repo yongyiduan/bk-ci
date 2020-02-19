@@ -29,7 +29,6 @@ interface Window {
     projectList: ObjectMap[]
     serviceObject: ObjectMap
     currentPage: subService
-    X_DEVOPS_PROJECT_ID: String
     userInfo: User
     vuexStore: any
     setLsCacheItem: Function
