@@ -109,15 +109,6 @@
                         </bk-select>
                     </div>
                 </div>
-                <div class="bk-form-item is-required is-open" ref="openSourceError" v-if="!atomForm.version && !isEnterprise">
-                    <label class="bk-label"> {{ $t('store.是否开源') }} </label>
-                    <div class="bk-form-content atom-item-content">
-                        <bk-radio-group v-model="atomForm.visibilityLevel" class="radio-group">
-                            <bk-radio :value="entry.value" v-for="(entry, key) in isOpenSource" :key="key" @click.native="formErrors.openSourceError = false">{{entry.label}}</bk-radio>
-                        </bk-radio-group>
-                        <div v-if="formErrors.openSourceError" class="error-tips"> {{ $t('store.字段有误，请重新选择') }} </div>
-                    </div>
-                </div>
                 <div class="bk-form-item introduction-form-item is-required">
                     <label class="bk-label"> {{ $t('store.简介') }} </label>
                     <div class="bk-form-content atom-item-content is-tooltips">
@@ -291,10 +282,6 @@
                     { label: 'Linux', value: 'LINUX', icon: 'linux-view' },
                     { label: 'Windows', value: 'WINDOWS', icon: 'windows' },
                     { label: 'macOS', value: 'MACOS', icon: 'macos' }
-                ],
-                isOpenSource: [
-                    { label: this.$t('store.是'), value: 'LOGIN_PUBLIC' },
-                    { label: this.$t('store.否'), value: 'PRIVATE' }
                 ],
                 publishShelf: [
                     { label: this.$t('store.新上架'), value: 'NEW' }
@@ -625,12 +612,6 @@
                 if (this.atomForm.jobType === 'AGENT' && !this.atomForm.os.length) {
                     this.formErrors.envError = true
                     ref = ref || 'envError'
-                    errorCount++
-                }
-
-                if (!this.isEnterprise && this.isOpenSource.find(x => x.value === this.atomForm.visibilityLevel) < 0) {
-                    this.formErrors.openSourceError = true
-                    ref = ref || 'openSourceError'
                     errorCount++
                 }
 
