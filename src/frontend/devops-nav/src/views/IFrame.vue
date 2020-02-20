@@ -27,7 +27,7 @@
     import { Component, Watch } from 'vue-property-decorator'
     import eventBus from '../utils/eventBus'
     import { urlJoin, queryStringify, getServiceAliasByPath } from '../utils/util'
-    import { State } from 'vuex-class'
+    import { State, Getter } from 'vuex-class'
 
     Component.registerHooks([
         'beforeRouteEnter',
@@ -53,6 +53,7 @@
         @State isShowPreviewTips
         @State user
         @State headerConfig
+        @Getter getServiceExtensions
 
         created () {
             this.init()
@@ -114,6 +115,10 @@
             }))
         }
 
+        get extensions (): any[] {
+            return this.getServiceExtensions(this.$route.params.projectId, this.currentPage.id)
+        }
+
         backHome () {
             if (this.needLoading) {
                 this.isLoading = true
@@ -157,11 +162,12 @@
         onLoad () {
             this.isLoading = false
             if (this.$refs.iframeEle) {
+                console.log(this.extensions, 'this.extensions')
                 const childWin = this.$refs.iframeEle.contentWindow
                 this.iframeUtil.syncProjectList(childWin, this.underlineProjectList)
                 this.iframeUtil.syncUserInfo(childWin, this.user)
                 this.iframeUtil.syncLocale(childWin, this.$i18n.locale)
-                
+                this.iframeUtil.syncExtensions(childWin, this.extensions)
                 if (this.$route.params.projectId) {
                     this.iframeUtil.syncProjectId(childWin, this.$route.params.projectId)
                 }

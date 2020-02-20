@@ -34,9 +34,9 @@
                             @click="requestUrl(row, 'download')"></i>
                         <i class="bk-icon icon-tree-module-shape handler-btn" v-if="hasPermission && isMof && isWindows && isApkOrIpa(row)" :title="$t('details.mofDownload')"
                             @click="requestUrl(row, 'download', null, 'MoF')"></i>
-                        <span class="handler-btn-tool copy" v-if="row.artifactoryType === 'PIPELINE'" :title="$t('details.saveToCustom')" @click="copyToCustom(row)">
+                        <i class="handler-btn-tool copy" v-if="row.artifactoryType === 'PIPELINE'" :title="$t('details.saveToCustom')" @click="copyToCustom(row)">
                             <Logo class="icon-copy" name="copy" size="15"></Logo>
-                        </span>
+                        </i>
                         <span class="handler-btn-tool qrcode"
                             v-if="(extForFile(row.name) === 'ipafile' || extForFile(row.name) === 'apkfile') && hasPermission">
                             <i class="bk-icon icon-qrcode handler-btn"
@@ -57,6 +57,7 @@
                                 <p>{{ $t('details.noDownloadPermTips') }}</p>
                             </template>
                         </bk-popover>
+                        <artifactory-operation :artifact="row" />
                     </div>
                 </div>
             </div>
@@ -135,11 +136,13 @@
     import Logo from '@/components/Logo'
     import qrcode from '@/components/devops/qrcode'
     import { convertFileSize, convertTime } from '@/utils/util'
+    import { ArtifactoryOperation } from '@/components/Hooks'
 
     export default {
         components: {
             Logo,
-            qrcode
+            qrcode,
+            ArtifactoryOperation
         },
         data () {
             return {

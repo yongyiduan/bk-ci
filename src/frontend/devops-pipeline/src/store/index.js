@@ -29,8 +29,10 @@ import soda from './modules/soda/'
 import atom from './modules/atom'
 
 import {
-    FETCH_ERROR
+    FETCH_ERROR,
+    SET_EXTENSION
 } from './constants'
+import { ARTIFACTORY_OPERATION } from '../utils/extensionHooks'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -49,10 +51,17 @@ export default new Vuex.Store({
         // fetch error
         fetchError: null,
 
-        cancelTokenMap: {}
+        cancelTokenMap: {},
+
+        extensions: []
     },
     // 公共 mutations
     mutations: {
+        [SET_EXTENSION]: (state, extensions) => {
+            Object.assign(state, {
+                extensions
+            })
+        },
         /**
          * 更新当前project
          *
@@ -77,6 +86,10 @@ export default new Vuex.Store({
     },
     // 公共 actions
     actions: {
+        setExtensions: ({ commit }, extensions) => {
+            console.log(extensions)
+            commit(SET_EXTENSION, extensions)
+        },
         requestProjectDetail: async ({ commit }, { projectId }) => {
             return ajax.get(AJAX_URL_PIRFIX + `/project/api/user/projects/${projectId}/`).then(response => {
                 let data = {}
@@ -92,5 +105,30 @@ export default new Vuex.Store({
     },
     // 公共 getters
     getters: {
+        extensionKeyMap (state) {
+            if (Array.isArray(state.extensions)) {
+                return state.extensions.reduce((acc, extension) => {
+                    acc[extension.key] = extension
+                    return acc
+                }, {})
+            }
+            return null
+        },
+        artifactExtensions (state) {
+            const { extensions } = state
+            return extensions.reduce((acc, extension) => {
+                if (Array.isArray(extension.modules[ARTIFACTORY_OPERATION])) {
+                    acc = [
+                        ...acc,
+                        ...extension.modules[ARTIFACTORY_OPERATION].map(mod => ({
+                            ...mod,
+                            appKey: extension.key
+                        }))
+                    ]
+                }
+                return acc
+            }, [])
+            // ARTIFACTORY_OPERATION
+        }
     }
 })

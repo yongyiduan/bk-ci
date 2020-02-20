@@ -14,6 +14,7 @@ import {
     PROCESS_API_URL_PREFIX,
     PROJECT_API_URL_PREFIX,
     SUPPORT_API_URL_PREFIX,
+    STORE_API_URL_PREFIX,
     EMPTY_PROJECT,
     RESET_NEW_PROJECT,
     SET_POPUP_SHOW,
@@ -22,10 +23,67 @@ import {
     TOGGLE_MODULE_LOADING,
     UPDATE_CURRENT_PAGE,
     SET_SERVICES,
+    SET_SERVICE_EXTENSIONS,
     TOGGLE_PERMISSION_DIALOG
 } from './constants'
 
 const actions: ActionTree<RootState, any> = {
+    async getServiceExtensions ({ commit }: ActionContext<RootState, any>, { serviceId, projectCode }: any) {
+        try {
+            const extensions = await Request.get(`${STORE_API_URL_PREFIX}/user/market/extension/items/list/projectCode=${projectCode}&serviceId=${serviceId}`)
+            console.log(extensions)
+            commit(SET_SERVICE_EXTENSIONS, {
+                extensions,
+                serviceId,
+                projectCode
+            })
+        } catch (error) {
+            commit(SET_SERVICE_EXTENSIONS, {
+                extensions: [{
+                    "name": "Hello World",
+                    "description": "Tencent CI Extension",
+                    "key": "tci.job.artifactory",
+                    "baseURL": "http://localhost:8081",
+                    "vendor": {
+                        "name": "Lockiechen",
+                        "url": "http://devops.oa.com"
+                    },
+                    "modules": {
+                        "ARTIFACTORY_OPERATION": [
+                            {
+                                "weight": 200,
+                                "url": "http://localhost:8081/helloworld.html",
+                                "context": "addon",
+                                "target": {
+                                    "type": "asidePanel",
+                                    "options": {
+                                      "width": 800
+                                    },
+                                    "data": {
+                                        "demo": "hello"
+                                    }
+                                  },
+                                "tooltip": {
+                                    "value": "This is a tooltip"
+                                },
+                                "icon": {
+                                    "width": 16,
+                                    "height": 16,
+                                    "url": "/icon.svg"
+                                },
+                                "name": {
+                                    "value": "构件分发"
+                                },
+                                "key": "web-item-example"
+                            }
+                        ]
+                    }
+                }],
+                serviceId,
+                projectCode
+            })
+        }
+    },
     togglePermissionDialog ({ commit }: ActionContext<RootState, any>, visible: boolean) {
         this.commit(TOGGLE_PERMISSION_DIALOG, visible)  
     },
@@ -44,7 +102,7 @@ const actions: ActionTree<RootState, any> = {
     async toggleServiceCollect (_, { serviceId, isCollected }: any) {
         return Request.put(`${PROJECT_API_URL_PREFIX}/user/services/${serviceId}?collector=${isCollected}`)
     },
-    async fetchLinks ({ commit }, { type }) {
+    async fetchLinks ({ commit }: ActionContext<RootState, any>, { type }) {
         try {
             const links = await Request.get(`${PROJECT_API_URL_PREFIX}/user/activities/types/${type}`)
             commit(SET_LINKS, {

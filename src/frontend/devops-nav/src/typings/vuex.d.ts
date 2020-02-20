@@ -13,9 +13,10 @@ interface RootState {
     isAnyPopupShow: boolean
     isShowPreviewTips: boolean
     fetchError: object
-    headerConfig: object,
-    moduleLoading: boolean,
+    headerConfig: object
+    moduleLoading: boolean
     isPermissionDialogShow: boolean
+    extensionMap: any
 }
 
 interface Link {

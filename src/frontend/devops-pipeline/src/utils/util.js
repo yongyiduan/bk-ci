@@ -587,3 +587,7 @@ export function getQueryParamList (arr = [], key) {
         return `${key}=${arr}`
     }
 }
+
+export function isAbsoluteURL (url = '') {
+    return /^https?:\/\//i.test(url)
+}

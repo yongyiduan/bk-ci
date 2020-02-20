@@ -24,6 +24,7 @@ export default new Vuex.Store<RootState>({
     getters,
     state: {
         isPermissionDialogShow: false,
+        extensionMap: {},
         projectList,
         fetchError: null,
         moduleLoading: false,

@@ -17,10 +17,17 @@ import {
     CLOSE_PREVIEW_TIPS,
     TOGGLE_MODULE_LOADING,
     UPDATE_CURRENT_PAGE,
-    TOGGLE_PERMISSION_DIALOG
+    TOGGLE_PERMISSION_DIALOG,
+    SET_SERVICE_EXTENSIONS
 } from './constants'
 
 const mutations: MutationTree<RootState> = {
+    [SET_SERVICE_EXTENSIONS]: (state: RootState, { projectCode, serviceId, extensions }: any) => {
+        Vue.set(state, 'extensionMap', {
+            ...state.extensionMap,
+            [`${projectCode}-${serviceId}`]: extensions
+        })
+    },
     [TOGGLE_PERMISSION_DIALOG]: (state: RootState, visible: boolean) => {
         Vue.set(state, 'isPermissionDialogShow', visible)
     },

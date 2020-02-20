@@ -71,6 +71,7 @@
 
         <login-dialog v-if="showLoginDialog" />
         <ask-permission-dialog />
+        <extension-aside-panel />
     </div>
 </template>
 
@@ -78,19 +79,29 @@
     import Vue from 'vue'
     import Header from '../components/Header/index.vue'
     import AskPermissionDialog from '../components/AskPermissionDialog/AskPermissionDialog.vue'
+    import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
     import LoginDialog from '../components/LoginDialog/index.vue'
     import { Component, Watch } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
     import eventBus from '../utils/eventBus'
+    import { getServiceAliasByPath } from '../utils/util'
+
+    Component.registerHooks([
+        'beforeRouteEnter',
+        'beforeRouteLeave',
+        'beforeRouteUpdate'
+    ])
 
     @Component({
         components: {
             Header,
             LoginDialog,
-            AskPermissionDialog
+            AskPermissionDialog,
+            ExtensionAsidePanel
         }
     })
     export default class Index extends Vue {
+        @State currentPage
         @State projectList
         @State headerConfig
         @State isShowPreviewTips
@@ -98,6 +109,7 @@
         @Getter disableProjectList
         @Getter approvalingProjectList
         @Action closePreviewTips
+        @Action getServiceExtensions
 
         showLoginDialog: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
@@ -155,6 +167,27 @@
             }
         }
 
+        isSameModule (newPath: string, oldPath: string): boolean {
+            return getServiceAliasByPath(newPath) === getServiceAliasByPath(oldPath)
+        }
+
+        beforeRouteUpdate (to, from, next) {
+            const { path, params } = to
+            const { path: oldPath, params: oldParams } = from
+            console.log(this.isSameModule(path, oldPath) || params.projectId !== oldParams.projectId)
+            if (!this.isSameModule(path, oldPath) || params.projectId !== oldParams.projectId) {
+                const serviceAlias = getServiceAliasByPath(path)
+                const currentPage = window.serviceObject.serviceMap[serviceAlias]
+                if (currentPage) {
+                    this.getServiceExtensions({
+                        serviceId: currentPage.id,
+                        projectCode: params.projectId
+                    })
+                }
+            }
+            next()
+        }
+
         created () {
             this.hasProjectList && this.saveProjectId()
             eventBus.$on('toggle-login-dialog', (isShow) => {
@@ -172,6 +205,13 @@
                     }
                 })
             })
+
+            if (this.currentPage) {
+                this.getServiceExtensions({
+                    serviceId: this.currentPage.id,
+                    projectCode: this.$route.params.projectId
+                })
+            }
         }
     }
 </script>

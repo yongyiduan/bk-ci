@@ -21,6 +21,7 @@ import axios from 'axios'
 import Vue from 'vue'
 import { bus } from './bus'
 import cookie from 'cookie'
+import { isAbsoluteURL } from './util'
 
 const request = axios.create({
     baseURL: `${AJAX_URL_PIRFIX}`,
@@ -35,10 +36,6 @@ const request = axios.create({
 
 function errorHandler (error) {
     return Promise.reject(error)
-}
-
-function isAbsoluteURL (url = '') {
-    return /^https?:\/\//i.test(url)
 }
 
 request.interceptors.request.use(config => {
