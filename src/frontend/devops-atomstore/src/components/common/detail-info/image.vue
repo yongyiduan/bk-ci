@@ -122,8 +122,11 @@
     .detail-title {
         display: flex;
         align-items: center;
-        margin: 47px auto 30px;
-        width: 1200px;
+        margin: 26px auto 0;
+        width: 1460px;
+        background: $white;
+        box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
+        padding: 32px;
         .detail-pic {
             width: 130px;
         }
@@ -131,15 +134,17 @@
             height: 160px;
             width: 160px;
         }
+        button {
+            border-radius: 4px;
+            width: 120px;
+            height: 40px;
+        }
         .detail-install {
-            width: 89px;
-            height: 36px;
             background: $primaryColor;
-            border-radius: 2px;
             border: none;
             font-size: 14px;
             color: $white;
-            line-height: 36px;
+            line-height: 40px;
             text-align: center;
             &.opicity-hidden {
                 opacity: 0;
@@ -149,12 +154,9 @@
                 transform: scale(.97)
             }
         }
-        .bk-tooltip button {
-            width: 89px;
-        }
     }
     .detail-info-group {
-        width: 829px;
+        width: 996px;
         margin: 0 76px;
         
         h3 {
@@ -234,8 +236,8 @@
             }
         }
         .detail-info.detail-label {
-            width: 829px;
-            padding-left: 90px;
+            width: 994px;
+            padding-left: 70px;
             display: inline-block;
             position: relative;
             span {

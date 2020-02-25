@@ -70,6 +70,9 @@
                     case 'template':
                         res = bkLocale.$t('store.流水线模板')
                         break
+                    case 'service':
+                        res = bkLocale.$t('store.服务扩展')
+                        break
                     default:
                         res = bkLocale.$t('store.容器镜像')
                         break
@@ -128,7 +131,8 @@
                 const methods = {
                     atom: this.getAtomDetail,
                     template: this.getTemplateDetail,
-                    image: this.getImageDetail
+                    image: this.getImageDetail,
+                    service: this.getServiceDetail
                 }
 
                 return methods[this.type]()
@@ -155,11 +159,19 @@
                 })
             },
 
+            getServiceDetail () {
+                return this.$store.dispatch('store/requestServiceDetailByCode', this.code).then((res) => {
+                    this.name = res.serviceName
+                    this.id = res.serviceId
+                })
+            },
+
             requestRelativeProject () {
                 const methods = {
                     atom: 'store/requestRelativeProject',
                     template: 'store/requestRelativeTplProject',
-                    image: 'store/requestRelativeImageProject'
+                    image: 'store/requestRelativeImageProject',
+                    service: 'store/requestRelativeServiceProject'
                 }
 
                 return this.$store.dispatch(methods[this.type], this.code).then((res) => {
@@ -224,7 +236,8 @@
                 const methods = {
                     atom: this.installAtom,
                     template: this.installTemplate,
-                    image: this.installImage
+                    image: this.installImage,
+                    service: this.installService
                 }
 
                 this.isLoading = true
@@ -279,6 +292,14 @@
                     projectCodeList: this.project
                 }
                 return this.$store.dispatch('store/installImage', params)
+            },
+
+            installService () {
+                const params = {
+                    serviceCode: this.code,
+                    projectCodeList: this.project
+                }
+                return this.$store.dispatch('store/installService', params)
             }
         }
     }

@@ -1,0 +1,308 @@
+<template>
+    <article class="edit-atom-wrapper edit-detail" v-bkloading="{ isLoading }">
+        <section class="inner-header">
+            <div class="title"> {{ $t('store.扩展编辑') }} </div>
+        </section>
+
+        <main class="edit-main">
+            <bk-form ref="editForm" class="edit-service" label-width="125" :model="form">
+                <bk-form-item class="wt660" :label="$t('store.扩展名称')" :required="true" property="serviceName" :rules="[requireRule]" ref="serviceName">
+                    <bk-input v-model="form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
+                </bk-form-item>
+                <bk-form-item class="wt660" :label="$t('store.扩展点')" :required="true" property="extensionItemList" :rules="[requireRule]" ref="extensionItemList">
+                    <bk-select v-model="form.extensionItemList"
+                        :placeholder="$t('store.请选择扩展点')"
+                        multiple
+                        :scroll-height="500"
+                        :clearable="true"
+                        @toggle="getServiceList"
+                        :loading="isServiceListLoading"
+                    >
+                        <bk-option-group
+                            v-for="(group, index) in serviceList"
+                            :name="group.name"
+                            :key="index">
+                            <bk-option v-for="(option, key) in group.children"
+                                :key="key"
+                                :id="option.itemId"
+                                :name="option.itemName"
+                            >
+                            </bk-option>
+                        </bk-option-group>
+                    </bk-select>
+                </bk-form-item>
+                <bk-form-item :label="$t('store.标签')" property="labelIdList" class="wt660">
+                    <bk-tag-input v-model="form.labelIdList" :list="labelList" display-key="labelName" search-key="labelName" trigger="focus" :placeholder="$t('store.请选择标签')"></bk-tag-input>
+                </bk-form-item>
+                <bk-form-item :label="$t('store.简介')" property="summary" :required="true" :rules="[requireRule]" ref="summary">
+                    <bk-input v-model="form.summary" :placeholder="$t('store.请输入简介')"></bk-input>
+                </bk-form-item>
+                <bk-form-item :label="$t('store.描述')" property="description">
+                    <bk-radio-group v-model="form.desType">
+                        <bk-radio value="hand" class="mr21"> {{ $t('store.手动录入') }} </bk-radio>
+                        <bk-radio value="read"> {{ $t('store.fromReadme') }} </bk-radio>
+                    </bk-radio-group>
+                    <mavon-editor class="service-remark-input"
+                        v-if="form.desType === 'hand'"
+                        ref="mdHook"
+                        v-model="form.description"
+                        :toolbars="toolbars"
+                        :external-link="false"
+                        :box-shadow="false"
+                        preview-background="#fff"
+                        @imgAdd="uploadimg"
+                    />
+                </bk-form-item>
+                <div class="version-msg">
+                    <p class="form-title"> {{ $t('store.媒体信息') }} </p>
+                    <hr class="cut-line">
+                </div>
+                <bk-form-item :label="$t('store.截图')">
+                    <bk-upload
+                        :tip="$t('只允许上传JPG、PNG、JPEG的文件，文件最大为2MB')"
+                        :with-credentials="true"
+                        url="/support/api/user/file/upload"
+                        name="file"
+                        :header="{ 'Content-Type': 'multipart/form-data' }"
+                        accept="image/png,image/jpeg,image/jpg"
+                        :handle-res-code="res => res.status === 0"
+                        size="2"
+                        @on-success="(res) => successFileUpload(res, 'PICTURE')"
+                    ></bk-upload>
+                </bk-form-item>
+                <bk-form-item :label="$t('store.视频教程')">
+                    <bk-upload
+                        :tip="$t('只允许上传video的文件，文件最大为500MB')"
+                        :with-credentials="true"
+                        url="/support/api/user/file/upload"
+                        name="file"
+                        :header="{ 'Content-Type': 'multipart/form-data' }"
+                        accept="video/mp4,video/x-m4v,video/*"
+                        :handle-res-code="res => res.status === 0"
+                        size="500"
+                        @on-success="(res) => successFileUpload(res, 'VIDEO')"
+                    ></bk-upload>
+                </bk-form-item>
+                <bk-form-item>
+                    <bk-button theme="primary" @click.native="saveService"> {{ $t('store.保存') }} </bk-button>
+                </bk-form-item>
+                <select-logo ref="selectLogo" label="Logo" :form="form" type="SERVICE" :is-err="logoErr" right="25"></select-logo>
+            </bk-form>
+        </main>
+    </article>
+</template>
+
+<script>
+    import { mapActions } from 'vuex'
+    import { toolbars } from '@/utils/editor-options'
+    import selectLogo from '@/components/common/selectLogo'
+
+    export default {
+        components: {
+            selectLogo
+        },
+
+        data () {
+            return {
+                isLoading: false,
+                form: JSON.parse(JSON.stringify(this.$store.state.store.currentService)),
+                requireRule: {
+                    required: true,
+                    message: this.$t('store.必填项'),
+                    trigger: 'blur'
+                },
+                labelList: [],
+                isServiceListLoading: false,
+                toolbars
+            }
+        },
+
+        created () {
+            this.hackData()
+            this.initData()
+        },
+
+        methods: {
+            ...mapActions('store', [
+                'requestServiceItemList',
+                'requestServiceLabel',
+                'requestUpdateServiceInfo'
+            ]),
+
+            successFileUpload ({ responseData: { data: mediaUrl } }, mediaType) {
+                if (this.form.mediaInfoList) {
+                    this.form.mediaInfoList.push({ mediaUrl, mediaType })
+                } else {
+                    this.form.mediaInfoList = [{ mediaUrl, mediaType }]
+                }
+            },
+
+            hackData () {
+                this.form.labelIdList = (this.form.labelList || []).map(label => label.id)
+                this.form.description = this.form.description || this.$t('store.serviceMdDesc')
+                this.$set(this.form, 'desType', this.form.desType || 'hand')
+            },
+
+            getServiceList (isExpand) {
+                if (!isExpand) return
+                const code = this.form.projectCode
+                this.isServiceListLoading = true
+                this.requestServiceItemList(code).then((res) => {
+                    this.serviceList = (res || []).map((item) => {
+                        const serviceItem = item.serviceItem || {}
+                        return {
+                            name: serviceItem.itemName,
+                            children: item.childItem || []
+                        }
+                    })
+                }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => (this.isServiceListLoading = false))
+            },
+
+            initData () {
+                this.isLoading = true
+                Promise.all([
+                    this.requestServiceLabel()
+                ]).then(([labels]) => {
+                    this.labelList = labels || []
+                }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            saveService () {
+                this.$refs.editForm.validate().then(() => {
+                    if (!this.form.logoUrl) {
+                        this.logoErr = true
+                        const err = { field: 'selectLogo' }
+                        throw err
+                    }
+                    this.isLoading = true
+                    const postData = {
+                        serviceCode: this.form.serviceCode,
+                        data: this.form
+                    }
+                    this.requestUpdateServiceInfo(postData).then(() => {
+                        this.$store.dispatch('store/updateCurrentService', this.form)
+                        this.$bkMessage({ message: this.$t('store.修改成功'), theme: 'success' })
+                        this.$router.push({ name: 'serviceDetail' })
+                    }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
+                        this.isLoading = false
+                    })
+                }).catch((validate) => {
+                    const field = validate.field
+                    const label = this.$refs[field].label
+                    this.$bkMessage({ message: `${label + this.$t('store.是必填项，请填写以后重试')}`, theme: 'error' })
+                })
+            },
+
+            async uploadimg (pos, file) {
+                const formData = new FormData()
+                const config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+                let message, theme
+                formData.append('file', file)
+
+                try {
+                    const res = await this.$store.dispatch('store/uploadFile', {
+                        formData,
+                        config
+                    })
+
+                    this.$refs.mdHook.$img2Url(pos, res)
+                } catch (err) {
+                    message = err.message ? err.message : err
+                    theme = 'error'
+
+                    this.$bkMessage({
+                        message,
+                        theme
+                    })
+                    this.$refs.mdHook.$refs.toolbar_left.$imgDel(pos)
+                }
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    @import './../../assets/scss/conf';
+    .dockerfile {
+        height: 400px;
+        overflow: auto;
+        background: black;
+        /deep/ .CodeMirror {
+            font-family: Consolas, "Courier New", monospace;
+            line-height: 1.5;
+            padding: 10px;
+            height: auto;
+        }
+    }
+
+    .edit-atom-wrapper {
+        height: 100%;
+        overflow: auto;
+        .inner-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px 20px;
+            width: 100%;
+            height: 60px;
+            border-bottom: 1px solid $borderWeightColor;
+            background-color: #fff;
+            box-shadow:0px 2px 5px 0px rgba(51,60,72,0.03);
+            .title {
+                font-size: 16px;
+            }
+        }
+    }
+
+    .h32 {
+        height: 32px;
+    }
+
+    .mt6 {
+        margin-top: 6px;
+    }
+
+    .mr12 {
+        margin-right: 12px;
+    }
+
+    .mr21 {
+        margin-right: 21px;
+    }
+
+    .lh30 {
+        line-height: 30px;
+    }
+
+    .wt660 {
+        width: 660px;
+    }
+
+    .version-msg {
+        margin: 30px 0 20px;
+    }
+
+    .edit-main {
+        height: calc(100% - 60px);
+        overflow: auto;
+    }
+
+    .edit-service {
+        position: relative;
+        width: 1200px;
+        margin: 18px 20px;
+        .service-remark-input {
+            margin-top: 10px;
+            height: 263px;
+            border: 1px solid #c4c6cc;
+            &.fullscreen {
+                height: auto;
+            }
+        }
+    }
+</style>

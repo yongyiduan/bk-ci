@@ -7,7 +7,7 @@
                 <i class="right-arrow banner-arrow"></i>
                 <span class="banner-des">{{filterData.pipeType|pipeTypeFilter}}</span>
             </p>
-            <router-link :to="{ name: 'atomList', params: { type: filterData.pipeType || 'atom' } }" class="title-work"> {{ $t('store.工作台') }} </router-link>
+            <router-link v-if="filterData.pipeType !== 'ide'" :to="{ name: 'atomList', params: { type: filterData.pipeType || 'atom' } }" class="title-work"> {{ $t('store.工作台') }} </router-link>
         </h3>
 
         <main class="store-main" @scroll.passive="mainScroll">
@@ -105,6 +105,9 @@
                     case 'image':
                         res = bkLocale.$t('store.容器镜像')
                         break
+                    case 'service':
+                        res = bkLocale.$t('store.服务扩展')
+                        break
                     default:
                         res = bkLocale.$t('store.流水线插件')
                         break
@@ -142,7 +145,8 @@
                     { type: 'atom', des: this.$t('store.流水线插件') },
                     { type: 'template', des: this.$t('store.流水线模板') },
                     { type: 'ide', des: this.$t('store.IDE插件') },
-                    { type: 'image', des: this.$t('store.容器镜像') }
+                    { type: 'image', des: this.$t('store.容器镜像') },
+                    { type: 'service', des: this.$t('store.服务扩展') }
                 ]
             }
         },
@@ -203,6 +207,9 @@
                 'requestImageClassifys',
                 'requestImageCategorys',
                 'requestImageLabel',
+                'requestServiceClassifys',
+                'requestServiceCategorys',
+                'requestServiceLabel',
                 'setMarketQuery'
             ]),
 
@@ -300,7 +307,8 @@
                     atom: () => this.getAtomClassifys(),
                     template: () => this.getTemplateClassifys(),
                     ide: () => this.getIDEClassifys(),
-                    image: () => this.getImageClassifys()
+                    image: () => this.getImageClassifys(),
+                    service: () => this.getServiceClassifys()
                 }
                 const type = val || 'atom'
                 const method = fun[type]
@@ -362,6 +370,16 @@
                     if (categorys.length > 0) res.push({ name: 'categoryName', key: 'categoryCode', groupName: '按应用范畴', data: categorys })
                     if (classify.length > 0) res.push({ name: 'classifyName', key: 'classifyCode', groupName: '按分类', data: classify })
                     if (lables.length > 0) res.push({ name: 'labelName', key: 'labelCode', groupName: '按功能', data: lables })
+                    return res
+                })
+            },
+
+            getServiceClassifys () {
+                return Promise.all([this.requestServiceCategorys(), this.requestServiceLabel(), this.requestServiceClassifys()]).then(([categorys = [], lables = [], classify = []]) => {
+                    const res = []
+                    if (categorys.length > 0) res.push({ name: 'categoryName', key: 'categoryCode', groupName: this.$t('store.按应用范畴'), data: categorys })
+                    if (classify.length > 0) res.push({ name: 'classifyName', key: 'classifyCode', groupName: this.$t('store.按分类'), data: classify })
+                    if (lables.length > 0) res.push({ name: 'labelName', key: 'labelCode', groupName: this.$t('store.按功能'), data: lables })
                     return res
                 })
             },

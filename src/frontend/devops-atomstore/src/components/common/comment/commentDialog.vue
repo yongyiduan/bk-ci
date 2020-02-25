@@ -36,19 +36,22 @@
                     atom: (data) => this.requestAtomModifyComment(data),
                     template: (data) => this.requestTemplateModifyComment(data),
                     ide: (data) => this.requestIDEModifyComment(data),
-                    image: (data) => this.requestImageModifyComment(data)
+                    image: (data) => this.requestImageModifyComment(data),
+                    service: (data) => this.requestServiceModifyComment(data)
                 },
                 addCommentGenerator: {
                     atom: (postData) => this.requestAddAtomComment(postData),
                     template: (postData) => this.requestAddTemplateComment(postData),
                     ide: (postData) => this.requestAddIDEComment(postData),
-                    image: (postData) => this.requestAddImageComment(postData)
+                    image: (postData) => this.requestAddImageComment(postData),
+                    service: (postData) => this.requestAddServiceComment(postData)
                 },
                 getCommentGenerator: {
                     atom: () => this.requestAtomUserComment(this.commentId),
                     template: () => this.requestTemplateUserComment(this.commentId),
                     ide: () => this.requestIDEUserComment(this.commentId),
-                    image: () => this.requestImageUserComment(this.commentId)
+                    image: () => this.requestImageUserComment(this.commentId),
+                    service: () => this.requestServiceUserComment(this.commentId)
                 }
             }
         },
@@ -76,7 +79,10 @@
                 'requestIDEUserComment',
                 'requestAddImageComment',
                 'requestImageModifyComment',
-                'requestImageUserComment'
+                'requestImageUserComment',
+                'requestAddServiceComment',
+                'requestServiceModifyComment',
+                'requestServiceUserComment'
             ]),
 
             getComment () {
@@ -169,6 +175,7 @@
         right: 0;
         top: 0;
         bottom: 0;
+        z-index: 2;
         background: rgba(0,0,0,0.6);
         .add-main {
             margin: 0 auto;

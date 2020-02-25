@@ -1,0 +1,452 @@
+<template>
+    <main>
+        <div class="content-header">
+            <div class="atom-total-row">
+                <button class="bk-button bk-primary" @click="relateService">
+                    <span style="margin-left: 0;"> {{ $t('store.新增扩展') }} </span>
+                </button>
+            </div>
+            <section :class="[{ 'control-active': isInputFocus }, 'g-input-search', 'list-input']">
+                <input class="g-input-border" type="text" :placeholder="$t('store.请输入关键字搜索')" v-model="searchName" @focus="isInputFocus = true" @blur="isInputFocus = false" @keyup.enter="search" />
+                <i class="bk-icon icon-search" v-if="!searchName"></i>
+                <i class="bk-icon icon-close-circle-shape clear-icon" v-else @click="clearSearch"></i>
+            </section>
+        </div>
+        <bk-table style="margin-top: 15px;" :empty-text="$t('store.暂时没有扩展')"
+            :data="renderList"
+            :pagination="pagination"
+            @page-change="pageChanged"
+            @page-limit-change="pageCountChanged"
+            v-bkloading="{ isLoading }"
+        >
+            <bk-table-column :label="$t('store.扩展名称')">
+                <template slot-scope="props">
+                    <span class="atom-name" :title="props.row.serviceName" @click="goToServiceDetail(props.row.serviceCode)">{{ props.row.serviceName }}</span>
+                </template>
+            </bk-table-column>
+            <bk-table-column :label="$t('store.扩展标识')" prop="serviceCode"></bk-table-column>
+            <bk-table-column :label="$t('store.调试项目')" prop="projectName" width="200"></bk-table-column>
+            <bk-table-column :label="$t('store.扩展类型')" prop="category" width="180" :formatter="categoryFormatter"></bk-table-column>
+            <bk-table-column :label="$t('store.版本')" prop="version" width="180"></bk-table-column>
+            <bk-table-column :label="$t('store.状态')" width="220">
+                <template slot-scope="props">
+                    <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
+                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'BUILD_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.serviceStatus)">
+                        <div class="rotate rotate1"></div>
+                        <div class="rotate rotate2"></div>
+                        <div class="rotate rotate3"></div>
+                        <div class="rotate rotate4"></div>
+                        <div class="rotate rotate5"></div>
+                        <div class="rotate rotate6"></div>
+                        <div class="rotate rotate7"></div>
+                        <div class="rotate rotate8"></div>
+                    </div>
+                    <span class="atom-status-icon success" v-if="props.row.serviceStatus === 'RELEASED'"></span>
+                    <span class="atom-status-icon fail" v-if="props.row.serviceStatus === 'GROUNDING_SUSPENSION'"></span>
+                    <span class="atom-status-icon obtained" v-if="props.row.serviceStatus === 'AUDIT_REJECT' || props.row.serviceStatus === 'UNDERCARRIAGED'"></span>
+                    <span class="atom-status-icon bk-icon icon-initialize" v-if="props.row.serviceStatus === 'INIT'"></span>
+                    <span>{{ $t(serviceStatusList[props.row.serviceStatus]) }}</span>
+                </template>
+            </bk-table-column>
+            <bk-table-column :label="$t('store.修改人')" prop="modifier" width="180"></bk-table-column>
+            <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
+            <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
+                <template slot-scope="props">
+                    <span class="shelf-btn"
+                        v-if="props.row.serviceStatus === 'INIT' || props.row.serviceStatus === 'UNDERCARRIAGED'
+                            || props.row.serviceStatus === 'GROUNDING_SUSPENSION' || props.row.serviceStatus === 'AUDIT_REJECT'"
+                        @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"> {{ $t('store.上架') }} </span>
+                    <span class="shelf-btn"
+                        v-if="props.row.serviceStatus === 'RELEASED'"
+                        @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"> {{ $t('store.升级') }} </span>
+                    <span class="shelf-btn"
+                        v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
+                        @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'atomList' } })"> {{ $t('store.安装') }} </span>
+                    <span class="schedule-btn"
+                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'BUILD_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.serviceStatus)"
+                        @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
+                    <span class="obtained-btn"
+                        v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
+                        @click="offline(props.row)"
+                    > {{ $t('store.下架') }} </span>
+                    <!-- <span @click="deleteService(props.row.serviceCode)" v-if="['INIT', 'GROUNDING_SUSPENSION', 'UNDERCARRIAGED'].includes(props.row.serviceStatus)"> {{ $t('store.删除') }} </span> -->
+                </template>
+            </bk-table-column>
+        </bk-table>
+
+        <bk-sideslider :is-show.sync="relateServiceData.show"
+            :title="relateServiceData.title"
+            :quick-close="relateServiceData.quickClose"
+            :width="relateServiceData.width">
+            <template slot="content">
+                <bk-form ref="relateForm" class="relate-form" label-width="100" :model="relateServiceData.form" v-bkloading="{ isLoading: relateServiceData.isLoading }">
+                    <bk-form-item :label="$t('store.扩展名称')" :required="true" property="serviceName" :desc="$t('store.扩展在研发商店中的别名')" :rules="[requireRule]">
+                        <bk-input v-model="relateServiceData.form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.扩展标识')" :required="true" property="serviceCode" :desc="$t('store.扩展在研发商店中的唯一标识')" :rules="[requireRule, alpRule]">
+                        <bk-input v-model="relateServiceData.form.serviceCode" :placeholder="$t('store.请输入扩展标识')"></bk-input>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.扩展点')" :required="true" property="extensionItemList" :desc="$t('store.服务扩展的具体扩展点')" :rules="[requireRule]">
+                        <bk-select v-model="relateServiceData.form.extensionItemList"
+                            :placeholder="$t('store.请选择扩展点')"
+                            multiple
+                            :scroll-height="500"
+                            :clearable="true"
+                            @toggle="getServiceList"
+                            :loading="isServiceListLoading"
+                        >
+                            <bk-option-group
+                                v-for="(group, index) in serviceList"
+                                :name="group.name"
+                                :key="index">
+                                <bk-option v-for="(option, key) in group.children"
+                                    :key="key"
+                                    :id="option.itemId"
+                                    :name="option.itemName"
+                                >
+                                </bk-option>
+                            </bk-option-group>
+                        </bk-select>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在发布过程中，可以在该项目下调试扩展')" :rules="[requireRule]">
+                        <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
+                            <bk-option v-for="option in projectList"
+                                :key="option.project_code"
+                                :id="option.project_code"
+                                :name="option.project_name">
+                            </bk-option>
+                            <a href="/console/pm" slot="extension" target="_blank"> {{ $t('store.新增项目') }} </a>
+                        </bk-select>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.开发语言')" :required="true" property="language" :rules="[requireRule]">
+                        <bk-select v-model="relateServiceData.form.language" searchable @toggle="getServiceLanguage" :loading="isItemLoading">
+                            <bk-option v-for="option in languageList"
+                                :key="option"
+                                :id="option"
+                                :name="option">
+                            </bk-option>
+                        </bk-select>
+                    </bk-form-item>
+                    <bk-form-item>
+                        <bk-button theme="primary" @click.native="submitAddService"> {{ $t('store.提交') }} </bk-button>
+                        <bk-button @click.native="cancelRelateService"> {{ $t('store.取消') }} </bk-button>
+                    </bk-form-item>
+                </bk-form>
+            </template>
+        </bk-sideslider>
+
+        <bk-sideslider :is-show.sync="offlineServiceData.show"
+            :title="offlineServiceData.title"
+            :quick-close="offlineServiceData.quickClose"
+            :width="offlineServiceData.width">
+            <template slot="content">
+                <bk-form ref="offlineForm" class="relate-form" label-width="100" :model="offlineServiceData.form" v-bkloading="{ isLoading: offlineServiceData.isLoading }">
+                    <bk-form-item :label="$t('store.扩展名称')" property="serviceName">
+                        <span class="lh30">{{offlineServiceData.form.serviceName}}</span>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.扩展标识')" property="serviceCode">
+                        <span class="lh30">{{offlineServiceData.form.serviceCode}}</span>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.扩展版本')" property="version">
+                        <bk-select v-model="offlineServiceData.form.version" searchable :placeholder="$t('store.请选择扩展版本')">
+                            <bk-option v-for="option in offlineServiceData.versionList"
+                                :key="option.version"
+                                :id="option.version"
+                                :name="option.version">
+                            </bk-option>
+                        </bk-select>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.下架原因')" :required="true" property="reason" :rules="[requireRule]">
+                        <bk-input type="textarea" v-model="offlineServiceData.form.reason" :placeholder="$t('store.请输入下架原因')"></bk-input>
+                    </bk-form-item>
+                    <bk-form-item>
+                        <bk-button theme="primary" @click.native="submitOfflineService"> {{ $t('store.提交') }} </bk-button>
+                        <bk-button @click.native="cancelOfflineService"> {{ $t('store.取消') }} </bk-button>
+                    </bk-form-item>
+                </bk-form>
+            </template>
+        </bk-sideslider>
+    </main>
+</template>
+
+<script>
+    import { atomStatusMap } from '@/store/constants'
+
+    export default {
+        data () {
+            return {
+                serviceStatusList: atomStatusMap,
+                searchName: '',
+                isLoading: false,
+                renderList: [],
+                projectList: [],
+                serviceList: [],
+                languageList: [],
+                isItemLoading: false,
+                isServiceListLoading: false,
+                pagination: {
+                    current: 1,
+                    count: 1,
+                    limit: 10
+                },
+                relateServiceData: {
+                    title: this.$t('store.新增服务扩展'),
+                    quickClose: true,
+                    width: 565,
+                    isLoading: false,
+                    show: false,
+                    isLoadingTicketList: false,
+                    form: {
+                        serviceCode: '',
+                        projectCode: '',
+                        serviceName: '',
+                        extensionItemList: [],
+                        language: ''
+                    }
+                },
+                offlineServiceData: {
+                    title: this.$t('store.下架扩展'),
+                    quickClose: true,
+                    width: 565,
+                    isLoading: false,
+                    show: false,
+                    versionList: [],
+                    form: {
+                        serviceName: '',
+                        serviceCode: '',
+                        version: '',
+                        reason: ''
+                    }
+                },
+                requireRule: {
+                    required: true,
+                    message: this.$t('store.必填项'),
+                    trigger: 'blur'
+                },
+                alpRule: {
+                    validator: (val) => (/^[a-zA-Z0-9-_]+$/.test(val)),
+                    message: this.$t('store.标识需要是大小写字母、数字、中划线或下划线'),
+                    trigger: 'blur'
+                }
+            }
+        },
+
+        created () {
+            this.requestList()
+            this.getProjectList()
+        },
+
+        methods: {
+            search () {
+                this.pagination.current = 1
+                this.requestList()
+            },
+
+            getServiceLanguage (isOpen) {
+                if (!isOpen) return
+
+                this.isItemLoading = true
+                this.$store.dispatch('store/requestServiceLanguage').then((res) => {
+                    this.languageList = res || []
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => (this.isItemLoading = false))
+            },
+
+            getServiceList (isOpen) {
+                if (!isOpen) return
+
+                this.isServiceListLoading = true
+                this.$store.dispatch('store/requestServiceItemList').then((res) => {
+                    this.serviceList = (res || []).map((item) => {
+                        const serviceItem = item.serviceItem || {}
+                        return {
+                            name: serviceItem.itemName,
+                            children: item.childItem || []
+                        }
+                    })
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => (this.isServiceListLoading = false))
+            },
+
+            categoryFormatter (row, column, cellValue, index) {
+                let res = this.$t('store.触发器类扩展服务')
+                switch (cellValue) {
+                    case 'TRIGGER':
+                        res = this.$t('store.触发器类扩展服务')
+                        break
+                    case 'TASK':
+                        res = this.$t('store.任务类扩展服务')
+                        break
+                }
+                return res
+            },
+
+            submitOfflineService (row) {
+                this.$refs.offlineForm.validate().then(() => {
+                    const postData = {
+                        serviceCode: this.offlineServiceData.form.serviceCode,
+                        params: {
+                            version: this.offlineServiceData.form.version,
+                            reason: this.offlineServiceData.form.reason
+                        }
+                    }
+                    this.offlineServiceData.isLoading = true
+                    this.$store.dispatch('store/requestOfflineService', postData).then((res) => {
+                        this.cancelOfflineService()
+                        this.requestList()
+                    }).catch((err) => {
+                        this.$bkMessage({ message: err.message || err, theme: 'error' })
+                    }).finally(() => (this.offlineServiceData.isLoading = false))
+                }).catch(() => this.$bkMessage({ message: this.$t('store.校验失败，请修改再试'), theme: 'error' }))
+            },
+
+            goToServiceDetail (serviceCode) {
+                this.$router.push({
+                    name: 'serviceOverview',
+                    params: {
+                        serviceCode
+                    }
+                })
+            },
+
+            cancelOfflineService () {
+                this.offlineServiceData.show = false
+                this.offlineServiceData.form.serviceName = ''
+                this.offlineServiceData.form.serviceCode = ''
+                this.offlineServiceData.form.version = ''
+            },
+
+            offline (row) {
+                this.offlineServiceData.show = true
+                this.offlineServiceData.form.serviceName = row.serviceName
+                this.offlineServiceData.form.serviceCode = row.serviceCode
+                this.offlineServiceData.form.version = row.version
+                this.offlineServiceData.isLoading = true
+
+                const postData = {
+                    serviceCode: row.serviceCode,
+                    page: 1,
+                    pageSize: 1000
+                }
+                this.offlineServiceData.isLoading = true
+                this.$store.dispatch('store/requestServiceVersionList', postData).then((res) => {
+                    this.offlineServiceData.versionList = res.records || []
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => (this.offlineServiceData.isLoading = false))
+            },
+
+            deleteService (serviceCode) {
+                const confirmFn = () => {
+                    this.isLoading = true
+                    this.$store.dispatch('store/requestDelService', serviceCode).then((res) => {
+                        this.requestList()
+                    }).catch((err) => {
+                        this.$bkMessage({ message: err.message || err, theme: 'error' })
+                    }).finally(() => (this.isLoading = false))
+                }
+                this.$bkInfo({
+                    title: this.$t('store.确认要删除？'),
+                    confirmFn
+                })
+            },
+
+            submitAddService () {
+                this.$refs.relateForm.validate((val) => {
+                    if (val) {
+                        this.relateServiceData.isLoading = true
+                        this.$store.dispatch('store/requestAddService', this.relateServiceData.form).then(() => {
+                            this.cancelRelateService()
+                            this.requestList()
+                        }).catch((err) => {
+                            this.$bkMessage({ message: err.message || err, theme: 'error' })
+                        }).finally(() => (this.relateServiceData.isLoading = false))
+                    }
+                }).catch(() => {
+                    this.$bkMessage({ message: this.$t('store.校验不通过，请修改后再试'), theme: 'error' })
+                })
+            },
+
+            cancelRelateService () {
+                this.relateServiceData.show = false
+                this.relateServiceData.form = {
+                    serviceCode: '',
+                    projectCode: '',
+                    serviceName: '',
+                    extensionItemList: [],
+                    language: ''
+                }
+            },
+
+            getProjectList () {
+                this.$store.dispatch('store/requestProjectList').then((res) => {
+                    this.projectList = res
+                }).catch(() => {
+                    this.projectList = []
+                })
+            },
+
+            requestList () {
+                this.isLoading = true
+                this.$store.dispatch('store/requestDeskServiceList', { serviceName: this.searchName, page: this.pagination.current, pageSize: this.pagination.limit }).then((res) => {
+                    this.renderList = res.records || []
+                    this.pagination.count = res.count
+                }).catch((err) => {
+                    this.renderList = []
+                    this.pagination.count = 0
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => (this.isLoading = false))
+            },
+
+            pageCountChanged (currentLimit, prevLimit) {
+                if (currentLimit === this.pagination.limit) return
+
+                this.pagination.current = 1
+                this.pagination.limit = currentLimit
+                this.requestList()
+            },
+
+            pageChanged (page) {
+                this.pagination.current = page
+                this.requestList()
+            },
+
+            clearSearch () {
+                this.searchName = ''
+                this.requestList()
+            },
+
+            relateService () {
+                this.relateServiceData.show = true
+            },
+
+            timeFormatter (row, column, cellValue, index) {
+                const date = new Date(cellValue)
+                const year = date.toISOString().slice(0, 10)
+                const time = date.toTimeString().split(' ')[0]
+                return `${year} ${time}`
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    .relate-form {
+        margin: 30px 20px;
+        min-height: 700px;
+    }
+    .h32 {
+        height: 32px;
+    }
+    .mt6 {
+        margin-top: 6px;
+    }
+    .mr12 {
+        margin-right: 12px;
+    }
+    .lh30 {
+        line-height: 30px;
+    }
+</style>

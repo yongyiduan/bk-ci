@@ -45,7 +45,7 @@
 
         watch: {
             reply (val) {
-                const reg = this.replyToUser ? new RegExp(`^回复@${this.replyToUser}：`) : /^/
+                const reg = this.replyToUser ? new RegExp(`^${this.$t('store.回复')}@${this.replyToUser}：`) : /^/
                 const isMatchUser = reg.test(val)
                 if (!isMatchUser) this.replyToUser = ''
             }
@@ -57,13 +57,14 @@
                 'requestTemplateReplyComment',
                 'requestIDEReplyComment',
                 'requestImageReplyComment',
+                'requestServiceReplyComment',
                 'setCommentReplay',
                 'clearCommentReply'
             ]),
 
             replyComment (user) {
-                const reg = this.replyToUser ? new RegExp(`^回复@${this.replyToUser}：`) : /^/
-                const replaceStr = user ? `${this.$t('store.回复@')}${user}：` : ''
+                const reg = this.replyToUser ? new RegExp(`^${this.$t('store.回复')}@${this.replyToUser}：`) : /^/
+                const replaceStr = user ? `${this.$t('store.回复')}@${user}：` : ''
 
                 this.replyToUser = user
                 this.reply = this.reply.replace(reg, replaceStr)
@@ -97,7 +98,8 @@
                     atom: () => this.requestAtomReplyComment({ id, postData }),
                     template: () => this.requestTemplateReplyComment({ id, postData }),
                     ide: () => this.requestIDEReplyComment({ id, postData }),
-                    image: () => this.requestImageReplyComment({ id, postData })
+                    image: () => this.requestImageReplyComment({ id, postData }),
+                    service: () => this.requestServiceReplyComment({ id, postData })
                 }
 
                 funObj[type]().then((res) => {
@@ -116,10 +118,10 @@
         margin: 8px 0;
         .reply-content {
             resize: none;
-            width: 1050px;
+            width: 1319px;
             height: 56px;
             padding: 5px 5px;
-            margin-left: 59px;
+            margin-left: 77px;
             &:focus {
                 border: 1px solid $primaryColor;
                 outline: none;
@@ -129,8 +131,8 @@
             border: none;
             background: none;
             padding-right: 0;
-            width: 1050px;
-            margin-left: 59px;
+            width: 1319px;
+            margin-left: 77px;
             button {
                 margin: 10px 5px;
                 height: 28px;

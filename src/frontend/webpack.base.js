@@ -18,7 +18,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
         devtool: '#source-map',
         entry,
         output: {
-            publicPath,
+            publicPath: 'http://v2.dev.static.devops.oa.com' + publicPath,
             chunkFilename: '[name].[chunkhash].js',
             filename: isMaster ? '[name].[contentHash].min.js' : '[name].js',
             path: buildDist
