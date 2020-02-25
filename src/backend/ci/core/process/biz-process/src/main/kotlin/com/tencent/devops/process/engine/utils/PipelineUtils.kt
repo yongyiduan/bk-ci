@@ -24,13 +24,37 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.environment.pojo.thirdPartyAgent
+package com.tencent.devops.process.engine.utils
 
-data class HeartbeatResponse(
-    val masterVersion: String,
-    val slaveVersion: String,
-    val AgentStatus: String,
-    val ParallelTaskCount: Int,
-    val envs: Map<String, String>,
-    val gateway: String? = ""
-)
+import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.exception.OperationException
+import com.tencent.devops.common.pipeline.pojo.BuildFormProperty
+import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.process.constant.ProcessMessageCode
+import org.slf4j.LoggerFactory
+import java.util.regex.Pattern
+
+object PipelineUtils {
+
+    private val logger = LoggerFactory.getLogger(PipelineUtils::class.java)
+
+    private const val ENGLISH_NAME_PATTERN = "[A-Za-z_0-9]+"
+
+    fun checkPipelineName(name: String) {
+        if (name.toCharArray().size > 64) {
+            throw ErrorCodeException(
+                errorCode = ProcessMessageCode.ERROR_PIPELINE_NAME_TOO_LONG,
+                defaultMessage = "Pipeline's name is too long"
+            )
+        }
+    }
+
+    fun checkPipelineParams(params: List<BuildFormProperty>) {
+        params.forEach {
+            if (!Pattern.matches(ENGLISH_NAME_PATTERN, it.id)) {
+                logger.warn("Pipeline's start params Name is iregular")
+                throw OperationException(MessageCodeUtil.getCodeLanMessage(ProcessMessageCode.ERROR_PIPELINE_PARAMS_NAME_ERROR))
+            }
+        }
+    }
+}
