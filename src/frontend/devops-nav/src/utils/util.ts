@@ -175,20 +175,12 @@ export function getServiceAliasByPath (path: string): string {
 //     }
 // }
 
-export function createDialog (options) {
-    console.log(options)
-    // const fn = createComponent('dialog')
-    // fn({
-    //     propsData: {
-    //         quickClose: false
-    //     },
-    //     data: {
-
-    //     },
-    //     methods: {
-
-    //     }
-    // })
+export function toggleDialog (options) {
+    if (!isObject(options)) {
+        console.warn('需要传入一个对象')
+        return
+    }
+    eventBus.$emit('update-extension-dialog', options)
 }
 export function toggleAsidePanel (options) {
     if (!isObject(options)) {

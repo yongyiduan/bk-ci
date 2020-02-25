@@ -72,6 +72,7 @@
         <login-dialog v-if="showLoginDialog" />
         <ask-permission-dialog />
         <extension-aside-panel />
+        <extension-dialog />
     </div>
 </template>
 
@@ -80,6 +81,7 @@
     import Header from '../components/Header/index.vue'
     import AskPermissionDialog from '../components/AskPermissionDialog/AskPermissionDialog.vue'
     import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
+    import ExtensionDialog from '../components/ExtensionDialog/index.vue'
     import LoginDialog from '../components/LoginDialog/index.vue'
     import { Component, Watch } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
@@ -97,7 +99,8 @@
             Header,
             LoginDialog,
             AskPermissionDialog,
-            ExtensionAsidePanel
+            ExtensionAsidePanel,
+            ExtensionDialog
         }
     })
     export default class Index extends Vue {

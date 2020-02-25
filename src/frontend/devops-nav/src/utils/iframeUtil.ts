@@ -1,5 +1,5 @@
 import eventBus from './eventBus'
-import { toggleAsidePanel } from './util'
+import { toggleAsidePanel, toggleDialog } from './util'
 
 interface UrlParam {
     url: string
@@ -37,9 +37,19 @@ function iframeUtil (router: any) {
                     customData: hook.target.data,
                     show: true
                 })
-                break;
+                break
+            case 'dialog':
+                toggleDialog({
+                    src: hook.url,
+                    header: hook.name.value,
+                    options: hook.target.options,
+                    customData: hook.target.data,
+                    show: true
+                })
+                break
         }
-    } 
+    }
+
     utilMap.closeAsidePanel = function (params) {
         toggleAsidePanel({
             ...params,
@@ -47,6 +57,12 @@ function iframeUtil (router: any) {
         })
     }
 
+    utilMap.closeDialog = function (params) {
+        toggleDialog({
+            ...params,
+            show: false
+        })
+    }
 
     utilMap.syncUrl = function ({ url, refresh = false }: UrlParam): void {
         const pathname = `${location.pathname.replace(/^\/(\w+)\/(\w+)\/(\S+)$/, '/$1/$2')}${url}`

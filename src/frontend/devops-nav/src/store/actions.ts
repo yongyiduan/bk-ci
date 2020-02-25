@@ -52,12 +52,13 @@ const actions: ActionTree<RootState, any> = {
                         "ARTIFACTORY_OPERATION": [
                             {
                                 "weight": 200,
-                                "url": "http://localhost:8081/helloworld.html",
-                                "context": "addon",
+                                "url": "http://localhost:8081",
                                 "target": {
-                                    "type": "asidePanel",
+                                    "type": "dialog",
                                     "options": {
-                                      "width": 800
+                                      "width": 600,
+                                      "maskClose": true,
+                                      "height": 400
                                     },
                                     "data": {
                                         "demo": "hello"
