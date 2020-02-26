@@ -368,7 +368,7 @@
     }
 
     .summary-empty {
-        margin-top: 130px;
+        margin-top: 50px;
     }
 
     .detail-tab {
@@ -399,7 +399,7 @@
     }
     
     .comment-empty {
-        margin-top: 70px;
+        margin-top: 50px;
     }
 
     .rate-group {
