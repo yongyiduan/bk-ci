@@ -69,6 +69,9 @@
             },
             templateCode () {
                 return this.$route.params.templateCode
+            },
+            imageCode () {
+                return this.$route.params.imageCode
             }
         },
         watch: {
@@ -155,8 +158,10 @@
 
                     if (this.routeName === 'visible') {
                         params.atomCode = this.atomCode
-                    } else {
+                    } else if (this.routeName === 'tplVisible') {
                         params.templateCode = this.templateCode
+                    } else {
+                        params.imageCode = this.imageCode
                     }
 
                     this.organizationConf.isLoading = true
@@ -164,8 +169,10 @@
                     try {
                         if (this.routeName === 'visible') {
                             await this.$store.dispatch('store/setVisableDept', { params })
-                        } else {
+                        } else if (this.routeName === 'tplVisible') {
                             await this.$store.dispatch('store/setTplVisableDept', { params })
+                        } else {
+                            await this.$store.dispatch('store/setImageVisableDept', { params })
                         }
 
                         message = this.$t('store.保存成功')
