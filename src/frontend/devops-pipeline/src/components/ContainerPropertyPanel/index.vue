@@ -656,19 +656,12 @@
                             }
                         }
                     } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
-                        const res = await this.startDebugDevcloud({
-                            pipelineId: this.pipelineId,
-                            vmSeqId,
-                            buildId: this.buildId
-                        })
-                        console.log(res, 7)
-                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?`
+                        const buildIdStr = this.buildId ? `&buildId=${this.buildId}` : ''
+                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
-                    // console.log(url)
                     tab.location = url
                 } catch (err) {
-                    // tab.close()
-                    console.log(err)
+                    tab.close()
                     if (err.code === 403) {
                         this.$showAskPermissionDialog({
                             noPermissionList: [{

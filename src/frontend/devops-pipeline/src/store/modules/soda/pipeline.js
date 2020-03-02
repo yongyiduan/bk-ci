@@ -318,7 +318,12 @@ export const actions = {
     },
     startDebugDevcloud: async ({ commit }, data) => {
         const buildIdQuery = data.buildId ? `?buildId=${data.buildId}` : ''
-        return request.post(`dispatch-devcloud/api/user/dispatchDevcloud/startDebug/pipeline/${data.pipelineId}/vmSeq/${data.vmSeqId}${buildIdQuery}`, data).then(response => {
+        return request.post(`dispatch-devcloud/api/user/dispatchDevcloud/startDebug/pipeline/${data.pipelineId}/vmSeq/${data.vmSeqId}${buildIdQuery}`, {}).then(response => {
+            return response.data
+        })
+    },
+    stopDebugDevcloud: async ({ commit }, data) => {
+        return request.post(`dispatch-devcloud/api/user/dispatchDevcloud/stopDebug/pipeline/${data.pipelineId}/vmSeq/${data.vmSeqId}?containerName=${data.containerName}`, {}).then(response => {
             return response.data
         })
     },

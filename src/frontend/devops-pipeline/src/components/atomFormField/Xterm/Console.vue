@@ -80,7 +80,7 @@
             },
             handleResize (size) {
                 this.$nextTick(() => {
-                    this.$store.dispatch('soda/resizeTerm', {
+                    this.resizeUrl && this.$store.dispatch('soda/resizeTerm', {
                         resizeUrl: this.resizeUrl,
                         params: {
                             exec_id: this.execId,
@@ -90,13 +90,6 @@
                     })
                 })
             }
-            // heartCheck () {
-            //     clearTimeout(this.heartTimer)
-            //     this.heartTimer = setTimeout(() => {
-            //         this.terminalSocket.send('\n')
-            //         console.log('sendping')
-            //     }, 10000)
-            // }
         }
     }
 </script>
