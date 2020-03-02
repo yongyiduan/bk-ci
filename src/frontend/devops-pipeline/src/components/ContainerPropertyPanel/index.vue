@@ -1,9 +1,9 @@
 <template>
     <bk-sideslider class="sodaci-property-panel" width="640" :is-show.sync="visible" :quick-close="true">
         <header class="container-panel-header" slot="header">
-            {{ title }}
+            {{ title }}333
             <div v-if="showDebugDockerBtn" :class="!editable ? 'control-bar' : 'debug-btn'">
-                <bk-button theme="warning" @click="startDebug('docker')">{{ $t('editPage.docker.debugConsole') }}</bk-button>
+                <bk-button theme="warning" @click="startDebug">{{ $t('editPage.docker.debugConsole') }}</bk-button>
             </div>
         </header>
         <section v-if="container" slot="content" :class="{ &quot;readonly&quot;: !editable }" class="container-property-panel bk-form bk-form-vertical">
@@ -269,9 +269,6 @@
             ...mapState('atom', [
                 'isPropertyPanelVisible'
             ]),
-            ...mapState('soda', [
-                'tstackWhiteList'
-            ]),
             visible: {
                 get () {
                     return this.isPropertyPanelVisible
@@ -383,7 +380,7 @@
                 return Object.keys(apps).filter(app => !selectedApps.includes(app))
             },
             showDebugDockerBtn () {
-                return this.routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && this.isDocker && this.buildResource && (this.routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (this.routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
+                return this.routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && (this.routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (this.routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
             },
             imageCredentialOption () {
                 return {
@@ -467,7 +464,7 @@
             ...mapActions('soda', [
                 'startDebugDocker',
                 'getContainerInfoByBuildId',
-                'startDebugTstack'
+                'startDebugDevcloud'
             ]),
             ...mapActions('pipelines', [
                 'requestImageVersionlist',
@@ -625,12 +622,12 @@
                     ...buildEnv
                 })
             },
-            async startDebug (type) {
+            async startDebug () {
                 const vmSeqId = this.getRealSeqId()
                 let url = ''
                 const tab = window.open('about:blank')
                 try {
-                    if (type === 'docker') {
+                    if (this.buildResourceType === 'DOCKER') {
                         // docker 分根据buildId获取容器信息和新启动一个容器
                         if (this.routeName === 'pipelinesDetail' && this.container.status === 'RUNNING') {
                             const res = await this.getContainerInfoByBuildId({
@@ -658,10 +655,20 @@
                                 url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}`
                             }
                         }
+                    } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
+                        const res = await this.startDebugDevcloud({
+                            pipelineId: this.pipelineId,
+                            vmSeqId,
+                            buildId: this.buildId
+                        })
+                        console.log(res, 7)
+                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?`
                     }
+                    // console.log(url)
                     tab.location = url
                 } catch (err) {
-                    tab.close()
+                    // tab.close()
+                    console.log(err)
                     if (err.code === 403) {
                         this.$showAskPermissionDialog({
                             noPermissionList: [{

@@ -68,13 +68,14 @@
             }
         },
         async created () {
-            if (this.targetIp && this.pipelineId && this.containerId) {
-                this.isRunning = true
-                this.getLinkDetail(this.containerId, this.targetIp)
-                // this.url = `ws://${PROXY_URL_PREFIX}/docker-console?pipelineId=${this.pipelineId}&containerId=${this.containerId}&projectId=${this.projectId}&targetIP=${this.targetIp}`
-            } else {
-                await this.getContainerInfo()
-            }
+            // if (this.targetIp && this.pipelineId && this.containerId) {
+            //     this.isRunning = true
+            //     this.getLinkDetail(this.containerId, this.targetIp)
+            //     // this.url = `ws://${PROXY_URL_PREFIX}/docker-console?pipelineId=${this.pipelineId}&containerId=${this.containerId}&projectId=${this.projectId}&targetIP=${this.targetIp}`
+            // } else {
+            //     await this.getContainerInfo()
+            // }
+            this.url = 'ws://9.134.142.7/containers/terlinhe1581908760590/cf884515-b2c9-4ec7-bc8d-3d13cb4c2320/terminal'
         },
         mounted () {
             this.addLeaveListenr()
