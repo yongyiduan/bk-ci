@@ -216,7 +216,7 @@
                         }
                     } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
                         const buildIdStr = buildId ? `&buildId=${buildId}` : ''
-                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
+                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
                     tab.location = url
                 } catch (err) {
