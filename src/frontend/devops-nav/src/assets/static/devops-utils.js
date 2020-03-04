@@ -39,7 +39,7 @@ const devopsUtil = {};
     const SHOW_TIPS = 'showTips'
     const BACK_HOME = 'backHome'
     const HOOK_TRIGGER = 'hookTrigger'
-    const SYNC_EXTENSIONS = 'syncExtensions'
+    const SYNC_SERVICE_HOOKS = 'syncServiceHooks'
 
     function init () {
         if (win.addEventListener) {
@@ -271,8 +271,8 @@ const devopsUtil = {};
      * 同步扩展信息
      * @method syncExtensions
      */
-    exports[SYNC_EXTENSIONS] = function (extensions) {
-        triggerEvent('order::' + SYNC_EXTENSIONS, extensions)
+    exports[SYNC_SERVICE_HOOKS] = function (hooks) {
+        triggerEvent('order::' + SYNC_SERVICE_HOOKS, hooks)
     }
 
     

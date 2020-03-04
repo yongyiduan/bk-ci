@@ -24,16 +24,24 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ajax from '../utils/ajax'
+import request from '@/utils/request'
 import pipelines from './modules/pipelines/'
 import soda from './modules/soda/'
 import atom from './modules/atom'
 
 import {
     FETCH_ERROR,
-    SET_EXTENSION
+    SET_SERVICE_HOOKS
 } from './constants'
-import { ARTIFACTORY_OPERATION } from '../utils/extensionHooks'
+import { ARTIFACT_HOOK_CONST } from '../utils/extensionHooks'
 Vue.use(Vuex)
+
+function getHookByHTMLPath (htmlPath) {
+    return state => {
+        const { hooks } = state
+        return hooks.filter(hook => hook.htmlPath === htmlPath)
+    }
+}
 
 export default new Vuex.Store({
     // 模块
@@ -53,13 +61,13 @@ export default new Vuex.Store({
 
         cancelTokenMap: {},
 
-        extensions: []
+        hooks: []
     },
     // 公共 mutations
     mutations: {
-        [SET_EXTENSION]: (state, extensions) => {
+        [SET_SERVICE_HOOKS]: (state, hooks) => {
             Object.assign(state, {
-                extensions
+                hooks
             })
         },
         /**
@@ -86,9 +94,12 @@ export default new Vuex.Store({
     },
     // 公共 actions
     actions: {
-        setExtensions: ({ commit }, extensions) => {
-            console.log(extensions)
-            commit(SET_EXTENSION, extensions)
+        setServiceHooks: ({ commit }, hooks) => {
+            console.log(hooks)
+            commit(SET_SERVICE_HOOKS, hooks)
+        },
+        fetchExtensionByHookId: ({ commit }, { projectCode, itemIds }) => {
+            return request.get(`${AJAX_URL_PIRFIX}/store/api/user/ext/services/items/projects/${projectCode}/list?itemIds=${itemIds}`)
         },
         requestProjectDetail: async ({ commit }, { projectId }) => {
             return ajax.get(AJAX_URL_PIRFIX + `/project/api/user/projects/${projectId}/`).then(response => {
@@ -105,30 +116,15 @@ export default new Vuex.Store({
     },
     // 公共 getters
     getters: {
-        extensionKeyMap (state) {
-            if (Array.isArray(state.extensions)) {
-                return state.extensions.reduce((acc, extension) => {
-                    acc[extension.key] = extension
+        hookKeyMap (state) {
+            if (Array.isArray(state.hooks)) {
+                return state.hooks.reduce((acc, hook) => {
+                    acc[hook.itemCode] = hook
                     return acc
                 }, {})
             }
             return null
         },
-        artifactExtensions (state) {
-            const { extensions } = state
-            return extensions.reduce((acc, extension) => {
-                if (Array.isArray(extension.modules[ARTIFACTORY_OPERATION])) {
-                    acc = [
-                        ...acc,
-                        ...extension.modules[ARTIFACTORY_OPERATION].map(mod => ({
-                            ...mod,
-                            appKey: extension.key
-                        }))
-                    ]
-                }
-                return acc
-            }, [])
-            // ARTIFACTORY_OPERATION
-        }
+        artifactHooks: getHookByHTMLPath(ARTIFACT_HOOK_CONST)
     }
 })

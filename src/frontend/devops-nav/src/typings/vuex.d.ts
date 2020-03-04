@@ -16,7 +16,7 @@ interface RootState {
     headerConfig: object
     moduleLoading: boolean
     isPermissionDialogShow: boolean
-    extensionMap: any
+    hookMap: any
 }
 
 interface Link {

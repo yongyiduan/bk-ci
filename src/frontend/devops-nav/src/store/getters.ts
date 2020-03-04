@@ -30,8 +30,8 @@ const getters: GetterTree<RootState, any> = {
         return state.projectList.filter((project: ObjectMap) => project.approvalStatus === 1)
     },
 
-    getServiceExtensions: (state: RootState) => (projectCode, serviceId): any[] => {
-        return state.extensionMap[`${projectCode}-${serviceId}`]
+    getServiceHooks: (state: RootState) => (serviceId): any[] => {
+        return state.hookMap[serviceId]
     }
     
 }

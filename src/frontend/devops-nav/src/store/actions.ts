@@ -14,7 +14,7 @@ import {
     PROCESS_API_URL_PREFIX,
     PROJECT_API_URL_PREFIX,
     SUPPORT_API_URL_PREFIX,
-    STORE_API_URL_PREFIX,
+    // STORE_API_URL_PREFIX,
     EMPTY_PROJECT,
     RESET_NEW_PROJECT,
     SET_POPUP_SHOW,
@@ -23,21 +23,35 @@ import {
     TOGGLE_MODULE_LOADING,
     UPDATE_CURRENT_PAGE,
     SET_SERVICES,
-    SET_SERVICE_EXTENSIONS,
+    SET_SERVICE_HOOKS,
     TOGGLE_PERMISSION_DIALOG
 } from './constants'
 
 const actions: ActionTree<RootState, any> = {
-    async getServiceExtensions ({ commit }: ActionContext<RootState, any>, { serviceId, projectCode }: any) {
+    async fetchServiceHooks ({ commit }: ActionContext<RootState, any>, { serviceId }: any) {
         try {
-            const extensions = await Request.get(`${STORE_API_URL_PREFIX}/user/market/extension/items/list/projectCode=${projectCode}&serviceId=${serviceId}`)
-            console.log(extensions)
-            commit(SET_SERVICE_EXTENSIONS, {
-                extensions,
-                serviceId,
-                projectCode
+            const extHooks = await Request.get(`${PROJECT_API_URL_PREFIX}/user/ext/items/list?serviceId=${serviceId}`)
+            console.log(extHooks)
+            commit(SET_SERVICE_HOOKS, {
+                extHooks: [{
+                    "itemName": "归档构件",
+                    "htmlPath": "PIPELINE.BUILD.ARTIFACTS",
+                    "htmlComponentType": "SIMPLE",
+                    "itemId": 5,
+                    "itemCode": "buildArtifact"
+                }],
+                serviceId
             })
         } catch (error) {
+<<<<<<< HEAD
+            commit(SET_SERVICE_HOOKS, {
+                extHooks: [{
+                    "itemName": "归档构件",
+                    "htmlPath": "PIPELINE.BUILD.ARTIFACTS",
+                    "htmlComponentType": "SIMPLE",
+                    "itemId": 5,
+                    "itemCode": "buildArtifact"
+=======
             commit(SET_SERVICE_EXTENSIONS, {
                 extensions: [{
                     "name": "Hello World",
@@ -52,13 +66,12 @@ const actions: ActionTree<RootState, any> = {
                         "ARTIFACTORY_OPERATION": [
                             {
                                 "weight": 200,
-                                "url": "http://localhost:8081",
+                                "url": "http://localhost:8081/helloworld.html",
+                                "context": "addon",
                                 "target": {
-                                    "type": "dialog",
+                                    "type": "asidePanel",
                                     "options": {
-                                      "width": 600,
-                                      "maskClose": true,
-                                      "height": 400
+                                      "width": 800
                                     },
                                     "data": {
                                         "demo": "hello"
@@ -79,9 +92,9 @@ const actions: ActionTree<RootState, any> = {
                             }
                         ]
                     }
+>>>>>>> parent of 82b7baff8... add extension dialog
                 }],
-                serviceId,
-                projectCode
+                serviceId
             })
         }
     },

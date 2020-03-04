@@ -53,7 +53,7 @@
         @State isShowPreviewTips
         @State user
         @State headerConfig
-        @Getter getServiceExtensions
+        @Getter getServiceHooks
 
         created () {
             this.init()
@@ -115,8 +115,8 @@
             }))
         }
 
-        get extensions (): any[] {
-            return this.getServiceExtensions(this.$route.params.projectId, this.currentPage.id)
+        get serviceHooks (): any[] {
+            return this.getServiceHooks(this.currentPage.id)
         }
 
         backHome () {
@@ -162,12 +162,12 @@
         onLoad () {
             this.isLoading = false
             if (this.$refs.iframeEle) {
-                console.log(this.extensions, 'this.extensions')
+                console.log(this.serviceHooks, 'this.serviceHooks')
                 const childWin = this.$refs.iframeEle.contentWindow
                 this.iframeUtil.syncProjectList(childWin, this.underlineProjectList)
                 this.iframeUtil.syncUserInfo(childWin, this.user)
                 this.iframeUtil.syncLocale(childWin, this.$i18n.locale)
-                this.iframeUtil.syncExtensions(childWin, this.extensions)
+                this.iframeUtil.syncServiceHooks(childWin, this.serviceHooks)
                 if (this.$route.params.projectId) {
                     this.iframeUtil.syncProjectId(childWin, this.$route.params.projectId)
                 }

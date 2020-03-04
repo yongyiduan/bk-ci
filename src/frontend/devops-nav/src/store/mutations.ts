@@ -18,14 +18,14 @@ import {
     TOGGLE_MODULE_LOADING,
     UPDATE_CURRENT_PAGE,
     TOGGLE_PERMISSION_DIALOG,
-    SET_SERVICE_EXTENSIONS
+    SET_SERVICE_HOOKS
 } from './constants'
 
 const mutations: MutationTree<RootState> = {
-    [SET_SERVICE_EXTENSIONS]: (state: RootState, { projectCode, serviceId, extensions }: any) => {
-        Vue.set(state, 'extensionMap', {
-            ...state.extensionMap,
-            [`${projectCode}-${serviceId}`]: extensions
+    [SET_SERVICE_HOOKS]: (state: RootState, { serviceId, extHooks }: any) => {
+        Vue.set(state, 'hookMap', {
+            ...state.hookMap,
+            [serviceId]: extHooks
         })
     },
     [TOGGLE_PERMISSION_DIALOG]: (state: RootState, visible: boolean) => {

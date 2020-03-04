@@ -60,9 +60,9 @@
                 this.$setLocale(locale)
             })
 
-            window.globalVue.$on('order::syncExtensions', extensions => {
-                console.log('receive extensions', extensions)
-                this.$store.dispatch('setExtensions', extensions)
+            window.globalVue.$on('order::syncServiceHooks', extensions => {
+                console.log('receive hooks', extensions)
+                this.$store.dispatch('setServiceHooks', extensions)
             })
         },
         methods: {

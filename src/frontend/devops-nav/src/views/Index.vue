@@ -112,7 +112,7 @@
         @Getter disableProjectList
         @Getter approvalingProjectList
         @Action closePreviewTips
-        @Action getServiceExtensions
+        @Action fetchServiceHooks
 
         showLoginDialog: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
@@ -182,9 +182,8 @@
                 const serviceAlias = getServiceAliasByPath(path)
                 const currentPage = window.serviceObject.serviceMap[serviceAlias]
                 if (currentPage) {
-                    this.getServiceExtensions({
-                        serviceId: currentPage.id,
-                        projectCode: params.projectId
+                    this.fetchServiceHooks({
+                        serviceId: currentPage.id
                     })
                 }
             }
@@ -210,9 +209,8 @@
             })
 
             if (this.currentPage) {
-                this.getServiceExtensions({
-                    serviceId: this.currentPage.id,
-                    projectCode: this.$route.params.projectId
+                this.fetchServiceHooks({
+                    serviceId: this.currentPage.id
                 })
             }
         }

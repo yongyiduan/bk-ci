@@ -12,7 +12,7 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
     import { isAbsoluteURL, urlJoin } from '@/utils/util'
 
     export default {
@@ -25,14 +25,20 @@
         },
         computed: {
             ...mapGetters([
-                'artifactExtensions',
-                'extensionKeyMap'
-            ])
+                'artifactHooks'
+            ]),
+            hookIds () {
+                return this.artifactHooks.map(hook => hook.itemId).join(',')
+            }
         },
         created () {
-            console.log(this.artifactExtensions)
+            console.log(this.artifactHooks)
+            this.fetchExt()
         },
         methods: {
+            ...mapActions([
+                'fetchExtensionByHookId'
+            ]),
             hookAction (hook) {
                 this.$hookTrigger({
                     ...hook,
@@ -44,6 +50,17 @@
                         }
                     }
                 })
+            },
+            async fetchExt () {
+                try {
+                    const res = await this.fetchExtensionByHookId({
+                        projectCode: this.$route.params.projectId,
+                        itemIds: this.hookIds
+                    })
+                    console.log(res)
+                } catch (error) {
+                    console.log(error)
+                }
             },
             getResUrl (url, appKey) {
                 console.log(url, appKey, 'geturl')
