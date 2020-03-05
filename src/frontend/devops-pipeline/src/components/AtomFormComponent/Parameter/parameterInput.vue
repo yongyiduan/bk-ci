@@ -127,6 +127,11 @@
                     return
                 }
 
+                if (!this.url) {
+                    console.log('nourl')
+                    return
+                }
+
                 let url = this.url || ''
                 let isErrorParam = false
                 url = url.replace(/{([^\{\}]+)}/g, (str, key) => {
