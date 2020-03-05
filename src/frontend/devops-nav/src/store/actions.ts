@@ -43,7 +43,6 @@ const actions: ActionTree<RootState, any> = {
                 serviceId
             })
         } catch (error) {
-<<<<<<< HEAD
             commit(SET_SERVICE_HOOKS, {
                 extHooks: [{
                     "itemName": "归档构件",
@@ -51,48 +50,6 @@ const actions: ActionTree<RootState, any> = {
                     "htmlComponentType": "SIMPLE",
                     "itemId": 5,
                     "itemCode": "buildArtifact"
-=======
-            commit(SET_SERVICE_EXTENSIONS, {
-                extensions: [{
-                    "name": "Hello World",
-                    "description": "Tencent CI Extension",
-                    "key": "tci.job.artifactory",
-                    "baseURL": "http://localhost:8081",
-                    "vendor": {
-                        "name": "Lockiechen",
-                        "url": "http://devops.oa.com"
-                    },
-                    "modules": {
-                        "ARTIFACTORY_OPERATION": [
-                            {
-                                "weight": 200,
-                                "url": "http://localhost:8081/helloworld.html",
-                                "context": "addon",
-                                "target": {
-                                    "type": "asidePanel",
-                                    "options": {
-                                      "width": 800
-                                    },
-                                    "data": {
-                                        "demo": "hello"
-                                    }
-                                  },
-                                "tooltip": {
-                                    "value": "This is a tooltip"
-                                },
-                                "icon": {
-                                    "width": 16,
-                                    "height": 16,
-                                    "url": "/icon.svg"
-                                },
-                                "name": {
-                                    "value": "构件分发"
-                                },
-                                "key": "web-item-example"
-                            }
-                        ]
-                    }
->>>>>>> parent of 82b7baff8... add extension dialog
                 }],
                 serviceId
             })
