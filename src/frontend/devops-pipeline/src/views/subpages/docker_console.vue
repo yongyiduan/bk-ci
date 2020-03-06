@@ -109,15 +109,8 @@
                     this.containerName = res.containerName
                 } catch (err) {
                     console.log(err)
-                    if (err && err.code === 1) {
-                        this.connectError = true
-                        this.config.desc = err.message || this.$t('editPage.docker.failDesc')
-                    } else {
-                        this.$showTips({
-                            theme: 'error',
-                            message: err.message || err
-                        })
-                    }
+                    this.connectError = true
+                    this.config.desc = err.message || this.$t('editPage.docker.failDesc')
                 }
             },
             async getContainerInfo () {
