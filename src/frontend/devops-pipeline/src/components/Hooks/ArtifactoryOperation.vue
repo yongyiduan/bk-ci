@@ -23,6 +23,11 @@
                 default: () => ({})
             }
         },
+        data () {
+            return {
+                artifactExtensions: []
+            }
+        },
         computed: {
             ...mapGetters([
                 'artifactHooks'
@@ -40,6 +45,7 @@
                 'fetchExtensionByHookId'
             ]),
             hookAction (hook) {
+                console.log(hook)
                 this.$hookTrigger({
                     ...hook,
                     target: {
@@ -57,9 +63,83 @@
                         projectCode: this.$route.params.projectId,
                         itemIds: this.hookIds
                     })
-                    console.log(res)
+                    const mock = true
+                    if (mock) throw Error('mock')
+                    let artifactExtensions = []
+                    this.artifactExtensionMap = res.data.reduce((artifactExtensionMap, ext) => {
+                        artifactExtensionMap[ext.itemId] = [
+                            ...ext.extServiceList
+                        ]
+
+                        artifactExtensions = [
+                            ...artifactExtensions,
+                            ...ext.extServiceList
+                        ]
+
+                        return artifactExtensionMap
+                    })
+                    this.artifactExtensions = artifactExtensions
                 } catch (error) {
                     console.log(error)
+                    this.artifactExtensions = [{
+                        'location': 'system.top.navigation.bar',
+                        'weight': 200,
+                        'styleClasses': [
+                            'webitem',
+                            'system-present-webitem'
+                        ],
+                        'url': 'http://localhost:8081',
+                        'context': 'addon',
+                        'target': {
+                            'type': 'asidePanel',
+                            'options': {
+                                'width': '800'
+                            }
+                        },
+                        'tooltip': {
+                            'value': 'Example tooltip'
+                        },
+                        'icon': {
+                            'width': 16,
+                            'height': 16,
+                            'url': 'http://localhost:8081/icon.svg'
+                        },
+                        'name': {
+                            'value': 'Demo WebItem'
+                        },
+                        'key': 'web-item-example'
+                    }]
+                    this.artifactExtensionMap = {
+                        5: [{
+                            'location': 'system.top.navigation.bar',
+                            'weight': 200,
+                            'styleClasses': [
+                                'webitem',
+                                'system-present-webitem'
+                            ],
+                            'url': '/helloworld',
+                            'context': 'addon',
+                            'target': {
+                                'type': 'dialog',
+                                'options': {
+                                    'height': '100px',
+                                    'width': '200px'
+                                }
+                            },
+                            'tooltip': {
+                                'value': 'Example tooltip'
+                            },
+                            'icon': {
+                                'width': 16,
+                                'height': 16,
+                                'url': '/icon.svg'
+                            },
+                            'name': {
+                                'value': 'Demo WebItem'
+                            },
+                            'key': 'web-item-example'
+                        }]
+                    }
                 }
             },
             getResUrl (url, appKey) {
@@ -70,7 +150,7 @@
     }
 </script>
 
-<style lang="scss">
+<style lang='scss'>
     .artifactory-operation-hooks {
         display: inline-flex;
         align-items: center;
