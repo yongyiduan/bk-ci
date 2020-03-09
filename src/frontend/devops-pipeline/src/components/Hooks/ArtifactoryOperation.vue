@@ -105,7 +105,7 @@
                             'url': 'http://localhost:8081/icon.svg'
                         },
                         'name': {
-                            'value': 'Demo WebItem'
+                            'value': '1 WebItem'
                         },
                         'key': 'web-item-example'
                     }]
@@ -154,5 +154,8 @@
     .artifactory-operation-hooks {
         display: inline-flex;
         align-items: center;
+        > li {
+            margin-right: 8px;
+        }
     }
 </style>

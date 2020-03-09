@@ -37,9 +37,10 @@ function iframeUtil (router: any) {
                     customData: hook.target.data,
                     show: true
                 })
-                break;
+                break
         }
-    } 
+    }
+
     utilMap.closeAsidePanel = function (params) {
         toggleAsidePanel({
             ...params,

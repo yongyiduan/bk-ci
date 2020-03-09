@@ -505,7 +505,7 @@
             font-size: 16px;
             cursor: pointer;
             i {
-                margin-right: 16px;
+                margin-right: 8px;
             }
             i:last-child {
                 margin-right: 0px;
