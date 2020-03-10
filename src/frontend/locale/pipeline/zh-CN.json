@@ -2,6 +2,7 @@
     "pipeline": "流水线",
     "pipelineName": "流水线名称",
     "labelManage": "标签管理",
+    "label": "标签",
     "viewManage": "视图管理",
     "templateManage": "模板管理",
     "pluginManage": "插件管理",
@@ -76,6 +77,10 @@
     "loadingTips": "数据加载中，请稍候",
     "metaData": "元数据",
     "download": "下载",
+    "enableStage": "启用本Stage",
+    "stageFastKill": "启用FastKill",
+    "stageOptionLabel": "本Stage执行条件",
+    "stageTriggerDesc": "多个人员用英文逗号分隔",
     "timeMap": {
         "days": "天",
         "hours": "小时",
@@ -339,6 +344,7 @@
         "stopFail": "终止失败"
     },
     "history": {
+        "stageStatus": "Stage",
         "execHistory": "执行历史",
         "trendData": "安装包趋势",
         "chooseDateRange": "请选择日期范围",
@@ -446,7 +452,8 @@
             "CALL_WAITING": "等待回调",
             "TRY_FINALLY": "补偿任务",
             "QUEUE_CACHE": "队列待处理",
-            "UNKNOWN": "未知状态"
+            "UNKNOWN": "未知状态",
+            "STAGE_SUCCESS": "STAGE_SUCCESS"
         },
         "toArtifactory": "到版本仓库查看",
         "saveToCustom": "保存到自定义仓库",
@@ -513,6 +520,9 @@
         "prepareEnv": "准备构建环境中",
         "copyJob": "复制job",
         "copyJobFail": "复制job失败",
+        "copyStage": "复制stage",
+        "copyStageFail": "复制stage失败",
+        "stageManualTriggerUserNoEmptyTips": "手动执行stage执行人不能为空",
         "triggerTooltips": "点击构建触发可配置推荐版本号、流水线变量",
         "userTime": "用户耗时",
         "systemTime": "系统耗时",
@@ -687,7 +697,8 @@
             "serviceId": "业务ID",
             "templateDownload": "模板下载",
             "otherChoice": "其他选项"
-        }
+        },
+        "stageOption": "高级流程控制"
     },
     "storeMap": {
         "string": "字符串",
@@ -733,6 +744,8 @@
         "mutualTimeoutPlaceholder": "请填写1-10080之间的整数",
         "queueLabel": "队列最大任务数",
         "queuePlaceholder": "请填写1-10之间的整数",
-        "noEnv": "无编译环境" 
+        "noEnv": "无编译环境",
+        "afterPreStageSuccess": "前一个Stage成功时运行",
+        "manualRunStage": "手动触发运行"       
     }
 }

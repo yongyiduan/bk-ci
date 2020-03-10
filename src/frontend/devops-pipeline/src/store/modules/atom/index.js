@@ -51,7 +51,9 @@ export default {
         globalEnvs: null,
         executeStatus: false,
         saveStatus: false,
-        authSettingEditing: false
+        authSettingEditing: false,
+        stageTagList: [],
+        defaultStageTags: []
     },
     mutations,
     actions,

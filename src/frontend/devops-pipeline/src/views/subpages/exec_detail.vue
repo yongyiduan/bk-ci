@@ -66,6 +66,13 @@
                     :editable="false"
                 />
             </template>
+            <template v-else-if="typeof editingElementPos.stageIndex !== 'undefined'">
+                <stage-property-panel
+                    :stage="stage"
+                    :stage-index="editingElementPos.stageIndex"
+                    :editable="false"
+                />
+            </template>
         </template>
 
         <template v-if="execDetail">
@@ -94,6 +101,7 @@
     import codeRecord from '@/components/codeRecord'
     import outputOption from '@/components/outputOption'
     import ContainerPropertyPanel from '@/components/ContainerPropertyPanel/'
+    import StagePropertyPanel from '@/components/StagePropertyPanel'
     import emptyTips from '@/components/devops/emptyTips'
     import log from '../../../../devops-log'
     import pipelineOperateMixin from '@/mixins/pipeline-operate-mixin'
@@ -104,6 +112,7 @@
         components: {
             stages,
             ContainerPropertyPanel,
+            StagePropertyPanel,
             viewPart,
             codeRecord,
             outputOption,
@@ -222,6 +231,16 @@
                 const currentStage = stages[editingElementPos.stageIndex] || []
                 return currentStage.containers[editingElementPos.containerIndex]
             },
+            stage () {
+                const { editingElementPos, execDetail } = this
+                if (editingElementPos) {
+                    const model = execDetail.model || {}
+                    const stages = model.stages || []
+                    const stage = stages[editingElementPos.stageIndex]
+                    return stage
+                }
+                return null
+            },
             currentElement () {
                 const {
                     editingElementPos: { stageIndex, containerIndex, elementIndex },
@@ -266,7 +285,7 @@
                     width: 820
                 } : {
                     title: this.$t('propertyBar'),
-                    class: 'sodaci-property-panel',
+                    class: 'bkci-property-panel',
                     width: 640
                 }
             },
@@ -281,7 +300,7 @@
                 return this.routerParams.type || 'executeDetail'
             },
             showRetryIcon () {
-                return this.execDetail && ['RUNNING', 'QUEUE'].indexOf(this.execDetail.status) < 0
+                return this.execDetail && ['RUNNING', 'QUEUE', 'STAGE_SUCCESS'].indexOf(this.execDetail.status) < 0
             }
         },
 
