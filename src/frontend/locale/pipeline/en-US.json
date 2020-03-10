@@ -536,6 +536,7 @@
         "abortSuc": "Abort successfully",
         "agreeSuc": "Approval successfully",
         "toCheck": "To Review",
+        "noAuthToCheck": "No Access",
         "abortTips": "Review has not passed",
         "checkUser": "Reviewer",
         "aborted": "Aborted",
