@@ -19,12 +19,12 @@
             @page-limit-change="pageCountChanged"
             v-bkloading="{ isLoading }"
         >
-            <bk-table-column :label="$t('store.扩展名称')">
+            <bk-table-column :label="$t('store.扩展名称')" width="180">
                 <template slot-scope="props">
                     <span class="atom-name" :title="props.row.serviceName" @click="goToServiceDetail(props.row.serviceCode)">{{ props.row.serviceName }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.扩展标识')" prop="serviceCode"></bk-table-column>
+            <bk-table-column :label="$t('store.扩展标识')" prop="serviceCode" width="180"></bk-table-column>
             <bk-table-column :label="$t('store.调试项目')" prop="projectName" width="200"></bk-table-column>
             <bk-table-column :label="$t('store.扩展类型')" prop="category" width="180" :formatter="categoryFormatter"></bk-table-column>
             <bk-table-column :label="$t('store.版本')" prop="version" width="180"></bk-table-column>
@@ -80,35 +80,25 @@
             :width="relateServiceData.width">
             <template slot="content">
                 <bk-form ref="relateForm" class="relate-form" label-width="100" :model="relateServiceData.form" v-bkloading="{ isLoading: relateServiceData.isLoading }">
-                    <bk-form-item :label="$t('store.扩展名称')" :required="true" property="serviceName" :desc="$t('store.扩展在研发商店中的别名')" :rules="[requireRule]">
+                    <bk-form-item :label="$t('store.扩展名称')" :required="true" property="serviceName" :desc="$t('store.展示给用户的名称，用户根据名称识别扩展服务')" :rules="[requireRule]">
                         <bk-input v-model="relateServiceData.form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.扩展标识')" :required="true" property="serviceCode" :desc="$t('store.扩展在研发商店中的唯一标识')" :rules="[requireRule, alpRule]">
+                    <bk-form-item :label="$t('store.扩展标识')" :required="true" property="serviceCode" :desc="$t('store.唯一标识，创建后不能修改。将作为扩展的代码库名称')" :rules="[requireRule, alpRule]">
                         <bk-input v-model="relateServiceData.form.serviceCode" :placeholder="$t('store.请输入扩展标识')"></bk-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.扩展点')" :required="true" property="extensionItemList" :desc="$t('store.服务扩展的具体扩展点')" :rules="[requireRule]">
-                        <bk-select v-model="relateServiceData.form.extensionItemList"
-                            :placeholder="$t('store.请选择扩展点')"
-                            multiple
-                            :scroll-height="500"
-                            :clearable="true"
-                            @toggle="getServiceList"
-                            :loading="isServiceListLoading"
-                        >
-                            <bk-option-group
-                                v-for="(group, index) in serviceList"
-                                :name="group.name"
-                                :key="index">
-                                <bk-option v-for="(option, key) in group.children"
-                                    :key="key"
-                                    :id="option.itemId"
-                                    :name="option.itemName"
-                                >
-                                </bk-option>
-                            </bk-option-group>
-                        </bk-select>
+                    <bk-form-item :label="$t('store.扩展点')" :required="true" property="extensionItemList" :desc="$t('store.扩展服务生效的功能区域')" :rules="[requireRule]">
+                        <bk-tag-input :placeholder="$t('store.请选择扩展点')"
+                            v-model="relateServiceData.form.extensionItemList"
+                            :list="serviceList"
+                            :use-group="true"
+                            :tag-tpl="serviceTagTpl"
+                            save-key="itemId"
+                            display-key="itemName"
+                            search-key="itemName"
+                            trigger="focus">
+                        </bk-tag-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在发布过程中，可以在该项目下调试扩展')" :rules="[requireRule]">
+                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在开发测试过程中，开发者可以在此项目下调试扩展')" :rules="[requireRule]">
                         <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
                             <bk-option v-for="option in projectList"
                                 :key="option.project_code"
@@ -127,6 +117,7 @@
                             </bk-option>
                         </bk-select>
                     </bk-form-item>
+                    <form-tips :tips-content="createTips" class="atom-tip" v-if="!isEnterprise"></form-tips>
                     <bk-form-item>
                         <bk-button theme="primary" @click.native="submitAddService"> {{ $t('store.提交') }} </bk-button>
                         <bk-button @click.native="cancelRelateService"> {{ $t('store.取消') }} </bk-button>
@@ -170,9 +161,14 @@
 </template>
 
 <script>
+    import formTips from '@/components/common/formTips/index'
     import { atomStatusMap } from '@/store/constants'
 
     export default {
+        components: {
+            formTips
+        },
+
         data () {
             return {
                 serviceStatusList: atomStatusMap,
@@ -231,12 +227,31 @@
             }
         },
 
+        computed: {
+            createTips () {
+                const host = location.host
+                const devHosts = ['dev.devops.oa.com', 'v2.dev.devops.oa.com']
+                const testHosts = ['test.devops.oa.com', 'v2.test.devops.oa.com']
+                const devIndex = devHosts.findIndex(innerHost => innerHost === host)
+                const testIndex = testHosts.findIndex(innerHost => innerHost === host)
+                const group = devIndex > -1 ? 'dev-bkdevops-extension-service' : (testIndex > -1 ? 'test-bkdevops-extension-service' : 'bkdevops-extension-service')
+                return `${this.$t('store.提交后，系统将在工蜂自动创建代码库，地址示例')}：http://git.code.oa.com/${group}/${this.relateServiceData.form.serviceCode}.git`
+            },
+
+            isEnterprise () {
+                return VERSION_TYPE === 'ee'
+            }
+        },
+
         created () {
             this.requestList()
-            this.getProjectList()
         },
 
         methods: {
+            serviceTagTpl (node) {
+                return (<span style="font-size: 12px; line-height: 22px; padding: 0 5px">{`${node.parentName}：${node.itemName}`}</span>)
+            },
+
             search () {
                 this.pagination.current = 1
                 this.requestList()
@@ -253,21 +268,21 @@
                 }).finally(() => (this.isItemLoading = false))
             },
 
-            getServiceList (isOpen) {
-                if (!isOpen) return
-
+            getServiceList () {
                 this.isServiceListLoading = true
-                this.$store.dispatch('store/requestServiceItemList').then((res) => {
+                return this.$store.dispatch('store/requestServiceItemList').then((res) => {
                     this.serviceList = (res || []).map((item) => {
                         const serviceItem = item.serviceItem || {}
                         return {
-                            name: serviceItem.itemName,
-                            children: item.childItem || []
+                            itemId: serviceItem.itemId,
+                            itemName: serviceItem.itemName,
+                            children: (item.childItem || []).map((x) => {
+                                x.parentName = serviceItem.itemName
+                                return x
+                            })
                         }
                     })
-                }).catch((err) => {
-                    this.$bkMessage({ message: err.message || err, theme: 'error' })
-                }).finally(() => (this.isServiceListLoading = false))
+                })
             },
 
             categoryFormatter (row, column, cellValue, index) {
@@ -381,9 +396,10 @@
             },
 
             getProjectList () {
-                this.$store.dispatch('store/requestProjectList').then((res) => {
+                return this.$store.dispatch('store/requestProjectList').then((res) => {
                     this.projectList = res
-                }).catch(() => {
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
                     this.projectList = []
                 })
             },
@@ -420,6 +436,10 @@
 
             relateService () {
                 this.relateServiceData.show = true
+                this.relateServiceData.isLoading = true
+                Promise.all([this.getProjectList(), this.getServiceList()]).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => (this.relateServiceData.isLoading = false))
             },
 
             timeFormatter (row, column, cellValue, index) {
@@ -436,6 +456,9 @@
     .relate-form {
         margin: 30px 20px;
         min-height: 700px;
+        .atom-tip {
+            margin: 16px 0 16px 21px;
+        }
     }
     .h32 {
         height: 32px;

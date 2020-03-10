@@ -17,26 +17,16 @@
                     <bk-input v-model="form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
                 </bk-form-item>
                 <bk-form-item class="wt660" :label="$t('store.扩展点')" :required="true" property="extensionItemList" :rules="[requireRule]" ref="extensionItemList">
-                    <bk-select v-model="form.extensionItemList"
-                        :placeholder="$t('store.请选择扩展点')"
-                        multiple
-                        :scroll-height="500"
-                        :clearable="true"
-                        @toggle="getServiceList"
-                        :loading="isServiceListLoading"
-                    >
-                        <bk-option-group
-                            v-for="(group, index) in serviceList"
-                            :name="group.name"
-                            :key="index">
-                            <bk-option v-for="(option, key) in group.children"
-                                :key="key"
-                                :id="option.itemId"
-                                :name="option.itemName"
-                            >
-                            </bk-option>
-                        </bk-option-group>
-                    </bk-select>
+                    <bk-tag-input :placeholder="$t('store.请选择扩展点')"
+                        v-model="form.extensionItemList"
+                        :list="serviceList"
+                        :use-group="true"
+                        :tag-tpl="serviceTagTpl"
+                        save-key="itemId"
+                        display-key="itemName"
+                        search-key="itemName"
+                        trigger="focus">
+                    </bk-tag-input>
                 </bk-form-item>
                 <bk-form-item :label="$t('store.标签')" property="labelIdList" class="wt660">
                     <bk-tag-input v-model="form.labelIdList" :list="labelList" display-key="labelName" search-key="labelName" trigger="focus" :placeholder="$t('store.请选择标签')"></bk-tag-input>
@@ -122,7 +112,6 @@
                 serviceList: [],
                 serviceVersionList: [],
                 isLoading: false,
-                isServiceListLoading: false,
                 originVersion: '',
                 requireRule: {
                     required: true,
@@ -177,6 +166,10 @@
                 'requestServiceLabel'
             ]),
 
+            serviceTagTpl (node) {
+                return (<span style="font-size: 12px; line-height: 22px; padding: 0 5px">{`${node.parentName}：${node.itemName}`}</span>)
+            },
+
             submitService () {
                 this.$refs.serviceForm.validate().then(() => {
                     if (!this.form.logoUrl) {
@@ -205,7 +198,8 @@
 
                 Promise.all([
                     this.requestServiceDetail(serviceId),
-                    this.requestServiceLabel()
+                    this.requestServiceLabel(),
+                    this.getServiceList()
                 ]).then(([res, labels]) => {
                     this.labelList = labels || []
                     Object.assign(this.form, res)
@@ -229,19 +223,21 @@
                 })
             },
 
-            getServiceList (isExpand) {
-                if (!isExpand) return
+            getServiceList () {
                 const code = this.form.projectCode
-                this.isServiceListLoading = true
-                this.requestServiceItemList(code).then((res) => {
+                return this.requestServiceItemList(code).then((res) => {
                     this.serviceList = (res || []).map((item) => {
                         const serviceItem = item.serviceItem || {}
                         return {
-                            name: serviceItem.itemName,
-                            children: item.childItem || []
+                            itemId: serviceItem.itemId,
+                            itemName: serviceItem.itemName,
+                            children: (item.childItem || []).map((x) => {
+                                x.parentName = serviceItem.itemName
+                                return x
+                            })
                         }
                     })
-                }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => (this.isServiceListLoading = false))
+                })
             },
 
             async uploadimg (pos, file) {
