@@ -29,8 +29,8 @@
                     <key-value-normal :disabled="disabled" :value="variables" :allow-null="false" name="customVariables" :handle-change="handleUpdateStageControl"></key-value-normal>
                 </bk-form-item>
                 <template v-if="showMemberInput">
-                    <bk-form-item class="stage-trigger-member-input" label="stage执行人:" :required="true" :class="{ 'is-error': !hasTriggerMember }" :desc="$t('stageTriggerDesc')">
-                        <bk-input :clearable="true" :disabled="disabled" v-model="triggerUsers" />
+                    <bk-form-item class="stage-trigger-member-input" label="stage执行人:" :required="true" :class="{ 'is-error': !hasTriggerMember }">
+                        <staff-input :disabled="disabled" name="triggerUsers" :value="triggerUsers" :handle-change="handleUpdateStageControl"></staff-input>
                         <p v-if="!hasTriggerMember" class="mt5 mb0">{{ $t('editPage.stageManualTriggerUserNoEmptyTips') }}</p>
                     </bk-form-item>
                 </template>
@@ -43,11 +43,13 @@
     import { mapActions } from 'vuex'
     import Accordion from '@/components/atomFormField/Accordion'
     import KeyValueNormal from '@/components/atomFormField/KeyValueNormal'
+    import StaffInput from '@/components/atomFormField/StaffInput'
     export default {
         name: 'stage-control',
         components: {
             Accordion,
-            KeyValueNormal
+            KeyValueNormal,
+            StaffInput
         },
         props: {
             stageControl: {
@@ -91,15 +93,8 @@
             variables () {
                 return this.stageControl && Array.isArray(this.stageControl.customVariables) ? this.stageControl.customVariables : []
             },
-            triggerUsers: {
-                get () {
-                    return this.stageControl && Array.isArray(this.stageControl.triggerUsers) ? this.stageControl.triggerUsers.join(',') : ''
-                },
-                set (triggerUsers) {
-                    console.log('set', triggerUsers)
-                    this.handleUpdateStageControl('triggerUsers', triggerUsers.split(','))
-                }
-
+            triggerUsers () {
+                return this.stageControl && Array.isArray(this.stageControl.triggerUsers) ? this.stageControl.triggerUsers : []
             },
             conditionConf () {
                 return [
@@ -156,6 +151,7 @@
                 'setPipelineEditing'
             ]),
             handleUpdateStageControl (name, value) {
+                console.log(name, value)
                 this.setPipelineEditing(true)
                 this.handleStageChange('stageControlOption', {
                     ...(this.stageControl || {}),
