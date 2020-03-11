@@ -28,15 +28,16 @@
                         <staff-input :disabled="disabled" name="triggerUsers" :value="triggerUsers" :handle-change="handleStageChange"></staff-input>
                         <p v-if="!hasTriggerMember" class="mt5 mb0">{{ $t('editPage.stageManualTriggerUserNoEmptyTips') }}</p>
                     </bk-form-item>
+                
+                    <bk-form-item class="stage-timeout-input" :label="$t('stageTimeoutLabel')" :required="true" :class="{ 'is-error': !validTimeout }" :desc="$t('stageTimeoutDesc')">
+                        <bk-input type="number" :disabled="disabled" v-model="timeout" :min="1" :max="720">
+                            <template slot="append">
+                                <div class="group-text">{{ $t('timeMap.hours') }}</div>
+                            </template>
+                        </bk-input>
+                        <p v-if="!validTimeout" class="mt5 mb0">{{ $t('stageTimeoutError') }}</p>
+                    </bk-form-item>
                 </template>
-                <bk-form-item class="stage-timeout-input" :label="$t('stageTimeoutLabel')" :required="true" :class="{ 'is-error': !validTimeout }" :desc="$t('stageTimeoutDesc')">
-                    <bk-input type="number" :disabled="disabled" v-model="timeout" :min="1" :max="720">
-                        <template slot="append">
-                            <div class="group-text">{{ $t('timeMap.hours') }}</div>
-                        </template>
-                    </bk-input>
-                    <p v-if="!validTimeout" class="mt5 mb0">{{ $t('stageTimeoutError') }}</p>
-                </bk-form-item>
                 <bk-form-item :label="$t('stageOptionLabel')">
                     <bk-select :disabled="disabled" v-model="stageCondition" searchable>
                         <bk-option v-for="option in conditionConf"
@@ -102,7 +103,7 @@
                     return this.stageControl.manualTrigger
                 },
                 set (manualTrigger) {
-                    this.handleStageChange('manualTrigger', manualTrigger)
+                    this.handleUpdateStageControl('manualTrigger', manualTrigger)
                 }
             },
             timeout: {
@@ -110,7 +111,7 @@
                     return this.stageControl.timeout
                 },
                 set (timeout) {
-                    this.handleStageChange('timeout', timeout)
+                    this.handleUpdateStageControl('timeout', timeout)
                 }
             },
             stageCondition: {
@@ -162,17 +163,15 @@
                 !val && this.handleUpdateStageControl('customVariables', [{ key: 'param1', value: '' }])
             },
             manualTrigger (val) {
-                !val && this.handleStageChange('triggerUsers', [])
+                !val && this.handleUpdateStageControl('triggerUsers', [])
+                this.handleStageChange('isError', !this.validateStageControl())
             },
-            hasTriggerMember: {
-                handler (hasTriggerMember) {
-                    this.manualTrigger && this.handleStageChange('isError', !hasTriggerMember)
-                }
+            hasTriggerMember (hasTriggerMember) {
+                console.log(hasTriggerMember)
+                this.handleStageChange('isError', !this.validateStageControl())
             },
-            validTimeout: {
-                handler (valid) {
-                    this.handleStageChange('isError', !valid)
-                }
+            validTimeout (valid) {
+                this.handleStageChange('isError', !this.validateStageControl())
             }
         },
         created () {
@@ -197,15 +196,17 @@
                     this.handleStageChange('stageControlOption', {
                         enable: true,
                         runCondition: 'AFTER_LAST_FINISHED',
+                        manualTrigger: false,
+                        triggerUsers: [],
+                        timeout: 24,
+                        
                         customVariables: [{ key: 'param1', value: '' }]
                     })
                     this.handleStageChange('fastKill', false)
-                    this.handleStageChange('manualTrigger', false)
-                    this.handleStageChange('timeout', 24)
                 }
             },
             validateStageControl () {
-                return this.validTimeout && (!this.manualTrigger || this.hasTriggerMember)
+                return !this.manualTrigger || (this.validTimeout && this.hasTriggerMember)
             }
         }
     }
