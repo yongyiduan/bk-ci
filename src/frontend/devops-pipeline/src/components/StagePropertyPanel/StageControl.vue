@@ -25,7 +25,7 @@
                 </bk-form-item>
                 <template v-if="manualTrigger">
                     <bk-form-item class="stage-trigger-member-input" :label="$t('stageUserTriggers')" :required="true" :class="{ 'is-error': !hasTriggerMember }" :desc="$t('stageTriggerDesc')">
-                        <staff-input :disabled="disabled" name="triggerUsers" :value="triggerUsers" :handle-change="handleStageChange"></staff-input>
+                        <staff-input :disabled="disabled" name="triggerUsers" :value="triggerUsers" :handle-change="handleUpdateStageControl"></staff-input>
                         <p v-if="!hasTriggerMember" class="mt5 mb0">{{ $t('editPage.stageManualTriggerUserNoEmptyTips') }}</p>
                     </bk-form-item>
                 
