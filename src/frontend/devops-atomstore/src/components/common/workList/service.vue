@@ -26,7 +26,7 @@
             </bk-table-column>
             <bk-table-column :label="$t('store.扩展标识')" prop="serviceCode" width="180"></bk-table-column>
             <bk-table-column :label="$t('store.调试项目')" prop="projectName" width="200"></bk-table-column>
-            <bk-table-column :label="$t('store.扩展类型')" prop="category" width="180" :formatter="categoryFormatter"></bk-table-column>
+            <bk-table-column :label="$t('store.扩展点')" prop="itemName" width="180"></bk-table-column>
             <bk-table-column :label="$t('store.版本')" prop="version" width="180"></bk-table-column>
             <bk-table-column :label="$t('store.状态')" width="220">
                 <template slot-scope="props">
@@ -89,16 +89,18 @@
                     <bk-form-item :label="$t('store.扩展点')" :required="true" property="extensionItemList" :desc="$t('store.扩展服务生效的功能区域')" :rules="[requireRule]">
                         <bk-tag-input :placeholder="$t('store.请选择扩展点')"
                             v-model="relateServiceData.form.extensionItemList"
+                            :has-delete-icon="true"
                             :list="serviceList"
                             :use-group="true"
                             :tag-tpl="serviceTagTpl"
+                            :tpl="renderServiceList"
                             save-key="itemId"
                             display-key="itemName"
                             search-key="itemName"
                             trigger="focus">
                         </bk-tag-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在开发测试过程中，开发者可以在此项目下调试扩展')" :rules="[requireRule]">
+                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在开发测试过程中，开发者可以在此项目下调试扩展，成功提交后将不能修改')" :rules="[requireRule]">
                         <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
                             <bk-option v-for="option in projectList"
                                 :key="option.project_code"
@@ -188,7 +190,7 @@
                 relateServiceData: {
                     title: this.$t('store.新增服务扩展'),
                     quickClose: true,
-                    width: 565,
+                    width: 600,
                     isLoading: false,
                     show: false,
                     isLoadingTicketList: false,
@@ -248,8 +250,12 @@
         },
 
         methods: {
+            renderServiceList (node) {
+                return (<span class="tag-list">{node.itemName}</span>)
+            },
+
             serviceTagTpl (node) {
-                return (<span style="font-size: 12px; line-height: 22px; padding: 0 5px">{`${node.parentName}：${node.itemName}`}</span>)
+                return (<span style="font-size: 12px; line-height: 22px; padding: 0 3px">{`${node.parentName}：${node.itemName}`}</span>)
             },
 
             search () {
@@ -283,19 +289,6 @@
                         }
                     })
                 })
-            },
-
-            categoryFormatter (row, column, cellValue, index) {
-                let res = this.$t('store.触发器类扩展服务')
-                switch (cellValue) {
-                    case 'TRIGGER':
-                        res = this.$t('store.触发器类扩展服务')
-                        break
-                    case 'TASK':
-                        res = this.$t('store.任务类扩展服务')
-                        break
-                }
-                return res
             },
 
             submitOfflineService (row) {
@@ -453,6 +446,19 @@
 </script>
 
 <style lang="scss" scoped>
+    .tag-list {
+        padding: 0 20px;
+        line-height: 32px;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #63656e;
+    }
+    /deep/ .bk-tag-selector .bk-tag-input .tag-list .remove-key {
+        top: 0;
+        margin-left: 6px;
+    }
     .relate-form {
         margin: 30px 20px;
         min-height: 700px;

@@ -170,7 +170,7 @@
                 display: flex;
                 align-items: center;
                 svg {
-                    margin-right: 3px;
+                    margin-right: 7px;
                 }
             }
         }

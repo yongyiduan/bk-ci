@@ -19,9 +19,11 @@
                 <bk-form-item class="wt660" :label="$t('store.扩展点')" :required="true" property="extensionItemList" :rules="[requireRule]" ref="extensionItemList">
                     <bk-tag-input :placeholder="$t('store.请选择扩展点')"
                         v-model="form.extensionItemList"
+                        :has-delete-icon="true"
                         :list="serviceList"
                         :use-group="true"
                         :tag-tpl="serviceTagTpl"
+                        :tpl="renderServiceList"
                         save-key="itemId"
                         display-key="itemName"
                         search-key="itemName"
@@ -166,8 +168,12 @@
                 'requestServiceLabel'
             ]),
 
+            renderServiceList (node) {
+                return (<span class="tag-list">{node.itemName}</span>)
+            },
+
             serviceTagTpl (node) {
-                return (<span style="font-size: 12px; line-height: 22px; padding: 0 5px">{`${node.parentName}：${node.itemName}`}</span>)
+                return (<span style="font-size: 12px; line-height: 22px; padding: 0 3px">{`${node.parentName}：${node.itemName}`}</span>)
             },
 
             submitService () {
@@ -289,6 +295,21 @@
 
 <style lang="scss" scoped>
     @import '@/assets/scss/conf.scss';
+    .tag-list {
+        padding: 0 20px;
+        line-height: 32px;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #63656e;
+    }
+
+    /deep/ .bk-tag-selector .bk-tag-input .tag-list .remove-key {
+        top: 0;
+        margin-left: 6px;
+    }
+
     .edit-service-home {
         height: 100%;
         overflow: hidden;

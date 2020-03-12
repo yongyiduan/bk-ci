@@ -82,7 +82,7 @@
             ...mapActions('store', [
                 'requestServiceDetail',
                 'requestServiceProcess',
-                'requestCancelRelease',
+                'requestServiceCancelRelease',
                 'requestServicePassTest',
                 'requestRecheckService'
             ]),
@@ -127,7 +127,7 @@
                 const confirmFn = () => {
                     const params = this.$route.params || {}
                     const serviceId = params.serviceId || ''
-                    this.requestCancelRelease(serviceId).then(() => {
+                    this.requestServiceCancelRelease(serviceId).then(() => {
                         this.$bkMessage({ message: this.$t('store.取消发布成功'), theme: 'success' })
                         this.toServiceList()
                     }).catch((err) => {

@@ -447,7 +447,7 @@
                 .active-tab {
                     background: $lightBlue;
                     color: $primaryColor;
-                    i {
+                    .title-icon {
                         color: $primaryColor;
                     }
                     span {

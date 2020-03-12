@@ -120,7 +120,7 @@ export const actions = {
     /**
      * 取消上架扩展
      */
-    requestCancelRelease ({ commit }, serviceId) {
+    requestServiceCancelRelease ({ commit }, serviceId) {
         return vue.$ajax.put(`${prefix}/user/market/desk/service/release/cancel/serviceIds/${serviceId}`)
     },
 

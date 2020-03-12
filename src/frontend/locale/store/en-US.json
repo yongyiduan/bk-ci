@@ -16,7 +16,7 @@
     "唯一标识，创建后不能修改。将作为扩展的代码库名称": "The unique identifier of the extension in the R & D store",
     "扩展服务生效的功能区域": "Functional area where extended services take effect",
     "请输入扩展标识": "Please enter an extension ID",
-    "在开发测试过程中，开发者可以在此项目下调试扩展": "During the development testing process, developers can debug extensions under this project",
+    "在开发测试过程中，开发者可以在此项目下调试扩展，成功提交后将不能修改": "During the development and testing process, developers can debug extensions under this project and cannot be modified after successful submission",
     "服务扩展概览": "Overview of service extensions",
     "服务扩展代码": "Service extension code",
     "星级": "Stars",
