@@ -126,6 +126,7 @@
                     this.paramList = this.list
                     return
                 }
+
                 if (typeof this.url === 'string' && this.url !== '') { // 只有存在url字段时才去请求
                     let url = this.url
                     let isErrorParam = false
