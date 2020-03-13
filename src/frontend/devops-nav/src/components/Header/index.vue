@@ -224,7 +224,6 @@
             }
             
             if ((!oldProject && project.gray) || (oldProject && oldProject.gray !== project.gray)) {
-                debugger
                 this.goHomeById(id, true)
             }
         }
