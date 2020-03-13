@@ -6,7 +6,6 @@ import compilePath from '../utils/pathExp'
 import request from '../utils/request'
 import * as cookie from 'js-cookie'
 
-
 // 404
 // const None = () => import('../views/None.vue')
 // const App = () => import('../views/App.vue')
@@ -243,7 +242,7 @@ function initProjectId (to, store): string {
 
 function goNext(to, store, next) {
     const newPath = initProjectId(to, store)
-
+    
     // @ts-ignore
     window.setProjectIdCookie(getProjectId(store, to.params))
     if (to.path !== newPath) {
