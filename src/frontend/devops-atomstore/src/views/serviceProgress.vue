@@ -14,13 +14,26 @@
         <article v-if="!isLoading" class="service-progress-main">
             <header class="progress-header">
                 <bk-process :list="progressStatus" :cur-process="currentStepIndex" display-key="name" class="progress-steps"></bk-process>
-                <bk-button class="progress-cancle"> {{ $t('store.中止发布') }} </bk-button>
+                <bk-button class="progress-cancle" @click="cancelRelease"> {{ $t('store.中止发布') }} </bk-button>
             </header>
 
             <section class="progress-main">
-                <component :is="currentStep.code" :current-step="currentStep" :detail="serviceDetail"></component>
+                <component :is="currentStep.code" :current-step="currentStep" :detail="serviceDetail" @freshProgress="getServiceProcess"></component>
             </section>
         </article>
+
+        <bk-sideslider :is-show.sync="showDetail" :title="$t('store.查看扩展详情')">
+            <template slot="content">
+                <bk-form label-width="100" :model="serviceDetail">
+                    <bk-form-item :label="$t('store.扩展名称')" property="serviceName">
+                        <span class="lh30">{{serviceDetail.serviceName}}</span>
+                    </bk-form-item>
+                    <bk-form-item :label="$t('store.扩展标识')" property="serviceCode">
+                        <span class="lh30">{{serviceDetail.serviceCode}}</span>
+                    </bk-form-item>
+                </bk-form>
+            </template>
+        </bk-sideslider>
     </article>
 </template>
 
@@ -53,7 +66,8 @@
                 permission: true,
                 currentProjectId: '',
                 currentBuildNo: '',
-                currentPipelineId: ''
+                currentPipelineId: '',
+                showDetail: false
             }
         },
 
@@ -71,7 +85,7 @@
 
         created () {
             this.initData()
-            // this.loopProgress()
+            this.loopProgress()
         },
 
         beforeDestroy () {
@@ -88,7 +102,11 @@
             ]),
 
             initData () {
-                Promise.all([this.getServiceDetail(), this.getServiceProcess()]).catch((err) => {
+                Promise.all([this.getServiceDetail(), this.getServiceProcess()]).then(() => {
+                    let index = this.progressStatus.findIndex(x => x.status === 'doing')
+                    index = index > 0 ? index : 0
+                    this.currentStepIndex = index + 1
+                }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
                     this.isLoading = false
@@ -101,7 +119,7 @@
                 const params = this.$route.params || {}
                 const serviceId = params.serviceId || ''
                 this.requestRecheckService(serviceId).then(() => {
-                    this.$bkMessage({ message: this.$t('store.发起重新验证成功'), theme: 'success' })
+                    this.$bkMessage({ message: this.$t('store.发起重新构建成功'), theme: 'success' })
                     this.getServiceProcess()
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
@@ -160,8 +178,6 @@
                     })
                     this.permission = res.opPermission || false
                     this.storeBuildInfo = res.storeBuildInfo || {}
-
-                    this.currentStepIndex = (this.progressStatus.findIndex(x => x.status === 'doing') || 0) + 1
                     const lastStep = this.progressStatus[this.progressStatus.length - 1] || {}
                     this.isOver = lastStep.status === 'success'
                 })

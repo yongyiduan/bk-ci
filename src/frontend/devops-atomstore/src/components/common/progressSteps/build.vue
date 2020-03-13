@@ -5,8 +5,8 @@
         </ul>
 
         <footer class="main-footer">
-            <bk-button :disabled="currentStep.status === 'success'" theme="primary" @click=" nextStep"> {{ $t('store.下一步') }} </bk-button>
-            <bk-button @click="previousStep"> {{ $t('store.重新构建') }} </bk-button>
+            <bk-button :disabled="currentStep.status !== 'success'" theme="primary" @click="nextStep"> {{ $t('store.下一步') }} </bk-button>
+            <bk-button :loading="isLoading" @click="rebuild"> {{ $t('store.重新构建') }} </bk-button>
         </footer>
     </section>
 </template>
@@ -15,6 +15,9 @@
     export default {
         props: {
             currentStep: {
+                type: Object
+            },
+            detail: {
                 type: Object
             }
         },
@@ -34,40 +37,26 @@
                     'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
                     'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
                     'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
-                    'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh',
                     'aksdjashkdjsahdkjsadhkjsadhasjkdhakjdssahdjksadkjsahdakjshdakjsdh'
-                ]
+                ],
+                isLoading: false
             }
         },
 
         methods: {
-            previousStep () {
-                this.$parent.currentStepIndex--
+            rebuild () {
+                this.isLoading = true
+                const postData = {
+                    id: this.detail.serviceId,
+                    projectCode: this.detail.projectCode
+                }
+                this.$store.dispatch('store/requestRebuildService', postData).then(() => {
+                    this.$emit('freshProgress')
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => {
+                    this.isLoading = false
+                })
             },
 
             nextStep () {

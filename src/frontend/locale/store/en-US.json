@@ -1,5 +1,6 @@
 {
     "store": "Store",
+    "发起重新构建成功": "Successfully initiated rebuild",
     "从工蜂自动同步": "Automatic synchronization from git",
     "新增扩展": "New extension",
     "暂时没有扩展": "No expansion at the moment",
@@ -44,6 +45,7 @@
     "上一步": "Previous",
     "前往测试": "Go to test",
     "完成测试后返回此页面继续发布流程": "Return to this page after testing to continue the publishing process",
+    "测试完成": "Finished test",
     "项目正在审核中，请耐心等候": "Project is under review, please be patient",
     "触发器类扩展服务": "Trigger Class Extension Service",
     "任务类扩展服务": "Task class extension service",

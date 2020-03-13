@@ -6,7 +6,6 @@
         </section>
 
         <footer class="main-footer">
-            <bk-button theme="primary" @click="previousStep"> {{ $t('store.上一步') }} </bk-button>
             <bk-button :disabled="currentStep.status !== 'success'" @click="nextStep"> {{ $t('store.下一步') }} </bk-button>
         </footer>
     </section>
@@ -21,10 +20,6 @@
         },
 
         methods: {
-            previousStep () {
-                this.$parent.currentStepIndex--
-            },
-
             nextStep () {
                 this.$parent.currentStepIndex++
             }

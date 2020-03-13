@@ -104,24 +104,24 @@ export const actions = {
         return vue.$ajax.get(`${prefix}/user/market/service/project/installedProjects/${serviceCode}`)
     },
     /**
-     * 重新验证扩展
+     * 重新构建
      */
-    requestRecheckService ({ commit }, serviceId) {
-        return vue.$ajax.put(`${prefix}/user/market/desk/service/release/recheck/serviceIds/${serviceId}`)
+    requestRebuildService ({ commit }, { id, projectCode }) {
+        return vue.$ajax.put(`${prefix}/user/market/desk/service/release/rebuild/${id}?projectCode=${projectCode}`)
     },
 
     /**
      * 确认扩展通过测试
      */
     requestServicePassTest ({ commit }, serviceId) {
-        return vue.$ajax.put(`${prefix}/user/market/desk/service/release/passTest/serviceIds/${serviceId}`)
+        return vue.$ajax.put(`${prefix}/user/market/desk/service/release/passTest/${serviceId}`)
     },
 
     /**
      * 取消上架扩展
      */
     requestServiceCancelRelease ({ commit }, serviceId) {
-        return vue.$ajax.put(`${prefix}/user/market/desk/service/release/cancel/serviceIds/${serviceId}`)
+        return vue.$ajax.put(`${prefix}/user/market/desk/service/release/cancel/${serviceId}`)
     },
 
     /**
