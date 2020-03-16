@@ -44,6 +44,7 @@
     import commit from '../components/common/progressSteps/commit'
     import approve from '../components/common/progressSteps/approve'
     import begin from '../components/common/progressSteps/begin'
+    import end from '../components/common/progressSteps/end'
 
     export default {
         components: {
@@ -51,7 +52,8 @@
             test,
             commit,
             approve,
-            begin
+            begin,
+            end
         },
 
         data () {
@@ -102,11 +104,7 @@
             ]),
 
             initData () {
-                Promise.all([this.getServiceDetail(), this.getServiceProcess()]).then(() => {
-                    let index = this.progressStatus.findIndex(x => x.status === 'doing')
-                    index = index > 0 ? index : 0
-                    this.currentStepIndex = index + 1
-                }).catch((err) => {
+                Promise.all([this.getServiceDetail(), this.getServiceProcess()]).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
                     this.isLoading = false
@@ -178,8 +176,12 @@
                     })
                     this.permission = res.opPermission || false
                     this.storeBuildInfo = res.storeBuildInfo || {}
+                    let index = this.progressStatus.findIndex(x => ['doing', 'fail'].includes(x.status))
+                    if (index < 0) index = 0
+                    this.currentStepIndex = index + 1
                     const lastStep = this.progressStatus[this.progressStatus.length - 1] || {}
                     this.isOver = lastStep.status === 'success'
+                    if (this.isOver) this.currentStepIndex = this.progressStatus.length
                 })
             },
 

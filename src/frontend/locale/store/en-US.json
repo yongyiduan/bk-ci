@@ -1,5 +1,6 @@
 {
     "store": "Store",
+    "项目正在初始化，请耐心等候": "Project is initializing, please be patient",
     "发起重新构建成功": "Successfully initiated rebuild",
     "从工蜂自动同步": "Automatic synchronization from git",
     "新增扩展": "New extension",

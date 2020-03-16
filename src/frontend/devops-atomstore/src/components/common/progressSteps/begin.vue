@@ -2,7 +2,7 @@
     <section class="main-body">
         <section class="progress-approve">
             <img src="../../../images/progressApprove.png" class="approve-image">
-            <span class="approve-tip"> {{ $t('store.项目正在开始中，请耐心等候') }} </span>
+            <span class="approve-tip"> {{ $t('store.项目正在初始化，请耐心等候') }} </span>
         </section>
 
         <footer class="main-footer">

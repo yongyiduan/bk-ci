@@ -24,9 +24,6 @@
                         :use-group="true"
                         :tag-tpl="serviceTagTpl"
                         :tpl="renderServiceList"
-                        save-key="itemId"
-                        display-key="itemName"
-                        search-key="itemName"
                         trigger="focus">
                     </bk-tag-input>
                 </bk-form-item>
@@ -169,11 +166,11 @@
             ]),
 
             renderServiceList (node) {
-                return (<span class="tag-list">{node.itemName}</span>)
+                return (<span class="tag-list">{node.name}</span>)
             },
 
             serviceTagTpl (node) {
-                return (<span style="font-size: 12px; line-height: 22px; padding: 0 3px">{`${node.parentName}：${node.itemName}`}</span>)
+                return (<span style="font-size: 12px; line-height: 22px; padding: 0 3px">{`${node.parentName}：${node.name}`}</span>)
             },
 
             submitService () {
@@ -233,15 +230,12 @@
                 const code = this.form.projectCode
                 return this.requestServiceItemList(code).then((res) => {
                     this.serviceList = (res || []).map((item) => {
-                        const serviceItem = item.serviceItem || {}
-                        return {
-                            itemId: serviceItem.itemId,
-                            itemName: serviceItem.itemName,
-                            children: (item.childItem || []).map((x) => {
-                                x.parentName = serviceItem.itemName
-                                return x
-                            })
-                        }
+                        const serviceItem = item.extServiceItem || {}
+                        serviceItem.children = (item.childItem || []).map((x) => {
+                            x.parentName = serviceItem.name
+                            return x
+                        })
+                        return serviceItem
                     })
                 })
             },
@@ -305,9 +299,13 @@
         color: #63656e;
     }
 
-    /deep/ .bk-tag-selector .bk-tag-input .tag-list .remove-key {
-        top: 0;
-        margin-left: 6px;
+    /deep/ .bk-tag-selector {
+        min-height: 32px;
+        height: auto;
+        .bk-tag-input .tag-list .remove-key {
+            top: 0;
+            margin-left: 6px;
+        }
     }
 
     .edit-service-home {

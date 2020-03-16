@@ -4,28 +4,8 @@
             <img src="../../../images/progressApprove.png" class="approve-image">
             <span class="approve-tip"> {{ $t('store.项目正在审核中，请耐心等候') }} </span>
         </section>
-
-        <footer class="main-footer">
-            <bk-button :disabled="currentStep.status !== 'success'" @click="nextStep"> {{ $t('store.下一步') }} </bk-button>
-        </footer>
     </section>
 </template>
-
-<script>
-    export default {
-        props: {
-            currentStep: {
-                type: Object
-            }
-        },
-
-        methods: {
-            nextStep () {
-                this.$parent.currentStepIndex++
-            }
-        }
-    }
-</script>
 
 <style lang="scss" scoped>
     @import '@/assets/scss/conf.scss';
