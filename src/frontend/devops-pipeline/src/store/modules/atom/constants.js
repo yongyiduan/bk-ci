@@ -112,3 +112,4 @@ export const defaultBuildNo = {
 }
 
 export const SET_AUTH_EDITING = 'SET_AUTH_EDITING'
+export const TOGGLE_REVIEW_DIALOG = 'TOGGLE_REVIEW_DIALOG'
