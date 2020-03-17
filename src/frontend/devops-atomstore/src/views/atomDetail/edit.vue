@@ -227,10 +227,10 @@
                 if (!validate) return
 
                 this.isSaving = true
-                const { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason } = this.atomForm
+                const { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason, visibilityLevel } = this.atomForm
                 const putData = {
                     atomCode: this.$route.params.atomCode,
-                    data: { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason }
+                    data: { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason, visibilityLevel }
                 }
                 this.$store.dispatch('store/modifyAtomDetail', putData).then(() => {
                     this.$store.dispatch('store/updateCurrentaAtom', { res: this.atomForm })
