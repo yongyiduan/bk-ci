@@ -106,7 +106,7 @@
             submit () {
                 this.isCommiting = true
                 const postData = {
-                    serviceCode: this.detail.serviceCode,
+                    serviceId: this.detail.serviceId,
                     commitInfo: this.commitInfo
                 }
                 this.$store.dispatch('store/requestCommitServiceInfo', postData).catch((err) => {

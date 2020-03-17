@@ -3,7 +3,7 @@
         <section class="progress-test">
             <img src="../../../images/progressTest.png" class="test-image">
             <bk-button class="test-button" @click="goToTest"> {{ $t('store.前往测试') }} </bk-button>
-            <span class="test-tip"> {{ $t('store.完成测试后返回此页面继续发布流程') }} </span>
+            <span class="test-tip" v-html="$t('store.testTip')"></span>
         </section>
 
         <footer class="main-footer">

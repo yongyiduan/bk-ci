@@ -1,5 +1,6 @@
 {
     "store": "Store",
+    "testTip": "Verify that the extension function is OK under the corresponding extension point of the debugging project<br/>If you find a problem, after modifying the code, click the Rebuild entry below, build again, and test again<br/>If the test is OK, click the test completed entry below to continue the publishing process",
     "项目正在初始化，请耐心等候": "Project is initializing, please be patient",
     "发起重新构建成功": "Successfully initiated rebuild",
     "从工蜂自动同步": "Automatic synchronization from git",
@@ -47,7 +48,7 @@
     "前往测试": "Go to test",
     "完成测试后返回此页面继续发布流程": "Return to this page after testing to continue the publishing process",
     "测试完成": "Finished test",
-    "项目正在审核中，请耐心等候": "Project is under review, please be patient",
+    "扩展正在审核中，请耐心等候": "Extension is under review, please be patient",
     "触发器类扩展服务": "Trigger Class Extension Service",
     "任务类扩展服务": "Task class extension service",
     "请选择扩展点": "Please select an extension point",

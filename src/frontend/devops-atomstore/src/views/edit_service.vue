@@ -9,7 +9,7 @@
             <div class="title secondary" @click="toServiceList"> {{ $t('store.工作台') }} </div>
             <i class="right-arrow"></i>
             <div class="title third-level">{{$t('store.上架/升级扩展')}}（{{form.serviceCode}}）</div>
-            <a class="develop-guide-link" target="_blank" href="http://tempdocklink/pages/viewpage.action?pageId=22118721"> {{ $t('store.扩展指引') }} </a>
+            <a class="develop-guide-link" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.扩展指引') }} </a>
         </div>
         <main v-bkloading="{ isLoading }" class="edit-content">
             <bk-form ref="serviceForm" class="edit-service" label-width="125" :model="form" v-show="!isLoading">
@@ -17,15 +17,41 @@
                     <bk-input v-model="form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
                 </bk-form-item>
                 <bk-form-item class="wt660" :label="$t('store.扩展点')" :required="true" property="extensionItemList" :rules="[requireRule]" ref="extensionItemList">
-                    <bk-tag-input :placeholder="$t('store.请选择扩展点')"
-                        v-model="form.extensionItemList"
-                        :has-delete-icon="true"
-                        :list="serviceList"
-                        :use-group="true"
-                        :tag-tpl="serviceTagTpl"
-                        :tpl="renderServiceList"
-                        trigger="focus">
-                    </bk-tag-input>
+                    <bk-select v-model="form.extensionItemList"
+                        :placeholder="$t('store.请选择扩展点')"
+                        multiple
+                        :scroll-height="500"
+                        :clearable="true"
+                        @toggle="getServiceList"
+                        :loading="isServiceListLoading"
+                    >
+                        <template v-slot:trigger>
+                            <section>
+                                <ul class="select-tag" v-if="!isLoading">
+                                    <li v-for="item in form.extensionItemList" :key="item">
+                                        <i class="bk-icon icon-close" @click.prevent.stop="deleteServiceItem(item)"></i>
+                                        {{ getItemName(item) }}
+                                    </li>
+                                </ul>
+                                <i class="bk-select-clear bk-icon icon-close"
+                                    v-if="form.extensionItemList.length"
+                                    @click.prevent.stop="form.extensionItemList = []">
+                                </i>
+                                <i class="bk-select-angle bk-icon icon-angle-down" v-else></i>
+                            </section>
+                        </template>
+                        <bk-option-group
+                            v-for="(group, index) in serviceList"
+                            :name="group.name"
+                            :key="index">
+                            <bk-option v-for="(option, key) in group.children"
+                                :key="key"
+                                :id="option.id"
+                                :name="`${group.name}-${option.name}`"
+                            >
+                            </bk-option>
+                        </bk-option-group>
+                    </bk-select>
                 </bk-form-item>
                 <bk-form-item :label="$t('store.标签')" property="labelIdList" class="wt660">
                     <bk-tag-input v-model="form.labelIdList" :list="labelList" display-key="labelName" search-key="labelName" trigger="focus" :placeholder="$t('store.请选择标签')"></bk-tag-input>
@@ -165,12 +191,19 @@
                 'requestServiceLabel'
             ]),
 
-            renderServiceList (node) {
-                return (<span class="tag-list">{node.name}</span>)
+            deleteServiceItem (id) {
+                const index = this.relateServiceData.form.extensionItemList.findIndex(x => id)
+                this.relateServiceData.form.extensionItemList.splice(index, 1)
             },
 
-            serviceTagTpl (node) {
-                return (<span style="font-size: 12px; line-height: 22px; padding: 0 3px">{`${node.parentName}：${node.name}`}</span>)
+            getItemName (id) {
+                let name = ''
+                this.serviceList.forEach((item) => {
+                    item.children.forEach((child) => {
+                        if (child.id === id) name = `${item.name}：${child.name}`
+                    })
+                })
+                return name
             },
 
             submitService () {
@@ -202,7 +235,7 @@
                 Promise.all([
                     this.requestServiceDetail(serviceId),
                     this.requestServiceLabel(),
-                    this.getServiceList()
+                    this.getServiceList(true)
                 ]).then(([res, labels]) => {
                     this.labelList = labels || []
                     Object.assign(this.form, res)
@@ -226,18 +259,21 @@
                 })
             },
 
-            getServiceList () {
-                const code = this.form.projectCode
-                return this.requestServiceItemList(code).then((res) => {
+            getServiceList (isOpen) {
+                if (!isOpen) return
+
+                this.isServiceListLoading = true
+                this.$store.dispatch('store/requestServiceItemList').then((res) => {
                     this.serviceList = (res || []).map((item) => {
                         const serviceItem = item.extServiceItem || {}
-                        serviceItem.children = (item.childItem || []).map((x) => {
-                            x.parentName = serviceItem.name
-                            return x
-                        })
-                        return serviceItem
+                        return {
+                            name: serviceItem.name,
+                            children: item.childItem || []
+                        }
                     })
-                })
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => (this.isServiceListLoading = false))
             },
 
             async uploadimg (pos, file) {
@@ -299,12 +335,25 @@
         color: #63656e;
     }
 
-    /deep/ .bk-tag-selector {
-        min-height: 32px;
-        height: auto;
-        .bk-tag-input .tag-list .remove-key {
-            top: 0;
-            margin-left: 6px;
+    .select-tag {
+        min-height: 30px;
+        &::after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+        li {
+            float: left;
+            height: 24px;
+            background: #f1f2f3;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            line-height: 24px;
+            margin: 3px 5px;
+            padding: 0 4px;
+            .icon-close {
+                margin-right: 3px;
+            }
         }
     }
 

@@ -12,8 +12,8 @@ export const actions = {
     /***
      *  提交相关信息
      */
-    requestCommitServiceInfo ({ commit }, { serviceCode, commitInfo }) {
-        return vue.$ajax.post(`${prefix}/user/market/serviceCodes/${serviceCode}/ext/submitInfo?serviceCode=${serviceCode}`, commitInfo)
+    requestCommitServiceInfo ({ commit }, { serviceId, commitInfo }) {
+        return vue.$ajax.post(`${prefix}/user/market/serviceIds/${serviceId}/ext/submitInfo?serviceId=${serviceId}`, commitInfo)
     },
 
     /***

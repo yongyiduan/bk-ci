@@ -64,7 +64,7 @@
                         v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
                         @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'atomList' } })"> {{ $t('store.安装') }} </span>
                     <span class="schedule-btn"
-                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'BUILD_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.serviceStatus)"
+                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'BUILD_FAIL', 'TESTING'].includes(props.row.serviceStatus)"
                         @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
                     <span class="obtained-btn"
                         v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
@@ -88,15 +88,41 @@
                         <bk-input v-model="relateServiceData.form.serviceCode" :placeholder="$t('store.请输入扩展标识')"></bk-input>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.扩展点')" :required="true" property="extensionItemList" :desc="$t('store.扩展服务生效的功能区域')" :rules="[requireRule]">
-                        <bk-tag-input :placeholder="$t('store.请选择扩展点')"
-                            v-model="relateServiceData.form.extensionItemList"
-                            :has-delete-icon="true"
-                            :list="serviceList"
-                            :use-group="true"
-                            :tag-tpl="serviceTagTpl"
-                            :tpl="renderServiceList"
-                            trigger="focus">
-                        </bk-tag-input>
+                        <bk-select v-model="relateServiceData.form.extensionItemList"
+                            :placeholder="$t('store.请选择扩展点')"
+                            multiple
+                            :scroll-height="500"
+                            :clearable="true"
+                            @toggle="getServiceList"
+                            :loading="isServiceListLoading"
+                        >
+                            <template v-slot:trigger>
+                                <section>
+                                    <ul class="select-tag">
+                                        <li v-for="item in relateServiceData.form.extensionItemList" :key="item">
+                                            <i class="bk-icon icon-close" @click.prevent.stop="deleteServiceItem(item)"></i>
+                                            {{ getItemName(item) }}
+                                        </li>
+                                    </ul>
+                                    <i class="bk-select-clear bk-icon icon-close"
+                                        v-if="relateServiceData.form.extensionItemList.length"
+                                        @click.prevent.stop="relateServiceData.form.extensionItemList = []">
+                                    </i>
+                                    <i class="bk-select-angle bk-icon icon-angle-down" v-else></i>
+                                </section>
+                            </template>
+                            <bk-option-group
+                                v-for="(group, index) in serviceList"
+                                :name="group.name"
+                                :key="index">
+                                <bk-option v-for="(option, key) in group.children"
+                                    :key="key"
+                                    :id="option.id"
+                                    :name="`${group.name}-${option.name}`"
+                                >
+                                </bk-option>
+                            </bk-option-group>
+                        </bk-select>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在开发测试过程中，开发者可以在此项目下调试扩展，成功提交后将不能修改')" :rules="[requireRule]">
                         <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
@@ -248,12 +274,19 @@
         },
 
         methods: {
-            renderServiceList (node) {
-                return (<span class="tag-list">{node.name}</span>)
+            deleteServiceItem (id) {
+                const index = this.relateServiceData.form.extensionItemList.findIndex(x => id)
+                this.relateServiceData.form.extensionItemList.splice(index, 1)
             },
 
-            serviceTagTpl (node) {
-                return (<span style="font-size: 12px; line-height: 22px; padding: 0 3px">{`${node.parentName}：${node.name}`}</span>)
+            getItemName (id) {
+                let name = ''
+                this.serviceList.forEach((item) => {
+                    item.children.forEach((child) => {
+                        if (child.id === id) name = `${item.name}：${child.name}`
+                    })
+                })
+                return name
             },
 
             search () {
@@ -272,18 +305,21 @@
                 }).finally(() => (this.isItemLoading = false))
             },
 
-            getServiceList () {
+            getServiceList (isOpen) {
+                if (!isOpen) return
+
                 this.isServiceListLoading = true
-                return this.$store.dispatch('store/requestServiceItemList').then((res) => {
+                this.$store.dispatch('store/requestServiceItemList').then((res) => {
                     this.serviceList = (res || []).map((item) => {
                         const serviceItem = item.extServiceItem || {}
-                        serviceItem.children = (item.childItem || []).map((x) => {
-                            x.parentName = serviceItem.name
-                            return x
-                        })
-                        return serviceItem
+                        return {
+                            name: serviceItem.name,
+                            children: item.childItem || []
+                        }
                     })
-                })
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => (this.isServiceListLoading = false))
             },
 
             submitOfflineService (row) {
@@ -425,7 +461,7 @@
             relateService () {
                 this.relateServiceData.show = true
                 this.relateServiceData.isLoading = true
-                Promise.all([this.getProjectList(), this.getServiceList()]).catch((err) => {
+                Promise.all([this.getProjectList()]).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => (this.relateServiceData.isLoading = false))
             },
@@ -441,6 +477,27 @@
 </script>
 
 <style lang="scss" scoped>
+    .select-tag {
+        min-height: 30px;
+        &::after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+        li {
+            float: left;
+            height: 24px;
+            background: #f1f2f3;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            line-height: 24px;
+            margin: 3px 5px;
+            padding: 0 4px;
+            .icon-close {
+                margin-right: 3px;
+            }
+        }
+    }
     .tag-list {
         padding: 0 20px;
         line-height: 32px;
@@ -449,14 +506,6 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         color: #63656e;
-    }
-    /deep/ .bk-tag-selector {
-        min-height: 32px;
-        height: auto;
-        .bk-tag-input .tag-list .remove-key {
-            top: 0;
-            margin-left: 6px;
-        }
     }
     .relate-form {
         margin: 30px 20px;

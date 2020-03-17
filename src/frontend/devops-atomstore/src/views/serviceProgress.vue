@@ -9,7 +9,7 @@
                 <i class="right-arrow banner-arrow"></i>
                 <span class="banner-des">{{$t('store.上架/升级扩展')}}（{{serviceDetail.serviceCode}}）</span>
             </p>
-            <a class="title-work" target="_blank" href="http://tempdocklink/pages/viewpage.action?pageId=22118721"> {{ $t('store.扩展指引') }} </a>
+            <a class="title-work" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.扩展指引') }} </a>
         </h3>
         <article v-if="!isLoading" class="service-progress-main">
             <header class="progress-header">
