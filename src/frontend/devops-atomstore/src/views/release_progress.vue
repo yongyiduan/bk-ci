@@ -219,8 +219,8 @@
 </template>
 
 <script>
-    import BuildLog from '@/components/Log'
     import * as cookie from 'js-cookie'
+    import BuildLog from '@/components/Log'
     import webSocketMessage from '@/utils/webSocketMessage'
 
     const CSRFToken = cookie.get('backend_csrftoken')
