@@ -21,7 +21,7 @@
                     <bk-table-column :label="$t('store.状态')">
                         <template slot-scope="props">
                             <span>{{ statusMap[props.row.status] }}</span>
-                            <span class="audit-tips" v-if="props.row.status === 'APPROVING'"><i class="bk-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }} </span>
+                            <span class="audit-tips" v-if="props.row.status === 'APPROVING'"><i class="devops-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }} </span>
                             <span class="audit-tips" v-else>{{ props.row.comment }}</span>
                         </template>
                     </bk-table-column>

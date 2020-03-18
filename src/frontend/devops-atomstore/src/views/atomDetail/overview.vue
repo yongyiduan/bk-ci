@@ -59,7 +59,7 @@
                                     <div class="info-value codelib-url">
                                         {{codeForm.repositoryAuthorizer}}
                                         <bk-popover placement="top">
-                                            <i class="bk-icon icon-info-circle"></i>
+                                            <i class="devops-icon icon-info-circle"></i>
                                             <template slot="content">
                                                 <p> {{ $t('store.在发布插件时，使用授权人的身份拉取插件代码自动构建打包，或设置插件可见范围') }} </p>
                                             </template>

@@ -21,7 +21,7 @@
                 >
                     <bk-table-column label="文件名（版本号）" prop="name" min-width="150">
                         <template slot-scope="props">
-                            <i v-if="props.row.expired" class="bk-icon icon-expired-experience"></i>
+                            <i v-if="props.row.expired" class="devops-icon icon-expired-experience"></i>
                             <span class="link-text" :title="`${props.row.name}（ ${props.row.version} ）`">{{ props.row.name }}（{{ props.row.version }}）</span>
                         </template>
                     </bk-table-column>
@@ -34,15 +34,15 @@
                         <template slot-scope="props">
                             <div class="operate-cell">
                                 <template v-if="!props.row.expired && props.row.online">
-                                    <span v-if="!props.row.permissions.canExperience " v-bk-tooltips="{ content: '你没有该版本的体验权限' }" class="bk-icon icon-qrcode"></span>
+                                    <span v-if="!props.row.permissions.canExperience " v-bk-tooltips="{ content: '你没有该版本的体验权限' }" class="devops-icon icon-qrcode"></span>
                                     <bk-popover placement="left" theme="light" v-if="props.row.permissions.canExperience">
-                                        <i class="bk-icon icon-qrcode" @mouseover="requestUrl(props.row)"></i>
+                                        <i class="devops-icon icon-qrcode" @mouseover="requestUrl(props.row)"></i>
                                         <p slot="content" class="qrcode-box" v-if="props.row.permissions.canExperience" v-bkloading="{ isLoading: !curIndexItemUrl }">
                                             <qrcode class="qrcode-view" :text="curIndexItemUrl" :size="100"></qrcode>
                                         </p>
                                     </bk-popover>
                                 </template>
-                                <i v-bk-tooltips="{ content: '该体验已过期' }" class="bk-icon icon-qrcode expired-text" v-else></i>
+                                <i v-bk-tooltips="{ content: '该体验已过期' }" class="devops-icon icon-qrcode expired-text" v-else></i>
                                 <span class="edit" @click.stop="toEditRow(props.row)">编辑</span>
                                 <span class="drop-off" @click.stop="toDropOff(props.row)" v-if="props.row.online && !props.row.expired">下架</span>
                                 <span v-bk-tooltips="{ content: '该体验已下架' }" class="expired-text" v-else>下架</span>
@@ -287,7 +287,7 @@
         .link-text {
             color: $primaryColor;
         }
-        .bk-icon.icon-expired-experience{
+        .devops-icon.icon-expired-experience{
             position: absolute;
             left: -3px;
             top: -3px;

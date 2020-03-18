@@ -29,7 +29,7 @@
                 <bk-dropdown-menu style="margin-top: 4px;" @show="importMember">
                     <bk-button slot="dropdown-trigger">
                         <span>从用户组导入</span>
-                        <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+                        <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
                     </bk-button>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
                         <li v-for="(entry, index) in userGroupList" :key="index">
