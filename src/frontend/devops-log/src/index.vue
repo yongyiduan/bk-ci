@@ -517,7 +517,7 @@
                         padding: 0 5px;
                         font-size: 12px;
                     }
-                    .bk-icon {
+                    .devops-icon {
                         margin-left: 5px;
                         cursor: pointer;
                         user-select: none;
