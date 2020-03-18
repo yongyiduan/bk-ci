@@ -33,26 +33,11 @@ const actions: ActionTree<RootState, any> = {
             const extHooks = await Request.get(`${PROJECT_API_URL_PREFIX}/user/ext/items/list?serviceId=${serviceId}`)
             console.log(extHooks)
             commit(SET_SERVICE_HOOKS, {
-                extHooks: [{
-                    "itemName": "归档构件",
-                    "htmlPath": "PIPELINE.BUILD.ARTIFACTS",
-                    "htmlComponentType": "SIMPLE",
-                    "itemId": 5,
-                    "itemCode": "buildArtifact"
-                }],
+                extHooks: extHooks,
                 serviceId
             })
         } catch (error) {
-            commit(SET_SERVICE_HOOKS, {
-                extHooks: [{
-                    "itemName": "归档构件",
-                    "htmlPath": "PIPELINE.BUILD.ARTIFACTS",
-                    "htmlComponentType": "SIMPLE",
-                    "itemId": 5,
-                    "itemCode": "buildArtifact"
-                }],
-                serviceId
-            })
+            console.log(error)
         }
     },
     togglePermissionDialog ({ commit }: ActionContext<RootState, any>, visible: boolean) {

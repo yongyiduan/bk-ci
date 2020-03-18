@@ -63,8 +63,9 @@
                         projectCode: this.$route.params.projectId,
                         itemIds: this.hookIds
                     })
-                    const mock = true
-                    if (mock) throw Error('mock')
+                    console.log(res, this.hookIds)
+                    // const mock = true
+                    // if (mock) throw Error('mock')
                     let artifactExtensions = []
                     this.artifactExtensionMap = res.data.reduce((artifactExtensionMap, ext) => {
                         artifactExtensionMap[ext.itemId] = [
@@ -77,7 +78,7 @@
                         ]
 
                         return artifactExtensionMap
-                    })
+                    }, {})
                     this.artifactExtensions = artifactExtensions
                 } catch (error) {
                     console.log(error)
