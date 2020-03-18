@@ -72,7 +72,7 @@
                                     :title="permissionMsg"
                                 > {{ $t('store.继续') }} </bk-button>
                                 <div class="audit-tips" v-if="entry.code === 'approve' && entry.status === 'doing' && !isEnterprise">
-                                    <i class="bk-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }}
+                                    <i class="devops-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }}
                                 </div>
                             </div>
                         </div>
@@ -119,9 +119,9 @@
                                 <div class="info-label"> {{ $t('store.适用Job类型：') }} </div>
                                 <div class="info-value" v-if="versionDetail.os">{{ jobTypeMap[versionDetail.jobType] }}
                                     <span v-if="versionDetail.jobType === 'AGENT'">（
-                                        <i class="bk-icon icon-linux-view" v-if="versionDetail.os.indexOf('LINUX') !== -1"></i>
-                                        <i class="bk-icon icon-windows" v-if="versionDetail.os.indexOf('WINDOWS') !== -1"></i>
-                                        <i class="bk-icon icon-macos" v-if="versionDetail.os.indexOf('MACOS') !== -1"></i>）
+                                        <i class="devops-icon icon-linux-view" v-if="versionDetail.os.indexOf('LINUX') !== -1"></i>
+                                        <i class="devops-icon icon-windows" v-if="versionDetail.os.indexOf('WINDOWS') !== -1"></i>
+                                        <i class="devops-icon icon-macos" v-if="versionDetail.os.indexOf('MACOS') !== -1"></i>）
                                     </span>
                                 </div>
                             </div>

@@ -15,7 +15,7 @@
                     :key="index"
                     :class="{ &quot;step&quot;: true, &quot;done&quot;: isDone(index + 1), &quot;active&quot;: isActive(index + 1) }"
                 >
-                    <span v-if="isDone(index + 1) || (isActive(index + 1) && index + 1 === stepList.length) "><i class="bk-icon icon-check-1" /></span>
+                    <span v-if="isDone(index + 1) || (isActive(index + 1) && index + 1 === stepList.length) "><i class="devops-icon icon-check-1" /></span>
                     <span v-else>{{ index + 1 }}</span>
                     <p>{{ step }}</p>
                 </li>

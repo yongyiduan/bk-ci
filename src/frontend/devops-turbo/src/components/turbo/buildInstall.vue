@@ -2,7 +2,7 @@
 <template>
     <section class="build-wrapper build-install-form">
         <div class="build-tooltips">
-            <i class="bk-icon icon-info-circle-shape"></i>
+            <i class="devops-icon icon-info-circle-shape"></i>
             <span>输入IP等信息并下载安装包，以便蓝盾接受你构建机的加速请求</span>
         </div>
         <bk-form :label-width="130" :model="machineParam">
@@ -18,7 +18,7 @@
                     v-model.trim="machineParam.machineIp">
                 </bk-input>
                 <bk-popover placement="right" :width="200" class="prompt-tips">
-                    <i class="bk-icon icon-info-circle"></i>
+                    <i class="devops-icon icon-info-circle"></i>
                     <div slot="content" style="white-space: normal;">
                         <div class="">多IP请用英文逗号分隔，蓝盾会将该IP设置为白名单</div>
                     </div>

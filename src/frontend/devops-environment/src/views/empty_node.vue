@@ -14,7 +14,7 @@
                     ref="dropdown">
                     <bk-button slot="dropdown-trigger">
                         <span>{{ $t('environment.import') }}</span>
-                        <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+                        <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
                     </bk-button>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
                         <li>

@@ -72,7 +72,7 @@
                         <template slot="extension">
                             <div class="bk-selector-create-item">
                                 <a class="bk-selector-link" target="_blank" :href="`/console/pipeline/${projectId}/list/allPipeline`">
-                                    <i class="bk-icon icon-plus-circle"></i>
+                                    <i class="devops-icon icon-plus-circle"></i>
                                     <span class="text">添加流水线</span>
                                 </a>
                             </div>
