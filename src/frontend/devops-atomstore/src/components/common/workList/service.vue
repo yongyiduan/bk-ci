@@ -8,8 +8,8 @@
             </div>
             <section :class="[{ 'control-active': isInputFocus }, 'g-input-search', 'list-input']">
                 <input class="g-input-border" type="text" :placeholder="$t('store.请输入关键字搜索')" v-model="searchName" @focus="isInputFocus = true" @blur="isInputFocus = false" @keyup.enter="search" />
-                <i class="bk-icon icon-search" v-if="!searchName"></i>
-                <i class="bk-icon icon-close-circle-shape clear-icon" v-else @click="clearSearch"></i>
+                <i class="devops-icon icon-search" v-if="!searchName"></i>
+                <i class="devops-icon icon-close-circle-shape clear-icon" v-else @click="clearSearch"></i>
             </section>
         </div>
         <bk-table style="margin-top: 15px;" :empty-text="$t('store.暂时没有扩展')"
@@ -45,7 +45,7 @@
                     <span class="atom-status-icon success" v-if="props.row.serviceStatus === 'RELEASED'"></span>
                     <span class="atom-status-icon fail" v-if="props.row.serviceStatus === 'GROUNDING_SUSPENSION'"></span>
                     <span class="atom-status-icon obtained" v-if="props.row.serviceStatus === 'AUDIT_REJECT' || props.row.serviceStatus === 'UNDERCARRIAGED'"></span>
-                    <span class="atom-status-icon bk-icon icon-initialize" v-if="props.row.serviceStatus === 'INIT'"></span>
+                    <span class="atom-status-icon devops-icon icon-initialize" v-if="props.row.serviceStatus === 'INIT'"></span>
                     <span>{{ $t(serviceStatusList[props.row.serviceStatus]) }}</span>
                 </template>
             </bk-table-column>
@@ -104,7 +104,7 @@
                                             {{ getItemName(item) }}
                                         </li>
                                     </ul>
-                                    <i class="bk-select-clear bk-icon icon-close"
+                                    <i class="bk-select-clear bk-icon icon-close-circle-shape"
                                         v-if="relateServiceData.form.extensionItemList.length"
                                         @click.prevent.stop="relateServiceData.form.extensionItemList = []">
                                     </i>
@@ -118,7 +118,7 @@
                                 <bk-option v-for="(option, key) in group.children"
                                     :key="key"
                                     :id="option.id"
-                                    :name="`${group.name}-${option.name}`"
+                                    :name="option.name"
                                 >
                                 </bk-option>
                             </bk-option-group>

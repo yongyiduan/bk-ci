@@ -164,6 +164,7 @@
         line-height: 30px;
         .bk-icon {
             margin-right: 4px;
+            font-size: 18px;
         }
     }
 </style>

@@ -207,10 +207,8 @@
                         title: sideSliderConfig.loading.title
                     }">
                     <build-log v-if="currentBuildNo"
-                        :project-id="currentProjectId"
-                        :pipeline-id="currentPipelineId"
                         :build-no="currentBuildNo"
-                        :log-url="`store/api/user/market/atom/logs/${currentProjectId}/${currentPipelineId}`"
+                        :log-url="`store/api/user/store/logs/types/ATOM/projects/${currentProjectCode}/pipelines/${currentPipelineId}/builds`"
                     />
                 </div>
             </template>
@@ -241,7 +239,7 @@
             return {
                 permission: true,
                 atomlogoUrl: '',
-                currentProjectId: '',
+                currentProjectCode: '',
                 currentBuildNo: '',
                 currentPipelineId: '',
                 timer: -1,
@@ -318,7 +316,7 @@
         watch: {
             'sideSliderConfig.show' (val) {
                 if (!val) {
-                    this.currentProjectId = ''
+                    this.currentProjectCode = ''
                     this.currentBuildNo = ''
                     this.currentPipelineId = ''
                 }
@@ -457,7 +455,7 @@
             },
             readLog () {
                 this.sideSliderConfig.show = true
-                this.currentProjectId = this.storeBuildInfo.projectCode
+                this.currentProjectCode = this.storeBuildInfo.projectCode
                 this.currentBuildNo = this.storeBuildInfo.buildId
                 this.currentPipelineId = this.storeBuildInfo.pipelineId
             },

@@ -36,7 +36,7 @@
                         <h3>
                             <span class="code-title"> {{ $t('store.授权人') }} </span>：<span>{{ currentService.repositoryAuthorizer }}</span>
                             <bk-popover placement="top">
-                                <i class="bk-icon icon-info-circle ml4"></i>
+                                <i class="devops-icon icon-info-circle ml4"></i>
                                 <template slot="content">
                                     <p> {{ $t('store.在发布扩展时，使用授权人的身份拉取扩展代码自动构建打包，或设置扩展可见范围') }} </p>
                                 </template>

@@ -110,6 +110,10 @@ const commonModules = {
 
         requestProjectList ({ commit }) {
             return vue.$ajax.get(`/project/api/user/projects/`)
+        },
+
+        requestProgressLog ({ commit }, { type, projectCode, pipelineId, buildId, start }) {
+            return vue.$ajax.get(`${prefix}/user/store/logs/types/${type}/projects/${projectCode}/pipelines/${pipelineId}/builds/${buildId}/after?start=${start}`)
         }
     },
     getters: {

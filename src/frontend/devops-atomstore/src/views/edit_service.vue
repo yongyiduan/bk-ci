@@ -33,7 +33,7 @@
                                         {{ getItemName(item) }}
                                     </li>
                                 </ul>
-                                <i class="bk-select-clear bk-icon icon-close"
+                                <i class="bk-select-clear bk-icon icon-close-circle-shape"
                                     v-if="form.extensionItemList.length"
                                     @click.prevent.stop="form.extensionItemList = []">
                                 </i>
@@ -47,7 +47,7 @@
                             <bk-option v-for="(option, key) in group.children"
                                 :key="key"
                                 :id="option.id"
-                                :name="`${group.name}-${option.name}`"
+                                :name="option.name"
                             >
                             </bk-option>
                         </bk-option-group>
