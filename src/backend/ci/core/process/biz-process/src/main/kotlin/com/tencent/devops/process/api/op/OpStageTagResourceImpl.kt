@@ -24,32 +24,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.pipeline.container
+package com.tencent.devops.process.api.op
 
-import com.tencent.devops.common.pipeline.option.StageControlOption
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.process.pojo.PipelineStageTag
+import com.tencent.devops.process.pojo.StageTagRequest
+import com.tencent.devops.process.service.StageTagService
+import org.springframework.beans.factory.annotation.Autowired
 
-@ApiModel("流水线模型-阶段")
-data class Stage(
-    @ApiModelProperty("容器集合", required = true)
-    val containers: List<Container> = listOf(),
-    @ApiModelProperty("阶段ID", required = false)
-    var id: String?,
-    @ApiModelProperty("阶段名称", required = true)
-    var name: String? = "",
-    @ApiModelProperty("阶段标签", required = false, hidden = true)
-    var tag: List<String?>? = null,
-    @ApiModelProperty("阶段状态", required = false, hidden = true)
-    var status: String? = null,
-    @ApiModelProperty("阶段启动时间", required = false, hidden = true)
-    var startEpoch: Long? = null,
-    @ApiModelProperty("容器运行时间", required = false, hidden = true)
-    var elapsed: Long? = null,
-    @ApiModelProperty("用户自定义环境变量", required = false)
-    val customBuildEnv: Map<String, String>? = null,
-    @ApiModelProperty("是否启用容器失败快速终止阶段", required = false)
-    val fastKill: Boolean? = false,
-    @ApiModelProperty("流程控制选项", required = true)
-    var stageControlOption: StageControlOption? = null // 为了兼容旧数据，所以定义为可空以及var
-)
+@RestResource
+class OpStageTagResourceImpl @Autowired constructor(
+    private val stageTagService: StageTagService
+) : OpStageTagResource {
+    override fun add(stageTagRequest: StageTagRequest): Result<Boolean> {
+        return stageTagService.saveStageTag(stageTagRequest.stageTagName, stageTagRequest.weight)
+    }
+
+    override fun update(id: String, stageTagRequest: StageTagRequest): Result<Boolean> {
+        return stageTagService.updateStageTag(id, stageTagRequest.stageTagName, stageTagRequest.weight)
+    }
+
+    override fun listAllStageTags(): Result<List<PipelineStageTag>> {
+        return stageTagService.getAllStageTag()
+    }
+
+    override fun getStageTagById(id: String): Result<PipelineStageTag?> {
+        return stageTagService.getStageTag(id)
+    }
+
+    override fun deleteStageTagById(id: String): Result<Boolean> {
+        return stageTagService.deleteStageTag(id)
+    }
+}
