@@ -192,8 +192,8 @@
             ]),
 
             deleteServiceItem (id) {
-                const index = this.relateServiceData.form.extensionItemList.findIndex(x => id)
-                this.relateServiceData.form.extensionItemList.splice(index, 1)
+                const index = this.form.extensionItemList.findIndex(x => x === id)
+                this.form.extensionItemList.splice(index, 1)
             },
 
             getItemName (id) {

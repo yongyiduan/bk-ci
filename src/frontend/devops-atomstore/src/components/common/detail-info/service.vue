@@ -225,10 +225,6 @@
             padding-left: 70px;
             display: inline-block;
             position: relative;
-            span {
-                overflow: inherit;
-                margin-top: 7px;
-            }
             span:first-child {
                 position: absolute;
                 left: 0;

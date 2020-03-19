@@ -14,7 +14,7 @@
         <article v-if="!isLoading" class="service-progress-main">
             <header class="progress-header">
                 <bk-steps ext-cls="progress-steps" :status="currentStepStatus" :steps="progressStatus" :cur-step="currentStepIndex"></bk-steps>
-                <!--bk-button class="progress-detail" @click="showDetail = true"> {{ $t('store.查看扩展详情') }} </bk-button-->
+                <bk-button class="progress-detail" @click="showDetail"> {{ $t('store.查看扩展详情') }} </bk-button>
                 <bk-button class="progress-cancle" @click="cancelRelease"> {{ $t('store.中止发布') }} </bk-button>
             </header>
 
@@ -23,29 +23,63 @@
             </section>
         </article>
 
-        <bk-sideslider :is-show.sync="showDetail"
+        <bk-sideslider :is-show.sync="isShowDetail"
             :title="$t('store.查看扩展详情')"
             :quick-close="true"
             :width="640"
         >
             <template slot="content">
-                <h3>
-                    <img :src="serviceDetail.logoUrl">
-                    <span class="lh30">{{serviceDetail.serviceName}}</span>
-                </h3>
-                <bk-form label-width="100" :model="serviceDetail">
-                    <bk-form-item :label="$t('store.扩展标识')" property="serviceCode">
-                        <span class="lh30">{{serviceDetail.serviceCode}}</span>
-                    </bk-form-item>
-                    <bk-form-item :label="$t('store.标签')" property="serviceCode">
-                        <ul>
-                            <li v-for="(label, index) in serviceDetail.labelList" :key="index">{{label}}</li>
-                        </ul>
-                    </bk-form-item>
-                    <bk-form-item :label="$t('store.标签')" property="serviceCode">
-                        <span class="lh30">{{serviceDetail.serviceCode}}</span>
-                    </bk-form-item>
-                </bk-form>
+                <section class="progress-detail-content">
+                    <h3 class="detail-title">
+                        <img :src="serviceDetail.logoUrl">
+                        <span>{{serviceDetail.serviceName}}</span>
+                    </h3>
+                    <bk-form label-width="100" :model="serviceDetail">
+                        <bk-form-item :label="$t('store.扩展标识')" property="serviceCode">
+                            <span class="lh30">{{serviceDetail.serviceCode}}</span>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.功能标签')" property="labelList">
+                            <h5 class="detail-label">
+                                <span v-for="(label, index) in serviceDetail.labelList" :key="index" class="info-label">{{label.labelName}}</span>
+                            </h5>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.扩展点')" property="itemName">
+                            <span class="lh30">{{serviceDetail.itemName}}</span>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.简介')" property="summary">
+                            <span class="lh30">{{serviceDetail.summary}}</span>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.详细描述')" property="description">
+                            <p :class="{ 'overflow': !isDropdownShow }" ref="edit">
+                                <mavon-editor class="image-remark-input"
+                                    ref="mdHook"
+                                    v-model="serviceDetail.description"
+                                    :editable="false"
+                                    :toolbars-flag="false"
+                                    default-open="preview"
+                                    :box-shadow="false"
+                                    :subfield="false"
+                                    preview-back-ground="#fafbfd"
+                                />
+                            </p>
+                            <span class="toggle-btn" v-if="isOverflow" @click="isDropdownShow = !isDropdownShow">{{ isDropdownShow ? $t('store.收起') : $t('store.展开') }}
+                                <i :class="['devops-icon icon-angle-down', { 'icon-flip': isDropdownShow }]"></i>
+                            </span>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.发布者')" property="publisher">
+                            <span class="lh30">{{serviceDetail.publisher}}</span>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.发布类型')" property="releaseType">
+                            <span class="lh30">{{serviceDetail.releaseType | releaseTypeFilter}}</span>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.版本')" property="version">
+                            <span class="lh30">{{serviceDetail.version}}</span>
+                        </bk-form-item>
+                        <bk-form-item :label="$t('store.版本日志')" property="versionContent">
+                            <span class="lh30">{{serviceDetail.versionContent}}</span>
+                        </bk-form-item>
+                    </bk-form>
+                </section>
             </template>
         </bk-sideslider>
     </article>
@@ -70,6 +104,28 @@
             end
         },
 
+        filters: {
+            releaseTypeFilter (val) {
+                const local = window.devops || {}
+                let res = ''
+                switch (val) {
+                    case 'NEW':
+                        res = local.$t('store.新上架')
+                        break
+                    case 'INCOMPATIBILITY_UPGRADE':
+                        res = local.$t('store.非兼容升级')
+                        break
+                    case 'COMPATIBILITY_UPGRADE':
+                        res = local.$t('store.兼容式功能更新')
+                        break
+                    case 'COMPATIBILITY_FIX':
+                        res = local.$t('store.兼容式问题修正')
+                        break
+                }
+                return res
+            }
+        },
+
         data () {
             return {
                 isLoading: false,
@@ -83,7 +139,9 @@
                 currentProjectId: '',
                 currentBuildNo: '',
                 currentPipelineId: '',
-                showDetail: false
+                isShowDetail: false,
+                isOverflow: false,
+                isDropdownShow: false
             }
         },
 
@@ -130,6 +188,11 @@
                 'requestServicePassTest',
                 'requestRecheckService'
             ]),
+
+            showDetail () {
+                this.isShowDetail = true
+                this.$nextTick(() => (this.isOverflow = this.$refs.edit.scrollHeight > 180))
+            },
 
             initData () {
                 Promise.all([this.getServiceDetail(), this.getServiceProcess()]).catch((err) => {
@@ -220,6 +283,7 @@
                     const lastStep = this.progressStatus[this.progressStatus.length - 1] || {}
                     this.isOver = lastStep.status === 'success'
                     if (this.isOver) this.currentStepIndex = this.progressStatus.length
+                    if (this.isOver || this.currentStep.status === 'fail') clearTimeout(this.loopProgress.timeId)
                 })
             },
 
@@ -252,6 +316,69 @@
 
 <style lang="scss" scoped>
     @import '@/assets/scss/conf.scss';
+
+    .progress-detail-content {
+        padding: 32px;
+        .detail-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            img {
+                width: 56px;
+                height: 56px;
+                border-radius: 11px;
+                margin: 0 28px 0 16px;
+            }
+            span {
+                font-weight: normal;
+                font-size: 20px;
+                text-align: left;
+                color: #222222;
+                line-height: 24px;
+            }
+        }
+        .toggle-btn {
+            font-size: 12px;
+            color: $primaryColor;
+            text-align: right;
+            cursor: pointer;
+            .devops-icon {
+                display: inline-block;
+                margin-left: 2px;
+                transition: all ease 0.2s;
+                &.icon-flip {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+        .overflow {
+            max-height: 180px;
+            overflow: hidden;
+        }
+        .detail-label {
+            display: inline-block;
+            position: relative;
+            span {
+                overflow: inherit;
+                margin-top: 7px;
+            }
+            span.info-label {
+                font-weight: normal;
+                display: inline-block;
+                width: auto;
+                height: 18px;
+                padding: 0 12px;
+                border: 1px solid $lightBorder;
+                border-radius: 20px;
+                margin-right: 8px;
+                line-height: 16px;
+                text-align: center;
+                font-size: 12px;
+                color: $fontDarkBlack;
+                background-color: $white;
+            }
+        }
+    }
 
     .service-progress-home {
         height: 100%;

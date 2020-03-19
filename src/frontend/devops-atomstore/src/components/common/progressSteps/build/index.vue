@@ -59,7 +59,7 @@
             }
         },
 
-        created () {
+        mounted () {
             this.getLog()
         },
 
@@ -93,6 +93,9 @@
                     }
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => {
+                    const ele = document.querySelector('.progress-log')
+                    ele.scrollTop = ele.scrollHeight
                 })
             },
 

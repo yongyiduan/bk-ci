@@ -275,7 +275,7 @@
 
         methods: {
             deleteServiceItem (id) {
-                const index = this.relateServiceData.form.extensionItemList.findIndex(x => id)
+                const index = this.relateServiceData.form.extensionItemList.findIndex(x => x === id)
                 this.relateServiceData.form.extensionItemList.splice(index, 1)
             },
 
