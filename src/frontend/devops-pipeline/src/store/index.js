@@ -119,7 +119,7 @@ export default new Vuex.Store({
         hookKeyMap (state) {
             if (Array.isArray(state.hooks)) {
                 return state.hooks.reduce((acc, hook) => {
-                    acc[hook.itemCode] = hook
+                    acc[hook.itemId] = hook
                     return acc
                 }, {})
             }

@@ -1,11 +1,11 @@
 <template>
     <ul class="artifactory-operation-hooks">
-        <li v-for="hook in artifactExtensions" :key="hook.key" @click="hookAction(hook)">
-            <template v-if="hook.tooltip && hook.tooltip.value">
-                <img v-bk-tooltips="hook.tooltip.value" v-bind="hook.icon" :src="getResUrl(hook.icon.url, hook.appKey)" />
+        <li class="icon-hook" v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)">
+            <template v-if="ext.tooltip">
+                <img v-bk-tooltips="ext.tooltip" :src="getResUrl(ext.iconUrl, ext.baseUrl)" />
             </template>
             <template v-else>
-                <img v-bind="hook.icon" :src="getResUrl(hook.icon.url, hook.appKey)" />
+                <img :src="getResUrl(ext.iconUrl, ext.baseUrl)" />
             </template>
         </li>
     </ul>
@@ -30,7 +30,8 @@
         },
         computed: {
             ...mapGetters([
-                'artifactHooks'
+                'artifactHooks',
+                'hookKeyMap'
             ]),
             hookIds () {
                 return this.artifactHooks.map(hook => hook.itemId).join(',')
@@ -44,14 +45,16 @@
             ...mapActions([
                 'fetchExtensionByHookId'
             ]),
-            hookAction (hook) {
-                console.log(hook)
+            hookAction (ext) {
                 this.$hookTrigger({
-                    ...hook,
+                    ...ext,
+                    url: urlJoin(ext.baseUrl, 'static/index.html'),
+                    name: ext.itemName,
                     target: {
-                        ...hook.target,
+                        type: ext.htmlComponentType,
+                        options: {},
                         data: {
-                            ...hook.target.data,
+                            ...(ext.props.data ? ext.props.data : {}),
                             artifact: this.artifact
                         }
                     }
@@ -63,89 +66,34 @@
                         projectCode: this.$route.params.projectId,
                         itemIds: this.hookIds
                     })
-                    console.log(res, this.hookIds)
-                    // const mock = true
-                    // if (mock) throw Error('mock')
+                    console.log(res, this.hookIds, this.artifactHooks)
                     let artifactExtensions = []
                     this.artifactExtensionMap = res.data.reduce((artifactExtensionMap, ext) => {
+                        const extServiceList = ext.extServiceList.map(item => ({
+                            ...this.hookKeyMap[ext.itemId],
+                            ...item
+                        }))
+                        console.log(extServiceList, this.hookKeyMap[ext.itemId])
                         artifactExtensionMap[ext.itemId] = [
-                            ...ext.extServiceList
+                            ...extServiceList
                         ]
 
                         artifactExtensions = [
                             ...artifactExtensions,
-                            ...ext.extServiceList
+                            ...extServiceList
                         ]
 
                         return artifactExtensionMap
                     }, {})
+                    console.log(artifactExtensions)
                     this.artifactExtensions = artifactExtensions
                 } catch (error) {
                     console.log(error)
-                    this.artifactExtensions = [{
-                        'location': 'system.top.navigation.bar',
-                        'weight': 200,
-                        'styleClasses': [
-                            'webitem',
-                            'system-present-webitem'
-                        ],
-                        'url': 'http://localhost:8081',
-                        'context': 'addon',
-                        'target': {
-                            'type': 'asidePanel',
-                            'options': {
-                                'width': '800'
-                            }
-                        },
-                        'tooltip': {
-                            'value': 'Example tooltip'
-                        },
-                        'icon': {
-                            'width': 16,
-                            'height': 16,
-                            'url': 'http://localhost:8081/icon.svg'
-                        },
-                        'name': {
-                            'value': '1 WebItem'
-                        },
-                        'key': 'web-item-example'
-                    }]
-                    this.artifactExtensionMap = {
-                        5: [{
-                            'location': 'system.top.navigation.bar',
-                            'weight': 200,
-                            'styleClasses': [
-                                'webitem',
-                                'system-present-webitem'
-                            ],
-                            'url': '/helloworld',
-                            'context': 'addon',
-                            'target': {
-                                'type': 'dialog',
-                                'options': {
-                                    'height': '100px',
-                                    'width': '200px'
-                                }
-                            },
-                            'tooltip': {
-                                'value': 'Example tooltip'
-                            },
-                            'icon': {
-                                'width': 16,
-                                'height': 16,
-                                'url': '/icon.svg'
-                            },
-                            'name': {
-                                'value': 'Demo WebItem'
-                            },
-                            'key': 'web-item-example'
-                        }]
-                    }
                 }
             },
-            getResUrl (url, appKey) {
-                console.log(url, appKey, 'geturl')
-                return isAbsoluteURL(url) ? url : urlJoin(this.extensionKeyMap[appKey].baseURL, url)
+            getResUrl (url, baseURL) {
+                console.log(url, baseURL, 'geturl')
+                return isAbsoluteURL(url) ? url : urlJoin(baseURL, 'static', url)
             }
         }
     }
@@ -157,6 +105,9 @@
         align-items: center;
         > li {
             margin-right: 8px;
+            width: 16px;
+            height: 16px;
+            
         }
     }
 </style>

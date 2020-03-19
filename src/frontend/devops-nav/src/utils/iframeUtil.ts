@@ -29,7 +29,7 @@ function iframeUtil (router: any) {
 
     utilMap.hookTrigger = function (hook) {
         switch (hook.target.type) {
-            case 'asidePanel':
+            case 'ASIDEPANEL':
                 toggleAsidePanel({
                     src: hook.url,
                     header: hook.name.value,
