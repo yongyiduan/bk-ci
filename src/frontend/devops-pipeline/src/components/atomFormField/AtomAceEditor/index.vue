@@ -115,7 +115,6 @@
                     try {
                         this.isLoading = true
                         const res = await this.$ajax.get(changeUrl)
-                        console.log(res.data)
                         const content = this.getResponseData(res, dataPath)
                         this.handleChange(this.name, content)
                     } catch (e) {
