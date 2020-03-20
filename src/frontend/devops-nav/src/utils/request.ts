@@ -25,12 +25,13 @@ request.interceptors.request.use(config => {
     if (/(\/?ms\/backend|\/?backend)/.test(config.url)) {
         return config   
     }
+
     const routePid = getCurrentPid()
     return {
         ...config,
         headers: routePid ? {
-            ...(config.headers || {}),
-            'X-DEVOPS-PROJECT-ID': routePid
+            'X-DEVOPS-PROJECT-ID': routePid,
+            ...(config.headers || {})
         } : config.headers
     };
   }, function (error) {

@@ -76,7 +76,8 @@
     <!-- end devops:assets -->
     
     <script>
-        var WEBSITE_URL = '__HTTP_SCHEMA__://__BKCI_STATIC_FQDN__'
+        var WEBSITE_URL = '__HTTP_SCHEMA__://__BKCI_FQDN__'
+        var CODECC_PREFIX = '__HTTP_SCHEMA__://__CODECC_FQDN__'
         var GW_URL_PREFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__/ms'     // api接口前缀
         var WS_URL_PREFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__/'
         var PERM_URL_PREFIX = '__HTTP_SCHEMA__://__PAAS_FQDN__:__PAAS_HTTPS_PORT__/o/bk_iam_app' // EE PERM URL PREFIX
@@ -151,7 +152,7 @@
         }
 
         function setCookie(cname, cvalue, domain){
-            document.cookie = cname + "=" + cvalue + "; " + 'domain=' + domain + '; path=/';
+            document.cookie = cname + "=" + cvalue + "; " + 'domain=' + domain + '; path=/;expires=Fri, 31 Dec 2030 23:59:59 GMT"';
         }
         
         window.setProjectIdCookie = function (projectId) {
@@ -184,7 +185,7 @@
                     return ''    
                 } else {
                     var res = location.pathname.match(reg)
-                    return res ? res[1] : ''
+                    return res && res[1] !== '0' ? res[1] : ''
                 }
                 
             } catch (e) {
@@ -252,8 +253,8 @@
                     
                     if (children[j].name.indexOf('CodeCC') > -1) {  // 临时兼容正式环境灰度
                         children[j] = Object.assign(children[j], {
-                            "link_new" : "/codecc/0",
-                            "iframe_url" : "http://v2.codecc.oa.com/codecc/",
+                            "link_new" : "/codecc/",
+                            "iframe_url" : CODECC_PREFIX + "/codecc/",
                             "project_id_type" : "path",
                         })
                     }

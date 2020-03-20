@@ -229,8 +229,8 @@ const bcsMixin = {
         async getNamespace () {
             try {
                 let res = await this.$store.dispatch('soda/getBcsNamespaces', {
-                    projectId: this.curProject.projectId,
-                    ccId: this.curProject.ccAppId
+                    projectId: this.curProject.project_id,
+                    ccId: this.curProject.cc_app_id
                 })
                 if (!res) {
                     res = []
@@ -253,8 +253,8 @@ const bcsMixin = {
             }
             try {
                 let res = await this.$store.dispatch('soda/getBcsProjectInstance', {
-                    projectId: this.curProject.projectId,
-                    ccId: this.curProject.ccAppId,
+                    projectId: this.curProject.project_id,
+                    ccId: this.curProject.cc_app_id,
                     category: this.element.category,
                     namespace
                 })
@@ -279,8 +279,8 @@ const bcsMixin = {
             }
             try {
                 let res = await this.$store.dispatch('soda/getBcsInstVersion', {
-                    projectId: this.curProject.projectId,
-                    ccId: this.curProject.ccAppId,
+                    projectId: this.curProject.project_id,
+                    ccId: this.curProject.cc_app_id,
                     instId
                 })
                 if (res === null) {
@@ -307,8 +307,8 @@ const bcsMixin = {
             }
             try {
                 const res = await this.$store.dispatch('soda/getBcsInstVar', {
-                    projectId: this.curProject.projectId,
-                    ccId: this.curProject.ccAppId,
+                    projectId: this.curProject.project_id,
+                    ccId: this.curProject.cc_app_id,
                     instId,
                     versionId
                 })
@@ -327,7 +327,7 @@ const bcsMixin = {
         async getCluster () {
             try {
                 let res = await this.$store.dispatch('soda/getBcsCluster', {
-                    projectCode: this.curProject.projectCode
+                    projectCode: this.projectId || this.curProject.english_name
                 })
                 if (!res) {
                     res = []
@@ -349,8 +349,8 @@ const bcsMixin = {
         async getMuster () {
             try {
                 let res = await this.$store.dispatch('soda/getBcsMuster', {
-                    projectId: this.curProject.projectId,
-                    ccId: this.curProject.ccAppId
+                    projectId: this.curProject.project_id,
+                    ccId: this.curProject.cc_app_id
                 })
                 if (!res) {
                     res = []
@@ -373,8 +373,8 @@ const bcsMixin = {
             }
             try {
                 let res = await this.$store.dispatch('soda/getBcsMusterVersion', {
-                    projectId: this.curProject.projectId,
-                    ccId: this.curProject.ccAppId,
+                    projectId: this.curProject.project_id,
+                    ccId: this.curProject.cc_app_id,
                     musterId
                 })
                 if (!res) {
@@ -406,8 +406,8 @@ const bcsMixin = {
             try {
                 let res = []
                 const resData = await this.$store.dispatch('soda/getBcsInstanceEntity', {
-                    projectId: this.curProject.projectId,
-                    ccId: this.curProject.ccAppId,
+                    projectId: this.curProject.project_id,
+                    ccId: this.curProject.cc_app_id,
                     versionId
                 })
                 if (resData) {

@@ -227,10 +227,10 @@
                 if (!validate) return
 
                 this.isSaving = true
-                const { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason } = this.atomForm
+                const { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason, visibilityLevel } = this.atomForm
                 const putData = {
                     atomCode: this.$route.params.atomCode,
-                    data: { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason }
+                    data: { name, classifyCode, summary, description, logoUrl, publisher, labelIdList, privateReason, visibilityLevel }
                 }
                 this.$store.dispatch('store/modifyAtomDetail', putData).then(() => {
                     this.$store.dispatch('store/updateCurrentaAtom', { res: this.atomForm })
@@ -454,7 +454,7 @@
             position: relative;
             width: 1200px;
             .bk-label {
-                width: 120px;
+                width: 110px;
                 font-weight: normal;
             }
             .bk-form-content {
@@ -490,6 +490,7 @@
             .publish-form-item,
             .version-num-form-item {
                 .bk-tooltip {
+                    margin-top: 10px;
                     margin-left: 10px;
                     color: $fontLigtherColor;
                     p {

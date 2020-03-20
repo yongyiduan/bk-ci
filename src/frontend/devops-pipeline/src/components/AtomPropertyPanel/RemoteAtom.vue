@@ -16,6 +16,7 @@
 </template>
 
 <script>
+    import { mapActions } from 'vuex'
     import atomMixin from './atomMixin'
     import validMixins from '../validMixins'
     import AtomOutput from './AtomOutput'
@@ -29,8 +30,7 @@
             return {
                 newModel: {},
                 loading: true,
-                iframeHeight: '300px',
-                src1: 'http://dev.nav.oa.com:8002?projectId=t1'
+                iframeHeight: '300px'
             }
         },
         computed: {
@@ -51,6 +51,9 @@
             }, 1000)
         },
         methods: {
+            ...mapActions('atom', [
+                'setPipelineEditing'
+            ]),
             onLoad () {
                 this.loading = false
                 const iframe = document.getElementById('atom-iframe').contentWindow
@@ -58,9 +61,9 @@
             },
             receiveMsgFromIframe (e) {
                 // if (location.href.indexOf(e.origin) === 0) return
-                // console.log(e, e.data, 'top1')
                 if (!e.data) return
                 if (e.data.atomValue) {
+                    this.setPipelineEditing(true)
                     this.$nextTick(this.handleUpdateWholeAtomInput(e.data.atomValue))
                 } else if (e.data.isError !== undefined) {
                     this.handleUpdateElement('isError', e.data.isError)

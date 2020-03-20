@@ -211,6 +211,8 @@
             const oldProject = this.selectProjectList.find(project => project.projectCode === projectId)
             const project = this.selectProjectList.find(project => project.projectCode === id)
             
+            window.setProjectIdCookie(id)
+
             if (projectId && !oldProject) { // 当前无权限时返回首页
                 this.goHomeById(id)
             } else {
@@ -220,9 +222,9 @@
                     }
                 })
             }
-            window.setProjectIdCookie(id)
-
+            
             if ((!oldProject && project.gray) || (oldProject && oldProject.gray !== project.gray)) {
+                debugger
                 this.goHomeById(id, true)
             }
         }

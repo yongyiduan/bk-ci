@@ -40,7 +40,7 @@
                 'checkHasCodecc': 'soda/getHasAtomCheck'
             }),
             hasCodecc () {
-                return this.checkHasCodecc(this.curPipeline.stages, 'linuxPaasCodeCCScript') || this.checkHasCodecc(this.curPipeline.stages, 'CodeccCheckAtom')
+                return this.checkHasCodecc(this.curPipeline.stages, 'linuxPaasCodeCCScript')
             },
             buildNo () {
                 return this.$route.params.buildNo
@@ -157,7 +157,6 @@
         .report-iframe-content {
             // overflow: hidden;
             height: 95%;
-            margin-top: 20px;
             width: 100%;
             // min-width: 1280px;
             .iframe-over-layout {

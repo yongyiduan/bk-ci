@@ -93,7 +93,7 @@
 
                 <template v-if="buildResourceType === 'MACOS'">
                     <form-field :label="$t('editPage.macSystemVersion')" :required="true" :is-error="errors.has('systemVersion')" :error-msg="errors.first(`systemVersion`)">
-                        <bk-select :value="systemVersion" searchable :loading="isLoadingMac" name="systemVersion" v-validate.initial="'required'">
+                        <bk-select :disabled="!editable" :value="systemVersion" searchable :loading="isLoadingMac" name="systemVersion" v-validate.initial="'required'">
                             <bk-option v-for="item in systemVersionList"
                                 :key="item"
                                 :id="item"
@@ -103,7 +103,7 @@
                         </bk-select>
                     </form-field>
                     <form-field :label="$t('editPage.xcodeVersion')" :required="true" :is-error="errors.has('xcodeVersion')" :error-msg="errors.first(`xcodeVersion`)">
-                        <bk-select :value="xcodeVersion" searchable :loading="isLoadingMac" name="xcodeVersion" v-validate.initial="'required'">
+                        <bk-select :disabled="!editable" :value="xcodeVersion" searchable :loading="isLoadingMac" name="xcodeVersion" v-validate.initial="'required'">
                             <bk-option v-for="item in xcodeVersionList"
                                 :key="item"
                                 :id="item"
@@ -455,7 +455,7 @@
             if (this.container.dispatchType && this.container.dispatchType.imageCode) {
                 this.getVersionList(this.container.dispatchType.imageCode)
             }
-            this.getMacOsData()
+            if (this.buildResourceType === 'MACOS') this.getMacOsData()
         },
         methods: {
             ...mapActions('atom', [
@@ -487,6 +487,7 @@
                     imageName: '',
                     [name]: val
                 }))
+                if (val === 'MACOS') this.getMacOsData()
             },
 
             changeThirdImage (val) {
@@ -549,7 +550,6 @@
                     this.$bkMessage({ message: (err.message || err), theme: 'error' })
                 }).finally(() => (this.isLoadingMac = false))
             },
-
             chooseMacSystem (item) {
                 this.handleContainerChange('dispatchType', Object.assign({
                     ...this.container.dispatchType,
@@ -564,7 +564,6 @@
                     value: `${this.systemVersion}:${this.xcodeVersion}`
                 }))
             },
-
             setContainerValidate (addErrors, removeErrors) {
                 const { errors } = this
 
@@ -731,7 +730,7 @@
             align-items: center;
             margin-top: 15px;
             .image-name {
-                width: 44%;
+                width: 50%;
                 display: flex;
                 align-items: center;
                 .not-recommend {
@@ -756,7 +755,7 @@
                 }
             }
             .image-tag {
-                width: 44%;
+                width: 50%;
                 margin-left: 10px;
             }
         }

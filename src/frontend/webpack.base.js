@@ -32,7 +32,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                 },
                 {
                     test: /\.js$/,
-                    include: [path.resolve('src'), path.resolve('../node_modules/vue-echarts'), path.resolve('../devops-log')],
+                    include: [path.resolve('src'), path.resolve('../node_modules/vue-echarts'), path.resolve('../devops-log'), path.resolve('../locale')],
                     use: [
                         {
                             loader: 'babel-loader'

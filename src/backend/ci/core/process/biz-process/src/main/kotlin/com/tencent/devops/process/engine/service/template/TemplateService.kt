@@ -48,6 +48,7 @@ import com.tencent.devops.common.pipeline.container.Container
 import com.tencent.devops.common.pipeline.container.Stage
 import com.tencent.devops.common.pipeline.container.TriggerContainer
 import com.tencent.devops.common.pipeline.enums.ChannelCode
+import com.tencent.devops.common.pipeline.enums.PipelineInstanceTypeEnum
 import com.tencent.devops.common.pipeline.extend.ModelCheckPlugin
 import com.tencent.devops.common.pipeline.pojo.BuildFormProperty
 import com.tencent.devops.common.pipeline.pojo.BuildNo
@@ -88,6 +89,7 @@ import com.tencent.devops.process.pojo.template.SaveAsTemplateReq
 import com.tencent.devops.process.pojo.template.TemplateCompareModel
 import com.tencent.devops.process.pojo.template.TemplateCompareModelResult
 import com.tencent.devops.process.pojo.template.TemplateInstanceCreate
+import com.tencent.devops.process.pojo.template.TemplateInstancePage
 import com.tencent.devops.process.pojo.template.TemplateInstanceParams
 import com.tencent.devops.process.pojo.template.TemplateInstanceUpdate
 import com.tencent.devops.process.pojo.template.TemplateInstances
@@ -99,7 +101,6 @@ import com.tencent.devops.process.pojo.template.TemplateOperationRet
 import com.tencent.devops.process.pojo.template.TemplatePipeline
 import com.tencent.devops.process.pojo.template.TemplateType
 import com.tencent.devops.process.pojo.template.TemplateVersion
-import com.tencent.devops.process.pojo.template.TemplateInstancePage
 import com.tencent.devops.process.service.ParamService
 import com.tencent.devops.process.service.label.PipelineGroupService
 import com.tencent.devops.process.template.dao.PipelineTemplateDao
@@ -292,7 +293,8 @@ class TemplateService @Autowired constructor(
         val template = templateDao.getLatestTemplate(dslContext, templateId)
         dslContext.transaction { configuration ->
             val context = DSL.using(configuration)
-            val pipelines = templatePipelineDao.listPipeline(context, setOf(templateId))
+            val pipelines =
+                templatePipelineDao.listPipeline(context, PipelineInstanceTypeEnum.CONSTRAINT.type, setOf(templateId))
             if (pipelines.isNotEmpty) {
                 throw ErrorCodeException(
                     errorCode = ProcessMessageCode.TEMPLATE_CAN_NOT_DELETE_WHEN_HAVE_INSTANCE,
@@ -329,7 +331,8 @@ class TemplateService @Autowired constructor(
         checkPermission(projectId, userId)
         return dslContext.transactionResult { configuration ->
             val context = DSL.using(configuration)
-            val pipelines = templatePipelineDao.listPipeline(context, templateId, version)
+            val pipelines =
+                templatePipelineDao.listPipeline(context, templateId, PipelineInstanceTypeEnum.CONSTRAINT.type, version)
             if (pipelines.isNotEmpty) {
                 logger.warn("There are ${pipelines.size} pipeline attach to $templateId of version $version")
                 throw ErrorCodeException(
@@ -374,7 +377,7 @@ class TemplateService @Autowired constructor(
         }
 
 //        if (latestTemplate.storeFlag) {
-            // 将更新信息推送给使用模版的项目管理员 -- todo
+        // 将更新信息推送给使用模版的项目管理员 -- todo
 //        }
 
         return true
@@ -436,6 +439,7 @@ class TemplateService @Autowired constructor(
                         users = it.get(SUCCESS_RECEIVER),
                         wechatGroupFlag = it.get(SUCCESS_WECHAT_GROUP_FLAG),
                         wechatGroup = it.get(SUCCESS_WECHAT_GROUP),
+                        wechatGroupMarkdownFlag = it.get(SUCCESS_WECHAT_GROUP_MARKDOWN_FLAG),
                         detailFlag = it.get(SUCCESS_DETAIL_FLAG),
                         content = it.get(SUCCESS_CONTENT) ?: ""
                     ),
@@ -445,6 +449,7 @@ class TemplateService @Autowired constructor(
                         users = it.get(FAIL_RECEIVER),
                         wechatGroupFlag = it.get(FAIL_WECHAT_GROUP_FLAG),
                         wechatGroup = it.get(FAIL_WECHAT_GROUP),
+                        wechatGroupMarkdownFlag = it.get(FAIL_WECHAT_GROUP_MARKDOWN_FLAG),
                         detailFlag = it.get(FAIL_DETAIL_FLAG),
                         content = it.get(FAIL_CONTENT) ?: ""
                     ),
@@ -570,7 +575,7 @@ class TemplateService @Autowired constructor(
 
                 val associateCodes = listAssociateCodes(record["projectId"] as String, model)
                 val associatePipeline =
-                    templatePipelineDao.listPipeline(context, setOf(templateId))
+                    templatePipelineDao.listPipeline(context, PipelineInstanceTypeEnum.CONSTRAINT.type, setOf(templateId))
 
                 val pipelineIds = associatePipeline.map { PipelineId(it.pipelineId) }
 
@@ -674,10 +679,12 @@ class TemplateService @Autowired constructor(
                 container.elements.forEach element@{ element ->
                     when (element) {
                         is CodeGitElement -> codes.add(
-                            getCode(projectId = projectId, repositoryConfig = RepositoryConfigUtils.buildConfig(element)) ?: return@element
+                            getCode(projectId = projectId, repositoryConfig = RepositoryConfigUtils.buildConfig(element))
+                                ?: return@element
                         )
                         is GithubElement -> codes.add(
-                            getCode(projectId = projectId, repositoryConfig = RepositoryConfigUtils.buildConfig(element)) ?: return@element
+                            getCode(projectId = projectId, repositoryConfig = RepositoryConfigUtils.buildConfig(element))
+                                ?: return@element
                         )
                         is CodeSvnElement -> codes.add(
                             getCode(projectId, RepositoryConfigUtils.buildConfig(element)) ?: return@element
@@ -888,6 +895,9 @@ class TemplateService @Autowired constructor(
             labels.addAll(it.labels)
         }
         model.labels = labels
+        val templateResult = instanceParamModel(userId, projectId, model)
+        val params = (templateResult.stages[0].containers[0] as TriggerContainer).params
+        val templateParams = (templateResult.stages[0].containers[0] as TriggerContainer).templateParams
         return TemplateModelDetail(
             versions = versions,
             currentVersion = currentVersion,
@@ -900,7 +910,9 @@ class TemplateService @Autowired constructor(
             logoUrl = if (isConstrainedFlag) constrainedTemplate.logoUrl ?: "" else {
                 if (template!!.logoUrl.isNullOrEmpty()) "" else template!!.logoUrl
             },
-            hasPermission = hasManagerPermission(projectId, userId)
+            hasPermission = hasManagerPermission(projectId, userId),
+            params = params,
+            templateParams = templateParams
         )
     }
 
@@ -1120,6 +1132,7 @@ class TemplateService @Autowired constructor(
 
         val successPipelines = ArrayList<String>()
         val failurePipelines = ArrayList<String>()
+        val successPipelinesId = ArrayList<String>()
         val messages = HashMap<String, String>()
 
         instances.forEach { instance ->
@@ -1138,26 +1151,17 @@ class TemplateService @Autowired constructor(
                             param = param,
                             instanceFromTemplate = true
                         )
+                    instanceModel.templateId = templateId
                     val pipelineId = pipelineService.createPipeline(
                         userId = userId,
                         projectId = projectId,
                         model = instanceModel,
                         channelCode = ChannelCode.BS,
-                        checkPermission = true
-                    )
-                    templatePipelineDao.create(
-                        dslContext = context,
-                        pipelineId = pipelineId,
-                        templateVersion = template.version,
-                        versionName = template.versionName,
-                        templateId = templateId,
-                        userId = userId,
-                        buildNo = if (buildNo == null) {
-                            null
-                        } else {
-                            objectMapper.writeValueAsString(buildNo)
-                        },
-                        param = objectMapper.writeValueAsString(param)
+                        checkPermission = true,
+                        fixPipelineId = null,
+                        instanceType = PipelineInstanceTypeEnum.CONSTRAINT.type,
+                        buildNo = buildNo,
+                        param = param
                     )
                     if (useTemplateSettings) {
                         val setting = copySetting(
@@ -1179,6 +1183,7 @@ class TemplateService @Autowired constructor(
                         )
                     }
                     successPipelines.add(instance.pipelineName)
+                    successPipelinesId.add(pipelineId)
                 }
             } catch (t: DuplicateKeyException) {
                 logger.warn("Fail to update the pipeline $instance of project $projectId by user $userId", t)
@@ -1191,7 +1196,12 @@ class TemplateService @Autowired constructor(
             }
         }
 
-        return TemplateOperationRet(0, TemplateOperationMessage(successPipelines, failurePipelines, messages), "")
+        return TemplateOperationRet(0, TemplateOperationMessage(
+            successPipelines = successPipelines,
+            failurePipelines = failurePipelines,
+            failureMessages = messages,
+            successPipelinesId = successPipelinesId
+        ), "")
     }
 
     /**
@@ -1543,7 +1553,8 @@ class TemplateService @Autowired constructor(
     ): TemplateInstancePage {
         logger.info("[$projectId|$userId|$templateId|$page|$pageSize] List the template instances with filter $searchKey")
 
-        val instancePage = templatePipelineDao.listPipelineInPage(dslContext, projectId, templateId, page, pageSize, searchKey)
+        val instancePage =
+            templatePipelineDao.listPipelineInPage(dslContext, projectId, templateId, PipelineInstanceTypeEnum.CONSTRAINT.type, page, pageSize, searchKey)
         val associatePipelines = instancePage.records
         val pipelineIds = associatePipelines.map { it.pipelineId }.toSet()
         logger.info("Get the pipelineIds - $associatePipelines")
@@ -1596,13 +1607,13 @@ class TemplateService @Autowired constructor(
     fun serviceCountTemplateInstances(projectId: String, templateIds: Collection<String>): Int {
         logger.info("[$projectId|$templateIds] List the templates instances")
         if (templateIds.isEmpty()) return 0
-        return templatePipelineDao.listPipeline(dslContext, templateIds).size
+        return templatePipelineDao.listPipeline(dslContext, PipelineInstanceTypeEnum.CONSTRAINT.type, templateIds).size
     }
 
     fun serviceCountTemplateInstancesDetail(projectId: String, templateIds: Collection<String>): Map<String, Int> {
         logger.info("[$projectId|$templateIds] List the templates instances")
         if (templateIds.isEmpty()) return mapOf()
-        return templatePipelineDao.listPipeline(dslContext, templateIds).groupBy { it.templateId }.map { it.key to it.value.size }.toMap()
+        return templatePipelineDao.listPipeline(dslContext, PipelineInstanceTypeEnum.CONSTRAINT.type, templateIds).groupBy { it.templateId }.map { it.key to it.value.size }.toMap()
     }
 
     fun listTemplateInstances(projectId: String, userId: String, templateId: String): TemplateInstances {
@@ -1612,7 +1623,7 @@ class TemplateService @Autowired constructor(
     fun listTemplateInstances(projectId: String, userId: String, templateIds: Set<String>): List<TemplateInstances> {
         logger.info("[$projectId|$userId|$templateIds] List the templates instances")
         val associateTemplatePipelines =
-            templatePipelineDao.listPipeline(dslContext, templateIds).groupBy { it.templateId }
+            templatePipelineDao.listPipeline(dslContext, PipelineInstanceTypeEnum.CONSTRAINT.type, templateIds).groupBy { it.templateId }
         return templateIds.map { tid ->
             val associatePipelines = associateTemplatePipelines[tid] ?: listOf()
 
@@ -1663,6 +1674,7 @@ class TemplateService @Autowired constructor(
             )
         }
     }
+
     /**
      * 检查模板是不是合法
      */
@@ -1826,6 +1838,7 @@ class TemplateService @Autowired constructor(
         }
         return com.tencent.devops.common.api.pojo.Result(projectTemplateMap)
     }
+
     fun updateMarketTemplateReference(
         userId: String,
         updateMarketTemplateRequest: AddMarketTemplateRequest

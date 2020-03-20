@@ -123,7 +123,7 @@ class DockerHostDebugService @Autowired constructor(
             else -> when (imageName) {
                 DockerVersion.TLINUX1_2.value -> dockerBuildImagePrefix + TLINUX1_2_IMAGE
                 DockerVersion.TLINUX2_2.value -> dockerBuildImagePrefix + TLINUX2_2_IMAGE
-                else -> "$dockerBuildImagePrefix/$imageName"
+                else -> "$dockerBuildImagePrefix/bkdevops/$imageName"
             }
         }
         logger.info("insertDebug:Docker images is: $dockerImage")
@@ -210,7 +210,6 @@ class DockerHostDebugService @Autowired constructor(
         try {
             val gray = !grayFlag.isNullOrBlank() && grayFlag!!.toBoolean()
             val grayProjectSet = this.gray.grayProjectSet(redisOperation)
-            logger.info("gray environment: $gray")
             redisLock.lock()
             if (gray) {
                 // 优先取设置了IP的任务（可能是固定构建机，也可能是上次用的构建机）
