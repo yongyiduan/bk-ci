@@ -15,7 +15,7 @@
             <header class="progress-header">
                 <bk-steps ext-cls="progress-steps" :status="currentStepStatus" :steps="progressStatus" :cur-step="currentStepIndex"></bk-steps>
                 <bk-button class="progress-detail" @click="showDetail"> {{ $t('store.查看扩展详情') }} </bk-button>
-                <bk-button class="progress-cancle" @click="cancelRelease"> {{ $t('store.中止发布') }} </bk-button>
+                <bk-button class="progress-cancle" :disabled="isOver" @click="cancelRelease"> {{ $t('store.中止发布') }} </bk-button>
             </header>
 
             <section class="progress-main">

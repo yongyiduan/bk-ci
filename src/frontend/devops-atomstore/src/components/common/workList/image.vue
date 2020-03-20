@@ -19,12 +19,12 @@
             @page-limit-change="pageCountChanged"
             v-bkloading="{ isLoading }"
         >
-            <bk-table-column :label="$t('store.镜像名称')" width="200">
+            <bk-table-column :label="$t('store.镜像名称')" width="180">
                 <template slot-scope="props">
                     <span class="atom-name" :title="props.row.imageName" @click="goToImageDetail(props.row.imageCode)">{{ props.row.imageName }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.镜像来源')" prop="imageSourceType" :formatter="sourceTypeFormatter" width="150"></bk-table-column>
+            <bk-table-column :label="$t('store.镜像来源')" prop="imageSourceType" :formatter="sourceTypeFormatter" width="100"></bk-table-column>
             <bk-table-column :label="$t('store.镜像')" prop="imageRepoUrl">
                 <template slot-scope="props">
                     <span :title="(props.row.imageRepoUrl ? props.row.imageRepoUrl + '/' : '') + props.row.imageRepoName + ':' + props.row.imageTag">
@@ -32,17 +32,17 @@
                     </span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.镜像大小')" prop="imageSize" width="150">
+            <bk-table-column :label="$t('store.镜像大小')" prop="imageSize" width="100">
                 <template slot-scope="props">
                     <span>{{ props.row.imageSize || '-' }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.版本号')" prop="version" width="150">
+            <bk-table-column :label="$t('store.版本号')" prop="version" width="100">
                 <template slot-scope="props">
                     <span>{{ props.row.version || '-' }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.状态')" width="220">
+            <bk-table-column :label="$t('store.状态')" width="160">
                 <template slot-scope="props">
                     <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
                         v-if="['AUDITING', 'COMMITTING', 'CHECKING', 'CHECK_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.imageStatus)">
@@ -62,7 +62,7 @@
                     <span>{{ $t(imageStatusList[props.row.imageStatus]) }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.修改人')" prop="modifier" width="180"></bk-table-column>
+            <bk-table-column :label="$t('store.修改人')" prop="modifier" width="150"></bk-table-column>
             <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
             <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
                 <template slot-scope="props">

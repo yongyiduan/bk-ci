@@ -67,8 +67,6 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '@/assets/scss/conf.scss';
-
     .progress-test {
         display: flex;
         justify-content: center;
@@ -83,7 +81,7 @@
             margin: 24px 0 16px;
         }
         .test-tip {
-            color: $grayBlack;
+            color: #b0b0b0;
         }
     }
 </style>

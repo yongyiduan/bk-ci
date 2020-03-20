@@ -25,11 +25,11 @@
                     <span class="atom-name" :title="props.row.serviceName" @click="goToServiceDetail(props.row.serviceCode)">{{ props.row.serviceName }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.扩展标识')" prop="serviceCode" width="180"></bk-table-column>
-            <bk-table-column :label="$t('store.调试项目')" prop="projectName" width="160"></bk-table-column>
-            <bk-table-column :label="$t('store.扩展点')" prop="itemName" width="200"></bk-table-column>
-            <bk-table-column :label="$t('store.版本')" prop="version" width="160"></bk-table-column>
-            <bk-table-column :label="$t('store.状态')" width="160">
+            <bk-table-column :label="$t('store.扩展标识')" prop="serviceCode"></bk-table-column>
+            <bk-table-column :label="$t('store.调试项目')" prop="projectName"></bk-table-column>
+            <bk-table-column :label="$t('store.扩展点')" prop="itemName"></bk-table-column>
+            <bk-table-column :label="$t('store.版本')" prop="version" width="120"></bk-table-column>
+            <bk-table-column :label="$t('store.状态')" width="120">
                 <template slot-scope="props">
                     <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
                         v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'BUILD_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.serviceStatus)">
@@ -49,7 +49,7 @@
                     <span>{{ $t(serviceStatusList[props.row.serviceStatus]) }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.修改人')" prop="modifier" width="150"></bk-table-column>
+            <bk-table-column :label="$t('store.修改人')" prop="modifier" width="100"></bk-table-column>
             <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
             <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
                 <template slot-scope="props">
@@ -246,8 +246,8 @@
                     trigger: 'blur'
                 },
                 alpRule: {
-                    validator: (val) => (/^[a-zA-Z0-9-_]+$/.test(val)),
-                    message: this.$t('store.标识需要是大小写字母、数字、中划线或下划线'),
+                    validator: (val) => (/^[a-z0-9-]+$/.test(val)),
+                    message: this.$t('store.标识需要是小写字母、数字、中划线'),
                     trigger: 'blur'
                 }
             }

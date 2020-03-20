@@ -169,6 +169,7 @@
             align-items: center;
             .score-group {
                 position: relative;
+                margin-top: -2px;
                 .score-real {
                     position: absolute;
                     overflow: hidden;
@@ -182,7 +183,6 @@
                 }
             }
             .rate-num {
-                margin-top: 2px;
                 margin-left: 6px;
                 color: $fontWeightColor;
             }
@@ -194,7 +194,7 @@
             width: 33.33%;
             font-size: 14px;
             font-weight: normal;
-            line-height: 19px;
+            line-height: 20px;
             color: $fontBlack;
             span:nth-child(1) {
                 color: $fontWeightColor;

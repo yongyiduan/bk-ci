@@ -1,7 +1,7 @@
 <template>
     <section class="main-body">
         <bk-form class="progress-info">
-            <bk-form-item :label="$t('store.可见范围')">
+            <bk-form-item :label="$t('store.可见范围')" :desc="$t('store.未设置可见范围时，仅扩展成员可以安装到名下项目中使用。设置后，对应组织架构的用户可以在研发商店中安装使用')">
                 <ul class="info-visable" v-if="commitInfo.deptInfoList.length">
                     <li v-for="dept in commitInfo.deptInfoList" :key="dept.deptId" class="visable-item">{{ dept.deptName }}<icon name="close" size="10" class="dept-close" @click.native="deleteDept(dept)" /></li>
                 </ul>

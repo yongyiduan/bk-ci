@@ -23,7 +23,7 @@
             </h5>
             <h5 class="detail-info">
                 <span> {{ $t('store.扩展点') }}： </span>
-                <span class="info-over-hidden">{{detail.publisher || '-'}}</span>
+                <span class="info-over-hidden">{{detail.itemName || '-'}}</span>
             </h5>
             <h5 class="detail-info" :title="detail.summary">
                 <span> {{ $t('store.简介：') }} </span>
@@ -143,6 +143,7 @@
             .score-group {
                 position: relative;
                 margin-left: 8px;
+                margin-top: -2px;
                 .score-real {
                     position: absolute;
                     overflow: hidden;

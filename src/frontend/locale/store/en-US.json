@@ -1,5 +1,6 @@
 {
     "store": "Store",
+    "未设置可见范围时，仅扩展成员可以安装到名下项目中使用。设置后，对应组织架构的用户可以在研发商店中安装使用": "When the visible range is not set, only extended members can be installed and used in the project. After setting, users of the corresponding organizational structure can be installed and used in the R & D store",
     "查看扩展详情": "View extension details",
     "testTip": "Verify that the extension function is OK under the corresponding extension point of the debugging project<br/>If you find a problem, after modifying the code, click the Rebuild entry below, build again, and test again<br/>If the test is OK, click the test completed entry below to continue the publishing process",
     "项目正在初始化，请耐心等候": "Project is initializing, please be patient",
