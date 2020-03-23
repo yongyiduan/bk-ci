@@ -19,7 +19,13 @@
             </header>
 
             <section class="progress-main">
-                <component :is="currentStep.code" :store-build-info="storeBuildInfo" :current-step="currentStep" :detail="serviceDetail" @freshProgress="getServiceProcess"></component>
+                <component :is="currentStep.code"
+                    :store-build-info="storeBuildInfo"
+                    :current-step="currentStep"
+                    :detail="serviceDetail"
+                    @freshProgress="getServiceProcess"
+                    @loopProgress="loopProgress"
+                ></component>
             </section>
         </article>
 
@@ -287,8 +293,10 @@
                 })
             },
 
-            loopProgress () {
-                this.getServiceProcess().catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' }))
+            loopProgress (callback) {
+                this.getServiceProcess().then(() => {
+                    if (callback) callback()
+                }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' }))
                 clearTimeout(this.loopProgress.timeId)
                 if (!this.isOver) this.loopProgress.timeId = setTimeout(this.loopProgress, 5000)
             },
@@ -402,7 +410,7 @@
     }
 
     .service-progress-main {
-        width: 1460px;
+        width: 95vw;
         height: calc(100% - 116px);
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
         margin: 33px auto;

@@ -123,7 +123,7 @@
         display: flex;
         align-items: center;
         margin: 26px auto 0;
-        width: 1460px;
+        width: 95vw;
         background: $white;
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
         padding: 32px;
@@ -157,7 +157,7 @@
     }
     .detail-info-group {
         width: 996px;
-        margin: 0 76px;
+        margin: 0 32px;
         
         h3 {
             font-size: 22px;
@@ -237,7 +237,7 @@
         }
         .detail-info.detail-label {
             width: 994px;
-            padding-left: 70px;
+            padding-left: 90px;
             display: inline-block;
             position: relative;
             span {

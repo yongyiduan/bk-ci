@@ -21,9 +21,7 @@
                         <bk-row>
                             <bk-col :span="4.5" class="g-progress-item">
                                 <span class="g-progress-label">{{ $t('store.扩展点') }} :</span>
-                                <section class="g-progress-content label-list">
-                                    <span class="label-card" v-for="(item, index) in currentService.extensionItemList" :key="index">{{ item.name }}</span>
-                                </section>
+                                <span class="g-progress-content">{{currentService.itemName}}</span>
                             </bk-col>
                         </bk-row>
                         <bk-row>
@@ -65,6 +63,11 @@
                                 <i :class="['devops-icon icon-angle-down', { 'icon-flip': isDropdownShow }]"></i>
                             </span>
                         </section>
+                    </bk-col>
+                </bk-row>
+                <bk-row>
+                    <bk-col :span="12" class="g-progress-item">
+                        a
                     </bk-col>
                 </bk-row>
             </bk-container>

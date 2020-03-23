@@ -65,13 +65,14 @@
 
         methods: {
             getLog () {
-                if (!this.getLog.start) this.isLogLoading = true
+                if (this.getLog.start === undefined) this.isLogLoading = true
                 const postData = {
                     type: 'SERVICE',
                     projectCode: this.storeBuildInfo.projectCode,
                     pipelineId: this.storeBuildInfo.pipelineId,
                     buildId: this.storeBuildInfo.buildId,
-                    start: this.getLog.start || 0
+                    start: this.getLog.start || 0,
+                    executeCount: this.getLog.executeCount || (this.getLog.executeCount = 1, 1)
                 }
                 this.$store.dispatch('store/requestProgressLog', postData).then((data = {}) => {
                     this.isLogLoading = false
@@ -89,7 +90,7 @@
                             })
                             this.logs.push(res)
                         })
-                        if (!data.finished || data.hasMore) setTimeout(this.getLog, 1000)
+                        if (!data.finished || data.hasMore) this.getLog.id = setTimeout(this.getLog, 100)
                     }
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
@@ -100,6 +101,7 @@
             },
 
             rebuild () {
+                clearTimeout(this.getLog.id)
                 this.isLoading = true
                 const postData = {
                     id: this.detail.serviceId,
@@ -108,8 +110,7 @@
                 this.$store.dispatch('store/requestRebuildService', postData).then(() => {
                     this.logs = []
                     this.getLog.start = 0
-                    this.getLog()
-                    this.$emit('freshProgress')
+                    this.$emit('loopProgress', this.getLog)
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {

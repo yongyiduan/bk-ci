@@ -246,7 +246,7 @@
 
     .detail-tabs {
         margin: 20px auto 30px;
-        width: 1460px;
+        width: 95vw;
         background: #fff;
         padding: 10px 32px 40px;
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);

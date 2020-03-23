@@ -50,7 +50,7 @@
             <section class="service-map">
                 <section class="flex74 overview-section">
                     <h3> {{ $t('store.趋势图') }} </h3>
-                    <bk-tab :active.sync="active" class="custom-tabs">
+                    <!-- <bk-tab :active.sync="active" class="custom-tabs">
                         <template slot="setting">
                             <bk-select value="最近30天" class="trend-date" :clearable="false">
                                 <bk-option v-for="option in trendDate"
@@ -67,12 +67,16 @@
                         <bk-tab-panel name="uninstallReason" :label="$t('store.卸载原因占比')">
                             <section class="uninstall-pie"></section>
                         </bk-tab-panel>
-                    </bk-tab>
+                    </bk-tab> -->
+                    <section class="custom-tabs">
+                        <img src="../../images/building.png">
+                        <p>{{ $t('store.功能正在建设中') }}···</p>
+                    </section>
                 </section>
 
                 <section class="flex32 overview-section">
                     <h3> {{ $t('store.最新动态') }} </h3>
-                    <section class="overview-news">
+                    <section class="overview-news" v-bkloading="{ isLoading }">
                         <bk-timeline :list="list"></bk-timeline>
                     </section>
                 </section>
@@ -97,14 +101,8 @@
                     { name: '最近半年' },
                     { name: '最近一年' }
                 ],
-                list: [
-                    { tag: '一天前', content: '由张三上线到蓝鲸市场' },
-                    { tag: '16:59', content: '由李四部署到生产环境并发布至应用市场' },
-                    { tag: '一天前', content: '由王五部署到预发布环境' },
-                    { tag: '2天前', content: '由王五上线到蓝鲸市场' },
-                    { tag: '一周前', content: '由李四部署到生产环境并发布至应用市场' },
-                    { tag: '一天前', content: '由张三上线到蓝鲸市场' }
-                ]
+                list: [],
+                isLoading: false
             }
         },
 
@@ -115,7 +113,7 @@
         },
 
         mounted () {
-            this.$nextTick(this.initEchart)
+            this.initData()
         },
 
         methods: {
@@ -233,6 +231,17 @@
                 })
             },
 
+            initData () {
+                this.isLoading = true
+                this.$store.dispatch('store/requestVersionLog', this.currentService.serviceCode).then((res) => {
+                    const records = res.records || []
+                    this.list = records.map((x) => ({
+                        tag: x.createTime,
+                        content: `${x.creator} ${this.$t('store.新增版本')}${x.version}`
+                    }))
+                }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => (this.isLoading = false))
+            },
+
             copyCodeUrl () {
                 const input = document.createElement('input')
                 document.body.appendChild(input)
@@ -264,6 +273,10 @@
     .custom-tabs {
         margin-top: 8px;
         height: calc(100% - 19px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         /deep/ .bk-tab-section {
             height: calc(100% - 43px);
             background: $white;
@@ -298,7 +311,7 @@
             text-align: right;
         }
         .code-url {
-            max-width: 14.7vw;
+            max-width: 14vw;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

@@ -10,6 +10,13 @@ const vue = new Vue()
 
 export const actions = {
     /***
+     * 获取版本信息列表
+     */
+    requestVersionLog ({ commit }, serviceCode) {
+        return vue.$ajax.get(`${prefix}/user/market/service/version/list?serviceCode=${serviceCode}`)
+    },
+
+    /***
      *  提交相关信息
      */
     requestCommitServiceInfo ({ commit }, { serviceId, commitInfo }) {

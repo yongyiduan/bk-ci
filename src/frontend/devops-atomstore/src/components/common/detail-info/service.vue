@@ -98,7 +98,7 @@
         display: flex;
         align-items: flex-start;
         margin: 26px auto 0;
-        width: 1460px;
+        width: 95vw;
         background: $white;
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
         padding: 32px;
@@ -127,7 +127,7 @@
         }
     }
     .detail-info-group {
-        width: 1176px;
+        flex: 1;
         padding: 0 32px;
         h3 {
             font-size: 20px;
