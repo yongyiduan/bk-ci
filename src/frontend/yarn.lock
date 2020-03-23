@@ -3489,10 +3489,10 @@ code-point-at@^1.0.0:
   resolved "http://r.tnpm.oa.com/code-point-at/download/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
-codemirror@^5.49.2:
-  version "5.50.0"
-  resolved "http://r.tnpm.oa.com/codemirror/download/codemirror-5.50.0.tgz#aeacd18f225735b17cbab98908edace87fedcdab"
-  integrity sha1-rqzRjyJXNbF8urmJCO2s6H/tzas=
+codemirror@5.49.2:
+  version "5.49.2"
+  resolved "http://r.tnpm.oa.com/codemirror/download/codemirror-5.49.2.tgz#c84fdaf11b19803f828b0c67060c7bc6d154ccad"
+  integrity sha1-yE/a8RsZgD+CiwxnBgx7xtFUzK0=
 
 collection-map@^1.0.0:
   version "1.0.0"
