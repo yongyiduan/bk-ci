@@ -300,13 +300,15 @@
                                             </bk-checkbox-group>
                                         </bk-form-item>
                                         <bk-form-item label="附加通知人员">
-                                            <user-input :handle-change="handleChange" name="attacher" :value="createRuleForm.notifyUserList" placeholder="请输入通知人员"></user-input>
+                                            <staff-input v-if="isExtendTx" :name="'attacher'" :value="createRuleForm.notifyUserList" :handle-change="handleChange"></staff-input>
+                                            <user-input v-else :handle-change="handleChange" name="attacher" :value="createRuleForm.notifyUserList" placeholder="请输入通知人员"></user-input>
                                         </bk-form-item>
                                     </bk-form>
 
                                     <bk-form v-else :label-width="120" :model="createRuleForm" class="user-audit-form">
                                         <bk-form-item label="审核人" :required="true">
-                                            <user-input :handle-change="handleChange" name="reviewer" :value="createRuleForm.auditUserList" placeholder="请输入通知人员"></user-input>
+                                            <staff-input v-if="isExtendTx" :name="'reviewer'" :value="createRuleForm.auditUserList" :handle-change="handleChange"></staff-input>
+                                            <user-input v-else :handle-change="handleChange" name="reviewer" :value="createRuleForm.auditUserList" placeholder="请输入通知人员"></user-input>
                                         </bk-form-item>
                                         <bk-form-item label="审核超时时间">
                                             <bk-input type="number"
@@ -408,6 +410,7 @@
 <script>
     import { mapGetters } from 'vuex'
     import metadataPanel from '@/components/devops/metadata-panel'
+    import staffInput from '@/components/devops/StaffInput'
     import UserInput from '@/components/devops/UserInput/index.vue'
     import pipelineList from '@/components/devops/pipeline-list'
     import templateList from '@/components/devops/template-list'
@@ -421,6 +424,7 @@
             pipelineList,
             templateList,
             metadataPanel,
+            staffInput,
             UserInput,
             emptyTips
         },
@@ -562,10 +566,18 @@
                 const target = this.createRuleForm.indicators.map(item => item.cnName)
                 return target.join('、')
             },
+            isExtendTx () {
+                return VERSION_TYPE === 'tencent'
+            },
             noticeTypeList () {
                 const list = [
+                    { name: 'work-wechat', value: 'RTX', isChecked: false },
+                    { name: 'wechat', value: 'WECHAT', isChecked: false },
                     { name: 'email', value: 'EMAIL', isChecked: false }
                 ]
+                if (!this.isExtendTx) {
+                    list.splice(0, 2)
+                }
                 return list
             }
         },
@@ -635,7 +647,8 @@
                 this.iframeUtil.toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                const url = PERM_URL_PREFIX
+                const host = GW_URL_PREFIX.replace('/console', '')
+                const url = this.isExtendTx ? `${host}/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_creator=rule` : PERM_URL_PREFIX
                 window.open(url, '_blank')
             },
             addLeaveListenr () {
