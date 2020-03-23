@@ -1,6 +1,5 @@
 {
     "store": "Store",
-    "手动录入": "Enter manually",
     "从工蜂自动同步": "Automatic synchronization from git",
     "若模版中有未安装的插件，将自动安装": "If there are uninstalled plugins in the template, they will be installed automatically",
     "debugTask": "Debug task.json",
