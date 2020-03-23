@@ -12,7 +12,7 @@
             <a class="develop-guide-link" target="_blank" href="http://iwiki.oa.com/pages/viewpage.action?pageId=22118721"> {{ $t('store.镜像指引') }} </a>
         </div>
         <main v-bkloading="{ isLoading }" class="edit-content">
-            <bk-form ref="imageForm" class="edit-image" label-width="125" :model="form" v-show="!isLoading">
+            <bk-form ref="imageForm" class="edit-image" label-width="150" :model="form" v-show="!isLoading">
                 <bk-form-item class="wt660" :label="$t('store.镜像名称')" :required="true" property="imageName" :rules="[requireRule]" ref="imageName">
                     <bk-input v-model="form.imageName" :placeholder="$t('store.请输入镜像名称')"></bk-input>
                 </bk-form-item>
@@ -221,13 +221,6 @@
                 requireRule: {
                     required: true,
                     message: this.$t('store.必填项'),
-                    trigger: 'blur'
-                },
-                latestRule: {
-                    validator (val) {
-                        return val !== 'latest'
-                    },
-                    message: this.$t('store.镜像tag不能是latest'),
                     trigger: 'blur'
                 },
                 logoErr: false,
