@@ -1,7 +1,7 @@
 <template>
     <section class="main-body">
         <section class="progress-approve">
-            <img src="../../../images/progressApprove.png" class="approve-image">
+            <img src="../../../images/progressApprove.svg" class="approve-image">
             <span class="approve-tip"> {{ $t('store.扩展正在审核中，请耐心等候') }} </span>
         </section>
     </section>

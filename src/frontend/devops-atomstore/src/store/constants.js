@@ -61,3 +61,18 @@ export const imageStatusList = {
     'UNDERCARRIAGING': 'store.下架中',
     'UNDERCARRIAGED': 'store.已下架'
 }
+
+export const serviceStatusMap = {
+    'INIT': 'store.初始化',
+    'COMMITTING': 'store.提交中',
+    'BUILDING': 'store.构建中',
+    'BUILD_FAIL': 'store.构建失败',
+    'TESTING': 'store.测试中',
+    'EDIT': 'store.填写相关信息中',
+    'AUDITING': 'store.审核中',
+    'AUDIT_REJECT': 'store.审核驳回',
+    'RELEASED': 'store.已发布',
+    'GROUNDING_SUSPENSION': 'store.上架中止',
+    'UNDERCARRIAGING': 'store.下架中',
+    'UNDERCARRIAGED': 'store.已下架'
+}

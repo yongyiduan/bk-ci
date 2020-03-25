@@ -1,37 +1,17 @@
 <template>
-    <section class="main-body">
+    <section class="main-body" v-bkloading="{ isLoading }">
         <bk-form class="progress-info">
             <bk-form-item :label="$t('store.可见范围')" :desc="$t('store.未设置可见范围时，仅扩展成员可以安装到名下项目中使用。设置后，对应组织架构的用户可以在研发商店中安装使用')">
-                <ul class="info-visable" v-if="commitInfo.deptInfoList.length">
-                    <li v-for="dept in commitInfo.deptInfoList" :key="dept.deptId" class="visable-item">{{ dept.deptName }}<icon name="close" size="10" class="dept-close" @click.native="deleteDept(dept)" /></li>
+                <ul class="info-visable" v-if="deptInfoList.length">
+                    <li v-for="dept in deptInfoList" :key="dept.deptId" class="visable-item">{{ dept.deptName }}<icon name="close" size="10" class="dept-close" @click.native="deleteDept(dept)" /></li>
                 </ul>
                 <p @click="showDialog = true" class="info-add-vis"><i class="bk-icon icon-plus"></i>{{ $t('store.添加') }}</p>
             </bk-form-item>
             <bk-form-item :label="$t('store.截图')">
-                <bk-upload
-                    :tip="$t('只允许上传JPG、PNG、JPEG的文件，文件最大为2MB')"
-                    :with-credentials="true"
-                    url="/support/api/user/file/upload"
-                    name="file"
-                    :header="{ 'Content-Type': 'multipart/form-data' }"
-                    accept="image/png,image/jpeg,image/jpg"
-                    :handle-res-code="res => res.status === 0"
-                    size="2"
-                    @on-success="(res) => successFileUpload(res, 'PICTURE')"
-                ></bk-upload>
+                <upload type="PICTURE" :file-list.sync="imageList"></upload>
             </bk-form-item>
             <bk-form-item :label="$t('store.视频教程')">
-                <bk-upload
-                    :tip="$t('只允许上传video的文件，文件最大为500MB')"
-                    :with-credentials="true"
-                    url="/support/api/user/file/upload"
-                    name="file"
-                    :header="{ 'Content-Type': 'multipart/form-data' }"
-                    accept="video/mp4,video/x-m4v,video/*"
-                    :handle-res-code="res => res.status === 0"
-                    size="500"
-                    @on-success="(res) => successFileUpload(res, 'VIDEO')"
-                ></bk-upload>
+                <upload type="VIDEO" :file-list.sync="videoList"></upload>
             </bk-form-item>
         </bk-form>
 
@@ -49,11 +29,13 @@
 </template>
 
 <script>
+    import upload from '@/components/upload'
     import organizationDialog from '@/components/organization-dialog'
 
     export default {
         components: {
-            organizationDialog
+            organizationDialog,
+            upload
         },
 
         props: {
@@ -67,30 +49,44 @@
 
         data () {
             return {
-                commitInfo: {
-                    mediaInfoList: [],
-                    deptInfoList: []
-                },
+                imageList: [],
+                videoList: [],
+                deptInfoList: [],
                 isCommiting: false,
-                showDialog: false
+                showDialog: false,
+                isloading: false
             }
         },
 
+        created () {
+            this.initData()
+        },
+
         methods: {
-            successFileUpload ({ responseData: { data: mediaUrl } }, mediaType) {
-                this.commitInfo.mediaInfoList.push({ mediaUrl, mediaType })
+            initData () {
+                this.isloading = true
+                this.$store.dispatch('store/requestServiceVisableList', this.detail.serviceCode).then((res) => {
+                    const mediaList = this.detail.mediaList || []
+                    this.imageList.push(...mediaList.filter(x => x.mediaType === 'PICTURE'))
+                    this.videoList.push(...mediaList.filter(x => x.mediaType === 'VIDEO'))
+                    this.deptInfoList = res.deptInfos || []
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => {
+                    this.isloading = false
+                })
             },
 
             deleteDept (dept) {
-                const index = this.commitInfo.deptInfoList.findIndex((x) => (x.deptId === dept.deptId))
-                this.commitInfo.deptInfoList.splice(index, 1)
+                const index = this.deptInfoList.findIndex((x) => (x.deptId === dept.deptId))
+                this.deptInfoList.splice(index, 1)
             },
 
             saveHandle (params) {
                 const deptInfos = params.deptInfos || []
                 deptInfos.forEach((dept) => {
-                    const index = this.commitInfo.deptInfoList.findIndex((x) => (x.deptId === dept.deptId))
-                    if (index <= -1) this.commitInfo.deptInfoList.push(dept)
+                    const index = this.deptInfoList.findIndex((x) => (x.deptId === dept.deptId))
+                    if (index <= -1) this.deptInfoList.push(dept)
                 })
                 this.showDialog = false
             },
@@ -107,7 +103,10 @@
                 this.isCommiting = true
                 const postData = {
                     serviceId: this.detail.serviceId,
-                    commitInfo: this.commitInfo
+                    commitInfo: {
+                        mediaInfoList: [...this.imageList, ...this.videoList],
+                        deptInfoList: this.deptInfoList
+                    }
                 }
                 this.$store.dispatch('store/requestCommitServiceInfo', postData).catch((err) => {
                     this.$bkMessage({ message: (err.message || err), theme: 'error' })

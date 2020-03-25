@@ -2,7 +2,6 @@
     <section class="main-body">
         <section class="progress-test">
             <img src="../../../images/progressTest.png" class="test-image">
-            <bk-button class="test-button" @click="goToTest"> {{ $t('store.前往测试') }} </bk-button>
             <span class="test-tip" v-html="$t('store.testTip')"></span>
         </section>
 
@@ -76,9 +75,7 @@
         .test-image {
             width: 160px;
             height: 123px;
-        }
-        .test-button {
-            margin: 24px 0 16px;
+            margin-bottom: 16px;
         }
         .test-tip {
             color: #b0b0b0;

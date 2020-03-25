@@ -102,8 +102,8 @@
             top: 50%;
             left: 50%;
             transform: translate3d(-50%, -50%, 0);
-            height: 444px;
-            width: 790px;
+            max-height: 50vh;
+            max-width: 50vw;
         }
     }
 

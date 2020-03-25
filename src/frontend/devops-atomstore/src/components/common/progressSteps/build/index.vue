@@ -63,6 +63,10 @@
             this.getLog()
         },
 
+        beforeDestroy () {
+            clearTimeout(this.getLog.id)
+        },
+
         methods: {
             getLog () {
                 if (this.getLog.start === undefined) this.isLogLoading = true
@@ -71,7 +75,7 @@
                     projectCode: this.storeBuildInfo.projectCode,
                     pipelineId: this.storeBuildInfo.pipelineId,
                     buildId: this.storeBuildInfo.buildId,
-                    start: this.getLog.start || 0,
+                    start: this.getLog.start > 0 ? this.getLog.start + 1 : 0,
                     executeCount: this.getLog.executeCount || (this.getLog.executeCount = 1, 1)
                 }
                 this.$store.dispatch('store/requestProgressLog', postData).then((data = {}) => {
@@ -90,7 +94,7 @@
                             })
                             this.logs.push(res)
                         })
-                        if (!data.finished || data.hasMore) this.getLog.id = setTimeout(this.getLog, 100)
+                        if (!data.finished || data.hasMore) this.getLog.id = setTimeout(this.getLog, 300)
                     }
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })

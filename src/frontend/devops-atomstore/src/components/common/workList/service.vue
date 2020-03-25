@@ -29,10 +29,10 @@
             <bk-table-column :label="$t('store.调试项目')" prop="projectName"></bk-table-column>
             <bk-table-column :label="$t('store.扩展点')" prop="itemName"></bk-table-column>
             <bk-table-column :label="$t('store.版本')" prop="version" width="120"></bk-table-column>
-            <bk-table-column :label="$t('store.状态')" width="120">
+            <bk-table-column :label="$t('store.状态')" width="160">
                 <template slot-scope="props">
                     <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
-                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'BUILD_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.serviceStatus)">
+                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.serviceStatus)">
                         <div class="rotate rotate1"></div>
                         <div class="rotate rotate2"></div>
                         <div class="rotate rotate3"></div>
@@ -64,7 +64,7 @@
                         v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
                         @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'atomList' } })"> {{ $t('store.安装') }} </span>
                     <span class="schedule-btn"
-                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'BUILD_FAIL', 'TESTING'].includes(props.row.serviceStatus)"
+                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING'].includes(props.row.serviceStatus)"
                         @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
                     <span class="obtained-btn"
                         v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
@@ -188,7 +188,7 @@
 
 <script>
     import formTips from '@/components/common/formTips/index'
-    import { atomStatusMap } from '@/store/constants'
+    import { serviceStatusMap } from '@/store/constants'
 
     export default {
         components: {
@@ -197,7 +197,7 @@
 
         data () {
             return {
-                serviceStatusList: atomStatusMap,
+                serviceStatusList: serviceStatusMap,
                 searchName: '',
                 isLoading: false,
                 renderList: [],

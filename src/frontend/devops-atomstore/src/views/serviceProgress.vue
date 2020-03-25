@@ -277,7 +277,7 @@
                 return this.requestServiceProcess(serviceId).then((res) => {
                     this.progressStatus = (res.processInfos || []).map((item) => ({
                         title: item.name,
-                        icon: iconMap[item.code],
+                        icon: item.status === 'success' ? 'check-1' : iconMap[item.code],
                         status: item.status,
                         code: item.code
                     }))
