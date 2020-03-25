@@ -56,8 +56,8 @@
                 const { entryResUrl = 'index.html', options = {}, data = {} } = props
                 this.$hookTrigger({
                     ...ext,
-                    url: urlJoin(ext.baseUrl, 'static', entryResUrl),
-                    name: ext.itemName,
+                    url: this.getResUrl(entryResUrl, ext.baseUrl),
+                    name: ext.serviceName,
                     target: {
                         type: ext.htmlComponentType,
                         options,

@@ -32,7 +32,7 @@ function iframeUtil (router: any) {
             case 'ASIDEPANEL':
                 toggleAsidePanel({
                     src: hook.url,
-                    header: hook.name.value,
+                    header: hook.name,
                     options: hook.target.options,
                     customData: hook.target.data,
                     show: true
