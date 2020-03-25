@@ -93,6 +93,9 @@ window.devops = new Vue({
     i18n,
     router,
     store,
+    provide: {
+        isMooc: location.search.indexOf('isMooc') > -1
+    },
     render (h) {
         return h(App)
     }

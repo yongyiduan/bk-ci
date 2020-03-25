@@ -1,17 +1,17 @@
 <template>
     <div
         v-clickoutside="hideUserInfo"
-        :class="{ &quot;devops-user-info&quot;: true, &quot;active&quot;: show }"
+        :class="{ 'devops-user-info': true, 'active': show }"
     >
         <div
             class="user-entry"
             @click.stop="toggleUserInfo"
         >
             {{ username }}
-            <i class="bk-icon icon-down-shape" />
+            <i v-if="!disabled" class="bk-icon icon-down-shape" />
         </div>
         <div
-            v-if="show"
+            v-if="show && !disabled"
             class="user-info-dropmenu"
         >
             <p class="user-avatar">
@@ -68,12 +68,17 @@
         chineseName: string
         @Prop()
         bkpaasUserId: string
+        @Prop()
+        disabled: boolean
+
         show: boolean = false
 
         @Action togglePopupShow
 
         toggleUserInfo (show: boolean) :void {
-            this.show = !this.show
+            if (!this.disabled) {
+                this.show = !this.show
+            }
         }
 
         hideUserInfo () : void {
