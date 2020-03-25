@@ -1,5 +1,5 @@
 <template>
-    <bk-sideslider :is-show.sync="show" :quick-close="quickClose" v-bind="options">
+    <bk-sideslider :is-show.sync="show" :quick-close="quickClose" v-bind="asidePanelOption">
         <div slot="header">{{ header }}</div>
         <div slot="content" class="extention-aside-panel-content">
             <iframe v-if="show" @load="onload" ref="extensionIframe" class="extention-aside-panel-content-iframe" :src="src" />
@@ -21,6 +21,14 @@
         customData: object | null = null
         loaded: boolean = false
 
+        get asidePanelOption (): object {
+            const { options = {} } = this
+            return {
+                width: 680,
+                ...options
+            }
+        }
+ 
         updateProps (props) {
             Object.keys(props).map(prop => {
               this[prop] = props[prop]

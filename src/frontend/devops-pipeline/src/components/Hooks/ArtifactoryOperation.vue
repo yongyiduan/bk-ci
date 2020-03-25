@@ -1,11 +1,11 @@
 <template>
     <ul class="artifactory-operation-hooks">
         <li class="icon-hook" v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)">
-            <template v-if="ext.tooltip">
-                <img v-bk-tooltips="ext.tooltip" :src="getResUrl(ext.iconUrl, ext.baseUrl)" />
+            <template v-if="getExtTooltip(ext)">
+                <img v-bk-tooltips="getExtTooltip(ext)" :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
             </template>
             <template v-else>
-                <img :src="getResUrl(ext.iconUrl, ext.baseUrl)" />
+                <img :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
             </template>
         </li>
     </ul>
@@ -45,16 +45,24 @@
             ...mapActions([
                 'fetchExtensionByHookId'
             ]),
+            getExtTooltip (ext) {
+                return ext.props && ext.props.tooltip ? ext.props.tooltip : ''
+            },
+            getExtIconUrl (ext) {
+                return ext.props && ext.props.iconUrl ? ext.props.iconUrl : ext.iconUrl
+            },
             hookAction (ext) {
+                const { props = {} } = ext
+                const { entryResUrl = 'index.html', options = {}, data = {} } = props
                 this.$hookTrigger({
                     ...ext,
-                    url: urlJoin(ext.baseUrl, 'static/index.html'),
+                    url: urlJoin(ext.baseUrl, 'static', entryResUrl),
                     name: ext.itemName,
                     target: {
                         type: ext.htmlComponentType,
-                        options: {},
+                        options,
                         data: {
-                            ...(ext.props.data ? ext.props.data : {}),
+                            ...data,
                             artifact: this.artifact
                         }
                     }
@@ -107,6 +115,10 @@
             margin-right: 8px;
             width: 16px;
             height: 16px;
+            img {
+                width: 100%;
+                height: 100%;
+            }
             
         }
     }
