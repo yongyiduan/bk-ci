@@ -27,7 +27,12 @@ function iframeUtil (router: any) {
     }
 
     utilMap.syncUrl = function ({ url, refresh = false }: UrlParam): void {
-        const pathname = `${location.pathname.replace(/^\/(\w+)\/(\w+)\/(\S+)$/, '/$1/$2')}${url}`
+        let addMoocUrl = url
+        if (window.isMooc && addMoocUrl.indexOf('isMooc') < 0) {
+            console.log(/^\S+\?\S+$/.test(url), url)
+            addMoocUrl = /^\S+\?\S+$/.test(url) ? `${url}&isMooc` : `${url}?isMooc`
+        }
+        const pathname = `${location.pathname.replace(/^\/(\w+)\/(\w+)\/(\S+)$/, '/$1/$2')}${addMoocUrl}`
         if (refresh) {
             location.pathname = pathname
         } else {
