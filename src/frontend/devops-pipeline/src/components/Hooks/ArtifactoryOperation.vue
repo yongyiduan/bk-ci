@@ -63,6 +63,7 @@
                         options,
                         data: {
                             ...data,
+                            ...this.$route.params,
                             artifact: this.artifact
                         }
                     }
