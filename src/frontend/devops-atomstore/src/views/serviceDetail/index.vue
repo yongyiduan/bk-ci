@@ -85,7 +85,7 @@
             },
             sideMenuNav () {
                 return {
-                    backUrl: 'atomList',
+                    backUrl: 'workList',
                     backType: 'service',
                     icon: 'atom-story',
                     title: this.currentService.serviceName,
@@ -101,7 +101,7 @@
         methods: {
             goBack () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: 'service'
                     }
@@ -118,7 +118,7 @@
             },
 
             requestServiceDetail () {
-                return this.$store.dispatch('store/requestServiceDetailByCode', this.serviceCode).then(res => this.$store.dispatch('store/updateCurrentService', res))
+                return this.$store.dispatch('store/requestServiceDetailByCode', this.serviceCode).then(res => this.$store.dispatch('store/updateCurrentService', res || {}))
             },
 
             getMemInfo () {

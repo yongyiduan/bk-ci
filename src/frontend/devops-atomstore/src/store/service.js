@@ -10,6 +10,27 @@ const vue = new Vue()
 
 export const actions = {
     /***
+     * 服务扩展重新授权
+     */
+    resetServiceGit ({ commit }, { serviceCode, projectCode }) {
+        return vue.$ajax.post(`${prefix}/user/market/service/repositorys/${serviceCode}?projectCode=${projectCode}`)
+    },
+
+    /***
+     * 返回测试状态
+     */
+    requestBackToTest ({ commit }, serviceId) {
+        return vue.$ajax.post(`${prefix}/user/market/serviceIds/${serviceId}/ext/back`)
+    },
+
+    /***
+     * 获取服务扩展打分相关信息
+     */
+    requestServiceStic ({ commit }, serviceCode) {
+        return vue.$ajax.get(`${prefix}/user/market/service/stat/serviceCodes/${serviceCode}`)
+    },
+
+    /***
      * 获取版本信息列表
      */
     requestVersionLog ({ commit }, serviceCode) {

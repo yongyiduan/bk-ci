@@ -15,7 +15,7 @@
             <header class="progress-header">
                 <bk-steps ext-cls="progress-steps" :status="currentStepStatus" :steps="progressStatus" :cur-step="currentStepIndex"></bk-steps>
                 <bk-button class="progress-detail" @click="showDetail"> {{ $t('store.查看扩展详情') }} </bk-button>
-                <bk-button class="progress-cancle" :disabled="isOver" @click="cancelRelease"> {{ $t('store.中止发布') }} </bk-button>
+                <bk-button class="progress-cancle" :loading="isCancleLoading" :disabled="isOver" @click="cancelRelease"> {{ $t('store.中止发布') }} </bk-button>
             </header>
 
             <section class="progress-main">
@@ -135,7 +135,7 @@
         data () {
             return {
                 isLoading: false,
-                isTestLoading: false,
+                isCancleLoading: false,
                 progressStatus: [],
                 currentStepIndex: 1,
                 isOver: false,
@@ -190,9 +190,7 @@
             ...mapActions('store', [
                 'requestServiceDetail',
                 'requestServiceProcess',
-                'requestServiceCancelRelease',
-                'requestServicePassTest',
-                'requestRecheckService'
+                'requestServiceCancelRelease'
             ]),
 
             showDetail () {
@@ -201,37 +199,12 @@
             },
 
             initData () {
+                this.isLoading = true
                 Promise.all([this.getServiceDetail(), this.getServiceProcess()]).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
                     this.isLoading = false
                 })
-            },
-
-            reCheck () {
-                if (!this.permission) return
-
-                const params = this.$route.params || {}
-                const serviceId = params.serviceId || ''
-                this.requestRecheckService(serviceId).then(() => {
-                    this.$bkMessage({ message: this.$t('store.发起重新构建成功'), theme: 'success' })
-                    this.getServiceProcess()
-                }).catch((err) => {
-                    this.$bkMessage({ message: err.message || err, theme: 'error' })
-                })
-            },
-
-            passTest () {
-                if (!this.permission) return
-
-                const params = this.$route.params || {}
-                const serviceId = params.serviceId || ''
-                this.isTestLoading = true
-                this.requestServicePassTest(serviceId).then(() => {
-                    this.getServiceProcess()
-                }).catch((err) => {
-                    this.$bkMessage({ message: err.message || err, theme: 'error' })
-                }).finally(() => (this.isTestLoading = false))
             },
 
             cancelRelease () {
@@ -240,12 +213,13 @@
                 const confirmFn = () => {
                     const params = this.$route.params || {}
                     const serviceId = params.serviceId || ''
+                    this.isCancleLoading = true
                     this.requestServiceCancelRelease(serviceId).then(() => {
                         this.$bkMessage({ message: this.$t('store.取消发布成功'), theme: 'success' })
                         this.toServiceList()
                     }).catch((err) => {
                         this.$bkMessage({ message: err.message || err, theme: 'error' })
-                    }).finally(() => (this.isLoading = false))
+                    }).finally(() => (this.isCancleLoading = false))
                 }
                 this.$bkInfo({
                     title: this.$t('store.确认要取消发布吗？'),
@@ -256,13 +230,12 @@
             getServiceDetail () {
                 const params = this.$route.params || {}
                 const serviceId = params.serviceId || ''
-                this.isLoading = true
                 return this.requestServiceDetail(serviceId).then((res) => {
                     this.serviceDetail = res
                 })
             },
 
-            getServiceProcess () {
+            getServiceProcess (callBack) {
                 const params = this.$route.params || {}
                 const serviceId = params.serviceId || ''
                 const iconMap = {
@@ -290,6 +263,8 @@
                     this.isOver = lastStep.status === 'success'
                     if (this.isOver) this.currentStepIndex = this.progressStatus.length
                     if (this.isOver || this.currentStep.status === 'fail') clearTimeout(this.loopProgress.timeId)
+                }).finally(() => {
+                    if (callBack) callBack()
                 })
             },
 
@@ -303,7 +278,7 @@
 
             toServiceList () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: 'service'
                     }

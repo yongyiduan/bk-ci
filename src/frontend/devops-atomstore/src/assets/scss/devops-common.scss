@@ -467,6 +467,7 @@
         flex: 1;
         color: $fontBlack;
         word-break: break-all;
+        max-width: calc(100vw - 400px);
         /deep/ .v-note-panel {
             border: none;
             .v-show-content {

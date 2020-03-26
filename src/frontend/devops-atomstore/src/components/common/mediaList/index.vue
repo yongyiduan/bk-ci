@@ -1,18 +1,18 @@
 <template>
-    <section>
+    <section class="media-List" ref="mediaList">
         <ul class="detail-swiper" :style="{ width: maxTransferWidth + 'px', transform: `translateX(${swiperTransfer}px)` }">
-            <li v-for="media in list" :key="media.id">
-                <img :src="media.mediaUrl" v-if="media.mediaType === 'PICTURE'" class="media-item" @click="fullScreenImgSrc = media.mediaUrl">
+            <li v-for="media in list" :key="media.id" class="media-item">
+                <img :src="media.mediaUrl" v-if="media.mediaType === 'PICTURE'" @click="fullScreenImgSrc = media.mediaUrl">
                 <video-player v-else
                     :key="media.id"
-                    class="video-player vjs-custom-skin media-item"
+                    class="video-player vjs-custom-skin"
                     ref="videoPlayer"
                     :playsinline="true"
                     :options="getPlayOption(media)">
                 </video-player>
             </li>
         </ul>
-        <i class="swiper-nav nav-left" @click="changeIndex(-1)" v-if="swiperTransfer > -maxTransferWidth + 1396"></i>
+        <i class="swiper-nav nav-left" @click="changeIndex(-1)" v-if="swiperTransfer > -maxTransferWidth + containWidth"></i>
         <i class="swiper-nav nav-right" @click="changeIndex(1)" v-if="swiperTransfer < 0"></i>
 
         <transition name="fade">
@@ -26,6 +26,7 @@
 <script>
     import { videoPlayer } from 'vue-video-player'
     import 'video.js/dist/video-js.css'
+    videoPlayer.watch = {}
 
     export default {
         components: {
@@ -41,7 +42,8 @@
         data () {
             return {
                 swiperTransfer: 0,
-                fullScreenImgSrc: ''
+                fullScreenImgSrc: '',
+                containWidth: 0
             }
         },
 
@@ -50,6 +52,11 @@
                 const mediaList = this.list || []
                 return mediaList.length * 395 + (mediaList.length - 1) * 37
             }
+        },
+
+        mounted () {
+            const mediaList = this.$refs.mediaList
+            this.containWidth = mediaList.offsetWidth
         },
 
         methods: {
@@ -77,7 +84,7 @@
 
             changeIndex (num) {
                 let newTransferDis = this.swiperTransfer + num * 432
-                const maxMove = this.maxTransferWidth - 1396
+                const maxMove = this.maxTransferWidth - this.containWidth
                 if (newTransferDis >= 0) newTransferDis = 0
                 if (newTransferDis <= -maxMove) newTransferDis = -maxMove
                 this.swiperTransfer = newTransferDis
@@ -88,6 +95,12 @@
 
 <style lang="scss" scoped>
     @import '@/assets/scss/conf.scss';
+
+    .media-List {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
 
     .full-screen {
         position: fixed;
@@ -116,6 +129,10 @@
             width: 395px;
             margin-right: 37px;
             cursor: pointer;
+            img {
+                height: 222px;
+                width: 395px;
+            }
             &:last-child {
                 margin-right: 0;
             }
@@ -126,21 +143,21 @@
         cursor: pointer;
         position: absolute;
         display: block;
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         border-left: 3px solid $navGray;
         border-bottom: 3px solid $navGray;
         opacity: .6;
         top: 135px;
         &.nav-left {
-            left: -12px;
+            left: 12px;
             transform: rotate(45deg);
             &:hover {
                 transform: rotate(45deg) scale(1.1);
             }
         }
         &.nav-right {
-            right: -12px;
+            right: 12px;
             transform: rotate(225deg);
             &:hover {
                 transform: rotate(225deg) scale(1.1);

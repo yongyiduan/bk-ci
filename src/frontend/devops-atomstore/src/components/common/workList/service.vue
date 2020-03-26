@@ -62,7 +62,7 @@
                         @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"> {{ $t('store.升级') }} </span>
                     <span class="shelf-btn"
                         v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
-                        @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'atomList' } })"> {{ $t('store.安装') }} </span>
+                        @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'workList' } })"> {{ $t('store.安装') }} </span>
                     <span class="schedule-btn"
                         v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING'].includes(props.row.serviceStatus)"
                         @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
@@ -80,7 +80,13 @@
             :quick-close="relateServiceData.quickClose"
             :width="relateServiceData.width">
             <template slot="content">
-                <bk-form ref="relateForm" class="relate-form" label-width="100" :model="relateServiceData.form" v-bkloading="{ isLoading: relateServiceData.isLoading }">
+                <bk-form ref="relateForm"
+                    class="relate-form"
+                    label-width="100"
+                    :model="relateServiceData.form"
+                    v-bkloading="{ isLoading: relateServiceData.isLoading }"
+                    v-if="hasOauth"
+                >
                     <bk-form-item :label="$t('store.扩展名称')" :required="true" property="serviceName" :desc="$t('store.展示给用户的名称，用户根据名称识别扩展服务')" :rules="[requireRule]">
                         <bk-input v-model="relateServiceData.form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
                     </bk-form-item>
@@ -124,7 +130,7 @@
                             </bk-option-group>
                         </bk-select>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在开发测试过程中，开发者可以在此项目下调试扩展，成功提交后将不能修改')" :rules="[requireRule]">
+                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在开发过程中，开发者可在此项目下调试扩展。成功提交后将不能修改，建议不要选择有正式业务的项目，避免调试过程中影响业务使用')" :rules="[requireRule]">
                         <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
                             <bk-option v-for="option in projectList"
                                 :key="option.project_code"
@@ -149,6 +155,13 @@
                         <bk-button @click.native="cancelRelateService"> {{ $t('store.取消') }} </bk-button>
                     </bk-form-item>
                 </bk-form>
+                <div class="oauth-tips" v-else style="margin: 30px">
+                    <button class="bk-button bk-primary" type="button" @click="openValidate"> {{ $t('store.OAUTH认证') }} </button>
+                    <p class="prompt-oauth">
+                        <i class="devops-icon icon-info-circle-shape"></i>
+                        <span> {{ $t('store.新增扩展时将自动初始化扩展代码库，请先进行工蜂OAUTH授权') }} </span>
+                    </p>
+                </div>
             </template>
         </bk-sideslider>
 
@@ -163,15 +176,6 @@
                     </bk-form-item>
                     <bk-form-item :label="$t('store.扩展标识')" property="serviceCode">
                         <span class="lh30">{{offlineServiceData.form.serviceCode}}</span>
-                    </bk-form-item>
-                    <bk-form-item :label="$t('store.扩展版本')" property="version">
-                        <bk-select v-model="offlineServiceData.form.version" searchable :placeholder="$t('store.请选择扩展版本')">
-                            <bk-option v-for="option in offlineServiceData.versionList"
-                                :key="option.version"
-                                :id="option.version"
-                                :name="option.version">
-                            </bk-option>
-                        </bk-select>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.下架原因')" :required="true" property="reason" :rules="[requireRule]">
                         <bk-input type="textarea" v-model="offlineServiceData.form.reason" :placeholder="$t('store.请输入下架原因')"></bk-input>
@@ -197,6 +201,8 @@
 
         data () {
             return {
+                hasOauth: true,
+                gitOAuthUrl: '',
                 serviceStatusList: serviceStatusMap,
                 searchName: '',
                 isLoading: false,
@@ -232,11 +238,9 @@
                     width: 565,
                     isLoading: false,
                     show: false,
-                    versionList: [],
                     form: {
                         serviceName: '',
                         serviceCode: '',
-                        version: '',
                         reason: ''
                     }
                 },
@@ -271,9 +275,27 @@
 
         created () {
             this.requestList()
+            this.checkIsOAuth()
         },
 
         methods: {
+            openValidate () {
+                window.open(this.gitOAuthUrl, '_self')
+            },
+
+            async checkIsOAuth () {
+                try {
+                    const res = await this.$store.dispatch('store/checkIsOAuth', { type: 'EXT_SERVICE_MARKET', code: '' })
+                    this.hasOauth = res.status === 200
+                    this.gitOAuthUrl = res.url
+                } catch (err) {
+                    this.$bkMessage({
+                        message: err.message ? err.message : err,
+                        theme: 'error'
+                    })
+                }
+            },
+
             deleteServiceItem (id) {
                 const index = this.relateServiceData.form.extensionItemList.findIndex(x => x === id)
                 this.relateServiceData.form.extensionItemList.splice(index, 1)
@@ -327,7 +349,7 @@
                     const postData = {
                         serviceCode: this.offlineServiceData.form.serviceCode,
                         params: {
-                            version: this.offlineServiceData.form.version,
+                            version: '',
                             reason: this.offlineServiceData.form.reason
                         }
                     }
@@ -354,27 +376,12 @@
                 this.offlineServiceData.show = false
                 this.offlineServiceData.form.serviceName = ''
                 this.offlineServiceData.form.serviceCode = ''
-                this.offlineServiceData.form.version = ''
             },
 
             offline (row) {
                 this.offlineServiceData.show = true
                 this.offlineServiceData.form.serviceName = row.serviceName
                 this.offlineServiceData.form.serviceCode = row.serviceCode
-                this.offlineServiceData.form.version = row.version
-                this.offlineServiceData.isLoading = true
-
-                const postData = {
-                    serviceCode: row.serviceCode,
-                    page: 1,
-                    pageSize: 1000
-                }
-                this.offlineServiceData.isLoading = true
-                this.$store.dispatch('store/requestServiceVersionList', postData).then((res) => {
-                    this.offlineServiceData.versionList = res.records || []
-                }).catch((err) => {
-                    this.$bkMessage({ message: err.message || err, theme: 'error' })
-                }).finally(() => (this.offlineServiceData.isLoading = false))
             },
 
             deleteService (serviceCode) {

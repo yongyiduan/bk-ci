@@ -138,8 +138,8 @@
             },
 
             isPublicTitle () {
-                if (this.isPublic) return '查看源码'
-                else return '未开源'
+                if (this.isPublic) return this.$t('store.查看源码')
+                else return this.$t('store.未开源')
             },
 
             approveMsg () {

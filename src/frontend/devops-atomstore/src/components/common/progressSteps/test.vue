@@ -6,8 +6,8 @@
         </section>
 
         <footer class="main-footer">
-            <bk-button theme="primary" @click="completeTest" :loading="isLoading"> {{ $t('store.测试完成') }} </bk-button>
-            <bk-button :loading="isRebuildLoading" @click="rebuild"> {{ $t('store.重新构建') }} </bk-button>
+            <bk-button theme="primary" @click="completeTest" :disabled="isRebuildLoading" :loading="isLoading"> {{ $t('store.测试完成') }} </bk-button>
+            <bk-button :loading="isRebuildLoading" :disabled="isLoading" @click="rebuild"> {{ $t('store.重新构建') }} </bk-button>
         </footer>
     </section>
 </template>
@@ -42,23 +42,25 @@
                     projectCode: this.detail.projectCode
                 }
                 this.$store.dispatch('store/requestRebuildService', postData).then(() => {
-                    this.$emit('freshProgress')
+                    this.$emit('freshProgress', () => {
+                        this.isRebuildLoading = false
+                    })
                 }).catch((err) => {
-                    this.$bkMessage({ message: err.message || err, theme: 'error' })
-                }).finally(() => {
                     this.isRebuildLoading = false
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
                 })
             },
 
             completeTest () {
                 this.isLoading = true
                 this.$store.dispatch('store/requestServicePassTest', this.detail.serviceId).then(() => {
-                    this.$emit('freshProgress')
+                    this.$emit('freshProgress', () => {
+                        this.isLoading = false
+                    })
                     this.$parent.currentStepIndex++
                 }).catch((err) => {
-                    this.$bkMessage({ message: err.message || err, theme: 'error' })
-                }).finally(() => {
                     this.isLoading = false
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
                 })
             }
         }

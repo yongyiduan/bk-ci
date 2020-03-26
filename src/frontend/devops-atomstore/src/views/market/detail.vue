@@ -9,11 +9,11 @@
                 <i class="right-arrow banner-arrow"></i>
                 <span class="banner-des">{{detail.name}}</span>
             </p>
-            <router-link :to="{ name: 'atomList' }" class="title-work" v-if="type !== 'ide'"> {{ $t('store.工作台') }} </router-link>
+            <router-link :to="{ name: 'workList' }" class="title-work" v-if="type !== 'ide'"> {{ $t('store.工作台') }} </router-link>
         </h3>
 
-        <main class="store-main" v-show="!isLoading">
-            <component :is="`${type}Info`" :detail="detail"></component>
+        <main class="store-main" v-if="!isLoading">
+            <component :is="`${type}Info`" :detail="detail" class="detail-info"></component>
             <bk-tab type="unborder-card" :active.sync="currentTab" class="detail-tabs">
                 <bk-tab-panel :name="tab.name" :label="tab.label" v-for="(tab, index) in tabList[type]" :key="index">
                     <component :is="tab.componentName" v-bind="tab.bindData"></component>
@@ -130,11 +130,11 @@
                 'getUserApprovalInfo',
                 'requestImageCategorys',
                 'getAtomYaml',
-                'requestService'
+                'requestService',
+                'requestServiceStic'
             ]),
 
             getDetail () {
-                this.isLoading = true
                 const type = this.$route.params.type
                 const funObj = {
                     atom: () => this.getAtomDetail(),
@@ -211,9 +211,11 @@
                 const serviceCode = this.detailCode
 
                 return Promise.all([
-                    this.requestService({ serviceCode })
-                ]).then(([serviceDetail]) => {
+                    this.requestService({ serviceCode }),
+                    this.requestServiceStic(serviceCode)
+                ]).then(([serviceDetail = {}, serviceStatic = {}]) => {
                     const detail = serviceDetail || {}
+                    detail.downloads = serviceStatic.downloads || 0
                     detail.detailId = serviceDetail.serviceId
                     detail.name = serviceDetail.serviceName
                     this.setDetail(detail)
@@ -244,9 +246,14 @@
         min-height: 100%;
     }
 
+    .detail-info {
+        max-width: 1400px;
+    }
+
     .detail-tabs {
         margin: 20px auto 30px;
         width: 95vw;
+        max-width: 1400px;
         background: #fff;
         padding: 10px 32px 40px;
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);

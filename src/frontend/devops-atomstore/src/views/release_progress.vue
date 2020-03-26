@@ -335,7 +335,7 @@
         methods: {
             toAtomList () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: 'atom'
                     }

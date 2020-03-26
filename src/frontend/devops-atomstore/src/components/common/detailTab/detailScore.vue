@@ -1,7 +1,7 @@
 <template>
     <section v-bkloading="{ isLoading }" class="detail-score">
         <main class="main-swiper" v-if="detail.mediaList && detail.mediaList.length">
-            <media-list :list="detail.mediaList"></media-list>
+            <media-list :list="detail.mediaList" v-if="!isLoading"></media-list>
         </main>
 
         <section class="summary-tab">
@@ -78,8 +78,7 @@
                 showComment: false,
                 pageSize: 10,
                 pageIndex: 1,
-                isLoading: false,
-                
+                isLoading: true,
                 isOverDes: false,
                 hasShowAll: false,
                 methodsGenerator: {
@@ -134,15 +133,14 @@
             ]),
 
             getSummaryScore () {
-                this.isLoading = true
                 this.setDetail({ avgScore: 0 })
                 Promise.all([this.getComments(), this.getScoreDetail()]).catch((err) => {
                     this.$bkMessage({ message: (err.message || err), theme: 'error' })
                 }).finally(() => {
                     this.isLoading = false
-                    setTimeout(() => {
+                    this.$nextTick(() => {
                         this.isOverDes = this.$refs.edit.scrollHeight > 65
-                    }, 400)
+                    })
                 })
             },
 
@@ -229,10 +227,6 @@
 
     .detail-score {
         position: relative;
-        .main-swiper {
-            width: 100%;
-            overflow: hidden;
-        }
     }
 
     .summary-tab {

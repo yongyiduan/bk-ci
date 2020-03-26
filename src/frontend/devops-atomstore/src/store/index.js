@@ -24,6 +24,7 @@ import * as Image from './image'
 import * as Service from './service'
 import { mergeModules } from '@/utils/index'
 import { UPDATE_CURRENT_LIST, UPDATE_MARKET_QUERY, UPDATE_MARKET_DETAIL, CLEAR_MARKET_DETAIL } from './constants'
+const repositoryPrefix = 'repository/api'
 
 const Vue = window.Vue
 const vue = new Vue()
@@ -114,6 +115,13 @@ const commonModules = {
 
         requestProgressLog ({ commit }, { type, projectCode, pipelineId, buildId, start, executeCount }) {
             return vue.$ajax.get(`${prefix}/user/store/logs/types/${type}/projects/${projectCode}/pipelines/${pipelineId}/builds/${buildId}/after?start=${start}&executeCount=${executeCount}`)
+        },
+
+        /**
+         * git OAuth授权
+         */
+        checkIsOAuth ({ commit }, { type, code }) {
+            return vue.$ajax.get(`${repositoryPrefix}/user/git/isOauth?redirectUrlType=${type}&storeCode=${code}`)
         }
     },
     getters: {

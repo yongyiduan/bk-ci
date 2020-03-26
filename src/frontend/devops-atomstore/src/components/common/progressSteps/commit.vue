@@ -16,8 +16,8 @@
         </bk-form>
 
         <footer class="main-footer">
-            <bk-button theme="primary" @click="submit" :loading="isCommiting"> {{ $t('store.提交') }} </bk-button>
-            <bk-button @click="previousStep"> {{ $t('store.上一步') }} </bk-button>
+            <bk-button theme="primary" @click="submit" :disabled="isToBackIng" :loading="isCommiting"> {{ $t('store.提交') }} </bk-button>
+            <bk-button @click="previousStep" :disabled="isCommiting" :loading="isToBackIng"> {{ $t('store.上一步') }} </bk-button>
         </footer>
 
         <organization-dialog :show-dialog="showDialog"
@@ -54,7 +54,8 @@
                 deptInfoList: [],
                 isCommiting: false,
                 showDialog: false,
-                isloading: false
+                isloading: false,
+                isToBackIng: false
             }
         },
 
@@ -96,7 +97,13 @@
             },
 
             previousStep () {
-                this.$parent.currentStepIndex--
+                this.isToBackIng = true
+                this.$store.dispatch('store/requestBackToTest', this.detail.serviceId).then(() => {
+                    this.$emit('freshProgress', () => (this.isToBackIng = false))
+                }).catch((err) => {
+                    this.isToBackIng = false
+                    this.$bkMessage({ message: (err.message || err), theme: 'error' })
+                })
             },
 
             submit () {

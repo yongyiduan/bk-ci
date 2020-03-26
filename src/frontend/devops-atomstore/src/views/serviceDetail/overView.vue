@@ -10,15 +10,15 @@
                     <h3> {{ $t('store.总体统计') }} </h3>
                     <section class="section-static">
                         <h3>
-                            <p style="border-color: #7ed321"><span style="color: #7ed321">10</span></p>
+                            <p style="border-color: #7ed321"><span style="color: #7ed321">{{staticData.downloads}}</span></p>
                             <span class="static-title"> {{ $t('store.安装量') }} </span>
                         </h3>
                         <h3>
-                            <p style="border-color: #2680eb"><span style="color: #2680eb">10</span></p>
+                            <p style="border-color: #2680eb"><span style="color: #2680eb">{{staticData.commentCnt}}</span></p>
                             <span class="static-title"> {{ $t('store.评论数') }} </span>
                         </h3>
                         <h3>
-                            <p style="border-color: #2680eb"><span style="color: #2680eb">10</span></p>
+                            <p style="border-color: #2680eb"><span style="color: #2680eb">{{staticData.score}}</span></p>
                             <span class="static-title"> {{ $t('store.星级') }} </span>
                         </h3>
                     </section>
@@ -41,7 +41,10 @@
                                     <p> {{ $t('store.在发布扩展时，使用授权人的身份拉取扩展代码自动构建打包，或设置扩展可见范围') }} </p>
                                 </template>
                             </bk-popover>
-                            <span class="ml4 click-txt">{{ $t('store.重置授权') }}</span>
+                            <span class="ml4 click-txt"
+                                v-if="userInfo.isProjectAdmin && userInfo.userName !== currentService.repositoryAuthorizer"
+                                @click="modifyRepoMemInfo"
+                            >{{ $t('store.重置授权') }}</span>
                         </h3>
                     </section>
                 </section>
@@ -102,13 +105,19 @@
                     { name: '最近一年' }
                 ],
                 list: [],
-                isLoading: false
+                isLoading: false,
+                staticData: {
+                    downloads: 0,
+                    commentCnt: 0,
+                    score: 0
+                }
             }
         },
 
         computed: {
             ...mapGetters('store', {
-                'currentService': 'getCurrentService'
+                'currentService': 'getCurrentService',
+                'userInfo': 'getUserInfo'
             })
         },
 
@@ -233,8 +242,13 @@
 
             initData () {
                 this.isLoading = true
-                this.$store.dispatch('store/requestVersionLog', this.currentService.serviceCode).then((res) => {
-                    const records = res.records || []
+                const serviceCode = this.currentService.serviceCode
+                Promise.all([
+                    this.$store.dispatch('store/requestVersionLog', serviceCode),
+                    this.$store.dispatch('store/requestServiceStic', serviceCode)
+                ]).then(([logRes, staticRes]) => {
+                    this.staticData = staticRes || {}
+                    const records = logRes.records || []
                     this.list = records.map((x) => ({
                         tag: x.createTime,
                         content: `${x.creator} ${this.$t('store.新增版本')}${x.version}`
@@ -252,6 +266,25 @@
                     this.$bkMessage({ theme: 'success', message: this.$t('store.复制代码库地址成功') })
                 }
                 document.body.removeChild(input)
+            },
+
+            modifyRepoMemInfo () {
+                const serviceCode = this.currentService.serviceCode
+                const projectCode = this.currentService.projectCode
+                this.$store.dispatch('store/checkIsOAuth', { type: 'EXT_SERVICE_REPOSITORY', serviceCode }).then((res) => {
+                    if (res.status === 403) {
+                        window.open(res.url, '_self')
+                        return
+                    }
+
+                    return this.$store.dispatch('store/resetServiceGit', { serviceCode, projectCode }).then((res) => {
+                        if (res) {
+                            this.currentService.repositoryAuthorizer = this.userInfo.userName
+                            this.$store.dispatch('store/updateCurrentService', { res: this.currentService })
+                            this.$bkMessage({ message: this.$t('this.重置授权成功'), theme: 'success', limit: 1 })
+                        }
+                    })
+                }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' }))
             }
         }
     }

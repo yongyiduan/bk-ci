@@ -2,13 +2,20 @@
     <section class="detail-title">
         <img class="detail-pic atom-logo" :src="detail.logoUrl">
         <hgroup class="detail-info-group">
-            <h3 :class="[{ 'not-recommend': detail.recommendFlag === false }, 'title-with-img']" :title="detail.recommendFlag === false ? $t('store.该扩展不推荐使用') : ''">
-                {{detail.name}}（{{detail.version}}）
+            <h3 class="title-with-img">
+                <span :class="[{ 'not-recommend': detail.recommendFlag === false }, 'title-with-img']" :title="detail.recommendFlag === false ? $t('store.该扩展不推荐使用') : ''">
+                    {{detail.name}}（{{detail.version}}）
+                </span>
+                <h5 :title="isPublicTitle" @click="goToCode" :class="{ 'not-public': !isPublic }" v-if="!isEnterprise">
+                    <icon v-if="isPublic" class="detail-img" name="color-git-code" size="16" />
+                    <icon v-else class="detail-img" name="gray-git-code" size="16" style="fill:#9E9E9E" />
+                    <span class="approve-msg">{{ $t('store.工蜂') }}</span>
+                </h5>
             </h3>
             <h5 class="install-info">
                 <span>{{detail.publisher || '-'}}</span><span class="install-title"> {{ $t('store.发布') }} </span>
                 <span>{{detail.downloads || 0}}</span><span class="install-title"> {{ $t('store.次安装') }} </span>
-                <h6 class="detail-score">
+                <h6 class="detail-score" :title="$t('store.rateTips', [(detail.score || 0), (detail.totalNum || 0)])">
                     <span>{{detail.totalNum || 0}}</span>
                     <p class="score-group">
                         <comment-rate :rate="5" :width="14" :height="14" :style="{ width: starWidth }" class="score-real"></comment-rate>
@@ -67,6 +74,19 @@
                 return `${fixWidth + rateWidth}px`
             },
 
+            isPublic () {
+                return this.detail.visibilityLevel === 'LOGIN_PUBLIC'
+            },
+
+            isPublicTitle () {
+                if (this.isPublic) return this.$t('store.查看源码')
+                else return this.$t('store.未开源')
+            },
+
+            isEnterprise () {
+                return VERSION_TYPE === 'ee'
+            },
+
             buttonInfo () {
                 const info = {}
                 info.disable = this.detail.publicFlag || !this.detail.flag
@@ -86,6 +106,10 @@
                         from: 'details'
                     }
                 })
+            },
+
+            goToCode () {
+                if (this.isPublic) window.open(this.detail.codeSrc, '_blank')
             }
         }
     }

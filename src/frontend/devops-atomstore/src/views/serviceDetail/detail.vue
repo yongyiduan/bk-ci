@@ -66,8 +66,9 @@
                     </bk-col>
                 </bk-row>
                 <bk-row>
-                    <bk-col :span="12" class="g-progress-item">
-                        a
+                    <bk-col :span="12" class="g-progress-item service-media">
+                        <span class="g-progress-label">{{ $t('store.媒体信息') }} :</span>
+                        <media-list class="g-progress-content media-list" :list="currentService.mediaList"></media-list>
                     </bk-col>
                 </bk-row>
             </bk-container>
@@ -112,10 +113,15 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    import { atomStatusMap } from '@/store/constants'
+    import { serviceStatusMap } from '@/store/constants'
     import { convertTime } from '../../utils/index'
+    import mediaList from '../../components/common/mediaList'
 
     export default {
+        components: {
+            mediaList
+        },
+
         data () {
             return {
                 isLoading: false,
@@ -183,7 +189,7 @@
             },
 
             statusFormatter (row, column, cellValue, index) {
-                return this.$t(atomStatusMap[cellValue])
+                return this.$t(serviceStatusMap[cellValue])
             },
 
             convertTime (row, column, cellValue, index) {
@@ -195,6 +201,17 @@
 
 <style lang="scss" scoped>
     @import '@/assets/scss/conf.scss';
+
+    .service-media {
+        .media-list {
+            /deep/ .detail-swiper {
+                margin-top: 0;
+            }
+            /deep/ i {
+                top: 105px;
+            }
+        }
+    }
 
     .service-detail-home {
         height: 100%;

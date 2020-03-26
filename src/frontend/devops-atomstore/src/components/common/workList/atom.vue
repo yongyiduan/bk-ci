@@ -379,7 +379,7 @@
 
             async checkIsOAuth () {
                 try {
-                    const res = await this.$store.dispatch('store/checkIsOAuth', { type: 'ATOM_MARKET', atomCode: '' })
+                    const res = await this.$store.dispatch('store/checkIsOAuth', { type: 'ATOM_MARKET', code: '' })
                     this.hasOauth = res.status === 200
                     this.gitOAuthUrl = res.url
                 } catch (err) {
@@ -603,7 +603,7 @@
                     query: {
                         code,
                         type: 'atom',
-                        from: 'atomList'
+                        from: 'workList'
                     }
                 })
             },

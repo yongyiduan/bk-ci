@@ -412,7 +412,7 @@
 
             toImageList () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: 'image'
                     }

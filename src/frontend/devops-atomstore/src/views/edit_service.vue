@@ -97,7 +97,7 @@
                 <select-logo ref="selectLogo" label="Logo" :form="form" type="SERVICE" :is-err="logoErr" right="25"></select-logo>
             </bk-form>
             <section class="edit-service button-padding" v-show="!isLoading">
-                <bk-button theme="primary" @click="submitService"> {{ $t('store.提交') }} </bk-button>
+                <bk-button theme="primary" @click="submitService" :loading="isCommitLoading"> {{ $t('store.提交') }} </bk-button>
                 <bk-button @click="toServiceList"> {{ $t('store.取消') }} </bk-button>
             </section>
         </main>
@@ -137,17 +137,11 @@
                 serviceList: [],
                 serviceVersionList: [],
                 isLoading: false,
+                isCommitLoading: false,
                 originVersion: '',
                 requireRule: {
                     required: true,
                     message: this.$t('store.必填项'),
-                    trigger: 'blur'
-                },
-                latestRule: {
-                    validator (val) {
-                        return val !== 'latest'
-                    },
-                    message: this.$t('store.镜像tag不能是latest'),
                     trigger: 'blur'
                 },
                 logoErr: false,
@@ -213,12 +207,12 @@
                         const err = { field: 'selectLogo' }
                         throw err
                     }
-                    this.isLoading = true
+                    this.isCommitLoading = true
                     this.requestReleaseService(this.form).then((serviceId) => {
                         this.$bkMessage({ message: this.$t('store.提交成功'), theme: 'success' })
                         this.$router.push({ name: 'serviceProgress', params: { serviceId } })
                     }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
-                        this.isLoading = false
+                        this.isCommitLoading = false
                     })
                 }).catch((validate) => {
                     const field = validate.field
@@ -240,7 +234,7 @@
                     this.labelList = labels || []
                     Object.assign(this.form, res)
                     if (res.serviceStatus === 'RELEASED') this.form.serviceTag = ''
-                    this.form.description = this.form.description || this.$t('store.imageMdDesc')
+                    this.form.description = this.form.description || this.$t('store.serviceMdDesc')
                     this.originVersion = res.version
 
                     switch (res.serviceStatus) {
@@ -307,7 +301,7 @@
 
             toServiceList () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: 'service'
                     }
