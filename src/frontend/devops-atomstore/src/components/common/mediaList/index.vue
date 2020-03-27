@@ -1,15 +1,25 @@
 <template>
     <section class="media-List" ref="mediaList">
-        <ul class="detail-swiper" :style="{ width: maxTransferWidth + 'px', transform: `translateX(${swiperTransfer}px)` }">
+        <ul class="detail-swiper" :style="{ width: maxTransferWidth + 'px', left: `${swiperTransfer}px` }">
             <li v-for="media in list" :key="media.id" class="media-item">
-                <img :src="media.mediaUrl" v-if="media.mediaType === 'PICTURE'" @click="fullScreenImgSrc = media.mediaUrl">
-                <video-player v-else
-                    :key="media.id"
-                    class="video-player vjs-custom-skin"
-                    ref="videoPlayer"
-                    :playsinline="true"
-                    :options="getPlayOption(media)">
-                </video-player>
+                <span v-if="media.mediaType === 'PICTURE'"
+                    class="media-image"
+                    :style="`background-image: url(${media.mediaUrl})`"
+                    @click="fullScreenImgSrc = media.mediaUrl"
+                >
+                </span>
+                <video v-else
+                    controls="true"
+                    preload="auto"
+                    webkit-playsinline="true"
+                    playsinline="true"
+                    x-webkit-airplay="allow"
+                    x5-video-player-type="h5"
+                    x5-video-player-fullscreen="true"
+                    x5-video-orientation="portraint"
+                    style="object-fit: fill; width: 100%; height: 100%"
+                    :src="media.mediaUrl">
+                </video>
             </li>
         </ul>
         <i class="swiper-nav nav-left" @click="changeIndex(-1)" v-if="swiperTransfer > -maxTransferWidth + containWidth"></i>
@@ -24,15 +34,7 @@
 </template>
 
 <script>
-    import { videoPlayer } from 'vue-video-player'
-    import 'video.js/dist/video-js.css'
-    videoPlayer.watch = {}
-
     export default {
-        components: {
-            videoPlayer
-        },
-
         props: {
             list: {
                 type: Array
@@ -98,6 +100,7 @@
 
     .media-List {
         width: 100%;
+        height: 222px;
         position: relative;
         overflow: hidden;
     }
@@ -121,15 +124,25 @@
     }
 
     .detail-swiper {
-        margin-top: 32px;
-        display: flex;
+        position: absolute;
         transition: 0.525s cubic-bezier(0.42, 0, 0.58, 1);
+        &::after {
+            content: '';
+            display: table;
+            clear: both;
+        }
         .media-item {
+            float: left;
             height: 222px;
             width: 395px;
             margin-right: 37px;
             cursor: pointer;
-            img {
+            .media-image {
+                display: inline-block;
+                background-color: #F6F7FA;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: contain;
                 height: 222px;
                 width: 395px;
             }
@@ -148,7 +161,7 @@
         border-left: 3px solid $navGray;
         border-bottom: 3px solid $navGray;
         opacity: .6;
-        top: 135px;
+        top: 105px;
         &.nav-left {
             left: 12px;
             transform: rotate(45deg);

@@ -8,10 +8,20 @@
                 <p @click="showDialog = true" class="info-add-vis"><i class="bk-icon icon-plus"></i>{{ $t('store.添加') }}</p>
             </bk-form-item>
             <bk-form-item :label="$t('store.截图')">
-                <upload type="PICTURE" :file-list.sync="imageList"></upload>
+                <upload type="PICTURE"
+                    :file-list.sync="imageList"
+                    :limit="6"
+                    :size="2"
+                    :tip="$t('store.支持jpg、png、gif、svg格式，不超过6张，每张不超过2M')"
+                ></upload>
             </bk-form-item>
             <bk-form-item :label="$t('store.视频教程')">
-                <upload type="VIDEO" :file-list.sync="videoList"></upload>
+                <upload type="VIDEO"
+                    :file-list.sync="videoList"
+                    :limit="4"
+                    :size="50"
+                    :tip="$t('store.支持mp4、ogg、webm格式，不超过4个，每个不超过50M')"
+                ></upload>
             </bk-form-item>
         </bk-form>
 

@@ -8,18 +8,27 @@
             :before-upload="checkUpload"
             :file-list="fileList"
         >
+            <p slot="tip">
+                {{tip}}
+            </p>
             <p class="upload-title">
                 <i class="bk-icon icon-plus"></i>
                 <span>{{$t('store.点击上传')}}</span>
             </p>
             <div slot="file" slot-scope="{ file }" class="upload-list">
                 <img :src="file.mediaUrl" v-if="type === 'PICTURE'" class="media-item" @click="fullScreenImgSrc = file.mediaUrl">
-                <video-player v-else
-                    :key="file.mediaUrl"
-                    class="video-player vjs-custom-skin media-item"
-                    :playsinline="true"
-                    :options="getPlayOption(file.mediaUrl)">
-                </video-player>
+                <video v-else
+                    controls="true"
+                    preload="auto"
+                    webkit-playsinline="true"
+                    playsinline="true"
+                    x-webkit-airplay="allow"
+                    x5-video-player-type="h5"
+                    x5-video-player-fullscreen="true"
+                    x5-video-orientation="portraint"
+                    style="object-fit: fill; width: 100%; height: 100%"
+                    :src="file.mediaUrl">
+                </video>
                 <bk-progress class="media-progress" v-if="file.status === 'uploading'" :show-text="false" :theme="file.theme || 'success'" :percent="+(file.percentage || 100) / 100"></bk-progress>
                 <span class="media-tool-abort media-tool" v-if="file.status === 'uploading'">
                     <span
@@ -50,14 +59,10 @@
 
 <script>
     import upload from './elUpload'
-    import { videoPlayer } from 'vue-video-player'
-    import 'video.js/dist/video-js.css'
-    videoPlayer.watch = {}
 
     export default {
         components: {
-            upload,
-            videoPlayer
+            upload
         },
 
         props: {
@@ -67,7 +72,9 @@
             limit: {
                 type: Number,
                 default: 0
-            }
+            },
+            size: Number,
+            tip: String
         },
 
         data () {
@@ -78,8 +85,8 @@
 
         computed: {
             accept () {
-                let res = 'image/png,image/jpeg,image/jpg'
-                if (this.type === 'VIDEO') res = 'video/mp4,video/x-m4v,video/*'
+                let res = 'image/png,image/jpeg,image/jpg,image/gif,image/svg+xml'
+                if (this.type === 'VIDEO') res = 'video/webm,video/ogg,video/mp4'
                 return res
             }
         },
@@ -108,6 +115,12 @@
             },
 
             checkUpload (file) {
+                console.log(file.type)
+                if (+file.size / 1048576 > +this.size) {
+                    this.$bkMessage({ message: this.$t('store.uploadSize', [this.size]), theme: 'error' })
+                    return false
+                }
+
                 if (this.limit && this.fileList.length >= this.limit) {
                     this.$bkMessage({ message: this.$t('store.uploadLimit', [this.limit]), theme: 'error' })
                     return false
@@ -131,7 +144,6 @@
                     aspectRatio: '1:1', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
                     fluid: false, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
                     sources: [{
-                        type: 'video/mp4', // 类型
                         src: mediaUrl // url地址
                     }],
                     controlBar: {
@@ -169,6 +181,9 @@
         position: relative;
         height: 146px;
         width: 146px;
+        img {
+            cursor: pointer;
+        }
         .media-progress {
             position: absolute;
             bottom: 0;
@@ -177,13 +192,16 @@
         }
         .media-tool {
             position: absolute;
+            z-index: 2;
             right: 2px;
             top: 2px;
-            height: 18px;
-            width: 18px;
+            height: 24px;
+            width: 24px;
             display: none;
             justify-content: center;
             align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 100%;
             span {
                 margin: 0 5px;
                 font-size: 18px;

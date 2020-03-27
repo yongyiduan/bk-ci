@@ -202,17 +202,6 @@
 <style lang="scss" scoped>
     @import '@/assets/scss/conf.scss';
 
-    .service-media {
-        .media-list {
-            /deep/ .detail-swiper {
-                margin-top: 0;
-            }
-            /deep/ i {
-                top: 105px;
-            }
-        }
-    }
-
     .service-detail-home {
         height: 100%;
         overflow: hidden;

@@ -220,6 +220,10 @@
 <style lang="scss" scoped>
     @import '@/assets/scss/conf.scss';
 
+    .main-swiper {
+        margin-top: 32px;
+    }
+
     .overflow {
         max-height: 65px;
         overflow: hidden;
