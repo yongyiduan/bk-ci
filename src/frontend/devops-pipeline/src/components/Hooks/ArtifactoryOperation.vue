@@ -1,6 +1,6 @@
 <template>
     <bk-dropdown-menu align="center">
-        <i slot="dropdown-trigger" class="bk-icon icon-logo-store"></i>
+        <logo slot="dropdown-trigger" name="logo-store" size="16" fill="currentColor"></logo>
         <ul class="artifactory-operation-hooks" slot="dropdown-content">
             <li v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)" :title="getExtTooltip(ext)">
                 <img :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
@@ -13,9 +13,13 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
     import { isAbsoluteURL, urlJoin } from '@/utils/util'
+    import Logo from '@/components/Logo'
 
     export default {
         name: 'artifactory-operation-hooks',
+        components: {
+            Logo
+        },
         props: {
             artifact: {
                 type: Object,
