@@ -109,7 +109,7 @@
                     />
                     <bk-table-column
                         :label="$t('projectOperation')"
-                        width="200"
+                        width="250"
                     >
                         <template slot-scope="props">
                             <!-- 状态为待审批 -->
