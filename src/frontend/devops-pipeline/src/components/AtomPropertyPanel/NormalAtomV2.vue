@@ -65,6 +65,7 @@
     import TimePicker from '@/components/AtomFormComponent/TimePicker'
     import Parameter from '@/components/AtomFormComponent/Parameter'
     import Tips from '@/components/AtomFormComponent/Tips'
+    import NameSpaceVar from '@/components/atomFormField/NameSpaceVar'
     import { getAtomDefaultValue } from '@/store/modules/atom/atomUtil'
     export default {
         name: 'normal-atom-v2',
@@ -77,7 +78,8 @@
             TimePicker,
             Parameter,
             DevopsSelect,
-            Tips
+            Tips,
+            NameSpaceVar
         },
         mixins: [atomMixin, validMixins],
         computed: {
