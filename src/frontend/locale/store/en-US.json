@@ -1,5 +1,13 @@
 {
     "store": "Store",
+    "确定卸载": "Are you sure you want to uninstall {0}?",
+    "卸载": "Uninstall",
+    "操作时间": "Operating time",
+    "操作人": "Operator",
+    "作者": "Author",
+    "全部扩展": "Expand all",
+    "添加扩展服务": "Add extended services",
+    "扩展管理": "Extended Management",
     "支持mp4、ogg、webm格式，不超过4个，每个不超过50M": "Support mp4, ogg, webm formats, no more than 4, each no more than 50M",
     "支持jpg、png、gif、svg格式，不超过6张，每张不超过2M": "Support jpg, png, gif, svg format, no more than 6 photos, each no more than 2M",
     "重置授权成功": "Reset authorization succeeded",

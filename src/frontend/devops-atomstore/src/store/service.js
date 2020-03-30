@@ -10,6 +10,24 @@ const vue = new Vue()
 
 export const actions = {
     /***
+     * 卸载扩展服务
+     */
+    uninstallService ({ commit }, { serviceCode, projectCode }) {
+        const reasonList = [{
+            reasonId: '',
+            note: ''
+        }]
+        return vue.$ajax.put(`${prefix}/user/market/service/project/${projectCode}/serviceCodes/${serviceCode}/uninstalled`, { reasonList })
+    },
+
+    /***
+     * 获取已安装的扩展列表
+     */
+    requesInstalledServiceList ({ commit }, projectCode) {
+        return vue.$ajax.get(`${prefix}/user/market/service/project/${projectCode}/installed/service`)
+    },
+
+    /***
      * 服务扩展重新授权
      */
     resetServiceGit ({ commit }, { serviceCode, projectCode }) {

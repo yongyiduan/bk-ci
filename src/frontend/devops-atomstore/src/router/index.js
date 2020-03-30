@@ -68,6 +68,8 @@ const serviceEdit = () => import(/* webpackChunkName: 'serviceEdit' */ '@/views/
 const serviceApproval = () => import(/* webpackChunkName: 'approval' */ '@/views/serviceDetail/approval.vue') // 服务扩展审批
 const serviceVisibleRange = () => import(/* webpackChunkName: 'serviceVisibleRange' */ '@/views/serviceDetail/visible_range.vue') // 镜像可见范围
 
+const serviceManage = () => import(/* webpackChunkName: 'serviceManage' */ '@/views/serviceManage.vue') // 扩展管理
+
 const routes = [
     {
         path: 'store',
@@ -116,6 +118,17 @@ const routes = [
                         }
                     }
                 ]
+            },
+            {
+                path: 'serviceManage/:projectCode',
+                name: 'serviceManage',
+                component: serviceManage,
+                meta: {
+                    title: 'serviceManage',
+                    logo: 'store',
+                    header: 'store',
+                    to: 'atomHome'
+                }
             },
             {
                 path: 'atomStore/detail/:type/:code',
