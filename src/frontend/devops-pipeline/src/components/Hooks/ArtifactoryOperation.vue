@@ -1,14 +1,13 @@
 <template>
-    <ul class="artifactory-operation-hooks">
-        <li class="icon-hook" v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)">
-            <template v-if="getExtTooltip(ext)">
-                <img v-bk-tooltips="getExtTooltip(ext)" :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
-            </template>
-            <template v-else>
+    <bk-dropdown-menu align="center">
+        <i slot="dropdown-trigger" class="bk-icon icon-cog-shape"></i>
+        <ul class="artifactory-operation-hooks" slot="dropdown-content">
+            <li v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)" :title="getExtTooltip(ext)">
                 <img :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
-            </template>
-        </li>
-    </ul>
+                <span> {{ ext.serviceName }} </span>
+            </li>
+        </ul>
+    </bk-dropdown-menu>
 </template>
 
 <script>
@@ -46,7 +45,7 @@
                 'fetchExtensionByHookId'
             ]),
             getExtTooltip (ext) {
-                return ext.props && ext.props.tooltip ? ext.props.tooltip : ''
+                return ext.props && ext.props.tooltip ? ext.props.tooltip : ext.tooltip
             },
             getExtIconUrl (ext) {
                 return ext.props && ext.props.iconUrl ? ext.props.iconUrl : ext.iconUrl
@@ -101,7 +100,6 @@
                 }
             },
             getResUrl (url, baseURL) {
-                console.log(url, baseURL, 'geturl')
                 return isAbsoluteURL(url) ? url : urlJoin(baseURL, 'static', url)
             }
         }
@@ -109,16 +107,18 @@
 </script>
 
 <style lang='scss'>
+    @import '../../scss/mixins/ellipsis';
     .artifactory-operation-hooks {
-        display: inline-flex;
         align-items: center;
         > li {
-            margin-right: 8px;
-            width: 16px;
-            height: 16px;
+            line-height: 32px;
+            vertical-align: middle;
+            padding: 0 16px;
+            @include ellipsis();
             img {
-                width: 100%;
-                height: 100%;
+                display: inline-block;
+                width: 16px;
+                height: 16px;
             }
             
         }

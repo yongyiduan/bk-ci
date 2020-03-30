@@ -39,7 +39,8 @@ Vue.use(Vuex)
 function getHookByHTMLPath (htmlPath) {
     return state => {
         const { hooks } = state
-        return hooks.filter(hook => hook.htmlPath === htmlPath)
+        console.log(state)
+        return Array.isArray(hooks) ? hooks.filter(hook => hook.htmlPath === htmlPath) : []
     }
 }
 
