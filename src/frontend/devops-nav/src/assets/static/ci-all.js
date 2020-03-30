@@ -27,6 +27,7 @@ const tencentCI = {};
     const CREATE_ASIDE_PANEL = 'createAsidePanel'
     const CLOSE_ASIDE_PANEL = 'closeAsidePanel'
     const SYNC_CUSTOME_DATA = 'syncCustomData'
+    const SHOW_TIPS = 'showTips'
 
     function init () {
         if (win.addEventListener) {
@@ -111,8 +112,7 @@ const tencentCI = {};
             action: CREATE_DIALOG,
             params
         })
-    }    
-
+    }
 
     /**
      * 创建一个侧边栏
@@ -127,7 +127,7 @@ const tencentCI = {};
             action: CREATE_ASIDE_PANEL,
             params
         })
-    }    
+    }
 
     /**
      * 关闭侧边栏
@@ -139,8 +139,7 @@ const tencentCI = {};
             action: CLOSE_ASIDE_PANEL,
             params
         })
-    }    
-
+    }
 
     /**
      * 接收数据
@@ -151,6 +150,19 @@ const tencentCI = {};
         console.log(params)
         window.data = params
         triggerEvent('data:' + SYNC_CUSTOME_DATA, JSON.parse(params))
-    }    
+    }
+
+    /**
+     * 弹出信息
+     * @method showTips
+     * @param {tips} object 提示信息对象, 传入$bkMessage
+     */
+    exports[SHOW_TIPS] = function (tips) {
+        console.log(tips)
+        communicateOuter({
+            action: SHOW_TIPS,
+            params: tips
+        })
+    }
     init()
 })(window, tencentCI)
