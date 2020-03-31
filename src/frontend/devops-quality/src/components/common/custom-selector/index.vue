@@ -1,33 +1,37 @@
 <template>
-    <div class="bk-tag-selector staff-selector" :class="{ 'disable-status': disabled }">
-        <span class="staff-placeholder"
-            v-if="!selectedList.length && !value.length">{{ placeholder }}</span>
-        <div class="select-tags" @click="toEdit">
-            <div class="select-editor" ref="selectEditor">
-                <span class="tag-info" @click="selectInfo($event, entry)"
-                    :key="index"
-                    v-for="(entry, index) in selectedList">{{ entry }}</span>
-                <input type="text" ref="staffInput" id="staffInput"
-                    class="form-input"
-                    autocomplete="off"
-                    :name="name"
-                    :value="value"
-                    @input="input"
-                    @keydown="keydown"
-                    @mousedown="mousedown"
-                    @paste="paste"
-                    @blur="hideAll" />
+    <div class="devops-staff-selector" @click="toEdit">
+        <div :class="['devops-staff-input', { 'active': isEdit, 'disabled': disabled }]">
+            <span class="placeholder"
+                v-if="!isEdit && !selectedList.length && !value.length">{{ placeholder }}</span>
+            <div class="tag-list" :class="!selectedList.length ? 'no-item' : ''">
+                <div class="select-editor" ref="selectEditor">
+                    <span class="tag-info"
+                        v-for="(entry, index) in selectedList"
+                        :key="index"
+                        @click="selectInfo($event, entry)"
+                    >{{ entry }}</span>
+                    <input type="text" ref="staffInput" id="staffInput"
+                        class="form-input"
+                        autocomplete="off"
+                        :name="name"
+                        :value="value"
+                        @input="input"
+                        @keydown="keydown"
+                        @mousedown="mousedown"
+                        @paste="paste"
+                        @blur="hideAll" />
+                </div>
             </div>
         </div>
 
-        <div class="bk-selector-list" v-show="showList && list.length">
-            <ul ref="selectorList">
+        <div class="staff-selector-list" v-show="showList && list.length">
+            <ul class="outside-ul" ref="selectorList">
                 <li v-for="(data, index) in list"
-                    class="bk-selector-list-item"
+                    class="staff-selector-list-item"
                     :key="index"
                     @click.stop="selectList(data)">
-                    <div class="bk-selector-node" :class="activeClass(index)">
-                        <img :src="localCoverAvatar(data)" class="bk-data-avatar">
+                    <div class="selector-node" :class="activeClass(index)">
+                        <img :src="localCoverAvatar(data)" class="avatar">
                         <span class="text">{{ data }}</span>
                     </div>
                 </li>
@@ -62,7 +66,7 @@
             },
             disabled: {
                 type: Boolean,
-                default: true
+                default: false
             },
             selectedList: {
                 type: Array,
@@ -73,11 +77,12 @@
         },
         data () {
             return {
+                isEdit: false,
                 showList: false,
                 isSelected: false,
                 focusList: '',
                 minscroll: 0,
-                maxscroll: 4,
+                maxscroll: 6,
                 list: []
             }
         },
@@ -108,8 +113,9 @@
                 // 重置下拉菜单选中信息
                 this.focusList = 0
                 this.minscroll = 0
-                this.maxscroll = 4
+                this.maxscroll = 6
                 this.$refs.selectorList.scrollTop = 0
+                this.isEdit = true
 
                 const { value } = e.target
                 this.config.onChange(this.name, value)
@@ -210,6 +216,7 @@
                     }
                     // this.value = ''
                     this.config.onChange(this.name, '')
+                    this.isEdit = false
 
                     if (this.$refs.staffInput) this.$refs.staffInput.style.width = 10 + 'px'
                 }, 100)
@@ -217,7 +224,7 @@
             mousedown (e) {
                 this.focusList = 0
                 this.minscroll = 0
-                this.maxscroll = 4
+                this.maxscroll = 6
                 this.$refs.selectorList.scrollTop = 0
 
                 if (this.value.length) {
@@ -240,6 +247,7 @@
                     // 删除
                     case 8:
                     case 46:
+                        this.isEdit = true
                         if (parseInt(result.index) !== 0) {
                             target = result.temp[result.index - 1].innerText
 
@@ -258,7 +266,7 @@
                         this.focusList++
                         this.focusList = this.focusList > this.list.length - 1 ? this.list.length - 1 : this.focusList
                         if (this.focusList > this.maxscroll) {
-                            this.$refs.selectorList.scrollTop += 42
+                            this.$refs.selectorList.scrollTop += 32
                             this.minscroll++
                             this.maxscroll++
                         }
@@ -270,13 +278,14 @@
 
                         this.focusList = this.focusList < 0 ? 0 : this.focusList
                         if (this.focusList < this.minscroll) {
-                            this.$refs.selectorList.scrollTop -= 42
+                            this.$refs.selectorList.scrollTop -= 32
                             this.maxscroll--
                             this.minscroll--
                         }
                         break
                     // 向左
                     case 37:
+                        this.isEdit = true
                         if (!this.value.length) {
                             if (parseInt(result.index) > 1) {
                                 const leftsite = nodes[parseInt(result.index) - 2]
@@ -292,6 +301,7 @@
                         break
                     // 向右
                     case 39:
+                        this.isEdit = true
                         if (!this.value.length) {
                             const rightsite = nodes[parseInt(result.index) + 1]
                             this.insertAfter(this.$refs.staffInput, rightsite)
@@ -300,6 +310,7 @@
                         break
                     // 确认
                     case 13:
+                        this.isEdit = true
                         if (this.showList) {
                             this.selectList(this.list[this.focusList])
                             this.showList = false
@@ -326,7 +337,7 @@
              */
             activeClass (i) {
                 return {
-                    'bk-selector-selected': i === this.focusList
+                    'selected': i === this.focusList
                 }
             },
             /**
@@ -374,6 +385,7 @@
                 }
             },
             toEdit (event) {
+                this.isEdit = true
                 this.$refs.staffInput.focus()
             },
             selectInfo (event, val) {
@@ -412,68 +424,152 @@
 
 <style lang="scss" scoped>
     @import '../../../scss/conf';
-    .staff-selector {
-        border: 1px solid $fontLigtherColor;
-        .select-tags {
+    @import '../../../scss/mixins/scroller';
+
+    .devops-staff-selector {
+        position: relative;
+        min-height: 32px;
+        .devops-staff-input {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0 0 5px;
+            border: 1px solid #c4c6cc;
+            min-height: 32px;
+            border-radius: 2px;
+            font-size: 12px;
             position: relative;
+            z-index: 1;
+            background: #fff;
+            cursor: pointer;
+            overflow: hidden;
+            .placeholder {
+                margin: 0;
+                padding: 0;
+                font-size: 12px;
+                position: absolute;
+                line-height: 30px;
+                top: 0;
+                left: 8px;
+                color: #c4c6cc;
+            }
+            &.disabled {
+                background: #fafafa;
+                cursor: not-allowed;
+            }
+            &.active {
+                border-color: #3a84ff;
+            }
+        }
+
+        .tag-list {
             z-index: 99;
-            margin: 4px 10px 0px 4px;
+            display: inline-block;
+            max-height: 135px;
+            overflow: auto;
+            margin: 0;
+            padding: 0;
+            &.no-item {
+                padding: 0 0 0 5px;
+            }
+        }
+        .tag-item {
+            display: inline-block;
+            cursor: pointer;
+            position: relative;
+            margin: 4px 5px 4px 0;
+            border-radius: 2px;
+            height: 22px;
+            overflow: hidden;
+            font-size: 0;
+            line-height: 0;
         }
         .tag-info {
-            display: inline-block;
-            padding: 2px 5px;
-            margin: 1px 5px 4px 5px;
-            background-color: #fafafa;
-            border: 1px solid #d9d9d9;
+            cursor: pointer;
+            position: relative;
+            margin: 4px 5px 4px 0;
             border-radius: 2px;
-            font-size: 14px;
-            color: #2b2b2b;
+            height: 22px;
+            line-height: 20px;
+            overflow: hidden;
+            display: inline-block;
+            background-color: #F0F1F5;
+            color: #63656e;
+            font-size: 12px;
+            border: none;
+            vertical-align: middle;
+            box-sizing: border-box;
+            border-radius: 2px;
+            padding: 0 5px;
+            word-break: break-all;
+            max-width: 190px;
+            display: inline-block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .form-input {
-            padding: 6px 0 8px 4px;
             width: 10px;
-            max-width: 160px;
-            border: none;
-            background-color: transparent;
-            outline: 0;
-        }
-        .staff-placeholder {
-            position: absolute;
-            z-index: 10;
-            line-height: 36px;
-            padding-left: 8px;
+            height: 22px;
+            padding: 0;
+            border: 0;
+            box-sizing: border-box;
+            outline: none;
+            max-width: 295px;
             font-size: 12px;
-            color: $fontLigtherColor;
+            background-color: transparent;
         }
         .select-editor {
             cursor: text;
         }
-        .bk-selector-list {
+        .staff-selector-list {
             position: absolute;
-            top: calc(100% + 5px);
+            top: calc(100% + 4px);
+            width: 100%;
+            box-shadow: 0 3px 9px 0 rgba(0,0,0,.1);
+            background-color: #fff;
+            border-radius: 4px;
+            z-index: 2000;
         }
-        .bk-selector-list > ul {
-            max-height: 212px;
+        .outside-ul {
+            margin: 0;
+            list-style: none;
+            overflow-y: auto;
+            padding: 6px 0;
+            border-radius: 2px;
+            background-color: #fff;
+            border: 1px solid #dcdee5;
+            @include scroller(#a5a5a5, 5px);
         }
-        .bk-selector-list-item {
-            // background-color: pink;
+        .staff-selector-list > ul {
+            max-height: 238px;
+        }
+        .staff-selector-list-item {
+            list-style: none;
+            .selector-node {
+                display: flex;
+                align-items: center;
+                padding: 0 10px;
+                background: none;
+                height: 32px;
+                line-height: 30px;
+            }
+            .selected {
+                background-color: #f4f6fa;
+            }
             .text {
                 display: inline;
+                font-size: 12px;
+                color: #63656e;
             }
         }
-        .bk-data-avatar {
-            margin-left: 16px;
-            margin-right: 0;
-            width: 28px;
-            height: 28px;
+        .avatar {
+            width: 22px;
+            height: 22px;
+            float: left;
+            margin-right: 8px;
+            border-radius: 50%;
+            vertical-align: middle;
+            border:1px solid #C4C6CC;
         }
-        .bk-selector-selected {
-            background-color: #eef6fe;
-            color: #3c96ff;
-        }
-    }
-    .disable-status {
-        background-color: #fafafa;
-        pointer-events: none;
     }
 </style>
