@@ -130,7 +130,16 @@
                             </bk-option-group>
                         </bk-select>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.调试项目')" :required="true" property="projectCode" :desc="$t('store.在开发过程中，开发者可在此项目下调试扩展。成功提交后将不能修改，建议不要选择有正式业务的项目，避免调试过程中影响业务使用')" :rules="[requireRule]">
+                    <bk-form-item :label="$t('store.调试项目')"
+                        required="true"
+                        property="projectCode"
+                        :desc="{
+                            width: 500,
+                            content: $t('store.在开发过程中，开发者可在此项目下调试扩展。成功提交后将不能修改，建议不要选择有正式业务的项目，避免调试过程中影响业务使用'),
+                            placement: 'top'
+                        }"
+                        :rules="[requireRule]"
+                    >
                         <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
                             <bk-option v-for="option in projectList"
                                 :key="option.project_code"
@@ -250,8 +259,8 @@
                     trigger: 'blur'
                 },
                 alpRule: {
-                    validator: (val) => (/^[a-z0-9-]+$/.test(val)),
-                    message: this.$t('store.标识需要是小写字母、数字、中划线'),
+                    validator: (val) => (/^[a-z][a-z0-9-]*$/.test(val)),
+                    message: this.$t('store.由小写英文字母、数字和中划线组成，且需以小写英文字母开头'),
                     trigger: 'blur'
                 }
             }

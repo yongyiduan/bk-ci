@@ -88,7 +88,7 @@
                     return
                 }
 
-                const reg = new RegExp(`^回复@${this.replyToUser}：`)
+                const reg = new RegExp(`^${this.$t('store.回复')}@${this.replyToUser}：`)
                 replyContent = replyContent.replace(reg, '')
 
                 const id = this.comment.data.commentId
@@ -118,7 +118,7 @@
         margin: 8px 0;
         .reply-content {
             resize: none;
-            width: 1319px;
+            width: calc(100% - 77px);
             height: 56px;
             padding: 5px 5px;
             margin-left: 77px;
@@ -131,7 +131,7 @@
             border: none;
             background: none;
             padding-right: 0;
-            width: 1319px;
+            width: calc(100% - 77px);
             margin-left: 77px;
             button {
                 margin: 10px 5px;

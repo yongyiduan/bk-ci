@@ -5,9 +5,8 @@
             <h3 class="title-with-img">
                 <span :class="{ 'not-recommend': detail.recommendFlag === false }" :title="detail.recommendFlag === false ? $t('store.该插件不推荐使用') : ''">{{detail.name}}</span>
                 <h5 :title="isPublicTitle" @click="goToCode" :class="{ 'not-public': !isPublic }" v-if="!isEnterprise">
-                    <icon v-if="isPublic" class="detail-img" name="color-git-code" size="16" />
-                    <icon v-else class="detail-img" name="gray-git-code" size="16" style="fill:#9E9E9E" />
-                    <span class="approve-msg">{{ $t('store.工蜂') }}</span>
+                    <icon class="detail-img" name="gray-git-code" size="14" />
+                    <span class="approve-msg">{{ isPublic ? $t('store.源码') : $t('store.未开源') }}</span>
                 </h5>
                 <template v-if="!isEnterprise && userInfo.type !== 'ADMIN' && detail.htmlTemplateVersion !== '1.0'">
                     <h5 :title="approveMsg" :class="[{ 'not-public': approveMsg !== $t('store.协作') }]" @click="cooperation">
@@ -138,7 +137,7 @@
             },
 
             isPublicTitle () {
-                if (this.isPublic) return this.$t('store.查看源码')
+                if (this.isPublic) return this.$t('store.点击查看源码')
                 else return this.$t('store.未开源')
             },
 
@@ -358,25 +357,38 @@
         .title-with-img {
             display: flex;
             align-items: center;
-            .not-recommend {
-                text-decoration: line-through;
-            }
-            h5 {
+            >h5 {
+                margin-left: 12px;
+                line-height: 14px;
+                padding: 2px 5px;
                 cursor: pointer;
+                background: rgba(21, 146, 255, 0.08);
+                color: #1592ff;
+                .detail-img {
+                    fill: #1592ff;
+                }
+                span {
+                    font-weight: normal;
+                    font-size: 12px;
+                    line-height: 14px;
+                }
             }
-            .approve-msg {
-                margin-left: -2px;
-                font-size: 14px;
+            >span {
+                font-size: 20px;
                 color: $fontLightGray;
-                line-height: 19px;
+                line-height: 20px;
                 font-weight: normal;
             }
             .detail-img {
-                margin-left: 12px;
                 vertical-align: middle;
             }
-            .not-public {
+            h5.not-public {
                 cursor: auto;
+                background: none;
+                color: #9e9e9e;
+                .detail-img {
+                    fill: #9e9e9e;
+                }
             }
         }
         .detail-info.detail-label {

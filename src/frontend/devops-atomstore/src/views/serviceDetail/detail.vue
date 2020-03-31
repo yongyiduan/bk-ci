@@ -231,6 +231,17 @@
         }
     }
 
+    .label-card {
+        float: left;
+        margin-bottom: 4px;
+        margin-right: 4PX;
+        padding: 2px 7px;
+        font-size: 12px;
+        border: 1px solid $borderWeightColor;
+        background-color: #F0F1F3;
+        color: $fontColor;
+    }
+
     .inner-header {
         display: flex;
         justify-content: space-between;

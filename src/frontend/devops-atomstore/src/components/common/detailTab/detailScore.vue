@@ -370,7 +370,7 @@
                     background: $grayBlack;
                 }
                 .gray {
-                    background: $lighterGray;
+                    background: #dcdee5;
                 }
             }
         }

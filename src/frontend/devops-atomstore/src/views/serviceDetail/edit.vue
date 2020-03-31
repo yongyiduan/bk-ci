@@ -18,14 +18,29 @@
                         @toggle="getServiceList"
                         :loading="isServiceListLoading"
                     >
+                        <template v-slot:trigger>
+                            <section>
+                                <ul class="select-tag" v-if="!isLoading">
+                                    <li v-for="item in form.extensionItemList" :key="item">
+                                        <i class="bk-icon icon-close" @click.prevent.stop="deleteServiceItem(item)"></i>
+                                        {{ getItemName(item) }}
+                                    </li>
+                                </ul>
+                                <i class="bk-select-clear bk-icon icon-close-circle-shape"
+                                    v-if="form.extensionItemList.length"
+                                    @click.prevent.stop="form.extensionItemList = []">
+                                </i>
+                                <i class="bk-select-angle bk-icon icon-angle-down" v-else></i>
+                            </section>
+                        </template>
                         <bk-option-group
                             v-for="(group, index) in serviceList"
                             :name="group.name"
                             :key="index">
                             <bk-option v-for="(option, key) in group.children"
                                 :key="key"
-                                :id="option.itemId"
-                                :name="option.itemName"
+                                :id="option.id"
+                                :name="option.name"
                             >
                             </bk-option>
                         </bk-option-group>
@@ -58,30 +73,20 @@
                     <hr class="cut-line">
                 </div>
                 <bk-form-item :label="$t('store.截图')">
-                    <bk-upload
-                        :tip="$t('只允许上传JPG、PNG、JPEG的文件，文件最大为2MB')"
-                        :with-credentials="true"
-                        url="/support/api/user/file/upload"
-                        name="file"
-                        :header="{ 'Content-Type': 'multipart/form-data' }"
-                        accept="image/png,image/jpeg,image/jpg"
-                        :handle-res-code="res => res.status === 0"
-                        size="2"
-                        @on-success="(res) => successFileUpload(res, 'PICTURE')"
-                    ></bk-upload>
+                    <upload type="PICTURE"
+                        :file-list.sync="imageList"
+                        :limit="6"
+                        :size="2"
+                        :tip="$t('store.支持jpg、png、gif、svg格式，不超过6张，每张不超过2M')"
+                    ></upload>
                 </bk-form-item>
                 <bk-form-item :label="$t('store.视频教程')">
-                    <bk-upload
-                        :tip="$t('只允许上传video的文件，文件最大为500MB')"
-                        :with-credentials="true"
-                        url="/support/api/user/file/upload"
-                        name="file"
-                        :header="{ 'Content-Type': 'multipart/form-data' }"
-                        accept="video/mp4,video/x-m4v,video/*"
-                        :handle-res-code="res => res.status === 0"
-                        size="500"
-                        @on-success="(res) => successFileUpload(res, 'VIDEO')"
-                    ></bk-upload>
+                    <upload type="VIDEO"
+                        :file-list.sync="videoList"
+                        :limit="4"
+                        :size="50"
+                        :tip="$t('store.支持mp4、ogg、webm格式，不超过4个，每个不超过50M')"
+                    ></upload>
                 </bk-form-item>
                 <bk-form-item>
                     <bk-button theme="primary" @click.native="saveService"> {{ $t('store.保存') }} </bk-button>
@@ -96,10 +101,12 @@
     import { mapActions } from 'vuex'
     import { toolbars } from '@/utils/editor-options'
     import selectLogo from '@/components/common/selectLogo'
+    import upload from '@/components/upload'
 
     export default {
         components: {
-            selectLogo
+            selectLogo,
+            upload
         },
 
         data () {
@@ -111,7 +118,10 @@
                     message: this.$t('store.必填项'),
                     trigger: 'blur'
                 },
+                serviceList: [],
                 labelList: [],
+                imageList: [],
+                videoList: [],
                 isServiceListLoading: false,
                 toolbars
             }
@@ -129,6 +139,21 @@
                 'requestUpdateServiceInfo'
             ]),
 
+            deleteServiceItem (id) {
+                const index = this.form.extensionItemList.findIndex(x => x === id)
+                this.form.extensionItemList.splice(index, 1)
+            },
+
+            getItemName (id) {
+                let name = ''
+                this.serviceList.forEach((item) => {
+                    item.children.forEach((child) => {
+                        if (child.id === id) name = `${item.name}：${child.name}`
+                    })
+                })
+                return name
+            },
+
             successFileUpload ({ responseData: { data: mediaUrl } }, mediaType) {
                 if (this.form.mediaInfoList) {
                     this.form.mediaInfoList.push({ mediaUrl, mediaType })
@@ -141,6 +166,9 @@
                 this.form.labelIdList = (this.form.labelList || []).map(label => label.id)
                 this.form.description = this.form.description || this.$t('store.serviceMdDesc')
                 this.$set(this.form, 'desType', this.form.desType || 'hand')
+                const mediaList = this.form.mediaList || []
+                this.imageList.push(...mediaList.filter(x => x.mediaType === 'PICTURE'))
+                this.videoList.push(...mediaList.filter(x => x.mediaType === 'VIDEO'))
             },
 
             getServiceList (isExpand) {
@@ -149,9 +177,9 @@
                 this.isServiceListLoading = true
                 this.requestServiceItemList(code).then((res) => {
                     this.serviceList = (res || []).map((item) => {
-                        const serviceItem = item.serviceItem || {}
+                        const serviceItem = item.extServiceItem || {}
                         return {
-                            name: serviceItem.itemName,
+                            name: serviceItem.name,
                             children: item.childItem || []
                         }
                     })
@@ -161,7 +189,8 @@
             initData () {
                 this.isLoading = true
                 Promise.all([
-                    this.requestServiceLabel()
+                    this.requestServiceLabel(),
+                    this.getServiceList(true)
                 ]).then(([labels]) => {
                     this.labelList = labels || []
                 }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
@@ -177,6 +206,7 @@
                         throw err
                     }
                     this.isLoading = true
+                    this.form.mediaList = [...this.imageList, ...this.videoList]
                     const postData = {
                         serviceCode: this.form.serviceCode,
                         data: this.form
@@ -229,6 +259,39 @@
 
 <style lang="scss" scoped>
     @import './../../assets/scss/conf';
+
+    .tag-list {
+        padding: 0 20px;
+        line-height: 32px;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #63656e;
+    }
+
+    .select-tag {
+        min-height: 30px;
+        &::after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+        li {
+            float: left;
+            height: 24px;
+            background: #f1f2f3;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            line-height: 24px;
+            margin: 3px 5px;
+            padding: 0 4px;
+            .icon-close {
+                margin-right: 3px;
+            }
+        }
+    }
+
     .dockerfile {
         height: 400px;
         overflow: auto;

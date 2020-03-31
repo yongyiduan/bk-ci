@@ -8,7 +8,7 @@
             :before-upload="checkUpload"
             :file-list="fileList"
         >
-            <p slot="tip">
+            <p slot="tip" class="upload-tip">
                 {{tip}}
             </p>
             <p class="upload-title">
@@ -176,6 +176,9 @@
         &:hover .bk-icon.icon-plus{
             color: #409eff;
         }
+    }
+    .upload-tip {
+        color: #b0b0b0;
     }
     .upload-list {
         position: relative;

@@ -210,6 +210,7 @@
                 'requestServiceClassifys',
                 'requestServiceCategorys',
                 'requestServiceLabel',
+                'requestServiceItemList',
                 'setMarketQuery'
             ]),
 
@@ -281,11 +282,17 @@
             },
 
             setClassifyValue (key) {
-                let categories = this.categories[2] || {}
-                if (this.filterData.pipeType === 'atom') categories = this.categories[1] || {}
-                const selected = (categories.children || []).find((category) => category.classifyCode === key) || {}
-                this.filterData.classifyValue = selected.classifyValue
-                this.filterData.classifyKey = 'classifyCode'
+                let classifyKey = ''
+                switch (this.filterData.pipeType) {
+                    case 'service':
+                        classifyKey = 'bkServiceId'
+                        break
+                    default:
+                        classifyKey = 'classifyCode'
+                        break
+                }
+                this.filterData.classifyValue = key
+                this.filterData.classifyKey = classifyKey
             },
 
             changeRoute () {
@@ -323,10 +330,10 @@
                         const name = item.name
                         const children = item.data
                         children.forEach((x) => {
-                            x.name = x[name]
-                            x.id = x[key] + key
                             x.classifyValue = x[key]
                             x.classifyKey = key
+                            x.name = x[name]
+                            x.id = x[key] + key
                         })
                         this.categories.push({ name: item.groupName, children })
                     })
@@ -375,8 +382,24 @@
             },
 
             getServiceClassifys () {
-                return Promise.all([this.requestServiceCategorys(), this.requestServiceLabel(), this.requestServiceClassifys()]).then(([categorys = [], lables = [], classify = []]) => {
+                return Promise.all([
+                    this.requestServiceCategorys(),
+                    this.requestServiceLabel(),
+                    this.requestServiceClassifys(),
+                    this.requestServiceItemList()
+                ]).then(([categorys = [], lables = [], classify = [], services = []]) => {
                     const res = []
+                    if (services.length > 0) {
+                        res.push({
+                            name: 'name',
+                            key: 'bkServiceId',
+                            groupName: this.$t('store.按服务'),
+                            data: services.map((x) => {
+                                x.extServiceItem.bkServiceId = x.extServiceItem.id
+                                return x.extServiceItem
+                            })
+                        })
+                    }
                     if (categorys.length > 0) res.push({ name: 'categoryName', key: 'categoryCode', groupName: this.$t('store.按应用范畴'), data: categorys })
                     if (classify.length > 0) res.push({ name: 'classifyName', key: 'classifyCode', groupName: this.$t('store.按分类'), data: classify })
                     if (lables.length > 0) res.push({ name: 'labelName', key: 'labelCode', groupName: this.$t('store.按功能'), data: lables })
@@ -418,6 +441,7 @@
 
     .store-main {
         overflow-y: scroll;
+        background: #f1f2f3;
     }
 
     .home-main {

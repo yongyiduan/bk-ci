@@ -93,7 +93,9 @@
                 }
                 const confirmFn = () => {
                     this.isLoading = true
-                    this.$store.dispatch('store/uninstallService', postData).catch((err) => {
+                    this.$store.dispatch('store/uninstallService', postData).then(() => {
+                        this.initData()
+                    }).catch((err) => {
                         this.$bkMessage({ message: err.message || err, theme: 'error' })
                     }).finally(() => (this.isLoading = false))
                 }
@@ -139,7 +141,6 @@
 <style lang="scss" scoped>
     .service-manage-home {
         background: #ebedf0;
-        min-height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -193,6 +194,7 @@
             width: 94%;
             max-width: 1400px;
             padding: 15px 32px;
+            margin-bottom: 32px;
             background: #ffffff;
             box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
         }

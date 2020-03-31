@@ -91,7 +91,7 @@
                 return {
                     atom: [
                         { componentName: 'detailScore', label: this.$t('概述'), name: 'des' },
-                        { componentName: 'codeSection', label: 'YAML', name: 'YAML', bindData: { code: this.detail.codeSection } }
+                        { componentName: 'codeSection', label: 'YAML', name: 'YAML', bindData: { code: this.detail.codeSection, limitHeight: false } }
                     ],
                     template: [
                         { componentName: 'detailScore', label: this.$t('概述'), name: 'des' }
@@ -101,7 +101,7 @@
                     ],
                     image: [
                         { componentName: 'detailScore', label: this.$t('概述'), name: 'des' },
-                        { componentName: 'codeSection', label: 'Dockerfile', name: 'Dockerfile', bindData: { code: this.detail.codeSection } }
+                        { componentName: 'codeSection', label: 'Dockerfile', name: 'Dockerfile', bindData: { code: this.detail.codeSection, limitHeight: false } }
                     ],
                     service: [
                         { componentName: 'detailScore', label: this.$t('概述'), name: 'des' }

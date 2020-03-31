@@ -40,22 +40,22 @@
                         <img :src="serviceDetail.logoUrl">
                         <span>{{serviceDetail.serviceName}}</span>
                     </h3>
-                    <bk-form label-width="100" :model="serviceDetail">
-                        <bk-form-item :label="$t('store.扩展标识')" property="serviceCode">
+                    <bk-form label-width="80" :model="serviceDetail">
+                        <bk-form-item :label="$t('store.扩展标识') + '：'" property="serviceCode">
                             <span class="lh30">{{serviceDetail.serviceCode}}</span>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.功能标签')" property="labelList">
+                        <bk-form-item :label="$t('store.功能标签') + '：'" property="labelList">
                             <h5 class="detail-label">
                                 <span v-for="(label, index) in serviceDetail.labelList" :key="index" class="info-label">{{label.labelName}}</span>
                             </h5>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.扩展点')" property="itemName">
+                        <bk-form-item :label="$t('store.扩展点') + '：'" property="itemName">
                             <span class="lh30">{{serviceDetail.itemName}}</span>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.简介')" property="summary">
+                        <bk-form-item :label="$t('store.简介') + '：'" property="summary">
                             <span class="lh30">{{serviceDetail.summary}}</span>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.详细描述')" property="description">
+                        <bk-form-item :label="$t('store.详细描述') + '：'" property="description">
                             <p :class="{ 'overflow': !isDropdownShow }" ref="edit">
                                 <mavon-editor class="image-remark-input"
                                     ref="mdHook"
@@ -72,16 +72,16 @@
                                 <i :class="['devops-icon icon-angle-down', { 'icon-flip': isDropdownShow }]"></i>
                             </span>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.发布者')" property="publisher">
+                        <bk-form-item :label="$t('store.发布者') + '：'" property="publisher">
                             <span class="lh30">{{serviceDetail.publisher}}</span>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.发布类型')" property="releaseType">
+                        <bk-form-item :label="$t('store.发布类型') + '：'" property="releaseType">
                             <span class="lh30">{{serviceDetail.releaseType | releaseTypeFilter}}</span>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.版本')" property="version">
+                        <bk-form-item :label="$t('store.版本') + '：'" property="version">
                             <span class="lh30">{{serviceDetail.version}}</span>
                         </bk-form-item>
-                        <bk-form-item :label="$t('store.版本日志')" property="versionContent">
+                        <bk-form-item :label="$t('store.版本日志') + '：'" property="versionContent">
                             <span class="lh30">{{serviceDetail.versionContent}}</span>
                         </bk-form-item>
                     </bk-form>
@@ -310,7 +310,7 @@
                 width: 56px;
                 height: 56px;
                 border-radius: 11px;
-                margin: 0 28px 0 16px;
+                margin: 0 13px 0 10px;
             }
             span {
                 font-weight: normal;
@@ -318,6 +318,21 @@
                 text-align: left;
                 color: #222222;
                 line-height: 24px;
+            }
+        }
+        /deep/ .bk-form-item {
+            &+.bk-form-item {
+                margin-top: 24px;
+            }
+            .bk-label {
+                padding: 0 5px;
+                color: #999999;
+            }
+            .bk-form-content {
+                color: #222222;
+                span {
+                    word-break: break-all;
+                }
             }
         }
         .toggle-btn {

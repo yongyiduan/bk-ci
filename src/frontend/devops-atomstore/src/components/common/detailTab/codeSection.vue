@@ -1,5 +1,5 @@
 <template>
-    <section class="store-code" v-bkloading="{ isLoading }"></section>
+    <section :class="[{ 'max-height': limitHeight }, 'store-code']" v-bkloading="{ isLoading }"></section>
 </template>
 
 <script>
@@ -12,6 +12,10 @@
     export default {
         props: {
             readOnly: {
+                type: Boolean,
+                default: true
+            },
+            limitHeight: {
                 type: Boolean,
                 default: true
             },
@@ -29,10 +33,10 @@
             return {
                 codeMirrorCon: {
                     lineNumbers: true,
+                    lineWrapping: true,
                     tabMode: 'indent',
                     mode: 'yaml',
                     theme: '3024-night',
-                    height: '400px',
                     cursorBlinkRate: this.cursorBlinkRate,
                     readOnly: this.readOnly,
                     autoRefresh: true,
@@ -71,8 +75,14 @@
     @import '@/assets/scss/conf.scss';
 
     .store-code {
-        height: 400px;
         background: black;
+    }
+
+    .max-height {
+        height: 400px;
+        /deep/ .CodeMirror-scroll {
+            height: 400px;
+        }
     }
 
     /deep/ .CodeMirror {
@@ -81,12 +91,12 @@
         margin-bottom: 20px;
         padding: 10px;
         height: auto;
-        .CodeMirror-scroll {
-            height: 400px;
-        }
     }
     /deep/ .CodeMirror {
         min-height: 300px;
         height: auto;
+        .CodeMirror-scroll {
+            min-height: 300px;
+        }
     }
 </style>
