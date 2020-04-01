@@ -10,6 +10,13 @@ const vue = new Vue()
 
 export const actions = {
     /***
+     * 获取ReadMe文件信息
+     */
+    requestReadMe ({ commit }, serviceCode) {
+        return vue.$ajax.get(`${prefix}/user/market/service/repositorys/serviceCodes/${serviceCode}/readme`)
+    },
+
+    /***
      * 卸载扩展服务
      */
     uninstallService ({ commit }, { serviceCode, projectCode }) {
@@ -87,7 +94,7 @@ export const actions = {
      * 更新扩展信息
      */
     requestUpdateServiceInfo ({ commit }, { serviceCode, data }) {
-        return vue.$ajax.put(`${prefix}/user/market/baseInfo/services/${serviceCode}`, data)
+        return vue.$ajax.put(`${prefix}/user/market/baseInfo/serviceCodes/${serviceCode}/serviceIds/${data.serviceId}`, data)
     },
     /**
      * 删除扩展成员
@@ -202,15 +209,33 @@ export const actions = {
     /**
      * 获取扩展详情
      */
-    requestServiceDetailByCode ({ commit }, serviceCode) {
-        return vue.$ajax.get(`${prefix}/user/market/service/${serviceCode}`)
+    requestServiceDetailByCode ({ dispatch }, serviceCode) {
+        return vue.$ajax.get(`${prefix}/user/market/service/${serviceCode}`).then((res) => {
+            if (res.descInputType === 'FILE') {
+                return dispatch('store/requestReadMe', serviceCode).then((description) => {
+                    res.description = description
+                    return res
+                })
+            } else {
+                return res
+            }
+        })
     },
 
     /**
      * 获取扩展详情
      */
-    requestServiceDetail ({ commit }, serviceId) {
-        return vue.$ajax.get(`${prefix}/user/market/desk/service/${serviceId}`)
+    requestServiceDetail ({ dispatch }, serviceId) {
+        return vue.$ajax.get(`${prefix}/user/market/desk/service/${serviceId}`).then((res) => {
+            if (res.descInputType === 'FILE') {
+                return dispatch('store/requestReadMe', res.serviceCode).then((description) => {
+                    res.description = description
+                    return res
+                })
+            } else {
+                return res
+            }
+        })
     },
 
     /**
@@ -270,8 +295,17 @@ export const actions = {
     /**
      * 流水线Service插件详情
      */
-    requestService ({ commit }, { serviceCode }) {
-        return vue.$ajax.get(`${prefix}/user/market/service/${serviceCode}`)
+    requestService ({ dispatch }, { serviceCode }) {
+        return vue.$ajax.get(`${prefix}/user/market/service/${serviceCode}`).then((res) => {
+            if (res.descInputType === 'FILE') {
+                return dispatch('store/requestReadMe', serviceCode).then((description) => {
+                    res.description = description
+                    return res
+                })
+            } else {
+                return res
+            }
+        })
     },
 
     /**

@@ -60,7 +60,12 @@
                     <bk-input v-model="form.summary" :placeholder="$t('store.请输入简介')"></bk-input>
                 </bk-form-item>
                 <bk-form-item :label="$t('store.描述')" property="description">
+                    <bk-radio-group v-model="form.descInputType" class="service-input-type">
+                        <bk-radio value="MANUAL" class="mr21"> {{ $t('store.手动录入') }} </bk-radio>
+                        <bk-radio value="FILE"> {{ $t('store.fromReadme') }} </bk-radio>
+                    </bk-radio-group>
                     <mavon-editor class="service-remark-input"
+                        v-if="form.descInputType === 'MANUAL'"
                         ref="mdHook"
                         preview-background="#fff"
                         v-model="form.description"
@@ -98,7 +103,7 @@
             </bk-form>
             <section class="edit-service button-padding" v-show="!isLoading">
                 <bk-button theme="primary" @click="submitService" :loading="isCommitLoading"> {{ $t('store.提交') }} </bk-button>
-                <bk-button @click="toServiceList"> {{ $t('store.取消') }} </bk-button>
+                <bk-button @click="toServiceList" :disabled="isCommitLoading"> {{ $t('store.取消') }} </bk-button>
             </section>
         </main>
     </article>
@@ -130,6 +135,7 @@
                     publisher: '',
                     versionContent: '',
                     projectCode: '',
+                    descInputType: 'MANUAL',
                     extensionItemList: []
                 },
                 classifys: [],
@@ -380,6 +386,10 @@
         margin-right: 12px;
     }
 
+    .mr21 {
+        margin-right: 21px;
+    }
+
     .lh30 {
         line-height: 30px;
     }
@@ -397,6 +407,9 @@
         width: 1200px;
         margin: 20px auto;
         position: relative;
+        .service-input-type {
+            margin-bottom: 10px;
+        }
         .service-remark-input {
             border: 1px solid #c4c6cc;
             height: 263px;

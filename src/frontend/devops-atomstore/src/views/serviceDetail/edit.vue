@@ -53,12 +53,12 @@
                     <bk-input v-model="form.summary" :placeholder="$t('store.请输入简介')"></bk-input>
                 </bk-form-item>
                 <bk-form-item :label="$t('store.描述')" property="description">
-                    <bk-radio-group v-model="form.desType">
-                        <bk-radio value="hand" class="mr21"> {{ $t('store.手动录入') }} </bk-radio>
-                        <bk-radio value="read"> {{ $t('store.fromReadme') }} </bk-radio>
+                    <bk-radio-group v-model="form.descInputType">
+                        <bk-radio value="MANUAL" class="mr21"> {{ $t('store.手动录入') }} </bk-radio>
+                        <bk-radio value="FILE"> {{ $t('store.fromReadme') }} </bk-radio>
                     </bk-radio-group>
                     <mavon-editor class="service-remark-input"
-                        v-if="form.desType === 'hand'"
+                        v-if="form.descInputType === 'MANUAL'"
                         ref="mdHook"
                         v-model="form.description"
                         :toolbars="toolbars"
@@ -212,9 +212,11 @@
                         data: this.form
                     }
                     this.requestUpdateServiceInfo(postData).then(() => {
-                        this.$store.dispatch('store/updateCurrentService', this.form)
-                        this.$bkMessage({ message: this.$t('store.修改成功'), theme: 'success' })
-                        this.$router.push({ name: 'serviceDetail' })
+                        return this.$store.dispatch('store/requestServiceDetailByCode', postData.serviceCode).then((res) => {
+                            this.$store.dispatch('store/updateCurrentService', res || {})
+                            this.$bkMessage({ message: this.$t('store.修改成功'), theme: 'success' })
+                            this.$router.push({ name: 'serviceDetail' })
+                        })
                     }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
                         this.isLoading = false
                     })
