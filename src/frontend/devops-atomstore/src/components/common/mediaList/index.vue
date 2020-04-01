@@ -5,7 +5,7 @@
                 <span v-if="media.mediaType === 'PICTURE'"
                     class="media-image"
                     :style="`background-image: url(${media.mediaUrl})`"
-                    @click="fullScreenImgSrc = media.mediaUrl"
+                    @click="imgSrc = media.mediaUrl"
                 >
                 </span>
                 <video v-else
@@ -25,16 +25,17 @@
         <i class="swiper-nav nav-left" @click="changeIndex(-1)" v-if="swiperTransfer > -maxTransferWidth + containWidth"></i>
         <i class="swiper-nav nav-right" @click="changeIndex(1)" v-if="swiperTransfer < 0"></i>
 
-        <transition name="fade">
-            <section class="full-screen" v-if="fullScreenImgSrc" @click="fullScreenImgSrc = ''">
-                <img :src="fullScreenImgSrc">
-            </section>
-        </transition>
+        <zoomImage :img-src.sync="imgSrc"></zoomImage>
     </section>
 </template>
 
 <script>
+    import zoomImage from '../zoomImage'
     export default {
+        components: {
+            zoomImage
+        },
+
         props: {
             list: {
                 type: Array
@@ -44,7 +45,7 @@
         data () {
             return {
                 swiperTransfer: 0,
-                fullScreenImgSrc: '',
+                imgSrc: '',
                 containWidth: 0
             }
         },
@@ -103,24 +104,6 @@
         height: 222px;
         position: relative;
         overflow: hidden;
-    }
-
-    .full-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        z-index: 2;
-        background: rgba(0, 0, 0, 0.6);
-        img {
-            position: relative;
-            top: 50%;
-            left: 50%;
-            transform: translate3d(-50%, -50%, 0);
-            max-height: 50vh;
-            max-width: 50vw;
-        }
     }
 
     .detail-swiper {

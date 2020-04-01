@@ -212,7 +212,7 @@ export const actions = {
     requestServiceDetailByCode ({ dispatch }, serviceCode) {
         return vue.$ajax.get(`${prefix}/user/market/service/${serviceCode}`).then((res) => {
             if (res.descInputType === 'FILE') {
-                return dispatch('store/requestReadMe', serviceCode).then((description) => {
+                return dispatch('requestReadMe', serviceCode).then((description) => {
                     res.description = description
                     return res
                 })
@@ -228,7 +228,7 @@ export const actions = {
     requestServiceDetail ({ dispatch }, serviceId) {
         return vue.$ajax.get(`${prefix}/user/market/desk/service/${serviceId}`).then((res) => {
             if (res.descInputType === 'FILE') {
-                return dispatch('store/requestReadMe', res.serviceCode).then((description) => {
+                return dispatch('requestReadMe', res.serviceCode).then((description) => {
                     res.description = description
                     return res
                 })
@@ -298,7 +298,7 @@ export const actions = {
     requestService ({ dispatch }, { serviceCode }) {
         return vue.$ajax.get(`${prefix}/user/market/service/${serviceCode}`).then((res) => {
             if (res.descInputType === 'FILE') {
-                return dispatch('store/requestReadMe', serviceCode).then((description) => {
+                return dispatch('requestReadMe', serviceCode).then((description) => {
                     res.description = description
                     return res
                 })

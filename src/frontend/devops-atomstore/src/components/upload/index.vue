@@ -16,7 +16,7 @@
                 <span>{{$t('store.点击上传')}}</span>
             </p>
             <div slot="file" slot-scope="{ file }" class="upload-list">
-                <img :src="file.mediaUrl" v-if="type === 'PICTURE'" class="media-item" @click="fullScreenImgSrc = file.mediaUrl">
+                <img :src="file.mediaUrl" v-if="type === 'PICTURE'" class="media-item" @click="imgSrc = file.mediaUrl">
                 <video v-else
                     controls="true"
                     preload="auto"
@@ -49,20 +49,18 @@
             </div>
         </upload>
 
-        <transition name="fade">
-            <section class="full-screen" v-if="fullScreenImgSrc" @click="fullScreenImgSrc = ''">
-                <img :src="fullScreenImgSrc">
-            </section>
-        </transition>
+        <zoomImage :img-src.sync="imgSrc"></zoomImage>
     </section>
 </template>
 
 <script>
     import upload from './elUpload'
+    import zoomImage from '../common/zoomImage'
 
     export default {
         components: {
-            upload
+            upload,
+            zoomImage
         },
 
         props: {
@@ -79,7 +77,7 @@
 
         data () {
             return {
-                fullScreenImgSrc: ''
+                imgSrc: ''
             }
         },
 
@@ -222,24 +220,6 @@
     .upload-list:hover {
         .media-tool {
             display: flex;
-        }
-    }
-    .full-screen {
-        position: fixed;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        z-index: 2;
-        background: rgba(0, 0, 0, 0.6);
-        img {
-            position: relative;
-            top: 50%;
-            left: 50%;
-            transform: translate3d(-50%, -50%, 0);
-            max-height: 50vh;
-            max-width: 50vw;
         }
     }
 </style>
