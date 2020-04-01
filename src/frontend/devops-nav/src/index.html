@@ -207,7 +207,8 @@
                     if (this.readyState == 4 && this.status == 200) {
                         resolve(JSON.parse(xhr.responseText).data)
                     }  else if (this.status == 401) {
-                        window.location.href = LOGIN_SERVICE_URL + '/?c_url=' + window.location.href
+                        var c_url = location.origin + location.pathname + encodeURIComponent(location.search)
+                        window.location.href = LOGIN_SERVICE_URL + '/?c_url=' + c_url
                     } else if (this.readyState == 4 && this.status > 400) {
                         reject({
                             status: this.status,
