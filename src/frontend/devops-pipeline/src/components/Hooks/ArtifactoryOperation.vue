@@ -115,12 +115,15 @@
     .artifactory-operation-hooks {
         align-items: center;
         > li {
-            line-height: 32px;
+            height: 32px;
             vertical-align: middle;
             padding: 0 16px;
             @include ellipsis();
+            display: flex;
+            align-items: center;
             img {
                 display: inline-block;
+                margin: 3px 6px 0 0;
                 width: 16px;
                 height: 16px;
             }

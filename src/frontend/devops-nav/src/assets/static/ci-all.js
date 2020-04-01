@@ -158,7 +158,6 @@ const tencentCI = {};
      * @param {tips} object 提示信息对象, 传入$bkMessage
      */
     exports[SHOW_TIPS] = function (tips) {
-        console.log(tips)
         communicateOuter({
             action: SHOW_TIPS,
             params: tips
