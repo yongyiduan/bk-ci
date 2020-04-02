@@ -1,23 +1,11 @@
 <template>
     <div class="metadata-select-panel" v-bkloading="{ isLoading: loading }">
-        <div class="metadata-panel-header">
-            <div class="search-input-row" :class="{ 'crtl-point-panel': isCtrPointPanel }">
-                <input class="bk-form-input" type="text" placeholder="请输入..."
-                    v-model="searchKey"
-                    @keyup.enter="toSearch()">
-                <i class="bk-icon icon-search" @click="toSearch()"></i>
-            </div>
-        </div>
         <div class="metadata-panel-container">
             <div :class="{
                 'metadata-main-tab': true,
                 'indicator-list-tab': isIndexList
             }" v-if="!isCtrPointPanel">
                 <bk-tab :active="currentTab" type="unborder-card" @tab-change="changeTab">
-                    <!-- <bk-tab-panel name="indexList" title="指标集">
-                    </bk-tab-panel>
-                    <bk-tab-panel name="singleIndex" title="单个指标">
-                    </bk-tab-panel> -->
                     <bk-tab-panel
                         v-for="(panel, index) in panels"
                         v-bind="panel"
@@ -160,6 +148,10 @@
                 type: String,
                 default: ''
             },
+            searchKey: {
+                type: String,
+                default: ''
+            },
             panelType: {
                 type: String,
                 default: 'index'
@@ -174,7 +166,7 @@
                 isInit: false,
                 loading: false,
                 currentTab: 'indexList',
-                searchKey: '',
+                // searchKey: '',
                 metaTree: [],
                 indicatorSetList: [],
                 indicatorList: [],
@@ -484,6 +476,11 @@
                     params.type = 'controlPoint'
                 }
                 this.$emit('comfireHandle', params)
+                if (!this.isCtrPointPanel) {
+                    setTimeout(() => {
+                        this.isIndexList ? this.getIndicatortList(this.indicatorSetList, this.searchKey) : this.getMetaList(this.indicatorList, this.searchKey)
+                    }, 10)
+                }
             }
         }
     }
