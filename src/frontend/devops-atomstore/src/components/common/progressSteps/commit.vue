@@ -137,7 +137,6 @@
     @import '@/assets/scss/conf.scss';
 
     .progress-info {
-        width: 90%;
         height: 100%;
         overflow: auto;
     }

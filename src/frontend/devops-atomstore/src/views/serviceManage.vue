@@ -13,14 +13,16 @@
             <bk-checkbox-group v-model="filterList">
                 <ul class="fliter-list">
                     <li v-for="(group, index) in serviceGroup" :key="index" class="filter-item">
-                        <logo
-                            class="service-logo"
-                            :name="getIcon(group.extServiceItem.id)"
-                            size="18"
-                        />
-                        <section class="filter-select">
-                            <bk-checkbox :value="service.id" v-for="service in group.childItem" :key="service.id">{{service.name}}</bk-checkbox>
-                        </section>
+                        <template v-if="group.childItem.length">
+                            <logo
+                                class="service-logo"
+                                :name="getIcon(group.extServiceItem.id)"
+                                size="18"
+                            />
+                            <section class="filter-select">
+                                <bk-checkbox :value="service.id" v-for="service in group.childItem" :key="service.id">{{service.name}}</bk-checkbox>
+                            </section>
+                        </template>
                     </li>
                 </ul>
             </bk-checkbox-group>
@@ -34,13 +36,14 @@
                 :show-overflow-tooltip="true"
             >
                 <bk-table-column :label="$t('store.扩展名称')" prop="serviceName"></bk-table-column>
-                <bk-table-column :label="$t('store.作者')" prop="itemName"></bk-table-column>
+                <bk-table-column :label="$t('store.发布者')" prop="publisher"></bk-table-column>
                 <bk-table-column :label="$t('store.版本')" prop="version"></bk-table-column>
-                <bk-table-column :label="$t('store.操作人')" prop="modifier"></bk-table-column>
-                <bk-table-column :label="$t('store.操作时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
+                <bk-table-column :label="$t('store.状态')" prop="serviceStatus" :formatter="statusFormatter"></bk-table-column>
+                <bk-table-column :label="$t('store.操作人')" prop="publisher"></bk-table-column>
+                <bk-table-column :label="$t('store.操作时间')" prop="publishTime" width="180" :formatter="timeFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.操作')" width="150" class-name="handler-btn">
                     <template slot-scope="props">
-                        <span @click="uninstall(props.row)">{{$t('store.卸载')}}</span>
+                        <span @click="uninstall(props.row)" v-if="props.row.uninstall">{{$t('store.卸载')}}</span>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -49,6 +52,8 @@
 </template>
 
 <script>
+    import { serviceStatusMap } from '../store/constants'
+
     export default {
         data () {
             return {
@@ -62,7 +67,7 @@
         computed: {
             filterInstallList () {
                 return this.installList.filter((install) => {
-                    return this.filterList.length <= 0 || this.filterList.includes(install.serviceId)
+                    return this.filterList.length <= 0 || this.filterList.some(id => install.itemIds.includes(id))
                 })
             }
         },
@@ -78,7 +83,14 @@
                     this.$store.dispatch('store/requesInstalledServiceList', projectCode),
                     this.$store.dispatch('store/requestServiceItemList')
                 ]).then(([installList, serviecList]) => {
-                    this.serviceGroup = serviecList || []
+                    const itemIds = []
+                    installList.forEach(x => itemIds.push(...x.itemIds))
+                    this.serviceGroup = (serviecList || []).map((service) => {
+                        service.childItem = service.childItem.filter((item) => {
+                            return itemIds.includes(item.id)
+                        })
+                        return service
+                    })
                     this.installList = installList || []
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
@@ -120,10 +132,14 @@
             },
 
             timeFormatter (row, column, cellValue, index) {
-                const date = new Date(cellValue)
+                const date = new Date(+cellValue)
                 const year = date.toISOString().slice(0, 10)
                 const time = date.toTimeString().split(' ')[0]
                 return `${year} ${time}`
+            },
+
+            statusFormatter (row, column, cellValue, index) {
+                return this.$t(serviceStatusMap[cellValue])
             },
 
             goToStore () {
@@ -144,6 +160,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        flex: 1;
         .service-nav {
             width: 100%;
             min-height: 56px;

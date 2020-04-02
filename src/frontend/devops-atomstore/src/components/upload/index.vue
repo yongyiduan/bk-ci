@@ -7,6 +7,7 @@
             :on-success="handleUpload"
             :before-upload="checkUpload"
             :file-list="fileList"
+            :limit="limit"
         >
             <p slot="tip" class="upload-tip">
                 {{tip}}
@@ -16,7 +17,11 @@
                 <span>{{$t('store.点击上传')}}</span>
             </p>
             <div slot="file" slot-scope="{ file }" class="upload-list">
-                <img :src="file.mediaUrl" v-if="type === 'PICTURE'" class="media-item" @click="imgSrc = file.mediaUrl">
+                <span v-if="type === 'PICTURE'"
+                    class="media-item media-image"
+                    @click="imgSrc = file.mediaUrl"
+                    :style="`background-image: url(${file.mediaUrl})`"
+                ></span>
                 <video v-else
                     controls="true"
                     preload="auto"
@@ -161,6 +166,14 @@
         height: 146px;
         width: 146px;
     }
+    .media-image {
+        cursor: pointer;
+        display: inline-block;
+        background-color: #F6F7FA;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
     .upload-title {
         display: flex;
         align-items: center;
@@ -193,7 +206,7 @@
         }
         .media-tool {
             position: absolute;
-            z-index: 2;
+            z-index: 1;
             right: 2px;
             top: 2px;
             height: 24px;
