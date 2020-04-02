@@ -1,5 +1,5 @@
 <template>
-    <div class="metadata-select-panel">
+    <div class="metadata-select-panel" v-bkloading="{ isLoading: loading }">
         <div class="metadata-panel-header">
             <div class="search-input-row" :class="{ 'crtl-point-panel': isCtrPointPanel }">
                 <input class="bk-form-input" type="text" placeholder="请输入..."
@@ -172,6 +172,7 @@
         data () {
             return {
                 isInit: false,
+                loading: false,
                 currentTab: 'indexList',
                 searchKey: '',
                 metaTree: [],
@@ -217,7 +218,18 @@
         },
         created () {
             this.isInit = true
-            this.initData()
+
+            // 组件升级之前保留 升级后需注释
+            // this.initData()
+
+            // 兼容sideslider组件升级问题（关闭侧栏时组件被销毁）
+            if (this.isCtrPointPanel) {
+                this.requestControlPoint()
+            } else if (!this.isCtrPointPanel && this.isIndexList) {
+                this.requestIndicatorSet()
+            } else if (!this.isInit && !this.isCtrPointPanel && !this.isIndexList) {
+                this.requestIndicators()
+            }
         },
         methods: {
             initData () {
@@ -226,6 +238,7 @@
                 this.requestControlPoint()
             },
             async requestIndicatorSet () {
+                this.loading = true
                 try {
                     const res = await this.$store.dispatch('quality/requestIndicatorSet')
 
@@ -244,9 +257,13 @@
                         message,
                         theme
                     })
+                } finally {
+                    this.loading = false
                 }
             },
             async requestIndicators () {
+                this.loading = true
+
                 try {
                     const res = await this.$store.dispatch('quality/requestIndicators', {
                         projectId: this.projectId
@@ -267,9 +284,13 @@
                         message,
                         theme
                     })
+                } finally {
+                    this.loading = false
                 }
             },
             async requestControlPoint () {
+                this.loading = true
+
                 try {
                     const res = await this.$store.dispatch('quality/requestControlPoint', { projectId: this.projectId })
 
@@ -279,6 +300,7 @@
                             this.controlPointList.push(item)
                         })
                     }
+                    this.getMetaList(this.controlPointList, this.searchKey)
                 } catch (err) {
                     const message = err.message ? err.message : err
                     const theme = 'error'
@@ -287,6 +309,8 @@
                         message,
                         theme
                     })
+                } finally {
+                    this.loading = false
                 }
             },
             getMetaList (container, searchKey) {
@@ -431,7 +455,8 @@
             changeTab (tab) {
                 this.currentTab = tab
                 if (tab === 'singleIndex') {
-                    this.getMetaList(this.indicatorList, this.searchKey)
+                    this.requestIndicators()
+                    // this.getMetaList(this.indicatorList, this.searchKey)
                 } else {
                     this.getIndicatortList(this.indicatorSetList, this.searchKey)
                 }
@@ -677,7 +702,7 @@
                 .task-name,
                 .task-desc,
                 .meta-name,
-                .meta-desc, {
+                .meta-desc {
                     color: $primaryColor;
                 }
                 .select-btn {
