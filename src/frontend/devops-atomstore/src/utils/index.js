@@ -30,6 +30,10 @@ export function filters (html) {
         .replace(/&#39;/g, "\'")
 }
 
+export function urlJoin (...args) {
+    return args.filter(arg => arg).join('/').replace(/([^:]\/)\/+/g, '$1')
+}
+
 /**
  *  获取url参数值
  */

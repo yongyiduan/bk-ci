@@ -3,6 +3,7 @@
         <section class="progress-test">
             <img src="../../../images/progressTest.png" class="test-image">
             <span class="test-tip" v-html="$t('store.testTip')"></span>
+            <bk-button @click="goToTest"> {{ $t('store.前往测试') }} </bk-button>
         </section>
 
         <footer class="main-footer">
@@ -13,6 +14,8 @@
 </template>
 
 <script>
+    import { urlJoin } from '../../../utils/index.js'
+
     export default {
         props: {
             currentStep: {
@@ -32,7 +35,20 @@
 
         methods: {
             goToTest () {
-                window.open(`/console/pipeline/${this.detail.projectCode}/list`, '_blank')
+                const serviceIds = this.detail.bkServiceId || []
+                const id = serviceIds[0]
+                const serviceObject = window.serviceObject || {}
+                const serviceMap = serviceObject.serviceMap || {}
+                const keys = Object.keys(serviceMap)
+                let link = ''
+                keys.forEach((key) => {
+                    const cur = serviceMap[key]
+                    if (+cur.id === +id) link = cur.link_new
+                })
+                const url = urlJoin('/console', link)
+                const projectId = this.detail.projectCode
+                window.setProjectIdCookie(projectId)
+                window.open(url, '_blank')
             },
 
             rebuild () {
@@ -81,6 +97,7 @@
         }
         .test-tip {
             color: #b0b0b0;
+            margin-bottom: 16px;
         }
     }
 </style>

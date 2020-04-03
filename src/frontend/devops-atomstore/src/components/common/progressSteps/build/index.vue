@@ -53,6 +53,7 @@
 
         data () {
             return {
+                cancelIds: [],
                 logs: [],
                 isLoading: false,
                 isLogLoading: false
@@ -65,10 +66,11 @@
 
         beforeDestroy () {
             clearTimeout(this.getLog.id)
+            this.cancelIds.push(this.getLog.id)
         },
 
         methods: {
-            getLog () {
+            getLog (id) {
                 if (this.getLog.start === undefined) this.isLogLoading = true
                 const postData = {
                     type: 'SERVICE',
@@ -79,6 +81,7 @@
                     executeCount: this.getLog.executeCount || (this.getLog.executeCount = 1, 1)
                 }
                 this.$store.dispatch('store/requestProgressLog', postData).then((data = {}) => {
+                    if (id && this.cancelIds.includes(id)) return
                     this.isLogLoading = false
                     if (data.status === 0) {
                         const logs = data.logs || []
@@ -94,7 +97,7 @@
                             })
                             this.logs.push(res)
                         })
-                        if (!data.finished || data.hasMore) this.getLog.id = setTimeout(this.getLog, 300)
+                        if (!data.finished || data.hasMore) this.getLog.id = setTimeout(() => this.getLog(this.getLog.id), 300)
                     }
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
@@ -106,6 +109,7 @@
 
             rebuild () {
                 clearTimeout(this.getLog.id)
+                this.cancelIds.push(this.getLog.id)
                 this.isLoading = true
                 const postData = {
                     id: this.detail.serviceId,

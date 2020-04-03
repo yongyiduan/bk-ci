@@ -22,8 +22,20 @@
                 </video>
             </li>
         </ul>
-        <i class="swiper-nav nav-left" @click="changeIndex(-1)" v-if="swiperTransfer > -maxTransferWidth + containWidth"></i>
-        <i class="swiper-nav nav-right" @click="changeIndex(1)" v-if="swiperTransfer < 0"></i>
+        <span :class="[{ disabled: swiperTransfer <= -maxTransferWidth + containWidth }, 'nav-left', 'swiper-nav']"
+            @click="() => {
+                if (swiperTransfer > -maxTransferWidth + containWidth) changeIndex(-1)
+            }"
+        >
+            <i class="nav-icon"></i>
+        </span>
+        <span :class="[{ disabled: swiperTransfer >= 0 }, 'nav-right', 'swiper-nav']"
+            @click="() => {
+                if (swiperTransfer < 0) changeIndex(1)
+            }"
+        >
+            <i class="nav-icon"></i>
+        </span>
 
         <zoomImage :img-src.sync="imgSrc"></zoomImage>
     </section>
@@ -138,31 +150,40 @@
     .swiper-nav {
         cursor: pointer;
         position: absolute;
-        display: block;
-        width: 12px;
-        height: 12px;
-        border-left: 3px solid $navGray;
-        border-bottom: 3px solid $navGray;
-        opacity: .6;
-        top: 105px;
+        width: 15px;
+        height: 20px;
+        background: #000;
+        opacity: .7;
+        top: 101px;
+        &.disabled {
+            cursor: not-allowed;
+            opacity: .2;
+        }
+        .nav-icon {
+            position: absolute;
+            top: 7px;
+            left: 5px;
+            width: 6px;
+            height: 6px;
+            border-left: 1px solid $white;
+            border-bottom: 1px solid $white;
+        }
         &.nav-left {
-            left: 12px;
-            transform: rotate(45deg);
-            &:hover {
-                transform: rotate(45deg) scale(1.1);
+            left: 0;
+            .nav-icon {
+                transform: rotate(45deg);
             }
         }
         &.nav-right {
-            right: 12px;
-            transform: rotate(225deg);
-            &:hover {
-                transform: rotate(225deg) scale(1.1);
+            right: 0;
+            .nav-icon {
+                transform: rotate(225deg);
             }
         }
-        &:hover {
+        &:not(.disabled):hover {
             opacity: .9;
         }
-        &:active {
+        &:not(.disabled):active {
             opacity: .8;
         }
     }
