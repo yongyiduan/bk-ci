@@ -1,6 +1,6 @@
 <template>
     <bk-dropdown-menu align="center">
-        <logo slot="dropdown-trigger" name="logo-store" size="16" fill="currentColor"></logo>
+        <logo slot="dropdown-trigger" name="ellipsis" size="16" fill="currentColor"></logo>
         <ul class="artifactory-operation-hooks" slot="dropdown-content">
             <li v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)" :title="getExtTooltip(ext)">
                 <img :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />

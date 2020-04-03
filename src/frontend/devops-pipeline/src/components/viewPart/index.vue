@@ -29,20 +29,28 @@
                         <span v-if="row.artifactoryType === 'PIPELINE'">{{ $t('details.pipelineRepo') }}</span>
                     </div>
                     <div class="table-part-item part-item-handler">
-                        <i @click.stop="gotoArtifactory" class="bk-icon icon-position-shape handler-btn" :title="$t('editPage.atomForm.toArtifactory')"></i>
-                        <i class="bk-icon icon-new-download handler-btn" v-if="hasPermission" :title="$t('download')"
-                            @click="requestUrl(row, 'download')"></i>
-                        <i class="bk-icon icon-tree-module-shape handler-btn" v-if="hasPermission && isMof && isWindows && isApkOrIpa(row)" :title="$t('details.mofDownload')"
-                            @click="requestUrl(row, 'download', null, 'MoF')"></i>
-                        <i class="handler-btn-tool copy" v-if="row.artifactoryType === 'PIPELINE'" :title="$t('details.saveToCustom')" @click="copyToCustom(row)">
-                            <Logo class="icon-copy" name="copy" size="15"></Logo>
-                        </i>
+                        <span @click.stop="gotoArtifactory" class="handler-btn" v-bk-tooltips="$t('editPage.atomForm.toArtifactory')">
+                            {{ $t('locate') }}
+                        </span>
+                        <span class="handler-btn" v-if="hasPermission" v-bk-tooltips="$t('download')"
+                            @click="requestUrl(row, 'download')">
+                            {{$t('download')}}
+                        </span>
+                        <span class="handler-btn" v-if="hasPermission && isMof && isWindows && isApkOrIpa(row)" v-bk-tooltips="$t('details.mofDownload')"
+                            @click="requestUrl(row, 'download', null, 'MoF')">
+                            {{ $t('details.mofDownload') }}
+                        </span>
+                        <span class="handler-btn-tool copy" v-if="row.artifactoryType === 'PIPELINE'" v-bk-tooltips="$t('details.saveToCustom')" @click="copyToCustom(row)">
+                            {{ $t('saveAs') }}
+                        </span>
                         <span class="handler-btn-tool qrcode"
                             v-if="(extForFile(row.name) === 'ipafile' || extForFile(row.name) === 'apkfile') && hasPermission">
-                            <i class="bk-icon icon-qrcode handler-btn"
+                            <span class="handler-btn"
                                 id="partviewqrcode"
-                                :title="$t('details.qrcode')"
-                                @click="requestUrl(row, 'url', index)"></i>
+                                v-bk-tooltips="$t('details.qrcode')"
+                                @click="requestUrl(row, 'url', index)">
+                                {{ $t('details.qrcode') }}
+                            </span>
                             <p class="qrcode-box" v-if="row.display"
                                 v-bkloading="{
                                     isLoading: !curIndexItemUrl,
@@ -133,14 +141,12 @@
 </template>
 
 <script>
-    import Logo from '@/components/Logo'
     import qrcode from '@/components/devops/qrcode'
     import { convertFileSize, convertTime } from '@/utils/util'
     import { ArtifactoryOperation } from '@/components/Hooks'
 
     export default {
         components: {
-            Logo,
             qrcode,
             ArtifactoryOperation
         },
@@ -502,17 +508,16 @@
         .part-item-handler {
             flex: 2;
             max-width: 180px;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
-            i {
+            span {
                 margin-right: 8px;
-            }
-            i:last-child {
-                margin-right: 0px;
-            }
-            .handler-btn:hover {
                 color: $primaryColor;
             }
+            span:last-child {
+                margin-right: 0px;
+            }
+            
         }
         .qrcode {
             position: relative;
