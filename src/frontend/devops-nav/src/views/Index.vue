@@ -83,10 +83,9 @@
     import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
     import ExtensionDialog from '../components/ExtensionDialog/index.vue'
     import LoginDialog from '../components/LoginDialog/index.vue'
-    import { Component, Watch } from 'vue-property-decorator'
+    import { Component } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
     import eventBus from '../utils/eventBus'
-    import { getServiceAliasByPath } from '../utils/util'
 
     Component.registerHooks([
         'beforeRouteEnter',
@@ -149,11 +148,6 @@
             return explorer.indexOf('Chrome') >= 0 && explorer.indexOf('QQ') === -1
         }
 
-        @Watch('$route.path')
-        routeChange (name: string): void {
-            this.hasProjectList && this.saveProjectId()
-        }
-
         switchProject () {
             this.iframeUtil.toggleProjectMenu(true)
         }
@@ -163,35 +157,7 @@
             this.closePreviewTips()
         }
 
-        saveProjectId (): void {
-            const { $route, projectList } = this
-            if (projectList.find(project => (project.projectCode === $route.params.projectId && project.enabled && (project.approvalStatus === 2 || project.approvalStatus === 1)))) {
-                localStorage.setItem('projectId', $route.params.projectId)
-            }
-        }
-
-        isSameModule (newPath: string, oldPath: string): boolean {
-            return getServiceAliasByPath(newPath) === getServiceAliasByPath(oldPath)
-        }
-
-        beforeRouteUpdate (to, from, next) {
-            const { path, params } = to
-            const { path: oldPath, params: oldParams } = from
-            console.log(this.isSameModule(path, oldPath) || params.projectId !== oldParams.projectId)
-            if (!this.isSameModule(path, oldPath) || params.projectId !== oldParams.projectId) {
-                const serviceAlias = getServiceAliasByPath(path)
-                const currentPage = window.serviceObject.serviceMap[serviceAlias]
-                if (currentPage) {
-                    this.fetchServiceHooks({
-                        serviceId: currentPage.id
-                    })
-                }
-            }
-            next()
-        }
-
         created () {
-            this.hasProjectList && this.saveProjectId()
             eventBus.$on('toggle-login-dialog', (isShow) => {
                 this.showLoginDialog = isShow
             })

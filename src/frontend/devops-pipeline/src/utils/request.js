@@ -20,8 +20,8 @@
 import axios from 'axios'
 import Vue from 'vue'
 import { bus } from './bus'
-import cookie from 'cookie'
 import { isAbsoluteURL } from './util'
+import * as cookie from 'js-cookie'
 
 const request = axios.create({
     baseURL: `${AJAX_URL_PIRFIX}`,
@@ -107,7 +107,7 @@ request.interceptors.response.use(response => {
 }, errorHandler)
 
 const injectCSRFTokenToHeaders = () => {
-    const CSRFToken = cookie.parse(document.cookie).backend_csrftoken
+    const CSRFToken = cookie.get('backend_csrftoken')
     if (CSRFToken !== undefined) {
         request.defaults.headers.post['X-CSRFToken'] = CSRFToken
     } else {
@@ -118,8 +118,8 @@ const injectCSRFTokenToHeaders = () => {
 const getCurrentPid = () => {
     try {
         const pathPid = window.pipelineVue && window.pipelineVue.$route && window.pipelineVue.$route.params && window.pipelineVue.$route.params.projectId
-        const lsPid = localStorage.getItem('projectId')
-        return pathPid || lsPid
+        const cookiePid = cookie.get(X_DEVOPS_PROJECT_ID)
+        return pathPid || cookiePid
     } catch (e) {
         return undefined
     }

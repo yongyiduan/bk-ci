@@ -68,7 +68,7 @@
 <script>
     import UserGroupings from '@/components/pipelineSetting/UserGroupings'
     import { mapActions, mapState } from 'vuex'
-    import cookie from 'cookie'
+    import * as cookie from 'js-cookie'
 
     export default {
         components: {
@@ -211,7 +211,7 @@
                     item.group_list = item.selected
                 })
                 try {
-                    const res = await this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.parse(document.cookie).backend_csrftoken } })
+                    const res = await this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.get('backend_csrftoken') } })
                     if (res) {
                         if (res.code === 403) {
                             this.$showAskPermissionDialog({
