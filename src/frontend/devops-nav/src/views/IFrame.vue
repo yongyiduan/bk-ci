@@ -1,7 +1,7 @@
 <template>
     <div
         class="devops-iframe-content"
-        :class="{ 'showTopPrompt': showExplorerTips === 'true' && isShowPreviewTips && !chromeExplorer }"
+        :class="{ 'showTopPrompt': showAnnounce }"
     >
         <div
             v-if="isAnyPopupShow"
@@ -54,6 +54,11 @@
         @State isShowPreviewTips
         @State user
         @State headerConfig
+        @State currentNotice
+
+        get showAnnounce (): boolean {
+            return this.currentNotice && this.currentNotice.id
+        }
 
         created () {
             this.init()
