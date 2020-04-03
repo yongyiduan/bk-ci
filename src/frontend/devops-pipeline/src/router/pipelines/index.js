@@ -48,6 +48,8 @@ const pipelinesDocker = () => import(/* webpackChunkName: "pipelinesDocker" */'.
 // 插件前端task.json在线调试
 const atomDebug = () => import(/* webpackChunkName: "atomDebug" */'../../views/atomDebug.vue')
 
+const moocPipelinePage = () => import(/* webpackChunkName: "moocPipelinePage" */'../../views/list/mooc.vue')
+
 const routes = [
     {
         path: '/pipeline/:projectId',
@@ -58,6 +60,17 @@ const routes = [
                 redirect: {
                     name: 'pipelinesList'
                 }
+            },
+            {
+                path: 'mooc',
+                name: 'mooc',
+                meta: {
+                    title: 'pipeline',
+                    header: 'pipeline',
+                    icon: 'pipeline',
+                    to: 'pipelinesList'
+                },
+                component: moocPipelinePage
             },
             {
                 path: 'list',

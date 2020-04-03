@@ -57,7 +57,7 @@
                         @imgAdd="uploadimg"
                     />
                 </bk-form-item>
-                <bk-form-item label="Dockerfile" :required="true" property="dockerFileContent" :rules="[requireRule]" ref="dockerFileContent">
+                <bk-form-item label="Dockerfile" property="dockerFileContent" ref="dockerFileContent">
                     <code-section :code="form.dockerFileContent" :cursor-blink-rate="530" :read-only="false" ref="codeEditor" />
                 </bk-form-item>
                 <div class="version-msg">

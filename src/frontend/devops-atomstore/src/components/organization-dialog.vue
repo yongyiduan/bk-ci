@@ -69,6 +69,9 @@
             },
             templateCode () {
                 return this.$route.params.templateCode
+            },
+            imageCode () {
+                return this.$route.params.imageCode
             }
         },
         watch: {

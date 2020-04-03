@@ -11,7 +11,7 @@
                     height="28"
                 />
             </router-link>
-            <template v-if="showProjectList">
+            <template v-if="showProjectList && !isMooc">
                 <devops-select
                     ref="projectDropdown"
                     class="bkdevops-project-selector"
@@ -41,9 +41,9 @@
                     </template>
                 </devops-select>
             </template>
-            <nav-menu v-if="showNav" />
+            <nav-menu v-if="showNav && !isMooc" />
             <h3
-                v-if="title"
+                v-if="title && !isMooc"
                 class="service-title"
                 @click="goHome"
             >
@@ -55,21 +55,24 @@
             </h3>
         </div>
         <div class="header-right-bar">
-            <locale-switcher></locale-switcher>
-            <qrcode class="feed-back-icon" />
-            <span class="seperate-line">|</span>
+            <locale-switcher v-if="!isMooc"></locale-switcher>
+            <qrcode v-if="!isMooc" class="feed-back-icon" />
+            <span v-if="!isMooc" class="seperate-line">|</span>
             <!-- <feed-back class='feed-back-icon'></feed-back> -->
             <i
+                v-if="!isMooc"
                 class="devops-icon icon-helper"
                 @click.stop="goToDocs"
             />
             <User
                 class="user-info"
+                :disabled="isMooc"
                 v-bind="user"
             />
         </div>
 
         <project-dialog
+            v-if="!isMooc"
             :init-show-dialog="showProjectDialog"
             :title="projectDialogTitle"
         />
@@ -78,7 +81,7 @@
 
 <script lang="ts">
     import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
+    import { Component, Inject } from 'vue-property-decorator'
     import { State, Action, Getter } from 'vuex-class'
     import User from '../User/index.vue'
     import NavMenu from './NavMenu.vue'
@@ -117,6 +120,9 @@
 
         isDropdownMenuVisible: boolean = false
         isShowTooltip: boolean = true
+
+        @Inject()
+        isMooc: boolean
 
         get showProjectList (): boolean {
             return this.headerConfig.showProjectList
@@ -224,7 +230,6 @@
             }
             
             if ((!oldProject && project.gray) || (oldProject && oldProject.gray !== project.gray)) {
-                debugger
                 this.goHomeById(id, true)
             }
         }

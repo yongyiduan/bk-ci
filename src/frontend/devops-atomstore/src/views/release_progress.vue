@@ -217,11 +217,11 @@
 </template>
 
 <script>
+    import * as cookie from 'js-cookie'
     import BuildLog from '@/components/Log'
-    import cookie from 'cookie'
     import webSocketMessage from '@/utils/webSocketMessage'
 
-    const CSRFToken = cookie.parse(document.cookie).backend_csrftoken
+    const CSRFToken = cookie.get('backend_csrftoken')
 
     export default {
         components: {

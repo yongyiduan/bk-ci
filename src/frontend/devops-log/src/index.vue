@@ -18,7 +18,7 @@
                 </p>
             </header>
 
-            <virtual-scroll class="log-scroll" ref="scroll" :id="id" :currentExe="currentExe">
+            <virtual-scroll class="log-scroll" ref="scroll" :id="id" :current-exe="currentExe">
                 <template slot-scope="item">
                     <span class="item-txt selection-color"
                         v-if="!isInit"
@@ -131,7 +131,7 @@
             this.offsetTop = mainEle.offsetTop
 
             const query = this.$route.query || {}
-            const minMapTop = query.minMapTop
+            // const minMapTop = query.minMapTop
             const id = query.id
             if (id === this.id) this.currentExe = +query.currentExe
         },
@@ -147,17 +147,19 @@
 
             valuefilter (val) {
                 return val.replace(/\s|<|>/g, (str) => {
+                    let res = '&nbsp;'
                     switch (str) {
-                        case ' ':
-                            return '&nbsp;'
-                            break;
                         case '<':
-                            return '&lt;'
-                            break;
+                            res = '&lt;'
+                            break
                         case '>':
-                            return '&gt;'
-                            break;
+                            res = '&gt;'
+                            break
+                        default:
+                            res = '&nbsp;'
+                            break
                     }
+                    return res
                 }).replace(/&lt;a.+?href=["']?([^"']+)["']?.*&gt;(.+)&lt;\/a&gt;/g, "<a href='$1' target='_blank'>$2</a>")
             },
 
