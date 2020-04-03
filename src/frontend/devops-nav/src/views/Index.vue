@@ -3,21 +3,9 @@
         v-bkloading="loadingOption"
         class="devops-index"
     >
-        <div
-            v-if="showExplorerTips === 'true' && isShowPreviewTips && !chromeExplorer"
-            class="user-prompt"
-        >
-            <p><i class="bk-icon icon-info-circle-shape" />{{ $t("recommendationLabel") }}</p>
-            <div class="close-btn">
-                <span
-                    class="close-remind"
-                    @click="closeExplorerTips"
-                >{{ $t("dismiss") }}</span>
-                <i
-                    class="bk-icon icon-close"
-                    @click="closePreviewTips"
-                />
-            </div>
+        <div class="user-prompt" v-if="showAnnounce">
+            <!-- <p><i class="bk-icon icon-info-circle-shape"></i>{{currentNotice.noticeContent}}</p> -->
+            <p v-html="currentNotice.noticeContent"></p>
         </div>
         <template v-if="projectList">
             <Header />
@@ -91,6 +79,7 @@
         }
     })
     export default class Index extends Vue {
+        @State currentNotice
         @State projectList
         @State headerConfig
         @State isShowPreviewTips
@@ -98,9 +87,15 @@
         @Getter disableProjectList
         @Getter approvalingProjectList
         @Action closePreviewTips
+        @Action getAnnouncement
+        @Action setAnnouncement
 
         showLoginDialog: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
+
+        get showAnnounce (): boolean {
+            return this.currentNotice && this.currentNotice.id
+        }
 
         get loadingOption (): object {
             return {
@@ -143,7 +138,11 @@
             this.closePreviewTips()
         }
 
-        created () {
+        async created () {
+            const announce = await this.getAnnouncement()
+            if (announce && announce.id) {
+                this.setAnnouncement(announce)
+            }
             eventBus.$on('toggle-login-dialog', (isShow) => {
                 this.showLoginDialog = isShow
             })
@@ -178,7 +177,7 @@
         }
         .user-prompt {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             padding: 0 24px;
             min-width: 1280px;
             line-height: 32px;
