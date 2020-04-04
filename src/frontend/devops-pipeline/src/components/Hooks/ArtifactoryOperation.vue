@@ -1,6 +1,8 @@
 <template>
-    <bk-dropdown-menu align="center">
-        <logo slot="dropdown-trigger" name="ellipsis" size="16" fill="currentColor"></logo>
+    <bk-dropdown-menu align="right">
+        <div slot="dropdown-trigger" class="hook-dropdown-trigger">
+            <i class="entry-circle" v-for="i in [1, 2, 3]" :key="i" />
+        </div>
         <ul class="artifactory-operation-hooks" slot="dropdown-content">
             <li v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)" :title="getExtTooltip(ext)">
                 <img :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
@@ -13,13 +15,9 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
     import { isAbsoluteURL, urlJoin } from '@/utils/util'
-    import Logo from '@/components/Logo'
 
     export default {
         name: 'artifactory-operation-hooks',
-        components: {
-            Logo
-        },
         props: {
             artifact: {
                 type: Object,
@@ -112,8 +110,37 @@
 
 <style lang='scss'>
     @import '../../scss/mixins/ellipsis';
+
+    .hook-dropdown-trigger {
+        display: flex;
+        width: 25px;
+        height: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+
+        &:hover,
+        &.active {
+            i.entry-circle {
+                background-color: #3c96ff;
+            }
+        }
+
+        i.entry-circle {
+            display: flex;
+            width: 18px;
+            background-color: #AEB1C0;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+    }
     .artifactory-operation-hooks {
         align-items: center;
+        max-height: 188px;
+        overflow: auto;
         > li {
             height: 32px;
             vertical-align: middle;
@@ -121,9 +148,15 @@
             @include ellipsis();
             display: flex;
             align-items: center;
+            span {
+                color: #222222;
+            }
+            &:hover span {
+                color: #3c96ff;
+            }
             img {
                 display: inline-block;
-                margin: 3px 6px 0 0;
+                margin: 0 6px 0 0;
                 width: 16px;
                 height: 16px;
             }

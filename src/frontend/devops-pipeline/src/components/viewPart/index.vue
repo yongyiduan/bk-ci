@@ -507,11 +507,13 @@
         }
         .part-item-handler {
             flex: 2;
-            max-width: 180px;
+            max-width: 200px;
             font-size: 14px;
+            display: flex;
+            align-items: center;
             cursor: pointer;
-            span {
-                margin-right: 8px;
+            > span {
+                margin-right: 12px;
                 color: $primaryColor;
             }
             span:last-child {
