@@ -88,6 +88,7 @@
                             width: size.cols
                         }
                     })
+                    !this.resizeUrl && this.terminalSocket.send(`__resize__:${size.rows},${size.cols}\n`)
                 })
             }
         }
