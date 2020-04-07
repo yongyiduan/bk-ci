@@ -9,7 +9,7 @@
         <div class="rotate rotate7"></div>
         <div class="rotate rotate8"></div>
     </div>
-    <icon class="store-status" :name="`store-status-${status}`" size="14" v-else />
+    <icon class="store-status" :name="`store-status-${status}`" size="12" v-else />
 </template>
 
 <script>
@@ -23,6 +23,7 @@
 <style lang="scss" scoped>
     .store-status {
         vertical-align: text-top;
+        margin-right: 2px;
         &.bk-spin-loading {
             width: 14px;
             height: 14px;
