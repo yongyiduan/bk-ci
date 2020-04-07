@@ -59,7 +59,7 @@
                                     <div class="info-value codelib-url">
                                         {{codeForm.repositoryAuthorizer}}
                                         <bk-popover placement="top">
-                                            <i class="bk-icon icon-info-circle"></i>
+                                            <i class="devops-icon icon-info-circle"></i>
                                             <template slot="content">
                                                 <p> {{ $t('store.在发布插件时，使用授权人的身份拉取插件代码自动构建打包，或设置插件可见范围') }} </p>
                                             </template>
@@ -144,7 +144,7 @@
             modifyRepoMemInfo () {
                 const atomCode = this.atomCode
                 const projectCode = this.codeForm.projectCode
-                this.$store.dispatch('store/checkIsOAuth', { type: 'ATOM_REPOSITORY', atomCode }).then((res) => {
+                this.$store.dispatch('store/checkIsOAuth', { type: 'ATOM_REPOSITORY', code: atomCode }).then((res) => {
                     if (res.status === 403) {
                         window.open(res.url, '_self')
                         return
@@ -154,7 +154,7 @@
                         if (res) {
                             this.codeForm.repositoryAuthorizer = this.userInfo.userName
                             this.$store.dispatch('store/updateCurrentaAtom', { res: this.codeForm })
-                            this.$bkMessage({ message: '重置授权成功', theme: 'success', limit: 1 })
+                            this.$bkMessage({ message: this.$t('this.重置授权成功'), theme: 'success', limit: 1 })
                         }
                     })
                 }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' }))

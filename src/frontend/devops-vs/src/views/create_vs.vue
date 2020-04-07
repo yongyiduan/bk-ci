@@ -37,7 +37,7 @@
                     <bk-table-column label="名称" class="name-item" width="300">
                         <template slot-scope="props">
                             <div :title="props.row.name">
-                                <i class="bk-icon icon-file"></i>
+                                <i class="devops-icon icon-file"></i>
                                 <span><span class="buildno-item" v-if="selectInfo.constructId === 'all'">{{ props.row.buildDesc }}&nbsp;</span>{{ props.row.name }}</span>
                             </div>
                         </template>
@@ -135,7 +135,7 @@
                             }
                         }
                     }, [
-                        h('i', { 'class': ['bk-icon', 'icon-question-circle'] })
+                        h('i', { 'class': ['devops-icon', 'icon-question-circle'] })
                     ])
                 ])
 

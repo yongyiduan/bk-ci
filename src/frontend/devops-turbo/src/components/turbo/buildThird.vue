@@ -1,7 +1,7 @@
 <template>
     <section class="build-wrapper build-wrapper-third">
         <div class="build-tooltips">
-            <i class="bk-icon icon-info-circle-shape"></i>
+            <i class="devops-icon icon-info-circle-shape"></i>
             <span>选择你导入的构建机并填写相关信息，系统将为你安装必要的软件。</span>
         </div>
         <bk-form :label-width="130" :model="machineParam">
@@ -24,7 +24,7 @@
                         <template>
                             <div class="bk-selector-create-item">
                                 <a class="bk-selector-link" target="_blank" :href="`/console/environment/${projectId}/nodeList?type=LINUX`">
-                                    <i class="bk-icon icon-plus-circle"></i>
+                                    <i class="devops-icon icon-plus-circle"></i>
                                     <i class="text">导入新构建机</i>
                                 </a>
                             </div>
@@ -32,7 +32,7 @@
                     </vv-selector>
                 </div>
                 <bk-popover placement="right" :width="200" class="prompt-tips">
-                    <i class="bk-icon icon-info-circle"></i>
+                    <i class="devops-icon icon-info-circle"></i>
                     <div slot="content" style="white-space: normal;">
                         <div>请将自己的构建机导入到蓝盾平台</div>
                     </div>
@@ -105,7 +105,7 @@
                         <template>
                             <div class="bk-selector-create-item">
                                 <a class="bk-selector-link" target="_blank" :href="`/console/pipeline/${projectId}/list/allPipeline`">
-                                    <i class="bk-icon icon-plus-circle"></i>
+                                    <i class="devops-icon icon-plus-circle"></i>
                                     <i class="text">添加流水线</i>
                                 </a>
                             </div>

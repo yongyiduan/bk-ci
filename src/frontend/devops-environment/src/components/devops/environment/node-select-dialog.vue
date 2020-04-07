@@ -85,11 +85,11 @@
                                 <div v-if="(col.nodeType === 'CC' || col.nodeType === 'CMDB') && ((col.nodeType === 'CC' && col.createdUser !== col.operator && col.createdUser !== col.bakOperator)
                                     || (col.nodeType === 'CMDB' && col.createdUser !== col.operator && col.bakOperator.split(';').indexOf(col.createdUser) === -1))">
                                     <div class="edit-operator" v-if="curUserInfo.username === col.operator || curUserInfo.username === col.bakOperator">
-                                        <i class="bk-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(col.nodeHashId, 1)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
+                                        <i class="devops-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(col.nodeHashId, 1)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
                                     </div>
                                     <div class="prompt-operator" v-else>
                                         <bk-popover placement="top">
-                                            <span><i class="bk-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
+                                            <span><i class="devops-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
                                             <template slot="content">
                                                 <p style="text-align: left;">{{ $t('environment.nodeInfo.currentImporter') }}<span>{{ col.createdUser }}</span></p>
                                                 <p style="text-align: left;">{{ $t('environment.nodeInfo.currentOperator') }}<span>{{ col.operator }}</span><span v-if="col.nodeType === 'CC'">/{{ col.bakOperator }}</span></p>

@@ -51,7 +51,7 @@
                                 <bk-checkbox v-for="(col, index) in experienceGroup" :key="index" v-model="col.isChecked" class="exp-group-item">
                                     {{ col.name }}
                                     <bk-popover :delay="500" placement="bottom">
-                                        <i class="bk-icon icon-member-list"></i>
+                                        <i class="devops-icon icon-member-list"></i>
                                         <template slot="content">
                                             <p style="max-width: 300px; text-align: left; white-space: normal;word-break: break-all;font-weight: 400;">内部人员名单：
                                                 <span v-for="(entry, uIndex) in col.innerUsers" :key="uIndex">{{ entry.replace('"', '') }}<span v-if="index !== (col.innerUsers.length - 1)">,</span></span>
@@ -64,7 +64,7 @@
                                 </bk-checkbox>
                             </div>
                             <span class="create-group-entry" @click="toCreateGroup">
-                                <i class="bk-icon icon-plus-circle" />
+                                <i class="devops-icon icon-plus-circle" />
                                 新增体验组
                             </span>
                         </bk-form-item>

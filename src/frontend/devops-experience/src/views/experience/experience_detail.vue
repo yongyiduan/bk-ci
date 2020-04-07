@@ -3,7 +3,7 @@
         <content-header>
             <div slot="left">
                 <router-link :to="{ name: 'experienceList' }">
-                    <i class="bk-icon icon-arrows-left"></i>
+                    <i class="devops-icon icon-arrows-left"></i>
                 </router-link>
                 <span> {{ $route.meta.title }} </span>
                 <span v-if="curReleaseDetail">
@@ -325,7 +325,7 @@
 
         .bk-page .page-item .page-button {
             height: 36px;
-            .bk-icon {
+            .devops-icon {
                 line-height: 2.5;
             }
         }

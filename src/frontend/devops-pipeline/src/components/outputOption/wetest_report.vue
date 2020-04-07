@@ -28,7 +28,7 @@
                                 <div class="rotate rotate7"></div>
                                 <div class="rotate rotate8"></div>
                             </div>
-                            <i class="bk-icon" :class="buildClass(report.status)" v-else></i>
+                            <i class="devops-icon" :class="buildClass(report.status)" v-else></i>
                             {{ buildStatus(report.status) }}
                         </div>
                     </td>
@@ -153,7 +153,7 @@
             overflow: hidden;
         }
         .report {
-            .bk-icon {
+            .devops-icon {
                 vertical-align: middle;
             }
             .icon-circle-2-1{

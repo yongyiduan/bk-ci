@@ -5,7 +5,7 @@
             <hgroup v-for="cardGroup in cardGroups" :key="cardGroup.key" class="main-group">
                 <h3 class="main-title">
                     <span>{{cardGroup.label}}</span>
-                    <span v-if="cardGroup.records.length >= 8" class="title-route" @click="showMore(cardGroup.key)"> {{ $t('store.显示全部') }} </span>
+                    <span v-if="cardGroup.records.length >= 8" class="title-route" @click="showMore(cardGroup)"> {{ $t('store.显示全部') }} </span>
                 </h3>
                 <card v-for="(card, index) in cardGroup.records" :key="index" :atom="card" class="main-card"></card>
                 <empty v-if="cardGroup.records <= 0"></empty>
@@ -66,7 +66,8 @@
                     atom: 'store/requestAtomHome',
                     template: 'store/requestTemplateHome',
                     ide: 'store/requestIDEHome',
-                    image: 'store/requestImageHome'
+                    image: 'store/requestImageHome',
+                    service: 'store/requestServiceHome'
                 }
                 const type = this.$route.query.pipeType || 'atom'
                 const url = urls[type]
@@ -78,8 +79,9 @@
                 })
             },
 
-            showMore (sortType) {
-                switch (sortType) {
+            showMore (cardGroup) {
+                console.log(cardGroup)
+                switch (cardGroup.key) {
                     case 'hottest':
                         this.$parent.filterData.sortType = 'DOWNLOAD_COUNT'
                         break
@@ -87,7 +89,7 @@
                         this.$parent.filterData.sortType = 'UPDATE_TIME'
                         break
                     default:
-                        this.$parent.setClassifyValue(sortType)
+                        this.$parent.setClassifyValue(cardGroup.key)
                         break
                 }
             }

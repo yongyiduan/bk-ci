@@ -86,7 +86,7 @@
                                 <li
                                     v-if="isExtendTx && lastClickItem.fullPath && lastClickItem.folder === false && isWindows && isApkOrIpa() && isMof"
                                     @click.stop="handlerDownload($event, 'MoF')">
-                                    <i class="bk-icon icon-download"></i>魔方有线安装
+                                    <i class="devops-icon icon-download"></i>魔方有线安装
                                 </li>
                             </template>
                             <template

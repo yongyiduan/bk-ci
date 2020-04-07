@@ -14,7 +14,7 @@
                     <div :class="{ 'form-field': true, 'bk-form-inline-item': true, 'is-danger': errors.has('@type') }">
                         <label :title="$t('atom')" class="bk-label">{{ $t('atom') }}：</label>
                         <bk-popover placement="right" theme="light" class="form-field-icon atom-name-field" v-if="atom && (atom.summary || atom.docsLink)">
-                            <i class="bk-icon icon-info-circle"></i>
+                            <i class="devops-icon icon-info-circle"></i>
                             <div slot="content" style="font-size: 12px; width: 350px; min-height: 100px;">
                                 <div class="atom-desc-content">
                                     <p v-if="atom.summary">{{ $t('desc') }}：{{ atom.summary }}</p>
@@ -52,7 +52,7 @@
                 <div class="atom-form-content">
                     <div class="no-atom-tips" v-if="!atom && atomCode">
                         <div class="no-atom-tips-icon">
-                            <i class="bk-icon icon-info-circle-shape" size="14" />
+                            <i class="devops-icon icon-info-circle-shape" size="14" />
                         </div>
                         <p>{{ $t('editPage.noAtomVersion') }}</p>
                     </div>
