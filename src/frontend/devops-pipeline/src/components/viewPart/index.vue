@@ -507,7 +507,7 @@
         }
         .part-item-handler {
             flex: 2;
-            max-width: 200px;
+            max-width: 222px;
             font-size: 14px;
             display: flex;
             align-items: center;
