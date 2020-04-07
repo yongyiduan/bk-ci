@@ -31,21 +31,7 @@
             <bk-table-column :label="$t('store.版本')" prop="version" width="120"></bk-table-column>
             <bk-table-column :label="$t('store.状态')" width="160">
                 <template slot-scope="props">
-                    <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
-                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.serviceStatus)">
-                        <div class="rotate rotate1"></div>
-                        <div class="rotate rotate2"></div>
-                        <div class="rotate rotate3"></div>
-                        <div class="rotate rotate4"></div>
-                        <div class="rotate rotate5"></div>
-                        <div class="rotate rotate6"></div>
-                        <div class="rotate rotate7"></div>
-                        <div class="rotate rotate8"></div>
-                    </div>
-                    <span class="atom-status-icon success" v-if="props.row.serviceStatus === 'RELEASED'"></span>
-                    <span class="atom-status-icon fail" v-if="props.row.serviceStatus === 'GROUNDING_SUSPENSION'"></span>
-                    <span class="atom-status-icon obtained" v-if="props.row.serviceStatus === 'AUDIT_REJECT' || props.row.serviceStatus === 'UNDERCARRIAGED'"></span>
-                    <span class="atom-status-icon devops-icon icon-initialize" v-if="props.row.serviceStatus === 'INIT'"></span>
+                    <status :status="calcStatus(props.row.serviceStatus)"></status>
                     <span>{{ $t(serviceStatusList[props.row.serviceStatus]) }}</span>
                 </template>
             </bk-table-column>
@@ -201,11 +187,13 @@
 
 <script>
     import formTips from '@/components/common/formTips/index'
+    import status from './status'
     import { serviceStatusMap } from '@/store/constants'
 
     export default {
         components: {
-            formTips
+            formTips,
+            status
         },
 
         data () {
@@ -288,6 +276,35 @@
         },
 
         methods: {
+            calcStatus (status) {
+                let icon = ''
+                switch (status) {
+                    case 'AUDITING':
+                    case 'COMMITTING':
+                    case 'BUILDING':
+                    case 'EDIT':
+                    case 'BUILD_FAIL':
+                    case 'UNDERCARRIAGING':
+                    case 'TESTING':
+                        icon = 'doing'
+                        break
+                    case 'RELEASED':
+                        icon = 'success'
+                        break
+                    case 'GROUNDING_SUSPENSION':
+                        icon = 'fail'
+                        break
+                    case 'AUDIT_REJECT':
+                    case 'UNDERCARRIAGED':
+                        icon = 'info'
+                        break
+                    case 'INIT':
+                        icon = 'init'
+                        break
+                }
+                return icon
+            },
+
             openValidate () {
                 window.open(this.gitOAuthUrl, '_self')
             },

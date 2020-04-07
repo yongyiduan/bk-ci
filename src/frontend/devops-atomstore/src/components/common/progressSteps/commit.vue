@@ -125,9 +125,12 @@
                         deptInfoList: this.deptInfoList
                     }
                 }
-                this.$store.dispatch('store/requestCommitServiceInfo', postData).catch((err) => {
+                this.$store.dispatch('store/requestCommitServiceInfo', postData).then(() => {
+                    this.$emit('freshProgress', () => (this.isCommiting = false))
+                }).catch((err) => {
+                    this.isCommiting = false
                     this.$bkMessage({ message: (err.message || err), theme: 'error' })
-                }).finally(() => (this.isCommiting = false))
+                })
             }
         }
     }
