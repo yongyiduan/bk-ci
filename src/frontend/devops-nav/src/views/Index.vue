@@ -3,9 +3,21 @@
         v-bkloading="loadingOption"
         class="devops-index"
     >
-        <div class="user-prompt" v-if="showAnnounce">
-            <!-- <p><i class="bk-icon icon-info-circle-shape"></i>{{currentNotice.noticeContent}}</p> -->
-            <p v-html="currentNotice.noticeContent"></p>
+        <div
+            v-if="showExplorerTips === 'true' && isShowPreviewTips && !chromeExplorer"
+            class="user-prompt"
+        >
+            <p><i class="devops-icon icon-info-circle-shape" />{{ $t("recommendationLabel") }}</p>
+            <div class="close-btn">
+                <span
+                    class="close-remind"
+                    @click="closeExplorerTips"
+                >{{ $t("dismiss") }}</span>
+                <i
+                    class="devops-icon icon-close"
+                    @click="closePreviewTips"
+                />
+            </div>
         </div>
         <template v-if="projectList">
             <Header />

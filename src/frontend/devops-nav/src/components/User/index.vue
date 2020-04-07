@@ -8,7 +8,7 @@
             @click.stop="toggleUserInfo"
         >
             {{ username }}
-            <i v-if="!disabled" class="bk-icon icon-down-shape" />
+            <i v-if="!disabled" class="devops-icon icon-down-shape" />
         </div>
         <div
             v-if="show && !disabled"
@@ -140,7 +140,7 @@
             align-items: center;
         }
 
-        .bk-icon.icon-down-shape {
+        .devops-icon.icon-down-shape {
             vertical-align: -2px;
         }
 
