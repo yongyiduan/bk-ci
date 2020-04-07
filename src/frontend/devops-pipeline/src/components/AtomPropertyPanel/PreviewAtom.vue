@@ -39,7 +39,7 @@
                     <p v-for="(output, key) in outputProps" :key="key">
                         {{ namespace ? `${namespace}_` : '' }}{{ key }}
                         <bk-popover placement="right">
-                            <i class="devops-icon icon-info-circle" />
+                            <i class="icon-info-circle" />
                             <div slot="content">
                                 {{ output.description }}
                             </div>
@@ -61,6 +61,7 @@
     import AppId from '@/components/AtomFormComponent/AppId'
     import Accordion from '@/components/atomFormField/Accordion'
     import SelectInput from '@/components/AtomFormComponent/SelectInput'
+    import DevopsSelect from '@/components/AtomFormComponent/DevopsSelect'
     import TimePicker from '@/components/AtomFormComponent/TimePicker'
     import Parameter from '@/components/AtomFormComponent/Parameter'
     import Tips from '@/components/AtomFormComponent/Tips'
@@ -74,6 +75,7 @@
             CcAppId,
             AppId,
             SelectInput,
+            DevopsSelect,
             TimePicker,
             Parameter,
             Tips,

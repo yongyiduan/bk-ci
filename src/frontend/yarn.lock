@@ -262,10 +262,15 @@
     unique-filename "^1.1.1"
     which "^1.3.1"
 
-"@icon-cool/bk-icon-devops@0.0.6", "@icon-cool/bk-icon-devops@^0.0.6":
+"@icon-cool/bk-icon-devops@0.0.6":
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@icon-cool/bk-icon-devops/-/bk-icon-devops-0.0.6.tgz#8d94c2dacef4ec7a3b38dcf8bf4de735f008c98a"
   integrity sha512-oyi8vR0WE0CFr1guDHIoke2odEgAhz+WQHVp4sfn3cfXazQgiU6Tc0SM+PkXo3TPgO3usfEiXHc0ZHpOEl+s7w==
+
+"@icon-cool/bk-icon-devops@^0.0.8":
+  version "0.0.8"
+  resolved "http://r.tnpm.oa.com/@icon-cool/bk-icon-devops/download/@icon-cool/bk-icon-devops-0.0.8.tgz#cd7fc1ae2f5e36f18c352de94ac5680e5d4bd376"
+  integrity sha1-zX/Bri9eNvGMNS3pSsVoDl1L03Y=
 
 "@lerna/add@3.17.0":
   version "3.17.0"
@@ -2787,10 +2792,12 @@ binary-extensions@^1.0.0:
   resolved "http://r.tnpm.oa.com/binary-extensions/download/binary-extensions-1.13.1.tgz#598afe54755b2868a5330d2aff9d4ebb53209b65"
   integrity sha1-WYr+VHVbKGilMw0q/51Ou1Mgm2U=
 
-bk-magic-vue@2.1.8:
-  version "2.1.8"
-  resolved "http://r.tnpm.oa.com/@tencent/bk-magic-vue/download/@tencent/bk-magic-vue-2.1.8.tgz#e02264de4a9caf3dcb5f6d2748e61d3f24a08e44"
-  integrity sha1-4CJk3kqcrz3LX20nSOYdPySgjkQ=
+bk-magic-vue@2.1.12:
+  version "2.1.12"
+  resolved "http://r.tnpm.oa.com/@tencent/bk-magic-vue/download/@tencent/bk-magic-vue-2.1.12.tgz#2391fb86affb7595c8cddccf49fdaf604fd374a6"
+  integrity sha1-I5H7hq/7dZXIzdzPSf2vYE/TdKY=
+  dependencies:
+    tinycolor2 "^1.4.1"
 
 block-stream@*:
   version "0.0.9"
@@ -3997,7 +4004,7 @@ core-util-is@1.0.2, core-util-is@~1.0.0:
   resolved "http://r.tnpm.oa.com/core-util-is/download/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
 
-cosmiconfig@^5.0.0, cosmiconfig@^5.0.7, cosmiconfig@^5.1.0, cosmiconfig@^5.2.1:
+cosmiconfig@^5.0.0, cosmiconfig@^5.1.0, cosmiconfig@^5.2.1:
   version "5.2.1"
   resolved "http://r.tnpm.oa.com/cosmiconfig/download/cosmiconfig-5.2.1.tgz#040f726809c591e77a17c0a3626ca45b4f168b1a"
   integrity sha1-BA9yaAnFked6F8CjYmykW08Wixo=
@@ -6132,11 +6139,6 @@ get-stdin@^4.0.1:
   resolved "http://r.tnpm.oa.com/get-stdin/download/get-stdin-4.0.1.tgz#b968c6b0a04384324902e8bf1a5df32579a450fe"
   integrity sha1-uWjGsKBDhDJJAui/Gl3zJXmkUP4=
 
-get-stdin@^6.0.0:
-  version "6.0.0"
-  resolved "http://r.tnpm.oa.com/get-stdin/download/get-stdin-6.0.0.tgz#9e09bf712b360ab9225e812048f71fde9c89657b"
-  integrity sha1-ngm/cSs2CrkiXoEgSPcf3pyJZXs=
-
 get-stdin@^7.0.0:
   version "7.0.0"
   resolved "http://r.tnpm.oa.com/get-stdin/download/get-stdin-7.0.0.tgz#8d5de98f15171a125c5e516643c7a6d0ea8a96f6"
@@ -7064,26 +7066,10 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-husky@^1.2.0, husky@^1.2.1:
-  version "1.3.1"
-  resolved "http://r.tnpm.oa.com/husky/download/husky-1.3.1.tgz#26823e399300388ca2afff11cfa8a86b0033fae0"
-  integrity sha1-JoI+OZMAOIyir/8Rz6ioawAz+uA=
-  dependencies:
-    cosmiconfig "^5.0.7"
-    execa "^1.0.0"
-    find-up "^3.0.0"
-    get-stdin "^6.0.0"
-    is-ci "^2.0.0"
-    pkg-dir "^3.0.0"
-    please-upgrade-node "^3.1.1"
-    read-pkg "^4.0.1"
-    run-node "^1.0.0"
-    slash "^2.0.0"
-
-husky@^3.0.7:
-  version "3.0.9"
-  resolved "http://r.tnpm.oa.com/husky/download/husky-3.0.9.tgz#a2c3e9829bfd6b4957509a9500d2eef5dbfc8044"
-  integrity sha1-osPpgpv9a0lXUJqVANLu9dv8gEQ=
+husky@^3.1.0:
+  version "3.1.0"
+  resolved "http://r.tnpm.oa.com/husky/download/husky-3.1.0.tgz#5faad520ab860582ed94f0c1a77f0f04c90b57c0"
+  integrity sha1-X6rVIKuGBYLtlPDBp38PBMkLV8A=
   dependencies:
     chalk "^2.4.2"
     ci-info "^2.0.0"
@@ -10405,7 +10391,7 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-please-upgrade-node@^3.1.1, please-upgrade-node@^3.2.0:
+please-upgrade-node@^3.2.0:
   version "3.2.0"
   resolved "http://r.tnpm.oa.com/please-upgrade-node/download/please-upgrade-node-3.2.0.tgz#aeddd3f994c933e4ad98b99d9a556efa0e2fe942"
   integrity sha1-rt3T+ZTJM+StmLmdmlVu+g4v6UI=
@@ -11425,15 +11411,6 @@ read-pkg@^3.0.0:
     load-json-file "^4.0.0"
     normalize-package-data "^2.3.2"
     path-type "^3.0.0"
-
-read-pkg@^4.0.1:
-  version "4.0.1"
-  resolved "http://r.tnpm.oa.com/read-pkg/download/read-pkg-4.0.1.tgz#963625378f3e1c4d48c85872b5a6ec7d5d093237"
-  integrity sha1-ljYlN48+HE1IyFhytabsfV0JMjc=
-  dependencies:
-    normalize-package-data "^2.3.2"
-    parse-json "^4.0.0"
-    pify "^3.0.0"
 
 read-pkg@^5.2.0:
   version "5.2.0"
@@ -13361,6 +13338,11 @@ tiny-emitter@^2.0.0:
   version "2.1.0"
   resolved "http://r.tnpm.oa.com/tiny-emitter/download/tiny-emitter-2.1.0.tgz#1d1a56edfc51c43e863cbb5382a72330e3555423"
   integrity sha1-HRpW7fxRxD6GPLtTgqcjMONVVCM=
+
+tinycolor2@^1.4.1:
+  version "1.4.1"
+  resolved "http://r.tnpm.oa.com/tinycolor2/download/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
+  integrity sha1-9PrTM0R7wLB9TcjpIJ2POaisd+g=
 
 tmp@^0.0.33:
   version "0.0.33"

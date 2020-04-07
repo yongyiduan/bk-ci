@@ -42,6 +42,7 @@ export default new Vuex.Store<RootState>({
         headerConfig: {
             showProjectList: false,
             showNav: true
-        }
+        },
+        currentNotice: {}
     }
 })
