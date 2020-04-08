@@ -131,7 +131,7 @@
                                     class="bk-text-button is-disabled"
                                     :title="$t('accessDeny.noOperateAccess')"
                                 >{{ $t('userManage') }}</a>
-                                <a  href="javascript:void(0)"
+                                <a href="javascript:void(0)"
                                     v-bk-tooltips="{ content: $t('waitforReview') }"
                                     class="bk-text-button is-disabled"
                                     :title="$t('accessDeny.noOperateAccess')"
@@ -182,7 +182,7 @@
                                     :class="['bk-text-button', { 'is-disabled': !props.row.enabled }]"
                                     @click="goProject(props.row)"
                                 >{{ $t('userManage') }}</a>
-                                <a  href="javascript:void(0)"
+                                <a href="javascript:void(0)"
                                     @click="goServiceManage(props.row)"
                                     class="bk-text-button"
                                 >{{ $t('serviceManage') }}</a>

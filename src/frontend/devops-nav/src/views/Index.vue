@@ -59,6 +59,8 @@
 
         <login-dialog v-if="showLoginDialog" />
         <ask-permission-dialog />
+        <extension-aside-panel />
+        <extension-dialog />
     </div>
 </template>
 
@@ -66,20 +68,31 @@
     import Vue from 'vue'
     import Header from '../components/Header/index.vue'
     import AskPermissionDialog from '../components/AskPermissionDialog/AskPermissionDialog.vue'
+    import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
+    import ExtensionDialog from '../components/ExtensionDialog/index.vue'
     import LoginDialog from '../components/LoginDialog/index.vue'
     import { Component } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
     import eventBus from '../utils/eventBus'
 
+    Component.registerHooks([
+        'beforeRouteEnter',
+        'beforeRouteLeave',
+        'beforeRouteUpdate'
+    ])
+
     @Component({
         components: {
             Header,
             LoginDialog,
-            AskPermissionDialog
+            AskPermissionDialog,
+            ExtensionAsidePanel,
+            ExtensionDialog
         }
     })
     export default class Index extends Vue {
         @State currentNotice
+        @State currentPage
         @State projectList
         @State headerConfig
         @State isShowPreviewTips
@@ -89,6 +102,7 @@
         @Action closePreviewTips
         @Action getAnnouncement
         @Action setAnnouncement
+        @Action fetchServiceHooks
 
         showLoginDialog: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
@@ -158,6 +172,12 @@
                     }
                 })
             })
+
+            if (this.currentPage) {
+                this.fetchServiceHooks({
+                    serviceId: this.currentPage.id
+                })
+            }
         }
     }
 </script>

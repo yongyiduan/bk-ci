@@ -57,6 +57,8 @@
     "detail": "详情",
     "status": "状态",
     "var": "变量",
+    "saveAs": "另存为",
+    "locate": "定位",
     "lastExecUser": "最近执行人",
     "lastExecTime": "最新执行时间",
     "lastUpdateTime": "最近更新时间",
@@ -468,7 +470,7 @@
             "STAGE_SUCCESS": "Stage成功"
         },
         "toArtifactory": "到版本仓库查看",
-        "saveToCustom": "保存到自定义仓库",
+        "saveToCustom": "另存到自定义仓库",
         "mofDownload": "魔方有线安装",
         "codeCheck": "代码检查",
         "wetestReportName": "Wetest测试报告",
