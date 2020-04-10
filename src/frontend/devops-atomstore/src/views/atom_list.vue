@@ -33,15 +33,16 @@
     import atomList from '@/components/common/workList/atom'
     import templateList from '@/components/common/workList/template'
     import imageList from '@/components/common/workList/image'
-    import * as cookie from 'js-cookie'
-    let currentProjectCode = cookie.get(X_DEVOPS_PROJECT_ID)
+    import serviceList from '@/components/common/workList/service'
+    let currentProjectCode = localStorage.getItem('projectId')
     if (!currentProjectCode) currentProjectCode = (window.projectList[0] || {}).projectCode
 
     export default {
         components: {
             atomList,
             templateList,
-            imageList
+            imageList,
+            serviceList
         },
 
         data () {
@@ -57,7 +58,8 @@
                         ]
                     },
                     template: { name: this.$t('store.模版指引'), tabName: this.$t('store.流水线模板'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=15008944' },
-                    image: { name: this.$t('store.镜像指引'), tabName: this.$t('store.容器镜像'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=22118721' }
+                    image: { name: this.$t('store.镜像指引'), tabName: this.$t('store.容器镜像'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=22118721' },
+                    service: { name: this.$t('store.扩展指引'), tabName: this.$t('store.服务扩展'), link: 'https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086' }
                 }
             }
         },
@@ -65,7 +67,7 @@
         watch: {
             currentTab (val) {
                 this.$router.replace({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: val
                     }
@@ -168,7 +170,7 @@
                 display: flex;
                 align-items: center;
                 svg {
-                    margin-right: 3px;
+                    margin-right: 7px;
                 }
             }
         }

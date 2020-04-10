@@ -39,7 +39,7 @@
                                 <div class="dropdown-menu" v-clickoutside="close">
                                     <div class="dropdown-trigger" @click="importMember">
                                         <span>从用户组导入</span>
-                                        <i :class="['bk-icon icon-angle-down', { 'icon-flip': isDropdownShow }]"></i>
+                                        <i :class="['devops-icon icon-angle-down', { 'icon-flip': isDropdownShow }]"></i>
                                     </div>
                                     <div class="dropdown-list" v-if="isDropdownShow">
                                         <ul class="list-wrapper">

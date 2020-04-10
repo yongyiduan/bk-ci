@@ -43,7 +43,6 @@ declare module 'vue/types/vue' {
     }
 }
 
-
 Vue.use(bkMagic)
 Vue.component('AsideNav', AsideNav)
 Vue.component('ContentHeader', ContentHeader)

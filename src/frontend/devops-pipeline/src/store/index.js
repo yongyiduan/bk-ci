@@ -24,14 +24,25 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ajax from '../utils/ajax'
+import request from '@/utils/request'
 import pipelines from './modules/pipelines/'
 import soda from './modules/soda/'
 import atom from './modules/atom'
 
 import {
-    FETCH_ERROR
+    FETCH_ERROR,
+    SET_SERVICE_HOOKS
 } from './constants'
+import { ARTIFACT_HOOK_CONST } from '../utils/extensionHooks'
 Vue.use(Vuex)
+
+function getHookByHTMLPath (htmlPath) {
+    return state => {
+        const { hooks } = state
+        console.log(state)
+        return Array.isArray(hooks) ? hooks.filter(hook => hook.htmlPath === htmlPath) : []
+    }
+}
 
 export default new Vuex.Store({
     // 模块
@@ -49,10 +60,17 @@ export default new Vuex.Store({
         // fetch error
         fetchError: null,
 
-        cancelTokenMap: {}
+        cancelTokenMap: {},
+
+        hooks: []
     },
     // 公共 mutations
     mutations: {
+        [SET_SERVICE_HOOKS]: (state, hooks) => {
+            Object.assign(state, {
+                hooks
+            })
+        },
         /**
          * 更新当前project
          *
@@ -77,6 +95,13 @@ export default new Vuex.Store({
     },
     // 公共 actions
     actions: {
+        setServiceHooks: ({ commit }, hooks) => {
+            console.log(hooks)
+            commit(SET_SERVICE_HOOKS, hooks)
+        },
+        fetchExtensionByHookId: ({ commit }, { projectCode, itemIds }) => {
+            return request.get(`${AJAX_URL_PIRFIX}/store/api/user/ext/services/items/projects/${projectCode}/list?itemIds=${itemIds}`)
+        },
         requestProjectDetail: async ({ commit }, { projectId }) => {
             return ajax.get(AJAX_URL_PIRFIX + `/project/api/user/projects/${projectId}/`).then(response => {
                 let data = {}
@@ -92,5 +117,15 @@ export default new Vuex.Store({
     },
     // 公共 getters
     getters: {
+        hookKeyMap (state) {
+            if (Array.isArray(state.hooks)) {
+                return state.hooks.reduce((acc, hook) => {
+                    acc[hook.itemId] = hook
+                    return acc
+                }, {})
+            }
+            return null
+        },
+        artifactHooks: getHookByHTMLPath(ARTIFACT_HOOK_CONST)
     }
 })

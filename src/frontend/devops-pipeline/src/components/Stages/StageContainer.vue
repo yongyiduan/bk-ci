@@ -109,8 +109,15 @@
             isDocker () {
                 return this.isDockerBuildResource(this.container)
             },
+            buildResourceType () {
+                try {
+                    return this.container.dispatchType.buildType
+                } catch (e) {
+                    return 'DOCKER'
+                }
+            },
             showDebugBtn () {
-                return this.container.baseOS === 'LINUX' && this.isDocker && (this.container.status === 'FAILED' && this.$route.name === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion)
+                return this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && (this.container.status === 'FAILED' && this.$route.name === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion)
             },
             containerDisabled () {
                 return !!(this.container.jobControlOption && this.container.jobControlOption.enable === false) || this.stageDisabled
@@ -198,22 +205,28 @@
                 const vmSeqId = this.getRealSeqId()
                 const projectId = this.$route.params.projectId
                 const pipelineId = this.$route.params.pipelineId
+                const buildId = this.$route.params.buildNo
                 let url = ''
                 const tab = window.open('about:blank')
                 try {
-                    const res = await this.startDebugDocker({
-                        projectId: projectId,
-                        pipelineId: pipelineId,
-                        vmSeqId,
-                        imageCode: this.container.dispatchType && this.container.dispatchType.imageCode,
-                        imageVersion: this.container.dispatchType && this.container.dispatchType.imageVersion,
-                        imageName: this.container.dispatchType && this.container.dispatchType.value ? this.container.dispatchType.value : this.container.dockerBuildVersion,
-                        buildEnv: this.container.buildEnv,
-                        imageType: this.container.dispatchType && this.container.dispatchType.imageType ? this.container.dispatchType.imageType : 'BKDEVOPS',
-                        credentialId: this.container.dispatchType && this.container.dispatchType.credentialId ? this.container.dispatchType.credentialId : ''
-                    })
-                    if (res === true) {
-                        url = `${WEB_URL_PIRFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                    if (this.buildResourceType === 'DOCKER') {
+                        const res = await this.startDebugDocker({
+                            projectId: projectId,
+                            pipelineId: pipelineId,
+                            vmSeqId,
+                            imageCode: this.container.dispatchType && this.container.dispatchType.imageCode,
+                            imageVersion: this.container.dispatchType && this.container.dispatchType.imageVersion,
+                            imageName: this.container.dispatchType && this.container.dispatchType.value ? this.container.dispatchType.value : this.container.dockerBuildVersion,
+                            buildEnv: this.container.buildEnv,
+                            imageType: this.container.dispatchType && this.container.dispatchType.imageType ? this.container.dispatchType.imageType : 'BKDEVOPS',
+                            credentialId: this.container.dispatchType && this.container.dispatchType.credentialId ? this.container.dispatchType.credentialId : ''
+                        })
+                        if (res === true) {
+                            url = `${WEB_URL_PIRFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                        }
+                    } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
+                        const buildIdStr = buildId ? `&buildId=${buildId}` : ''
+                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
                     tab.location = url
                 } catch (err) {

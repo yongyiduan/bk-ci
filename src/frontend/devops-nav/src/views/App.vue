@@ -12,7 +12,7 @@
             </div>
         </div>
         <router-view />
-        <Announcement-dialog v-if="hideAnnounce !== true" />
+        <Announcement-dialog v-if="false" />
     </div>
 </template>
 

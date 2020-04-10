@@ -9,7 +9,6 @@
 
 <script>
     import { mapState } from 'vuex'
-
     export default {
         name: 'app',
         data () {
@@ -59,6 +58,11 @@
 
             window.globalVue.$on('order::syncLocale', locale => {
                 this.$setLocale(locale)
+            })
+
+            window.globalVue.$on('order::syncServiceHooks', extensions => {
+                console.log('receive hooks', extensions)
+                this.$store.dispatch('setServiceHooks', extensions)
             })
         },
         methods: {

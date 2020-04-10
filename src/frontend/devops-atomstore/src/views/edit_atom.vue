@@ -84,7 +84,7 @@
                     <bk-checkbox-group v-model="atomForm.os" v-if="atomForm.jobType === 'AGENT'" class="bk-form-content atom-os" ref="envError">
                         <bk-checkbox :value="entry.value" v-for="(entry, key) in envList" :key="key" @click.native="changeOs(entry.value)">
                             <p class="os-checkbox-label">
-                                <i :class="{ 'bk-icon': true, [`icon-${entry.icon}`]: true }"></i>
+                                <i :class="{ 'devops-icon': true, [`icon-${entry.icon}`]: true }"></i>
                                 <span class="bk-checkbox-text">{{ entry.label }}</span>
                             </p>
                         </bk-checkbox>
@@ -404,7 +404,7 @@
         methods: {
             toAtomList () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: 'atom'
                     }

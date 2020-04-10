@@ -9,7 +9,7 @@
             :target="entry.target"
         >
             <icon
-                class="bk-icon"
+                class="devops-icon"
                 :name="entry.icon"
                 size="13"
             />
@@ -139,7 +139,7 @@
                 opacity: 1;
             }
         }
-        .bk-icon {
+        .devops-icon {
             display: inline-block;
             margin-top: 6px;
             color: #fff;

@@ -65,7 +65,7 @@
                             <i class="devops-icon icon-download"></i>下载
                         </li>
                         <li @click.stop="handlerDownload($event, 'MoF')" v-if="isExtendTx && isWindows && isApkOrIpa() && isMof">
-                            <i class="bk-icon icon-download"></i>魔方有线安装
+                            <i class="devops-icon icon-download"></i>魔方有线安装
                         </li>
                         <li @click.stop="refresh()">
                             <i class="devops-icon icon-refresh"></i>刷新

@@ -24,7 +24,7 @@ const marketHome = () => import(/* webpackChunkName: 'atomHome' */ '@/views/mark
 const marketList = () => import(/* webpackChunkName: 'atomStore' */ '@/views/market/list.vue') // 流水线插件市场列表
 const marketDetail = () => import(/* webpackChunkName: 'atomDetails' */ '@/views/market/detail.vue') // 流水线插件信息
 
-const atomList = () => import(/* webpackChunkName: 'atomList' */ '@/views/atom_list.vue') // 工作台
+const workList = () => import(/* webpackChunkName: 'workList' */ '@/views/atom_list.vue') // 工作台
 
 const install = () => import(/* webpackChunkName: 'install' */ '@/views/install.vue') // 研发商店安装页面
 
@@ -56,6 +56,19 @@ const imageSettings = () => import(/* webpackChunkName: 'imageSettings' */ '@/vi
 const imageVisibleRange = () => import(/* webpackChunkName: 'tplVisibleRange' */ '@/views/imageDetail/visibleRange.vue') // 镜像可见范围
 const imageMemberManage = () => import(/* webpackChunkName: 'imageMemberManage' */ '@/views/imageDetail/memberManage.vue') // 镜像成员管理
 const imageEdit = () => import(/* webpackChunkName: 'imageEdit' */ '@/views/imageDetail/edit.vue') // 编辑镜像详情
+
+const serviceProgress = () => import(/* webpackChunkName: 'serviceProgress' */ '@/views/serviceProgress.vue') // 服务扩展进度
+const editService = () => import(/* webpackChunkName: 'editService' */ '@/views/edit_service.vue') // 服务扩展上架页面
+const serviceDatailIndex = () => import(/* webpackChunkName: 'serviceDatailIndex' */ '@/views/serviceDetail/index.vue') // 服务扩展详情总览
+const serviceDetail = () => import(/* webpackChunkName: 'serviceDetail' */ '@/views/serviceDetail/detail.vue') // 服务扩展详情页面
+const serviceOverview = () => import(/* webpackChunkName: 'serviceOverview' */ '@/views/serviceDetail/overView.vue') // 服务扩展概览
+const serviceSettings = () => import(/* webpackChunkName: 'serviceSettings' */ '@/views/serviceDetail/settings.vue') // 服务扩展设置
+const serviceMemberManage = () => import(/* webpackChunkName: 'serviceMemberManage' */ '@/views/serviceDetail/memberManage.vue') // 服务扩展成员管理
+const serviceEdit = () => import(/* webpackChunkName: 'serviceEdit' */ '@/views/serviceDetail/edit.vue') // 服务扩展详情
+const serviceApproval = () => import(/* webpackChunkName: 'approval' */ '@/views/serviceDetail/approval.vue') // 服务扩展审批
+const serviceVisibleRange = () => import(/* webpackChunkName: 'serviceVisibleRange' */ '@/views/serviceDetail/visible_range.vue') // 镜像可见范围
+
+const serviceManage = () => import(/* webpackChunkName: 'serviceManage' */ '@/views/serviceManage.vue') // 扩展管理
 
 const routes = [
     {
@@ -107,6 +120,17 @@ const routes = [
                 ]
             },
             {
+                path: 'serviceManage/:projectCode',
+                name: 'serviceManage',
+                component: serviceManage,
+                meta: {
+                    title: 'serviceManage',
+                    logo: 'store',
+                    header: 'store',
+                    to: 'atomHome'
+                }
+            },
+            {
                 path: 'atomStore/detail/:type/:code',
                 name: 'details',
                 component: marketDetail,
@@ -118,11 +142,11 @@ const routes = [
                 }
             },
             {
-                path: 'atomList/:type',
-                name: 'atomList',
-                component: atomList,
+                path: 'workList/:type',
+                name: 'workList',
+                component: workList,
                 meta: {
-                    title: 'atomList',
+                    title: 'workList',
                     logo: 'store',
                     header: 'store',
                     to: 'atomHome'
@@ -201,6 +225,28 @@ const routes = [
                 component: imageProgress,
                 meta: {
                     title: 'imageProgress',
+                    logo: 'store',
+                    header: 'store',
+                    to: 'atomHome'
+                }
+            },
+            {
+                path: 'editService/:serviceId',
+                name: 'editService',
+                component: editService,
+                meta: {
+                    title: 'editService',
+                    logo: 'store',
+                    header: 'store',
+                    to: 'atomHome'
+                }
+            },
+            {
+                path: 'serviceProgress/:serviceId',
+                name: 'serviceProgress',
+                component: serviceProgress,
+                meta: {
+                    title: 'serviceProgress',
                     logo: 'store',
                     header: 'store',
                     to: 'atomHome'
@@ -430,9 +476,9 @@ const routes = [
                         name: 'imageOverview',
                         component: imageOverview,
                         meta: {
-                            title: '概览',
+                            title: 'overview',
                             logo: 'store',
-                            header: '研发商店',
+                            header: 'store',
                             to: 'atomHome'
                         }
                     },
@@ -441,9 +487,9 @@ const routes = [
                         name: 'imageDetail',
                         component: imageDetail,
                         meta: {
-                            title: '详情',
+                            title: 'detail',
                             logo: 'store',
-                            header: '研发商店',
+                            header: 'store',
                             to: 'atomHome'
                         }
                     },
@@ -452,9 +498,9 @@ const routes = [
                         name: 'imageEdit',
                         component: imageEdit,
                         meta: {
-                            title: '编辑',
+                            title: 'edit',
                             logo: 'store',
-                            header: '研发商店',
+                            header: 'store',
                             to: 'atomHome'
                         }
                     },
@@ -463,9 +509,9 @@ const routes = [
                         name: 'imageSettings',
                         component: imageSettings,
                         meta: {
-                            title: '设置',
+                            title: 'settings',
                             logo: 'store',
-                            header: '研发商店',
+                            header: 'store',
                             to: 'atomHome'
                         },
                         children: [
@@ -474,9 +520,95 @@ const routes = [
                                 name: 'imageMemberManage',
                                 component: imageMemberManage,
                                 meta: {
-                                    title: '成员管理',
+                                    title: 'member',
                                     logo: 'store',
-                                    header: '研发商店',
+                                    header: 'store',
+                                    to: 'atomHome'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                path: 'service/:serviceCode',
+                name: 'serviceDatailIndex',
+                component: serviceDatailIndex,
+                children: [
+                    {
+                        path: 'overview',
+                        name: 'serviceOverview',
+                        component: serviceOverview,
+                        meta: {
+                            title: 'overview',
+                            logo: 'store',
+                            header: 'store',
+                            to: 'atomHome'
+                        }
+                    },
+                    {
+                        path: 'detail',
+                        name: 'serviceDetail',
+                        component: serviceDetail,
+                        meta: {
+                            title: 'detail',
+                            logo: 'store',
+                            header: 'store',
+                            to: 'atomHome'
+                        }
+                    },
+                    {
+                        path: 'edit',
+                        name: 'serviceEdit',
+                        component: serviceEdit,
+                        meta: {
+                            title: 'edit',
+                            logo: 'store',
+                            header: 'store',
+                            to: 'atomHome'
+                        }
+                    },
+                    {
+                        path: 'approval',
+                        name: 'serviceApproval',
+                        component: serviceApproval,
+                        meta: {
+                            title: 'approval',
+                            logo: 'store',
+                            header: 'store',
+                            to: 'atomHome'
+                        }
+                    },
+                    {
+                        path: 'settings',
+                        name: 'serviceSettings',
+                        component: serviceSettings,
+                        meta: {
+                            title: 'settings',
+                            logo: 'store',
+                            header: 'store',
+                            to: 'atomHome'
+                        },
+                        children: [
+                            {
+                                path: 'member',
+                                name: 'serviceMemberManage',
+                                component: serviceMemberManage,
+                                meta: {
+                                    title: 'member',
+                                    logo: 'store',
+                                    header: 'store',
+                                    to: 'atomHome'
+                                }
+                            },
+                            {
+                                path: 'visible',
+                                name: 'serviceVisibleRange',
+                                component: serviceVisibleRange,
+                                meta: {
+                                    title: 'visible',
+                                    logo: 'store',
+                                    header: 'store',
                                     to: 'atomHome'
                                 }
                             }

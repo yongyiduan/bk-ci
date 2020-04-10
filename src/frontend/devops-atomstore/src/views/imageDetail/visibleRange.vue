@@ -21,7 +21,7 @@
                     <bk-table-column :label="$t('store.状态')">
                         <template slot-scope="props">
                             <span>{{ statusMap[props.row.status] }}</span>
-                            <span class="audit-tips" v-if="props.row.status === 'APPROVING'"><i class="bk-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }} </span>
+                            <span class="audit-tips" v-if="props.row.status === 'APPROVING'"><i class="devops-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }} </span>
                             <span class="audit-tips" v-else>{{ props.row.comment }}</span>
                         </template>
                     </bk-table-column>
@@ -46,6 +46,7 @@
             </bk-tree>
         </section>
         <organization-dialog :show-dialog="showDialog"
+            :is-loading="isSaveOrg"
             @saveHandle="saveHandle"
             @cancelHandle="cancelHandle">
         </organization-dialog>
@@ -65,6 +66,7 @@
         data () {
             return {
                 showDialog: false,
+                isSaveOrg: false,
                 visibleList: [],
                 statusMap: {
                     'APPROVED': this.$t('store.审核通过'),
@@ -135,9 +137,18 @@
                 this.showDialog = true
             },
 
-            saveHandle () {
-                this.showDialog = false
-                this.requestList()
+            saveHandle (params) {
+                params.imageCode = this.imageCode
+                this.isSaveOrg = true
+
+                this.$store.dispatch('store/setImageVisableDept', { params }).then(() => {
+                    this.requestList()
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => {
+                    this.isSaveOrg = false
+                    this.showDialog = false
+                })
             },
 
             cancelHandle () {

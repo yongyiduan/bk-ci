@@ -14,7 +14,7 @@
                 <accordion show-checkbox show-content :key="prop.id" v-if="!newModel[prop.id].hidden || (showScript && prop.id === 'script')">
                     <header class="var-header" slot="header">
                         <span>{{ getPropName(prop.name) }}</span>
-                        <i class="bk-icon icon-angle-down" style="display:block"></i>
+                        <i class="devops-icon icon-angle-down" style="display:block"></i>
                     </header>
                     <div slot="content" class="bk-form bk-form-vertical">
                         <form-field v-for="key of prop.item" v-if="!newModel[key].hidden" :key="key" :desc="newModel[key].desc" :required="newModel[key].required" :label="newModel[key].label" :is-error="errors.has(key)" :error-msg="errors.first(key)">
@@ -42,7 +42,7 @@
             <accordion show-checkbox show-content key="otherChoice">
                 <header class="var-header" slot="header">
                     <span>其它选项</span>
-                    <i class="bk-icon icon-angle-down" style="display:block"></i>
+                    <i class="devops-icon icon-angle-down" style="display:block"></i>
                 </header>
                 <div slot="content" class="bk-form bk-form-vertical">
                     <template v-for="key in otherChoice">
