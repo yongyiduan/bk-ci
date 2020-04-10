@@ -59,11 +59,9 @@
         },
         methods: {
             runTerminal (e) {
-                // this.heartCheck()
                 this.terminalSocket.send('source /etc/profile\n')
             },
             receiveFromTerminal (e) {
-                // this.heartCheck()
                 // console.log(e.data, 'receive msg')
             },
             errorTerminal (e) {
@@ -80,7 +78,7 @@
             },
             handleResize (size) {
                 this.$nextTick(() => {
-                    this.$store.dispatch('soda/resizeTerm', {
+                    this.resizeUrl && this.$store.dispatch('soda/resizeTerm', {
                         resizeUrl: this.resizeUrl,
                         params: {
                             exec_id: this.execId,
@@ -88,15 +86,9 @@
                             width: size.cols
                         }
                     })
+                    !this.resizeUrl && this.terminalSocket.send(`__resize__:${size.rows},${size.cols}\n`)
                 })
             }
-            // heartCheck () {
-            //     clearTimeout(this.heartTimer)
-            //     this.heartTimer = setTimeout(() => {
-            //         this.terminalSocket.send('\n')
-            //         console.log('sendping')
-            //     }, 10000)
-            // }
         }
     }
 </script>
