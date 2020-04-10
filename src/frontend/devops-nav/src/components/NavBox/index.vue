@@ -87,7 +87,7 @@
         @Prop({ default: true })
         withHover: boolean
 
-       gotoPage ({ link_new: linkNew }) {
+       gotoPage ({ link_new: linkNew, newWindow = false }) {
            const cAlias = this.currentPage && getServiceAliasByPath(this.currentPage['link_new'])
            const nAlias = getServiceAliasByPath(linkNew)
            const destUrl = this.addConsole(linkNew)
@@ -96,7 +96,7 @@
                eventBus.$emit('goHome')
                return
            }
-           this.$router.push(destUrl)
+           newWindow ? window.open(destUrl, '_blank') : this.$router.push(destUrl)
        }
 
        addConsole (link: string): string {
