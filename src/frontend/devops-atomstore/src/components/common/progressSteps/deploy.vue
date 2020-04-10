@@ -59,7 +59,7 @@
                         })
                         this.logs.push({ message })
                     })
-                    this.getLog.id = setTimeout(() => this.getLog(this.getLog.id), 300)
+                    this.getLog.id = setTimeout(() => this.getLog(this.getLog.id), 1000)
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
