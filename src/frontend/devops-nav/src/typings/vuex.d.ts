@@ -12,10 +12,12 @@ interface RootState {
     showProjectDialog: boolean
     isAnyPopupShow: boolean
     isShowPreviewTips: boolean
-    fetchError: object
-    headerConfig: object,
-    moduleLoading: boolean,
+    fetchError: object,
+    currentNotice: {},
+    headerConfig: object
+    moduleLoading: boolean
     isPermissionDialogShow: boolean
+    hookMap: any
 }
 
 interface Link {

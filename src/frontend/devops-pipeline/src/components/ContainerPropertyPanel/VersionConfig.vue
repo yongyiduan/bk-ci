@@ -13,7 +13,7 @@
                     <span>
                         {{ $t('preview.introVersion') }}
                         <bk-popover placement="right" :max-width="200">
-                            <i style="display:block;" class="bk-icon icon-info-circle"></i>
+                            <i style="display:block;" class="devops-icon icon-info-circle"></i>
                             <div slot="content" style="white-space: pre-wrap;">
                                 <div> {{ $t('editPage.introVersionTips') }} </div>
                             </div>
@@ -50,7 +50,7 @@
     import validMixins from '../validMixins'
     import { isMultipleParam, DEFAULT_PARAM, STRING } from '@/store/modules/atom/paramsConfig'
     import PipelineVersionsForm from '@/components/PipelineVersionsForm.vue'
-    import { allVersionKeyList, versionConfig } from '@/utils/pipelineConst'
+    import { allVersionKeyList, getVersionConfig } from '@/utils/pipelineConst'
 
     export default {
         name: 'version-config',
@@ -191,7 +191,6 @@
                         defaultValue: value
                     })
                 }
-                console.log(value, name, version)
                 this.handleChange([
                     ...this.versions,
                     ...this.globalParams
@@ -207,6 +206,7 @@
 
             toggleVersions (e) {
                 const isShow = e.target.checked
+                const versionConfig = getVersionConfig()
 
                 if (isShow) {
                     const newVersions = allVersionKeyList.map(v => ({
@@ -309,7 +309,7 @@
                 margin-right: 10px;
             }
         }
-        .bk-icon {
+        .devops-icon {
             font-size: 14px;
             padding: 10px  0 0 10px;
             cursor: pointer;
@@ -329,7 +329,7 @@
         > span {
             flex: 1;
         }
-        >.bk-icon {
+        >.devops-icon {
             width: 24px;
             text-align: center;
             &.icon-plus {

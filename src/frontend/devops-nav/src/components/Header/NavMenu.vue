@@ -19,7 +19,7 @@
             <div
                 v-show="show"
                 class="nav-menu-layout"
-                :class="{ 'showTopPrompt': showExplorerTips === 'true' && isShowPreviewTips && !chromeExplorer }"
+                :class="{ 'showTopPrompt': showAnnounce }"
             >
                 <div
                     class="nav-menu-layout-content"
@@ -98,10 +98,15 @@
         @State services
         @State currentPage
         @State isShowPreviewTips
+        @State currentNotice
         @Action toggleServiceCollect
         show: boolean = false
         showNewServiveTips: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
+
+        get showAnnounce (): boolean {
+            return this.currentNotice && this.currentNotice.id
+        }
 
         get chromeExplorer (): boolean {
             const explorer = window.navigator.userAgent
@@ -226,8 +231,7 @@
             transition: 0.2s all linear;
         }
         > i {
-            font-size: 12px;
-            margin-left: 5px;
+            font-size: 22px;
             vertical-align: -2px;
             display: inline-block;
         }

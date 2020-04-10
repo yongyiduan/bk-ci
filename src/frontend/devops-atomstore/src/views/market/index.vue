@@ -7,7 +7,7 @@
                 <i class="right-arrow banner-arrow"></i>
                 <span class="banner-des">{{filterData.pipeType|pipeTypeFilter}}</span>
             </p>
-            <router-link v-if="filterData.pipeType !== 'ide'" :to="{ name: 'atomList', params: { type: filterData.pipeType || 'atom' } }" class="title-work"> {{ $t('store.工作台') }} </router-link>
+            <router-link v-if="filterData.pipeType !== 'ide'" :to="{ name: 'workList', params: { type: filterData.pipeType || 'atom' } }" class="title-work"> {{ $t('store.工作台') }} </router-link>
         </h3>
 
         <main class="store-main" @scroll.passive="mainScroll">
@@ -15,8 +15,8 @@
                 <nav class="home-nav">
                     <section :class="[{ 'control-active': isInputFocus }, 'g-input-search']">
                         <input class="g-input-border" type="text" :placeholder="$t('store.请输入名称')" v-model="inputValue" @focus="isInputFocus = true" @blur="isInputFocus = false" @keyup.enter="filterData.searchStr = inputValue" />
-                        <i class="bk-icon icon-search" v-if="!inputValue"></i>
-                        <i class="bk-icon icon-close-circle-shape clear-icon" v-else @click="(inputValue = '', filterData.searchStr = '')"></i>
+                        <i class="devops-icon icon-search" v-if="!inputValue"></i>
+                        <i class="devops-icon icon-close-circle-shape clear-icon" v-else @click="(inputValue = '', filterData.searchStr = '')"></i>
                     </section>
 
                     <section class="nav-pipetype">
@@ -105,6 +105,9 @@
                     case 'image':
                         res = bkLocale.$t('store.容器镜像')
                         break
+                    case 'service':
+                        res = bkLocale.$t('store.服务扩展')
+                        break
                     default:
                         res = bkLocale.$t('store.流水线插件')
                         break
@@ -142,7 +145,8 @@
                     { type: 'atom', des: this.$t('store.流水线插件') },
                     { type: 'template', des: this.$t('store.流水线模板') },
                     { type: 'ide', des: this.$t('store.IDE插件') },
-                    { type: 'image', des: this.$t('store.容器镜像') }
+                    { type: 'image', des: this.$t('store.容器镜像') },
+                    { type: 'service', des: this.$t('store.服务扩展') }
                 ]
             }
         },
@@ -203,6 +207,10 @@
                 'requestImageClassifys',
                 'requestImageCategorys',
                 'requestImageLabel',
+                'requestServiceClassifys',
+                'requestServiceCategorys',
+                'requestServiceLabel',
+                'requestServiceItemList',
                 'setMarketQuery'
             ]),
 
@@ -274,11 +282,17 @@
             },
 
             setClassifyValue (key) {
-                let categories = this.categories[2] || {}
-                if (this.filterData.pipeType === 'atom') categories = this.categories[1] || {}
-                const selected = (categories.children || []).find((category) => category.classifyCode === key) || {}
-                this.filterData.classifyValue = selected.classifyValue
-                this.filterData.classifyKey = 'classifyCode'
+                let classifyKey = ''
+                switch (this.filterData.pipeType) {
+                    case 'service':
+                        classifyKey = 'bkServiceId'
+                        break
+                    default:
+                        classifyKey = 'classifyCode'
+                        break
+                }
+                this.filterData.classifyValue = key
+                this.filterData.classifyKey = classifyKey
             },
 
             changeRoute () {
@@ -300,7 +314,8 @@
                     atom: () => this.getAtomClassifys(),
                     template: () => this.getTemplateClassifys(),
                     ide: () => this.getIDEClassifys(),
-                    image: () => this.getImageClassifys()
+                    image: () => this.getImageClassifys(),
+                    service: () => this.getServiceClassifys()
                 }
                 const type = val || 'atom'
                 const method = fun[type]
@@ -315,10 +330,10 @@
                         const name = item.name
                         const children = item.data
                         children.forEach((x) => {
-                            x.name = x[name]
-                            x.id = x[key] + key
                             x.classifyValue = x[key]
                             x.classifyKey = key
+                            x.name = x[name]
+                            x.id = x[key] + key
                         })
                         this.categories.push({ name: item.groupName, children })
                     })
@@ -366,6 +381,32 @@
                 })
             },
 
+            getServiceClassifys () {
+                return Promise.all([
+                    this.requestServiceCategorys(),
+                    this.requestServiceLabel(),
+                    this.requestServiceClassifys(),
+                    this.requestServiceItemList()
+                ]).then(([categorys = [], lables = [], classify = [], services = []]) => {
+                    const res = []
+                    if (services.length > 0) {
+                        res.push({
+                            name: 'name',
+                            key: 'bkServiceId',
+                            groupName: this.$t('store.按服务'),
+                            data: services.map((x) => {
+                                x.extServiceItem.bkServiceId = x.extServiceItem.id
+                                return x.extServiceItem
+                            })
+                        })
+                    }
+                    if (categorys.length > 0) res.push({ name: 'categoryName', key: 'categoryCode', groupName: this.$t('store.按应用范畴'), data: categorys })
+                    if (classify.length > 0) res.push({ name: 'classifyName', key: 'classifyCode', groupName: this.$t('store.按分类'), data: classify })
+                    if (lables.length > 0) res.push({ name: 'labelName', key: 'labelCode', groupName: this.$t('store.按功能'), data: lables })
+                    return res
+                })
+            },
+
             mainScroll (event) {
                 const target = event.target
                 this.showToTop = target.scrollTop > 0
@@ -400,6 +441,7 @@
 
     .store-main {
         overflow-y: scroll;
+        background: #f1f2f3;
     }
 
     .home-main {
@@ -429,7 +471,7 @@
                 .active-tab {
                     background: $lightBlue;
                     color: $primaryColor;
-                    i {
+                    .title-icon {
                         color: $primaryColor;
                     }
                     span {

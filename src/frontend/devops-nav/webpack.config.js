@@ -107,7 +107,7 @@ module.exports = (env = {}, argv) => {
     }),
     new CopyWebpackPlugin([{ from: path.join(__dirname, './src/assets/static'), to: `${dist}/static` }]),
     ...(isDev ? [new ReplacePlugin({
-      '__HTTP_SCHEMA__://__BKCI_STATIC_FQDN__': 'http://v2.dev.static.devops.oa.com',
+      '__HTTP_SCHEMA__://__BKCI_STATIC_FQDN__': 'http://dev.static.devops.oa.com',
       '__HTTP_SCHEMA__://__BKCI_FQDN__': urlPrefix,
       '__HTTP_SCHEMA__://__CODECC_FQDN__': 'http://v2.codecc.oa.com'
     })] : [])

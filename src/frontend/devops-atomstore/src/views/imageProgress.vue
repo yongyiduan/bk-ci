@@ -22,7 +22,7 @@
                         <div class="step-card" v-for="(entry, index) in progressStatus" :key="index"
                             :class="{ 'processing-status': entry.status === 'doing', 'fail-status': entry.status === 'fail', 'success-status': entry.code === 'end' && entry.status === 'success' }">
                             <div class="card-item">
-                                <i class="bk-icon icon-check-1" v-if="entry.status === 'success'"></i>
+                                <i class="devops-icon icon-check-1" v-if="entry.status === 'success'"></i>
                                 <p class="step-label">{{ entry.name }}</p>
                             </div>
                             <div class="retry-bth">
@@ -47,7 +47,7 @@
                                 :title="permissionMsg"
                             > {{ $t('store.继续') }} </bk-button>
                             <div class="audit-tips" v-if="entry.code === 'approve' && entry.status === 'doing'">
-                                <i class="bk-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }} </div>
+                                <i class="devops-icon icon-info-circle"></i> {{ $t('store.由蓝盾管理员审核') }} </div>
                         </div>
                     </div>
                 </div>
@@ -78,10 +78,8 @@
                         title: sideSliderConfig.loading.title
                     }">
                     <build-log v-if="currentBuildNo"
-                        :project-id="currentProjectId"
-                        :pipeline-id="currentPipelineId"
                         :build-no="currentBuildNo"
-                        :log-url="`log/api/user/logs/${currentProjectId}/${currentPipelineId}`"
+                        :log-url="`store/api/user/store/logs/types/IMAGE/projects/${currentProjectCode}/pipelines/${currentPipelineId}/builds`"
                     />
                 </div>
             </template>
@@ -108,7 +106,7 @@
                 imageDetail: {},
                 storeBuildInfo: {},
                 permission: true,
-                currentProjectId: '',
+                currentProjectCode: '',
                 currentBuildNo: '',
                 currentPipelineId: '',
                 sideSliderConfig: {
@@ -145,7 +143,7 @@
         watch: {
             'sideSliderConfig.show' (val) {
                 if (!val) {
-                    this.currentProjectId = ''
+                    this.currentProjectCode = ''
                     this.currentBuildNo = ''
                     this.currentPipelineId = ''
                 }
@@ -172,7 +170,7 @@
 
             readLog () {
                 this.sideSliderConfig.show = true
-                this.currentProjectId = this.storeBuildInfo.projectCode
+                this.currentProjectCode = this.storeBuildInfo.projectCode
                 this.currentBuildNo = this.storeBuildInfo.buildId
                 this.currentPipelineId = this.storeBuildInfo.pipelineId
             },
@@ -257,7 +255,7 @@
 
             toImageList () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: 'image'
                     }

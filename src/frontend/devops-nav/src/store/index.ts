@@ -24,6 +24,7 @@ export default new Vuex.Store<RootState>({
     getters,
     state: {
         isPermissionDialogShow: false,
+        hookMap: {},
         projectList,
         fetchError: null,
         moduleLoading: false,
@@ -42,6 +43,7 @@ export default new Vuex.Store<RootState>({
         headerConfig: {
             showProjectList: false,
             showNav: true
-        }
+        },
+        currentNotice: {}
     }
 })

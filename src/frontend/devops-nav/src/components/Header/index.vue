@@ -11,7 +11,7 @@
                     height="28"
                 />
             </router-link>
-            <template v-if="showProjectList">
+            <template v-if="showProjectList && !isMooc">
                 <devops-select
                     ref="projectDropdown"
                     class="bkdevops-project-selector"
@@ -28,22 +28,22 @@
                             class="bk-selector-create-item"
                             @click.stop.prevent="popProjectDialog()"
                         >
-                            <i class="bk-icon icon-plus-circle" />
+                            <i class="devops-icon icon-plus-circle" />
                             <span class="text">{{ $t('newProject') }}</span>
                         </div>
                         <div
                             class="bk-selector-create-item"
                             @click.stop.prevent="goToPm"
                         >
-                            <i class="bk-icon icon-apps" />
+                            <i class="devops-icon icon-apps" />
                             <span class="text">{{ $t('projectManage') }}</span>
                         </div>
                     </template>
                 </devops-select>
             </template>
-            <nav-menu v-if="showNav" />
+            <nav-menu v-if="showNav && !isMooc" />
             <h3
-                v-if="title"
+                v-if="title && !isMooc"
                 class="service-title"
                 @click="goHome"
             >
@@ -55,21 +55,24 @@
             </h3>
         </div>
         <div class="header-right-bar">
-            <locale-switcher></locale-switcher>
-            <qrcode class="feed-back-icon" />
-            <span class="seperate-line">|</span>
+            <locale-switcher v-if="!isMooc"></locale-switcher>
+            <qrcode v-if="!isMooc" class="feed-back-icon" />
+            <span v-if="!isMooc" class="seperate-line">|</span>
             <!-- <feed-back class='feed-back-icon'></feed-back> -->
             <i
-                class="bk-icon icon-helper"
+                v-if="!isMooc"
+                class="devops-icon icon-helper"
                 @click.stop="goToDocs"
             />
             <User
                 class="user-info"
+                :disabled="isMooc"
                 v-bind="user"
             />
         </div>
 
         <project-dialog
+            v-if="!isMooc"
             :init-show-dialog="showProjectDialog"
             :title="projectDialogTitle"
         />
@@ -78,7 +81,7 @@
 
 <script lang="ts">
     import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
+    import { Component, Inject } from 'vue-property-decorator'
     import { State, Action, Getter } from 'vuex-class'
     import User from '../User/index.vue'
     import NavMenu from './NavMenu.vue'
@@ -117,6 +120,9 @@
 
         isDropdownMenuVisible: boolean = false
         isShowTooltip: boolean = true
+
+        @Inject()
+        isMooc: boolean
 
         get showProjectList (): boolean {
             return this.headerConfig.showProjectList
@@ -224,7 +230,6 @@
             }
             
             if ((!oldProject && project.gray) || (oldProject && oldProject.gray !== project.gray)) {
-                debugger
                 this.goHomeById(id, true)
             }
         }
@@ -304,6 +309,7 @@
                 }
                 .bk-select-angle {
                     color: white;
+                    top: 7px;
                 }
                 .bk-tooltip-ref {
                     outline: none;
@@ -344,7 +350,7 @@
             display: flex;
             align-items: center;
 
-            >.bk-icon:hover,
+            >.devops-icon:hover,
             >.feed-back-icon:hover,
             >.user-info:hover,
             >.feed-back-icon.active,
@@ -360,7 +366,7 @@
                 line-height: $headerHeight;
             }
 
-            > .bk-icon {
+            > .devops-icon {
                 padding: 0 10px;
                 font-size: 20px;
                 color: $fontLigtherColor;

@@ -1,4 +1,5 @@
 {   
+    "serviceManage": "serviceExtendManage",
     "okLabel": "Confirm",
     "cancelLabel": "Cancel",
     "logout": "Log out",

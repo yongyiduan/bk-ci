@@ -3,21 +3,9 @@
         v-bkloading="loadingOption"
         class="devops-index"
     >
-        <div
-            v-if="showExplorerTips === 'true' && isShowPreviewTips && !chromeExplorer"
-            class="user-prompt"
-        >
-            <p><i class="bk-icon icon-info-circle-shape" />{{ $t("recommendationLabel") }}</p>
-            <div class="close-btn">
-                <span
-                    class="close-remind"
-                    @click="closeExplorerTips"
-                >{{ $t("dismiss") }}</span>
-                <i
-                    class="bk-icon icon-close"
-                    @click="closePreviewTips"
-                />
-            </div>
+        <div class="user-prompt" v-if="showAnnounce">
+            <!-- <p><i class="bk-icon icon-info-circle-shape"></i>{{currentNotice.noticeContent}}</p> -->
+            <p v-html="currentNotice.noticeContent"></p>
         </div>
         <template v-if="projectList">
             <Header />
@@ -71,6 +59,8 @@
 
         <login-dialog v-if="showLoginDialog" />
         <ask-permission-dialog />
+        <extension-aside-panel />
+        <extension-dialog />
     </div>
 </template>
 
@@ -78,19 +68,31 @@
     import Vue from 'vue'
     import Header from '../components/Header/index.vue'
     import AskPermissionDialog from '../components/AskPermissionDialog/AskPermissionDialog.vue'
+    import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
+    import ExtensionDialog from '../components/ExtensionDialog/index.vue'
     import LoginDialog from '../components/LoginDialog/index.vue'
-    import { Component, Watch } from 'vue-property-decorator'
+    import { Component } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
     import eventBus from '../utils/eventBus'
+
+    Component.registerHooks([
+        'beforeRouteEnter',
+        'beforeRouteLeave',
+        'beforeRouteUpdate'
+    ])
 
     @Component({
         components: {
             Header,
             LoginDialog,
-            AskPermissionDialog
+            AskPermissionDialog,
+            ExtensionAsidePanel,
+            ExtensionDialog
         }
     })
     export default class Index extends Vue {
+        @State currentNotice
+        @State currentPage
         @State projectList
         @State headerConfig
         @State isShowPreviewTips
@@ -98,9 +100,16 @@
         @Getter disableProjectList
         @Getter approvalingProjectList
         @Action closePreviewTips
+        @Action getAnnouncement
+        @Action setAnnouncement
+        @Action fetchServiceHooks
 
         showLoginDialog: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
+
+        get showAnnounce (): boolean {
+            return this.currentNotice && this.currentNotice.id
+        }
 
         get loadingOption (): object {
             return {
@@ -134,11 +143,6 @@
             return explorer.indexOf('Chrome') >= 0 && explorer.indexOf('QQ') === -1
         }
 
-        @Watch('$route.path')
-        routeChange (name: string): void {
-            this.hasProjectList && this.saveProjectId()
-        }
-
         switchProject () {
             this.iframeUtil.toggleProjectMenu(true)
         }
@@ -148,15 +152,11 @@
             this.closePreviewTips()
         }
 
-        saveProjectId (): void {
-            const { $route, projectList } = this
-            if (projectList.find(project => (project.projectCode === $route.params.projectId && project.enabled && (project.approvalStatus === 2 || project.approvalStatus === 1)))) {
-                localStorage.setItem('projectId', $route.params.projectId)
+        async created () {
+            const announce = await this.getAnnouncement()
+            if (announce && announce.id) {
+                this.setAnnouncement(announce)
             }
-        }
-
-        created () {
-            this.hasProjectList && this.saveProjectId()
             eventBus.$on('toggle-login-dialog', (isShow) => {
                 this.showLoginDialog = isShow
             })
@@ -172,6 +172,12 @@
                     }
                 })
             })
+
+            if (this.currentPage) {
+                this.fetchServiceHooks({
+                    serviceId: this.currentPage.id
+                })
+            }
         }
     }
 </script>
@@ -191,7 +197,7 @@
         }
         .user-prompt {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             padding: 0 24px;
             min-width: 1280px;
             line-height: 32px;

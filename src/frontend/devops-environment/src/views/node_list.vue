@@ -12,7 +12,7 @@
                         ref="dropdown">
                         <bk-button slot="dropdown-trigger">
                             <span>{{ $t('environment.import') }}</span>
-                            <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+                            <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
                         </bk-button>
                         <ul class="bk-dropdown-list" slot="dropdown-content">
                             <li>
@@ -57,7 +57,7 @@
                                 :title="props.row.displayName"
                                 @click="toNodeDetail(props.row)"
                             >{{ props.row.displayName || '-' }}</span>
-                            <i class="bk-icon icon-edit" v-if="!isEditNodeStatus && props.row.canEdit" @click="editNodeName(props.row)"></i>
+                            <i class="devops-icon icon-edit" v-if="!isEditNodeStatus && props.row.canEdit" @click="editNodeName(props.row)"></i>
                         </div>
                     </template>
                 </bk-table-column>
@@ -76,11 +76,11 @@
                         <div v-if="(props.row.nodeType === 'CC' || props.row.nodeType === 'CMDB') && ((props.row.nodeType === 'CC' && props.row.createdUser !== props.row.operator && props.row.createdUser !== props.row.bakOperator)
                             || (props.row.nodeType === 'CMDB' && props.row.createdUser !== props.row.operator && props.row.bakOperator.split(';').indexOf(props.row.createdUser) === -1))">
                             <div class="edit-operator" v-if="userInfo.username === props.row.operator || userInfo.username === props.row.bakOperator">
-                                <i class="bk-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(props.row.nodeHashId)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
+                                <i class="devops-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(props.row.nodeHashId)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
                             </div>
                             <div class="prompt-operator" v-else>
                                 <bk-popover placement="top">
-                                    <span><i class="bk-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
+                                    <span><i class="devops-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
                                     <template slot="content">
                                         <p>{{ $t('environment.nodeInfo.currentImporter') }}<span>{{ props.row.createdUser }}</span></p>
                                         <p>{{ $t('environment.nodeInfo.currentOperator') }}<span>{{ props.row.operator }}</span><span v-if="props.row.nodeType === 'CC'">/{{ props.row.bakOperator }}</span></p>
@@ -944,7 +944,7 @@
             padding-right: 10px;
             color: #ffbf00;
 
-            .bk-icon {
+            .devops-icon {
                 margin-right: 6px;
             }
         }

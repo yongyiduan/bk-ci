@@ -46,6 +46,7 @@ import com.tencent.devops.process.engine.service.PipelineBuildDetailService
 import com.tencent.devops.process.engine.service.PipelineRuntimeService
 import com.tencent.devops.common.api.pojo.ErrorCode
 import com.tencent.devops.common.api.pojo.ErrorType
+import com.tencent.devops.process.engine.common.BS_CONTAINER_END_SOURCE_PREIX
 import com.tencent.devops.process.pojo.mq.PipelineBuildContainerEvent
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
@@ -119,6 +120,16 @@ class ContainerControl @Autowired constructor(
                     startTime = LocalDateTime.now(),
                     endTime = LocalDateTime.now()
                 )
+
+                containerTaskList.forEach {
+                    pipelineRuntimeService.updateTaskStatus(
+                        buildId = buildId,
+                        taskId = it.taskId,
+                        userId = it.starter,
+                        buildStatus = BuildStatus.SKIP
+                    )
+                }
+
                 logger.info("[$buildId]|CONTAINER_SKIP|stage=$stageId|container=$containerId|action=$actionType")
                 pipelineBuildDetailService.normalContainerSkip(buildId, container.containerId)
                 // 返回stage的时候，需要解锁
@@ -210,7 +221,6 @@ class ContainerControl @Autowired constructor(
                     }
                 }
             }
-
             val finallyTasks = containerTaskList.filter { task ->
                 if (task.taskId == VMUtils.genEndPointTaskId(task.taskSeq) || // end-xxx 结束拦截点
                     task.taskId == VMUtils.genStopVMTaskId(task.taskSeq) // 停止构建机
@@ -256,8 +266,12 @@ class ContainerControl @Autowired constructor(
             } else null
 
             pipelineRuntimeService.updateContainerStatus(
-                buildId = buildId, stageId = stageId, containerId = containerId,
-                startTime = startTime, endTime = endTime, buildStatus = containerFinalStatus
+                buildId = buildId,
+                stageId = stageId,
+                containerId = containerId,
+                startTime = startTime,
+                endTime = endTime,
+                buildStatus = containerFinalStatus
             )
         }
 
@@ -275,7 +289,7 @@ class ContainerControl @Autowired constructor(
                 containerId = containerId,
                 mutexGroup = mutexGroup
             )
-            sendBackStage("CONTAINER_END_$containerFinalStatus")
+            sendBackStage("$BS_CONTAINER_END_SOURCE_PREIX$containerFinalStatus")
         } else {
             sendTask(waitToDoTask, actionType)
         }
@@ -365,13 +379,6 @@ class ContainerControl @Autowired constructor(
         containerTaskList.forEach nextOne@{ task ->
             if (!ControlUtils.isEnable(task.additionalOptions)) {
                 logger.info("[$buildId]|container=$containerId|task(${task.taskSeq})=${task.taskId}|${task.taskName}|is not enable, will skip")
-                pipelineRuntimeService.updateTaskStatus(
-                    buildId = buildId, taskId = task.taskId, userId = task.starter, buildStatus = BuildStatus.SKIP
-                )
-                pipelineBuildDetailService.taskEnd(
-                    buildId = buildId, taskId = task.taskId, buildStatus = BuildStatus.SKIP
-                )
-//                containerFinalStatus = BuildStatus.SKIP
 
                 LogUtils.addYellowLine(
                     rabbitTemplate = rabbitTemplate,
@@ -466,7 +473,7 @@ class ContainerControl @Autowired constructor(
             jobControlOption.runCondition == JobRunCondition.CUSTOM_VARIABLE_MATCH
         ) {
             val conditions = jobControlOption.customVariables ?: emptyList()
-            skip = ControlUtils.checkSkipCondition(conditions, variables, buildId, jobControlOption.runCondition)
+            skip = ControlUtils.checkJobSkipCondition(conditions, variables, buildId, jobControlOption.runCondition)
         }
 
         if (skip) {
@@ -491,7 +498,7 @@ class ContainerControl @Autowired constructor(
         }
 
         if (skip) {
-            logger.info("[$buildId]|MANUAL_SKIP|stageId=$stageId|container=$containerId|skipped")
+            logger.info("[$buildId]|CONTAINER_MANUAL_SKIP|stageId=$stageId|container=$containerId|skipped")
         }
 
         return skip

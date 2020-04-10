@@ -103,7 +103,8 @@
                     atom: () => this.getAtomList(postData, searchStr),
                     template: () => this.getTemplateList(postData, searchStr),
                     ide: () => this.getIDEList(postData, searchStr),
-                    image: () => this.getImageList(postData, searchStr)
+                    image: () => this.getImageList(postData, searchStr),
+                    service: () => this.getServiceList(postData, searchStr)
                 }
 
                 apiFun[pipeType]().then((res) => {
@@ -135,6 +136,11 @@
             getImageList (postData, searchStr) {
                 postData.imageName = searchStr
                 return this.$store.dispatch('store/requestMarketImage', postData)
+            },
+
+            getServiceList (postData, searchStr) {
+                postData.serviceName = searchStr
+                return this.$store.dispatch('store/requestMarketService', postData)
             },
 
             chooseOrderType (order) {

@@ -113,7 +113,7 @@
             confirmApprove () {
                 this.$refs.validateForm.validate().then((validator) => {
                     const { approveId, approveMsg, approveStatus } = this.approveRes
-                    this.$store.dispatch('store/approval', { atomCode: this.atomCode, approveId, approveMsg, approveStatus }).then((res) => {
+                    this.$store.dispatch('store/approval', { type: 'ATOM', code: this.atomCode, approveId, approveMsg, approveStatus }).then((res) => {
                         if (res) {
                             const currentData = this.approveList.find(item => item.approveId === this.approveRes.approveId) || {}
                             currentData.approveStatus = approveStatus
@@ -140,7 +140,7 @@
 
             requestApproveList () {
                 this.isLoading = true
-                const data = Object.assign({}, this.pagination, { atomCode: this.atomCode })
+                const data = Object.assign({}, this.pagination, { type: 'ATOM', code: this.atomCode })
                 this.$store.dispatch('store/getApprovalList', data).then((res) => {
                     this.approveList = res.records || []
                     this.pagination.count = res.count
@@ -210,10 +210,6 @@
             }
             .approval-table {
                 margin-top: 15px;
-                /deep/ .bk-table-body-wrapper {
-                    max-height: calc(100vh - 291px);
-                    overflow-y: auto;
-                }
             }
         }
         .approve-form {

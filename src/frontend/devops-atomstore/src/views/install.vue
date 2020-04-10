@@ -20,7 +20,7 @@
                 <div class="title"> {{ $t('store.请选择项目：') }} </div>
                 <big-select v-model="project" :loading="projectListLoading" :searchable="true" :multiple="true" :show-select-all="true" :options="projectList" setting-key="projectCode" display-key="projectName" @selected="selectProject" :placeholder="$t('store.请选择')">
                     <div slot="extension" style="cursor: pointer;">
-                        <a href="/console/pm" target="_blank"><i class="bk-icon icon-plus-circle" /> {{ $t('store.新建项目') }} </a>
+                        <a href="/console/pm" target="_blank"><i class="devops-icon icon-plus-circle" /> {{ $t('store.新建项目') }} </a>
                     </div>
                 </big-select>
                 <p class="template-tip" v-if="type === 'template'">{{ $t('store.若模版中有未安装的插件，将自动安装') }}</p>
@@ -43,7 +43,7 @@
                 </section>
             </div>
             <div class="install-success-tips" v-else>
-                <i class="bk-icon icon-check-circle"></i>
+                <i class="devops-icon icon-check-circle"></i>
                 <h3> {{ $t('store.恭喜，已安装成功！') }} </h3>
                 <div class="handle-btn">
                     <bk-button class="bk-button bk-primary" size="small" @click="backConsole"> {{ $t('store.工作台') }} </bk-button>
@@ -69,6 +69,9 @@
                         break
                     case 'template':
                         res = bkLocale.$t('store.流水线模板')
+                        break
+                    case 'service':
+                        res = bkLocale.$t('store.服务扩展')
                         break
                     default:
                         res = bkLocale.$t('store.容器镜像')
@@ -128,7 +131,8 @@
                 const methods = {
                     atom: this.getAtomDetail,
                     template: this.getTemplateDetail,
-                    image: this.getImageDetail
+                    image: this.getImageDetail,
+                    service: this.getServiceDetail
                 }
 
                 return methods[this.type]()
@@ -155,11 +159,19 @@
                 })
             },
 
+            getServiceDetail () {
+                return this.$store.dispatch('store/requestServiceDetailByCode', this.code).then((res) => {
+                    this.name = res.serviceName
+                    this.id = res.serviceId
+                })
+            },
+
             requestRelativeProject () {
                 const methods = {
                     atom: 'store/requestRelativeProject',
                     template: 'store/requestRelativeTplProject',
-                    image: 'store/requestRelativeImageProject'
+                    image: 'store/requestRelativeImageProject',
+                    service: 'store/requestRelativeServiceProject'
                 }
 
                 return this.$store.dispatch(methods[this.type], this.code).then((res) => {
@@ -191,7 +203,7 @@
 
             backConsole () {
                 this.$router.push({
-                    name: 'atomList',
+                    name: 'workList',
                     params: {
                         type: this.type
                     }
@@ -224,7 +236,8 @@
                 const methods = {
                     atom: this.installAtom,
                     template: this.installTemplate,
-                    image: this.installImage
+                    image: this.installImage,
+                    service: this.installService
                 }
 
                 this.isLoading = true
@@ -279,6 +292,14 @@
                     projectCodeList: this.project
                 }
                 return this.$store.dispatch('store/installImage', params)
+            },
+
+            installService () {
+                const params = {
+                    serviceCode: this.code,
+                    projectCodeList: this.project
+                }
+                return this.$store.dispatch('store/installService', params)
             }
         }
     }

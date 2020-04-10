@@ -5,9 +5,8 @@
             <h3 class="title-with-img">
                 <span :class="{ 'not-recommend': detail.recommendFlag === false }" :title="detail.recommendFlag === false ? $t('store.该插件不推荐使用') : ''">{{detail.name}}</span>
                 <h5 :title="isPublicTitle" @click="goToCode" :class="{ 'not-public': !isPublic }" v-if="!isEnterprise">
-                    <icon v-if="isPublic" class="detail-img" name="color-git-code" size="16" />
-                    <icon v-else class="detail-img" name="gray-git-code" size="16" style="fill:#9E9E9E" />
-                    <span class="approve-msg">{{ $t('store.工蜂') }}</span>
+                    <icon class="detail-img" name="gray-git-code" size="14" />
+                    <span class="approve-msg">{{ isPublic ? $t('store.源码') : $t('store.未开源') }}</span>
                 </h5>
                 <template v-if="!isEnterprise && userInfo.type !== 'ADMIN' && detail.htmlTemplateVersion !== '1.0'">
                     <h5 :title="approveMsg" :class="[{ 'not-public': approveMsg !== $t('store.协作') }]" @click="cooperation">
@@ -35,7 +34,7 @@
                 <span>
                     {{detail.jobType|atomJobType}}
                     <template v-if="detail.os && detail.os.length">
-                        (<i v-for="item in getJobList(detail.os)" :class="[item.icon, 'bk-icon']" :key="item" :title="item.name"></i>)
+                        (<i v-for="item in getJobList(detail.os)" :class="[item.icon, 'devops-icon']" :key="item" :title="item.name"></i>)
                     </template>
                 </span>
             </h5>
@@ -138,8 +137,8 @@
             },
 
             isPublicTitle () {
-                if (this.isPublic) return '查看源码'
-                else return '未开源'
+                if (this.isPublic) return this.$t('store.点击查看源码')
+                else return this.$t('store.未开源')
             },
 
             approveMsg () {
@@ -266,8 +265,11 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 47px auto 30px;
-        width: 1200px;
+        margin: 26px auto 0;
+        width: 95vw;
+        background: $white;
+        box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
+        padding: 32px;
         .detail-pic {
             width: 130px;
         }
@@ -275,15 +277,17 @@
             height: 160px;
             width: 160px;
         }
+        button {
+            border-radius: 4px;
+            width: 120px;
+            height: 40px;
+        }
         .detail-install {
-            width: 89px;
-            height: 36px;
             background: $primaryColor;
-            border-radius: 2px;
             border: none;
             font-size: 14px;
             color: $white;
-            line-height: 36px;
+            line-height: 40px;
             text-align: center;
             &.opicity-hidden {
                 opacity: 0;
@@ -293,13 +297,10 @@
                 transform: scale(.97)
             }
         }
-        .bk-tooltip button {
-            width: 89px;
-        }
     }
     .detail-info-group {
-        width: 829px;
-        margin: 0 76px;
+        flex: 1;
+        margin: 0 32px;
         
         h3 {
             font-size: 22px;
@@ -311,6 +312,7 @@
             align-items: center;
             .score-group {
                 position: relative;
+                margin-top: -2px;
                 .score-real {
                     position: absolute;
                     overflow: hidden;
@@ -324,7 +326,6 @@
                 }
             }
             .rate-num {
-                margin-top: 2px;
                 margin-left: 6px;
                 color: $fontWeightColor;
             }
@@ -336,7 +337,7 @@
             width: 33.33%;
             font-size: 14px;
             font-weight: normal;
-            line-height: 19px;
+            line-height: 20px;
             color: $fontBlack;
             span:nth-child(1) {
                 color: $fontWeightColor;
@@ -356,29 +357,42 @@
         .title-with-img {
             display: flex;
             align-items: center;
-            .not-recommend {
-                text-decoration: line-through;
-            }
-            h5 {
+            >h5 {
+                margin-left: 12px;
+                line-height: 14px;
+                padding: 2px 5px;
                 cursor: pointer;
+                background: rgba(21, 146, 255, 0.08);
+                color: #1592ff;
+                .detail-img {
+                    fill: #1592ff;
+                }
+                span {
+                    font-weight: normal;
+                    font-size: 12px;
+                    line-height: 14px;
+                }
             }
-            .approve-msg {
-                margin-left: -2px;
-                font-size: 14px;
+            >span {
+                font-size: 20px;
                 color: $fontLightGray;
-                line-height: 19px;
+                line-height: 20px;
                 font-weight: normal;
             }
             .detail-img {
-                margin-left: 12px;
                 vertical-align: middle;
             }
-            .not-public {
+            h5.not-public {
                 cursor: auto;
+                background: none;
+                color: #9e9e9e;
+                .detail-img {
+                    fill: #9e9e9e;
+                }
             }
         }
         .detail-info.detail-label {
-            width: 829px;
+            width: 994px;
             padding-left: 90px;
             display: inline-block;
             position: relative;

@@ -20,7 +20,6 @@
 import { UPDATE_CURRENT_ATOM } from './constants'
 
 const prefix = 'store/api'
-const repositoryPrefix = 'repository/api'
 const projectPrefix = 'project/api'
 const supportPrefix = 'support/api'
 const Vue = window.Vue
@@ -46,14 +45,14 @@ export const actions = {
     /**
      * 审批插件协作
      */
-    approval ({ commit }, { atomCode, approveId, approveMsg, approveStatus }) {
-        return vue.$ajax.put(`${prefix}/user/market/approval/types/ATOM/codes/${atomCode}/ids/${approveId}/approve`, { approveMsg, approveStatus })
+    approval ({ commit }, { type, code, approveId, approveMsg, approveStatus }) {
+        return vue.$ajax.put(`${prefix}/user/market/approval/types/${type}/codes/${code}/ids/${approveId}/approve`, { approveMsg, approveStatus })
     },
     /**
      * 获取协作者列表
      */
-    getApprovalList ({ commit }, { atomCode, limit, current }) {
-        return vue.$ajax.get(`${prefix}/user/market/approval/types/ATOM/codes/${atomCode}/list?page=${current}&pageSize=${limit}`)
+    getApprovalList ({ commit }, { type, code, limit, current }) {
+        return vue.$ajax.get(`${prefix}/user/market/approval/types/${type}/codes/${code}/list?page=${current}&pageSize=${limit}`)
     },
     /**
      * 申请成为协作者
@@ -170,13 +169,6 @@ export const actions = {
      */
     requestAtomList ({ commit }, { atomName, page, pageSize }) {
         return vue.$ajax.get(`${prefix}/user/market/desk/atom/list?atomName=${atomName}&page=${page}&pageSize=${pageSize}`)
-    },
-
-    /**
-     * git OAuth授权
-     */
-    checkIsOAuth ({ commit }, { type, atomCode }) {
-        return vue.$ajax.get(`${repositoryPrefix}/user/git/isOauth?redirectUrlType=${type}&atomCode=${atomCode}`)
     },
 
     /**

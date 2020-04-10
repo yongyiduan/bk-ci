@@ -6,7 +6,7 @@
         </div>
         <div class="build-quote" v-if="taskId && turboValue">
             <div class="quote-ident">
-                <i class="bk-icon icon-info-circle quote-ident-icon"></i>
+                <i class="devops-icon icon-info-circle quote-ident-icon"></i>
             </div>
             <div class="quote-content">
                 <p class="quote-text quote-title">

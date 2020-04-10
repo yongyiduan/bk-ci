@@ -6,7 +6,6 @@ import compilePath from '../utils/pathExp'
 import request from '../utils/request'
 import * as cookie from 'js-cookie'
 
-
 // 404
 // const None = () => import('../views/None.vue')
 // const App = () => import('../views/App.vue')
@@ -217,12 +216,11 @@ function parseOS (): string {
 function getProjectId (store, params): string {
     try {
         const cookiePid = cookie.get(X_DEVOPS_PROJECT_ID)
-        const projectId = window.GLOBAL_PID || cookiePid || localStorage.getItem('projectId') || store.getters.enableProjectList[0].projectCode
+        const projectId = window.GLOBAL_PID || cookiePid
         return String(params.projectId) !== '0' && params.projectId ? params.projectId : projectId
     } catch (e) {
         return ''
     }
-    
 }
 
 function initProjectId (to, store): string {
@@ -244,7 +242,7 @@ function initProjectId (to, store): string {
 
 function goNext(to, store, next) {
     const newPath = initProjectId(to, store)
-
+    
     // @ts-ignore
     window.setProjectIdCookie(getProjectId(store, to.params))
     if (to.path !== newPath) {

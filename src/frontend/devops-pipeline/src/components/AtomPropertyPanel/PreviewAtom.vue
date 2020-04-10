@@ -12,7 +12,7 @@
             <accordion v-else show-checkbox :show-content="group.isExpanded" :key="groupKey">
                 <header class="var-header" slot="header">
                     <span>{{ group.label }}</span>
-                    <i class="bk-icon icon-angle-down" style="display: block"></i>
+                    <i class="devops-icon icon-angle-down" style="display: block"></i>
                 </header>
                 <div slot="content">
                     <template v-for="(obj, key) in group.props">
@@ -28,7 +28,7 @@
         <accordion v-if="outputProps && Object.keys(outputProps).length > 0" show-checkbox show-content>
             <header class="var-header" slot="header">
                 <span>{{ $t('editPage.atomOutput') }}</span>
-                <i class="bk-icon icon-angle-down" style="display: block"></i>
+                <i class="devops-icon icon-angle-down" style="display: block"></i>
             </header>
             <div slot="content">
                 <form-field class="output-namespace" :desc="outputNamespaceDesc" label="输出字段命名空间" :is-error="errors.has(&quot;namespace&quot;)" :error-msg="errors.first(&quot;namespace&quot;)">
@@ -39,7 +39,7 @@
                     <p v-for="(output, key) in outputProps" :key="key">
                         {{ namespace ? `${namespace}_` : '' }}{{ key }}
                         <bk-popover placement="right">
-                            <i class="bk-icon icon-info-circle" />
+                            <i class="icon-info-circle" />
                             <div slot="content">
                                 {{ output.description }}
                             </div>
@@ -61,9 +61,11 @@
     import AppId from '@/components/AtomFormComponent/AppId'
     import Accordion from '@/components/atomFormField/Accordion'
     import SelectInput from '@/components/AtomFormComponent/SelectInput'
+    import DevopsSelect from '@/components/AtomFormComponent/DevopsSelect'
     import TimePicker from '@/components/AtomFormComponent/TimePicker'
     import Parameter from '@/components/AtomFormComponent/Parameter'
     import Tips from '@/components/AtomFormComponent/Tips'
+    import NameSpaceVar from '@/components/atomFormField/NameSpaceVar'
 
     export default {
         name: 'preview-atom',
@@ -73,9 +75,11 @@
             CcAppId,
             AppId,
             SelectInput,
+            DevopsSelect,
             TimePicker,
             Parameter,
-            Tips
+            Tips,
+            NameSpaceVar
         },
         mixins: [atomMixin],
         props: {

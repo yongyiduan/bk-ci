@@ -28,9 +28,6 @@ package com.tencent.devops.log.service
 
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.log.model.pojo.EndPageQueryLogs
-import com.tencent.devops.log.model.pojo.LogBatchEvent
-import com.tencent.devops.log.model.pojo.LogEvent
-import com.tencent.devops.log.model.pojo.LogStatusEvent
 import com.tencent.devops.log.model.pojo.PageQueryLogs
 import com.tencent.devops.log.model.pojo.QueryLogs
 import com.tencent.devops.log.model.pojo.QueryLineNo
@@ -167,9 +164,10 @@ class LogServiceDispatcher @Autowired constructor(
         buildId: String,
         tag: String?,
         jobId: String?,
-        executeCount: Int?
+        executeCount: Int?,
+        fileName: String?
     ): Response {
-        return logServiceV2.downloadLogs(pipelineId, buildId, tag, jobId, executeCount)
+        return logServiceV2.downloadLogs(pipelineId, buildId, tag, jobId, executeCount, fileName)
     }
 
     fun getEndLogs(
@@ -183,17 +181,5 @@ class LogServiceDispatcher @Autowired constructor(
         executeCount: Int?
     ): Result<EndPageQueryLogs> {
         return Result(logServiceV2.getEndLogs(pipelineId, buildId, tag, jobId, executeCount, size))
-    }
-
-    fun logEvent(event: LogEvent) {
-        logServiceV2.addLogEvent(event)
-    }
-
-    fun logBatchEvent(event: LogBatchEvent) {
-        logServiceV2.addBatchLogEvent(event)
-    }
-
-    fun logStatusEvent(event: LogStatusEvent) {
-        logServiceV2.updateLogStatus(event)
     }
 }

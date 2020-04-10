@@ -24,7 +24,7 @@
                                 <ul class="search-key" ref="searchKey">
                                     <li class="key-node" v-for="(entry, index) in searchKeyList" :key="index">
                                         <span>{{ entry }}</span>
-                                        <i class="bk-icon icon-close" @click="deleteKey(index)"></i>
+                                        <i class="devops-icon icon-close" @click="deleteKey(index)"></i>
                                     </li>
                                     <li class="input-item">
                                         <input type="text" class="search-input" ref="searchInput"
@@ -37,8 +37,8 @@
                                 </ul>
                             </div>
                             <div class="actions">
-                                <i class="bk-icon icon-close" @click="deleteAllKey" v-if="searchKeyList.length"></i>
-                                <i class="bk-icon icon-search" @click="searchNode"></i>
+                                <i class="devops-icon icon-close" @click="deleteAllKey" v-if="searchKeyList.length"></i>
+                                <i class="devops-icon icon-search" @click="searchNode"></i>
                             </div>
                             <div class="ip-searcher-footer" v-if="isSearchFooter">
                                 <p>{{ $t('environment.nodeInfo.searchNodePlaceholder') }}</p>
@@ -85,11 +85,11 @@
                                 <div v-if="(col.nodeType === 'CC' || col.nodeType === 'CMDB') && ((col.nodeType === 'CC' && col.createdUser !== col.operator && col.createdUser !== col.bakOperator)
                                     || (col.nodeType === 'CMDB' && col.createdUser !== col.operator && col.bakOperator.split(';').indexOf(col.createdUser) === -1))">
                                     <div class="edit-operator" v-if="curUserInfo.username === col.operator || curUserInfo.username === col.bakOperator">
-                                        <i class="bk-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(col.nodeHashId, 1)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
+                                        <i class="devops-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(col.nodeHashId, 1)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
                                     </div>
                                     <div class="prompt-operator" v-else>
                                         <bk-popover placement="top">
-                                            <span><i class="bk-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
+                                            <span><i class="devops-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
                                             <template slot="content">
                                                 <p style="text-align: left;">{{ $t('environment.nodeInfo.currentImporter') }}<span>{{ col.createdUser }}</span></p>
                                                 <p style="text-align: left;">{{ $t('environment.nodeInfo.currentOperator') }}<span>{{ col.operator }}</span><span v-if="col.nodeType === 'CC'">/{{ col.bakOperator }}</span></p>
@@ -417,7 +417,7 @@
                     height: 36px;
                     line-height: 36px;
 
-                    .bk-icon {
+                    .devops-icon {
                         cursor: pointer;
                     }
 
@@ -522,7 +522,7 @@
             padding-right: 10px;
             color: #ffbf00;
 
-            .bk-icon {
+            .devops-icon {
                 margin-right: 6px;
             }
         }
