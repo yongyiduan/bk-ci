@@ -1,5 +1,7 @@
 {
     "store": "Store",
+    "字段不超过20个字符": "Field does not exceed 20 characters",
+    "重新部署": "Redeploy",
     "源码": "Source code",
     "按服务": "By service",
     "确定卸载": "Are you sure you want to uninstall {0}?",

@@ -10,6 +10,20 @@ const vue = new Vue()
 
 export const actions = {
     /***
+     * 获取扩展部署相关信息
+     */
+    requestDeployInfo ({ commit }, serviceCode) {
+        return vue.$ajax.get(`${prefix}/user/ext/services/deployment/services/${serviceCode}/status`)
+    },
+
+    /***
+     * 重新部署
+     */
+    requestRedeploy ({ commit }, { serviceCode, version }) {
+        return vue.$ajax.get(`${prefix}/user/ext/services/deployment/services/${serviceCode}/versions/${version}/deploy`)
+    },
+
+    /***
      * 获取ReadMe文件信息
      */
     requestReadMe ({ commit }, serviceCode) {

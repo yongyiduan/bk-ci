@@ -68,7 +68,7 @@
                 <bk-row>
                     <bk-col :span="12" class="g-progress-item service-media">
                         <span class="g-progress-label">{{ $t('store.媒体信息') }} :</span>
-                        <media-list class="g-progress-content media-list" :list="currentService.mediaList"></media-list>
+                        <media-list class="g-progress-content media-list" :list="currentService.mediaList" v-if="currentService.mediaList.length"></media-list>
                     </bk-col>
                 </bk-row>
             </bk-container>

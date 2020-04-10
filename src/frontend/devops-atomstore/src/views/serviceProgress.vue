@@ -93,12 +93,13 @@
 
 <script>
     import { mapActions } from 'vuex'
-    import build from '../components/common/progressSteps/build/index'
+    import build from '../components/common/progressSteps/build'
     import test from '../components/common/progressSteps/test'
     import commit from '../components/common/progressSteps/commit'
     import approve from '../components/common/progressSteps/approve'
     import begin from '../components/common/progressSteps/begin'
     import end from '../components/common/progressSteps/end'
+    import deploy from '../components/common/progressSteps/deploy'
 
     export default {
         components: {
@@ -107,7 +108,8 @@
             commit,
             approve,
             begin,
-            end
+            end,
+            deploy
         },
 
         filters: {
@@ -240,11 +242,12 @@
                 const serviceId = params.serviceId || ''
                 const iconMap = {
                     begin: 'order-shape',
-                    build: 'panels',
+                    build: 'execute',
                     test: 'script-files',
                     commit: 'edit2',
                     approve: 'panel-permission',
-                    end: 'check-1'
+                    end: 'check-1',
+                    deploy: 'panels'
                 }
 
                 return this.requestServiceProcess(serviceId).then((res) => {
@@ -411,7 +414,7 @@
             border-bottom: 1px solid $lightBorder;
             .progress-steps {
                 padding: 22px 280px 0 180px;
-                /deep/ .icon-panels, /deep/ .icon-order-shape, /deep/ .icon-script-files, /deep/ .icon-panel-permission {
+                /deep/ .icon-execute, /deep/ .icon-panels, /deep/ .icon-order-shape, /deep/ .icon-script-files, /deep/ .icon-panel-permission {
                     font-size: 14px;
                 }
             }

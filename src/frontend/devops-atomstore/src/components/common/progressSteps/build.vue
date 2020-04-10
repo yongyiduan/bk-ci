@@ -1,11 +1,6 @@
 <template>
     <section class="main-body">
-        <ul class="progress-log" v-bkloading="{ isLoading: isLogLoading }">
-            <li class="log-item" v-for="(log, index) in logs" :key="index">
-                [{{index + 1}}] - {{log.time|timeFilter}}
-                <span :style="`color: ${log.color}`"> {{log.message}}</span>
-            </li>
-        </ul>
+        <log :logs="logs" v-bkloading="{ isLoading: isLogLoading }"></log>
 
         <footer class="main-footer">
             <bk-button :disabled="currentStep.status !== 'success'" theme="primary" @click="nextStep"> {{ $t('store.下一步') }} </bk-button>
@@ -15,28 +10,11 @@
 </template>
 
 <script>
-    import ansiParse from './ansiParse.js'
-
-    function prezero (num) {
-        num = Number(num)
-        if (num < 10) return '0' + num
-        return num
-    }
-
-    function millisecond (num) {
-        num = Number(num)
-        if (num < 10) return '00' + num
-        else if (num < 100) return '0' + num
-        return num
-    }
+    import log from './log'
 
     export default {
-        filters: {
-            timeFilter (val) {
-                if (!val) return ''
-                const time = new Date(val)
-                return `${time.getFullYear()}-${prezero(time.getMonth() + 1)}-${prezero(time.getDate())} ${prezero(time.getHours())}:${prezero(time.getMinutes())}:${prezero(time.getSeconds())}:${millisecond(time.getMilliseconds())}`
-            }
+        components: {
+            log
         },
 
         props: {
@@ -82,28 +60,17 @@
                 }
                 this.$store.dispatch('store/requestProgressLog', postData).then((data = {}) => {
                     if (id && this.cancelIds.includes(id)) return
-                    this.isLogLoading = false
                     if (data.status === 0) {
                         const logs = data.logs || []
                         const lastLog = logs[logs.length - 1] || {}
                         this.getLog.start = lastLog.lineNo || this.getLog.start || 0
-                        logs.forEach((log) => {
-                            const val = log.message
-                            const parseRes = ansiParse(val) || [{ message: '', hasHandle: false }]
-                            const res = { message: '', time: log.timestamp }
-                            parseRes.forEach((item) => {
-                                res.message += item.message
-                                if (!res.color && item.color) res.color = item.color
-                            })
-                            this.logs.push(res)
-                        })
+                        this.logs.push(...logs)
                         if (!data.finished || data.hasMore) this.getLog.id = setTimeout(() => this.getLog(this.getLog.id), 300)
                     }
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
-                    const ele = document.querySelector('.progress-log')
-                    ele.scrollTop = ele.scrollHeight
+                    this.isLogLoading = false
                 })
             },
 
@@ -132,27 +99,3 @@
         }
     }
 </script>
-
-<style lang="scss" scoped>
-    @import '@/assets/scss/conf.scss';
-
-    .progress-log {
-        background: #f5f5f5;
-        border: 1px solid #d9d9d9;
-        height: 100%;
-        width: 100%;
-        overflow: auto;
-        padding: 16px;
-        .log-item {
-            font-family: Consolas, "Courier New", monospace;
-            width: 100%;
-            word-break: break-all;
-            font-size: 12px;
-            line-height: 22px;
-            color: $grayBlack;
-            &:hover {
-                background: #3330303d;
-            }
-        }
-    }
-</style>
