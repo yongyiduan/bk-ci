@@ -88,7 +88,6 @@
                 }
             } else if (this.consoleType === 'DEVCLOUD') {
                 await this.linkDevCloud()
-                // this.url = 'ws://9.134.142.7/containers/terlinhe1581908760590/41b7c306-ae06-4168-9f95-8173104fa4c2/0/terminal'
             }
         },
         mounted () {

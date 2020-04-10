@@ -59,11 +59,9 @@
         },
         methods: {
             runTerminal (e) {
-                // this.heartCheck()
                 this.terminalSocket.send('source /etc/profile\n')
             },
             receiveFromTerminal (e) {
-                // this.heartCheck()
                 // console.log(e.data, 'receive msg')
             },
             errorTerminal (e) {
