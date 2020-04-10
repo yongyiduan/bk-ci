@@ -152,24 +152,24 @@
                                     <bk-radio :value="entry.value" v-for="(entry, key) in authTypeList" :key="key">{{ entry.label }}</bk-radio>
                                 </bk-radio-group>
                             </div>
-                            <div class="bk-form-item is-required">
-                                <label class="bk-label"> {{ $t('store.是否开源') }} </label>
-                                <div class="bk-form-content atom-item-content">
-                                    <bk-radio-group v-model="createAtomForm.visibilityLevel">
-                                        <bk-radio :disabled="entry.disable" :title="entry.title" :value="entry.value" v-for="(entry, key) in isOpenSource" :key="key" @click.native="changeOpenSource">{{ entry.label }}</bk-radio>
-                                    </bk-radio-group>
-                                    <p v-if="atomErrors.openSourceError" class="error-tips"> {{ $t('store.是否开源不能为空') }} </p>
-                                </div>
-                            </div>
-                            <div class="bk-form-item is-required" v-if="createAtomForm.visibilityLevel === 'PRIVATE'">
-                                <label class="bk-label"> {{ $t('store.不开源原因') }} </label>
-                                <div class="bk-form-content atom-item-content">
-                                    <bk-input v-model="createAtomForm.privateReason" type="textarea" :placeholder="$t('store.请输入不开源原因')" @input="atomErrors.privateReasonError = false"></bk-input>
-                                    <p v-if="atomErrors.privateReasonError" class="error-tips"> {{ $t('store.不开源原因不能为空') }} </p>
-                                </div>
-                            </div>
-                            <form-tips :tips-content="createTips" class="atom-tip"></form-tips>
                         </div>
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.是否开源') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-radio-group v-model="createAtomForm.visibilityLevel">
+                                    <bk-radio :disabled="entry.disable" :title="entry.title" :value="entry.value" v-for="(entry, key) in isOpenSource" :key="key" @click.native="changeOpenSource">{{ entry.label }}</bk-radio>
+                                </bk-radio-group>
+                                <p v-if="atomErrors.openSourceError" class="error-tips"> {{ $t('store.是否开源不能为空') }} </p>
+                            </div>
+                        </div>
+                        <div class="bk-form-item is-required" v-if="createAtomForm.visibilityLevel === 'PRIVATE'">
+                            <label class="bk-label"> {{ $t('store.不开源原因') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-input v-model="createAtomForm.privateReason" type="textarea" :placeholder="$t('store.请输入不开源原因')" @input="atomErrors.privateReasonError = false"></bk-input>
+                                <p v-if="atomErrors.privateReasonError" class="error-tips"> {{ $t('store.不开源原因不能为空') }} </p>
+                            </div>
+                        </div>
+                        <form-tips :tips-content="createTips" class="atom-tip"></form-tips>
                     </template>
                     <div class="form-footer">
                         <button class="bk-button bk-primary" type="button" @click="submitCreateAtom()"> {{ $t('store.提交') }} </button>
