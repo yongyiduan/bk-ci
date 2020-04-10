@@ -55,7 +55,7 @@
         >
             <h3 class="mb10"> {{ $t('store.VSCode 插件安装指引：') }} </h3>
             1. {{ $t('store.首先安装') }} <span class="text-tip" v-bk-tooltips="{ placements: ['top'], content: $t('store.T-extensions 管理公司内部的所有VSCode插件') }">T-extensions</span> {{ $t('store.到 VSCode。若已安装，则跳过此步') }} <br>
-            <span class="ml10">1）<a class="down-link" href="http://bk.artifactory.oa.com/generic-public/ide-plugin/t-extension/0.0.3/t-extension-0.0.3.vsix"> {{ $t('store.点此下载') }} </a>  {{ $t('store.T-extensions 插件安装包') }} <br></span>
+            <span class="ml10">1）<a class="down-link" href="http://bk.artifactory.oa.com/generic-public/ide-plugin/t-extension/0.0.4/t-extension-0.0.4.vsix"> {{ $t('store.点此下载') }} </a>  {{ $t('store.T-extensions 插件安装包') }} <br></span>
             <span class="ml10">2）{{ $t('store.在 VSCode 扩展 =》更多功能 =》从VSIX安装，安装上一步下载的VSIX包，入口如下图所示：') }}</span>
             <img src="http://radosgw.open.oa.com/paas_backend/ieod/prod/file/png/random_15705911044808382165408406563094.png?v=1570591104">
             <span class="mt10 inb">2. {{ $t('store.在 T-extensions 中安装目标插件，或在蓝盾研发商店中点击目标插件详情页面的安装按钮') }}</span>
