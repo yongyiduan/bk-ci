@@ -28,7 +28,7 @@
                             class="search-input-row"
                             name="searchInput"
                             :placeholder="$t('searchTips')"
-                            right-icon="devops-icon icon-search"
+                            right-icon="icon-search"
                             @keyup="filterProjectList(isFilterByOffline)"
                         />
                     </div>
@@ -109,7 +109,7 @@
                     />
                     <bk-table-column
                         :label="$t('projectOperation')"
-                        width="200"
+                        width="250"
                     >
                         <template slot-scope="props">
                             <!-- 状态为待审批 -->
@@ -131,6 +131,11 @@
                                     class="bk-text-button is-disabled"
                                     :title="$t('accessDeny.noOperateAccess')"
                                 >{{ $t('userManage') }}</a>
+                                <a href="javascript:void(0)"
+                                    v-bk-tooltips="{ content: $t('waitforReview') }"
+                                    class="bk-text-button is-disabled"
+                                    :title="$t('accessDeny.noOperateAccess')"
+                                >{{ $t('serviceManage') }}</a>
                             </template>
                             <!-- 状态为已驳回 -->
                             <template v-else-if="props.row.approvalStatus === 3">
@@ -151,6 +156,12 @@
                                     class="bk-text-button is-disabled"
                                     :title="$t('accessDeny.noOperateAccess')"
                                 >{{ $t('userManage') }}</a>
+                                <a
+                                    v-bk-tooltips="{ content: $t('waitforReview') }"
+                                    href="javascript:void(0)"
+                                    class="bk-text-button is-disabled"
+                                    :title="$t('accessDeny.noOperateAccess')"
+                                >{{ $t('serviceManage') }}</a>
                             </template>
 
                             <!-- 否则正常显示 -->
@@ -171,6 +182,10 @@
                                     :class="['bk-text-button', { 'is-disabled': !props.row.enabled }]"
                                     @click="goProject(props.row)"
                                 >{{ $t('userManage') }}</a>
+                                <a href="javascript:void(0)"
+                                    @click="goServiceManage(props.row)"
+                                    class="bk-text-button"
+                                >{{ $t('serviceManage') }}</a>
                             </template>
                         </template>
                     </bk-table-column>
@@ -201,7 +216,7 @@
                 :desc="$t('notFindProjectTips')"
             >
                 <bk-button
-                    icon-left="devops-icon icon-plus"
+                    icon-left="icon-plus"
                     theme="primary"
                     @click="togglePMDialog(true)"
                 >
@@ -378,6 +393,10 @@
             if (enabled) {
                 window.open(`/console/perm/my-project?project_code=${projectCode}`, '_blank')
             }
+        }
+
+        goServiceManage ({ projectCode }): void {
+            window.open(`/console/store/serviceManage/${projectCode}`, '_blank')
         }
 
         toggleProject (project: any): void {

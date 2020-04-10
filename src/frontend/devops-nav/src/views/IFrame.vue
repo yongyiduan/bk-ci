@@ -1,7 +1,7 @@
 <template>
     <div
         class="devops-iframe-content"
-        :class="{ 'showTopPrompt': showExplorerTips === 'true' && isShowPreviewTips && !chromeExplorer }"
+        :class="{ 'showTopPrompt': showAnnounce }"
     >
         <div
             v-if="isAnyPopupShow"
@@ -27,7 +27,7 @@
     import { Component, Watch } from 'vue-property-decorator'
     import eventBus from '../utils/eventBus'
     import { urlJoin, queryStringify, getServiceAliasByPath } from '../utils/util'
-    import { State } from 'vuex-class'
+    import { State, Getter } from 'vuex-class'
     import * as cookie from 'js-cookie'
 
     Component.registerHooks([
@@ -54,7 +54,13 @@
         @State isShowPreviewTips
         @State user
         @State headerConfig
+        @State currentNotice
+        @Getter getServiceHooks
 
+        get showAnnounce (): boolean {
+            return this.currentNotice && this.currentNotice.id
+        }
+        
         created () {
             this.init()
             eventBus.$on('goHome', this.backHome) // 触发返回首页事件
@@ -115,6 +121,10 @@
             }))
         }
 
+        get serviceHooks (): any[] {
+            return this.getServiceHooks(this.currentPage.id)
+        }
+
         backHome () {
             if (this.needLoading) {
                 this.isLoading = true
@@ -158,11 +168,12 @@
         onLoad () {
             this.isLoading = false
             if (this.$refs.iframeEle) {
+                console.log(this.serviceHooks, 'this.serviceHooks')
                 const childWin = this.$refs.iframeEle.contentWindow
                 this.iframeUtil.syncProjectList(childWin, this.underlineProjectList)
                 this.iframeUtil.syncUserInfo(childWin, this.user)
                 this.iframeUtil.syncLocale(childWin, this.$i18n.locale)
-                
+                this.iframeUtil.syncServiceHooks(childWin, this.serviceHooks)
                 if (this.$route.params.projectId) {
                     this.iframeUtil.syncProjectId(childWin, this.$route.params.projectId)
                 }

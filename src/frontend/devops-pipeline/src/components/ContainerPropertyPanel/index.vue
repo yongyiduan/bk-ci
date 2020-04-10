@@ -1,9 +1,9 @@
 <template>
-    <bk-sideslider class="sodaci-property-panel" width="640" :is-show.sync="visible" :quick-close="true">
+    <bk-sideslider class="bkci-property-panel" width="640" :is-show.sync="visible" :quick-close="true">
         <header class="container-panel-header" slot="header">
             {{ title }}
             <div v-if="showDebugDockerBtn" :class="!editable ? 'control-bar' : 'debug-btn'">
-                <bk-button theme="warning" @click="startDebug('docker')">{{ $t('editPage.docker.debugConsole') }}</bk-button>
+                <bk-button theme="warning" @click="startDebug">{{ $t('editPage.docker.debugConsole') }}</bk-button>
             </div>
         </header>
         <section v-if="container" slot="content" :class="{ &quot;readonly&quot;: !editable }" class="container-property-panel bk-form bk-form-vertical">
@@ -114,8 +114,8 @@
                     </form-field>
                 </template>
 
-                <form-field :label="$t('editPage.imageTicket')" v-if="(buildResourceType === 'DOCKER') && buildImageType === 'THIRD'">
-                    <request-selector v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></request-selector>
+                <form-field :label="$t('editPage.imageTicket')" v-if="['DOCKER', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && buildImageType === 'THIRD'">
+                    <select-input v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></select-input>
                 </form-field>
 
                 <form-field :label="$t('editPage.workspace')" v-if="isThirdParty">
@@ -198,7 +198,6 @@
 <script>
     import { mapGetters, mapActions, mapState } from 'vuex'
     import Vue from 'vue'
-    import RequestSelector from '@/components/atomFormField/RequestSelector'
     import EnumInput from '@/components/atomFormField/EnumInput'
     import VuexInput from '@/components/atomFormField/VuexInput'
     import Selector from '@/components/atomFormField/Selector'
@@ -211,11 +210,11 @@
     import JobMutual from './JobMutual'
     import AtomCheckbox from '@/components/atomFormField/AtomCheckbox'
     import ImageSelector from '@/components/AtomSelector/imageSelector'
+    import SelectInput from '@/components/AtomFormComponent/SelectInput'
 
     export default {
         name: 'container-property-panel',
         components: {
-            RequestSelector,
             EnumInput,
             VuexInput,
             FormField,
@@ -227,7 +226,8 @@
             JobMutual,
             Selector,
             AtomCheckbox,
-            ImageSelector
+            ImageSelector,
+            SelectInput
         },
         props: {
             containerIndex: Number,
@@ -269,9 +269,6 @@
             ...mapState('atom', [
                 'isPropertyPanelVisible'
             ]),
-            ...mapState('soda', [
-                'tstackWhiteList'
-            ]),
             visible: {
                 get () {
                     return this.isPropertyPanelVisible
@@ -285,7 +282,7 @@
             imageTypeList () {
                 return [
                     { label: this.$t('editPage.fromList'), value: 'BKSTORE' },
-                    { label: this.$t('editPage.fromHand'), value: 'THIRD', hidden: this.buildResourceType === 'PUBLIC_DEVCLOUD' }
+                    { label: this.$t('editPage.fromHand'), value: 'THIRD' }
                 ]
             },
             appEnvs () {
@@ -383,16 +380,18 @@
                 return Object.keys(apps).filter(app => !selectedApps.includes(app))
             },
             showDebugDockerBtn () {
-                return this.routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && this.isDocker && this.buildResource && (this.routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (this.routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
+                return this.routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && this.buildResource && (this.routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (this.routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
             },
             imageCredentialOption () {
                 return {
-                    paramId: 'credentialId',
-                    paramName: 'credentialId',
-                    url: `/ticket/api/user/credentials/${this.projectId}/hasPermissionList?permission=USE&page=1&pageSize=1000&credentialTypes=USERNAME_PASSWORD`,
-                    hasAddItem: true,
-                    itemText: this.$t('editPage.addCredentials'),
-                    itemTargetUrl: `/ticket/${this.projectId}/createCredential/USERNAME_PASSWORD/true`
+                    optionsConf: {
+                        paramId: 'credentialId',
+                        paramName: 'credentialId',
+                        url: `/ticket/api/user/credentials/${this.projectId}/hasPermissionList?permission=USE&page=1&pageSize=1000&credentialTypes=USERNAME_PASSWORD`,
+                        hasAddItem: true,
+                        itemText: this.$t('editPage.addCredentials'),
+                        itemTargetUrl: `/ticket/${this.projectId}/createCredential/USERNAME_PASSWORD/true`
+                    }
                 }
             }
         },
@@ -467,7 +466,7 @@
             ...mapActions('soda', [
                 'startDebugDocker',
                 'getContainerInfoByBuildId',
-                'startDebugTstack'
+                'startDebugDevcloud'
             ]),
             ...mapActions('pipelines', [
                 'requestImageVersionlist',
@@ -625,12 +624,12 @@
                     ...buildEnv
                 })
             },
-            async startDebug (type) {
+            async startDebug () {
                 const vmSeqId = this.getRealSeqId()
                 let url = ''
                 const tab = window.open('about:blank')
                 try {
-                    if (type === 'docker') {
+                    if (this.buildResourceType === 'DOCKER') {
                         // docker 分根据buildId获取容器信息和新启动一个容器
                         if (this.routeName === 'pipelinesDetail' && this.container.status === 'RUNNING') {
                             const res = await this.getContainerInfoByBuildId({
@@ -658,6 +657,9 @@
                                 url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}`
                             }
                         }
+                    } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
+                        const buildIdStr = this.buildId ? `&buildId=${this.buildId}` : ''
+                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
                     tab.location = url
                 } catch (err) {

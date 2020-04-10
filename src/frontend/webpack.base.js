@@ -18,7 +18,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
         devtool: '#source-map',
         entry,
         output: {
-            publicPath,
+            publicPath: isDev ? `http://dev.static.devops.oa.com${publicPath}` : publicPath,
             chunkFilename: '[name].[chunkhash].js',
             filename: isMaster ? '[name].[contentHash].min.js' : '[name].js',
             path: buildDist
@@ -45,7 +45,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                 },
                 {
                     test: /\.scss$/,
-                    use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader , 'css-loader', 'sass-loader']
+                    use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
                 },
                 {
                     test: /\.(png|jpe?g|gif|svg|webp|cur)(\?.*)?$/,
@@ -97,7 +97,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
         ],
         optimization: {
             namedChunks: true,
-            minimize: true
+            minimize: !isDev
         },
         resolve: {
             extensions: ['.js', '.vue', '.json', '.ts', '.scss', '.css'],

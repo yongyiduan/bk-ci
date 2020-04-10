@@ -43,7 +43,6 @@ declare module 'vue/types/vue' {
     }
 }
 
-
 Vue.use(bkMagic)
 Vue.component('AsideNav', AsideNav)
 Vue.component('ContentHeader', ContentHeader)
@@ -55,7 +54,7 @@ Vue.component('DevopsFormItem', DevopsFormItem)
 Vue.component('BigSelect', BigSelect)
 
 const { i18n, dynamicLoadModule, setLocale, localeList } = createLocale(require.context('@locale/nav/', false, /\.json$/))
-
+const isMooc = location.search.indexOf('isMooc') > -1
 // @ts-ignore
 Vue.use(VeeValidate, {
     i18nRootKey: 'validations', // customize the root path for validation messages.
@@ -80,6 +79,7 @@ router.beforeEach((to, from, next) => {
 })
 window.eventBus = eventBus
 window.vuexStore = store
+window.isMooc = isMooc
 Vue.prototype.iframeUtil = iframeUtil(router)
 Vue.prototype.$showAskPermissionDialog = showAskPermissionDialog
 Vue.prototype.$setLocale = setLocale
@@ -93,6 +93,9 @@ window.devops = new Vue({
     i18n,
     router,
     store,
+    provide: {
+        isMooc
+    },
     render (h) {
         return h(App)
     }

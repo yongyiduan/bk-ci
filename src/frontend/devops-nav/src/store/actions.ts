@@ -14,6 +14,7 @@ import {
     PROCESS_API_URL_PREFIX,
     PROJECT_API_URL_PREFIX,
     SUPPORT_API_URL_PREFIX,
+    // STORE_API_URL_PREFIX,
     EMPTY_PROJECT,
     RESET_NEW_PROJECT,
     SET_POPUP_SHOW,
@@ -22,10 +23,24 @@ import {
     TOGGLE_MODULE_LOADING,
     UPDATE_CURRENT_PAGE,
     SET_SERVICES,
-    TOGGLE_PERMISSION_DIALOG
+    TOGGLE_PERMISSION_DIALOG,
+    SET_CURRENT_NOTICE,
+    SET_SERVICE_HOOKS
 } from './constants'
 
 const actions: ActionTree<RootState, any> = {
+    async fetchServiceHooks ({ commit }: ActionContext<RootState, any>, { serviceId }: any) {
+        try {
+            const extHooks = await Request.get(`${PROJECT_API_URL_PREFIX}/user/ext/items/list?serviceId=${serviceId}`)
+            console.log(extHooks)
+            commit(SET_SERVICE_HOOKS, {
+                extHooks: extHooks,
+                serviceId
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    },
     togglePermissionDialog ({ commit }: ActionContext<RootState, any>, visible: boolean) {
         this.commit(TOGGLE_PERMISSION_DIALOG, visible)  
     },
@@ -44,7 +59,7 @@ const actions: ActionTree<RootState, any> = {
     async toggleServiceCollect (_, { serviceId, isCollected }: any) {
         return Request.put(`${PROJECT_API_URL_PREFIX}/user/services/${serviceId}?collector=${isCollected}`)
     },
-    async fetchLinks ({ commit }, { type }) {
+    async fetchLinks ({ commit }: ActionContext<RootState, any>, { type }) {
         try {
             const links = await Request.get(`${PROJECT_API_URL_PREFIX}/user/activities/types/${type}`)
             commit(SET_LINKS, {
@@ -125,6 +140,9 @@ const actions: ActionTree<RootState, any> = {
     },
     getAnnouncement () {
         return Request.get(`${SUPPORT_API_URL_PREFIX}/user/notice/valid`)
+    },
+    setAnnouncement ({ commit }, payload) {
+        commit(SET_CURRENT_NOTICE, payload)
     }
 }
 

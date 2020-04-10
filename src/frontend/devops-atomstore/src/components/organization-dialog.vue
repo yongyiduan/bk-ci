@@ -9,7 +9,7 @@
         @confirm="toConfirmLogo"
         @cancel="toCloseDialog"
     >
-        <main class="organization-select-content" v-bkloading="{ isLoading: organizationConf.isLoading }">
+        <main class="organization-select-content" v-bkloading="{ isLoading }">
             <div class="organization-content">
                 <div class="organization-card organization-tree">
                     <div class="info-header"> {{ $t('store.全部组织架构') }} </div>
@@ -44,7 +44,8 @@
             tree
         },
         props: {
-            showDialog: Boolean
+            showDialog: Boolean,
+            isLoading: Boolean
         },
         data () {
             return {
@@ -55,8 +56,7 @@
                     hasHeader: false,
                     hasFooter: false,
                     closeIcon: false,
-                    quickClose: false,
-                    isLoading: false
+                    quickClose: false
                 }
             }
         },
@@ -142,7 +142,6 @@
                     })
                     this.$emit('cancelHandle')
                 } else {
-                    let message, theme
                     const deptInfos = []
 
                     this.selectedList.map(item => {
@@ -153,42 +152,10 @@
                     })
                     
                     const params = {
-                        deptInfos: deptInfos
+                        deptInfos
                     }
 
-                    if (this.routeName === 'visible') {
-                        params.atomCode = this.atomCode
-                    } else if (this.routeName === 'tplVisible') {
-                        params.templateCode = this.templateCode
-                    } else {
-                        params.imageCode = this.imageCode
-                    }
-
-                    this.organizationConf.isLoading = true
-
-                    try {
-                        if (this.routeName === 'visible') {
-                            await this.$store.dispatch('store/setVisableDept', { params })
-                        } else if (this.routeName === 'tplVisible') {
-                            await this.$store.dispatch('store/setTplVisableDept', { params })
-                        } else {
-                            await this.$store.dispatch('store/setImageVisableDept', { params })
-                        }
-
-                        message = this.$t('store.保存成功')
-                        theme = 'success'
-                    } catch (err) {
-                        message = err.message ? err.message : err
-                        theme = 'error'
-                    } finally {
-                        this.$bkMessage({
-                            message,
-                            theme
-                        })
-
-                        this.organizationConf.isLoading = false
-                        this.$emit('saveHandle')
-                    }
+                    this.$emit('saveHandle', params)
                 }
             }
         }

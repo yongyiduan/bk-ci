@@ -1,8 +1,8 @@
 <template>
-    <bk-sideslider class="sodaci-property-panel" width="640" :quick-close="true" :is-show.sync="visible">
+    <bk-sideslider class="bkci-property-panel" width="640" :quick-close="true" :is-show.sync="visible">
         <header class="property-panel-header" slot="header">
             <div class="atom-name-edit">
-                <input v-show="nameEditing" v-bk-focus="1" @blur="toggleEditName(false)" @keydown.enter="toggleEditName(false)" class="bk-form-input" name="name" v-validate.initial="&quot;required|max:30&quot;" @@keyup.enter="toggleEditName" @input="handleEditName" :placeholder="$t('nameInputTips')" :value="element.name" />
+                <input v-show="nameEditing" v-bk-focus="1" @blur="toggleEditName(false)" @keydown.enter="toggleEditName(false)" class="bk-form-input" name="name" v-validate.initial="'required|max:30'" @@keyup.enter="toggleEditName" @input="handleEditName" :placeholder="$t('nameInputTips')" :value="element.name" />
                 <p v-if="!nameEditing">{{ atomCode ? element.name : this.$t('editPage.pendingAtom') }}</p>
                 <i v-if="atomCode && editable" @click="toggleEditName(true)" class="devops-icon icon-edit" :class="nameEditing ? 'editing' : ''" />
             </div>
@@ -11,8 +11,8 @@
         <section @click="toggleAtomSelectorPopup(false)" slot="content" v-if="element" class="atom-property-panel">
             <div class="atom-main-content" v-bkloading="{ isLoading: fetchingAtmoModal }">
                 <div class="atom-type-selector bk-form-row bk-form bk-form-vertical">
-                    <div :class="{ 'form-field': true, 'bk-form-inline-item': true, 'is-danger': errors.has(&quot;@type&quot;) }">
-                        <label :title="$t('atom')" class="bk-label atom-form-label">{{ $t('atom') }}</label>
+                    <div :class="{ 'form-field': true, 'bk-form-inline-item': true, 'is-danger': errors.has('@type') }">
+                        <label :title="$t('atom')" class="bk-label">{{ $t('atom') }}：</label>
                         <bk-popover placement="right" theme="light" class="form-field-icon atom-name-field" v-if="atom && (atom.summary || atom.docsLink)">
                             <i class="devops-icon icon-info-circle"></i>
                             <div slot="content" style="font-size: 12px; width: 350px; min-height: 100px;">
@@ -87,7 +87,7 @@
                         </div>
                         <div class="atom-option">
                             <atom-option
-                                v-if="element[&quot;@type&quot;] !== &quot;manualTrigger&quot;"
+                                v-if="element['@type'] !== 'manualTrigger'"
                                 :element-index="elementIndex"
                                 :container-index="containerIndex"
                                 :stage-index="stageIndex"

@@ -1,14 +1,14 @@
 <template>
     <div
         ref="stageContainer"
-        :class="{ &quot;soda-stage-container&quot;: true, &quot;first-container&quot;: stageIndex === 0, &quot;readonly&quot;: !editable || containerDisabled }"
+        :class="{ 'soda-stage-container': true, 'first-container': stageIndex === 0, 'readonly': !editable || containerDisabled }"
     >
         <template v-if="!isOnlyOneContainer && containerLength - 1 !== containerIndex">
-            <span class="connect-line left" :class="{ &quot;cruve&quot;: containerIndex === 0 }"></span>
-            <span class="connect-line right" :class="{ &quot;cruve&quot;: containerIndex === 0 }"></span>
+            <span class="connect-line left" :class="{ 'cruve': containerIndex === 0 }"></span>
+            <span class="connect-line right" :class="{ 'cruve': containerIndex === 0 }"></span>
         </template>
-        <h3 :class="{ &quot;container-title&quot;: true, &quot;first-ctitle&quot;: containerIndex === 0, [container.status]: container.status }" @click="showContainerPanel">
-            <status-icon type="container" :editable="editable" :job-option="container.jobControlOption" :status="container.status">
+        <h3 :class="{ 'container-title': true, 'first-ctitle': containerIndex === 0, [container.status]: container.status }" @click.stop="showContainerPanel">
+            <status-icon type="container" :editable="editable" :container-disabled="containerDisabled" :status="container.status">
                 {{ containerSerialNum }}
             </status-icon>
             <p class="container-name">
@@ -24,7 +24,16 @@
             </span>
             <bk-button v-if="showDebugBtn" class="debug-btn" theme="warning" @click.stop="debugDocker">{{ $t('editPage.docker.debugConsole') }}</bk-button>
         </h3>
-        <atom-list :container="container" :editable="editable" :is-preview="isPreview" :can-skip-element="canSkipElement" :stage-index="stageIndex" :container-index="containerIndex" :container-status="container.status">
+        <atom-list
+            :container="container"
+            :editable="editable"
+            :is-preview="isPreview"
+            :can-skip-element="canSkipElement"
+            :stage-index="stageIndex"
+            :container-index="containerIndex"
+            :container-status="container.status"
+            :container-disabled="containerDisabled"
+        >
         </atom-list>
     </div>
 </template>
@@ -50,6 +59,7 @@
             containerIndex: Number,
             stageLength: Number,
             containerLength: Number,
+            stageDisabled: Boolean,
             editable: {
                 type: Boolean,
                 default: true
@@ -99,11 +109,18 @@
             isDocker () {
                 return this.isDockerBuildResource(this.container)
             },
+            buildResourceType () {
+                try {
+                    return this.container.dispatchType.buildType
+                } catch (e) {
+                    return 'DOCKER'
+                }
+            },
             showDebugBtn () {
-                return this.container.baseOS === 'LINUX' && this.isDocker && (this.container.status === 'FAILED' && this.$route.name === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion)
+                return this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && (this.container.status === 'FAILED' && this.$route.name === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion)
             },
             containerDisabled () {
-                return !!(this.container.jobControlOption && this.container.jobControlOption.enable === false)
+                return !!(this.container.jobControlOption && this.container.jobControlOption.enable === false) || this.stageDisabled
             }
         },
         watch: {
@@ -115,7 +132,7 @@
             'container.runContainer' (newVal) {
                 const { container, updateContainer } = this
                 const { elements } = container
-                if (this.containerDisabled) return
+                if (this.containerDisabled && newVal) return
                 elements.filter(item => (item.additionalOptions === undefined || item.additionalOptions.enable)).map(item => {
                     item.canElementSkip = newVal
                     return false
@@ -188,22 +205,28 @@
                 const vmSeqId = this.getRealSeqId()
                 const projectId = this.$route.params.projectId
                 const pipelineId = this.$route.params.pipelineId
+                const buildId = this.$route.params.buildNo
                 let url = ''
                 const tab = window.open('about:blank')
                 try {
-                    const res = await this.startDebugDocker({
-                        projectId: projectId,
-                        pipelineId: pipelineId,
-                        vmSeqId,
-                        imageCode: this.container.dispatchType && this.container.dispatchType.imageCode,
-                        imageVersion: this.container.dispatchType && this.container.dispatchType.imageVersion,
-                        imageName: this.container.dispatchType && this.container.dispatchType.value ? this.container.dispatchType.value : this.container.dockerBuildVersion,
-                        buildEnv: this.container.buildEnv,
-                        imageType: this.container.dispatchType && this.container.dispatchType.imageType ? this.container.dispatchType.imageType : 'BKDEVOPS',
-                        credentialId: this.container.dispatchType && this.container.dispatchType.credentialId ? this.container.dispatchType.credentialId : ''
-                    })
-                    if (res === true) {
-                        url = `${WEB_URL_PIRFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                    if (this.buildResourceType === 'DOCKER') {
+                        const res = await this.startDebugDocker({
+                            projectId: projectId,
+                            pipelineId: pipelineId,
+                            vmSeqId,
+                            imageCode: this.container.dispatchType && this.container.dispatchType.imageCode,
+                            imageVersion: this.container.dispatchType && this.container.dispatchType.imageVersion,
+                            imageName: this.container.dispatchType && this.container.dispatchType.value ? this.container.dispatchType.value : this.container.dockerBuildVersion,
+                            buildEnv: this.container.buildEnv,
+                            imageType: this.container.dispatchType && this.container.dispatchType.imageType ? this.container.dispatchType.imageType : 'BKDEVOPS',
+                            credentialId: this.container.dispatchType && this.container.dispatchType.credentialId ? this.container.dispatchType.credentialId : ''
+                        })
+                        if (res === true) {
+                            url = `${WEB_URL_PIRFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                        }
+                    } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
+                        const buildIdStr = buildId ? `&buildId=${buildId}` : ''
+                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
                     tab.location = url
                 } catch (err) {

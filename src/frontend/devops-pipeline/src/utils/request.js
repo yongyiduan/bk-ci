@@ -20,6 +20,7 @@
 import axios from 'axios'
 import Vue from 'vue'
 import { bus } from './bus'
+import { isAbsoluteURL } from './util'
 import * as cookie from 'js-cookie'
 
 const request = axios.create({
@@ -35,10 +36,6 @@ const request = axios.create({
 
 function errorHandler (error) {
     return Promise.reject(error)
-}
-
-function isAbsoluteURL (url = '') {
-    return /^https?:\/\//i.test(url)
 }
 
 request.interceptors.request.use(config => {
