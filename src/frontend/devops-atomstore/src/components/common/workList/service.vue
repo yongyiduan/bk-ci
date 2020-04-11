@@ -50,7 +50,7 @@
                         v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
                         @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'workList' } })"> {{ $t('store.安装') }} </span>
                     <span class="schedule-btn"
-                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING'].includes(props.row.serviceStatus)"
+                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING', 'RELEASE_DEPLOYING', 'RELEASE_DEPLOY_FAIL'].includes(props.row.serviceStatus)"
                         @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
                     <span class="obtained-btn"
                         v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
@@ -291,6 +291,8 @@
                     case 'BUILD_FAIL':
                     case 'UNDERCARRIAGING':
                     case 'TESTING':
+                    case 'RELEASE_DEPLOY_FAIL':
+                    case 'RELEASE_DEPLOYING':
                         icon = 'doing'
                         break
                     case 'RELEASED':

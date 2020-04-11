@@ -1,5 +1,7 @@
 {
     "store": "Store",
+    "正式发布部署中": "Officially released",
+    "正式发布部署失败": "Official release deployment failed",
     "字段不超过20个字符": "Field does not exceed 20 characters",
     "重新部署": "Redeploy",
     "源码": "Source code",
