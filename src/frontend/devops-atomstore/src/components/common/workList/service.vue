@@ -50,7 +50,7 @@
                         v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
                         @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'workList' } })"> {{ $t('store.安装') }} </span>
                     <span class="schedule-btn"
-                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING'].includes(props.row.serviceStatus)"
+                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING', 'RELEASE_DEPLOYING', 'RELEASE_DEPLOY_FAIL'].includes(props.row.serviceStatus)"
                         @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
                     <span class="obtained-btn"
                         v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
@@ -73,10 +73,10 @@
                     v-bkloading="{ isLoading: relateServiceData.isLoading }"
                     v-if="hasOauth"
                 >
-                    <bk-form-item :label="$t('store.扩展名称')" :required="true" property="serviceName" :desc="$t('store.展示给用户的名称，用户根据名称识别扩展服务')" :rules="[requireRule]">
+                    <bk-form-item :label="$t('store.扩展名称')" :required="true" property="serviceName" :desc="$t('store.展示给用户的名称，用户根据名称识别扩展服务')" :rules="[requireRule, numMax]">
                         <bk-input v-model="relateServiceData.form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.扩展标识')" :required="true" property="serviceCode" :desc="$t('store.唯一标识，创建后不能修改。将作为扩展的代码库名称')" :rules="[requireRule, alpRule]">
+                    <bk-form-item :label="$t('store.扩展标识')" :required="true" property="serviceCode" :desc="$t('store.唯一标识，创建后不能修改。将作为扩展的代码库名称')" :rules="[requireRule, alpRule, numMax]">
                         <bk-input v-model="relateServiceData.form.serviceCode" :placeholder="$t('store.请输入扩展标识')"></bk-input>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.扩展点')" :required="true" property="extensionItemList" :desc="$t('store.扩展服务生效的功能区域')" :rules="[requireRule]">
@@ -246,6 +246,11 @@
                     message: this.$t('store.必填项'),
                     trigger: 'blur'
                 },
+                numMax: {
+                    validator: (val = '') => (val.length <= 20),
+                    message: this.$t('store.字段不超过20个字符'),
+                    trigger: 'blur'
+                },
                 alpRule: {
                     validator: (val) => (/^[a-z][a-z0-9-]*$/.test(val)),
                     message: this.$t('store.由小写英文字母、数字和中划线组成，且需以小写英文字母开头'),
@@ -286,6 +291,8 @@
                     case 'BUILD_FAIL':
                     case 'UNDERCARRIAGING':
                     case 'TESTING':
+                    case 'RELEASE_DEPLOY_FAIL':
+                    case 'RELEASE_DEPLOYING':
                         icon = 'doing'
                         break
                     case 'RELEASED':

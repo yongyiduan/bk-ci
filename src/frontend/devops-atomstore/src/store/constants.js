@@ -71,6 +71,8 @@ export const serviceStatusMap = {
     'EDIT': 'store.填写相关信息中',
     'AUDITING': 'store.审核中',
     'AUDIT_REJECT': 'store.审核驳回',
+    'RELEASE_DEPLOYING': 'store.正式发布部署中',
+    'RELEASE_DEPLOY_FAIL': 'store.正式发布部署失败',
     'RELEASED': 'store.已发布',
     'GROUNDING_SUSPENSION': 'store.上架中止',
     'UNDERCARRIAGING': 'store.下架中',
