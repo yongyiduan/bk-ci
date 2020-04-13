@@ -63,6 +63,7 @@
             </bk-table-column>
         </bk-table>
 
+
         <bk-sideslider
             class="create-atom-slider"
             :is-show.sync="templatesideConfig.show"

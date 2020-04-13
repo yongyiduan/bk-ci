@@ -36,7 +36,7 @@
                             >
                             </selector>
                             <bk-popover placement="right" :max-width="250">
-                                <i class="bk-icon icon-info-circle"></i>
+                                <i class="devops-icon icon-info-circle"></i>
                                 <div slot="content" style="white-space: normal;">
                                     <div>
                                         {{ getTypeDesc(localConfig.credentialType) }}
