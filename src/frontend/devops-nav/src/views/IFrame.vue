@@ -9,7 +9,7 @@
         />
         <div
             v-bkloading="{ isLoading }"
-            :style="{ height: &quot;100%&quot; }"
+            :style="{ height: '100%' }"
         >
             <iframe
                 v-if="src"
@@ -219,6 +219,14 @@
             if (this.$refs.iframeEle) {
                 const childWin = this.$refs.iframeEle.contentWindow
                 this.iframeUtil.syncLocale(childWin, locale)
+            }
+        }
+
+        @Watch('serviceHooks')
+        handleServiceHookChange (hooks) {
+            if (this.$refs.iframeEle) {
+                const childWin = this.$refs.iframeEle.contentWindow
+                this.iframeUtil.syncServiceHooks(childWin, hooks)
             }
         }
     }

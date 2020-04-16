@@ -1,7 +1,7 @@
 <template>
     <bk-sideslider :is-show.sync="show" :quick-close="quickClose" v-bind="asidePanelOption">
         <div slot="header">{{ header }}</div>
-        <div slot="content" class="extention-aside-panel-content">
+        <div slot="content" class="extention-aside-panel-content" v-bkloading="{ isLoading: !loaded }">
             <iframe v-if="show" @load="onload" ref="extensionIframe" class="extention-aside-panel-content-iframe" :src="src" />
         </div>
     </bk-sideslider>
@@ -10,7 +10,7 @@
 <script lang='ts'>
     import Vue from 'vue'
     import eventBus from '@/utils/eventBus'
-    import { Component } from 'vue-property-decorator'
+    import { Component, Watch } from 'vue-property-decorator'
     @Component
     export default class ExtensionAdiePanel extends Vue {
         src: string = ''
@@ -28,23 +28,10 @@
                 ...options
             }
         }
- 
-        updateProps (props) {
-            Object.keys(props).map(prop => {
-              this[prop] = props[prop]
-            })
-        }
 
-        onload () {
-            try {
-                // @ts-ignore
-                this.$refs.extensionIframe.contentWindow.postMessage({
-                    action: 'syncCustomData',
-                    params: JSON.stringify(this.customData)
-                }, '*')
-            } catch (e) {
-                console.warn('can not find extensionIframe')
-            }
+        @Watch('customData')
+        handleCustomDataChange (data) {
+            this.syncData(data)
         }
 
         mounted () {
@@ -53,6 +40,29 @@
         
         beforeDestroy () {
             eventBus.$off('update-extension-aside-panel', this.updateProps)
+        }
+
+        updateProps (props) {
+            Object.keys(props).map(prop => {
+              this[prop] = props[prop]
+            })
+        }
+
+        onload () {
+            this.loaded = true
+            this.syncData(this.customData)
+        }
+
+        syncData (data) {
+            try {
+                // @ts-ignore
+                this.$refs.extensionIframe.contentWindow.postMessage({
+                    action: 'syncCustomData',
+                    params: JSON.stringify(data)
+                }, '*')
+            } catch (e) {
+                console.warn('can not find extensionIframe')
+            }
         }
     }
 </script>

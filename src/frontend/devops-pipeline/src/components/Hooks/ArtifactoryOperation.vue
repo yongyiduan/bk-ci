@@ -1,10 +1,10 @@
 <template>
-    <bk-dropdown-menu align="right">
+    <bk-dropdown-menu v-if="hasHookIds" align="right">
         <div slot="dropdown-trigger" class="hook-dropdown-trigger">
             <i class="entry-circle" v-for="i in [1, 2, 3]" :key="i" />
         </div>
         <ul class="artifactory-operation-hooks" slot="dropdown-content">
-            <li v-for="ext in artifactExtensions" :key="ext.serviceId" @click="hookAction(ext)" :title="getExtTooltip(ext)">
+            <li v-for="ext in extensions" :key="ext.serviceId" @click="hookAction(ext)" :title="getExtTooltip(ext)">
                 <img :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
                 <span> {{ ext.serviceName }} </span>
             </li>
@@ -13,45 +13,23 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
-    import { isAbsoluteURL, urlJoin } from '@/utils/util'
+    import customExtMixin from '@/mixins/custom-extension-mixin'
 
     export default {
         name: 'artifactory-operation-hooks',
+        mixins: [customExtMixin],
         props: {
             artifact: {
                 type: Object,
                 default: () => ({})
             }
         },
-        data () {
-            return {
-                artifactExtensions: []
-            }
-        },
         computed: {
-            ...mapGetters([
-                'artifactHooks',
-                'hookKeyMap'
-            ]),
-            hookIds () {
-                return this.artifactHooks.map(hook => hook.itemId).join(',')
+            hooks () {
+                return this.artifactHooks
             }
-        },
-        created () {
-            console.log(this.artifactHooks)
-            this.fetchExt()
         },
         methods: {
-            ...mapActions([
-                'fetchExtensionByHookId'
-            ]),
-            getExtTooltip (ext) {
-                return ext.props && ext.props.tooltip ? ext.props.tooltip : ext.tooltip
-            },
-            getExtIconUrl (ext) {
-                return ext.props && ext.props.iconUrl ? ext.props.iconUrl : ext.iconUrl
-            },
             hookAction (ext) {
                 const { props = {} } = ext
                 const { entryResUrl = 'index.html', options = {}, data = {} } = props
@@ -69,40 +47,6 @@
                         }
                     }
                 })
-            },
-            async fetchExt () {
-                try {
-                    const res = await this.fetchExtensionByHookId({
-                        projectCode: this.$route.params.projectId,
-                        itemIds: this.hookIds
-                    })
-                    console.log(res, this.hookIds, this.artifactHooks)
-                    let artifactExtensions = []
-                    this.artifactExtensionMap = res.data.reduce((artifactExtensionMap, ext) => {
-                        const extServiceList = ext.extServiceList.map(item => ({
-                            ...this.hookKeyMap[ext.itemId],
-                            ...item
-                        }))
-                        console.log(extServiceList, this.hookKeyMap[ext.itemId])
-                        artifactExtensionMap[ext.itemId] = [
-                            ...extServiceList
-                        ]
-
-                        artifactExtensions = [
-                            ...artifactExtensions,
-                            ...extServiceList
-                        ]
-
-                        return artifactExtensionMap
-                    }, {})
-                    console.log(artifactExtensions)
-                    this.artifactExtensions = artifactExtensions
-                } catch (error) {
-                    console.log(error)
-                }
-            },
-            getResUrl (url, baseURL) {
-                return isAbsoluteURL(url) ? url : urlJoin(baseURL, 'static', url)
             }
         }
     }
@@ -160,7 +104,7 @@
                 width: 16px;
                 height: 16px;
             }
-            
+
         }
     }
 </style>

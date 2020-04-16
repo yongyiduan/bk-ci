@@ -33,13 +33,12 @@ import {
     FETCH_ERROR,
     SET_SERVICE_HOOKS
 } from './constants'
-import { ARTIFACT_HOOK_CONST } from '../utils/extensionHooks'
+import { ARTIFACT_HOOK_CONST, PIPELINE_HISTORY_TAB_HOOK_CONST } from '../utils/extensionHooks'
 Vue.use(Vuex)
 
 function getHookByHTMLPath (htmlPath) {
     return state => {
         const { hooks } = state
-        console.log(state)
         return Array.isArray(hooks) ? hooks.filter(hook => hook.htmlPath === htmlPath) : []
     }
 }
@@ -96,7 +95,6 @@ export default new Vuex.Store({
     // 公共 actions
     actions: {
         setServiceHooks: ({ commit }, hooks) => {
-            console.log(hooks)
             commit(SET_SERVICE_HOOKS, hooks)
         },
         fetchExtensionByHookId: ({ commit }, { projectCode, itemIds }) => {
@@ -126,6 +124,7 @@ export default new Vuex.Store({
             }
             return null
         },
-        artifactHooks: getHookByHTMLPath(ARTIFACT_HOOK_CONST)
+        artifactHooks: getHookByHTMLPath(ARTIFACT_HOOK_CONST),
+        extensionTabsHooks: getHookByHTMLPath(PIPELINE_HISTORY_TAB_HOOK_CONST)
     }
 })

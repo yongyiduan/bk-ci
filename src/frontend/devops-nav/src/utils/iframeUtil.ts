@@ -1,5 +1,5 @@
 import eventBus from './eventBus'
-import { toggleAsidePanel } from './util'
+import { toggleAsidePanel, toggleDialog } from './util'
 
 interface UrlParam {
     url: string
@@ -38,11 +38,27 @@ function iframeUtil (router: any) {
                     show: true
                 })
                 break
+            case 'DIALOG':
+                toggleDialog({
+                    src: hook.url,
+                    title: hook.name,
+                    options: hook.target.options,
+                    customData: hook.target.data,
+                    show: true
+                })
+                break
         }
     }
 
     utilMap.closeAsidePanel = function (params) {
         toggleAsidePanel({
+            ...params,
+            show: false
+        })
+    }
+
+    utilMap.closeExtDialog = function (params) {
+        toggleDialog({
             ...params,
             show: false
         })
