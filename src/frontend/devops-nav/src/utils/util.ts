@@ -197,3 +197,11 @@ export function toggleAsidePanel (options) {
     }
     eventBus.$emit('update-extension-aside-panel', options)
 }
+
+export function toggleDialog (options) {
+    if (!isObject(options)) {
+        console.warn('需要传入一个对象')
+        return
+    }
+    eventBus.$emit('update-extension-dialog', options)
+}

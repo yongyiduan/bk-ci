@@ -26,14 +26,17 @@
     import showTooltip from '@/components/common/showTooltip'
     import TrendData from '@/components/trendData'
     import trendMixins from '@/components/trendData/trendMixins'
+    import customExtMixin from '@/mixins/custom-extension-mixin'
+    import { HistoryTabsHooks } from '@/components/Hooks/'
 
     export default {
         components: {
             BuildHistoryTab,
+            HistoryTabsHooks,
             showTooltip,
             TrendData
         },
-        mixins: [trendMixins],
+        mixins: [trendMixins, customExtMixin],
 
         props: {
             execHandler: Function
@@ -45,7 +48,6 @@
                 showFilterBar: false
             }
         },
-
         computed: {
             ...mapGetters('pipelines', {
                 'statusMap': 'getStatusMap',
@@ -53,11 +55,25 @@
                 'curPipeline': 'getCurPipeline',
                 'hisPageStatus': 'getHisPageStatus'
             }),
+            hooks () {
+                return this.extensionTabsHooks
+            },
             projectId () {
                 return this.$route.params.projectId
             },
             pipelineId () {
                 return this.$route.params.pipelineId
+            },
+            extensionTabs () {
+                return this.extensions.map(ext => ({
+                    name: ext.serviceName,
+                    label: ext.serviceName,
+                    component: HistoryTabsHooks,
+                    bindData: {
+                        tabData: ext.props.data,
+                        hookIframeUrl: this.getResUrl(ext.props.entryResUrl || 'index.html', ext.baseUrl)
+                    }
+                }))
             },
             panels () {
                 return [{
@@ -77,7 +93,8 @@
                             bindData: {
                                 dateRange: this.dateRange
                             }
-                        }
+                        },
+                        ...this.extensionTabs
                 ]
             },
             currentTab () {

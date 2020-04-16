@@ -26,6 +26,7 @@ const tencentCI = {};
     const CREATE_DIALOG = 'createDialog'
     const CREATE_ASIDE_PANEL = 'createAsidePanel'
     const CLOSE_ASIDE_PANEL = 'closeAsidePanel'
+    const CLOSE_EXT_DIALOG = 'closeExtDialog'
     const SYNC_CUSTOME_DATA = 'syncCustomData'
     const SHOW_TIPS = 'showTips'
 
@@ -110,6 +111,18 @@ const tencentCI = {};
     exports[CREATE_DIALOG] = function (params) {
         communicateOuter({
             action: CREATE_DIALOG,
+            params
+        })
+    }
+
+    /**
+     * 关闭弹窗
+     * @method closeExtDialog
+     */
+    
+    exports[CLOSE_EXT_DIALOG] = function (params) {
+        communicateOuter({
+            action: CLOSE_EXT_DIALOG,
             params
         })
     }

@@ -4,22 +4,27 @@
         theme="primary"
         :mask-close="false"
         header-position="left"
+        :title="title"
+        :close-icon="false"
+        :show-footer="false"
         v-bind="options"
     >
-        <iframe v-if="show" @load="onload" ref="extensionIframe" class="extention-dialog-content-iframe" :src="src" />
+        <div v-bkloading="{ isLoading: !loaded }">
+            <iframe v-if="show" @load="onload" ref="extensionIframe" class="extention-dialog-content-iframe" :src="src" />
+        </div>
     </bk-dialog>
 </template>
 
 <script lang='ts'>
     import Vue from 'vue'
     import eventBus from '@/utils/eventBus'
-    import { Component } from 'vue-property-decorator'
+    import { Component, Watch } from 'vue-property-decorator'
     @Component
     export default class ExtensionDialog extends Vue {
         src: string = ''
         show: boolean = false
         options: object | null = null
-        header: string = 'Title'
+        title: string = 'Title'
         customData: object | null = null
         loaded: boolean = false
 
@@ -29,16 +34,14 @@
             })
         }
 
+        @Watch('customData')
+        handleCustomDataChange (data) {
+            this.syncData(data)
+        }
+
         onload () {
-            try {
-                // @ts-ignore
-                this.$refs.extensionIframe.contentWindow.postMessage({
-                    action: 'syncCustomData',
-                    params: JSON.stringify(this.customData)
-                }, '*')
-            } catch (e) {
-                console.warn('can not find extensionIframe')
-            }
+            this.syncData(this.customData)
+            this.loaded = true
         }
 
         mounted () {
@@ -47,6 +50,18 @@
         
         beforeDestroy () {
             eventBus.$off('update-extension-dialog', this.updateProps)
+        }
+
+        syncData (data) {
+            try {
+                // @ts-ignore
+                this.$refs.extensionIframe.contentWindow.postMessage({
+                    action: 'syncCustomData',
+                    params: JSON.stringify(data)
+                }, '*')
+            } catch (e) {
+                console.warn('can not find extensionIframe')
+            }
         }
     }
 </script>

@@ -519,7 +519,7 @@
             span:last-child {
                 margin-right: 0px;
             }
-            
+
         }
         .qrcode {
             position: relative;
