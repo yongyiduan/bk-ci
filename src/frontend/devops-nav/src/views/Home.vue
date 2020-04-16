@@ -12,17 +12,20 @@
                         class="recent-visit-service-list"
                     >
                         <template v-if="recentVisitService.length">
-                            <router-link
+                            <a
                                 v-for="service in recentVisitService"
+                                :href="service.newWindow ? service.newWindowUrl : addConsole(service.link_new)"
                                 :key="service.key"
-                                :to="addConsole(service.link_new)"
+                                :target="service.newWindow ? '_blank' : '_self'"
+                                @click.prevent="gotoPage(service)"
                             >
                                 <Logo
                                     :name="service.key"
                                     size="16"
                                 />
+
                                 {{ serviceName(service.name) }}
-                            </router-link>
+                            </a>
                         </template>
                         <p
                             v-else
@@ -202,6 +205,11 @@
                 return sum
             }, 0)
         }
+        
+        gotoPage ({ link_new: linkNew, newWindow = false, newWindowUrl }) {
+           const destUrl = this.addConsole(linkNew)
+           newWindow ? window.open(newWindowUrl, '_blank') : this.$router.push(destUrl)
+       }
 
         updateShowAllService (show: boolean): void {
             this.isAllServiceListShow = show
