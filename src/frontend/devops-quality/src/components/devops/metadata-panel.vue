@@ -166,7 +166,6 @@
                 isInit: false,
                 loading: false,
                 currentTab: 'indexList',
-                // searchKey: '',
                 metaTree: [],
                 indicatorSetList: [],
                 indicatorList: [],
@@ -255,7 +254,6 @@
             },
             async requestIndicators () {
                 this.loading = true
-
                 try {
                     const res = await this.$store.dispatch('quality/requestIndicators', {
                         projectId: this.projectId
@@ -282,7 +280,6 @@
             },
             async requestControlPoint () {
                 this.loading = true
-
                 try {
                     const res = await this.$store.dispatch('quality/requestControlPoint', { projectId: this.projectId })
 
