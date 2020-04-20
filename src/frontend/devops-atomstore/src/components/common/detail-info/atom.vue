@@ -10,7 +10,7 @@
                     <span class="approve-msg">{{ $t('store.工蜂') }}</span>
                 </h5>
                 <template v-if="!isEnterprise && userInfo.type !== 'ADMIN' && detail.htmlTemplateVersion !== '1.0'">
-                    <h5 :title="approveMsg" :class="[{ 'not-public': approveMsg !== $t('store.协作') }]" @click="cooperation">
+                    <h5 :title="approveTip" :class="[{ 'not-public': approveMsg !== $t('store.协作') }]" @click="cooperation">
                         <icon class="detail-img" name="cooperation" size="16" />
                         <span class="approve-msg">{{approveMsg}}</span>
                     </h5>
@@ -150,11 +150,17 @@
                 const key = `${typeof this.userInfo.type}-${this.detail.approveStatus}`
                 const mapStatus = {
                     'undefined-WAIT': this.$t('store.审批中'),
-                    'undefined-PASS': this.$t('store.点击申请成为协作者'),
-                    'undefined-undefined': this.$t('store.点击申请成为协作者'),
-                    'undefined-REFUSE': this.$t('store.点击申请成为协作者')
+                    'undefined-PASS': this.$t('store.协作'),
+                    'undefined-undefined': this.$t('store.协作'),
+                    'undefined-REFUSE': this.$t('store.协作')
                 }
                 const res = mapStatus[key] || this.$t('store.已协作')
+                return res
+            },
+
+            approveTip () {
+                let res = this.approveMsg
+                if (res === this.$t('store.协作')) res = this.$t('store.点击申请成为协作者')
                 return res
             },
 
@@ -215,7 +221,7 @@
             },
 
             cooperation () {
-                if (this.approveMsg !== this.$t('store.点击申请成为协作者')) return
+                if (this.approveMsg !== this.$t('store.协作')) return
                 this.showCooperDialog = true
                 this.getProjectList()
             },
