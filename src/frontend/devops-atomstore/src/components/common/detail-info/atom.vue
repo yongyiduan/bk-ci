@@ -15,7 +15,7 @@
                         <span class="approve-msg">{{approveMsg}}</span>
                     </h5>
                 </template>
-                <h5 :title="$t('store.支持通过YAML的方式使用')" class="not-public" v-if="detail.yamlFlag">
+                <h5 :title="$t('store.支持通过YAML的方式使用')" class="nomal-title" v-if="detail.yamlFlag">
                     <icon class="detail-img" name="yaml" size="16" />
                     <span class="approve-msg">{{$t('store.YAML可用')}}</span>
                 </h5>
@@ -394,6 +394,11 @@
                 .detail-img {
                     fill: #9e9e9e;
                 }
+            }
+            h5.nomal-title {
+                cursor: auto;
+                background: none;
+                color: #333C48;
             }
         }
         .detail-info.detail-label {
