@@ -13,7 +13,7 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions, mapState } from 'vuex'
+    import { mapActions, mapState, mapGetters } from 'vuex'
     import ReferenceVariable from './ReferenceVariable'
     import AtomContent from './AtomContent.vue'
 
