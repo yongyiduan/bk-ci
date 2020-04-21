@@ -89,33 +89,22 @@
             }
         },
 
-        mounted () {
-            const { globalEnvs, atomCode, requestGlobalEnvs } = this
-
-            if (!globalEnvs) { // 获取环境变量列表
-                requestGlobalEnvs()
-            }
-            this.toggleAtomSelectorPopup(!atomCode)
-        },
         methods: {
             ...mapActions('atom', [
                 'toggleAtomSelectorPopup',
-                'requestGlobalEnvs',
                 'updateAtom',
-                'fetchAtomVersionList',
                 'togglePropertyPanel'
             ]),
-            ...mapActions('soda', [
-                'updateRefreshQualityLoading'
-            ]),
+
             toggleEditName (show) {
                 this.nameEditing = show
             },
+
             handleEditName (e) {
                 const { value } = e.target
                 this.handleUpdateAtom('name', value)
             },
-            
+
             handleUpdateAtom (name, val) {
                 this.updateAtom({
                     element: this.element,
