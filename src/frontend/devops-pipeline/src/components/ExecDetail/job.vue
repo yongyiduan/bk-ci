@@ -5,7 +5,7 @@
         :current-tab="currentTab"
     >
         <span class="head-tab" slot="tab">
-            <span @click="currentTab = 'log'" :class="{ active: currentTab === 'log' }">日志</span><span @click="currentTab = 'setting'" :class="{ active: currentTab === 'setting' }">配置</span>
+            <span @click="currentTab = 'log'" :class="{ active: currentTab === 'log' }">{{ $t('execDetail.log') }}</span><span @click="currentTab = 'setting'" :class="{ active: currentTab === 'setting' }">{{ $t('execDetail.setting') }}</span>
         </span>
         <span slot="tool"
             v-if="currentTab === 'setting' && $refs.container.showDebugDockerBtn"
@@ -16,6 +16,7 @@
             <job-log v-show="currentTab === 'log'"
                 :plugin-list="pluginList"
                 :build-id="execDetail.id"
+                :down-load-link="downLoadJobLink"
                 ref="jobLog"
             />
             <container-content v-show="currentTab === 'setting'"
