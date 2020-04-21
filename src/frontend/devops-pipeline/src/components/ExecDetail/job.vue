@@ -8,9 +8,9 @@
             <span @click="currentTab = 'log'" :class="{ active: currentTab === 'log' }">日志</span><span @click="currentTab = 'setting'" :class="{ active: currentTab === 'setting' }">配置</span>
         </span>
         <span slot="tool"
-            v-if="currentTab === 'setting'"
-            class="tool-debug"
-            @click="startDebug"
+            v-if="currentTab === 'setting' && $refs.container.showDebugDockerBtn"
+            class="head-tool"
+            @click="$refs.container.startDebug"
         >{{ $t('editPage.docker.debugConsole') }}</span>
         <template v-slot:content>
             <job-log v-show="currentTab === 'log'"
@@ -23,6 +23,7 @@
                 :stage-index="editingElementPos.stageIndex"
                 :stages="execDetail.model.stages"
                 :editable="false"
+                ref="container"
             />
         </template>
     </detail-container>
@@ -84,11 +85,5 @@
     /deep/ .container-property-panel {
         padding: 10px 50px;
         overflow: auto;
-    }
-    .tool-debug {
-        cursor: pointer;
-        font-size: 14px;
-        margin-right: 5px;
-        color: #3c96ff;
     }
 </style>

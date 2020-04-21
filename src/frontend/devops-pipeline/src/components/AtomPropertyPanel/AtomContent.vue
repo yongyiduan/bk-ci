@@ -5,7 +5,7 @@
                 <div :class="{ 'form-field': true, 'bk-form-inline-item': true, 'is-danger': errors.has('@type') }">
                     <label :title="$t('atom')" class="bk-label">{{ $t('atom') }}：</label>
                     <bk-popover placement="right" theme="light" class="form-field-icon atom-name-field" v-if="atom && (atom.summary || atom.docsLink)">
-                        <i class="bk-icon icon-info-circle"></i>
+                        <i class="devops-icon icon-info-circle"></i>
                         <div slot="content" style="font-size: 12px; width: 350px; min-height: 100px;">
                             <div class="atom-desc-content">
                                 <p v-if="atom.summary">{{ $t('desc') }}：{{ atom.summary }}</p>
@@ -43,7 +43,7 @@
             <div class="atom-form-content">
                 <div class="no-atom-tips" v-if="!atom && atomCode">
                     <div class="no-atom-tips-icon">
-                        <i class="bk-icon icon-info-circle-shape" size="14" />
+                        <i class="devops-icon icon-info-circle-shape" size="14" />
                     </div>
                     <p>{{ $t('editPage.noAtomVersion') }}</p>
                 </div>
@@ -65,7 +65,6 @@
                     <div
                         v-if="atom.atomModal"
                         :is="AtomComponent"
-                        :atom="atom.atomModal"
                         :element-index="elementIndex"
                         :container-index="containerIndex"
                         :stage-index="stageIndex"
@@ -106,47 +105,81 @@
     import NormalAtom from './NormalAtom'
     import VuexInput from '@/components/atomFormField/VuexInput'
     import Selector from '@/components/atomFormField/Selector'
+    import Gcloud from './Gcloud'
+    import JobExecuteTaskExt from './JobExecuteTaskExt'
     import FormField from './FormField'
     import BuildArchiveGet from './BuildArchiveGet'
+    import Codecc from './Codecc'
     import { isObject } from '@/utils/util'
     import { bus } from '@/utils/bus'
+    import JobDevopsFastExecuteScript from './JobDevopsFastExecuteScript'
+    import Tcls from './Tcls'
+    import JobDevOpsFastPushFile from './JobDevOpsFastPushFile'
+    import JobDevopsExecuteTaskExt from './JobDevopsExecuteTaskExt'
+    import ZhiyunInstanceMaintenance from './ZhiyunInstanceMaintenance'
     import TimerTrigger from './TimerTrigger'
+    import Tcm from './Tcm'
     import CodePullGitX from './CodePullGitX'
     import CodePullSvn from './CodePullSvn'
+    import ZhiyunUpdateAsyncEX from './ZhiyunUpdateAsyncEX'
     import IosCertInstall from './IosCertInstall'
+    import BcsContainerOp from './BcsContainerOp'
+    import NewBcsContainerOp from './NewBcsContainerOp'
     import CrossDistribute from './CrossDistribute'
+    import VersionExperience from './VersionExperience'
     import SendWechatNotify from './SendWechatNotify'
+    import WeTest from './WeTest'
+    import jobCloudsFastPush from './jobCloudsFastPush'
+    import jobCloudsFastExecuteScript from './jobCloudsFastExecuteScript'
     import CodeSvnWebHookTrigger from './CodeSvnWebHookTrigger'
     import ReportArchive from './ReportArchive'
     import PullGithub from './PullGithub'
     import CodeGithubWebHookTrigger from './CodeGithubWebHookTrigger'
     import PushImageToThirdRepo from './PushImageToThirdRepo'
     import ReferenceVariable from './ReferenceVariable'
+    import AtomFormWithAppID from './AtomFormWithAppID'
     import NormalAtomV2 from './NormalAtomV2'
     import CodeGitWebHookTrigger from './CodeGitWebHookTrigger'
     import SubPipelineCall from './SubPipelineCall'
     import Logo from '@/components/Logo'
 
     export default {
-        name: 'atom-property-panel',
+        name: 'atom-content',
         components: {
             RemoteAtom,
             ReferenceVariable,
             AtomOption,
             VuexInput,
             Selector,
+            Gcloud,
+            JobExecuteTaskExt,
             FormField,
             BuildArchiveGet,
+            Codecc,
+            JobDevopsFastExecuteScript,
+            Tcls,
+            JobDevOpsFastPushFile,
+            JobDevopsExecuteTaskExt,
+            ZhiyunInstanceMaintenance,
             CodePullGitX,
             CodePullSvn,
+            ZhiyunUpdateAsyncEX,
+            Tcm,
             IosCertInstall,
+            BcsContainerOp,
+            NewBcsContainerOp,
             CrossDistribute,
+            VersionExperience,
             SendWechatNotify,
             QualitygateTips,
+            WeTest,
             CodeGithubWebHookTrigger,
+            jobCloudsFastPush,
+            jobCloudsFastExecuteScript,
             ReportArchive,
             CodeSvnWebHookTrigger,
             PullGithub,
+            AtomFormWithAppID,
             NormalAtomV2,
             PushImageToThirdRepo,
             CodeGitWebHookTrigger,
@@ -163,6 +196,7 @@
         },
         data () {
             return {
+                nameEditing: false,
                 isSetted: false,
                 isSupportVersion: true,
                 curVersionRelativeRules: [],
@@ -195,8 +229,20 @@
                 'atomMap',
                 'atomModalMap',
                 'fetchingAtmoModal',
-                'atomVersionList'
+                'atomVersionList',
+                'isPropertyPanelVisible'
             ]),
+            visible: {
+                get () {
+                    return this.isPropertyPanelVisible
+                },
+                set (value) {
+                    this.toggleAtomSelectorPopup(value)
+                    this.togglePropertyPanel({
+                        isShow: value
+                    })
+                }
+            },
             projectId () {
                 return this.$route.params.projectId
             },
@@ -296,31 +342,69 @@
                 return Array.isArray(this.atomVersionList) && this.atomVersionList.length > 0
             },
             AtomComponent () {
-                if (this.atomCode === 'ddtestatomdev' || this.atomCode === 'CodeccCheckAtom') {
+                if (this.atom.htmlTemplateVersion === '1.2' || this.atomCode === 'CodeccCheckAtomDebug' || this.atomCode === 'CodeccCheckAtom') {
                     return RemoteAtom
                 }
                 if (this.isNewAtomTemplate(this.atom.htmlTemplateVersion)) {
                     return NormalAtomV2
                 }
                 switch (this.atomCode) {
+                    case 'comDistribution':
+                    case 'cloudStone':
+                    case 'openStatePushFile':
+                    case 'gseKitProcRunCmdDev':
+                    case 'gseKitProcRunCmdProd':
+                        return AtomFormWithAppID
                     case 'timerTrigger':
                         return TimerTrigger
                     case 'linuxScript':
                     case 'windowsScript':
                         return BuildScript
+                    case 'linuxPaasCodeCCScript':
+                        return Codecc
                     case 'unity3dBuild':
                         return Unity3dBuild
+                    case 'gcloud':
+                        return Gcloud
+                    case 'jobExecuteTaskExt':
+                        return JobExecuteTaskExt
                     case 'buildArchiveGet':
                         return BuildArchiveGet
+                    case 'jobDevOpsFastExecuteScript':
+                        return JobDevopsFastExecuteScript
+                    case 'tclsAddVersion':
+                        return Tcls
+                    case 'jobDevOpsFastPushFile':
+                        return JobDevOpsFastPushFile
+                    case 'jobDevOpsExecuteTaskExt':
+                        return JobDevopsExecuteTaskExt
+                    case 'zhiyunInstanceMaintenance':
+                        return ZhiyunInstanceMaintenance
                     case 'CODE_GIT':
                     case 'CODE_GITLAB':
                         return CodePullGitX
                     case 'CODE_SVN':
                         return CodePullSvn
+                    case 'zhiyunUpdateAsyncEX':
+                        return ZhiyunUpdateAsyncEX
+                    case 'tcmElement':
+                        return Tcm
                     case 'iosCertInstall':
                         return IosCertInstall
+                    case 'bcsContainerOp':
+                        return BcsContainerOp
+                    case 'bcsContainerOpByName':
+                        return NewBcsContainerOp
                     case 'acrossProjectDistribution':
                         return CrossDistribute
+                    case 'experience':
+                        return VersionExperience
+                    case 'wetestElement':
+                        return WeTest
+                    case 'jobCloudsFastPush':
+                        return jobCloudsFastPush
+                    case 'jobCloudsFastExecuteScript':
+                        return jobCloudsFastExecuteScript
                     case 'sendRTXNotify':
                         return SendWechatNotify
                     case 'reportArchive':
@@ -390,11 +474,19 @@
                 'updateAtomType',
                 'fetchAtoms',
                 'fetchAtomModal',
-                'fetchAtomVersionList'
+                'fetchAtomVersionList',
+                'togglePropertyPanel'
             ]),
             ...mapActions('soda', [
                 'updateRefreshQualityLoading'
             ]),
+            toggleEditName (show) {
+                this.nameEditing = show
+            },
+            handleEditName (e) {
+                const { value } = e.target
+                this.handleUpdateAtom('name', value)
+            },
             setAtomValidate (addErrors, removeErrors) {
                 if (addErrors && addErrors.length) {
                     addErrors.map(e => this.errors.add(e))
@@ -623,6 +715,37 @@
     }
     .atom-option {
         margin-bottom: 50px;
+    }
+    .property-panel-header {
+        font-size: 14px;
+        font-weight:normal;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 60px;
+        width: calc(100% - 30px);
+        border-bottom: 1px solid #e6e6e6;
+
+        .atom-name-edit {
+            display: flex;
+            height: 36px;
+            line-height: 36px;
+            > p {
+                max-width: 450px;
+                @include ellipsis();
+            }
+            > .bk-form-input {
+                width: 450px;
+            }
+            .icon-edit {
+                cursor: pointer;
+                margin-left: 12px;
+                line-height: 36px;
+                &.editing {
+                    display: none;
+                }
+            }
+        }
     }
     .atom-select-entry {
         display: flex;

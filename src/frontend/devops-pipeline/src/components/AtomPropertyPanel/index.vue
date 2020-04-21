@@ -14,14 +14,14 @@
 
 <script>
     import { mapGetters, mapActions, mapState } from 'vuex'
-    import AtomContent from './AtomContent'
     import ReferenceVariable from './ReferenceVariable'
+    import AtomContent from './AtomContent.vue'
 
     export default {
         name: 'atom-property-panel',
         components: {
-            AtomContent,
-            ReferenceVariable
+            ReferenceVariable,
+            AtomContent
         },
         props: {
             elementIndex: Number,
@@ -37,16 +37,28 @@
             }
         },
         computed: {
-            ...mapState('atom', [
-                'globalEnvs',
-                'isPropertyPanelVisible'
-            ]),
             ...mapGetters('atom', [
+                'getDefaultVersion',
                 'getElement',
                 'getContainer',
                 'getContainers',
                 'getStage'
             ]),
+            ...mapState('atom', [
+                'globalEnvs',
+                'isPropertyPanelVisible'
+            ]),
+            visible: {
+                get () {
+                    return this.isPropertyPanelVisible
+                },
+                set (value) {
+                    this.toggleAtomSelectorPopup(value)
+                    this.togglePropertyPanel({
+                        isShow: value
+                    })
+                }
+            },
             stage () {
                 const { stageIndex, getStage, stages } = this
                 return getStage(stages, stageIndex)
@@ -64,24 +76,37 @@
                 const element = getElement(container, elementIndex)
                 return element
             },
-            visible: {
-                get () {
-                    return this.isPropertyPanelVisible
-                },
-                set (value) {
-                    this.toggleAtomSelectorPopup(value)
-                    this.togglePropertyPanel({
-                        isShow: value
-                    })
+            atomCode () {
+                if (this.element) {
+                    const isThrid = this.element.atomCode && this.element['@type'] !== this.element.atomCode
+                    if (isThrid) {
+                        return this.element.atomCode
+                    } else {
+                        return this.element['@type']
+                    }
                 }
+                return ''
             }
         },
 
+        mounted () {
+            const { globalEnvs, atomCode, requestGlobalEnvs } = this
+
+            if (!globalEnvs) { // 获取环境变量列表
+                requestGlobalEnvs()
+            }
+            this.toggleAtomSelectorPopup(!atomCode)
+        },
         methods: {
             ...mapActions('atom', [
                 'toggleAtomSelectorPopup',
+                'requestGlobalEnvs',
                 'updateAtom',
+                'fetchAtomVersionList',
                 'togglePropertyPanel'
+            ]),
+            ...mapActions('soda', [
+                'updateRefreshQualityLoading'
             ]),
             toggleEditName (show) {
                 this.nameEditing = show
@@ -90,7 +115,7 @@
                 const { value } = e.target
                 this.handleUpdateAtom('name', value)
             },
-
+            
             handleUpdateAtom (name, val) {
                 this.updateAtom({
                     element: this.element,
