@@ -318,7 +318,7 @@
 
             async checkIsOAuth () {
                 try {
-                    const res = await this.$store.dispatch('store/checkIsOAuth', { type: 'EXT_SERVICE_MARKET', code: '' })
+                    const res = await this.$store.dispatch('store/checkIsOAuth')
                     this.hasOauth = res.status === 200
                     this.gitOAuthUrl = res.url
                 } catch (err) {

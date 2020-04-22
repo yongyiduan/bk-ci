@@ -271,7 +271,7 @@
             modifyRepoMemInfo () {
                 const serviceCode = this.currentService.serviceCode
                 const projectCode = this.currentService.projectCode
-                this.$store.dispatch('store/checkIsOAuth', { type: 'EXT_SERVICE_REPOSITORY', serviceCode }).then((res) => {
+                this.$store.dispatch('store/checkIsOAuth').then((res) => {
                     if (res.status === 403) {
                         window.open(res.url, '_self')
                         return

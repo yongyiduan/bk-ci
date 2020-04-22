@@ -47,7 +47,7 @@
                                     :name="option.name">
                                 </bk-option>
                             </bk-select>
-                            <div class="prompt-tips"> {{ $t('store.若列表中找不到用户，请先将其添加为插件所属调试项目的成员') }} </div>
+                            <div class="prompt-tips"> {{ $t('store.若列表中找不到用户，请先将其添加为调试项目的成员') }} </div>
                             <div class="error-tips" v-if="nameError"> {{ $t('store.成员名称不能为空') }}</div>
                         </div>
                     </div>

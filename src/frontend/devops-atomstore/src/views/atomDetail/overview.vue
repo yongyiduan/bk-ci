@@ -144,7 +144,7 @@
             modifyRepoMemInfo () {
                 const atomCode = this.atomCode
                 const projectCode = this.codeForm.projectCode
-                this.$store.dispatch('store/checkIsOAuth', { type: 'ATOM_REPOSITORY', code: atomCode }).then((res) => {
+                this.$store.dispatch('store/checkIsOAuth').then((res) => {
                     if (res.status === 403) {
                         window.open(res.url, '_self')
                         return
