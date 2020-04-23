@@ -120,8 +120,8 @@ const commonModules = {
         /**
          * git OAuth授权
          */
-        checkIsOAuth ({ commit }, { type, code }) {
-            return vue.$ajax.get(`${repositoryPrefix}/user/git/isOauth?redirectUrlType=${type}&storeCode=${code}`)
+        checkIsOAuth ({ commit }, redirectUrl = location.href) {
+            return vue.$ajax.get(`${repositoryPrefix}/user/git/isOauth?redirectUrlType=SPEC&redirectUrl=${redirectUrl}`)
         }
     },
     getters: {
