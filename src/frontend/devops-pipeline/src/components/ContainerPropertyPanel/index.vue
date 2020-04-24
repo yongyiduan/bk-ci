@@ -58,13 +58,23 @@
                 const { stageIndex, stages } = this
                 return this.getStage(stages, stageIndex)
             },
+
             containers () {
                 const { stage, getContainers } = this
                 return getContainers(stage)
             },
+
             container () {
                 const { containers, containerIndex } = this
                 return this.getContainer(containers, containerIndex)
+            },
+
+            buildResourceType () {
+                try {
+                    return this.container.dispatchType.buildType
+                } catch (e) {
+                    return ''
+                }
             },
 
             buildResource () {
