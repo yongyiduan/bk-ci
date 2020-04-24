@@ -295,7 +295,7 @@
             }
         }
         .detail-info.detail-label {
-            width: 829px;
+            width: 100%;
             padding-left: 90px;
             display: inline-block;
             position: relative;

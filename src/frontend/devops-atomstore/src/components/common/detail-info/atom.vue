@@ -9,7 +9,7 @@
                     <span class="approve-msg">{{ isPublic ? $t('store.源码') : $t('store.未开源') }}</span>
                 </h5>
                 <template v-if="!isEnterprise && userInfo.type !== 'ADMIN' && detail.htmlTemplateVersion !== '1.0'">
-                    <h5 :title="approveMsg" :class="[{ 'not-public': approveMsg !== $t('store.协作') }]" @click="cooperation">
+                    <h5 :title="approveTip" :class="[{ 'not-public': approveMsg !== $t('store.协作') }]" @click="cooperation">
                         <icon class="detail-img" name="cooperation" size="16" />
                         <span class="approve-msg">{{approveMsg}}</span>
                     </h5>
