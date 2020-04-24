@@ -132,7 +132,7 @@
             background: none;
             padding-right: 0;
             width: calc(100% - 77px);
-            margin-left: 77px;
+            margin-left: 59px;
             button {
                 margin: 10px 5px;
                 height: 28px;

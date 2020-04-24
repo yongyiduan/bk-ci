@@ -14,6 +14,10 @@
                         <span class="approve-msg">{{approveMsg}}</span>
                     </h5>
                 </template>
+                <h5 :title="$t('store.点击查看YAML片段')" v-if="detail.yamlFlag && detail.recommendFlag" @click="$emit('update:currentTab', 'YAML')">
+                    <icon class="detail-img" name="yaml" size="16" />
+                    <span class="approve-msg">{{ $t('store.YAML可用') }}</span>
+                </h5>
             </h3>
             <h5 class="detail-info">
                 <span> {{ $t('store.发布者：') }} </span><span>{{detail.publisher || '-'}}</span>
@@ -102,7 +106,8 @@
         },
 
         props: {
-            detail: Object
+            detail: Object,
+            currentTab: String
         },
 
         data () {
@@ -150,6 +155,12 @@
                     'undefined-REFUSE': this.$t('store.协作')
                 }
                 const res = mapStatus[key] || this.$t('store.已协作')
+                return res
+            },
+
+            approveTip () {
+                let res = this.approveMsg
+                if (res === this.$t('store.协作')) res = this.$t('store.点击申请成为协作者')
                 return res
             },
 
@@ -357,6 +368,9 @@
         .title-with-img {
             display: flex;
             align-items: center;
+            .not-recommend {
+                text-decoration: line-through;
+            }
             >h5 {
                 margin-left: 12px;
                 line-height: 14px;
@@ -389,6 +403,11 @@
                 .detail-img {
                     fill: #9e9e9e;
                 }
+            }
+            h5.nomal-title {
+                cursor: auto;
+                background: none;
+                color: #333C48;
             }
         }
         .detail-info.detail-label {

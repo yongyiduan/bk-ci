@@ -13,9 +13,9 @@
         </h3>
 
         <main class="store-main" v-if="!isLoading">
-            <component :is="`${type}Info`" :detail="detail" class="detail-info"></component>
+            <component :is="`${type}Info`" :detail="detail" class="detail-info" :current-tab.sync="currentTab"></component>
             <bk-tab type="unborder-card" :active.sync="currentTab" class="detail-tabs">
-                <bk-tab-panel :name="tab.name" :label="tab.label" v-for="(tab, index) in tabList[type]" :key="index">
+                <bk-tab-panel :name="tab.name" :label="tab.label" v-for="(tab, index) in tabList[type].filter(x => !x.hidden)" :key="index">
                     <component :is="tab.componentName" v-bind="tab.bindData"></component>
                 </bk-tab-panel>
             </bk-tab>
@@ -51,9 +51,6 @@
                 switch (val) {
                     case 'template':
                         res = bkLocale.$t('store.流水线模板')
-                        break
-                    case 'ide':
-                        res = bkLocale.$t('store.IDE插件')
                         break
                     case 'image':
                         res = bkLocale.$t('store.容器镜像')
@@ -91,7 +88,7 @@
                 return {
                     atom: [
                         { componentName: 'detailScore', label: this.$t('概述'), name: 'des' },
-                        { componentName: 'codeSection', label: 'YAML', name: 'YAML', bindData: { code: this.detail.codeSection, limitHeight: false } }
+                        { componentName: 'codeSection', label: this.$t('YAML片段'), name: 'YAML', bindData: { code: this.detail.codeSection, limitHeight: false }, hidden: (!this.detail.yamlFlag || !this.detail.recommendFlag) }
                     ],
                     template: [
                         { componentName: 'detailScore', label: this.$t('概述'), name: 'des' }
