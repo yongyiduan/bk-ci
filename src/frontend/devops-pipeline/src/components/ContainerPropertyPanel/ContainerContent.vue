@@ -108,7 +108,7 @@
                 </form-field>
             </template>
 
-            <form-field :label="$t('editPage.imageTicket')" v-if="(buildResourceType === 'DOCKER') && buildImageType === 'THIRD'">
+            <form-field :label="$t('editPage.imageTicket')" v-if="['DOCKER', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && buildImageType === 'THIRD'">
                 <select-input v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></select-input>
             </form-field>
 
@@ -360,6 +360,9 @@
                 const selectedApps = Object.keys(buildEnv)
                 return Object.keys(apps).filter(app => !selectedApps.includes(app))
             },
+            showDebugDockerBtn () {
+                return this.routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && this.buildResource && (this.routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (this.routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
+            },
             imageCredentialOption () {
                 return {
                     optionsConf: {
@@ -439,6 +442,11 @@
                 'updateContainer',
                 'getMacSysVersion',
                 'getMacXcodeVersion'
+            ]),
+            ...mapActions('soda', [
+                'startDebugDocker',
+                'getContainerInfoByBuildId',
+                'startDebugDevcloud'
             ]),
             ...mapActions('pipelines', [
                 'requestImageVersionlist',
@@ -596,6 +604,75 @@
                     ...buildEnv
                 })
             },
+            async startDebug () {
+                const vmSeqId = this.getRealSeqId()
+                let url = ''
+                const tab = window.open('about:blank')
+                try {
+                    if (this.buildResourceType === 'DOCKER') {
+                        // docker 分根据buildId获取容器信息和新启动一个容器
+                        if (this.routeName === 'pipelinesDetail' && this.container.status === 'RUNNING') {
+                            const res = await this.getContainerInfoByBuildId({
+                                projectId: this.projectId,
+                                pipelineId: this.pipelineId,
+                                buildId: this.buildId,
+                                vmSeqId
+                            })
+                            if (res.containerId && res.address) {
+                                url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&containerId=${res.containerId}&targetIp=${res.address}`
+                            }
+                        } else {
+                            const res = await this.startDebugDocker({
+                                projectId: this.projectId,
+                                pipelineId: this.pipelineId,
+                                vmSeqId,
+                                imageCode: this.buildImageCode,
+                                imageVersion: this.buildImageVersion,
+                                imageName: this.buildResource,
+                                buildEnv: this.container.buildEnv,
+                                imageType: this.buildImageType,
+                                credentialId: this.buildImageCreId
+                            })
+                            if (res === true) {
+                                url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}`
+                            }
+                        }
+                    } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
+                        const buildIdStr = this.buildId ? `&buildId=${this.buildId}` : ''
+                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
+                    }
+                    tab.location = url
+                } catch (err) {
+                    tab.close()
+                    if (err.code === 403) {
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                resource: this.$t('pipeline'),
+                                option: this.$t('edit')
+                            }],
+                            applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
+                        })
+                    } else {
+                        this.$showTips({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    }
+                }
+            },
+            getRealSeqId () {
+                let i = 0
+                let seqId = 0
+                this.stages && this.stages.map((stage, sIndex) => {
+                    stage.containers.map((container, cIndex) => {
+                        if (sIndex === this.stageIndex && cIndex === this.containerIndex) {
+                            seqId = i
+                        }
+                        i++
+                    })
+                })
+                return seqId
+            },
             appBinPath (value, key) {
                 const { container: { baseOS }, apps } = this
                 const app = apps[key]
@@ -675,6 +752,11 @@
             }
         }
         .control-bar {
+            position: absolute;
+            right: 34px;
+            top: 12px;
+        }
+        .debug-btn {
             position: absolute;
             right: 34px;
             top: 12px;

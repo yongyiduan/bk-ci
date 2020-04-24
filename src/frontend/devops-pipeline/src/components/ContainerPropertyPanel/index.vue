@@ -11,7 +11,7 @@
 </template>
 
 <script>
-    import { mapActions, mapState } from 'vuex'
+    import { mapActions, mapState, mapGetters } from 'vuex'
     import ContainerContent from './ContainerContent'
 
     export default {
@@ -26,11 +26,19 @@
             editable: Boolean,
             title: String
         },
-
         computed: {
             ...mapState('atom', [
+                'execDetail',
                 'isPropertyPanelVisible'
             ]),
+
+            ...mapGetters('atom', [
+                'getContainer',
+                'getContainers',
+                'getStage',
+                'isDockerBuildResource'
+            ]),
+
             visible: {
                 get () {
                     return this.isPropertyPanelVisible
@@ -40,13 +48,53 @@
                         isShow: value
                     })
                 }
+            },
+
+            isDocker () {
+                return this.isDockerBuildResource(this.container)
+            },
+
+            stage () {
+                const { stageIndex, stages } = this
+                return this.getStage(stages, stageIndex)
+            },
+
+            containers () {
+                const { stage, getContainers } = this
+                return getContainers(stage)
+            },
+
+            container () {
+                const { containers, containerIndex } = this
+                return this.getContainer(containers, containerIndex)
+            },
+
+            buildResourceType () {
+                try {
+                    return this.container.dispatchType.buildType
+                } catch (e) {
+                    return ''
+                }
+            },
+
+            buildResource () {
+                return this.container.dispatchType.value
+            },
+
+            showDebugDockerBtn () {
+                const routeName = this.$route.name
+                return routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && this.buildResource && (routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
             }
         },
 
         methods: {
             ...mapActions('atom', [
                 'togglePropertyPanel'
-            ])
+            ]),
+
+            startDebug () {
+                this.$refs.container.startDebug()
+            }
         }
     }
 </script>

@@ -7,6 +7,11 @@
         <span class="head-tab" slot="tab">
             <span @click="currentTab = 'log'" :class="{ active: currentTab === 'log' }">{{ $t('execDetail.log') }}</span><span @click="currentTab = 'setting'" :class="{ active: currentTab === 'setting' }">{{ $t('execDetail.setting') }}</span>
         </span>
+        <span slot="tool"
+            v-if="currentTab === 'setting' && $refs.container.showDebugDockerBtn"
+            class="head-tool"
+            @click="$refs.container.startDebug"
+        >{{ $t('editPage.docker.debugConsole') }}</span>
         <template v-slot:content>
             <job-log v-show="currentTab === 'log'"
                 :plugin-list="pluginList"
@@ -19,6 +24,7 @@
                 :stage-index="editingElementPos.stageIndex"
                 :stages="execDetail.model.stages"
                 :editable="false"
+                ref="container"
             />
         </template>
     </detail-container>
