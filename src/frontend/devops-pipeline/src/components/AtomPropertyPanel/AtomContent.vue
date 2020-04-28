@@ -65,6 +65,7 @@
                     <div
                         v-if="atom.atomModal"
                         :is="AtomComponent"
+                        :atom="atom.atomModal"
                         :element-index="elementIndex"
                         :container-index="containerIndex"
                         :stage-index="stageIndex"
