@@ -26,6 +26,9 @@
             AtomOutput
         },
         mixins: [atomMixin, validMixins],
+        props: {
+            atom: Object
+        },
         data () {
             return {
                 newModel: {},
@@ -37,8 +40,11 @@
             atomVersion () {
                 return '1.0.0'
             },
+            atomCode () {
+                return this.atom.atomCode || 'CodeccCheckAtom'
+            },
             src () {
-                return `${PERM_URL_PIRFIX}/bk-plugin-fe/CodeccCheckAtom/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
+                return `${PERM_URL_PIRFIX}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
             }
         },
         mounted () {
