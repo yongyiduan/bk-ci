@@ -144,12 +144,11 @@ const createRouter = (store: any, dynamicLoadModule: any, i18n: any) => {
             goNext(to, store, next)
         } else if (isAmdModule(currentPage) && loadedModule[serviceAlias]) {
             dynamicLoadModule(serviceAlias, i18n.locale).then(() => {
-                goNext(to, store, next)    
+                goNext(to, store, next)
             })
         } else {
             goNext(to, store, next)
         }
-            
     })
 
     router.afterEach(route => {
@@ -213,7 +212,7 @@ function parseOS (): string {
     return 'WINDOWS'
 }
 
-function getProjectId (store, params): string {
+function getProjectId (params): string {
     try {
         const cookiePid = cookie.get(X_DEVOPS_PROJECT_ID)
         const projectId = window.GLOBAL_PID || cookiePid
@@ -226,7 +225,7 @@ function getProjectId (store, params): string {
 function initProjectId (to, store): string {
     try {
         const { matched, params } = to
-        const projectId: string = getProjectId(store, params)
+        const projectId: string = getProjectId(params)
         const lastMatched = matched[matched.length - 1]
         
         const options = projectId ? {
@@ -240,11 +239,11 @@ function initProjectId (to, store): string {
     }
 }
 
-function goNext(to, store, next) {
+function goNext (to, store, next) {
     const newPath = initProjectId(to, store)
     
     // @ts-ignore
-    window.setProjectIdCookie(getProjectId(store, to.params))
+    window.setProjectIdCookie(getProjectId(to.params))
     if (to.path !== newPath) {
         next({
             path: newPath,
