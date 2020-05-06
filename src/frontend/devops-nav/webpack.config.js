@@ -73,6 +73,7 @@ module.exports = (env = {}, argv) => {
         {
           loader: 'ts-loader',
           options: {
+            transpileOnly: !isDev,
             appendTsSuffixTo: [/\.vue$/]
           }
         }
