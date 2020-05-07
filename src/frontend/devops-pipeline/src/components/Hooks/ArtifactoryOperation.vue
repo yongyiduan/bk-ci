@@ -1,5 +1,5 @@
 <template>
-    <bk-dropdown-menu v-if="hasHookIds" align="right">
+    <bk-dropdown-menu v-if="hasExts" align="right">
         <div slot="dropdown-trigger" class="hook-dropdown-trigger">
             <i class="entry-circle" v-for="i in [1, 2, 3]" :key="i" />
         </div>

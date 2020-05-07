@@ -17,6 +17,9 @@ export default {
         },
         hasHookIds () {
             return !!this.hookIds
+        },
+        hasExts () {
+            return Array.isArray(this.extensions) && this.extensions.length > 0
         }
     },
     watch: {
