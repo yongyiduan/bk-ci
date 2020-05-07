@@ -1,3 +1,4 @@
+
 /*
  * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
  *
@@ -24,31 +25,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.environment.permission.service.impl
-
-import com.tencent.devops.common.auth.api.AuthPermissionApi
-import com.tencent.devops.common.auth.api.AuthResourceApi
-import com.tencent.devops.common.auth.code.EnvironmentAuthServiceCode
-import com.tencent.devops.environment.permission.AbstractEnvironmentPermissionService
-
-/**
- * 蓝鲸权限 心权限校验接口
- */
-class BluekingEnvironmentPermissionService constructor(
-    authResourceApi: AuthResourceApi,
-    authPermissionApi: AuthPermissionApi,
-    environmentAuthServiceCode: EnvironmentAuthServiceCode
-) : AbstractEnvironmentPermissionService(
-    authResourceApi = authResourceApi,
-    authPermissionApi = authPermissionApi,
-    environmentAuthServiceCode = environmentAuthServiceCode
-) {
-
-    override fun supplierForEnvFakePermission(projectId: String): () -> MutableList<String> {
-        return { mutableListOf() }
-    }
-
-    override fun supplierForNodeFakePermission(projectId: String): () -> MutableList<String> {
-        return { mutableListOf() }
-    }
+dependencies {
+    compile project(":core:websocket:biz-websocket")
 }

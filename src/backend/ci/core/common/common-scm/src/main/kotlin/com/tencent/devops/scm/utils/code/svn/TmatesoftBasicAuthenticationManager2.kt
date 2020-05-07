@@ -24,31 +24,37 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.environment.permission.service.impl
+package com.tencent.devops.scm.utils.code.svn
 
-import com.tencent.devops.common.auth.api.AuthPermissionApi
-import com.tencent.devops.common.auth.api.AuthResourceApi
-import com.tencent.devops.common.auth.code.EnvironmentAuthServiceCode
-import com.tencent.devops.environment.permission.AbstractEnvironmentPermissionService
+import org.tmatesoft.svn.core.auth.BasicAuthenticationManager
+import org.tmatesoft.svn.core.auth.SVNAuthentication
+import org.tmatesoft.svn.core.io.SVNRepository
+import kotlin.math.min
 
-/**
- * 蓝鲸权限 心权限校验接口
- */
-class BluekingEnvironmentPermissionService constructor(
-    authResourceApi: AuthResourceApi,
-    authPermissionApi: AuthPermissionApi,
-    environmentAuthServiceCode: EnvironmentAuthServiceCode
-) : AbstractEnvironmentPermissionService(
-    authResourceApi = authResourceApi,
-    authPermissionApi = authPermissionApi,
-    environmentAuthServiceCode = environmentAuthServiceCode
-) {
+class TmatesoftBasicAuthenticationManager2(authentications: Array<out SVNAuthentication>?) :
+    BasicAuthenticationManager(authentications) {
 
-    override fun supplierForEnvFakePermission(projectId: String): () -> MutableList<String> {
-        return { mutableListOf() }
+    /**
+     * max timeout for connect: 30 seconds
+     */
+    override fun getConnectTimeout(repository: SVNRepository?): Int {
+        var connectTimeout = super.getConnectTimeout(repository)
+        connectTimeout = min(connectTimeout, 30 * 1000)
+        if (connectTimeout <= 0) {
+            connectTimeout = 30 * 1000
+        }
+        return connectTimeout
     }
 
-    override fun supplierForNodeFakePermission(projectId: String): () -> MutableList<String> {
-        return { mutableListOf() }
+    /**
+     * max timeout for read data: 1800 second
+     */
+    override fun getReadTimeout(repository: SVNRepository?): Int {
+        var readTimeout = super.getReadTimeout(repository)
+        readTimeout = min(readTimeout, 1800 * 1000)
+        if (readTimeout <= 0) {
+            readTimeout = 1800 * 1000
+        }
+        return readTimeout
     }
 }

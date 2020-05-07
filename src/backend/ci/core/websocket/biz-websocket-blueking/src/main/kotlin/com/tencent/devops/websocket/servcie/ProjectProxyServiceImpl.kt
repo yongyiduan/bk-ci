@@ -24,31 +24,14 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.environment.permission.service.impl
+package com.tencent.devops.websocket.servcie
 
-import com.tencent.devops.common.auth.api.AuthPermissionApi
-import com.tencent.devops.common.auth.api.AuthResourceApi
-import com.tencent.devops.common.auth.code.EnvironmentAuthServiceCode
-import com.tencent.devops.environment.permission.AbstractEnvironmentPermissionService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
-/**
- * 蓝鲸权限 心权限校验接口
- */
-class BluekingEnvironmentPermissionService constructor(
-    authResourceApi: AuthResourceApi,
-    authPermissionApi: AuthPermissionApi,
-    environmentAuthServiceCode: EnvironmentAuthServiceCode
-) : AbstractEnvironmentPermissionService(
-    authResourceApi = authResourceApi,
-    authPermissionApi = authPermissionApi,
-    environmentAuthServiceCode = environmentAuthServiceCode
-) {
-
-    override fun supplierForEnvFakePermission(projectId: String): () -> MutableList<String> {
-        return { mutableListOf() }
-    }
-
-    override fun supplierForNodeFakePermission(projectId: String): () -> MutableList<String> {
-        return { mutableListOf() }
+@Service
+class ProjectProxyServiceImpl @Autowired constructor() : ProjectProxyService {
+    override fun checkProject(projectId: String, userId: String): Boolean {
+        return true
     }
 }
