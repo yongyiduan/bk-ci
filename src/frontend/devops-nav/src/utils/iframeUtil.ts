@@ -64,7 +64,6 @@ function iframeUtil (router: any) {
         })
     }
 
-
     utilMap.syncUrl = function ({ url, refresh = false }: UrlParam): void {
         let addMoocUrl = url
         if (window.isMooc && addMoocUrl.indexOf('isMooc') < 0) {

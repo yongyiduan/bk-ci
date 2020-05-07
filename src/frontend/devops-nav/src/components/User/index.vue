@@ -81,7 +81,7 @@
             }
         }
 
-        hideUserInfo () : void {
+        hideUserInfo (): void {
             this.show = false
         }
 

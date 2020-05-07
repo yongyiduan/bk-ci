@@ -139,15 +139,15 @@ const createRouter = (store: any, dynamicLoadModule: any, i18n: any) => {
                 setTimeout(() => {
                     store.dispatch('toggleModuleLoading', false)
                 }, 100)
-                goNext(to, store, next)
+                goNext(to, next)
             })
-            goNext(to, store, next)
+            goNext(to, next)
         } else if (isAmdModule(currentPage) && loadedModule[serviceAlias]) {
             dynamicLoadModule(serviceAlias, i18n.locale).then(() => {
-                goNext(to, store, next)
+                goNext(to, next)
             })
         } else {
-            goNext(to, store, next)
+            goNext(to, next)
         }
     })
 
@@ -222,7 +222,7 @@ function getProjectId (params): string {
     }
 }
 
-function initProjectId (to, store): string {
+function initProjectId (to): string {
     try {
         const { matched, params } = to
         const projectId: string = getProjectId(params)
@@ -239,9 +239,9 @@ function initProjectId (to, store): string {
     }
 }
 
-function goNext (to, store, next) {
-    const newPath = initProjectId(to, store)
-    
+function goNext (to, next) {
+    const newPath = initProjectId(to)
+
     // @ts-ignore
     window.setProjectIdCookie(getProjectId(to.params))
     if (to.path !== newPath) {

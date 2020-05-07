@@ -102,7 +102,7 @@
             return this.$route.name === 'job'
         }
 
-        get chromeExplorer () :boolean {
+        get chromeExplorer (): boolean {
             const explorer = window.navigator.userAgent
             return explorer.indexOf('Chrome') >= 0 && explorer.indexOf('QQ') === -1
         }
