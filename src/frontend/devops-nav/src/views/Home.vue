@@ -157,8 +157,8 @@
     import { State, Action } from 'vuex-class'
     import NavBox from '../components/NavBox/index.vue'
     import Logo from '../components/Logo/index.vue'
-    import { Accordion, AccordionItem } from '../components/Accordion/index'
-    import ConsultTools from '../components/ConsultTools'
+    import { Accordion, AccordionItem } from '../components/Accordion'
+    import ConsultTools from '../components/ConsultTools/index.vue'
     
     import { urlJoin } from '../utils/util'
 

@@ -59,7 +59,7 @@ export const EMPTY_PROJECT: Project = {
     description: '',
     bgId: '',
     bgName: '',
-    deptId: '', 
+    deptId: '',
     deptName: '',
     centerId: '',
     centerName: '',

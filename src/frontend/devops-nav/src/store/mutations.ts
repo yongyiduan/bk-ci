@@ -104,7 +104,7 @@ const mutations: MutationTree<RootState> = {
     },
     [SET_CURRENT_NOTICE]: (state: RootState, notice: object) => {
         Vue.set(state, 'currentNotice', notice)
-    },
+    }
 }
 
 export default mutations
