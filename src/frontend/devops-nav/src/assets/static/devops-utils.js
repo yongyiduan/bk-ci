@@ -76,7 +76,7 @@ const devopsUtil = {};
     function communicateOuter (data) {
         if (window.postMessage) {
             try {
-                top.postMessage(data, '*')
+                window.parent.postMessage(data, '*')
             } catch (e) {
                 console.warn('communicate fail', e)
             }
