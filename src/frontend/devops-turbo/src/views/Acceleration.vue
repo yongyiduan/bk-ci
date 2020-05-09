@@ -496,10 +496,10 @@
                 localStorage.setItem('tooltipEventList', JSON.stringify(this.tooltipEventList))
             },
             setParentzIndex (zIndex) {
-                const parentDom = document.querySelector('.navigation-bar-container') || document.querySelector('.navigation-container')
-                if (parentDom) {
-                    parentDom.style.zIndex = zIndex
-                }
+                // const parentDom = document.querySelector('.navigation-bar-container') || document.querySelector('.navigation-container')
+                // if (parentDom) {
+                //     parentDom.style.zIndex = zIndex
+                // }
             }
         }
     }
