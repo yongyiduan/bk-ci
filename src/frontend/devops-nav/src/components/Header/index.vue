@@ -55,7 +55,7 @@
             </h3>
         </div>
         <div class="header-right-bar">
-            <locale-switcher v-if="!isMooc"></locale-switcher>
+            <locale-switcher v-if="!isMooc || !isInIframe"></locale-switcher>
             <qrcode v-if="!isMooc" class="feed-back-icon" />
             <span v-if="!isMooc" class="seperate-line">|</span>
             <!-- <feed-back class='feed-back-icon'></feed-back> -->
@@ -147,6 +147,10 @@
                 id: project.projectCode,
                 name: project.projectName
             }))
+        }
+
+        get isInIframe () {
+            return top !== window
         }
 
         $refs: {

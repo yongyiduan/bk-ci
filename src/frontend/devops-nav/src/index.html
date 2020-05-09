@@ -79,7 +79,7 @@
         var GW_URL_PREFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__/ms'     // api接口前缀
         var WS_URL_PREFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__/'
         var PERM_URL_PREFIX = '__HTTP_SCHEMA__://__PAAS_FQDN__:__PAAS_HTTPS_PORT__/o/bk_iam_app' // EE PERM URL PREFIX
-        var LOGIN_SERVICE_URL = 'http://login.o.oa.com'  // 登录域名前缀
+        var LOGIN_SERVICE_URL = '__LOGIN_SERVICE_URL__' // 登录域名前缀
         var DOCS_URL_PREFIX = 'http://iwiki.oa.com'  // 文档中心域名
         var DEVOPS_LS_VERSION = '<%- htmlWebpackPlugin.options.DEVOPS_LS_VERSION%>'
         var ENTERPRISE_VERSION = false
@@ -198,6 +198,18 @@
     </script>
     <script>
         
+        window.getLoginUrl = function () {
+            var c_url = location.origin + location.pathname + encodeURIComponent(location.search)
+            if (/=%s/.test(LOGIN_SERVICE_URL)) { 
+                return LOGIN_SERVICE_URL.replace(/%s/, c_url)
+            } else if (/\?/.test(LOGIN_SERVICE_URL)) { 
+                LOGIN_SERVICE_URL =  LOGIN_SERVICE_URL + '&c_url=' + c_url
+            } else {
+                return LOGIN_SERVICE_URL =  LOGIN_SERVICE_URL + '?c_url=' + c_url
+            }
+            return LOGIN_SERVICE_URL
+        }
+
         function asyncGet (url, pid) {
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest()
@@ -205,8 +217,8 @@
                     if (this.readyState == 4 && this.status == 200) {
                         resolve(JSON.parse(xhr.responseText).data)
                     }  else if (this.status == 401) {
-                        var c_url = location.origin + location.pathname + encodeURIComponent(location.search)
-                        window.location.href = LOGIN_SERVICE_URL + '/?c_url=' + c_url
+                        // 无登录，这里处理跳转逻辑
+                        window.location.href = window.getLoginUrl()
                     } else if (this.readyState == 4 && this.status > 400) {
                         reject({
                             status: this.status,
