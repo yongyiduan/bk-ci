@@ -579,6 +579,8 @@
         "imageTicket": "Docker image  ticket",
         "workspace": "workspace on",
         "workspaceTips": "Default: [Agent installation directory]/workspace/[pipeline ID]/",
+        "useRootText": "Execute as root",
+        "useRootDesc": "If checked, landun agent will run as root, or it will run as mqq; and if you use codecc in this job, you must check this option",
         "envDependency": "Dependency tools",
         "envDependencyTips": "After selecting the dependence on tools above, the following will be executed:  ",
         "abnormal": "Abnormal",
