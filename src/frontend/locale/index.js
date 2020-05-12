@@ -36,8 +36,8 @@ function getLsLocale () {
 
 function setLsLocale (locale) {
     if (typeof cookies.set === 'function') {
-        cookies.remove(LS_KEY)
-        cookies.set(LS_KEY, locale, { domain: BK_CI_DOMAIN, path: '/' })
+        cookies.remove(LS_KEY, { domain: '.oa.com', path: '/' }) // remove oa language cookie
+        cookies.set(LS_KEY, locale, { domain: BK_CI_DOMAIN, path: '/', expires: 365 })
     }
 }
 
