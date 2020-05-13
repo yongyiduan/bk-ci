@@ -32,7 +32,7 @@ import com.tencent.devops.common.api.pojo.IdValue
  * statusName: 状态中文名
  * visiable: 是否对用户可见
  */
-enum class BuildStatus(val statusName: String, val visiable: Boolean) {
+enum class EBuildStatus(val statusName: String, val visiable: Boolean) {
     SUCCEED("成功", true), // 0 成功
     FAILED("失败", true), // 1 失败
     CANCELED("取消", true), // 2 取消
