@@ -25,7 +25,7 @@
                     atom: { str: this.$t('store.该分类下暂无流水线插件'), tip: this.$t('store.新增流水线插件') },
                     template: { str: this.$t('store.该分类下暂无流水线模板'), tip: this.$t('store.新增流水线模板') },
                     image: { str: this.$t('store.该分类下暂无容器镜像'), tip: this.$t('store.发布容器镜像') },
-                    service: { str: this.$t('store.该分类下暂无服务扩展'), tip: this.$t('store.发布服务扩展') }
+                    service: { str: this.$t('store.该分类下暂无微扩展'), tip: this.$t('store.发布微扩展') }
                 }
                 const tipObj = emptyMap[type]
                 return Object.assign({ type }, tipObj)

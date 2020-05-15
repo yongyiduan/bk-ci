@@ -106,7 +106,7 @@
                         res = bkLocale.$t('store.容器镜像')
                         break
                     case 'service':
-                        res = bkLocale.$t('store.服务扩展')
+                        res = bkLocale.$t('store.微扩展')
                         break
                     default:
                         res = bkLocale.$t('store.流水线插件')
@@ -143,7 +143,7 @@
                     { type: 'template', des: this.$t('store.流水线模板') },
                     { type: 'ide', des: this.$t('store.IDE插件') },
                     { type: 'image', des: this.$t('store.容器镜像') },
-                    { type: 'service', des: this.$t('store.服务扩展') }
+                    { type: 'service', des: this.$t('store.微扩展') }
                 ]
             }
         },

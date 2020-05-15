@@ -215,7 +215,7 @@
                     limit: 10
                 },
                 relateServiceData: {
-                    title: this.$t('store.新增服务扩展'),
+                    title: this.$t('store.新增微扩展'),
                     quickClose: true,
                     width: 600,
                     isLoading: false,
