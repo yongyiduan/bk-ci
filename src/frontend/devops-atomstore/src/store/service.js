@@ -49,7 +49,7 @@ export const actions = {
     },
 
     /***
-     * 服务扩展重新授权
+     * 微扩展重新授权
      */
     resetServiceGit ({ commit }, { serviceCode, projectCode }) {
         return vue.$ajax.post(`${prefix}/user/market/service/repositorys/${serviceCode}?projectCode=${projectCode}`)
@@ -63,7 +63,7 @@ export const actions = {
     },
 
     /***
-     * 获取服务扩展打分相关信息
+     * 获取微扩展打分相关信息
      */
     requestServiceStic ({ commit }, serviceCode) {
         return vue.$ajax.get(`${prefix}/user/market/service/stat/serviceCodes/${serviceCode}`)
@@ -84,21 +84,21 @@ export const actions = {
     },
 
     /***
-     * 获取服务扩展的标签
+     * 获取微扩展的标签
      */
     requestServiceLabel ({ commit }) {
         return vue.$ajax.get(`${prefix}/user/market/service/label/labels`)
     },
 
     /***
-     * 获取服务扩展支持的语言
+     * 获取微扩展支持的语言
      */
     requestServiceLanguage ({ commit }) {
         return vue.$ajax.get(`${prefix}/user/market/desk/service/desk/service/language`)
     },
 
     /***
-     * 获取服务扩展点列表
+     * 获取微扩展点列表
      */
     requestServiceItemList ({ commit }) {
         return vue.$ajax.get(`${project}/user/ext/items`)

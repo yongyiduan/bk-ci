@@ -57,15 +57,15 @@ const imageVisibleRange = () => import(/* webpackChunkName: 'tplVisibleRange' */
 const imageMemberManage = () => import(/* webpackChunkName: 'imageMemberManage' */ '@/views/imageDetail/memberManage.vue') // 镜像成员管理
 const imageEdit = () => import(/* webpackChunkName: 'imageEdit' */ '@/views/imageDetail/edit.vue') // 编辑镜像详情
 
-const serviceProgress = () => import(/* webpackChunkName: 'serviceProgress' */ '@/views/serviceProgress.vue') // 服务扩展进度
-const editService = () => import(/* webpackChunkName: 'editService' */ '@/views/edit_service.vue') // 服务扩展上架页面
-const serviceDatailIndex = () => import(/* webpackChunkName: 'serviceDatailIndex' */ '@/views/serviceDetail/index.vue') // 服务扩展详情总览
-const serviceDetail = () => import(/* webpackChunkName: 'serviceDetail' */ '@/views/serviceDetail/detail.vue') // 服务扩展详情页面
-const serviceOverview = () => import(/* webpackChunkName: 'serviceOverview' */ '@/views/serviceDetail/overView.vue') // 服务扩展概览
-const serviceSettings = () => import(/* webpackChunkName: 'serviceSettings' */ '@/views/serviceDetail/settings.vue') // 服务扩展设置
-const serviceMemberManage = () => import(/* webpackChunkName: 'serviceMemberManage' */ '@/views/serviceDetail/memberManage.vue') // 服务扩展成员管理
-const serviceEdit = () => import(/* webpackChunkName: 'serviceEdit' */ '@/views/serviceDetail/edit.vue') // 服务扩展详情
-const serviceApproval = () => import(/* webpackChunkName: 'approval' */ '@/views/serviceDetail/approval.vue') // 服务扩展审批
+const serviceProgress = () => import(/* webpackChunkName: 'serviceProgress' */ '@/views/serviceProgress.vue') // 微扩展进度
+const editService = () => import(/* webpackChunkName: 'editService' */ '@/views/edit_service.vue') // 微扩展上架页面
+const serviceDatailIndex = () => import(/* webpackChunkName: 'serviceDatailIndex' */ '@/views/serviceDetail/index.vue') // 微扩展详情总览
+const serviceDetail = () => import(/* webpackChunkName: 'serviceDetail' */ '@/views/serviceDetail/detail.vue') // 微扩展详情页面
+const serviceOverview = () => import(/* webpackChunkName: 'serviceOverview' */ '@/views/serviceDetail/overView.vue') // 微扩展概览
+const serviceSettings = () => import(/* webpackChunkName: 'serviceSettings' */ '@/views/serviceDetail/settings.vue') // 微扩展设置
+const serviceMemberManage = () => import(/* webpackChunkName: 'serviceMemberManage' */ '@/views/serviceDetail/memberManage.vue') // 微扩展成员管理
+const serviceEdit = () => import(/* webpackChunkName: 'serviceEdit' */ '@/views/serviceDetail/edit.vue') // 微扩展详情
+const serviceApproval = () => import(/* webpackChunkName: 'approval' */ '@/views/serviceDetail/approval.vue') // 微扩展审批
 const serviceVisibleRange = () => import(/* webpackChunkName: 'serviceVisibleRange' */ '@/views/serviceDetail/visible_range.vue') // 镜像可见范围
 
 const serviceManage = () => import(/* webpackChunkName: 'serviceManage' */ '@/views/serviceManage.vue') // 扩展管理

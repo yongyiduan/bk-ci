@@ -56,7 +56,7 @@
                         res = bkLocale.$t('store.容器镜像')
                         break
                     case 'service':
-                        res = bkLocale.$t('store.服务扩展')
+                        res = bkLocale.$t('store.微扩展')
                         break
                     default:
                         res = bkLocale.$t('store.流水线插件')

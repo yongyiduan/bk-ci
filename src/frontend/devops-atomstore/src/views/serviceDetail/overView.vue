@@ -1,7 +1,7 @@
 <template>
     <article class="service-overview-wrapper">
         <header class="inner-header">
-            <span class="title"> {{ $t('store.服务扩展概览') }} </span>
+            <span class="title"> {{ $t('store.微扩展概览') }} </span>
         </header>
 
         <main class="service-overview-container">
@@ -24,7 +24,7 @@
                     </section>
                 </section>
                 <section class="flex32 overview-section">
-                    <h3> {{ $t('store.服务扩展代码') }} </h3>
+                    <h3> {{ $t('store.微扩展代码') }} </h3>
                     <section class="section-code">
                         <h3>
                             <span class="code-title"> {{ $t('store.已托管至') }} </span>：<span>工蜂GIT</span>
