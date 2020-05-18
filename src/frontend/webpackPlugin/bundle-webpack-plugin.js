@@ -18,28 +18,11 @@
  */
 const fs = require('fs')
 const path = require('path')
-const fetch = require('node-fetch')
-const chalk = require('chalk')
-
-async function getAssetsJSON (jsonUrl) {
-    try {
-        const res = await fetch(jsonUrl)
-        const assets = await res.json()
-
-        console.log(chalk.blue.bold(`Successfully get assets json from ${jsonUrl}!`))
-        console.table(assets)
-        return assets
-    } catch (error) {
-        console.log(chalk.yellow.bgRed.bold(`Failed get assets json from ${jsonUrl}!`))
-        return {}
-    }
-}
 
 module.exports = class BundleWebpackPlugin {
     // Define `apply` as its prototype method which is supplied with compiler as its argument
     constructor (props) {
         const dist = props.dist || '.'
-        const envPrefix = props.envPrefix ? `${props.envPrefix}.` : ''
         const bundleName = props.bundleName || 'assets_bundle'
         this.SERVICE_ASSETS_JSON_PATH = path.join(
             __dirname,
@@ -47,7 +30,6 @@ module.exports = class BundleWebpackPlugin {
             dist,
             `${bundleName}.json`
         )
-        this.ASSETS_JSON_URL = `http://${envPrefix}devops.oa.com/${bundleName}.json`
         this.SERVICE_ASSETS_DIR = path.dirname(this.SERVICE_ASSETS_JSON_PATH)
     }
 
@@ -56,7 +38,7 @@ module.exports = class BundleWebpackPlugin {
             'BundleWebpackPlugin',
             async (compilation, callback) => {
                 console.log('This is an example plugin!')
-                const { SERVICE_ASSETS_JSON_PATH, SERVICE_ASSETS_DIR, ASSETS_JSON_URL } = this
+                const { SERVICE_ASSETS_JSON_PATH, SERVICE_ASSETS_DIR } = this
                 const entryNames = Array.from(
                     compilation.compilation.entrypoints.keys()
                 )
@@ -104,13 +86,11 @@ module.exports = class BundleWebpackPlugin {
                     assetsMap[entryName] = assets
                 }
 
-                const assetJSON = await getAssetsJSON(ASSETS_JSON_URL)
                 let json = {}
                 if (fs.existsSync(SERVICE_ASSETS_JSON_PATH)) {
                     json = require(SERVICE_ASSETS_JSON_PATH)
                 }
                 json = {
-                    ...assetJSON,
                     ...json,
                     ...assetsMap
                 }
