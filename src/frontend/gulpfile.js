@@ -33,7 +33,7 @@ const svgSpriteConfig = {
 }
 const envPrefix = env === 'master' ? '' : `${env}.`
 const BUNDLE_NAME = 'assets_bundle.json'
-const ASSETS_JSON_URL = `http://${envPrefix}devops.oa.com/${BUNDLE_NAME}`
+const ASSETS_JSON_URL = `http://${envPrefix}devgw.devops.oa.com/${BUNDLE_NAME}`
 
 async function getAssetsJSON (jsonUrl) {
     try {
@@ -90,7 +90,6 @@ task('copy', () => src(['common-lib/**'], { 'base': '.' }).pipe(dest(`${dist}/`)
 
 task('build', async cb => {
     const assetJson = await getAssetsJSON(ASSETS_JSON_URL)
-    console.log(assetJson)
     fs.writeFileSync(path.join(__dirname, dist, BUNDLE_NAME), JSON.stringify(assetJson))
     const spinner = new Ora('building bk-ci frontend project').start()
     const scopeStr = getScopeStr(scope)
