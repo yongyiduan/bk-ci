@@ -79,7 +79,8 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             new VueLoaderPlugin(),
             new BundleWebpackPlugin({
                 dist: envDist,
-                bundleName: 'assets_bundle'
+                bundleName: 'assets_bundle',
+                envPrefix: isMaster ? '' : process.env.NODE_ENV
             }),
             new webpack.optimize.LimitChunkCountPlugin({
                 minChunkSize: 1000
