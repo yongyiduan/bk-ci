@@ -60,8 +60,6 @@
     import CcAppId from '@/components/AtomFormComponent/CcAppId'
     import AppId from '@/components/AtomFormComponent/AppId'
     import Accordion from '@/components/atomFormField/Accordion'
-    import SelectInput from '@/components/AtomFormComponent/SelectInput'
-    import DevopsSelect from '@/components/AtomFormComponent/DevopsSelect'
     import TimePicker from '@/components/AtomFormComponent/TimePicker'
     import Parameter from '@/components/AtomFormComponent/Parameter'
     import Tips from '@/components/AtomFormComponent/Tips'
@@ -74,10 +72,8 @@
             Accordion,
             CcAppId,
             AppId,
-            SelectInput,
             TimePicker,
             Parameter,
-            DevopsSelect,
             Tips,
             NameSpaceVar
         },

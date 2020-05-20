@@ -34,8 +34,7 @@
                 },
                 sideMenuNav: {
                     icon: 'artifactory',
-                    title: VERSION_TYPE === 'tencent' ? '版本仓库' : '制品库',
-                    url: `${DOCS_URL_PREFIX}/x/6xYLAQ`
+                    title: VERSION_TYPE === 'tencent' ? '版本仓库' : '制品库'
                 },
                 baseObj: {
                     icon: 'icon-folder',
