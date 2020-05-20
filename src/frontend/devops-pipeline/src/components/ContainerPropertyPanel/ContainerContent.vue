@@ -115,6 +115,20 @@
             <form-field :label="$t('editPage.workspace')" v-if="isThirdParty">
                 <vuex-input :disabled="!editable" name="workspace" :value="container.dispatchType.workspace" :handle-change="changeBuildResource" :placeholder="$t('editPage.workspaceTips')" />
             </form-field>
+
+            <form-field v-if="buildResourceType === 'THIRD_PARTY_PCG'">
+                <atom-checkbox
+                    class="show-build-resource"
+                    :value="!!container.dispatchType.useRoot"
+                    :text="$t('editPage.useRootText')"
+                    :desc="$t('editPage.useRootDesc')"
+                    name="useRoot"
+                    :handle-change="changeBuildResource"
+                    :disabled="!editable"
+                >
+                </atom-checkbox>
+            </form-field>
+
             <form-field class="container-app-field" v-if="showDependencies" :label="$t('editPage.envDependency')">
                 <container-app-selector :disabled="!editable" class="app-selector-item" v-if="!hasBuildEnv" app="" version=""
                     :handle-change="handleContainerAppChange"
@@ -439,6 +453,7 @@
                     imageCode: defaultBuildResource.code || '',
                     imageName: defaultBuildResource.name || '',
                     recommendFlag: defaultBuildResource.recommendFlag,
+                    useRoot: val === 'THIRD_PARTY_PCG' ? true : undefined,
                     [name]: val
                 }))
                 if (val === 'MACOS') this.getMacOsData()
