@@ -69,7 +69,7 @@
     }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     @import '../../assets/scss/conf';
 
     .devops-announcement-dialog {
@@ -105,6 +105,9 @@
         .announcement-content {
             padding: 24px 50px 10px;
             height: 360px;
+            .content-detail img {
+                width: 100%;
+            }
         }
         .announcement-footer {
             padding: 20px 0;
