@@ -58,8 +58,7 @@
                         ]
                     },
                     template: { name: this.$t('store.模版指引'), tabName: this.$t('store.流水线模板'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=15008944' },
-                    image: { name: this.$t('store.镜像指引'), tabName: this.$t('store.容器镜像'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=22118721' },
-                    service: { name: this.$t('store.扩展指引'), tabName: this.$t('store.微扩展'), link: 'https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086' }
+                    image: { name: this.$t('store.镜像指引'), tabName: this.$t('store.容器镜像'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=22118721' }
                 }
             }
         },
