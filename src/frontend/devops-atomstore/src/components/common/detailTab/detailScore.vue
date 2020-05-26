@@ -225,7 +225,7 @@
     }
 
     .overflow {
-        max-height: 65px;
+        max-height: 120px;
         overflow: hidden;
     }
 
