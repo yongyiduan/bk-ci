@@ -39,7 +39,7 @@
                 <bk-table-column :label="$t('store.发布者')" prop="publisher"></bk-table-column>
                 <bk-table-column :label="$t('store.版本')" prop="version"></bk-table-column>
                 <bk-table-column :label="$t('store.状态')" prop="serviceStatus" :formatter="statusFormatter"></bk-table-column>
-                <bk-table-column :label="$t('store.操作人')" prop="publisher"></bk-table-column>
+                <bk-table-column :label="$t('store.操作人')" prop="creator"></bk-table-column>
                 <bk-table-column :label="$t('store.操作时间')" prop="publishTime" width="180" :formatter="timeFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.操作')" width="150" class-name="handler-btn">
                     <template slot-scope="props">
