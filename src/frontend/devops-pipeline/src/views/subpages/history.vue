@@ -78,7 +78,7 @@
             panels () {
                 return [{
                             name: 'history',
-                            label: this.$t('history.execHistory'),
+                            label: this.$t('pipelinesHistory'),
                             component: 'BuildHistoryTab',
                             bindData: {
                                 isColumnsSelectPopupVisible: this.isColumnsSelectPopupVisible,
