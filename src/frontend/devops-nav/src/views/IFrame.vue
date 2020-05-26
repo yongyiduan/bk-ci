@@ -54,12 +54,8 @@
         @State isShowPreviewTips
         @State user
         @State headerConfig
-        @State currentNotice
+        @Getter showAnnounce
         @Getter getServiceHooks
-
-        get showAnnounce (): boolean {
-            return this.currentNotice && this.currentNotice.id
-        }
         
         created () {
             this.init()

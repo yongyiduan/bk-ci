@@ -98,15 +98,11 @@
         @State services
         @State currentPage
         @State isShowPreviewTips
-        @State currentNotice
+        @Getter showAnnounce
         @Action toggleServiceCollect
         show: boolean = false
         showNewServiveTips: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
-
-        get showAnnounce (): boolean {
-            return this.currentNotice && this.currentNotice.id
-        }
 
         get chromeExplorer (): boolean {
             const explorer = window.navigator.userAgent

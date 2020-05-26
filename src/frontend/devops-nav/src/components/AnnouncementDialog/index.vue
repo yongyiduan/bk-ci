@@ -1,6 +1,5 @@
 <template>
     <bk-dialog
-        v-if="renderObj.id"
         v-model="showDialog"
         ext-cls="devops-announcement-dialog"
         :ok-text="$t('expNow')"
@@ -9,14 +8,14 @@
         :has-header="false"
         :close-icon="false"
         :quick-close="false"
-        :title="renderObj.noticeTitle"
-        @confirm="toLink(renderObj.redirectUrl)"
+        :title="currentNotice.noticeTitle"
+        @confirm="toLink(currentNotice.redirectUrl)"
     >
         <main class="new-service-content">
             <div class="announcement-content">
                 <div
                     class="content-detail"
-                    v-html="renderObj.noticeContent"
+                    v-html="currentNotice.noticeContent"
                 />
             </div>
         </main>
@@ -25,40 +24,34 @@
 
 <script lang='ts'>
     import Vue from 'vue'
-    import { Component } from 'vue-property-decorator'
-    import { Action } from 'vuex-class'
+    import { Component, Watch } from 'vue-property-decorator'
+    import { State } from 'vuex-class'
 
     @Component
     export default class NewServiceDialog extends Vue {
-        @Action getAnnouncement
+        @State currentNotice
 
         showDialog: boolean = false
-        renderObj: object = {}
 
         get announcementHistory () : object[] {
             const announcementHistory = localStorage.getItem('announcementHistory')
             return announcementHistory ? JSON.parse(announcementHistory) : []
         }
 
-        mounted () {
-            this.init()
+        @Watch('currentNotice')
+        handleWatchValue (currentNotice) {
+            this.init(currentNotice)
         }
 
-        async init () {
-            try {
-                const res = await this.getAnnouncement()
+        mounted () {
+            this.init(this.currentNotice)
+        }
 
-                if (res && this.announcementHistory.indexOf(res.id) === -1) {
-                    this.announcementHistory.push(res.id)
-                    localStorage.setItem('announcementHistory', JSON.stringify(this.announcementHistory))
-                    Object.assign(this.renderObj, res)
-                    this.showDialog = true
-                }
-            } catch (e) {
-                this.$bkMessage({
-                    message: e.message,
-                    theme: 'error'
-                })
+        init (currentNotice) {
+            if (currentNotice && currentNotice.id && this.announcementHistory.indexOf(currentNotice.id) === -1) {
+                this.announcementHistory.push(currentNotice.id)
+                localStorage.setItem('announcementHistory', JSON.stringify(this.announcementHistory))
+                this.showDialog = true
             }
         }
 

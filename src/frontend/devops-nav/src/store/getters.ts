@@ -32,6 +32,10 @@ const getters: GetterTree<RootState, any> = {
 
     getServiceHooks: (state: RootState) => (serviceId): any[] => {
         return state.hookMap[serviceId]
+    },
+    showAnnounce: (): boolean => {
+        // return state.currentNotice && state.currentNotice.id
+        return false
     }
     
 }

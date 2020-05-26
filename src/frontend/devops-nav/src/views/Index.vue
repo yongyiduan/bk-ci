@@ -96,20 +96,15 @@
         @State projectList
         @State headerConfig
         @State isShowPreviewTips
+        @Getter showAnnounce
         @Getter enableProjectList
         @Getter disableProjectList
         @Getter approvalingProjectList
         @Action closePreviewTips
-        @Action getAnnouncement
-        @Action setAnnouncement
         @Action fetchServiceHooks
 
         showLoginDialog: boolean = false
         showExplorerTips: string = localStorage.getItem('showExplorerTips')
-
-        get showAnnounce (): boolean {
-            return this.currentNotice && this.currentNotice.id
-        }
 
         get loadingOption (): object {
             return {
@@ -153,10 +148,6 @@
         }
 
         async created () {
-            const announce = await this.getAnnouncement()
-            if (announce && announce.id) {
-                this.setAnnouncement(announce)
-            }
             eventBus.$on('toggle-login-dialog', (isShow) => {
                 this.showLoginDialog = isShow
             })

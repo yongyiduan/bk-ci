@@ -12,14 +12,14 @@
             </div>
         </div>
         <router-view />
-        <Announcement-dialog v-if="false" />
+        <Announcement-dialog v-if="hideAnnounce !== true" />
     </div>
 </template>
 
 <script lang="ts">
     import Vue from 'vue'
     import { Component, Watch } from 'vue-property-decorator'
-    import { State } from 'vuex-class'
+    import { State, Action } from 'vuex-class'
     import AnnouncementDialog from '../components/AnnouncementDialog/index.vue'
     const ENTERPRISE_VERSION = false
     @Component({
@@ -30,6 +30,9 @@
     export default class App extends Vue {
         @State('fetchError') fetchError
         @State('moduleLoading') moduleLoading
+
+        @Action getAnnouncement
+        @Action setAnnouncement
 
         hideAnnounce: boolean = ENTERPRISE_VERSION
 
@@ -42,6 +45,13 @@
                 message: e.message || this.$t('NetworkError'),
                 theme: 'error'
             })
+        }
+
+        async created () {
+            const announce = await this.getAnnouncement()
+            if (announce && announce.id) {
+                this.setAnnouncement(announce)
+            }
         }
     }
 </script>
