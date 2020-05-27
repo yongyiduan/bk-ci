@@ -154,9 +154,6 @@
             },
             showLog: {
                 type: Function
-            },
-            loadingMore: {
-                type: Boolean
             }
         },
         data () {
