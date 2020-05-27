@@ -439,27 +439,9 @@ export const actions = {
         }
     },
 
-    requestJobTaskList: async ({ commit }, payload) => {
-        try {
-            const { data } = await request.get(`${BACKEND_API_URL_PREFIX}/api/ci/pipeline/job/templates/${payload.projectId}/`)
-            const finalData = data
-            await Promise.all(data.map(function (item, index) {
-                return request.get(`${BACKEND_API_URL_PREFIX}/api/ci/pipeline/job/templates/${payload.projectId}/${item.id}/`)
-            })).then((array) => {
-                data.map((item, index) => {
-                    item = Object.assign(item, { 'param': array[index].data })
-                    data.splice(index, 1, item)
-                })
-            })
-            commit(JOBEXECUTE_TASK_MUTATION, finalData)
-        } catch (e) {
-            rootCommit(commit, FETCH_ERROR, e)
-        }
-    },
-
     requestJobTaskParam: async ({ commit }, { projectId, taskId }) => {
-        return request.get(`${BACKEND_API_URL_PREFIX}/api/ci/pipeline/job/templates/${projectId}/${taskId}/`).then(response => {
-            return response.data
+        return request.get(`/plugin/api/user/job/projects/${projectId}/tasks/${taskId}/`).then(response => {
+            return (response.data && response.data.globalVarList) || []
         })
     },
     reviewExcudeAtom: async ({ commit }, { projectId, pipelineId, buildId, elementId, action }) => {
