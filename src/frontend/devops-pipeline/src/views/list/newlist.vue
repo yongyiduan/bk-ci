@@ -957,11 +957,6 @@
                 navConfirm({ type: 'warning', content })
                     .then(() => {
                         let message, theme
-                        const {
-                            loading
-                        } = this
-
-                        loading.title = this.$t('newlist.deleteTips')
                         this.togglePageLoading(true)
                         setTimeout(async () => {
                             try {
@@ -987,7 +982,9 @@
                                 this.togglePageLoading(false)
                             }
                         }, 1000)
-                    }).catch(() => {})
+                    }).catch((e) => {
+                        console.log('catch', e)
+                    })
             },
             /**
              *  复制流水线弹窗的确认回调函数
