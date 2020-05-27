@@ -315,25 +315,29 @@
         },
 
         methods: {
-            async changeLayoutType (val) {
+            changeLayoutType (val) {
                 localStorage.setItem('pipelineLayout', val)
                 this.layout = val
             },
-            async changeOrderType (val) {
+            changeOrderType (val) {
                 localStorage.setItem('pipelineSortType', val)
                 this.sortType = val
-                this.$nextTick(() => {
+                this.$nextTick(async () => {
                     if (this.$refs.infiniteScroll) {
-                        this.$refs.infiniteScroll.updateList()
+                        this.togglePageLoading(true)
+                        await this.$refs.infiniteScroll.updateList()
+                        this.togglePageLoading(false)
                     }
                 })
             },
-            async filterCommit (data, currentFilter, needLoad = true) { // needLoad 阻止重复请求流水线列表
+            filterCommit (data, currentFilter, needLoad = true) { // needLoad 阻止重复请求流水线列表
                 this.filter = data
                 this.currentFilter = currentFilter
                 if (needLoad && this.$refs.infiniteScroll) {
-                    this.$nextTick(() => {
-                        this.$refs.infiniteScroll.updateList()
+                    this.$nextTick(async () => {
+                        this.togglePageLoading(true)
+                        await this.$refs.infiniteScroll.updateList()
+                        this.togglePageLoading(false)
                     })
                 }
                 this.isDisabled = false
