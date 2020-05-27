@@ -33,7 +33,7 @@ const svgSpriteConfig = {
 }
 const envPrefix = env === 'master' ? '' : `${env}.`
 const BUNDLE_NAME = 'assets_bundle.json'
-const ASSETS_JSON_URL = `http://${envPrefix}devgw.devops.oa.com/${BUNDLE_NAME}`
+const ASSETS_JSON_URL = `http://${envPrefix}devnet.devops.oa.com/${BUNDLE_NAME}`
 
 async function getAssetsJSON (jsonUrl) {
     try {
