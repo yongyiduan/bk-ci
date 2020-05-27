@@ -35,15 +35,16 @@
 
                         <div class="pipeline-list-table" v-if="layout === 'table'">
                             <task-table
+                                :pipeline-fe-conf-map="pipelineFeConfMap"
                                 :list="slotProps.list">
                             </task-table>
                         </div>
                     </section>
-                    
+
                 </section>
             </template>
         </infinite-scroll>
-            
+
         <pipeline-template-popup :toggle-popup="toggleTemplatePopup" :is-show="templatePopupShow"></pipeline-template-popup>
 
         <pipeline-filter v-if="slideShow" :is-show="slideShow" @showSlide="showSlide" :is-disabled="isDisabled" :selected-filter="currentFilter" @filter="filterCommit" class="pipeline-filter"></pipeline-filter>
@@ -564,7 +565,7 @@
                         isCollect
                     })
                     pipeline.hasCollect = isCollect
-                    
+
                     this.pipelineFeConfMap[pipelineId].extMenu[1].text = isCollect ? this.$t('uncollect') : this.$t('collect')
                     if (this.currentViewId === 'collect' && !isCollect) {
                         this.$store.commit('pipelines/removePipelineById', pipelineId)
@@ -758,7 +759,7 @@
                     curPipeline.latestBuildId = res.id
 
                     // 重置执行进度
-                    
+
                     this.pipelineFeConfMap[pipelineId] = {
                         ...this.pipelineFeConfMap[pipelineId],
                         runningInfo: {
