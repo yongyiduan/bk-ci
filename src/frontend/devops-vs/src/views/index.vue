@@ -19,20 +19,20 @@
                         {
                             id: 'vsList',
                             name: '扫描记录',
-                            icon: 'devops-icon icon-txt',
+                            icon: 'icon-txt',
                             showChildren: false,
                             children: [
                                 {
                                     id: 'vsReport',
                                     name: '扫描报告',
-                                    icon: 'devops-icon icon-list'
+                                    icon: 'icon-list'
                                 }
                             ]
                         },
                         {
                             id: 'createVs',
                             name: '新增扫描',
-                            icon: 'devops-icon icon-create-vs',
+                            icon: 'icon-create-vs',
                             showChildren: false
                         }
                     ]

@@ -18,36 +18,36 @@
                         {
                             id: 'envList',
                             name: this.$t('environment.environment'),
-                            icon: 'devops-icon icon-env',
+                            icon: 'icon-env',
                             showChildren: false,
                             children: [
                                 {
                                     id: 'createEnv',
                                     name: this.$t('environment.createEnvrionment'),
-                                    icon: 'devops-icon icon-env'
+                                    icon: 'icon-env'
                                 },
                                 {
                                     id: 'envDetail',
                                     name: this.$t('environment.environmentDetail'),
-                                    icon: 'devops-icon icon-env'
+                                    icon: 'icon-env'
                                 }
                             ]
                         },
                         {
                             id: 'nodeList',
                             name: this.$t('environment.node'),
-                            icon: 'devops-icon icon-node',
+                            icon: 'icon-node',
                             showChildren: false,
                             children: [
                                 {
                                     id: 'createNode',
                                     name: this.$t('environment.createNode'),
-                                    icon: 'devops-icon icon-node'
+                                    icon: 'icon-node'
                                 },
                                 {
                                     id: 'nodeDetail',
                                     name: this.$t('environment.nodeDetail'),
-                                    icon: 'devops-icon icon-node'
+                                    icon: 'icon-node'
                                 }
                             ]
                         }
