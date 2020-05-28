@@ -453,7 +453,7 @@
                     imageCode: defaultBuildResource.code || '',
                     imageName: defaultBuildResource.name || '',
                     recommendFlag: defaultBuildResource.recommendFlag,
-                    useRoot: val === 'THIRD_PARTY_PCG' ? true : undefined,
+                    useRoot: val === 'THIRD_PARTY_PCG' ? false : undefined,
                     [name]: val
                 }))
                 if (val === 'MACOS') this.getMacOsData()
