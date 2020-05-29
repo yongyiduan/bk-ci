@@ -50,9 +50,9 @@ const optionConfigMixin = {
                     label: this.$t('storeMap.retryCount'),
                     placeholder: this.$t('storeMap.retryCountPlaceholder'),
                     default: '1',
-                    isHidden: (element) => {
+                    isHidden: `(element) => {
                         return !(element.additionalOptions && (element.additionalOptions.retryWhenFailed === true))
-                    }
+                    }`
                 },
                 timeout: {
                     rule: { 'numeric': true, 'max_value': 10080 },
