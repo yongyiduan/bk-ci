@@ -695,7 +695,7 @@
                                 }
                             ],
                             runningInfo: {
-                                time: convertMStoStringByRule(status === 'error' ? (item.latestBuildEndTime - item.latestBuildStartTime) : (item.pipelinerentTimestamp - item.latestBuildStartTime)),
+                                time: convertMStoStringByRule(status === 'error' ? (item.latestBuildEndTime - item.latestBuildStartTime) : (item.currentTimestamp - item.latestBuildStartTime)),
                                 percentage: this.calcPercentage(item),
                                 log: item.latestBuildTaskName,
                                 buildCount: item.runningBuildCount || 0
@@ -704,7 +704,7 @@
                             pipelineId,
                             buildId: item.latestBuildId || 0
                         }
-                        if (!this.pipelineFeConfMap[pipelineId].extMenu.length) {
+                        if (!(this.pipelineFeConfMap[pipelineId] && this.pipelineFeConfMap[pipelineId].extMenu && this.pipelineFeConfMap[pipelineId].extMenu.length)) {
                             feConfig.extMenu = [
                                 {
                                     text: this.$t('edit'),

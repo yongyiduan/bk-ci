@@ -64,9 +64,9 @@ const jobOptionConfigMixin = {
                     default: [{ key: 'param1', value: '' }],
                     label: this.$t('storeMap.customVar'),
                     allowNull: false,
-                    isHidden: (jobOptoin) => {
+                    isHidden: `function (jobOptoin) {
                         return !(jobOptoin && (jobOptoin.runCondition === 'CUSTOM_VARIABLE_MATCH' || jobOptoin.runCondition === 'CUSTOM_VARIABLE_MATCH_NOT_RUN'))
-                    }
+                    }`
                 },
                 customCondition: {
                     isHidden: true,
@@ -101,9 +101,9 @@ const jobOptionConfigMixin = {
                     placeholder: this.$t('storeMap.mutualTimeoutPlaceholder'),
                     default: '900',
                     required: true,
-                    isHidden: (mutexGroup) => {
+                    isHidden: `function (mutexGroup) {
                         return !(mutexGroup && mutexGroup.queueEnable)
-                    }
+                    }`
                 },
                 queue: {
                     rule: { 'numeric': true, 'max_value': 10, 'min_value': 1 },
@@ -112,9 +112,9 @@ const jobOptionConfigMixin = {
                     placeholder: this.$t('storeMap.queuePlaceholder'),
                     default: '5',
                     required: true,
-                    isHidden: (mutexGroup) => {
+                    isHidden: `function (mutexGroup) {
                         return !(mutexGroup && mutexGroup.queueEnable)
-                    }
+                    }`
                 }
             }
         }
