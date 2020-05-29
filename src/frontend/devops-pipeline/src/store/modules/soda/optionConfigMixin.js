@@ -19,9 +19,9 @@
 
 // 根据配置文件获取原子流程控制选项的默认值
 const optionConfigMixin = {
-    computed: {
-        ATOM_OPTION () {
-            return {
+    data () {
+        return {
+            ATOM_OPTION: {
                 enable: {
                     rule: {},
                     type: 'boolean',
@@ -50,9 +50,9 @@ const optionConfigMixin = {
                     label: this.$t('storeMap.retryCount'),
                     placeholder: this.$t('storeMap.retryCountPlaceholder'),
                     default: '1',
-                    isHidden: `(element) => {
+                    isHidden: (element) => {
                         return !(element.additionalOptions && (element.additionalOptions.retryWhenFailed === true))
-                    }`
+                    }
                 },
                 timeout: {
                     rule: { 'numeric': true, 'max_value': 10080 },
