@@ -19,9 +19,9 @@
 
 // 根据配置文件获取原子流程控制选项的默认值
 const optionConfigMixin = {
-    data () {
-        return {
-            ATOM_OPTION: {
+    computed: {
+        ATOM_OPTION () {
+            return {
                 enable: {
                     rule: {},
                     type: 'boolean',
