@@ -50,9 +50,9 @@ const optionConfigMixin = {
                     label: this.$t('storeMap.retryCount'),
                     placeholder: this.$t('storeMap.retryCountPlaceholder'),
                     default: '1',
-                    isHidden: (element) => {
+                    isHidden: `function (element) {
                         return !(element.additionalOptions && (element.additionalOptions.retryWhenFailed === true))
-                    }
+                    }`
                 },
                 timeout: {
                     rule: { 'numeric': true, 'max_value': 10080 },
@@ -96,9 +96,9 @@ const optionConfigMixin = {
                     default: [{ key: 'param1', value: '' }],
                     allowNull: false,
                     label: this.$t('storeMap.customVar'),
-                    isHidden: (element) => {
+                    isHidden: `function (element) {
                         return !(element.additionalOptions && (element.additionalOptions.runCondition === 'CUSTOM_VARIABLE_MATCH' || element.additionalOptions.runCondition === 'CUSTOM_VARIABLE_MATCH_NOT_RUN'))
-                    }
+                    }`
                 },
                 otherTask: {
                     isHidden: true,
