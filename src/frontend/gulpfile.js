@@ -31,13 +31,16 @@ const svgSpriteConfig = {
         symbol: true
     }
 }
-const envPrefix = env === 'master' ? '' : `${env}.`
+const isGray = env === 'gray'
+const envPrefix = isGray || env === 'master' ? '' : `${env}.`
 const BUNDLE_NAME = 'assets_bundle.json'
 const ASSETS_JSON_URL = `http://${envPrefix}devnet.devops.oa.com/${BUNDLE_NAME}`
 
 async function getAssetsJSON (jsonUrl) {
     try {
-        const res = await fetch(jsonUrl)
+        const res = await fetch(jsonUrl, {
+            headers: isGray ? { 'X-DEVOPS-PROJECT-ID': 'grayproject' } : {}
+        })
         const assets = await res.json()
 
         console.log(chalk.blue.bold(`Successfully get assets json from ${jsonUrl}!`))
@@ -45,7 +48,7 @@ async function getAssetsJSON (jsonUrl) {
         return assets
     } catch (error) {
         console.log(chalk.yellow.bgRed.bold(`Failed get assets json from ${jsonUrl}!`))
-        return {}
+        process.exit(1)
     }
 }
 
