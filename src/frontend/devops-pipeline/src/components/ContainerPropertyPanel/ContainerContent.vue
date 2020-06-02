@@ -16,7 +16,7 @@
             </div>
         </form-field>
 
-        <form v-if="isVmContainer(container)" v-bkloading="{ isLoading: !apps || !containerModalId }">
+        <form v-if="isVmContainer(container)" v-bkloading="{ isLoading: !apps || !containerModalId || isLoadingImage }">
             <form-field :label="$t('editPage.resourceType')">
                 <selector
                     :disabled="!editable"
@@ -41,7 +41,7 @@
                 <span class="bk-form-help" v-if="isPublicResourceType">{{ $t('editPage.publicResTips') }}</span>
             </form-field>
 
-            <form-field :label="$t('editPage.image')" v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)" :required="true" :is-error="errors.has(&quot;buildImageVersion&quot;) || errors.has(&quot;buildResource&quot;)" :error-msg="$t('editPage.imageErrMgs')">
+            <form-field :label="$t('editPage.image')" v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && !isLoadingImage" :required="true" :is-error="errors.has(&quot;buildImageVersion&quot;) || errors.has(&quot;buildResource&quot;)" :error-msg="$t('editPage.imageErrMgs')">
                 <enum-input
                     name="imageType"
                     :list="imageTypeList"
@@ -194,7 +194,7 @@
         </div>
 
         <image-selector :is-show.sync="showImageSelector"
-            v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)"
+            v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && !isLoadingImage"
             :code="buildImageCode"
             :build-resource-type="buildResourceType"
             @choose="choose"
@@ -249,7 +249,8 @@
                 isVersionLoading: false,
                 isLoadingMac: false,
                 xcodeVersionList: [],
-                systemVersionList: []
+                systemVersionList: [],
+                isLoadingImage: false
             }
         },
         computed: {
@@ -421,6 +422,25 @@
                     agentType: 'ID'
                 }))
             }
+            if (['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(this.buildResourceType) && !this.buildImageCode && this.buildImageType !== 'THIRD') {
+                if (/\$\{/.test(this.buildResource)) {
+                    this.handleContainerChange('dispatchType', Object.assign({
+                        ...this.container.dispatchType,
+                        imageType: 'THIRD'
+                    }))
+                } else {
+                    this.isLoadingImage = true
+                    this.requestImageHistory({ agentType: this.buildResourceType, value: this.buildResource }).then((res) => {
+                        const data = res.data || {}
+                        this.handleContainerChange('dispatchType', Object.assign({
+                            ...this.container.dispatchType,
+                            imageType: 'BKSTORE'
+                        }))
+                        data.historyVersion = data.version
+                        if (data.code) this.choose(data)
+                    }).catch((err) => this.$showTips({ theme: 'error', message: err.message || err })).finally(() => (this.isLoadingImage = false))
+                }
+            }
             if (this.container.dispatchType && this.container.dispatchType.imageCode) {
                 this.getVersionList(this.container.dispatchType.imageCode)
             }
@@ -438,7 +458,8 @@
                 'startDebugDevcloud'
             ]),
             ...mapActions('pipelines', [
-                'requestImageVersionlist'
+                'requestImageVersionlist',
+                'requestImageHistory'
             ]),
 
             changeResourceType (name, val) {
