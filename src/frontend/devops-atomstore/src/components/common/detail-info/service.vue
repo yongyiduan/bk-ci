@@ -152,6 +152,7 @@
     .detail-info-group {
         flex: 1;
         padding: 0 32px;
+        max-width: calc(100% - 314px);
         h3 {
             font-size: 20px;
             line-height: 23px;
