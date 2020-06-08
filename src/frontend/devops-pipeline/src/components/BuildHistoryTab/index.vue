@@ -307,7 +307,7 @@
 
             async updateBuildHistoryList () {
                 try {
-                    if (!this.pipelineId || !this.projectId) {
+                    if (!this.pipelineId || !this.projectId || !this.$refs.infiniteScroll) {
                         webSocketMessage.unInstallWsMessage()
                         return
                     }
