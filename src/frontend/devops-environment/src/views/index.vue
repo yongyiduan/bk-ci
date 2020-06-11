@@ -40,11 +40,6 @@
                             showChildren: false,
                             children: [
                                 {
-                                    id: 'createNode',
-                                    name: this.$t('environment.createNode'),
-                                    icon: 'devops-icon icon-node'
-                                },
-                                {
                                     id: 'nodeDetail',
                                     name: this.$t('environment.nodeDetail'),
                                     icon: 'devops-icon icon-node'

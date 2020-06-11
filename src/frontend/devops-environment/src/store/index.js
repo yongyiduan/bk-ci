@@ -24,26 +24,13 @@ import { nodeTypeMap, nodeStatusMap } from './constants'
 const store = {
     namespaced: true,
     state: {
-        publicDockerList: [],
-        customizeDockerList: [],
         nodeDetails: {},
         nodeTypes: nodeTypeMap,
         nodeStatus: nodeStatusMap,
         devCloudVmQuta: {},
-        currentSelectedModel: {},
-        processHeadConf: {
-            current: 0,
-            process: 'modelType'
-        }
+        currentSelectedModel: {}
     },
-    getters: {
-        getProcessHeadConf: state => () => {
-            const envLocale = window.devops.$i18n.t('environment')
-            state.processHeadConf.title = envLocale.node
-            state.processHeadConf.list = [envLocale.selectModel, envLocale.confirmInfo]
-            return state.processHeadConf
-        }
-    },
+    getters: {},
     mutations,
     actions
 }
