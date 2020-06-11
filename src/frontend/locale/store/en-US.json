@@ -43,6 +43,8 @@
     "微扩展": "Micro extension",
     "展示给用户的名称，用户根据名称识别扩展服务": "The name displayed to the user, who identifies the extended service based on the namee",
     "请输入扩展名称": "Please enter an extension name",
+    "复制成功": "Copy successful",
+    "镜像地址": "Image Address",
     "点击查看YAML片段": "Click to view YAML fragment",
     "YAML片段": "YAML fragment",
     "点击申请成为协作者": "Click Apply to become a collaborator",

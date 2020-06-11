@@ -140,8 +140,11 @@ export default {
         const preVerEle = container.elements[atomIndex]
         const preVerkey = getAtomModalKey(preVerEle.atomCode, preVerEle.version)
         const preVerAtomModal = state.atomModalMap[preVerkey] || { props: {} }
+        const isChangeAtom = atomModal.atomCode !== preVerAtomModal.atomCode
         let atom = null
         if (isNewAtomTemplate(atomModal.htmlTemplateVersion)) {
+            const preVerData = preVerEle.data || {}
+            const preVerModelProps = preVerAtomModal.props || {}
             atom = {
                 id: `e-${hashID(32)}`,
                 '@type': atomModal.classType !== atomCode ? atomModal.classType : atomCode,
@@ -151,12 +154,12 @@ export default {
                 data: {
                     input: {
                         ...getAtomDefaultValue(atomModal.props.input),
-                        ...getAtomPreviousVal(preVerEle.data.input, preVerAtomModal.props.input, atomModal.props.input)
+                        ...getAtomPreviousVal(preVerData.input, preVerModelProps.input, atomModal.props.input, isChangeAtom)
                     },
                     output: {
                         ...getAtomOutputObj(atomModal.props.output)
                     },
-                    namespace: preVerEle.data.namespace || ''
+                    namespace: isChangeAtom ? '' : preVerData.namespace || ''
                 }
             }
         } else {
@@ -167,7 +170,7 @@ export default {
                 version,
                 name: atomModal.name,
                 ...getAtomDefaultValue(atomModal.props),
-                ...getAtomPreviousVal(preVerEle, preVerAtomModal.props, atomModal.props)
+                ...getAtomPreviousVal(preVerEle, preVerAtomModal.props, atomModal.props, isChangeAtom)
             }
         }
         container.elements.splice(atomIndex, 1, atom)

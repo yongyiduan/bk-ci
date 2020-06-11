@@ -86,6 +86,7 @@
                             :element="element"
                             :container="container"
                             :set-parent-validate="setAtomValidate"
+                            :disabled="!editable"
                         >
                         </atom-option>
                     </div>
@@ -766,5 +767,8 @@
                 border-radius: 0 2px 2px 0;
             }
         }
+    }
+    .pointer-events-auto {
+        pointer-events: auto;
     }
 </style>
