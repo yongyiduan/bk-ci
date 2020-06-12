@@ -17,6 +17,8 @@
 <script>
     import { mapActions } from 'vuex'
     import Stage from './Stage'
+    import { hashID } from '@/utils/util'
+
     export default {
         components: {
             Stage
@@ -46,11 +48,12 @@
                 },
                 set (stages) {
                     const data = stages.map((stage, index) => {
-                        const id = `stage-${index + 1}`
+                        const id = `s-${hashID()}`
+                        const name = `stage-${index + 1}`
                         if (!stage.containers) { // container
                             return {
                                 id,
-                                name: id,
+                                name,
                                 containers: [stage]
                             }
                         }

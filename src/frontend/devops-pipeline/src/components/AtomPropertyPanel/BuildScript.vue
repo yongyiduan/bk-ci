@@ -193,50 +193,44 @@
 
             // 新建任务跳转
             async goRegist () {
-                if (!this.elementId) {
-                    const { checkPipelineInvalid, $route: { params }, pipeline } = this
-                    const { inValid, message } = checkPipelineInvalid(pipeline.stages)
-                    this.btnDisabled = true
-                    const tab = window.open('about:blank')
-                    try {
-                        if (inValid) {
-                            throw new Error(message)
-                        }
-                        const { data } = await this.$ajax.put(`/process/api/user/pipelines/${params.projectId}/${params.pipelineId}`, pipeline)
-                        if (data) {
-                            // this.requestPipeline(this.$route.params)
-                            const response = await this.$ajax.get(`/process/api/user/pipelines/${params.projectId}/${params.pipelineId}`)
-                            this.setPipeline(response.data)
-                            this.updatePipelineToTurbo(response.data)
-                            const { containerIndex, elementIndex, stageIndex } = this.getEditingElementPos
-                            const container = response.data.stages[stageIndex]
-                            this.elementId = container.containers[containerIndex].elements[elementIndex].id
-
-                            tab.location = `${WEB_URL_PIRFIX}/turbo/${this.projectId}/registration#${this.$route.params.pipelineId}&${this.elementId}`
-                        } else {
-                            this.$showTips({
-                                message: `${pipeline.name}${this.$t('updateFail')}`,
-                                theme: 'error'
-                            })
-                            tab.close()
-                        }
-                    } catch (e) {
-                        if (e.code === 403) { // 没有权限编辑
-                            this.setPermissionConfig(`${this.$t('pipeline')}：${this.pipeline.name}`, this.$t('edit'))
-                        } else {
-                            this.$showTips({
-                                message: e.message,
-                                theme: 'error'
-                            })
-                        }
-                        tab.close()
-                    } finally {
-                        this.btnDisabled = false
+                const { checkPipelineInvalid, $route: { params }, pipeline } = this
+                const { inValid, message } = checkPipelineInvalid(pipeline.stages)
+                this.btnDisabled = true
+                const tab = window.open('about:blank')
+                try {
+                    if (inValid) {
+                        throw new Error(message)
                     }
-                } else {
-                    setTimeout(() => {
-                        window.open(`${WEB_URL_PIRFIX}/turbo/${this.projectId}/registration#${this.$route.params.pipelineId}&${this.elementId}`, '_blank')
-                    }, 200)
+                    const { data } = await this.$ajax.put(`/process/api/user/pipelines/${params.projectId}/${params.pipelineId}`, pipeline)
+                    if (data) {
+                        // this.requestPipeline(this.$route.params)
+                        const response = await this.$ajax.get(`/process/api/user/pipelines/${params.projectId}/${params.pipelineId}`)
+                        this.setPipeline(response.data)
+                        this.updatePipelineToTurbo(response.data)
+                        const { containerIndex, elementIndex, stageIndex } = this.getEditingElementPos
+                        const container = response.data.stages[stageIndex]
+                        this.elementId = container.containers[containerIndex].elements[elementIndex].id
+
+                        tab.location = `${WEB_URL_PIRFIX}/turbo/${this.projectId}/registration#${this.$route.params.pipelineId}&${this.elementId}`
+                    } else {
+                        this.$showTips({
+                            message: `${pipeline.name}${this.$t('updateFail')}`,
+                            theme: 'error'
+                        })
+                        tab.close()
+                    }
+                } catch (e) {
+                    if (e.code === 403) { // 没有权限编辑
+                        this.setPermissionConfig(`${this.$t('pipeline')}：${this.pipeline.name}`, this.$t('edit'))
+                    } else {
+                        this.$showTips({
+                            message: e.message,
+                            theme: 'error'
+                        })
+                    }
+                    tab.close()
+                } finally {
+                    this.btnDisabled = false
                 }
             },
             setPermissionConfig (resource, option) {
