@@ -7,23 +7,8 @@
         </div>
         <div class="create-node-row" v-else>
             <template v-if="isExtendTx">
-                <bk-dropdown-menu :align="'right'"
-                    @show="dropdownShow"
-                    @hide="dropdownHide"
-                    ref="dropdown">
-                    <bk-button slot="dropdown-trigger">
-                        <span>{{ $t('environment.import') }}</span>
-                        <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                    </bk-button>
-                    <ul class="bk-dropdown-list" slot="dropdown-content">
-                        <li>
-                            <a href="javascript:;" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</a>
-                        </li>
-                        <li>
-                            <a href="javascript:;" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</a>
-                        </li>
-                    </ul>
-                </bk-dropdown-menu>
+                <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
+                <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
             </template>
             <bk-button theme="primary" class="import-node-btn" v-else @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
         </div>
@@ -40,19 +25,6 @@
             emptyInfo: Object,
             toCreateNode: Function,
             toImportNode: Function
-        },
-        data () {
-            return {
-                isDropdownShow: false
-            }
-        },
-        methods: {
-            dropdownShow () {
-                this.isDropdownShow = true
-            },
-            dropdownHide () {
-                this.isDropdownShow = false
-            }
         }
     }
 </script>

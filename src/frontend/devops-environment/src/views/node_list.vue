@@ -4,23 +4,8 @@
             <div slot="left">{{ $t('environment.node') }}</div>
             <div slot="right" v-if="nodeList.length > 0">
                 <template v-if="isExtendTx">
-                    <bk-dropdown-menu :align="'right'"
-                        @show="dropdownIsShow('show')"
-                        @hide="dropdownIsShow('hide')"
-                        ref="dropdown">
-                        <bk-button slot="dropdown-trigger">
-                            <span>{{ $t('environment.import') }}</span>
-                            <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                        </bk-button>
-                        <ul class="bk-dropdown-list" slot="dropdown-content">
-                            <li>
-                                <a href="javascript:;" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</a>
-                            </li>
-                            <li>
-                                <a href="javascript:;" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</a>
-                            </li>
-                        </ul>
-                    </bk-dropdown-menu>
+                    <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
+                    <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
                 </template>
                 <bk-button v-else theme="primary" class="import-vmbuild-btn" @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
             </div>
@@ -233,7 +218,6 @@
                 isAgent: false,
                 isMultipleBtn: false,
                 isEditNodeStatus: false,
-                isDropdownShow: false, // 导入菜单
                 showContent: false, // 内容显示
                 hasPermission: true, // 构建机权限
                 showTooltip: false,
@@ -425,13 +409,6 @@
             toNodeApplyPerm (row) {
                 const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}` : PERM_URL_PREFIX
                 window.open(url, '_blank')
-            },
-            dropdownIsShow (isShow) {
-                if (isShow === 'show') {
-                    this.isDropdownShow = true
-                } else {
-                    this.isDropdownShow = false
-                }
             },
             toNodeDetail (node) {
                 if (this.canShowDetail(node)) {
