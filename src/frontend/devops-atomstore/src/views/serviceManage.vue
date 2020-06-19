@@ -1,14 +1,14 @@
 <template>
     <article class="service-manage-home" v-bkloading="{ isLoading }">
         <nav class="service-nav">
-            <span>{{ $t('store.扩展管理') }}</span>
-            <bk-button @click="goToStore" theme="primary">{{ $t('store.添加扩展服务') }}</bk-button>
+            <span>{{ $t('store.微扩展管理') }}</span>
+            <bk-button @click="goToStore" theme="primary">{{ $t('store.添加微扩展服务') }}</bk-button>
         </nav>
         <header class="service-filter">
             <bk-button ext-cls="filter-button"
                 :disabled="filterList.length <= 0"
                 @click="filterList = []"
-            >{{ $t('store.全部扩展') }}（{{installList.length}}）
+            >{{ $t('store.全部微扩展') }}（{{installList.length}}）
             </bk-button>
             <bk-checkbox-group v-model="filterList">
                 <ul class="fliter-list">
@@ -28,14 +28,14 @@
             </bk-checkbox-group>
         </header>
         <main class="service-table">
-            <bk-table :empty-text="$t('store.暂时没有扩展')"
+            <bk-table :empty-text="$t('store.暂时没有微扩展')"
                 :outer-border="false"
                 :header-border="false"
                 :header-cell-style="{ background: '#fff' }"
                 :data="filterInstallList"
                 :show-overflow-tooltip="true"
             >
-                <bk-table-column :label="$t('store.扩展名称')" prop="serviceName"></bk-table-column>
+                <bk-table-column :label="$t('store.微扩展名称')" prop="serviceName"></bk-table-column>
                 <bk-table-column :label="$t('store.发布者')" prop="publisher"></bk-table-column>
                 <bk-table-column :label="$t('store.版本')" prop="version"></bk-table-column>
                 <bk-table-column :label="$t('store.状态')" prop="serviceStatus" :formatter="statusFormatter"></bk-table-column>

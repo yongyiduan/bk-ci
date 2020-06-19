@@ -16,7 +16,7 @@
                     <button class="bk-button bk-default" type="button" @click="bitchrRemove()"> {{ $t('store.批量删除') }} </button>
                 </div>
                 <bk-table style="margin-top: 15px;"
-                    :empty-text="$t('store.未设置可见对象时，仅扩展成员可以安装到名下项目中使用。设置可见对象后，对应用户可以在Store中查看并安装使用。')"
+                    :empty-text="$t('store.未设置可见对象时，仅微扩展成员可以安装到名下项目中使用。设置可见对象后，对应用户可以在Store中查看并安装使用。')"
                     :data="visibleList"
                     @select="select"
                     @select-all="selectAll"
@@ -97,7 +97,7 @@
             emptyTipsConfig () {
                 return {
                     title: this.$t('store.暂时没有设置可见范围'),
-                    desc: this.$t('store.未设置可见对象时，仅扩展成员可以安装到名下项目中使用。设置可见对象后，对应用户可以在Store中查看并安装使用。'),
+                    desc: this.$t('store.未设置可见对象时，仅微扩展成员可以安装到名下项目中使用。设置可见对象后，对应用户可以在Store中查看并安装使用。'),
                     btns: [
                         {
                             type: 'primary',

@@ -8,38 +8,39 @@
             <i class="right-arrow"></i>
             <div class="title secondary" @click="toServiceList"> {{ $t('store.工作台') }} </div>
             <i class="right-arrow"></i>
-            <div class="title third-level">{{$t('store.上架/升级扩展')}}（{{form.serviceCode}}）</div>
-            <a class="develop-guide-link" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.扩展指引') }} </a>
+            <div class="title third-level">{{$t('store.上架/升级微扩展')}}（{{form.serviceCode}}）</div>
+            <a class="develop-guide-link" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.微扩展指引') }} </a>
         </div>
         <main v-bkloading="{ isLoading }" class="edit-content">
             <bk-form ref="serviceForm" class="edit-service" label-width="125" :model="form" v-show="!isLoading">
-                <bk-form-item class="wt660" :label="$t('store.名称')" :required="true" property="serviceName" :rules="[requireRule]" ref="serviceName">
-                    <bk-input v-model="form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
+                <bk-form-item class="wt660"
+                    :label="$t('store.名称')"
+                    :required="true"
+                    property="serviceName"
+                    :rules="[requireRule, numMax, nameRule]"
+                    ref="serviceName"
+                    error-display-type="normal"
+                >
+                    <bk-input v-model="form.serviceName" :placeholder="$t('store.请输入微扩展名称，不超过20个字符')"></bk-input>
                 </bk-form-item>
-                <bk-form-item class="wt660" :label="$t('store.扩展点')" :required="true" property="extensionItemList" :rules="[requireRule]" ref="extensionItemList">
-                    <bk-select v-model="form.extensionItemList"
-                        :placeholder="$t('store.请选择扩展点')"
-                        multiple
-                        :scroll-height="500"
+                <bk-form-item class="wt660"
+                    :label="$t('store.扩展点')"
+                    :required="true"
+                    property="extensionItemList"
+                    :rules="[requireRule]"
+                    ref="extensionItemList"
+                    error-display-type="normal"
+                >
+                    <bk-select :placeholder="$t('store.请选择扩展点')"
+                        class="service-item"
+                        :scroll-height="300"
                         :clearable="true"
                         @toggle="getServiceList"
                         :loading="isServiceListLoading"
-                    >
-                        <template v-slot:trigger>
-                            <section>
-                                <ul class="select-tag" v-if="!isLoading">
-                                    <li v-for="item in form.extensionItemList" :key="item">
-                                        <i class="bk-icon icon-close" @click.prevent.stop="deleteServiceItem(item)"></i>
-                                        {{ getItemName(item) }}
-                                    </li>
-                                </ul>
-                                <i class="bk-select-clear bk-icon icon-close-circle-shape"
-                                    v-if="form.extensionItemList.length"
-                                    @click.prevent.stop="form.extensionItemList = []">
-                                </i>
-                                <i class="bk-select-angle bk-icon icon-angle-down" v-else></i>
-                            </section>
-                        </template>
+                        searchable
+                        multiple
+                        display-tag
+                        v-model="form.extensionItemList">
                         <bk-option-group
                             v-for="(group, index) in serviceList"
                             :name="group.name"
@@ -53,10 +54,19 @@
                         </bk-option-group>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item :label="$t('store.标签')" property="labelIdList" class="wt660">
+                <bk-form-item :label="$t('store.标签')"
+                    property="labelIdList"
+                    class="wt660"
+                >
                     <bk-tag-input v-model="form.labelIdList" :list="labelList" display-key="labelName" search-key="labelName" trigger="focus" :placeholder="$t('store.请选择标签')"></bk-tag-input>
                 </bk-form-item>
-                <bk-form-item :label="$t('store.简介')" property="summary" :required="true" :rules="[requireRule]" ref="summary">
+                <bk-form-item :label="$t('store.简介')"
+                    property="summary"
+                    :required="true"
+                    :rules="[requireRule]"
+                    ref="summary"
+                    error-display-type="normal"
+                >
                     <bk-input v-model="form.summary" :placeholder="$t('store.请输入简介')"></bk-input>
                 </bk-form-item>
                 <bk-form-item :label="$t('store.描述')" property="description">
@@ -79,7 +89,15 @@
                     <p class="form-title"> {{ $t('store.版本信息') }} </p>
                     <hr class="cut-line">
                 </div>
-                <bk-form-item :label="$t('store.发布类型')" :required="true" property="releaseType" class="h32" :rules="[requireRule]" ref="releaseType" v-if="form.releaseType !== 'CANCEL_RE_RELEASE'">
+                <bk-form-item :label="$t('store.发布类型')"
+                    :required="true"
+                    property="releaseType"
+                    class="h32"
+                    :rules="[requireRule]"
+                    ref="releaseType"
+                    v-if="form.releaseType !== 'CANCEL_RE_RELEASE'"
+                    error-display-type="normal"
+                >
                     <bk-radio-group v-model="form.releaseType">
                         <bk-radio value="NEW" class="mr12" v-if="form.serviceStatus === 'INIT'"> {{ $t('store.新上架') }} </bk-radio>
                         <template v-else>
@@ -89,21 +107,38 @@
                         </template>
                     </bk-radio-group>
                 </bk-form-item>
-                <bk-form-item :label="$t('store.版本号')" property="version" class="lh30" :required="true">
+                <bk-form-item :label="$t('store.版本号')"
+                    property="version"
+                    class="lh30"
+                    :required="true"
+                    error-display-type="normal"
+                >
                     <span>{{$t('store.semverType', [form.version])}}</span>
                     <span class="version-modify" @click="form.releaseType = 'COMPATIBILITY_FIX'" v-if="form.releaseType === 'CANCEL_RE_RELEASE'"> {{ $t('store.修改') }} </span>
                 </bk-form-item>
-                <bk-form-item :label="$t('store.发布者')" :required="true" property="publisher" :rules="[requireRule]" ref="publisher">
+                <bk-form-item :label="$t('store.发布者')"
+                    :required="true"
+                    property="publisher"
+                    :rules="[requireRule]"
+                    ref="publisher"
+                    error-display-type="normal"
+                >
                     <bk-input v-model="form.publisher" :placeholder="$t('store.请输入发布者')"></bk-input>
                 </bk-form-item>
-                <bk-form-item :label="$t('store.版本日志')" :required="true" property="versionContent" :rules="[requireRule]" ref="versionContent">
+                <bk-form-item :label="$t('store.版本日志')"
+                    :required="true"
+                    property="versionContent"
+                    :rules="[requireRule]"
+                    ref="versionContent"
+                    error-display-type="normal"
+                >
                     <bk-input type="textarea" v-model="form.versionContent" :placeholder="$t('store.请输入版本日志')"></bk-input>
                 </bk-form-item>
                 <select-logo ref="selectLogo" label="Logo" :form="form" type="SERVICE" :is-err="logoErr" right="25"></select-logo>
             </bk-form>
             <section class="edit-service button-padding" v-show="!isLoading">
                 <bk-button theme="primary" @click="submitService" :loading="isCommitLoading"> {{ $t('store.提交') }} </bk-button>
-                <bk-button @click="toServiceList" :disabled="isCommitLoading"> {{ $t('store.取消') }} </bk-button>
+                <bk-button @click="$router.back()" :disabled="isCommitLoading"> {{ $t('store.取消') }} </bk-button>
             </section>
         </main>
     </article>
@@ -144,10 +179,21 @@
                 serviceVersionList: [],
                 isLoading: false,
                 isCommitLoading: false,
+                isServiceListLoading: false,
                 originVersion: '',
                 requireRule: {
                     required: true,
                     message: this.$t('store.必填项'),
+                    trigger: 'blur'
+                },
+                numMax: {
+                    validator: (val = '') => (val.length <= 20),
+                    message: this.$t('store.字段不超过20个字符'),
+                    trigger: 'blur'
+                },
+                nameRule: {
+                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-]*$/.test(val)),
+                    message: this.$t('store.由汉字、英文字母、数字、连字符(-)组成，长度小于20个字符'),
                     trigger: 'blur'
                 },
                 logoErr: false,
@@ -190,21 +236,6 @@
                 'requestReleaseService',
                 'requestServiceLabel'
             ]),
-
-            deleteServiceItem (id) {
-                const index = this.form.extensionItemList.findIndex(x => x === id)
-                this.form.extensionItemList.splice(index, 1)
-            },
-
-            getItemName (id) {
-                let name = ''
-                this.serviceList.forEach((item) => {
-                    item.children.forEach((child) => {
-                        if (child.id === id) name = `${item.name}：${child.name}`
-                    })
-                })
-                return name
-            },
 
             submitService () {
                 this.$refs.serviceForm.validate().then(() => {
@@ -306,12 +337,7 @@
             },
 
             toServiceList () {
-                this.$router.push({
-                    name: 'workList',
-                    params: {
-                        type: 'service'
-                    }
-                })
+                this.$router.back()
             },
 
             toAtomStore () {
@@ -419,6 +445,9 @@
         }
         .bk-form-control {
             vertical-align: baseline;
+        }
+        .service-item {
+            background-color: #fff;
         }
     }
 

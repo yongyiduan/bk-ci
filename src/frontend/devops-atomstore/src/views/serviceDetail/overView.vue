@@ -38,7 +38,7 @@
                             <bk-popover placement="top">
                                 <i class="devops-icon icon-info-circle ml4"></i>
                                 <template slot="content">
-                                    <p> {{ $t('store.在发布扩展时，使用授权人的身份拉取扩展代码自动构建打包，或设置扩展可见范围') }} </p>
+                                    <p> {{ $t('store.在发布微扩展时，使用授权人的身份拉取微扩展代码自动构建打包，或设置微扩展可见范围') }} </p>
                                 </template>
                             </bk-popover>
                             <span class="ml4 click-txt"
