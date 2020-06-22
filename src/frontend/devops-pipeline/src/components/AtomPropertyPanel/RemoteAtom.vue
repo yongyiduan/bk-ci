@@ -62,9 +62,11 @@
             onLoad () {
                 const { baseOS, dispatchType } = this.container
                 const containerInfo = { baseOS, dispatchType }
+                const currentUserInfo = this.$userInfo || {}
+                const atomDisabled = this.disabled || false
                 this.loading = false
                 const iframe = document.getElementById('atom-iframe').contentWindow
-                iframe.postMessage({ atomPropsValue: this.element.data.input, atomPropsModel: this.atomPropsModel.input, containerInfo }, '*')
+                iframe.postMessage({ atomPropsValue: this.element.data.input, atomPropsModel: this.atomPropsModel.input, containerInfo, currentUserInfo, atomDisabled }, '*')
             },
             receiveMsgFromIframe (e) {
                 // if (location.href.indexOf(e.origin) === 0) return

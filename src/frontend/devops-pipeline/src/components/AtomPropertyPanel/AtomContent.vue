@@ -60,7 +60,7 @@
                 </div>
                 <qualitygate-tips v-if="showRuleList" :relative-rule-list="renderRelativeRuleList"></qualitygate-tips>
 
-                <div v-if="atom" :class="{ 'atom-form-box': true, 'readonly': !editable }">
+                <div v-if="atom" :class="{ 'atom-form-box': true, 'readonly': !editable && !isRemoteAtom }">
                     <!-- <div class='desc-tips' v-if="!isNewAtomTemplate(atom.htmlTemplateVersion) && atom.description"> <span>插件描述：</span> {{ atom.description }}</div> -->
                     <div
                         v-if="atom.atomModal"
@@ -342,11 +342,17 @@
             hasVersionList () {
                 return Array.isArray(this.atomVersionList) && this.atomVersionList.length > 0
             },
+            htmlTemplateVersion () {
+                return (this.atom.atomModal && this.atom.atomModal.htmlTemplateVersion) || this.atom.htmlTemplateVersion
+            },
+            isRemoteAtom () {
+                return this.htmlTemplateVersion === '1.2' || this.atomCode === 'CodeccCheckAtomDebug' || this.atomCode === 'CodeccCheckAtom'
+            },
             AtomComponent () {
-                if (this.atom.htmlTemplateVersion === '1.2' || this.atomCode === 'CodeccCheckAtomDebug' || this.atomCode === 'CodeccCheckAtom') {
+                if (this.isRemoteAtom) {
                     return RemoteAtom
                 }
-                if (this.isNewAtomTemplate(this.atom.htmlTemplateVersion)) {
+                if (this.isNewAtomTemplate(this.htmlTemplateVersion)) {
                     return NormalAtomV2
                 }
                 switch (this.atomCode) {
