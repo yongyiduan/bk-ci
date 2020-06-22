@@ -223,7 +223,7 @@
 
             goToEditAtom () {
                 if (!this.showEdit) return
-                this.$router.push({ name: 'edit' })
+                this.$router.replace({ name: 'edit' })
             },
 
             editAtom (routerName, id) {

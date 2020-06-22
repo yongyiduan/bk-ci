@@ -176,7 +176,7 @@
 
             goToEditService () {
                 if (!this.showEdit) return
-                this.$router.push({ name: 'serviceEdit' })
+                this.$router.replace({ name: 'serviceEdit' })
             },
 
             pageCountChanged (currentLimit, prevLimit) {

@@ -77,7 +77,7 @@
                 </bk-form-item>
                 <bk-form-item>
                     <bk-button theme="primary" @click="saveService"> {{ $t('store.保存') }} </bk-button>
-                    <bk-button theme="primary" @click="$router.back()"> {{ $t('store.取消') }} </bk-button>
+                    <bk-button theme="primary" @click="$router.replace({ name: 'serviceDetail' })"> {{ $t('store.取消') }} </bk-button>
                 </bk-form-item>
                 <select-logo ref="selectLogo" label="Logo" :form="form" type="SERVICE" :is-err="logoErr" right="25"></select-logo>
             </bk-form>
@@ -198,7 +198,7 @@
                         return this.$store.dispatch('store/requestServiceDetailByCode', postData.serviceCode).then((res) => {
                             this.$store.dispatch('store/updateCurrentService', res || {})
                             this.$bkMessage({ message: this.$t('store.修改成功'), theme: 'success' })
-                            this.$router.push({ name: 'serviceDetail' })
+                            this.$router.replace({ name: 'serviceDetail' })
                         })
                     }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
                         this.isLoading = false

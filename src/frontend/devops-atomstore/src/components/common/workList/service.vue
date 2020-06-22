@@ -30,7 +30,10 @@
             <bk-table-column :label="$t('store.扩展点')" width="120">
                 <template slot-scope="props">
                     <span v-if="props.row.itemName.length <= 0">{{props.row.itemName.length}}</span>
-                    <bk-popconfirm v-else trigger="click" :title="props.row.itemName.join(',')" confirm-text="" cancel-text="">
+                    <bk-popconfirm v-else trigger="click" title="" confirm-text="" cancel-text="">
+                        <div slot="content">
+                            <p v-for="(name, index) in props.row.itemName" :key="index">{{ name }}</p>
+                        </div>
                         <span class="atom-name">{{props.row.itemName.length}}</span>
                     </bk-popconfirm>
                 </template>

@@ -27,7 +27,7 @@
     "请选择扩展版本": "Please select an extended version",
     "扩展版本": "Extended version",
     "由小写英文字母、数字和中划线组成，且需以小写英文字母开头": "Consists of lowercase English letters, numbers, and dashes, and must begin with a lowercase English letter",
-    "serviceMdDesc": "#### Extensions\n\n#### Applicable scene\n\n#### Usage guidelines",
+    "serviceMdDesc": "#### Micro extensions\n\n#### Applicable scene\n\n#### Usage guidelines",
     "uploadSize": "The maximum file size is {0} M, please modify and try again",
     "uploadType": "Only supported file format is {0}, please modify and try again",
     "uploadLimit": "Maximum uploads are {0}, please modify and try again",

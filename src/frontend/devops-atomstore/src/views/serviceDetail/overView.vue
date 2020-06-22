@@ -27,7 +27,7 @@
                     <h3> {{ $t('store.微扩展代码') }} </h3>
                     <section class="section-code">
                         <h3>
-                            <span class="code-title"> {{ $t('store.已托管至') }} </span>：<span>工蜂GIT</span>
+                            <span class="code-title"> {{ $t('store.已托管至') }} </span>：<span>工蜂</span>
                         </h3>
                         <h3>
                             <span class="code-title"> {{ $t('store.代码库') }} </span>：<span class="code-url">{{ currentService.codeSrc }}</span>
@@ -419,7 +419,7 @@
             overflow: auto;
         }
         .service-static {
-            height: 26.3%;
+            height: 20.3%;
             display: flex;
             flex-direction: row;
             > section:nth-child(2) {
@@ -428,7 +428,7 @@
         }
         .service-map {
             margin-top: 2.3%;
-            height: 65.8%;
+            height: 71.8%;
             display: flex;
             flex-direction: row;
             > section:nth-child(2) {
