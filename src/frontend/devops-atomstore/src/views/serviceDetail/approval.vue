@@ -1,7 +1,7 @@
 <template>
     <article class="service-information-wrapper">
         <div class="inner-header">
-            <div class="title"> {{ $t('store.扩展审批') }} </div>
+            <div class="title"> {{ $t('store.微扩展审批') }} </div>
         </div>
         <section class="version-content" v-bkloading="{ isLoading }">
             <template v-if="!isLoading">
@@ -35,7 +35,7 @@
         <bk-sideslider :is-show.sync="approveRes.show" @hidden="clearFormData" :quick-close="true" :title="$t('store.审批')" width="565">
             <section slot="content" class="approve-form">
                 <bk-form label-width="90" ref="validateForm" :model="approveRes">
-                    <bk-form-item :label="$t('store.扩展名称')">
+                    <bk-form-item :label="$t('store.微扩展名称')">
                         {{currentService.name}}
                     </bk-form-item>
                     <bk-form-item :label="$t('store.申请人')">
@@ -57,7 +57,7 @@
                         <bk-input type="textarea" v-model="approveRes.approveMsg" :placeholder="$t('store.请输入审批原因')"></bk-input>
                     </bk-form-item>
                 </bk-form>
-                <form-tips :prompt-list="[$t('store.同意协作后，协作者将成为扩展开发人员，可以：'), $t('store.1、修改扩展代码'), $t('store.2、修改扩展私有配置'), $t('store.3、提交版本升级扩展'), $t('store.4、在协作者自己的调试项目下使用测试版本')]"></form-tips>
+                <form-tips :prompt-list="[$t('store.同意协作后，协作者将成为微扩展开发人员，可以：'), $t('store.1、修改微扩展代码'), $t('store.2、修改微扩展私有配置'), $t('store.3、提交版本升级微扩展'), $t('store.4、在协作者自己的调试项目下使用测试版本')]"></form-tips>
                 <div class="approve-button">
                     <bk-button @click="clearFormData"> {{ $t('store.取消') }} </bk-button>
                     <bk-button theme="primary" @click="confirmApprove"> {{ $t('store.确认') }} </bk-button>

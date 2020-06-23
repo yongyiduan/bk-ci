@@ -13,7 +13,7 @@
             <div class="member-manage-content" v-if="showContent && memberList.length">
                 <div class="info-header">
                     <button class="bk-button bk-primary add-button" type="button" @click="addMember" v-if="userInfo.isProjectAdmin"> {{ $t('store.新增成员') }} </button>
-                    <div class="member-total"> {{ $t('store.该扩展目前有') }} <span>{{ memberCount }}</span> {{ $t('store.名成员') }} </div>
+                    <div class="member-total"> {{ $t('store.该微扩展目前有') }} <span>{{ memberCount }}</span> {{ $t('store.名成员') }} </div>
                 </div>
                 <div class="member-content">
                     <bk-table style="margin-top: 15px;" :data="memberList">
@@ -65,7 +65,7 @@
                     'DEVELOPER': 'Developer'
                 },
                 permissionList: [
-                    { name: this.$t(this.$t('store.扩展发布')), active: false, type: 'DEVELOPER' },
+                    { name: this.$t(this.$t('store.微扩展发布')), active: false, type: 'DEVELOPER' },
                     { name: this.$t('store.审批'), active: false, type: 'ADMIN' },
                     { name: this.$t('store.成员管理'), active: false, type: 'ADMIN' },
                     { name: this.$t('store.可见范围'), active: false, type: 'ADMIN' }
@@ -89,7 +89,7 @@
             emptyTipsConfig () {
                 return {
                     title: this.$t('store.暂时没有成员'),
-                    desc: this.$t('store.可以新增扩展的管理人员或开发人员'),
+                    desc: this.$t('store.可以新增微扩展的管理人员或开发人员'),
                     btns: [
                         {
                             type: 'primary',
@@ -113,7 +113,7 @@
             },
 
             desFormatter (row, column, cellValue, index) {
-                return cellValue === 'ADMIN' ? this.$t('store.扩展发布 审批 成员管理 可见范围') : this.$t('store.扩展发布')
+                return cellValue === 'ADMIN' ? this.$t('store.微扩展发布 审批 成员管理 可见范围') : this.$t('store.微扩展发布')
             },
 
             async init () {

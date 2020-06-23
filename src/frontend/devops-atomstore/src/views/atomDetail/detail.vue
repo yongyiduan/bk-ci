@@ -82,7 +82,7 @@
                         </div>
                     </div>
                     <div class="item-form item-form-right">
-                        <img v-if="atomDetail.logoUrl" :src="atomDetail.logoUrl">
+                        <img v-if="atomDetail.logoUrl" :src="atomDetail.logoUrl || defaultUrl">
                     </div>
                 </div>
                 <div class="version-content">
@@ -223,7 +223,7 @@
 
             goToEditAtom () {
                 if (!this.showEdit) return
-                this.$router.push({ name: 'edit' })
+                this.$router.replace({ name: 'edit' })
             },
 
             editAtom (routerName, id) {

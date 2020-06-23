@@ -23,7 +23,6 @@
                     :style="`background-image: url(${file.mediaUrl})`"
                 ></span>
                 <video v-else
-                    controls="true"
                     preload="auto"
                     webkit-playsinline="true"
                     playsinline="true"

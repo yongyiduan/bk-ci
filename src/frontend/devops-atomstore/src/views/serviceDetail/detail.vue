@@ -1,7 +1,7 @@
 <template>
     <article class="service-detail-home" v-bkloading="{ isLoading }">
         <div class="inner-header">
-            <div class="title"> {{ $t('store.镜像详情') }} </div>
+            <div class="title"> {{ $t('store.微扩展详情') }} </div>
             <span @click="goToEditService" :class="[{ 'disable': !showEdit }, 'header-edit']" :title="!showEdit && $t('store.只有处于审核驳回、已发布、上架中止和已下架的状态才允许修改基本信息')"> {{ $t('store.编辑') }} </span>
         </div>
         <main class="detail-main">
@@ -21,7 +21,11 @@
                         <bk-row>
                             <bk-col :span="4.5" class="g-progress-item">
                                 <span class="g-progress-label">{{ $t('store.扩展点') }} :</span>
-                                <span class="g-progress-content">{{currentService.itemName}}</span>
+                                <span class="g-progress-content">{{currentService.itemName || '--'}}</span>
+                            </bk-col>
+                            <bk-col :span="4.5" class="g-progress-item">
+                                <span class="g-progress-label">{{ $t('store.调试项目') }} :</span>
+                                <span class="g-progress-content">{{currentService.initProjectCode || '--'}}</span>
                             </bk-col>
                         </bk-row>
                         <bk-row>
@@ -34,13 +38,13 @@
                         </bk-row>
                     </bk-col>
                     <bk-col :span="3">
-                        <img :src="currentService.logoUrl" class="g-progress-image">
+                        <img v-if="currentService.logoUrl" :src="currentService.logoUrl" class="g-progress-image">
                     </bk-col>
                 </bk-row>
                 <bk-row>
                     <bk-col :span="12" class="g-progress-item">
                         <span class="g-progress-label">{{ $t('store.简介') }} :</span>
-                        <span class="g-progress-content">{{currentService.summary}}</span>
+                        <span class="g-progress-content">{{currentService.summary || '--'}}</span>
                     </bk-col>
                 </bk-row>
                 <bk-row>
@@ -87,7 +91,7 @@
                     @page-change="pageChanged"
                     @page-limit-change="pageCountChanged"
                 >
-                    <bk-table-column :label="$t('store.版本')" prop="version"></bk-table-column>
+                    <bk-table-column :label="$t('store.版本')" prop="version" :formatter="versionFormatter"></bk-table-column>
                     <bk-table-column :label="$t('store.状态')" prop="serviceStatus" :formatter="statusFormatter"></bk-table-column>
                     <bk-table-column :label="$t('store.创建人')" prop="creator"></bk-table-column>
                     <bk-table-column :label="$t('store.创建时间')" prop="createTime" :formatter="convertTime"></bk-table-column>
@@ -172,7 +176,7 @@
 
             goToEditService () {
                 if (!this.showEdit) return
-                this.$router.push({ name: 'serviceEdit' })
+                this.$router.replace({ name: 'serviceEdit' })
             },
 
             pageCountChanged (currentLimit, prevLimit) {
@@ -194,6 +198,10 @@
 
             convertTime (row, column, cellValue, index) {
                 return convertTime(cellValue)
+            },
+
+            versionFormatter (row, column, cellValue, index) {
+                return cellValue || 'init'
             }
         }
     }

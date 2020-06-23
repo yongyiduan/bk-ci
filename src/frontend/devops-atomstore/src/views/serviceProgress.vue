@@ -7,14 +7,15 @@
                 <i class="right-arrow banner-arrow"></i>
                 <span class="banner-des back-home" @click="toServiceList"> {{ $t('store.工作台') }} </span>
                 <i class="right-arrow banner-arrow"></i>
-                <span class="banner-des">{{$t('store.上架/升级扩展')}}（{{serviceDetail.serviceCode}}）</span>
+                <span class="banner-des back-home" @click="toServiceDetail"> {{serviceDetail.serviceCode}} </span>
+                <i class="right-arrow banner-arrow"></i>
+                <span class="banner-des">{{$t('store.上架/升级微扩展')}}</span>
             </p>
-            <a class="title-work" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.扩展指引') }} </a>
+            <a class="title-work" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.微扩展指引') }} </a>
         </h3>
         <article v-if="!isLoading" class="service-progress-main">
             <header class="progress-header">
                 <bk-steps ext-cls="progress-steps" :status="currentStepStatus" :steps="progressStatus" :cur-step="currentStepIndex"></bk-steps>
-                <bk-button class="progress-detail" @click="showDetail"> {{ $t('store.查看扩展详情') }} </bk-button>
                 <bk-button class="progress-cancle" :loading="isCancleLoading" :disabled="isOver" @click="cancelRelease"> {{ $t('store.中止发布') }} </bk-button>
             </header>
 
@@ -30,7 +31,7 @@
         </article>
 
         <bk-sideslider :is-show.sync="isShowDetail"
-            :title="$t('store.查看扩展详情')"
+            :title="$t('store.查看微扩展详情')"
             :quick-close="true"
             :width="640"
         >
@@ -41,7 +42,7 @@
                         <span>{{serviceDetail.serviceName}}</span>
                     </h3>
                     <bk-form label-width="80" :model="serviceDetail">
-                        <bk-form-item :label="$t('store.扩展标识') + '：'" property="serviceCode">
+                        <bk-form-item :label="$t('store.微扩展标识') + '：'" property="serviceCode">
                             <span class="lh30">{{serviceDetail.serviceCode}}</span>
                         </bk-form-item>
                         <bk-form-item :label="$t('store.功能标签') + '：'" property="labelList">
@@ -156,7 +157,7 @@
         computed: {
             permissionMsg () {
                 let str = ''
-                if (!this.permission) str = this.$t('store.只有扩展管理员或当前流程创建者可以操作')
+                if (!this.permission) str = this.$t('store.只有微扩展管理员或当前流程创建者可以操作')
                 return str
             },
 
@@ -194,6 +195,15 @@
                 'requestServiceProcess',
                 'requestServiceCancelRelease'
             ]),
+
+            toServiceDetail () {
+                this.$router.push({
+                    name: 'serviceOverview',
+                    params: {
+                        serviceCode: this.serviceDetail.serviceCode
+                    }
+                })
+            },
 
             showDetail () {
                 this.isShowDetail = true
@@ -425,7 +435,7 @@
             }
             .progress-cancle {
                 position: absolute;
-                right: 24px;
+                right: 32px;
                 top: 16px;
             }
         }

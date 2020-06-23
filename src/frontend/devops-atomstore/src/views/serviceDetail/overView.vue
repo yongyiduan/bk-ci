@@ -27,7 +27,7 @@
                     <h3> {{ $t('store.微扩展代码') }} </h3>
                     <section class="section-code">
                         <h3>
-                            <span class="code-title"> {{ $t('store.已托管至') }} </span>：<span>工蜂GIT</span>
+                            <span class="code-title"> {{ $t('store.已托管至') }} </span>：<span>工蜂</span>
                         </h3>
                         <h3>
                             <span class="code-title"> {{ $t('store.代码库') }} </span>：<span class="code-url">{{ currentService.codeSrc }}</span>
@@ -38,7 +38,7 @@
                             <bk-popover placement="top">
                                 <i class="devops-icon icon-info-circle ml4"></i>
                                 <template slot="content">
-                                    <p> {{ $t('store.在发布扩展时，使用授权人的身份拉取扩展代码自动构建打包，或设置扩展可见范围') }} </p>
+                                    <p> {{ $t('store.在发布微扩展时，使用授权人的身份拉取微扩展代码自动构建打包，或设置微扩展可见范围') }} </p>
                                 </template>
                             </bk-popover>
                             <span class="ml4 click-txt"
@@ -419,7 +419,7 @@
             overflow: auto;
         }
         .service-static {
-            height: 26.3%;
+            height: 20.3%;
             display: flex;
             flex-direction: row;
             > section:nth-child(2) {
@@ -428,7 +428,7 @@
         }
         .service-map {
             margin-top: 2.3%;
-            height: 65.8%;
+            height: 71.8%;
             display: flex;
             flex-direction: row;
             > section:nth-child(2) {

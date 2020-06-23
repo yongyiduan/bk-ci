@@ -1,38 +1,25 @@
 <template>
     <article class="edit-atom-wrapper edit-detail" v-bkloading="{ isLoading }">
         <section class="inner-header">
-            <div class="title"> {{ $t('store.扩展编辑') }} </div>
+            <div class="title"> {{ $t('store.微扩展编辑') }} </div>
         </section>
 
         <main class="edit-main">
             <bk-form ref="editForm" class="edit-service" label-width="125" :model="form">
-                <bk-form-item class="wt660" :label="$t('store.扩展名称')" :required="true" property="serviceName" :rules="[requireRule]" ref="serviceName">
-                    <bk-input v-model="form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
+                <bk-form-item class="wt660" :label="$t('store.微扩展名称')" :required="true" property="serviceName" :rules="[requireRule, numMax, nameRule]" ref="serviceName">
+                    <bk-input v-model="form.serviceName" :placeholder="$t('store.请输入微扩展名称，不超过20个字符')"></bk-input>
                 </bk-form-item>
                 <bk-form-item class="wt660" :label="$t('store.扩展点')" :required="true" property="extensionItemList" :rules="[requireRule]" ref="extensionItemList">
-                    <bk-select v-model="form.extensionItemList"
-                        :placeholder="$t('store.请选择扩展点')"
-                        multiple
-                        :scroll-height="500"
+                    <bk-select :placeholder="$t('store.请选择扩展点')"
+                        class="service-item"
+                        :scroll-height="300"
                         :clearable="true"
                         @toggle="getServiceList"
                         :loading="isServiceListLoading"
-                    >
-                        <template v-slot:trigger>
-                            <section>
-                                <ul class="select-tag" v-if="!isLoading">
-                                    <li v-for="item in form.extensionItemList" :key="item">
-                                        <i class="bk-icon icon-close" @click.prevent.stop="deleteServiceItem(item)"></i>
-                                        {{ getItemName(item) }}
-                                    </li>
-                                </ul>
-                                <i class="bk-select-clear bk-icon icon-close-circle-shape"
-                                    v-if="form.extensionItemList.length"
-                                    @click.prevent.stop="form.extensionItemList = []">
-                                </i>
-                                <i class="bk-select-angle bk-icon icon-angle-down" v-else></i>
-                            </section>
-                        </template>
+                        searchable
+                        multiple
+                        display-tag
+                        v-model="form.extensionItemList">
                         <bk-option-group
                             v-for="(group, index) in serviceList"
                             :name="group.name"
@@ -89,7 +76,8 @@
                     ></upload>
                 </bk-form-item>
                 <bk-form-item>
-                    <bk-button theme="primary" @click.native="saveService"> {{ $t('store.保存') }} </bk-button>
+                    <bk-button theme="primary" @click="saveService"> {{ $t('store.保存') }} </bk-button>
+                    <bk-button theme="primary" @click="$router.replace({ name: 'serviceDetail' })"> {{ $t('store.取消') }} </bk-button>
                 </bk-form-item>
                 <select-logo ref="selectLogo" label="Logo" :form="form" type="SERVICE" :is-err="logoErr" right="25"></select-logo>
             </bk-form>
@@ -118,6 +106,16 @@
                     message: this.$t('store.必填项'),
                     trigger: 'blur'
                 },
+                numMax: {
+                    validator: (val = '') => (val.length <= 20),
+                    message: this.$t('store.字段不超过20个字符'),
+                    trigger: 'blur'
+                },
+                nameRule: {
+                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-]*$/.test(val)),
+                    message: this.$t('store.由汉字、英文字母、数字、连字符(-)组成，长度小于20个字符'),
+                    trigger: 'blur'
+                },
                 serviceList: [],
                 labelList: [],
                 imageList: [],
@@ -138,21 +136,6 @@
                 'requestServiceLabel',
                 'requestUpdateServiceInfo'
             ]),
-
-            deleteServiceItem (id) {
-                const index = this.form.extensionItemList.findIndex(x => x === id)
-                this.form.extensionItemList.splice(index, 1)
-            },
-
-            getItemName (id) {
-                let name = ''
-                this.serviceList.forEach((item) => {
-                    item.children.forEach((child) => {
-                        if (child.id === id) name = `${item.name}：${child.name}`
-                    })
-                })
-                return name
-            },
 
             successFileUpload ({ responseData: { data: mediaUrl } }, mediaType) {
                 if (this.form.mediaInfoList) {
@@ -215,7 +198,7 @@
                         return this.$store.dispatch('store/requestServiceDetailByCode', postData.serviceCode).then((res) => {
                             this.$store.dispatch('store/updateCurrentService', res || {})
                             this.$bkMessage({ message: this.$t('store.修改成功'), theme: 'success' })
-                            this.$router.push({ name: 'serviceDetail' })
+                            this.$router.replace({ name: 'serviceDetail' })
                         })
                     }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
                         this.isLoading = false
@@ -359,7 +342,7 @@
 
     .edit-service {
         position: relative;
-        width: 1200px;
+        max-width: 1200px;
         margin: 18px 20px;
         .service-remark-input {
             margin-top: 10px;
@@ -368,6 +351,9 @@
             &.fullscreen {
                 height: auto;
             }
+        }
+        .service-item {
+            background-color: #fff;
         }
     }
 </style>

@@ -111,8 +111,8 @@
                     class="h32"
                     :rules="[requireRule]"
                     ref="imageSourceType"
-                    error-display-type="normal"
                     v-if="VERSION_TYPE !== 'ee'"
+                    error-display-type="normal"
                 >
                     <bk-radio-group v-model="form.imageSourceType" @change="clearRepo">
                         <bk-radio value="BKDEVOPS" class="mr12"> {{ $t('store.蓝盾源') }} </bk-radio>
@@ -148,20 +148,20 @@
                 </bk-form-item>
                 <bk-form-item v-show="form.imageSourceType === 'THIRD'"
                     :label="$t('store.源镜像名称')"
+                    property="imageRepoName"
                     :required="true"
                     :rules="[requireRule]"
-                    property="imageRepoName"
                     ref="imageRepoName"
                     error-display-type="normal"
                 >
                     <bk-input v-model="form.imageRepoName" :placeholder="$t('store.请输入源镜像名称，如 XXX/XXXX')"></bk-input>
                 </bk-form-item>
-                <bk-form-item  v-show="form.imageSourceType === 'THIRD'"
+                <bk-form-item v-show="form.imageSourceType === 'THIRD'"
                     :label="$t('store.源镜像Tag')"
+                    property="imageTag"
                     :desc="$t('store.不建议使用可变功能的Tag（如latest），避免镜像变更导致关联流水线不能正常执行')"
                     :required="true"
                     :rules="[requireRule]"
-                    property="imageTag"
                     ref="imageTag"
                     error-display-type="normal"
                 >

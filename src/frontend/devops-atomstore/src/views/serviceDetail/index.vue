@@ -40,13 +40,6 @@
                                 showChildren: false
                             },
                             {
-                                id: 'serviceApproval',
-                                selectId: ['serviceApproval'],
-                                name: this.$t('store.审批'),
-                                icon: 'icon-panel-permission',
-                                showChildren: false
-                            },
-                            {
                                 id: 'serviceSettings',
                                 selectId: ['serviceSettings'],
                                 name: this.$t('store.设置'),

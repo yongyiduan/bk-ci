@@ -22,16 +22,16 @@
                 </video>
             </li>
         </ul>
-        <span :class="[{ disabled: swiperTransfer <= -maxTransferWidth + containWidth }, 'nav-left', 'swiper-nav']"
+        <span :class="[{ disabled: swiperTransfer >= 0 }, 'nav-left', 'swiper-nav']"
             @click="() => {
-                if (swiperTransfer > -maxTransferWidth + containWidth) changeIndex(-1)
+                if (swiperTransfer < 0) changeIndex(1)
             }"
         >
             <i class="nav-icon"></i>
         </span>
-        <span :class="[{ disabled: swiperTransfer >= 0 }, 'nav-right', 'swiper-nav']"
+        <span :class="[{ disabled: swiperTransfer <= -maxTransferWidth + containWidth }, 'nav-right', 'swiper-nav']"
             @click="() => {
-                if (swiperTransfer < 0) changeIndex(1)
+                if (swiperTransfer > -maxTransferWidth + containWidth) changeIndex(-1)
             }"
         >
             <i class="nav-icon"></i>

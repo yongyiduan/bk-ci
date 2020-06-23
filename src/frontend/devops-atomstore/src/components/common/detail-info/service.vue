@@ -3,8 +3,8 @@
         <img class="detail-pic atom-logo" :src="detail.logoUrl">
         <hgroup class="detail-info-group">
             <h3 class="title-with-img">
-                <span :class="[{ 'not-recommend': detail.recommendFlag === false }, 'title-with-img']" :title="detail.recommendFlag === false ? $t('store.该扩展不推荐使用') : ''">
-                    {{detail.name}}（{{detail.version}}）
+                <span :class="[{ 'not-recommend': detail.recommendFlag === false }, 'title-with-img']" :title="detail.recommendFlag === false ? $t('store.该微扩展不推荐使用') : ''">
+                    {{detail.name}}
                 </span>
                 <h5 :title="isPublicTitle" @click="goToCode" :class="{ 'not-public': !isPublic }" v-if="!isEnterprise">
                     <icon class="detail-img" name="gray-git-code" size="14" />
@@ -21,6 +21,7 @@
                         <comment-rate :rate="0" :width="14" :height="14"></comment-rate>
                     </p>
                 </h6>
+                <span>V{{detail.version || 'init'}}</span><span class="install-title"> {{ $t('store.版本') }} </span>
             </h5>
             <h5 class="detail-info detail-label">
                 <span> {{ $t('store.功能标签：') }} </span>
@@ -29,11 +30,11 @@
             </h5>
             <h5 class="detail-info">
                 <span> {{ $t('store.扩展点') }}： </span>
-                <span class="info-over-hidden">{{detail.itemName || '-'}}</span>
+                <span class="info-over-hidden" :title="detail.itemName">{{detail.itemName || '-'}}</span>
             </h5>
             <h5 class="detail-info" :title="detail.summary">
                 <span> {{ $t('store.简介：') }} </span>
-                <span class="info-over-show">{{detail.summary || '-'}}</span>
+                <span class="info-over-hidden" :title="detail.summary">{{detail.summary || '-'}}</span>
             </h5>
         </hgroup>
         <bk-popover placement="top" v-if="buttonInfo.disable">
@@ -89,8 +90,8 @@
             buttonInfo () {
                 const info = {}
                 info.disable = this.detail.publicFlag || !this.detail.flag
-                if (this.detail.publicFlag) info.des = `${this.$t('store.通用扩展，所有项目默认可用，无需安装')}`
-                if (!this.detail.flag) info.des = `${this.$t('store.你没有该扩展的安装权限，请联系扩展发布者')}`
+                if (this.detail.publicFlag) info.des = `${this.$t('store.通用微扩展，所有项目默认可用，无需安装')}`
+                if (!this.detail.flag) info.des = `${this.$t('store.你没有该微扩展的安装权限，请联系微扩展发布者')}`
                 return info
             }
         },
@@ -151,8 +152,8 @@
     }
     .detail-info-group {
         flex: 1;
-        padding: 0 32px;
-        max-width: calc(100% - 314px);
+        margin: 0 32px;
+        max-width: calc(100% - 284px);
         h3 {
             font-size: 20px;
             line-height: 23px;
@@ -164,6 +165,7 @@
             font-size: 14px;
             line-height: 17px;
             font-weight: normal;
+            margin-right: 26px;
             .score-group {
                 position: relative;
                 margin-left: 8px;
@@ -216,7 +218,7 @@
                 color: $fontDarkBlack;
             }
             .info-over-hidden {
-                max-width: 1042px;
+                display: inline-block;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;

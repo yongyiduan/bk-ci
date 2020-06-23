@@ -3,16 +3,16 @@
         <div class="content-header">
             <div class="atom-total-row">
                 <button class="bk-button bk-primary" @click="relateService">
-                    <span style="margin-left: 0;"> {{ $t('store.新增扩展') }} </span>
+                    <span style="margin-left: 0;"> {{ $t('store.新增微扩展') }} </span>
                 </button>
             </div>
             <section :class="[{ 'control-active': isInputFocus }, 'g-input-search', 'list-input']">
-                <input class="g-input-border" type="text" :placeholder="$t('store.请输入关键字搜索')" v-model="searchName" @focus="isInputFocus = true" @blur="isInputFocus = false" @keyup.enter="search" />
+                <input class="g-input-border" type="text" :placeholder="$t('store.请输入名称搜索')" v-model="searchName" @focus="isInputFocus = true" @blur="isInputFocus = false" @keyup.enter="search" />
                 <i class="devops-icon icon-search" v-if="!searchName"></i>
                 <i class="devops-icon icon-close-circle-shape clear-icon" v-else @click="clearSearch"></i>
             </section>
         </div>
-        <bk-table style="margin-top: 15px;" :empty-text="$t('store.暂时没有扩展')"
+        <bk-table style="margin-top: 15px;" :empty-text="$t('store.暂时没有微扩展')"
             :data="renderList"
             :pagination="pagination"
             @page-change="pageChanged"
@@ -20,14 +20,24 @@
             :show-overflow-tooltip="true"
             v-bkloading="{ isLoading }"
         >
-            <bk-table-column :label="$t('store.扩展名称')" width="180">
+            <bk-table-column :label="$t('store.微扩展名称')" width="180">
                 <template slot-scope="props">
                     <span class="atom-name" :title="props.row.serviceName" @click="goToServiceDetail(props.row.serviceCode)">{{ props.row.serviceName }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('store.扩展标识')" prop="serviceCode"></bk-table-column>
+            <bk-table-column :label="$t('store.微扩展标识')" prop="serviceCode"></bk-table-column>
             <bk-table-column :label="$t('store.调试项目')" prop="projectName"></bk-table-column>
-            <bk-table-column :label="$t('store.扩展点')" prop="itemName"></bk-table-column>
+            <bk-table-column :label="$t('store.扩展点')" width="120">
+                <template slot-scope="props">
+                    <span v-if="props.row.itemName.length <= 0">{{props.row.itemName.length}}</span>
+                    <bk-popconfirm v-else trigger="click" title="" confirm-text="" cancel-text="">
+                        <div slot="content">
+                            <p v-for="(name, index) in props.row.itemName" :key="index">{{ name }}</p>
+                        </div>
+                        <span class="atom-name">{{props.row.itemName.length}}</span>
+                    </bk-popconfirm>
+                </template>
+            </bk-table-column>
             <bk-table-column :label="$t('store.版本')" prop="version" width="120"></bk-table-column>
             <bk-table-column :label="$t('store.状态')" width="160">
                 <template slot-scope="props">
@@ -62,6 +72,7 @@
         </bk-table>
 
         <bk-sideslider :is-show.sync="relateServiceData.show"
+            @hidden="cancelRelateService"
             :title="relateServiceData.title"
             :quick-close="relateServiceData.quickClose"
             :width="relateServiceData.width">
@@ -73,36 +84,40 @@
                     v-bkloading="{ isLoading: relateServiceData.isLoading }"
                     v-if="hasOauth"
                 >
-                    <bk-form-item :label="$t('store.扩展名称')" :required="true" property="serviceName" :desc="$t('store.展示给用户的名称，用户根据名称识别扩展服务')" :rules="[requireRule, numMax]">
-                        <bk-input v-model="relateServiceData.form.serviceName" :placeholder="$t('store.请输入扩展名称')"></bk-input>
+                    <bk-form-item :label="$t('store.微扩展名称')"
+                        :required="true"
+                        property="serviceName"
+                        :desc="$t('store.展示给用户的名称，用户根据名称识别微扩展')"
+                        :rules="[requireRule, numMax, nameRule]"
+                        error-display-type="normal"
+                    >
+                        <bk-input v-model="relateServiceData.form.serviceName" :placeholder="$t('store.请输入微扩展名称，不超过20个字符')"></bk-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.扩展标识')" :required="true" property="serviceCode" :desc="$t('store.唯一标识，创建后不能修改。将作为扩展的代码库名称')" :rules="[requireRule, alpRule, numMax]">
-                        <bk-input v-model="relateServiceData.form.serviceCode" :placeholder="$t('store.请输入扩展标识')"></bk-input>
+                    <bk-form-item :label="$t('store.微扩展标识')"
+                        :required="true"
+                        property="serviceCode"
+                        :desc="$t('store.唯一标识，创建后不能修改。将作为微扩展的代码库名称')"
+                        :rules="[requireRule, alpRule, numMax]"
+                        error-display-type="normal"
+                    >
+                        <bk-input v-model="relateServiceData.form.serviceCode" :placeholder="$t('store.请输入微扩展标识，不超过20个字符')"></bk-input>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.扩展点')" :required="true" property="extensionItemList" :desc="$t('store.扩展服务生效的功能区域')" :rules="[requireRule]">
-                        <bk-select v-model="relateServiceData.form.extensionItemList"
-                            :placeholder="$t('store.请选择扩展点')"
-                            multiple
-                            :scroll-height="500"
+                    <bk-form-item :label="$t('store.扩展点')"
+                        :required="true"
+                        property="extensionItemList"
+                        :desc="$t('store.微扩展服务生效的功能区域')"
+                        :rules="[requireRule]"
+                        error-display-type="normal"
+                    >
+                        <bk-select :placeholder="$t('store.请选择扩展点')"
+                            :scroll-height="300"
                             :clearable="true"
                             @toggle="getServiceList"
                             :loading="isServiceListLoading"
-                        >
-                            <template v-slot:trigger>
-                                <section>
-                                    <ul class="select-tag">
-                                        <li v-for="item in relateServiceData.form.extensionItemList" :key="item">
-                                            <i class="bk-icon icon-close" @click.prevent.stop="deleteServiceItem(item)"></i>
-                                            {{ getItemName(item) }}
-                                        </li>
-                                    </ul>
-                                    <i class="bk-select-clear bk-icon icon-close-circle-shape"
-                                        v-if="relateServiceData.form.extensionItemList.length"
-                                        @click.prevent.stop="relateServiceData.form.extensionItemList = []">
-                                    </i>
-                                    <i class="bk-select-angle bk-icon icon-angle-down" v-else></i>
-                                </section>
-                            </template>
+                            searchable
+                            multiple
+                            display-tag
+                            v-model="relateServiceData.form.extensionItemList">
                             <bk-option-group
                                 v-for="(group, index) in serviceList"
                                 :name="group.name"
@@ -121,10 +136,11 @@
                         property="projectCode"
                         :desc="{
                             width: 500,
-                            content: $t('store.在开发过程中，开发者可在此项目下调试扩展。成功提交后将不能修改，建议不要选择有正式业务的项目，避免调试过程中影响业务使用'),
+                            content: $t('store.在开发过程中，开发者可在此项目下调试微扩展。成功提交后将不能修改，建议不要选择有正式业务的项目，避免调试过程中影响业务使用'),
                             placement: 'top'
                         }"
                         :rules="[requireRule]"
+                        error-display-type="normal"
                     >
                         <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
                             <bk-option v-for="option in projectList"
@@ -135,7 +151,13 @@
                             <a href="/console/pm" slot="extension" target="_blank"> {{ $t('store.新增项目') }} </a>
                         </bk-select>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.开发语言')" :required="true" property="language" :rules="[requireRule]">
+                    <bk-form-item :label="$t('store.开发语言')"
+                        :desc="$t('store.后台开发语言')"
+                        :required="true"
+                        property="language"
+                        :rules="[requireRule]"
+                        error-display-type="normal"
+                    >
                         <bk-select v-model="relateServiceData.form.language" searchable @toggle="getServiceLanguage" :loading="isItemLoading">
                             <bk-option v-for="option in languageList"
                                 :key="option"
@@ -154,7 +176,7 @@
                     <button class="bk-button bk-primary" type="button" @click="openValidate"> {{ $t('store.OAUTH认证') }} </button>
                     <p class="prompt-oauth">
                         <i class="devops-icon icon-info-circle-shape"></i>
-                        <span> {{ $t('store.新增扩展时将自动初始化扩展代码库，请先进行工蜂OAUTH授权') }} </span>
+                        <span> {{ $t('store.新增微扩展时将自动初始化微扩展代码库，请先进行工蜂OAUTH授权') }} </span>
                     </p>
                 </div>
             </template>
@@ -166,10 +188,10 @@
             :width="offlineServiceData.width">
             <template slot="content">
                 <bk-form ref="offlineForm" class="relate-form" label-width="100" :model="offlineServiceData.form" v-bkloading="{ isLoading: offlineServiceData.isLoading }">
-                    <bk-form-item :label="$t('store.扩展名称')" property="serviceName">
+                    <bk-form-item :label="$t('store.微扩展名称')" property="serviceName">
                         <span class="lh30">{{offlineServiceData.form.serviceName}}</span>
                     </bk-form-item>
-                    <bk-form-item :label="$t('store.扩展标识')" property="serviceCode">
+                    <bk-form-item :label="$t('store.微扩展标识')" property="serviceCode">
                         <span class="lh30">{{offlineServiceData.form.serviceCode}}</span>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.下架原因')" :required="true" property="reason" :rules="[requireRule]">
@@ -230,7 +252,7 @@
                     }
                 },
                 offlineServiceData: {
-                    title: this.$t('store.下架扩展'),
+                    title: this.$t('store.下架微扩展'),
                     quickClose: true,
                     width: 565,
                     isLoading: false,
@@ -254,6 +276,11 @@
                 alpRule: {
                     validator: (val) => (/^[a-z][a-z0-9-]*$/.test(val)),
                     message: this.$t('store.由小写英文字母、数字和中划线组成，且需以小写英文字母开头'),
+                    trigger: 'blur'
+                },
+                nameRule: {
+                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-]*$/.test(val)),
+                    message: this.$t('store.由汉字、英文字母、数字、连字符(-)组成，长度小于20个字符'),
                     trigger: 'blur'
                 }
             }
@@ -327,21 +354,6 @@
                         theme: 'error'
                     })
                 }
-            },
-
-            deleteServiceItem (id) {
-                const index = this.relateServiceData.form.extensionItemList.findIndex(x => x === id)
-                this.relateServiceData.form.extensionItemList.splice(index, 1)
-            },
-
-            getItemName (id) {
-                let name = ''
-                this.serviceList.forEach((item) => {
-                    item.children.forEach((child) => {
-                        if (child.id === id) name = `${item.name}：${child.name}`
-                    })
-                })
-                return name
             },
 
             search () {

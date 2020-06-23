@@ -235,7 +235,7 @@
                 this.$store.dispatch('store/modifyAtomDetail', putData).then(() => {
                     this.$store.dispatch('store/updateCurrentaAtom', { res: this.atomForm })
                     this.hasChange = false
-                    this.$router.push({ name: 'detail' })
+                    this.$router.replace({ name: 'detail' })
                 }).catch((err) => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => (this.isSaving = false))
             },
 

@@ -1,7 +1,7 @@
 <template>
     <section class="main-body" v-bkloading="{ isLoading }">
         <bk-form class="progress-info">
-            <bk-form-item :label="$t('store.可见范围')" :desc="$t('store.未设置可见范围时，仅扩展成员可以安装到名下项目中使用。设置后，对应组织架构的用户可以在研发商店中安装使用')">
+            <bk-form-item :label="$t('store.可见范围')" :desc="$t('store.未设置可见范围时，仅微扩展成员可以安装到名下项目中使用。设置后，对应组织架构的用户可以在研发商店中安装使用')">
                 <ul class="info-visable" v-if="deptInfoList.length">
                     <li v-for="dept in deptInfoList" :key="dept.deptId" class="visable-item">{{ dept.deptName }}<icon name="close" size="10" class="dept-close" @click.native="deleteDept(dept)" /></li>
                 </ul>
@@ -26,7 +26,7 @@
         </bk-form>
 
         <footer class="main-footer">
-            <bk-button theme="primary" @click="submit" :disabled="isToBackIng" :loading="isCommiting"> {{ $t('store.提交') }} </bk-button>
+            <bk-button theme="primary" @click="submit" :disabled="isToBackIng" :loading="isCommiting"> {{ $t('store.下一步') }} </bk-button>
             <bk-button @click="previousStep" :disabled="isCommiting" :loading="isToBackIng"> {{ $t('store.上一步') }} </bk-button>
         </footer>
 
@@ -107,12 +107,19 @@
             },
 
             previousStep () {
-                this.isToBackIng = true
-                this.$store.dispatch('store/requestBackToTest', this.detail.serviceId).then(() => {
-                    this.$emit('freshProgress', () => (this.isToBackIng = false))
-                }).catch((err) => {
-                    this.isToBackIng = false
-                    this.$bkMessage({ message: (err.message || err), theme: 'error' })
+                const confirmFn = () => {
+                    this.isToBackIng = true
+                    this.$store.dispatch('store/requestBackToTest', this.detail.serviceId).then(() => {
+                        this.$emit('freshProgress', () => (this.isToBackIng = false))
+                    }).catch((err) => {
+                        this.isToBackIng = false
+                        this.$bkMessage({ message: (err.message || err), theme: 'error' })
+                    })
+                }
+                this.$bkInfo({
+                    type: 'warning',
+                    title: this.$t('store.返回上一步将会清空当前数据'),
+                    confirmFn
                 })
             },
 
