@@ -1,0 +1,81 @@
+<template>
+    <selector
+        name="performanceConfigId"
+        :disabled="disabled"
+        :is-loading="isLoading"
+        :handle-change="handleSelect"
+        :list="optionList"
+        :value="selectValue"
+    >
+    </selector>
+</template>
+
+<script>
+    import { mapActions } from 'vuex'
+    import Selector from '@/components/atomFormField/Selector'
+
+    export default {
+        name: 'devcloud-option',
+        components: {
+            Selector
+        },
+        props: {
+            value: {
+                type: String,
+                default: ''
+            },
+            disabled: {
+                type: Boolean,
+                default: false
+            },
+            handleChange: {
+                type: Function,
+                required: false
+            }
+        },
+        data () {
+            return {
+                selectValue: '',
+                isLoading: false,
+                optionList: []
+            }
+        },
+        computed: {
+            projectId () {
+                return this.$route.params.projectId
+            }
+        },
+        async created () {
+            this.selectValue = this.value
+            try {
+                this.isLoading = true
+                const res = await this.fetchDevcloudSettings({ projectId: this.projectId })
+                this.selectValue = this.value || res.data['default']
+                this.optionList = res.data.performanceMaps || []
+                this.optionList = this.optionList.map(item => {
+                    return {
+                        ...item,
+                        name: this.getShowOption(item.performanceConfigVO)
+                    }
+                })
+            } catch (err) {
+                this.$showTips({
+                    theme: 'error',
+                    message: err.message || err
+                })
+            }
+            this.isLoading = false
+        },
+        methods: {
+            ...mapActions('atom', [
+                'fetchDevcloudSettings'
+            ]),
+            handleSelect (name, value) {
+                this.handleChange(name, value)
+            },
+            getShowOption (obj) {
+                return `${this.$t('editPage.cpu')}: ${obj.cpu}, ${this.$t('editPage.memory')}: ${obj.memory}, ${this.$t('editPage.disk')}: ${obj.disk}`
+            }
+        }
+    }
+</script>

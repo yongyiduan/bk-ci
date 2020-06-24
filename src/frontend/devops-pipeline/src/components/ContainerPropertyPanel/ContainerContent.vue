@@ -112,6 +112,15 @@
                 <select-input v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></select-input>
             </form-field>
 
+            <form-field :label="$t('editPage.performance')" v-if="buildResourceType === 'PUBLIC_DEVCLOUD'">
+                <devcloud-option
+                    :disabled="!editable"
+                    :value="container.dispatchType.performanceConfigId"
+                    :handle-change="changeBuildResource"
+                >
+                </devcloud-option>
+            </form-field>
+
             <form-field :label="$t('editPage.workspace')" v-if="isThirdParty">
                 <vuex-input :disabled="!editable" name="workspace" :value="container.dispatchType.workspace" :handle-change="changeBuildResource" :placeholder="$t('editPage.workspaceTips')" />
             </form-field>
@@ -211,6 +220,7 @@
     import FormField from '@/components/AtomPropertyPanel/FormField'
     import ContainerAppSelector from './ContainerAppSelector'
     import ContainerEnvNode from './ContainerEnvNode'
+    import DevcloudOption from './DevCloudOption'
     import BuildParams from './BuildParams'
     import VersionConfig from './VersionConfig'
     import JobOption from './JobOption'
@@ -229,6 +239,7 @@
             BuildParams,
             VersionConfig,
             ContainerEnvNode,
+            DevcloudOption,
             JobOption,
             JobMutual,
             Selector,
