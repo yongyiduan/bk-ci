@@ -220,7 +220,7 @@
     import FormField from '@/components/AtomPropertyPanel/FormField'
     import ContainerAppSelector from './ContainerAppSelector'
     import ContainerEnvNode from './ContainerEnvNode'
-    import DevcloudOption from './DevCloudOption'
+    import DevcloudOption from './DevcloudOption'
     import BuildParams from './BuildParams'
     import VersionConfig from './VersionConfig'
     import JobOption from './JobOption'
