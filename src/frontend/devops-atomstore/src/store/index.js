@@ -23,7 +23,7 @@ import * as IDE from './IDE'
 import * as Image from './image'
 import * as Service from './service'
 import { mergeModules } from '@/utils/index'
-import { UPDATE_CURRENT_LIST, UPDATE_MARKET_QUERY, UPDATE_MARKET_DETAIL, CLEAR_MARKET_DETAIL } from './constants'
+import { UPDATE_CURRENT_LIST, UPDATE_MARKET_QUERY, UPDATE_MARKET_DETAIL, CLEAR_MARKET_DETAIL, UPDATE_USER_INFO } from './constants'
 const repositoryPrefix = 'repository/api'
 
 const Vue = window.Vue
@@ -35,7 +35,8 @@ const commonModules = {
     state: {
         commentList: [],
         marketQuery: {},
-        marketDetail: {}
+        marketDetail: {},
+        userInfo: {}
     },
     mutations: {
         [UPDATE_CURRENT_LIST]: (state, res) => {
@@ -50,9 +51,16 @@ const commonModules = {
         },
         [CLEAR_MARKET_DETAIL]: (state, res) => {
             Vue.set(state, 'marketDetail', {})
+        },
+        [UPDATE_USER_INFO]: (state, res) => {
+            Vue.set(state, 'userInfo', res)
         }
     },
     actions: {
+        updateUserInfo ({ commit }, res) {
+            commit(UPDATE_USER_INFO, res)
+        },
+
         clearDetail ({ commit }) {
             commit(CLEAR_MARKET_DETAIL)
         },
@@ -127,7 +135,8 @@ const commonModules = {
     getters: {
         getCommentList: state => state.commentList,
         getMarketQuery: state => state.marketQuery,
-        getDetail: state => state.marketDetail
+        getDetail: state => state.marketDetail,
+        getUserInfo: state => state.userInfo
     }
 }
 

@@ -575,11 +575,12 @@
                 this.createAtomsideConfig.show = false
             },
 
-            routerAtoms (atomCode) {
+            routerAtoms (code) {
                 this.$router.push({
-                    name: 'overview',
+                    name: 'overView',
                     params: {
-                        atomCode
+                        code,
+                        type: 'atom'
                     }
                 })
             },
