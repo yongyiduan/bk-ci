@@ -50,7 +50,6 @@
             }
         },
         async created () {
-            console.log(889)
             this.selectValue = this.value
             try {
                 this.isLoading = true
