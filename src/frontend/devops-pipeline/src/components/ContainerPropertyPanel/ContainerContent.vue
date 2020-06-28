@@ -112,14 +112,17 @@
                 <select-input v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></select-input>
             </form-field>
 
-            <form-field :label="$t('editPage.performance')" v-if="buildResourceType === 'PUBLIC_DEVCLOUD'">
-                <devcloud-option
-                    :disabled="!editable"
-                    :value="container.dispatchType.performanceConfigId"
-                    :handle-change="changeBuildResource"
-                >
-                </devcloud-option>
-            </form-field>
+            <section v-if="buildResourceType === 'PUBLIC_DEVCLOUD'">
+                <form-field :label="$t('editPage.performance')" v-show="isShowPerformance">
+                    <devcloud-option
+                        :disabled="!editable"
+                        :value="container.dispatchType.performanceConfigId"
+                        :handle-change="changeBuildResource"
+                        :change-show-performance="changeShowPerformance"
+                    >
+                    </devcloud-option>
+                </form-field>
+            </section>
 
             <form-field :label="$t('editPage.workspace')" v-if="isThirdParty">
                 <vuex-input :disabled="!editable" name="workspace" :value="container.dispatchType.workspace" :handle-change="changeBuildResource" :placeholder="$t('editPage.workspaceTips')" />
@@ -261,7 +264,8 @@
                 isLoadingMac: false,
                 xcodeVersionList: [],
                 systemVersionList: [],
-                isLoadingImage: false
+                isLoadingImage: false,
+                isShowPerformance: false
             }
         },
         computed: {
@@ -715,6 +719,9 @@
             addDockerImage () {
                 const url = `${WEB_URL_PIRFIX}/artifactory/${this.projectId}/depot/project-image`
                 window.open(url, '_blank')
+            },
+            changeShowPerformance (isShow = false) {
+                this.isShowPerformance = isShow
             }
         }
     }

@@ -31,6 +31,10 @@
             handleChange: {
                 type: Function,
                 required: false
+            },
+            changeShowPerformance: {
+                type: Function,
+                required: false
             }
         },
         data () {
@@ -46,10 +50,12 @@
             }
         },
         async created () {
+            console.log(889)
             this.selectValue = this.value
             try {
                 this.isLoading = true
                 const res = await this.fetchDevcloudSettings({ projectId: this.projectId })
+                this.changeShowPerformance(res.needShow || false)
                 this.selectValue = this.value || res.data['default']
                 this.optionList = res.data.performanceMaps || []
                 this.optionList = this.optionList.map(item => {
