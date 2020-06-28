@@ -54,7 +54,7 @@
             try {
                 this.isLoading = true
                 const res = await this.fetchDevcloudSettings({ projectId: this.projectId })
-                this.changeShowPerformance(res.needShow || false)
+                this.changeShowPerformance(res.data.needShow || false)
                 this.selectValue = this.value || res.data['default']
                 this.optionList = res.data.performanceMaps || []
                 this.optionList = this.optionList.map(item => {
