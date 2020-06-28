@@ -33,9 +33,10 @@ const getters: GetterTree<RootState, any> = {
     getServiceHooks: (state: RootState) => (serviceId): any[] => {
         return state.hookMap[serviceId]
     },
-    showAnnounce: (): boolean => {
-        // return state.currentNotice && state.currentNotice.id
-        return false
+    // 是否显示跑马灯类型公告
+    showAnnounce (state: RootState) {
+        // @ts-ignore
+        return state.currentNotice && state.currentNotice.id && state.currentNotice.noticeType === 1
     }
     
 }

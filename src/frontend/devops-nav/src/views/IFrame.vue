@@ -42,7 +42,6 @@
         initPath: string = ''
         src: string = ''
         leaving: boolean = false
-        showExplorerTips: string = localStorage.getItem('showExplorerTips')
 
         $refs: {
             iframeEle: HTMLIFrameElement
@@ -51,7 +50,6 @@
         @State projectList
         @State currentPage
         @State isAnyPopupShow
-        @State isShowPreviewTips
         @State user
         @State headerConfig
         @Getter showAnnounce
@@ -96,11 +94,6 @@
 
         get needLoading (): boolean {
             return this.$route.name === 'job'
-        }
-
-        get chromeExplorer (): boolean {
-            const explorer = window.navigator.userAgent
-            return explorer.indexOf('Chrome') >= 0 && explorer.indexOf('QQ') === -1
         }
 
         get underlineProjectList () {

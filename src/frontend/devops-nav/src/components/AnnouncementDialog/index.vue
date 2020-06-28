@@ -4,10 +4,8 @@
         ext-cls="devops-announcement-dialog"
         :ok-text="$t('expNow')"
         :width="828"
-        :has-footer="false"
-        :has-header="false"
         :close-icon="false"
-        :quick-close="false"
+        :position="{ top: '100' }"
         :title="currentNotice.noticeTitle"
         @confirm="toLink(currentNotice.redirectUrl)"
     >
@@ -21,40 +19,33 @@
         </main>
     </bk-dialog>
 </template>
-
 <script lang='ts'>
     import Vue from 'vue'
     import { Component, Watch } from 'vue-property-decorator'
     import { State } from 'vuex-class'
-
     @Component
     export default class NewServiceDialog extends Vue {
         @State currentNotice
-
         showDialog: boolean = false
-
+    
         get announcementHistory () : object[] {
             const announcementHistory = localStorage.getItem('announcementHistory')
             return announcementHistory ? JSON.parse(announcementHistory) : []
         }
-
         @Watch('currentNotice')
         handleWatchValue (currentNotice) {
             this.init(currentNotice)
         }
-
         mounted () {
             this.init(this.currentNotice)
         }
-
         init (currentNotice) {
-            if (currentNotice && currentNotice.id && this.announcementHistory.indexOf(currentNotice.id) === -1) {
+            if (currentNotice && currentNotice.id && currentNotice.noticeType === 0 && this.announcementHistory.indexOf(currentNotice.id) === -1) {
                 this.announcementHistory.push(currentNotice.id)
                 localStorage.setItem('announcementHistory', JSON.stringify(this.announcementHistory))
                 this.showDialog = true
             }
         }
-
         toLink (url) {
             if (url) {
                 window.location.href = url
@@ -62,26 +53,23 @@
                 this.showDialog = false
             }
         }
-
         closeDialog () {
             this.showDialog = false
         }
     }
 </script>
-
 <style lang="scss">
     @import '../../assets/scss/conf';
-
     .devops-announcement-dialog {
-        // .bk-dialog-tool {
-        //     display: none;
-        // }
         .bk-dialog-body {
             margin: 0px;
             padding: 0px !important;
         }
+        .bk-dialog-header {
+            padding: 0px !important;
+        }
         .new-service-content {
-            padding: 20px;
+            padding: 0 20px;
             height: 547px;
             background-image: url('../../assets/images/guide-foot.png');
             background-size: 100% 100%;

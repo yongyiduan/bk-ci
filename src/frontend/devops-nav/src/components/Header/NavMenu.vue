@@ -95,19 +95,12 @@
     })
     export default class NavMenu extends Vue {
         @Getter('getCollectServices') collectServices
+        @Getter showAnnounce
         @State services
         @State currentPage
-        @State isShowPreviewTips
-        @Getter showAnnounce
         @Action toggleServiceCollect
         show: boolean = false
         showNewServiveTips: boolean = false
-        showExplorerTips: string = localStorage.getItem('showExplorerTips')
-
-        get chromeExplorer (): boolean {
-            const explorer = window.navigator.userAgent
-            return explorer.indexOf('Chrome') >= 0 && explorer.indexOf('QQ') === -1
-        }
 
         get newServiceList (): object[] {
             const newServiceList = localStorage.getItem('newServiceList')

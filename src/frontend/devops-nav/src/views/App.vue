@@ -12,7 +12,7 @@
             </div>
         </div>
         <router-view />
-        <Announcement-dialog v-if="hideAnnounce !== true" />
+        <Announcement-dialog />
     </div>
 </template>
 
@@ -21,7 +21,7 @@
     import { Component, Watch } from 'vue-property-decorator'
     import { State, Action } from 'vuex-class'
     import AnnouncementDialog from '../components/AnnouncementDialog/index.vue'
-    const ENTERPRISE_VERSION = false
+    
     @Component({
         components: {
             AnnouncementDialog
@@ -33,8 +33,6 @@
 
         @Action getAnnouncement
         @Action setAnnouncement
-
-        hideAnnounce: boolean = ENTERPRISE_VERSION
 
         @Watch('fetchError')
         handleFetchError (e) {
