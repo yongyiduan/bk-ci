@@ -12,17 +12,23 @@
 
         <bk-tab :active.sync="activeTab" type="unborder-card" class="manage-tabs" @tab-change="tabChange">
             <bk-tab-panel v-for="(panel, index) in panels" v-bind="panel" :key="index">
-                <ul v-if="activeTab === panel.name && panel.showChildTab" class="manage-child-tabs">
-                    <li v-for="childPanel in panel.children.filter(x => !x.hidden)"
-                        :key="childPanel.name"
-                        @click="tabChange(childPanel.name)"
-                        :class="['manage-child-tab', { active: activeChildTab === childPanel.name }]"
-                    >{{ childPanel.label }}</li>
-                </ul>
+                <transition name="fade">
+                    <ul v-if="activeTab === panel.name && panel.showChildTab" class="manage-child-tabs">
+                        <li v-for="childPanel in panel.children.filter(x => !x.hidden)"
+                            :key="childPanel.name"
+                            @click="tabChange(childPanel.name)"
+                            :class="['manage-child-tab', { active: activeChildTab === childPanel.name }]"
+                        >{{ childPanel.label }}</li>
+                    </ul>
+                </transition>
             </bk-tab-panel>
         </bk-tab>
 
-        <router-view v-if="Object.keys(detail).length > 0" class="manage-main" v-bkloading="{ isLoading }"></router-view>
+        <main v-bkloading="{ isLoading }" class="manage-main">
+            <transition :name="transitionName">
+                <router-view v-if="Object.keys(detail).length > 0 && !isLoading" class="manage-route"></router-view>
+            </transition>
+        </main>
     </article>
 </template>
 
@@ -59,6 +65,7 @@
                 panels: [],
                 isLoading: true,
                 type: '',
+                transitionName: 'fade',
                 panelMap: {
                     atom: [
                         { label: this.$t('store.概览'), name: 'overView' },
@@ -79,8 +86,7 @@
                           name: 'setting',
                           children: [
                               { label: this.$t('store.成员管理'), name: 'member' },
-                              { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' },
-                              { label: this.$t('store.私有配置'), name: 'private' }
+                              { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' }
                           ],
                           showChildTab: true }
                     ],
@@ -114,7 +120,22 @@
         },
 
         watch: {
-            '$route.name' (val) {
+            '$route.name' (val, oldVal) {
+                const calcIndex = (name) => {
+                    let res = ''
+                    this.panels.forEach((panel, index) => {
+                        if (name === panel.name) res = index + '0'
+                        if (panel.children) {
+                            panel.children.forEach((childPanel, childIndex) => {
+                                if (!panel.showChildTab) childIndex = 1
+                                if (name === childPanel.name) res = `${index}${childIndex}`
+                            })
+                        }
+                    })
+                    return +res
+                }
+                const diff = calcIndex(val) - calcIndex(oldVal)
+                this.transitionName = diff > 0 ? 'g-slide-left' : diff === 0 ? 'fade' : 'g-slide-right'
                 this.calcActiveTab()
             }
         },
@@ -200,7 +221,8 @@
             },
 
             goToDetail () {
-                const defaultPage = this.panels[0]
+                let defaultPage = this.panels[0]
+                if (defaultPage.children && defaultPage.children.length > 0) defaultPage = defaultPage.children[0]
                 this.$router.push({ name: defaultPage.name })
             }
         }
@@ -216,6 +238,7 @@
         max-height: 100vh;
         padding-bottom: 40px;
         flex-direction: column;
+        overflow: hidden;
         .manage-title {
             height: 56px;
             line-height: 56px;
@@ -240,6 +263,7 @@
         .manage-tabs {
             width: 14.6rem;
             margin: 0 auto;
+            box-shadow: 1px 2px 3px 0 rgba(0,0,0,0.05);
             .manage-child-tabs {
                 height: 47px;
                 line-height: 47px;
@@ -299,6 +323,10 @@
             position: relative;
             flex: 1;
             height: 0;
+            .manage-route {
+                height: 100%;
+                box-shadow: 1px 2px 3px 0 rgba(0,0,0,0.05);
+            }
         }
     }
 </style>

@@ -147,6 +147,9 @@
                 color: #1592ff;
                 cursor: pointer;
             }
+            .icon-info-circle {
+                margin-left: 5px;
+            }
         }
     }
 </style>

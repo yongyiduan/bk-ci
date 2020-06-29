@@ -172,9 +172,10 @@
 
             toImageDetail () {
                 this.$router.push({
-                    name: 'imageOverview',
+                    name: 'show',
                     params: {
-                        imageCode: this.imageDetail.imageCode
+                        code: this.imageDetail.imageCode,
+                        type: 'image'
                     }
                 })
             },
