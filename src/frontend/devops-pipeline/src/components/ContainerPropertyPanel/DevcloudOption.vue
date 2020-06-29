@@ -79,7 +79,7 @@
                 this.handleChange(name, value)
             },
             getShowOption (obj) {
-                return `${this.$t('editPage.cpu')}: ${obj.cpu}, ${this.$t('editPage.memory')}: ${obj.memory}, ${this.$t('editPage.disk')}: ${obj.disk}`
+                return `${obj.description} (${obj.cpu}${this.$t('editPage.cpuUnit')}/${obj.memory}/${obj.disk})`
             }
         }
     }
