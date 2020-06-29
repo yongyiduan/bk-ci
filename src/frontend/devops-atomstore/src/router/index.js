@@ -36,6 +36,7 @@ const approval = () => import(/* webpackChunkName: 'approval' */ '@/views/manage
 const setting = () => import(/* webpackChunkName: 'setting' */ '@/views/manage/setting/index.vue') // 研发商店管理页面
 const memberSetting = () => import(/* webpackChunkName: 'approval' */ '@/views/manage/setting/member-setting.vue') // 研发商店管理页面
 const privateSetting = () => import(/* webpackChunkName: 'approval' */ '@/views/manage/setting/private-setting.vue') // 研发商店管理页面
+const visibleSetting = () => import(/* webpackChunkName: 'visibleSetting' */ '@/views/manage/setting/visible-setting.vue') // 研发商店管理页面
 
 const editAtom = () => import(/* webpackChunkName: 'editAtom' */ '@/views/edit_atom.vue') // 上架/升级流水线插件
 const releaseProgress = () => import(/* webpackChunkName: 'releaseProgress' */ '@/views/release_progress.vue') // 发布进度
@@ -168,6 +169,11 @@ const routes = [
                                 path: 'private',
                                 name: 'private',
                                 component: privateSetting
+                            },
+                            {
+                                path: 'visible',
+                                name: 'visible',
+                                component: visibleSetting
                             }
                         ]
                     },

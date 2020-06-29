@@ -52,7 +52,7 @@ export const actions = {
      * 微扩展重新授权
      */
     resetServiceGit ({ commit }, { serviceCode, projectCode }) {
-        return vue.$ajax.post(`${prefix}/user/market/service/repositorys/${serviceCode}?projectCode=${projectCode}`)
+        return vue.$ajax.put(`${prefix}/user/market/service/repositorys/${serviceCode}?projectCode=${projectCode}`)
     },
 
     /***

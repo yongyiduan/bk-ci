@@ -30,7 +30,7 @@
             <bk-table-column :label="$t('store.扩展点')" width="120">
                 <template slot-scope="props">
                     <span v-if="props.row.itemName.length <= 0">{{props.row.itemName.length}}</span>
-                    <bk-popconfirm v-else trigger="click" title="" confirm-text="" cancel-text="">
+                    <bk-popconfirm v-else trigger="click" ext-cls="custom-popconfirm" title="" confirm-text="" cancel-text="">
                         <div slot="content">
                             <p v-for="(name, index) in props.row.itemName" :key="index">{{ name }}</p>
                         </div>
@@ -408,11 +408,12 @@
                 }).catch(() => this.$bkMessage({ message: this.$t('store.校验失败，请修改再试'), theme: 'error' }))
             },
 
-            goToServiceDetail (serviceCode) {
+            goToServiceDetail (code) {
                 this.$router.push({
-                    name: 'serviceOverview',
+                    name: 'overView',
                     params: {
-                        serviceCode
+                        code,
+                        type: 'service'
                     }
                 })
             },

@@ -25,7 +25,8 @@
         methods: {
             initData () {
                 const methodGenerator = {
-                    atom: this.getAtomData
+                    atom: this.getAtomData,
+                    service: this.getImageData
                 }
 
                 const currentMethod = methodGenerator[this.type]
@@ -38,6 +39,16 @@
                 return this.$store.dispatch('store/requestVersionList', {
                     atomCode: this.detail.atomCode
                 }).then((res) => {
+                    const records = res.records || []
+                    this.list = records.map((x) => ({
+                        tag: x.createTime,
+                        content: `${x.creator} ${this.$t('store.新增版本')} ${x.version}`
+                    }))
+                })
+            },
+
+            getImageData () {
+                return this.$store.dispatch('store/requestVersionLog', this.detail.serviceCode).then((res) => {
                     const records = res.records || []
                     this.list = records.map((x) => ({
                         tag: x.createTime,

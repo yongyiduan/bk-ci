@@ -16,6 +16,18 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+export function copyString (str) {
+    const input = document.createElement('input')
+    document.body.appendChild(input)
+    input.setAttribute('value', str)
+    input.select()
+    if (document.execCommand('copy')) {
+        document.execCommand('copy')
+        const bkDevops = window.devops || {}
+        bkDevops.$bkMessage({ theme: 'success', message: bkDevops.$t('store.复制成功') })
+    }
+    document.body.removeChild(input)
+}
 
 export function queryStringify (query) {
     return Object.keys(query).map(key => query[key] ? `${key}=${query[key]}` : key).join('&')

@@ -143,7 +143,7 @@
     "请选择成员": "Please select members",
     "若列表中找不到用户，请先将其添加为调试项目的成员": "If a user is not found in the list, please add it as a member of the debugging project to which the plugin belongs.",
     "工蜂OAUTH": "工蜂OAUTH",
-    "未设置可见对象时，仅插件成员可以安装到名下项目中使用。设置可见对象后，对应用户可以在Store中查看并安装使用。": "When the visiblity is not set, only plugin members can install plugins into their projects to use. Once such access is set, permitted members can view plugins in the Store and install them for use. ",
+    "未设置可见对象时，仅成员可以安装到名下项目中使用。设置可见对象后，对应用户可以在Store中查看并安装使用。": "When the visiblity is not set, only members can install item into their projects to use. Once such access is set, permitted members can view plugins in the Store and install them for use. ",
     "确定删除选中的可见对象？": "Delete the selected member?",
     "请至少选择一个可见对象": "Please select at least one member",
     "数据加载中，请稍候": "Loading, please wait",

@@ -115,7 +115,7 @@
             confirmApprove () {
                 this.$refs.validateForm.validate().then((validator) => {
                     const { approveId, approveMsg, approveStatus } = this.approveRes
-                    this.$store.dispatch('store/approval', { type: 'ATOM', code: this.atomCode, approveId, approveMsg, approveStatus }).then((res) => {
+                    this.$store.dispatch('store/approval', { type: 'ATOM', code: this.detail.atomCode, approveId, approveMsg, approveStatus }).then((res) => {
                         if (res) {
                             const currentData = this.approveList.find(item => item.approveId === this.approveRes.approveId) || {}
                             currentData.approveStatus = approveStatus
@@ -142,7 +142,7 @@
 
             requestApproveList () {
                 this.isLoading = true
-                const data = Object.assign({}, this.pagination, { type: 'ATOM', code: this.atomCode })
+                const data = Object.assign({}, this.pagination, { type: 'ATOM', code: this.detail.atomCode })
                 this.$store.dispatch('store/getApprovalList', data).then((res) => {
                     this.approveList = res.records || []
                     this.pagination.count = res.count

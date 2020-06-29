@@ -13,7 +13,7 @@
         <bk-tab :active.sync="activeTab" type="unborder-card" class="manage-tabs" @tab-change="tabChange">
             <bk-tab-panel v-for="(panel, index) in panels" v-bind="panel" :key="index">
                 <ul v-if="activeTab === panel.name && panel.showChildTab" class="manage-child-tabs">
-                    <li v-for="childPanel in panel.children"
+                    <li v-for="childPanel in panel.children.filter(x => !x.hidden)"
                         :key="childPanel.name"
                         @click="tabChange(childPanel.name)"
                         :class="['manage-child-tab', { active: activeChildTab === childPanel.name }]"
@@ -41,6 +41,9 @@
                     case 'image':
                         res = bkLocale.$t('store.容器镜像')
                         break
+                    case 'service':
+                        res = bkLocale.$t('store.微扩展')
+                        break
                     default:
                         res = bkLocale.$t('store.流水线插件')
                         break
@@ -65,6 +68,7 @@
                           name: 'setting',
                           children: [
                               { label: this.$t('store.成员管理'), name: 'member' },
+                              { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' },
                               { label: this.$t('store.私有配置'), name: 'private' }
                           ],
                           showChildTab: true }
@@ -75,6 +79,7 @@
                           name: 'setting',
                           children: [
                               { label: this.$t('store.成员管理'), name: 'member' },
+                              { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' },
                               { label: this.$t('store.私有配置'), name: 'private' }
                           ],
                           showChildTab: true }
@@ -82,7 +87,20 @@
                     template: [
                         { label: this.$t('store.设置'),
                           name: 'setting',
-                          children: [],
+                          children: [
+                              { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' }
+                          ],
+                          showChildTab: true }
+                    ],
+                    service: [
+                        { label: this.$t('store.概览'), name: 'overView' },
+                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
+                        { label: this.$t('store.设置'),
+                          name: 'setting',
+                          children: [
+                              { label: this.$t('store.成员管理'), name: 'member' },
+                              { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' }
+                          ],
                           showChildTab: true }
                     ]
                 }
@@ -141,18 +159,21 @@
                 const methodUrl = {
                     atom: 'store/requestAtom',
                     template: 'store/requestTemplate',
-                    image: 'store/requestImageDetailByCode'
+                    image: 'store/requestImageDetailByCode',
+                    service: 'store/requestServiceDetailByCode'
                 }
                 const currentUrl = methodUrl[this.type]
                 return this.$store.dispatch(currentUrl, code).then(res => this.$store.dispatch('store/setDetail', res))
             },
 
+            // requestGetMemInfo
             getMemInfo () {
                 const code = this.$route.params.code
                 const methodGenerator = {
                     atom: () => this.$store.dispatch('store/getMemberInfo', code),
-                    template: () => Promise.resolve(),
-                    image: () => this.$store.dispatch('store/requestGetMemInfo', code)
+                    template: () => Promise.resolve({ type: 'ADMIN' }),
+                    image: () => this.$store.dispatch('store/requestGetImageMemInfo', code),
+                    service: () => this.$store.dispatch('store/requestGetServiceMemInfo', code)
                 }
                 const currentMethod = methodGenerator[this.type]
 
