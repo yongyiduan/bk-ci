@@ -198,9 +198,10 @@
 
             toServiceDetail () {
                 this.$router.push({
-                    name: 'serviceOverview',
+                    name: 'overView',
                     params: {
-                        serviceCode: this.serviceDetail.serviceCode
+                        code: this.serviceDetail.serviceCode,
+                        type: 'service'
                     }
                 })
             },

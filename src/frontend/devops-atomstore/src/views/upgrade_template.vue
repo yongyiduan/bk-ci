@@ -174,8 +174,9 @@
         },
         methods: {
             toTemplateDetail () {
+                const name = VERSION_TYPE === 'ee' ? 'setting' : 'visible'
                 this.$router.push({
-                    name: 'setting',
+                    name,
                     params: {
                         code: this.templateDetail.templateCode,
                         type: 'template'

@@ -187,7 +187,6 @@
                 return this.$store.dispatch(currentUrl, code).then(res => this.$store.dispatch('store/setDetail', res))
             },
 
-            // requestGetMemInfo
             getMemInfo () {
                 const code = this.$route.params.code
                 const methodGenerator = {

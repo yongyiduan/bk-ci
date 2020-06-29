@@ -36,6 +36,15 @@
             @saveHandle="saveHandle"
             @cancelHandle="cancelHandle">
         </organization-dialog>
+
+        <bk-dialog v-model="deleteObj.show"
+            :loading="deleteObj.loading"
+            @confirm="requestDeleteVisiable"
+            @cancel="deleteObj.show = false"
+            :title="$t('store.删除')"
+        >
+            {{ deleteObj.name ? `${$t('store.确定删除')}(${deleteObj.name})？` : $t('store.确定删除选中的可见对象？') }}
+        </bk-dialog>
     </article>
 </template>
 
@@ -58,6 +67,13 @@
                     'APPROVED': this.$t('store.审核通过'),
                     'APPROVING': this.$t('store.待审核'),
                     'REJECT': this.$t('store.审核驳回')
+                },
+                deleteObj: {
+                    show: false,
+                    loading: false,
+                    name: '',
+                    id: '',
+                    index: ''
                 }
             }
         },
@@ -160,43 +176,21 @@
                         limit: 1
                     })
                 } else {
-                    const h = this.$createElement
-                    const subHeader = h('p', {
-                        style: {
-                            textAlign: 'center'
-                        }
-                    }, this.$t('store.确定删除选中的可见对象？'))
-
-                    this.$bkInfo({
-                        title: this.$t('store.删除'),
-                        subHeader,
-                        confirmFn: async () => {
-                            const deptIds = target.map(val => val.deptId).join(',')
-                            this.requestDeleteVisiable(deptIds)
-                        }
-                    })
+                    this.deleteObj.show = true
+                    this.deleteObj.name = ''
+                    this.deleteObj.id = target.map(val => val.deptId).join(',')
                 }
             },
 
             handleDelete (row) {
                 if (!this.userInfo.isProjectAdmin) return
-                const h = this.$createElement
-                const subHeader = h('p', {
-                    style: {
-                        textAlign: 'center'
-                    }
-                }, `${this.$t('store.确定删除')}(${row.deptName})？`)
-
-                this.$bkInfo({
-                    title: this.$t('store.删除'),
-                    subHeader,
-                    confirmFn: async () => {
-                        this.requestDeleteVisiable(row.deptId)
-                    }
-                })
+                this.deleteObj.show = true
+                this.deleteObj.name = row.deptName
+                this.deleteObj.id = row.deptId
             },
 
-            requestDeleteVisiable (deptIds) {
+            requestDeleteVisiable () {
+                const deptIds = this.deleteObj.id
                 const deleteMethodMap = {
                     atom: () => this.$store.dispatch('store/requestDeleteVisiable', { atomCode: this.detail.atomCode, deptIds }),
                     template: () => this.$store.dispatch('store/deleteTplVisiable', { templateCode: this.detail.templateCode, deptIds }),
@@ -204,7 +198,7 @@
                     service: () => this.$store.dispatch('store/requestDeleteServiceVis', { serviceCode: this.detail.serviceCode, deptIds })
                 }
                 const type = this.$route.params.type
-                this.isLoading = true
+                this.deleteObj.loading = true
                 deleteMethodMap[type]().then(() => {
                     (String(deptIds).split(',')).forEach(id => {
                         const index = this.visibleList.findIndex(x => String(x.deptId) === String(id))
@@ -214,7 +208,8 @@
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
-                    this.isLoading = false
+                    this.deleteObj.loading = false
+                    this.deleteObj.show = false
                 })
             }
         }
