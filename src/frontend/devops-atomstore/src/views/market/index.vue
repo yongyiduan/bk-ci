@@ -7,7 +7,7 @@
                 <i class="right-arrow banner-arrow"></i>
                 <span class="banner-des">{{filterData.pipeType|pipeTypeFilter}}</span>
             </p>
-            <router-link v-if="filterData.pipeType !== 'ide'" :to="{ name: 'workList', params: { type: filterData.pipeType || 'atom' } }" class="title-work"> {{ $t('store.工作台') }} </router-link>
+            <router-link v-if="filterData.pipeType !== 'ide'" :to="{ name: `${filterData.pipeType || 'atom'}Work` }" class="title-work"> {{ $t('store.工作台') }} </router-link>
         </h3>
 
         <main class="store-main" @scroll.passive="mainScroll">

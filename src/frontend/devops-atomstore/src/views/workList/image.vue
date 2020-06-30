@@ -12,67 +12,73 @@
                 <i class="devops-icon icon-close-circle-shape clear-icon" v-else @click="clearSearch"></i>
             </section>
         </div>
-        <bk-table style="margin-top: 15px;" :empty-text="$t('store.暂时没有镜像')"
-            :data="renderList"
-            :pagination="pagination"
-            @page-change="pageChanged"
-            @page-limit-change="pageCountChanged"
-            v-bkloading="{ isLoading }"
-        >
-            <bk-table-column :label="$t('store.镜像名称')" width="180">
-                <template slot-scope="props">
-                    <span class="atom-name" :title="props.row.imageName" @click="goToImageDetail(props.row.imageCode)">{{ props.row.imageName }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.镜像来源')" prop="imageSourceType" :formatter="sourceTypeFormatter" width="100"></bk-table-column>
-            <bk-table-column :label="$t('store.镜像')" prop="imageRepoUrl">
-                <template slot-scope="props">
-                    <span :title="(props.row.imageRepoUrl ? props.row.imageRepoUrl + '/' : '') + props.row.imageRepoName + ':' + props.row.imageTag">
-                        {{ props.row.imageRepoUrl + props.row.imageRepoName + props.row.imageTag ? (props.row.imageRepoUrl ? props.row.imageRepoUrl + '/' : '') + props.row.imageRepoName + ':' + props.row.imageTag : '-' }}
-                    </span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.镜像大小')" prop="imageSize" width="100">
-                <template slot-scope="props">
-                    <span>{{ props.row.imageSize || '-' }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.版本号')" prop="version" width="100">
-                <template slot-scope="props">
-                    <span>{{ props.row.version || '-' }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.状态')" width="160">
-                <template slot-scope="props">
-                    <status :status="calcStatus(props.row.imageStatus)"></status>
-                    <span>{{ $t(imageStatusList[props.row.imageStatus]) }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.修改人')" prop="modifier" width="150"></bk-table-column>
-            <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
-            <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
-                <template slot-scope="props">
-                    <span class="shelf-btn"
-                        v-if="props.row.imageStatus === 'INIT' || props.row.imageStatus === 'UNDERCARRIAGED'
-                            || props.row.imageStatus === 'GROUNDING_SUSPENSION' || props.row.imageStatus === 'AUDIT_REJECT'"
-                        @click="$router.push({ name: 'editImage', params: { imageId: props.row.imageId } })"> {{ $t('store.上架') }} </span>
-                    <span class="shelf-btn"
-                        v-if="props.row.imageStatus === 'RELEASED'"
-                        @click="$router.push({ name: 'editImage', params: { imageId: props.row.imageId } })"> {{ $t('store.升级') }} </span>
-                    <span class="shelf-btn"
-                        v-if="props.row.imageStatus === 'RELEASED' && !props.row.publicFlag"
-                        @click="$router.push({ name: 'install', query: { code: props.row.imageCode, type: 'image', from: 'workList' } })"> {{ $t('store.安装') }} </span>
-                    <span class="schedule-btn"
-                        v-if="['AUDITING', 'COMMITTING', 'CHECKING', 'CHECK_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.imageStatus)"
-                        @click="$router.push({ name: 'imageProgress', params: { imageId: props.row.imageId } })"> {{ $t('store.进度') }} </span>
-                    <span class="obtained-btn"
-                        v-if="props.row.imageStatus === 'RELEASED' || (props.row.imageStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
-                        @click="offline(props.row)"
-                    > {{ $t('store.下架') }} </span>
-                    <span @click="deleteImage(props.row.imageCode)" v-if="['INIT', 'GROUNDING_SUSPENSION', 'UNDERCARRIAGED'].includes(props.row.imageStatus)"> {{ $t('store.删除') }} </span>
-                </template>
-            </bk-table-column>
-        </bk-table>
+        <main class="g-scroll-pagination-table">
+            <bk-table style="margin-top: 15px;"
+                :empty-text="$t('store.暂时没有镜像')"
+                :outer-border="false"
+                :header-border="false"
+                :header-cell-style="{ background: '#fff' }"
+                :data="renderList"
+                :pagination="pagination"
+                @page-change="pageChanged"
+                @page-limit-change="pageCountChanged"
+                v-bkloading="{ isLoading }"
+            >
+                <bk-table-column :label="$t('store.镜像名称')" width="180">
+                    <template slot-scope="props">
+                        <span class="atom-name" :title="props.row.imageName" @click="goToImageDetail(props.row.imageCode)">{{ props.row.imageName }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.镜像来源')" prop="imageSourceType" :formatter="sourceTypeFormatter" width="100"></bk-table-column>
+                <bk-table-column :label="$t('store.镜像')" prop="imageRepoUrl">
+                    <template slot-scope="props">
+                        <span :title="(props.row.imageRepoUrl ? props.row.imageRepoUrl + '/' : '') + props.row.imageRepoName + ':' + props.row.imageTag">
+                            {{ props.row.imageRepoUrl + props.row.imageRepoName + props.row.imageTag ? (props.row.imageRepoUrl ? props.row.imageRepoUrl + '/' : '') + props.row.imageRepoName + ':' + props.row.imageTag : '-' }}
+                        </span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.镜像大小')" prop="imageSize" width="100">
+                    <template slot-scope="props">
+                        <span>{{ props.row.imageSize || '-' }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.版本号')" prop="version" width="100">
+                    <template slot-scope="props">
+                        <span>{{ props.row.version || '-' }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.状态')" width="160">
+                    <template slot-scope="props">
+                        <status :status="calcStatus(props.row.imageStatus)"></status>
+                        <span>{{ $t(imageStatusList[props.row.imageStatus]) }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.修改人')" prop="modifier" width="150"></bk-table-column>
+                <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
+                <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
+                    <template slot-scope="props">
+                        <span class="shelf-btn"
+                            v-if="props.row.imageStatus === 'INIT' || props.row.imageStatus === 'UNDERCARRIAGED'
+                                || props.row.imageStatus === 'GROUNDING_SUSPENSION' || props.row.imageStatus === 'AUDIT_REJECT'"
+                            @click="$router.push({ name: 'editImage', params: { imageId: props.row.imageId } })"> {{ $t('store.上架') }} </span>
+                        <span class="shelf-btn"
+                            v-if="props.row.imageStatus === 'RELEASED'"
+                            @click="$router.push({ name: 'editImage', params: { imageId: props.row.imageId } })"> {{ $t('store.升级') }} </span>
+                        <span class="shelf-btn"
+                            v-if="props.row.imageStatus === 'RELEASED' && !props.row.publicFlag"
+                            @click="$router.push({ name: 'install', query: { code: props.row.imageCode, type: 'image', from: 'workList' } })"> {{ $t('store.安装') }} </span>
+                        <span class="schedule-btn"
+                            v-if="['AUDITING', 'COMMITTING', 'CHECKING', 'CHECK_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.imageStatus)"
+                            @click="$router.push({ name: 'imageProgress', params: { imageId: props.row.imageId } })"> {{ $t('store.进度') }} </span>
+                        <span class="obtained-btn"
+                            v-if="props.row.imageStatus === 'RELEASED' || (props.row.imageStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
+                            @click="offline(props.row)"
+                        > {{ $t('store.下架') }} </span>
+                        <span @click="deleteImage(props.row.imageCode)" v-if="['INIT', 'GROUNDING_SUSPENSION', 'UNDERCARRIAGED'].includes(props.row.imageStatus)"> {{ $t('store.删除') }} </span>
+                    </template>
+                </bk-table-column>
+            </bk-table>
+        </main>
 
         <bk-sideslider :is-show.sync="relateImageData.show"
             :title="relateImageData.title"
