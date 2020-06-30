@@ -291,12 +291,7 @@
             },
 
             toServiceList () {
-                this.$router.push({
-                    name: 'workList',
-                    params: {
-                        type: 'service'
-                    }
-                })
+                this.$router.push({ name: 'serviceWork' })
             },
 
             toAtomStore () {

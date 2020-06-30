@@ -16,10 +16,7 @@
         methods: {
             toWorkList () {
                 this.$router.push({
-                    name: 'workList',
-                    params: {
-                        type: 'service'
-                    }
+                    name: 'serviceWork'
                 })
             },
 

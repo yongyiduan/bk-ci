@@ -28,6 +28,7 @@ const workList = () => import(/* webpackChunkName: 'workList' */ '@/views/workLi
 const atomWork = () => import(/* webpackChunkName: 'workList' */ '@/views/workList/atom.vue') // 工作台
 const templateWork = () => import(/* webpackChunkName: 'workList' */ '@/views/workList/template.vue') // 工作台
 const imageWork = () => import(/* webpackChunkName: 'workList' */ '@/views/workList/image.vue') // 工作台
+const serviceWork = () => import(/* webpackChunkName: 'workList' */ '@/views/workList/service.vue') // 工作台
 
 const install = () => import(/* webpackChunkName: 'install' */ '@/views/install.vue') // 研发商店安装页面
 const manage = () => import(/* webpackChunkName: 'manage' */ '@/views/manage/index.vue') // 研发商店管理页面
@@ -144,6 +145,11 @@ const routes = [
                         path: 'image',
                         name: 'imageWork',
                         component: imageWork
+                    },
+                    {
+                        path: 'service',
+                        name: 'serviceWork',
+                        component: serviceWork
                     }
                 ]
             },

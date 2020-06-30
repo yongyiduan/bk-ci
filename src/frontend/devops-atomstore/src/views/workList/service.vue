@@ -12,64 +12,70 @@
                 <i class="devops-icon icon-close-circle-shape clear-icon" v-else @click="clearSearch"></i>
             </section>
         </div>
-        <bk-table style="margin-top: 15px;" :empty-text="$t('store.暂时没有微扩展')"
-            :data="renderList"
-            :pagination="pagination"
-            @page-change="pageChanged"
-            @page-limit-change="pageCountChanged"
-            :show-overflow-tooltip="true"
-            v-bkloading="{ isLoading }"
-        >
-            <bk-table-column :label="$t('store.微扩展名称')" width="180">
-                <template slot-scope="props">
-                    <span class="atom-name" :title="props.row.serviceName" @click="goToServiceDetail(props.row.serviceCode)">{{ props.row.serviceName }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.微扩展标识')" prop="serviceCode"></bk-table-column>
-            <bk-table-column :label="$t('store.调试项目')" prop="projectName"></bk-table-column>
-            <bk-table-column :label="$t('store.扩展点')" width="120">
-                <template slot-scope="props">
-                    <span v-if="props.row.itemName.length <= 0">{{props.row.itemName.length}}</span>
-                    <bk-popconfirm v-else trigger="click" ext-cls="custom-popconfirm" title="" confirm-text="" cancel-text="">
-                        <div slot="content">
-                            <p v-for="(name, index) in props.row.itemName" :key="index">{{ name }}</p>
-                        </div>
-                        <span class="atom-name">{{props.row.itemName.length}}</span>
-                    </bk-popconfirm>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.版本')" prop="version" width="120"></bk-table-column>
-            <bk-table-column :label="$t('store.状态')" width="160">
-                <template slot-scope="props">
-                    <status :status="calcStatus(props.row.serviceStatus)"></status>
-                    <span>{{ $t(serviceStatusList[props.row.serviceStatus]) }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column :label="$t('store.修改人')" prop="modifier" width="100"></bk-table-column>
-            <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
-            <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
-                <template slot-scope="props">
-                    <span class="shelf-btn"
-                        v-if="props.row.serviceStatus === 'INIT' || props.row.serviceStatus === 'UNDERCARRIAGED'
-                            || props.row.serviceStatus === 'GROUNDING_SUSPENSION' || props.row.serviceStatus === 'AUDIT_REJECT'"
-                        @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"> {{ $t('store.上架') }} </span>
-                    <span class="shelf-btn"
-                        v-if="props.row.serviceStatus === 'RELEASED'"
-                        @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"> {{ $t('store.升级') }} </span>
-                    <span class="shelf-btn"
-                        v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
-                        @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'workList' } })"> {{ $t('store.安装') }} </span>
-                    <span class="schedule-btn"
-                        v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING', 'RELEASE_DEPLOYING', 'RELEASE_DEPLOY_FAIL'].includes(props.row.serviceStatus)"
-                        @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
-                    <span class="obtained-btn"
-                        v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
-                        @click="offline(props.row)"
-                    > {{ $t('store.下架') }} </span>
-                    <!-- <span @click="deleteService(props.row.serviceCode)" v-if="['INIT', 'GROUNDING_SUSPENSION', 'UNDERCARRIAGED'].includes(props.row.serviceStatus)"> {{ $t('store.删除') }} </span> -->
-                </template>
-            </bk-table-column>
-        </bk-table>
+        <main class="g-scroll-pagination-table">
+            <bk-table style="margin-top: 15px;"
+                :empty-text="$t('store.暂时没有微扩展')"
+                :outer-border="false"
+                :header-border="false"
+                :header-cell-style="{ background: '#fff' }"
+                :data="renderList"
+                :pagination="pagination"
+                @page-change="pageChanged"
+                @page-limit-change="pageCountChanged"
+                :show-overflow-tooltip="true"
+                v-bkloading="{ isLoading }"
+            >
+                <bk-table-column :label="$t('store.微扩展名称')" width="180">
+                    <template slot-scope="props">
+                        <span class="atom-name" :title="props.row.serviceName" @click="goToServiceDetail(props.row.serviceCode)">{{ props.row.serviceName }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.微扩展标识')" prop="serviceCode"></bk-table-column>
+                <bk-table-column :label="$t('store.调试项目')" prop="projectName"></bk-table-column>
+                <bk-table-column :label="$t('store.扩展点')" width="120">
+                    <template slot-scope="props">
+                        <span v-if="props.row.itemName.length <= 0">{{props.row.itemName.length}}</span>
+                        <bk-popconfirm v-else trigger="click" ext-cls="custom-popconfirm" title="" confirm-text="" cancel-text="">
+                            <div slot="content">
+                                <p v-for="(name, index) in props.row.itemName" :key="index">{{ name }}</p>
+                            </div>
+                            <span class="atom-name">{{props.row.itemName.length}}</span>
+                        </bk-popconfirm>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.版本')" prop="version" width="120"></bk-table-column>
+                <bk-table-column :label="$t('store.状态')" width="160">
+                    <template slot-scope="props">
+                        <status :status="calcStatus(props.row.serviceStatus)"></status>
+                        <span>{{ $t(serviceStatusList[props.row.serviceStatus]) }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column :label="$t('store.修改人')" prop="modifier" width="100"></bk-table-column>
+                <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
+                <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
+                    <template slot-scope="props">
+                        <span class="shelf-btn"
+                            v-if="props.row.serviceStatus === 'INIT' || props.row.serviceStatus === 'UNDERCARRIAGED'
+                                || props.row.serviceStatus === 'GROUNDING_SUSPENSION' || props.row.serviceStatus === 'AUDIT_REJECT'"
+                            @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"> {{ $t('store.上架') }} </span>
+                        <span class="shelf-btn"
+                            v-if="props.row.serviceStatus === 'RELEASED'"
+                            @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"> {{ $t('store.升级') }} </span>
+                        <span class="shelf-btn"
+                            v-if="props.row.serviceStatus === 'RELEASED' && !props.row.publicFlag"
+                            @click="$router.push({ name: 'install', query: { code: props.row.serviceCode, type: 'service', from: 'serviceWork' } })"> {{ $t('store.安装') }} </span>
+                        <span class="schedule-btn"
+                            v-if="['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING', 'RELEASE_DEPLOYING', 'RELEASE_DEPLOY_FAIL'].includes(props.row.serviceStatus)"
+                            @click="$router.push({ name: 'serviceProgress', params: { serviceId: props.row.serviceId } })"> {{ $t('store.进度') }} </span>
+                        <span class="obtained-btn"
+                            v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
+                            @click="offline(props.row)"
+                        > {{ $t('store.下架') }} </span>
+                        <!-- <span @click="deleteService(props.row.serviceCode)" v-if="['INIT', 'GROUNDING_SUSPENSION', 'UNDERCARRIAGED'].includes(props.row.serviceStatus)"> {{ $t('store.删除') }} </span> -->
+                    </template>
+                </bk-table-column>
+            </bk-table>
+        </main>
 
         <bk-sideslider :is-show.sync="relateServiceData.show"
             @hidden="cancelRelateService"
