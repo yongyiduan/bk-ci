@@ -112,6 +112,18 @@
                 <select-input v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></select-input>
             </form-field>
 
+            <section v-if="buildResourceType === 'PUBLIC_DEVCLOUD'">
+                <form-field :label="$t('editPage.performance')" v-show="isShowPerformance">
+                    <devcloud-option
+                        :disabled="!editable"
+                        :value="container.dispatchType.performanceConfigId"
+                        :handle-change="changeBuildResource"
+                        :change-show-performance="changeShowPerformance"
+                    >
+                    </devcloud-option>
+                </form-field>
+            </section>
+
             <form-field :label="$t('editPage.workspace')" v-if="isThirdParty">
                 <vuex-input :disabled="!editable" name="workspace" :value="container.dispatchType.workspace" :handle-change="changeBuildResource" :placeholder="$t('editPage.workspaceTips')" />
             </form-field>
@@ -211,6 +223,7 @@
     import FormField from '@/components/AtomPropertyPanel/FormField'
     import ContainerAppSelector from './ContainerAppSelector'
     import ContainerEnvNode from './ContainerEnvNode'
+    import DevcloudOption from './DevcloudOption'
     import BuildParams from './BuildParams'
     import VersionConfig from './VersionConfig'
     import JobOption from './JobOption'
@@ -229,6 +242,7 @@
             BuildParams,
             VersionConfig,
             ContainerEnvNode,
+            DevcloudOption,
             JobOption,
             JobMutual,
             Selector,
@@ -250,7 +264,8 @@
                 isLoadingMac: false,
                 xcodeVersionList: [],
                 systemVersionList: [],
-                isLoadingImage: false
+                isLoadingImage: false,
+                isShowPerformance: false
             }
         },
         computed: {
@@ -704,6 +719,9 @@
             addDockerImage () {
                 const url = `${WEB_URL_PIRFIX}/artifactory/${this.projectId}/depot/project-image`
                 window.open(url, '_blank')
+            },
+            changeShowPerformance (isShow = false) {
+                this.isShowPerformance = isShow
             }
         }
     }

@@ -591,6 +591,8 @@
         "imageType": "Image type",
         "assignResource": "Docker image url",
         "imageTicket": "Docker image  ticket",
+        "performance": "Model",
+        "cpuUnit": "C",
         "workspace": "workspace on",
         "workspaceTips": "Default: [Agent installation directory]/workspace/[pipeline ID]/",
         "useRootText": "Execute as root(please check it if you use codecc atom in this job)",

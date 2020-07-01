@@ -418,6 +418,10 @@ export default {
         return request.get(`${AJAX_URL_PIRFIX}/${LOG_API_URL_PREFIX}/user/logs/${projectId}/${pipelineId}/${buildId}/after?start=${lineNo}${currentExe ? '&executeCount=' + currentExe : ''}${tag ? '&tag=' + tag : ''}`)
     },
 
+    fetchDevcloudSettings ({ commit }, { projectId }) {
+        return request.get(`dispatch-devcloud/api/user/dispatchDevcloud/project/${projectId}/performanceConfig/list`)
+    },
+
     getMacSysVersion () {
         return request.get(`${MACOS_API_URL_PREFIX}/user/systemVersions`)
     },
