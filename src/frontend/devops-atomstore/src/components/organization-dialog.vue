@@ -105,7 +105,7 @@
                     res.forEach(x => {
                         x.type = curType
                         data.push(x)
-                        if (node.level === 1) leaf.push(x.id)
+                        if (node.level === 2) leaf.push(x.id)
                     })
                     return { data, leaf }
                 } catch (err) {

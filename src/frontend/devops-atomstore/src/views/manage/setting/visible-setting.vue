@@ -1,7 +1,7 @@
 <template>
     <article class="visible-setting">
         <h5 class="visible-header">
-            <bk-button theme="primary" @click="showDialog = true">{{ $t('store.添加') }}</bk-button>
+            <bk-button theme="primary" @click="showDialog = true" :disabled="!userInfo.isProjectAdmin">{{ $t('store.添加') }}</bk-button>
             <bk-button @click="bitchrRemove" :disabled="!userInfo.isProjectAdmin">{{ $t('store.批量删除') }}</bk-button>
         </h5>
 
