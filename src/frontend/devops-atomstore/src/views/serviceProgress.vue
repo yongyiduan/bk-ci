@@ -94,23 +94,23 @@
 
 <script>
     import { mapActions } from 'vuex'
-    import build from '../components/common/progressSteps/build'
+    import testEnvPrepare from '../components/common/progressSteps/test-env-prepare'
     import test from '../components/common/progressSteps/test'
     import commit from '../components/common/progressSteps/commit'
     import approve from '../components/common/progressSteps/approve'
     import begin from '../components/common/progressSteps/begin'
     import end from '../components/common/progressSteps/end'
-    import deploy from '../components/common/progressSteps/deploy'
+    import online from '../components/common/progressSteps/online'
 
     export default {
         components: {
-            build,
+            testEnvPrepare,
             test,
             commit,
             approve,
             begin,
             end,
-            deploy
+            online
         },
 
         filters: {
@@ -253,12 +253,12 @@
                 const serviceId = params.serviceId || ''
                 const iconMap = {
                     begin: 'order-shape',
-                    build: 'execute',
+                    testEnvPrepare: 'execute',
                     test: 'script-files',
                     commit: 'edit2',
                     approve: 'panel-permission',
                     end: 'check-1',
-                    deploy: 'panels'
+                    online: 'panels'
                 }
 
                 return this.requestServiceProcess(serviceId).then((res) => {
