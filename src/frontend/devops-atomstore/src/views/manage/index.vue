@@ -187,7 +187,12 @@
             },
 
             goToStore () {
-                this.$router.push({ name: 'atomHome' })
+                this.$router.push({
+                    name: 'atomHome',
+                    query: {
+                        pipeType: this.type
+                    }
+                })
             }
         }
     }
