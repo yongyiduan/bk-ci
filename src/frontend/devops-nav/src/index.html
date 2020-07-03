@@ -441,14 +441,16 @@
             init(...response)
         }).catch(function (e) {
             console.log(e)
-            printError(e.status, e.message)
+            printError(e.status)
         })  
         
 
-        function printError (status, msg) {
+        function printError (status) {
+            const locale = getCookie('blueking_language')
+            const msg = locale === 'en' ? 'Oops! Looks like something went wrong' : '后端服务异常，请稍后重试'
             document.writeln(
                 '<div style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column;">' 
-                + '<img src="/console/static/' + status + '.png" />'
+                + '<img src="/console/static/' + (status || 503) + '.png" />'
                 + '<p style="font-size: 20px; color: #979797; margin: 32px 0;">' + msg + '</p>'
                 + '</div>'
             )
