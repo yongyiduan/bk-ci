@@ -18,7 +18,8 @@
  */
 
 import Vue from 'vue'
-import { SET_STAGE_TAG_LIST,
+import {
+    SET_STAGE_TAG_LIST,
     SET_PIPELINE_STAGE,
     SET_PIPELINE_CONTAINER,
     SET_TEMPLATE,
@@ -78,7 +79,7 @@ export default {
     [SET_AUTH_EDITING]: (state, editing) => {
         return Object.assign(state, {
             authSettingEditing: editing
-        }
+        })
     },
     [TOGGLE_STAGE_REVIEW_PANEL]: (state, { isShow, editingElementPos = null }) => {
         Object.assign(state, {

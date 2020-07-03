@@ -38,7 +38,6 @@
     import { mapActions } from 'vuex'
     import Accordion from '@/components/atomFormField/Accordion'
     import KeyValueNormal from '@/components/atomFormField/KeyValueNormal'
-    import StaffInput from '@/components/atomFormField/StaffInput'
     import FormField from '@/components/AtomPropertyPanel/FormField'
 
     export default {
@@ -46,7 +45,6 @@
         components: {
             Accordion,
             KeyValueNormal,
-            StaffInput,
             FormField
         },
         props: {
