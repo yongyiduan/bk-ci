@@ -436,7 +436,7 @@ export const actions = {
             return (response.data && response.data.globalVarList) || []
         })
     },
-    reviewExcudeAtom: async ({ commit }, { projectId, pipelineId, buildId, elementId, action }) => {
+    reviewExcuteAtom: async ({ commit }, { projectId, pipelineId, buildId, elementId, action }) => {
         return request.post(`/${PROCESS_API_URL_PREFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/${elementId}/qualityGateReview/${action}`).then(response => {
             return response.data
         })

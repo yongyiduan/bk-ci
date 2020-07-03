@@ -98,6 +98,7 @@
         .bk-form-content {
             margin-top: 42px;
         }
+
         .atom-checkbox {
             padding-right: 0;
             padding-left: 8px;

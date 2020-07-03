@@ -6,10 +6,6 @@ import compilePath from '../utils/pathExp'
 import request from '../utils/request'
 import * as cookie from 'js-cookie'
 
-// 404
-// const None = () => import('../views/None.vue')
-// const App = () => import('../views/App.vue')
-
 // 首页 - index
 const Index = () => import('../views/Index.vue')
 

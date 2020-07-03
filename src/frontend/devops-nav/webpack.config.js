@@ -16,7 +16,6 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 /*
  * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
  *
@@ -35,7 +34,6 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const AssetPlugin = require('../webpackPlugin/assets-webpack-plugin')
 const ReplacePlugin = require('../webpackPlugin/replace-webpack-plugin')
@@ -46,14 +44,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const path = require('path')
 const webpackBaseConfig = require('../webpack.base')
 const webpack = require('webpack')
-
 module.exports = (env = {}, argv) => {
     const isDev = argv.mode === 'development'
     const urlPrefix = env && env.name ? env.name : ''
     const envDist = env && env.dist ? env.dist : 'frontend'
     const lsVersion = env && env.lsVersion ? env.lsVersion : 'dev' // 最后一个命令行参数为localStorage版本
     const dist = path.join(__dirname, `../${envDist}/console`)
-
     const config = webpackBaseConfig({
         env,
         argv,
@@ -85,8 +81,9 @@ module.exports = (env = {}, argv) => {
     config.plugins = [
         ...config.plugins,
         new ForkTsCheckerWebpackPlugin({
-            eslint: true,
-            vue: true
+            eslint: {
+                files: './src/**/*.{ts,tsx,vue,js,jsx}'
+            }
         }),
         new HtmlWebpackPlugin({
             template: './src/index.html',
