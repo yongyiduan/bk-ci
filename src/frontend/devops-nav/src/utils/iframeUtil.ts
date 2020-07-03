@@ -82,8 +82,8 @@ function iframeUtil (router: any) {
         eventBus.$showAskPermissionDialog(params)
     }
 
-    utilMap.toggleLoginDialog = function (isShow) {
-        eventBus.$emit('toggle-login-dialog', isShow)
+    utilMap.toggleLoginDialog = function () {
+        location.href = window.getLoginUrl()
     }
 
     utilMap.popProjectDialog = function (project: Project): void {

@@ -57,7 +57,6 @@
             </main>
         </template>
 
-        <login-dialog v-if="showLoginDialog" />
         <ask-permission-dialog />
         <extension-aside-panel />
         <extension-dialog />
@@ -70,7 +69,6 @@
     import AskPermissionDialog from '../components/AskPermissionDialog/AskPermissionDialog.vue'
     import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
     import ExtensionDialog from '../components/ExtensionDialog/index.vue'
-    import LoginDialog from '../components/LoginDialog/index.vue'
     import { Component } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
     import eventBus from '../utils/eventBus'
@@ -84,7 +82,6 @@
     @Component({
         components: {
             Header,
-            LoginDialog,
             AskPermissionDialog,
             ExtensionAsidePanel,
             ExtensionDialog
@@ -100,8 +97,6 @@
         @Getter disableProjectList
         @Getter approvalingProjectList
         @Action fetchServiceHooks
-
-        showLoginDialog: boolean = false
 
         get loadingOption (): object {
             return {
@@ -135,10 +130,6 @@
         }
 
         created () {
-            eventBus.$on('toggle-login-dialog', (isShow) => {
-                this.showLoginDialog = isShow
-            })
-
             eventBus.$on('update-project-id', projectId => {
                 this.$router.replace({
                     params: {
