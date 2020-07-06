@@ -1,21 +1,16 @@
 <template>
     <article class="manage-detail">
         <header class="manage-detail-header">
-            <router-link :to="showEdit ? { name: 'edit' } : ''"
-                :class="{ disable: !showEdit }"
-                :title="!showEdit && $t('store.只有处于审核驳回、已发布、上架中止和已下架的状态才允许修改基本信息')"
+            <router-link :to="detail.editFlag ? { name: 'edit' } : ''"
+                :class="{ disable: !detail.editFlag }"
+                :title="!detail.editFlag && $t('store.只有处于审核驳回、已发布、上架中止和已下架的状态才允许修改基本信息')"
             >{{ $t('store.编辑') }}</router-link>
         </header>
 
-        <main v-bkloading="{ isLoading }" class="detail-main">
+        <main class="detail-main">
             <component :is="`${$route.params.type}Show`"
-                v-if="!isLoading"
                 class="detail-show"
                 :detail="detail"
-                :version-list="versionList"
-                :pagination="pagination"
-                @pageChanged="pageChanged"
-                @pageLimitChanged="pageLimitChanged"
             ></component>
         </main>
     </article>
@@ -32,19 +27,6 @@
             atomShow,
             imageShow,
             serviceShow
-        },
-
-        data () {
-            return {
-                showEdit: false,
-                isLoading: true,
-                versionList: [],
-                pagination: {
-                    current: 1,
-                    count: 1,
-                    limit: 10
-                }
-            }
         },
 
         computed: {
@@ -213,24 +195,6 @@
                     border-left: 2px solid #1592ff;
                     border-bottom: 2px solid #1592ff;
                 }
-            }
-        }
-        /deep/ .show-version {
-            margin-top: 40px;
-            .version-label {
-                color: #999;
-                display: flex;
-                align-items: center;
-                &::after {
-                    content: '';
-                    height: 1px;
-                    background: #ebedf0;
-                    margin-left: 16px;
-                    flex: 1;
-                }
-            }
-            .version-button {
-                margin: 25px 0;
             }
         }
     }

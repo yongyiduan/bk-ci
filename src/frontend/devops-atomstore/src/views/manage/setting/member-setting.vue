@@ -8,7 +8,27 @@
         <section v-bkloading="{ isLoading }" class="g-scroll-table">
             <bk-table :data="memberList" :outer-border="false" :header-border="false" :header-cell-style="{ background: '#fff' }" v-if="!isLoading">
                 <bk-table-column :label="$t('store.成员')" prop="userName"></bk-table-column>
-                <bk-table-column :label="$t('store.调试项目')" prop="projectName"></bk-table-column>
+                <bk-table-column :label="$t('store.调试项目')">
+                    <template slot-scope="props">
+                        <section class="member-project">
+                            <template v-if="props.row.editing">
+                                <bk-select :disabled="false" v-model="props.row.projectCode" :loading="isLoadingProject" searchable style="width: 250px">
+                                    <bk-option v-for="option in projectList"
+                                        :key="option.projectCode"
+                                        :id="option.projectCode"
+                                        :name="option.projectName">
+                                    </bk-option>
+                                </bk-select>
+                                <i class="bk-icon icon-check-1" @click="saveChangeProject(props.row)"></i>
+                                <i class="bk-icon icon-close" @click="props.row.editing = false"></i>
+                            </template>
+                            <template v-else>
+                                <span>{{ props.row.projectName }}</span>
+                                <i class="bk-icon icon-edit2" @click="startEditProject(props.row)"></i>
+                            </template>
+                        </section>
+                    </template>
+                </bk-table-column>
                 <bk-table-column :label="$t('store.角色')" width="160" prop="type" :formatter="typeFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.描述')" prop="type" :formatter="desFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.操作')" width="120" class-name="handler-btn">
@@ -67,6 +87,7 @@
 <script>
     import { mapGetters } from 'vuex'
     import labelList from '@/components/labelList.vue'
+    import api from '@/api'
 
     export default {
         components: {
@@ -120,7 +141,8 @@
                     loading: false,
                     user: '',
                     id: ''
-                }
+                },
+                projectList: []
             }
         },
 
@@ -132,6 +154,25 @@
 
             isEnterprise () {
                 return VERSION_TYPE === 'ee'
+            },
+
+            storeType () {
+                const typeMap = {
+                    atom: 'ATOM',
+                    image: 'IMAGE'
+                }
+                const type = this.$route.params.type
+                return typeMap[type]
+            },
+
+            storeCode () {
+                const keyMap = {
+                    atom: 'atomCode',
+                    image: 'imageCode'
+                }
+                const type = this.$route.params.type
+                const key = keyMap[type]
+                return this.detail[key]
             }
         },
 
@@ -140,6 +181,30 @@
         },
 
         methods: {
+            saveChangeProject (row) {
+                this.isLoading = true
+                const data = {
+                    projectCode: row.projectCode,
+                    storeCode: this.storeCode,
+                    storeType: this.storeType
+                }
+                api.requestChangeProject(data).then(() => {
+                    return this.initData()
+                }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            startEditProject (row) {
+                row.editing = true
+                row.isLoadingProject = true
+                this.$store.dispatch('store/requestProjectList').then((res) => {
+                    this.projectList = res || []
+                }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
+                    row.isLoadingProject = false
+                })
+            },
+
             requireRule (name) {
                 return {
                     required: true,
@@ -172,18 +237,14 @@
             saveMember () {
                 this.$refs.addForm.validate().then(() => {
                     this.isSaving = true
-                    const params = {
+                    const postData = {
                         type: this.addMemberObj.form.type,
-                        member: this.addMemberObj.form.list
+                        member: this.addMemberObj.form.list,
+                        storeCode: this.storeCode,
+                        storeType: this.storeType
                     }
                     if (this.isEnterprise) params.member.push(this.addMemberObj.form.memberName)
-                    const saveMethodMap = {
-                        atom: () => this.$store.dispatch('store/addAtomMember', { params: Object.assign(params, { storeCode: this.detail.atomCode }) }),
-                        image: () => this.$store.dispatch('store/requestAddImageMem', Object.assign(params, { storeCode: this.detail.imageCode })),
-                        service: () => this.$store.dispatch('store/requestAddServiceMem', Object.assign(params, { storeCode: this.detail.serviceCode }))
-                    }
-                    const type = this.$route.params.type
-                    saveMethodMap[type]().then(() => {
+                    api.requestAddMember(postData).then(() => {
                         this.closeAddMember()
                         this.initData()
                     }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
@@ -213,15 +274,17 @@
 
             initData () {
                 this.isLoading = true
-                const methodMap = {
-                    atom: () => this.$store.dispatch('store/requestMemberList', { atomCode: this.detail.atomCode }),
-                    image: () => this.$store.dispatch('store/requestImageMemList', this.detail.imageCode),
-                    service: () => this.$store.dispatch('store/requestServiceMemList', this.detail.serviceCode)
+                const data = {
+                    storeCode: this.storeCode,
+                    storeType: this.storeType
                 }
-                const type = this.$route.params.type
-                methodMap[type]().then((res) => {
+                api.getMemberList(data).then((res) => {
                     this.memberCount = res.length
-                    this.memberList = res || []
+                    this.memberList = (res || []).map(x => {
+                        x.editing = false
+                        x.isLoadingProject = false
+                        return x
+                    })
                 }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
                     this.isLoading = false
                 })
@@ -235,18 +298,15 @@
             },
 
             requestDeleteMember () {
-                const id = this.deleteObj.id
-                const methodMap = {
-                    atom: () => this.$store.dispatch('store/requestDeleteMember', { atomCode: this.detail.atomCode, id }),
-                    image: () => this.$store.dispatch('store/requestDeleteImageMem', { imageCode: this.detail.imageCode, id }),
-                    service: () => this.$store.dispatch('store/requestDeleteServiceMem', { serviceCode: this.detail.serviceCode, id })
-                }
-
-                const type = this.$route.params.type
                 this.deleteObj.loading = true
-                methodMap[type]().then(() => {
+                const data = {
+                    id: this.deleteObj.id,
+                    storeCode: this.storeCode,
+                    storeType: this.storeType
+                }
+                api.requestDeleteMember(data).then(() => {
                     this.memberCount--
-                    const index = this.memberList.findIndex(x => x.id === id)
+                    const index = this.memberList.findIndex(x => x.id === this.deleteObj.id)
                     this.memberList.splice(index, 1)
                 }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
                     this.deleteObj.loading = false
@@ -282,6 +342,19 @@
             padding: 32px;
             /deep/ .bk-form-radio:not(:last-child) {
                 margin-right: 32px;
+            }
+        }
+        .member-project {
+            display: flex;
+            align-items: center;
+            .bk-icon {
+                font-size: 24px;
+                cursor: pointer;
+            }
+        }
+        .g-scroll-table {
+            /deep/ .bk-table .bk-table-body-wrapper {
+                height: calc(100% - 43px);
             }
         }
     }
