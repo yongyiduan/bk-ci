@@ -159,7 +159,8 @@
             storeType () {
                 const typeMap = {
                     atom: 'ATOM',
-                    image: 'IMAGE'
+                    image: 'IMAGE',
+                    service: 'SERVICE'
                 }
                 const type = this.$route.params.type
                 return typeMap[type]
@@ -168,7 +169,8 @@
             storeCode () {
                 const keyMap = {
                     atom: 'atomCode',
-                    image: 'imageCode'
+                    image: 'imageCode',
+                    service: 'serviceCode'
                 }
                 const type = this.$route.params.type
                 const key = keyMap[type]
@@ -243,7 +245,7 @@
                         storeCode: this.storeCode,
                         storeType: this.storeType
                     }
-                    if (this.isEnterprise) params.member.push(this.addMemberObj.form.memberName)
+                    if (this.isEnterprise) postData.member.push(this.addMemberObj.form.memberName)
                     api.requestAddMember(postData).then(() => {
                         this.closeAddMember()
                         this.initData()
