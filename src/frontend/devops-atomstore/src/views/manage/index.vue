@@ -23,6 +23,7 @@
 </template>
 
 <script>
+    import api from '@/api'
     import { mapGetters } from 'vuex'
     import transitionTab from '@/components/transition-tab.vue'
 
@@ -65,8 +66,8 @@
                 panelMap: {
                     atom: [
                         { label: this.$t('store.概览'), name: 'overView' },
-                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
                         { label: this.$t('store.发布管理'), name: 'release', children: [{ label: this.$t('store.版本管理'), name: 'version' }], showChildTab: true },
+                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
                         { label: this.$t('store.审批'), name: 'approval' },
                         { label: this.$t('store.设置'),
                           name: 'setting',
@@ -78,8 +79,8 @@
                           showChildTab: true }
                     ],
                     image: [
-                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
                         { label: this.$t('store.发布管理'), name: 'release', children: [{ label: this.$t('store.版本管理'), name: 'version' }], showChildTab: true },
+                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
                         { label: this.$t('store.设置'),
                           name: 'setting',
                           children: [
@@ -98,7 +99,6 @@
                     ],
                     service: [
                         { label: this.$t('store.概览'), name: 'overView' },
-                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
                         { label: this.$t('store.发布管理'),
                           name: 'release',
                           children: [
@@ -106,6 +106,7 @@
                               { label: this.$t('store.环境管理'), name: 'environment' }
                           ],
                           showChildTab: true },
+                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
                         { label: this.$t('store.设置'),
                           name: 'setting',
                           children: [
@@ -121,7 +122,17 @@
         computed: {
             ...mapGetters('store', {
                 'detail': 'getDetail'
-            })
+            }),
+
+            storeType () {
+                const storeTypeMap = {
+                    atom: 'ATOM',
+                    template: 'TEMPLATE',
+                    image: 'IMAGE',
+                    service: 'SERVICE'
+                }
+                return storeTypeMap[this.type]
+            }
         },
 
         created () {
@@ -170,16 +181,11 @@
             },
 
             getMemInfo () {
-                const code = this.$route.params.code
-                const methodGenerator = {
-                    atom: () => this.$store.dispatch('store/getMemberInfo', code),
-                    template: () => Promise.resolve({ type: 'ADMIN' }),
-                    image: () => this.$store.dispatch('store/requestGetImageMemInfo', code),
-                    service: () => this.$store.dispatch('store/requestGetServiceMemInfo', code)
+                const data = {
+                    storeCode: this.$route.params.code,
+                    storeType: this.storeType
                 }
-                const currentMethod = methodGenerator[this.type]
-
-                return currentMethod().then((res = {}) => {
+                return api.getMemberView(data).then((res = {}) => {
                     const userInfo = {
                         isProjectAdmin: res.type === 'ADMIN',
                         userName: res.userName
