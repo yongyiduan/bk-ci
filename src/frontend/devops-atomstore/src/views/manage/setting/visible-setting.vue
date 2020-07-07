@@ -230,7 +230,7 @@
             /deep/.bk-table {
                 height: 100%;
                 .bk-table-body-wrapper {
-                    height: calc(100% - 43px);
+                    max-height: calc(100% - 43px);
                     overflow-y: auto;
                 }
             }

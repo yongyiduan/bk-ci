@@ -9,12 +9,15 @@
                     :name="option.name">
                 </bk-option>
             </bk-select>
-            <bk-input class="head-item"
-                v-model="envName"
-                right-icon="bk-icon icon-search"
-                :clearable="true"
-                :placeholder="$t('store.请输入名称，按回车搜索')"
-            ></bk-input>
+            <section :class="[{ error: searchError }, 'head-item']">
+                <bk-input class="head-input"
+                    v-model="envName"
+                    right-icon="bk-icon icon-search"
+                    :clearable="true"
+                    :placeholder="$t('store.请输入名称，按回车搜索')"
+                ></bk-input>
+                <span class="err-info">{{ $t('store.以大写字母开头，包含大写字母、下划线或数字') }}</span>
+            </section>
         </header>
 
         <main v-bkloading="{ isLoading }" class="g-scroll-table">
@@ -114,6 +117,7 @@
                 envList: [],
                 isLoading: false,
                 isSaving: false,
+                searchError: false,
                 scopesList: [
                     { id: 'ALL', name: this.$t('store.所有') },
                     { id: 'TEST', name: this.$t('store.测试') },
@@ -134,7 +138,7 @@
                     }
                 },
                 nameRule: {
-                    validator: (val) => (/^[A-Z][A-Za-z0-9_]*$/.test(val)),
+                    validator: (val) => (/^[A-Z][A-Z0-9_]*$/.test(val)),
                     message: this.$t('store.以大写字母开头，包含大写字母、下划线或数字'),
                     trigger: 'blur'
                 },
@@ -281,6 +285,12 @@
             },
 
             getAllEnvList () {
+                this.searchError = this.envName && !/^[A-Z][A-Z0-9_]*$/.test(this.envName)
+                if (this.searchError) {
+                    this.envList = []
+                    return
+                }
+
                 this.isLoading = true
                 api.getAllEnv(this.postData).then((res) => {
                     this.envList = res || []
@@ -321,6 +331,24 @@
             .head-item {
                 width: 220px;
                 margin-left: 16px;
+                position: relative;
+                &.error {
+                    /deep/ .bk-input-text input {
+                        border-color: #ff5656;
+                    }
+                    .err-info {
+                        display: inline-block;
+                    }
+                }
+                .err-info {
+                    display: none;
+                    position: absolute;
+                    left: 0;
+                    top: 34px;
+                    width: 300px;
+                    font-size: 12px;
+                    color: #ea3636;
+                }
             }
         }
         .add-env {
