@@ -117,7 +117,7 @@
                     <devcloud-option
                         :disabled="!editable"
                         :value="container.dispatchType.performanceConfigId"
-                        :handle-change="changeBuildResource"
+                        :handle-change="changeBuildResourceWithoutEnv"
                         :change-show-performance="changeShowPerformance"
                     >
                     </devcloud-option>
@@ -596,6 +596,13 @@
                     [name]: value
                 }, emptyValueObj))
                 this.handleContainerChange('buildEnv', {}) // 清空依赖编译环境
+            },
+
+            changeBuildResourceWithoutEnv (name, value) {
+                this.handleContainerChange('dispatchType', Object.assign({
+                    ...this.container.dispatchType,
+                    [name]: value
+                }))
             },
             handleContainerChange (name, value) {
                 this.updateContainer({
