@@ -9,15 +9,12 @@
         </header>
 
         <transition-tab :panels="panels"
-            :transition-name.sync="transitionName"
             @tab-change="tabChange"
             @child-tab-change="childTabChange"
         ></transition-tab>
 
         <main v-bkloading="{ isLoading }" class="g-store-body">
-            <transition :name="transitionName">
-                <router-view v-if="Object.keys(detail).length > 0 && !isLoading" class="g-store-route" v-bind="routekey"></router-view>
-            </transition>
+            <router-view v-if="Object.keys(detail).length > 0 && !isLoading" class="g-store-route" v-bind="routekey"></router-view>
         </main>
     </article>
 </template>
@@ -61,15 +58,14 @@
                 panels: [],
                 isLoading: true,
                 type: '',
-                transitionName: '',
                 routekey: {},
                 panelMap: {
                     atom: [
                         { label: this.$t('store.概览'), name: 'overView' },
                         { label: this.$t('store.发布管理'), name: 'release', children: [{ label: this.$t('store.版本管理'), name: 'version' }], showChildTab: true },
-                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
-                        { label: this.$t('store.审批'), name: 'approval' },
-                        { label: this.$t('store.设置'),
+                        { label: this.$t('store.协作审批'), name: 'approval' },
+                        { label: this.$t('store.基本信息'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
+                        { label: this.$t('store.基本设置'),
                           name: 'setting',
                           children: [
                               { label: this.$t('store.成员管理'), name: 'member' },
@@ -80,8 +76,8 @@
                     ],
                     image: [
                         { label: this.$t('store.发布管理'), name: 'release', children: [{ label: this.$t('store.版本管理'), name: 'version' }], showChildTab: true },
-                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
-                        { label: this.$t('store.设置'),
+                        { label: this.$t('store.基本信息'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
+                        { label: this.$t('store.基本设置'),
                           name: 'setting',
                           children: [
                               { label: this.$t('store.成员管理'), name: 'member' },
@@ -90,7 +86,7 @@
                           showChildTab: true }
                     ],
                     template: [
-                        { label: this.$t('store.设置'),
+                        { label: this.$t('store.基本设置'),
                           name: 'setting',
                           children: [
                               { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' }
