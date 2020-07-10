@@ -102,8 +102,8 @@
                               { label: this.$t('store.环境管理'), name: 'environment' }
                           ],
                           showChildTab: true },
-                        { label: this.$t('store.详情'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
-                        { label: this.$t('store.设置'),
+                        { label: this.$t('store.基本信息'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
+                        { label: this.$t('store.基本设置'),
                           name: 'setting',
                           children: [
                               { label: this.$t('store.成员管理'), name: 'member' },

@@ -1,7 +1,7 @@
 <template>
     <article class="manage-environment">
         <header class="environment-head">
-            <bk-button theme="primary" @click="addEnvObj.show = true">{{ $t('store.新增环境变量') }}</bk-button>
+            <bk-button theme="primary" @click="addEnv">{{ $t('store.新增环境变量') }}</bk-button>
             <bk-select v-model="envScope" class="head-item" :clearable="false">
                 <bk-option v-for="option in scopesList"
                     :key="option.id"
@@ -32,8 +32,9 @@
                 <bk-table-column :label="$t('store.备注')" prop="varDesc"></bk-table-column>
                 <bk-table-column :label="$t('store.生效范围')" prop="scope" :formatter="convertScope"></bk-table-column>
                 <bk-table-column :label="$t('store.是否加密')" prop="encryptFlag" :formatter="convertEncryptFlag"></bk-table-column>
-                <bk-table-column :label="$t('store.操作')" width="180" class-name="handler-btn">
+                <bk-table-column :label="$t('store.操作')" width="220" class-name="handler-btn">
                     <template slot-scope="props">
+                        <span class="environment-btn" @click="editEnv(props.row)"> {{ $t('store.编辑') }} </span>
                         <span class="environment-btn" @click="deleteEnv(props.row)"> {{ $t('store.删除') }} </span>
                         <span class="environment-btn" @click="showHistory(props.row)"> {{ $t('store.变更历史') }} </span>
                     </template>
@@ -41,7 +42,7 @@
             </bk-table>
         </main>
 
-        <bk-sideslider :is-show.sync="addEnvObj.show" :quick-close="true" :title="$t('store.新增环境变量')" :width="640" @hidden="closeAddEnv">
+        <bk-sideslider :is-show.sync="addEnvObj.show" :quick-close="true" :title="addEnvObj.title" :width="640" @hidden="closeAddEnv">
             <bk-form :label-width="100" :model="addEnvObj.form" slot="content" class="add-env" ref="envForm">
                 <bk-form-item :label="$t('store.变量名')" :required="true" :rules="[requireRule($t('store.变量名')), numMax(20), nameRule]" property="varName" error-display-type="normal">
                     <bk-input v-model="addEnvObj.form.varName" :placeholder="$t('store.以大写字母开头，包含大写字母、下划线或数字')"></bk-input>
@@ -201,6 +202,29 @@
         },
 
         methods: {
+            editEnv (form) {
+                form = JSON.parse(JSON.stringify(form))
+                Object.assign(this.addEnvObj, {
+                    show: true,
+                    title: this.$t('store.修改环境变量'),
+                    form
+                })
+            },
+
+            addEnv () {
+                Object.assign(this.addEnvObj, {
+                    show: true,
+                    title: this.$t('store.新增环境变量'),
+                    form: {
+                        varName: '',
+                        varValue: '',
+                        scope: 'ALL',
+                        varDesc: '',
+                        encryptFlag: false
+                    }
+                })
+            },
+
             deleteEnv (row) {
                 this.deleteObj.show = true
                 this.deleteObj.name = row.varName
