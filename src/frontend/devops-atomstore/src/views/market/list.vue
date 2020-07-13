@@ -99,6 +99,7 @@
                     score,
                     page: this.page,
                     pageSize: this.pageSize,
+                    keyword: searchStr,
                     ...featureObj
                 }
                 if (classifyValue !== 'all') postData[classifyKey] = classifyValue
