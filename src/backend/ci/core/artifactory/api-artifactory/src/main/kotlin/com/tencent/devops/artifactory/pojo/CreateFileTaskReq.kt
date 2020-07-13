@@ -24,31 +24,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.web.handler
+package com.tencent.devops.artifactory.pojo
 
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.service.Profile
-import com.tencent.devops.common.service.utils.SpringContextUtil
-import org.slf4j.LoggerFactory
-import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
-import javax.ws.rs.ext.ExceptionMapper
+import com.tencent.devops.artifactory.pojo.enums.FileTypeEnum
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-class JsonMappingExceptionMapper : ExceptionMapper<JsonMappingException> {
-    companion object {
-        val logger = LoggerFactory.getLogger(IllegalArgumentExceptionMapper::class.java)!!
-    }
-
-    override fun toResponse(exception: JsonMappingException): Response {
-        logger.warn("Failed with json mapping exception", exception)
-        val status = Response.Status.BAD_REQUEST
-        val message = if (SpringContextUtil.getBean(Profile::class.java).isDebug()) {
-            exception.message
-        } else {
-            "查询参数请求错误"
-        }
-        return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE)
-            .entity(Result<Void>(status.statusCode, message)).build()
-    }
-}
+@ApiModel("创建文件托管任务请求")
+data class CreateFileTaskReq(
+    @ApiModelProperty("文件类型", required = true)
+    val fileType: FileTypeEnum,
+    @ApiModelProperty("文件路径", required = true)
+    val path: String
+)

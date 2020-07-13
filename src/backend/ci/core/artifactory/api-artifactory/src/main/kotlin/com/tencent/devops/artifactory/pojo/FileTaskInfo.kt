@@ -24,31 +24,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.web.handler
+package com.tencent.devops.artifactory.pojo
 
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.service.Profile
-import com.tencent.devops.common.service.utils.SpringContextUtil
-import org.slf4j.LoggerFactory
-import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
-import javax.ws.rs.ext.ExceptionMapper
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-class JsonMappingExceptionMapper : ExceptionMapper<JsonMappingException> {
-    companion object {
-        val logger = LoggerFactory.getLogger(IllegalArgumentExceptionMapper::class.java)!!
-    }
-
-    override fun toResponse(exception: JsonMappingException): Response {
-        logger.warn("Failed with json mapping exception", exception)
-        val status = Response.Status.BAD_REQUEST
-        val message = if (SpringContextUtil.getBean(Profile::class.java).isDebug()) {
-            exception.message
-        } else {
-            "查询参数请求错误"
-        }
-        return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE)
-            .entity(Result<Void>(status.statusCode, message)).build()
-    }
-}
+@ApiModel("版本仓库-文件托管任务信息")
+data class FileTaskInfo(
+    @ApiModelProperty("任务Id", required = true)
+    val id: String,
+    @ApiModelProperty("任务状态", required = true)
+    val status: Short,
+    @ApiModelProperty("文件所在机器IP", required = true)
+    val ip: String,
+    @ApiModelProperty("文件绝对路径", required = true)
+    val path: String
+)
