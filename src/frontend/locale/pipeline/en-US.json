@@ -430,7 +430,8 @@
         "fileUnit": "{0} files",
         "completedLog": "full-log",
         "artifactList": "Artifacts",
-        "showAll": "Show all"
+        "showAll": "Show all",
+        "errorCode": "Error Code"
     },
     "preview": {
         "introVersion": "Recommended version",
