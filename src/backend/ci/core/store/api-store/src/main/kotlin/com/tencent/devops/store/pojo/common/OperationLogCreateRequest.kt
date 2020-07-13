@@ -24,30 +24,21 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.notify.utils
+package com.tencent.devops.store.pojo.common
 
-object DateTimeUtil {
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-    fun formatMillSecond(mss: Long): String {
-        if (mss == 0L) return "0秒"
-
-        val days = mss / (1000 * 60 * 60 * 24)
-        val hours = mss % (1000 * 60 * 60 * 24) / (1000 * 60 * 60)
-        val minutes = mss % (1000 * 60 * 60) / (1000 * 60)
-        val seconds = mss % (1000 * 60) / 1000
-        val sb = StringBuilder()
-        if (days != 0L) {
-            sb.append(days.toString() + "天")
-        }
-        if (hours != 0L) {
-            sb.append(hours.toString() + "时")
-        }
-        if (minutes != 0L) {
-            sb.append(minutes.toString() + "分")
-        }
-        if (seconds != 0L) {
-            sb.append(seconds.toString() + "秒")
-        }
-        return sb.toString()
-    }
-}
+@ApiModel("新增操作日志")
+data class OperationLogCreateRequest(
+    @ApiModelProperty("store组件代码", required = true)
+    val storeCode: String,
+    @ApiModelProperty("store组件类型", required = true)
+    val storeType: Byte,
+    @ApiModelProperty("操作类型", required = true)
+    val optType: String,
+    @ApiModelProperty("操作用户", required = true)
+    val optUser: String,
+    @ApiModelProperty("操作内容", required = true)
+    val optDesc: String
+)
