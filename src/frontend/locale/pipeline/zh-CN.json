@@ -13,6 +13,8 @@
     "true": "是",
     "false": "否",
     "cancel": "取消",
+    "userError": "用户问题",
+    "systemError": "系统问题",
     "create": "创建",
     "add": "新建",
     "copy": "复制",

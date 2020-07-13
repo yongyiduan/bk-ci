@@ -13,6 +13,8 @@
     "true": "True",
     "false": "False",
     "cancel": "Cancel",
+    "userError": "USER",
+    "systemError": "SYSTEM",
     "create": "New",
     "add": "Add",
     "copy": "Duplicate",
