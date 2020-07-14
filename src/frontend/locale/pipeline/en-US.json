@@ -13,8 +13,8 @@
     "true": "True",
     "false": "False",
     "cancel": "Cancel",
-    "userError": "USER",
-    "systemError": "SYSTEM",
+    "userError": "USER",
+    "systemError": "SYSTEM",
     "create": "New",
     "add": "Add",
     "copy": "Duplicate",
@@ -30,7 +30,7 @@
     "resume": "Continue",
     "uninstall": "Uninstall",
     "collect": "Star",
-    "exec": "Run", 
+    "exec": "Run",
     "uncollect": "Unstar",
     "operate": "Operation",
     "name": "Name",
@@ -114,7 +114,7 @@
         "hours": "h ",
         "minutes": "m ",
         "seconds": "s ",
-        "ago" : "Ago"
+        "ago": "Ago"
     },
     "atomDebug": {
         "title": "Task.json online debugger",
@@ -230,7 +230,7 @@
         "pipelineLinkDesc": "When selected, url of the pipeline build detail will be added to the end of notification that is sent through Wechat Work, Wechat or SMS",
         "enableGroup": "Enable group notification on Wechat Work",
         "groupIdTips": "Please enter the ID of the group. If there are multiple groups, please separate IDs with semicolons",
-        "groupIdDesc": "Capable of sending notifications to groups on Wechat Work. To obtain group IDs, please invite 'CI-Notice' into your groups, @ 'CI-Notice' with keyword '会话ID' and send this message.", 
+        "groupIdDesc": "Capable of sending notifications to groups on Wechat Work. To obtain group IDs, please invite 'CI-Notice' into your groups, @ 'CI-Notice' with keyword '会话ID' and send this message.",
         "wechatGroupMarkdownFlag": "Show group message with Markdown format",
         "buildSuc": "Build successfully",
         "buildFail": "Build failed",
@@ -418,12 +418,12 @@
         "branch": "Branchs",
         "date": "Date",
         "tableMap": {
-            "queueTime": "Queued time", 
-            "startTime": "Start time", 
-            "endTime": "End time", 
-            "totalTime": "Duration", 
-            "appVersions": "APP version", 
-            "recommendVersion": "Recommended version", 
+            "queueTime": "Queued time",
+            "startTime": "Start time",
+            "endTime": "End time",
+            "totalTime": "Duration",
+            "appVersions": "APP version",
+            "recommendVersion": "Recommended version",
             "pipelineVersion": "Pipeline version",
             "entry": "Express entry"
         },
@@ -523,7 +523,6 @@
             "canSet": " Support using quality redlines to set quality requirement for this plugin so as to ensure the quality of this version",
             "settingNow": "Set now",
             "reflashSetting": " Click here to refresh"
-
         }
     },
     "editPage": {
@@ -710,7 +709,7 @@
             "fromRunningTips": " Go to the current debugging through the portal of pipeline at runtime and the container for debugging is the one used for the current build",
             "failTitle": " Failed in login to debug",
             "failDesc": " Illegal name for mirroring or other errors",
-            "stopTips": " You will leave this page after stop debugging sucessfully" ,
+            "stopTips": " You will leave this page after stop debugging sucessfully",
             "confirmStop": " Confirm stopping debugging",
             "abnormalParams": " Abnormal parameters",
             "consoleEnterTips": " Linux login portal of Linux to debug is through here"

@@ -13,8 +13,8 @@
     "true": "是",
     "false": "否",
     "cancel": "取消",
-    "userError": "用户问题",
-    "systemError": "系统问题",
+    "userError": "用户问题",
+    "systemError": "系统问题",
     "create": "创建",
     "add": "新建",
     "copy": "复制",
@@ -30,7 +30,7 @@
     "resume": "继续",
     "uninstall": "卸载",
     "collect": "收藏",
-    "exec": "执行", 
+    "exec": "执行",
     "uncollect": "取消收藏",
     "operate": "操作",
     "name": "名称",
@@ -114,7 +114,7 @@
         "hours": "小时",
         "minutes": "分",
         "seconds": "秒",
-        "ago" : "前"
+        "ago": "前"
     },
     "atomDebug": {
         "title": "task.json在线调试",
@@ -420,12 +420,12 @@
         "branch": "分支",
         "date": "日期",
         "tableMap": {
-            "queueTime": "排队于", 
-            "startTime": "开始于", 
-            "endTime": "完成于", 
-            "totalTime": "耗时", 
-            "appVersions": "APP版本", 
-            "recommendVersion": "推荐版本号", 
+            "queueTime": "排队于",
+            "startTime": "开始于",
+            "endTime": "完成于",
+            "totalTime": "耗时",
+            "appVersions": "APP版本",
+            "recommendVersion": "推荐版本号",
             "pipelineVersion": "编排版本号",
             "entry": "快捷入口"
         },
@@ -524,7 +524,6 @@
             "canSet": "该插件支持使用质量红线服务设置质量要求，保证版本质量。",
             "settingNow": "立即配置",
             "reflashSetting": "已配置点此刷新"
-
         }
     },
     "editPage": {
@@ -803,6 +802,6 @@
         "queuePlaceholder": "请填写1-10之间的整数",
         "noEnv": "无编译环境",
         "afterPreStageSuccess": "前一个Stage成功时运行",
-        "manualRunStage": "手动触发运行"       
+        "manualRunStage": "手动触发运行"
     }
 }
