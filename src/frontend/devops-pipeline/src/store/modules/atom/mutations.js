@@ -358,6 +358,6 @@ export default {
         state.storeAtomData.loading = data
     },
     [SET_STORE_SEARCH]: (state, str) => {
-        state.storeAtomData.atomName = str
+        state.storeAtomData.keyword = str
     }
 }

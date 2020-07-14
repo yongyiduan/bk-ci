@@ -104,15 +104,16 @@
                     score,
                     page: this.page,
                     pageSize: this.pageSize,
+                    keyword: searchStr,
                     ...featureObj
                 }
                 if (classifyValue !== 'all') postData[classifyKey] = classifyValue
 
                 const apiFun = {
-                    atom: () => this.getAtomList(postData, searchStr),
-                    template: () => this.getTemplateList(postData, searchStr),
+                    atom: () => this.$store.dispatch('store/requestMarketAtom', postData),
+                    template: () => this.$store.dispatch('store/requestMarketTemplate', postData),
+                    image: () => this.$store.dispatch('store/requestMarketImage', postData),
                     ide: () => this.getIDEList(postData, searchStr),
-                    image: () => this.getImageList(postData, searchStr),
                     service: () => this.getServiceList(postData, searchStr)
                 }
 
@@ -127,24 +128,9 @@
                 })
             },
 
-            getTemplateList (postData, searchStr) {
-                postData.templateName = searchStr
-                return this.$store.dispatch('store/requestMarketTemplate', postData)
-            },
-
-            getAtomList (postData, searchStr) {
-                postData.atomName = searchStr
-                return this.$store.dispatch('store/requestMarketAtom', postData)
-            },
-
             getIDEList (postData, searchStr) {
                 postData.atomName = searchStr
                 return this.$store.dispatch('store/requestMarketIDE', postData)
-            },
-
-            getImageList (postData, searchStr) {
-                postData.imageName = searchStr
-                return this.$store.dispatch('store/requestMarketImage', postData)
             },
 
             getServiceList (postData, searchStr) {
