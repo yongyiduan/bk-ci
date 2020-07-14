@@ -132,7 +132,10 @@
                 this.$refs.selectorList.scrollTop = 0
                 this.isEdit = true
 
-                const { value } = e.target
+                let { value } = e.target
+                if (value.endsWith(',') || value.endsWith(';')) {
+                    value = value.substr(0, value.length - 1)
+                }
                 this.config.onChange(this.name, value)
 
                 if (value.length) this.filterData(value)
@@ -196,11 +199,14 @@
              */
             hideAll (e) {
                 e.preventDefault()
-                this.handleValue(e.target.value)
+                this.handleValue(this.value)
             },
             handleValue (val) {
                 // 为了让blur方法异步执行，以便能够成功执行click方法
                 setTimeout(() => {
+                    if (val.endsWith(',') || val.endsWith(';')) {
+                        val = val.substr(0, val.length - 1)
+                    }
                     const errList = []
                     let temp = []
                     const value = val.trim()
@@ -327,10 +333,15 @@
                         }
                         break
                     // 确认
+                    case 186:
+                    case 188:
                     case 13:
                         this.isEdit = true
                         if (this.showList) {
                             this.selectList(this.list[this.focusList])
+                            if (key === 188 || key === 186) {
+                                return
+                            }
                             this.showList = false
                         } else {
                             this.handleValue(this.value)
