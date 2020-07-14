@@ -88,6 +88,16 @@
                         </bk-popover>
                     </div>
                 </template>
+                <template v-else-if="col.prop === 'errorCode'" v-slot="props">
+                    <div class="remark-cell">
+                        <div class="error">
+                            <i :title="$t('userError')" v-if="props.row.errorType === 'USER'" class="devops-icon icon-user "></i>
+                            <i :title="$t('systemError')" v-else-if="props.row.errorType === 'SYSTEM'" class="devops-icon icon-cog"></i>
+                            <span v-if="props.row.errorCode">{{ props.row.errorCode + ': ' + props.row. errorMsg }} </span>
+                            <span v-else>--</span>
+                        </div>
+                    </div>
+                </template>
                 <template v-else v-slot="props">
                     {{ props.row[col.prop] }}
                 </template>
