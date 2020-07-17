@@ -31,26 +31,26 @@
                 </bk-table-column>
                 <bk-table-column :label="$t('store.微扩展标识')" prop="serviceCode"></bk-table-column>
                 <bk-table-column :label="$t('store.调试项目')" prop="projectName"></bk-table-column>
-                <bk-table-column :label="$t('store.扩展点')" width="120">
+                <bk-table-column :label="$t('store.扩展点')">
                     <template slot-scope="props">
                         <span v-if="props.row.itemName.length <= 0">{{props.row.itemName.length}}</span>
                         <bk-popconfirm v-else trigger="click" ext-cls="custom-popconfirm" title="" confirm-text="" cancel-text="">
                             <div slot="content">
-                                <p v-for="(name, index) in props.row.itemName" :key="index">{{ name }}</p>
+                                <p v-for="(name, index) in props.row.itemName" :key="index" class="service-item">{{ name }}</p>
                             </div>
                             <span class="atom-name">{{props.row.itemName.length}}</span>
                         </bk-popconfirm>
                     </template>
                 </bk-table-column>
-                <bk-table-column :label="$t('store.版本')" prop="version" width="120"></bk-table-column>
-                <bk-table-column :label="$t('store.状态')" width="160">
+                <bk-table-column :label="$t('store.版本')" prop="version"></bk-table-column>
+                <bk-table-column :label="$t('store.状态')">
                     <template slot-scope="props">
                         <status :status="calcStatus(props.row.serviceStatus)"></status>
                         <span>{{ $t(serviceStatusList[props.row.serviceStatus]) }}</span>
                     </template>
                 </bk-table-column>
-                <bk-table-column :label="$t('store.修改人')" prop="modifier" width="100"></bk-table-column>
-                <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="180" :formatter="timeFormatter"></bk-table-column>
+                <bk-table-column :label="$t('store.修改人')" prop="modifier"></bk-table-column>
+                <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="160" :formatter="timeFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
                     <template slot-scope="props">
                         <span class="shelf-btn"
@@ -557,6 +557,9 @@
                 margin-right: 3px;
             }
         }
+    }
+    .service-item {
+        line-height: 20px;
     }
     .tag-list {
         padding: 0 20px;

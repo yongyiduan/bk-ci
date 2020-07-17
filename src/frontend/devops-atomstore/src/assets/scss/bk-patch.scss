@@ -56,7 +56,10 @@
 }
 
 .custom-popconfirm .tippy-tooltip {
-	padding: 10px;
+	padding: 5px;
+	.popconfirm-content {
+		margin: 0;
+	}
 }
 
 .bk-selector-create-item {

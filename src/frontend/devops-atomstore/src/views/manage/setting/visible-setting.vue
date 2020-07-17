@@ -219,14 +219,14 @@
 <style lang="scss" scoped>
     .visible-setting {
         background: #fff;
-        padding: 32px;
+        padding: 3.2vh;
         overflow: auto;
         .visible-header {
             font-weight: normal;
-            margin-bottom: 32px;
+            margin-bottom: 3.2vh;
         }
         .visible-table {
-            height: calc(100% - 64px);
+            height: calc(100% - 32px - 3.2vh);
             /deep/.bk-table {
                 height: 100%;
                 .bk-table-body-wrapper {

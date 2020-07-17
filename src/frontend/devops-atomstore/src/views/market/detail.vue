@@ -55,6 +55,9 @@
                     case 'image':
                         res = bkLocale.$t('store.容器镜像')
                         break
+                    case 'ide':
+                        res = bkLocale.$t('store.IDE插件')
+                        break
                     case 'service':
                         res = bkLocale.$t('store.微扩展')
                         break

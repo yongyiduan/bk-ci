@@ -347,10 +347,10 @@
 <style lang="scss" scoped>
     .manage-environment {
         height: 100%;
-        padding: 32px 32px 17px;
+        padding: 3.2vh 3.2vh 1.7vh;
         background: #fff;
         .environment-head {
-            margin-bottom: 32px;
+            margin-bottom: 3.2vh;
             display: flex;
             .head-item {
                 width: 220px;

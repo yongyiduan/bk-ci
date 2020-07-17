@@ -1,14 +1,14 @@
 <template>
     <article>
         <section class="show-detail">
-            <img v-if="detail.logoUrl" :src="detail.logoUrl" class="detail-img">
+            <img :src="detail.logoUrl || defaultPic" class="detail-img">
             <ul class="detail-items" ref="detail">
                 <li class="detail-item">
                     <span class="item-name">{{ detail.serviceName }}</span>
                 </li>
                 <li class="detail-item">
                     <span class="detail-label">{{ $t('store.标识') }}：</span>
-                    <span>{{ detail.serviceCode }}</span>
+                    <span>{{ detail.serviceCode || '--' }}</span>
                 </li>
                 <li class="detail-item">
                     <span class="detail-label">{{ $t('store.扩展点') }}：</span>
@@ -51,6 +51,7 @@
 <script>
     import labelList from '../../../labelList'
     import mediaList from '@/components/common/mediaList'
+    import defaultPic from '../../../../images/defaultPic.svg'
 
     export default {
         components: {
@@ -60,6 +61,12 @@
 
         props: {
             detail: Object
+        },
+
+        data () {
+            return {
+                defaultPic
+            }
         }
     }
 </script>
