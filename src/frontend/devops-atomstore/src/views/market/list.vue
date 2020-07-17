@@ -113,8 +113,8 @@
                     atom: () => this.$store.dispatch('store/requestMarketAtom', postData),
                     template: () => this.$store.dispatch('store/requestMarketTemplate', postData),
                     image: () => this.$store.dispatch('store/requestMarketImage', postData),
-                    ide: () => this.getIDEList(postData, searchStr),
-                    service: () => this.getServiceList(postData, searchStr)
+                    ide: () => this.$store.dispatch('store/requestMarketIDE', postData),
+                    service: () => this.$store.dispatch('store/requestMarketService', postData)
                 }
 
                 apiFun[pipeType]().then((res) => {
@@ -126,16 +126,6 @@
                     this.isLoading = false
                     this.isLoadingMore = false
                 })
-            },
-
-            getIDEList (postData, searchStr) {
-                postData.atomName = searchStr
-                return this.$store.dispatch('store/requestMarketIDE', postData)
-            },
-
-            getServiceList (postData, searchStr) {
-                postData.serviceName = searchStr
-                return this.$store.dispatch('store/requestMarketService', postData)
             },
 
             chooseOrderType (order) {
