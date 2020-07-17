@@ -45,6 +45,9 @@
                     case 'imageWork':
                         res = bkLocale.$t('store.容器镜像')
                         break
+                    case 'serviceWork':
+                        res = bkLocale.$t('store.微扩展')
+                        break
                     default:
                         res = bkLocale.$t('store.流水线插件')
                         break
