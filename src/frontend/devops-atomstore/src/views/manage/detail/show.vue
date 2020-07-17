@@ -43,7 +43,7 @@
         .manage-detail-header {
             position: absolute;
             right: 32px;
-            top: -58px;
+            top: calc(-26px - 3.2vh);
             a {
                 cursor: pointer;
                 color: #1592ff;
@@ -57,7 +57,7 @@
             height: 100%;
         }
         .detail-show {
-            padding: 32px;
+            padding: 3.2vh;
             height: 100%;
             overflow-y: auto;
         }

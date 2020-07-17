@@ -60,7 +60,7 @@
         .manage-detail-header {
             position: absolute;
             right: 32px;
-            top: -58px;
+            top: calc(-26px - 3.2vh);
             span {
                 cursor: pointer;
                 color: #1592ff;
@@ -72,7 +72,7 @@
         }
         .edit-main {
             overflow-y: auto;
-            padding: 32px;
+            padding: 3.2vh;
             height: 100%;
             position: relative;
         }

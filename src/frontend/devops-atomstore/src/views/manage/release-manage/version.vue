@@ -98,7 +98,6 @@
                 }
                 return this.$store.dispatch('store/requestImageVersionList', postData).then((res) => {
                     this.versionList = res.records || []
-                    this.versionList = [...this.versionList, ...this.versionList, ...this.versionList, ...this.versionList, ...this.versionList]
                     this.pagination.count = res.count
                     const lastestVersion = this.versionList[0] || {}
                     const lastestStatus = lastestVersion.imageStatus
@@ -127,13 +126,13 @@
 <style lang="scss" scoped>
     .release-version {
         background: #fff;
-        padding: 32px;
+        padding: 3.2vh;
         .version-main {
             height: 100%;
         }
         /deep/ .show-version {
             .version-button {
-                margin-bottom: 32px;
+                margin-bottom: 3.2vh;
             }
             .bk-table-pagination-wrapper {
                 padding-bottom: 0;
