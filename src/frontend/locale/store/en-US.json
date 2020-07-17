@@ -188,7 +188,6 @@
     "请输入不开源原因": "Please enter your reason for [not open-source]",
     "不开源原因": "Reason for [not open source]",
     "是否开源不能为空": "[open source or not] field cannot be empty",
-    "是否开源：": "Open source:",
     "是否开源": "Open source",
     "授权方式": "Authorization method",
     "重置授权": "Reset authorization",

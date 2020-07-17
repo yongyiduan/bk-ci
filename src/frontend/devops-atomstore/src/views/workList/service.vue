@@ -50,7 +50,7 @@
                     </template>
                 </bk-table-column>
                 <bk-table-column :label="$t('store.修改人')" prop="modifier"></bk-table-column>
-                <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="160" :formatter="timeFormatter"></bk-table-column>
+                <bk-table-column :label="$t('store.修改时间')" prop="updateTime" width="160"></bk-table-column>
                 <bk-table-column :label="$t('store.操作')" width="250" class-name="handler-btn">
                     <template slot-scope="props">
                         <span class="shelf-btn"
@@ -524,13 +524,6 @@
                 Promise.all([this.getProjectList()]).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => (this.relateServiceData.isLoading = false))
-            },
-
-            timeFormatter (row, column, cellValue, index) {
-                const date = new Date(cellValue)
-                const year = date.toISOString().slice(0, 10)
-                const time = date.toTimeString().split(' ')[0]
-                return `${year} ${time}`
             }
         }
     }

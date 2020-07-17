@@ -39,7 +39,7 @@
                     </div>
                 </li>
                 <li class="detail-item" v-if="!isEnterprise">
-                    <span class="detail-label">{{ $t('store.是否开源：') }}：</span>
+                    <span class="detail-label">{{ $t('store.是否开源') }}：</span>
                     <span>{{ detail.visibilityLevel | levelFilter }}</span>
                 </li>
                 <li class="detail-item" v-if="isEnterprise">
