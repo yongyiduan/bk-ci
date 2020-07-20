@@ -35,7 +35,7 @@ export const actions = {
     /**
      * 查看镜像成员信息
      */
-    requestGetImageMemInfo ({ commit }, imageCode) {
+    requestGetMemInfo ({ commit }, imageCode) {
         return vue.$ajax.get(`${prefix}/user/market/desk/image/member/view?imageCode=${imageCode}`)
     },
     /**

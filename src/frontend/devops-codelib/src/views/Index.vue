@@ -18,9 +18,11 @@
             <code-lib-table v-bind="codelibs" :switch-page="switchPage"></code-lib-table>
         </template>
         <empty-tips v-else-if="codelibs && codelibs.hasCreatePermission" :title="$t('codelib.codelib')" :desc="$t('codelib.codelibDesc')">
-            <bk-button v-for="typeLabel in codelibTypes" theme="primary" :key="typeLabel" @click="createCodelib(typeLabel)" v-if="!isExtendTx || typeLabel !== 'Gitlab' || isBlueKing">
-                {{ `${$t('codelib.link')}${typeLabel}${$t('codelib.codelib')}` }}
-            </bk-button>
+            <template v-for="typeLabel in codelibTypes" theme="primary">
+                <bk-button v-if="!isExtendTx || typeLabel !== 'Gitlab' || isBlueKing" :key="typeLabel" @click="createCodelib(typeLabel)">
+                    {{ `${$t('codelib.link')}${typeLabel}${$t('codelib.codelib')}` }}
+                </bk-button>
+            </template>
         </empty-tips>
         <empty-tips v-else :title="$t('codelib.noCodelibPermission')" :desc="$t('codelib.noPermissionDesc')">
             <bk-button theme="primary" @click="switchProject">{{ $t('codelib.switchProject') }}</bk-button>

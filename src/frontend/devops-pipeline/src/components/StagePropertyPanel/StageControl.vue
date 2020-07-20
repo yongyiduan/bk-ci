@@ -124,7 +124,6 @@
                 'setPipelineEditing'
             ]),
             handleUpdateStageControl (name, value) {
-                console.log(name, value)
                 this.setPipelineEditing(true)
                 this.handleStageChange('stageControlOption', {
                     ...(this.stageControl || {}),

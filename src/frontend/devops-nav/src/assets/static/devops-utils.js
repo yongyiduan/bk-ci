@@ -275,8 +275,6 @@ const devopsUtil = {};
         triggerEvent('order::' + SYNC_SERVICE_HOOKS, hooks)
     }
 
-    
-
     /**
      * Hook触发
      * @method hookTrigger

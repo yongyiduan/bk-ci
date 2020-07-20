@@ -66,64 +66,66 @@
                         </div>
                     </div>
                     <div class="table-node-body">
-                        <div class="table-node-row" v-for="(col, index) of rowList" :key="index" v-if="col.isDisplay">
-                            <div class="table-node-item node-item-checkbox">
-                                <bk-checkbox
-                                    :true-value="true"
-                                    :false-value="false"
-                                    :disabled="col.isEixtEnvNode"
-                                    v-model="col.isChecked"
-                                ></bk-checkbox>
-                            </div>
-                            <div class="table-node-item node-item-ip">
-                                <span class="node-ip">{{ col.ip }}</span>
-                            </div>
-                            <div class="table-node-item node-item-name" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">
-                                <span class="node-name">{{ col.name }}</span>
-                            </div>
-                            <div class="table-node-item node-item-type" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">
-                                <div v-if="(col.nodeType === 'CC' || col.nodeType === 'CMDB') && ((col.nodeType === 'CC' && col.createdUser !== col.operator && col.createdUser !== col.bakOperator)
-                                    || (col.nodeType === 'CMDB' && col.createdUser !== col.operator && col.bakOperator.split(';').indexOf(col.createdUser) === -1))">
-                                    <div class="edit-operator" v-if="curUserInfo.username === col.operator || curUserInfo.username === col.bakOperator">
-                                        <i class="devops-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(col.nodeHashId, 1)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
+                        <template v-for="(col, index) of rowList">    
+                            <div class="table-node-row" :key="index" v-if="col.isDisplay">
+                                <div class="table-node-item node-item-checkbox">
+                                    <bk-checkbox
+                                        :true-value="true"
+                                        :false-value="false"
+                                        :disabled="col.isEixtEnvNode"
+                                        v-model="col.isChecked"
+                                    ></bk-checkbox>
+                                </div>
+                                <div class="table-node-item node-item-ip">
+                                    <span class="node-ip">{{ col.ip }}</span>
+                                </div>
+                                <div class="table-node-item node-item-name" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">
+                                    <span class="node-name">{{ col.name }}</span>
+                                </div>
+                                <div class="table-node-item node-item-type" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">
+                                    <div v-if="(col.nodeType === 'CC' || col.nodeType === 'CMDB') && ((col.nodeType === 'CC' && col.createdUser !== col.operator && col.createdUser !== col.bakOperator)
+                                        || (col.nodeType === 'CMDB' && col.createdUser !== col.operator && col.bakOperator.split(';').indexOf(col.createdUser) === -1))">
+                                        <div class="edit-operator" v-if="curUserInfo.username === col.operator || curUserInfo.username === col.bakOperator">
+                                            <i class="devops-icon icon-exclamation-circle"></i><span @click="changeCreatedUser(col.nodeHashId, 1)">{{ $t('environment.nodeInfo.operatorModfied') }}</span>
+                                        </div>
+                                        <div class="prompt-operator" v-else>
+                                            <bk-popover placement="top">
+                                                <span><i class="devops-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
+                                                <template slot="content">
+                                                    <p style="text-align: left;">{{ $t('environment.nodeInfo.currentImporter') }}<span>{{ col.createdUser }}</span></p>
+                                                    <p style="text-align: left;">{{ $t('environment.nodeInfo.currentOperator') }}<span>{{ col.operator }}</span><span v-if="col.nodeType === 'CC'">/{{ col.bakOperator }}</span></p>
+                                                    <p style="text-align: left;">{{ $t('environment.nodeInfo.contactOperator') }}</p>
+                                                </template>
+                                            </bk-popover>
+                                        </div>
                                     </div>
-                                    <div class="prompt-operator" v-else>
-                                        <bk-popover placement="top">
-                                            <span><i class="devops-icon icon-exclamation-circle"></i>{{ $t('environment.nodeInfo.prohibited') }}</span>
-                                            <template slot="content">
-                                                <p style="text-align: left;">{{ $t('environment.nodeInfo.currentImporter') }}<span>{{ col.createdUser }}</span></p>
-                                                <p style="text-align: left;">{{ $t('environment.nodeInfo.currentOperator') }}<span>{{ col.operator }}</span><span v-if="col.nodeType === 'CC'">/{{ col.bakOperator }}</span></p>
-                                                <p style="text-align: left;">{{ $t('environment.nodeInfo.contactOperator') }}</p>
-                                            </template>
-                                        </bk-popover>
+                                    <div v-else>
+                                        <span class="node-name">{{ $t('environment.nodeTypeMap')[col.nodeType] }}</span>
+                                        <span>({{ col.createdUser }})</span>
                                     </div>
                                 </div>
-                                <div v-else>
-                                    <span class="node-name">{{ $t('environment.nodeTypeMap')[col.nodeType] }}</span>
-                                    <span>({{ col.createdUser }})</span>
+                                <div class="table-node-item node-item-status">
+                                    <span class="node-status" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">{{ $t('environment.nodeStatusMap')[col.nodeStatus] }}</span>
+                                </div>
+                                <div class="table-node-item node-item-agstatus" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">
+                                    <span v-if="['THIRDPARTY','DEVCLOUD'].includes(col.nodeType)">{{ col.gateway }}</span>
+                                    <span v-else>
+                                        <span class="node-agstatus normal-status-node" v-if="col.nodeType === 'BCSVM'"
+                                            :class="{
+                                                'refresh-status-node': !col.agentStatus,
+                                                'over-content': selectHandlercConf.curDisplayCount > 6
+                                            }">{{ col.agentStatus ? $t('environment.nodeInfo.normal') : $t('environment.nodeInfo.refreshing') }}
+                                        </span>
+                                        <span class="node-agstatus normal-status-node" v-else
+                                            :class="{
+                                                'abnormal-status-node': !col.agentStatus,
+                                                'over-content': selectHandlercConf.curDisplayCount > 6
+                                            }">{{ col.agentStatus ? $t('environment.nodeInfo.normal') : $t('environment.nodeInfo.abnormal') }}
+                                        </span>
+                                    </span>
                                 </div>
                             </div>
-                            <div class="table-node-item node-item-status">
-                                <span class="node-status" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">{{ $t('environment.nodeStatusMap')[col.nodeStatus] }}</span>
-                            </div>
-                            <div class="table-node-item node-item-agstatus" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">
-                                <span v-if="['THIRDPARTY','DEVCLOUD'].includes(col.nodeType)">{{ col.gateway }}</span>
-                                <span v-else>
-                                    <span class="node-agstatus normal-status-node" v-if="col.nodeType === 'BCSVM'"
-                                        :class="{
-                                            'refresh-status-node': !col.agentStatus,
-                                            'over-content': selectHandlercConf.curDisplayCount > 6
-                                        }">{{ col.agentStatus ? $t('environment.nodeInfo.normal') : $t('environment.nodeInfo.refreshing') }}
-                                    </span>
-                                    <span class="node-agstatus normal-status-node" v-else
-                                        :class="{
-                                            'abnormal-status-node': !col.agentStatus,
-                                            'over-content': selectHandlercConf.curDisplayCount > 6
-                                        }">{{ col.agentStatus ? $t('environment.nodeInfo.normal') : $t('environment.nodeInfo.abnormal') }}
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
                 <div class="no-data-row" v-if="selectHandlercConf.searchEmpty || !rowList.length">

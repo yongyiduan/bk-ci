@@ -92,12 +92,14 @@
                             <div class="detail-info">
                                 <div class="detail-info-label"><span>Info</span></div>
                                 <ul>
-                                    <li v-for="(item, key) of sideSliderConfig.detailData.info"
-                                        v-if="!(lastClickItem.folder && item.key === 'size')"
-                                        :key="`detail${key}`">
-                                        <span class="bk-lable">{{ item.name }}：</span>
-                                        <span>{{ item.key === 'name' ? (sideSliderConfig.data[item.key] || lastClickItem.name) : convertInfoItem(item.key, sideSliderConfig.data[item.key]) }}</span>
-                                    </li>
+                                    <template v-for="(item, key) of sideSliderConfig.detailData.info">    
+                                        <li
+                                            v-if="!(lastClickItem.folder && item.key === 'size')"
+                                            :key="`detail${key}`">
+                                            <span class="bk-lable">{{ item.name }}：</span>
+                                            <span>{{ item.key === 'name' ? (sideSliderConfig.data[item.key] || lastClickItem.name) : convertInfoItem(item.key, sideSliderConfig.data[item.key]) }}</span>
+                                        </li>
+                                    </template>
                                 </ul>
                             </div>
                             <div class="detail-info" v-if="!lastClickItem.folder">

@@ -71,7 +71,7 @@
             float: left;
             margin-right: 3px;
             enable-background: new 0 0 64 64;
-            fill: #dcdee5;
+            fill: $darkWhite;
             &.yellow {
                 fill: $starYellow;
             }

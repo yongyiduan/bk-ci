@@ -110,7 +110,7 @@
 
             getMemInfo () {
                 const code = this.$route.params.imageCode
-                return this.$store.dispatch('store/requestGetImageMemInfo', code).then((res) => {
+                return this.$store.dispatch('store/requestGetMemInfo', code).then((res) => {
                     const userInfo = {
                         isProjectAdmin: res.type === 'ADMIN',
                         userName: res.userName

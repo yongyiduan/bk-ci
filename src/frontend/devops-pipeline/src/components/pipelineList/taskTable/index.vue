@@ -14,7 +14,7 @@
         </thead>
         <tbody>
             <template
-                v-for="(row, index) of withFeConfigList">
+                v-for="(row, index) of listWithConfig">
                 <tr
                     style="position: relative"
                     :key="`taskTable${index}_re`">
@@ -111,7 +111,7 @@
             },
             pipelineFeConfMap: {
                 type: Object,
-                default: () => ({})
+                deafult: () => ({})
             }
         },
         data () {
@@ -120,10 +120,10 @@
             }
         },
         computed: {
-            withFeConfigList () {
-                return this.list.map(row => ({
-                    ...row,
-                    feConfig: this.pipelineFeConfMap[row.pipelineId]
+            listWithConfig () {
+                return this.list.map(item => ({
+                    ...item,
+                    feConfig: this.pipelineFeConfMap[item.pipelineId] || {}
                 }))
             }
         },

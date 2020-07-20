@@ -1,5 +1,6 @@
 node_modules/
 formatCommitMsg.js
 frontend/*
+svg-sprites/dist
 package-lock.json
 yarn-error.log

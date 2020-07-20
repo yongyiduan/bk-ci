@@ -5,9 +5,12 @@
             <span>{{ $t('codelib.linkCodelib') }}</span>
         </bk-button>
         <ul class="devops-button-dropdown-menu" slot="dropdown-content">
-            <li v-for="typeLabel in codelibTypes" :key="typeLabel" @click="createCodelib(typeLabel)" v-if="!isExtendTx || typeLabel !== 'Gitlab' || isBlueKing">
-                {{ `${typeLabel} ${$t('codelib.repo')}` }}
-            </li>
+            <template v-for="typeLabel in codelibTypes">
+                <li v-if="!isExtendTx || typeLabel !== 'Gitlab' || isBlueKing"
+                    :key="typeLabel" @click="createCodelib(typeLabel)">
+                    {{ `${typeLabel} ${$t('codelib.repo')}` }}
+                </li>
+            </template>
         </ul>
     </bk-dropdown-menu>
 </template>

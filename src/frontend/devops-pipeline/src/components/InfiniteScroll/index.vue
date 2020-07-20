@@ -69,7 +69,6 @@
             handleScroll (e) {
                 const { target } = e
                 const { hasNext, setScrollTop, scrollLoadMore, isLoadingMore } = this
-
                 setScrollTop(e.target.scrollTop)
                 const offset = e.target.scrollHeight - (e.target.offsetHeight + e.target.scrollTop)
                 if (offset <= SCROLL_THRESHOLD && hasNext && !isLoadingMore) { // scroll to end
@@ -85,7 +84,6 @@
                 ]
 
                 this.currentPage = Math.ceil(this.list.length / pageSize)
-
                 this.hasNext = this.currentPage < res.totalPages
                 this.totals = res.count
                 return res
