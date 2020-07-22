@@ -1,7 +1,7 @@
 <template>
     <infinite-scroll class="build-history-tab-content" ref="infiniteScroll" :data-fetcher="requestHistory" :page-size="36" scroll-box-class-name="bkdevops-pipeline-history" v-slot="slotProps">
         <filter-bar v-if="showFilterBar" @query="slotProps.queryList" :set-history-page-status="setHistoryPageStatus" :reset-query-condition="resetQueryCondition" v-bind="historyPageStatus.queryMap"></filter-bar>
-        <build-history-table :loading-more="slotProps.isLoadingMore" :current-pipeline-version="currentPipelineVersion" @update-table="updateBuildHistoryList" :build-list="slotProps.list" :columns="shownColumns" :empty-tips-config="emptyTipsConfig" :show-log="showLog"></build-history-table>
+        <build-history-table v-if="!slotProps.isLoading" :loading-more="slotProps.isLoadingMore" :current-pipeline-version="currentPipelineVersion" @update-table="updateBuildHistoryList" :build-list="slotProps.list" :columns="shownColumns" :empty-tips-config="emptyTipsConfig" :show-log="showLog"></build-history-table>
         <bk-dialog
             width="567"
             :title="$t('history.settingCols')"
