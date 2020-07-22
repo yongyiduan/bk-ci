@@ -1,46 +1,48 @@
 <template>
     <article class="pipeline-list">
         <infinite-scroll class="pipeline-list-wrapper" ref="infiniteScroll" :data-fetcher="requestPipelineList" :page-size="60" scroll-box-class-name="pipeline-list" v-slot="slotProps">
-            <list-empty
-                v-if="!slotProps.list.length"
-                :has-filter="hasFilter"
-                @showCreate="toggleTemplatePopup"
-                @showSlide="showSlide"
-                :has-pipeline="hasPipeline">
-            </list-empty>
-
-            <section v-if="slotProps.list.length">
-                <list-create-header
-                    :layout="layout"
+            <template v-if="!slotProps.isLoading">
+                <list-empty
+                    v-if="!slotProps.list.length"
                     :has-filter="hasFilter"
-                    :num="slotProps.totals"
+                    @showCreate="toggleTemplatePopup"
                     @showSlide="showSlide"
-                    @changeLayout="changeLayoutType"
-                    @changeOrder="changeOrderType"
-                    @showCreate="toggleTemplatePopup">
-                </list-create-header>
+                    :has-pipeline="hasPipeline">
+                </list-empty>
 
-                <section class="pipeline-list-content">
-                    <div class="pipeline-list-cards" v-if="layout === 'card'">
-                        <task-card
-                            v-for="(card, index) of slotProps.list"
-                            :has-permission="card.hasPermission"
-                            :config="pipelineFeConfMap[card.pipelineId]"
-                            :index="index"
-                            :key="`taskCard${card.pipelineId}`"
-                            :can-manual-startup="card.canManualStartup">
-                        </task-card>
-                    </div>
+                <section v-if="slotProps.list.length">
+                    <list-create-header
+                        :layout="layout"
+                        :has-filter="hasFilter"
+                        :num="slotProps.totals"
+                        @showSlide="showSlide"
+                        @changeLayout="changeLayoutType"
+                        @changeOrder="changeOrderType"
+                        @showCreate="toggleTemplatePopup">
+                    </list-create-header>
 
-                    <div class="pipeline-list-table" v-if="layout === 'table'">
-                        <task-table
-                            :pipeline-fe-conf-map="pipelineFeConfMap"
-                            :list="slotProps.list">
-                        </task-table>
-                    </div>
+                    <section class="pipeline-list-content">
+                        <div class="pipeline-list-cards" v-if="layout === 'card'">
+                            <task-card
+                                v-for="(card, index) of slotProps.list"
+                                :has-permission="card.hasPermission"
+                                :config="pipelineFeConfMap[card.pipelineId]"
+                                :index="index"
+                                :key="`taskCard${card.pipelineId}`"
+                                :can-manual-startup="card.canManualStartup">
+                            </task-card>
+                        </div>
+
+                        <div class="pipeline-list-table" v-if="layout === 'table'">
+                            <task-table
+                                :pipeline-fe-conf-map="pipelineFeConfMap"
+                                :list="slotProps.list">
+                            </task-table>
+                        </div>
+                    </section>
+
                 </section>
-
-            </section>
+            </template>
         </infinite-scroll>
 
         <pipeline-template-popup :toggle-popup="toggleTemplatePopup" :is-show="templatePopupShow"></pipeline-template-popup>
@@ -237,6 +239,7 @@
             }),
             ...mapState('pipelines', [
                 'currentViewId',
+                'pageLoading',
                 'hasCreatePermission'
             ]),
             projectId () {

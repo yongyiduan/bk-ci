@@ -1,7 +1,7 @@
 <template>
     <article class="pipeline-content"
         v-bkloading="{
-            isLoading: pageLoadifang
+            isLoading: pageLoading
         }">
         <pipeline-header :title="header.title">
             <span class="default-subheader-icon"
