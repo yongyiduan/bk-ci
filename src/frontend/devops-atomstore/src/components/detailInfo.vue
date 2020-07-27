@@ -130,7 +130,6 @@
                 }
                 return res
             },
-
             releaseFilter (value) {
                 const local = window.devops || {}
                 let res = ''
@@ -167,7 +166,9 @@
         },
 
         mounted () {
-            this.$nextTick(() => (this.isOverflow = this.$refs.edit.scrollHeight > 180))
+            setTimeout(() => {
+                this.isOverflow = this.$refs.edit.scrollHeight > 180
+            }, 1000)
         }
     }
 </script>
@@ -188,6 +189,10 @@
                 transform: rotate(180deg);
             }
         }
+    }
+
+    .g-progress-content {
+        max-width: calc(100% - 100px);
     }
 
     .label-card {
