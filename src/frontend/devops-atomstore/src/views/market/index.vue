@@ -143,10 +143,10 @@
                         name = this.$t('store.容器镜像')
                         break
                     case 'ide':
-                        res = this.$t('store.IDE插件')
+                        name = this.$t('store.IDE插件')
                         break
                     case 'service':
-                        res = this.$t('store.微扩展')
+                        name = this.$t('store.微扩展')
                         break
                     default:
                         name = this.$t('store.流水线插件')

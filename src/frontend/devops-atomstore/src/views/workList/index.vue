@@ -78,7 +78,7 @@
                         name = this.$t('store.容器镜像')
                         break
                     case 'serviceWork':
-                        res = this.$t('store.微扩展')
+                        name = this.$t('store.微扩展')
                         break
                     default:
                         name = this.$t('store.流水线插件')
