@@ -1,16 +1,8 @@
 <template>
     <article class="detail-home" v-bkloading="{ isLoading }">
-        <h3 class="market-home-title">
-            <icon class="title-icon" name="color-logo-store" size="25" />
-            <p class="title-name">
-                <router-link :to="{ name: 'atomHome' }" class="back-home"> {{ $t('store.研发商店') }} </router-link>
-                <i class="right-arrow banner-arrow"></i>
-                <span class="back-home" @click="backToStore">{{type|typeFilter}}</span>
-                <i class="right-arrow banner-arrow"></i>
-                <span class="banner-des">{{detail.name}}</span>
-            </p>
-            <router-link :to="{ name: 'atomWork' }" class="title-work" v-if="type !== 'ide'"> {{ $t('store.工作台') }} </router-link>
-        </h3>
+        <bread-crumbs :bread-crumbs="navList" :type="type">
+            <router-link :to="{ name: 'atomWork' }" class="g-title-work" v-if="type !== 'ide'"> {{ $t('store.工作台') }} </router-link>
+        </bread-crumbs>
 
         <main class="store-main" v-if="!isLoading">
             <component :is="`${type}Info`" :detail="detail" class="detail-info" :current-tab.sync="currentTab"></component>
@@ -25,6 +17,7 @@
 
 <script>
     import { mapActions, mapGetters } from 'vuex'
+    import breadCrumbs from '@/components/bread-crumbs.vue'
     import ideInfo from '../../components/common/detail-info/ide'
     import atomInfo from '../../components/common/detail-info/atom'
     import templateInfo from '../../components/common/detail-info/template'
@@ -41,32 +34,8 @@
             imageInfo,
             detailScore,
             serviceInfo,
-            codeSection
-        },
-
-        filters: {
-            typeFilter (val) {
-                const bkLocale = window.devops || {}
-                let res = ''
-                switch (val) {
-                    case 'template':
-                        res = bkLocale.$t('store.流水线模板')
-                        break
-                    case 'image':
-                        res = bkLocale.$t('store.容器镜像')
-                        break
-                    case 'ide':
-                        res = bkLocale.$t('store.IDE插件')
-                        break
-                    case 'service':
-                        res = bkLocale.$t('store.微扩展')
-                        break
-                    default:
-                        res = bkLocale.$t('store.流水线插件')
-                        break
-                }
-                return res
-            }
+            codeSection,
+            breadCrumbs
         },
 
         data () {
@@ -107,6 +76,32 @@
                         { componentName: 'detailScore', label: this.$t('概述'), name: 'des' }
                     ]
                 }
+            },
+
+            navList () {
+                let name
+                switch (this.type) {
+                    case 'template':
+                        name = this.$t('store.流水线模板')
+                        break
+                    case 'image':
+                        name = this.$t('store.容器镜像')
+                        break
+                    case 'ide':
+                        res = this.$t('store.IDE插件')
+                        break
+                    case 'service':
+                        res = this.$t('store.微扩展')
+                        break
+                    default:
+                        name = this.$t('store.流水线插件')
+                        break
+                }
+                Object.assign(this.markerQuey, { pipeType: this.type })
+                return [
+                    { name, to: { name: 'atomHome', query: this.markerQuey } },
+                    { name: this.detail.name }
+                ]
             }
         },
 
@@ -220,14 +215,6 @@
                     detail.name = serviceDetail.serviceName
                     this.setDetail(detail)
                 })
-            },
-
-            backToStore () {
-                Object.assign(this.markerQuey, { pipeType: this.type })
-                this.$router.push({
-                    name: 'atomHome',
-                    query: this.markerQuey
-                })
             }
         }
     }
@@ -238,16 +225,17 @@
     .store-main {
         height: calc(100vh - 93px);
         overflow-y: scroll;
-        background: $grayBackGroundColor;
     }
 
     .detail-home {
         overflow: hidden;
         min-height: 100%;
+        background: $grayBackGroundColor;
     }
 
     .detail-info {
         max-width: 1400px;
+        margin-top: 0;
     }
 
     .detail-tabs {
