@@ -420,13 +420,13 @@
     }
 
     .edit-content {
-        height: calc(100% - 50px);
+        height: calc(100% - 5.6vh);
         overflow: auto;
     }
 
     .edit-service {
         width: 1200px;
-        margin: 0 auto;
+        margin: 20px auto;
         position: relative;
         .service-input-type {
             margin-bottom: 10px;

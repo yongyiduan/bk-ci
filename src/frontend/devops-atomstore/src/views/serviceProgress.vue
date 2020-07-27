@@ -400,9 +400,9 @@
 
     .service-progress-main {
         width: 95vw;
-        height: calc(100% - 8.8vh - 33px);
+        height: calc(100% - 5.6vh - 66px);
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
-        margin: 0 auto 33px;
+        margin: 33px auto;
         background: $white;
         .progress-header {
             height: 65px;
