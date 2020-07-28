@@ -1,11 +1,15 @@
 <template>
     <div
         ref="stageContainer"
-        :class="{ 'devops-stage-container': true, 'first-container': stageIndex === 0, 'readonly': !editable || containerDisabled }"
+        :class="{ 'devops-stage-container': true, 'first-stage-container': stageIndex === 0, 'readonly': !editable || containerDisabled }"
     >
-        <template v-if="!isOnlyOneContainer && containerLength - 1 !== containerIndex">
-            <cruve-line :straight="true" :width="60" :height="cruveHeight" class="connect-line left" />
-            <cruve-line :straight="true" :width="60" :height="cruveHeight" :direction="false" class="connect-line right" />
+        <template v-if="containerIndex > 0">
+            <cruve-line :straight="true" :width="60" :style="`margin-top: -${cruveHeight}px`" :height="cruveHeight" class="connect-line left" />
+            <cruve-line :straight="true" :width="60" :style="`margin-top: -${cruveHeight}px`" :height="cruveHeight" :direction="false" class="connect-line right" />
+        </template>
+        <template v-else>
+            <cruveLine v-if="stageIndex !== 0" class="first-connect-line connect-line left" :width="60" :height="60"></cruveLine>
+            <cruve-line class="first-connect-line connect-line right" :width="60" :direction="false" :height="60"></cruve-line>
         </template>
 
         <h3 :class="{ 'container-title': true, 'first-ctitle': containerIndex === 0, [container.status]: container.status }" @click.stop="showContainerPanel">
@@ -57,6 +61,7 @@
             CruveLine
         },
         props: {
+            preContainer: Object,
             container: Object,
             stageIndex: Number,
             containerIndex: Number,
@@ -128,9 +133,9 @@
             }
         },
         watch: {
-            'container.elements.length': function (newVal, oldVal) {
+            'preContainer.elements.length': function (newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    this.$forceUpdate()
+                    this.updateCruveConnectHeight()
                 }
             },
             'container.runContainer' (newVal) {
@@ -154,9 +159,6 @@
             if (this.containerDisabled) {
                 this.container.runContainer = false
             }
-        },
-        updated () {
-            this.updateCruveConnectHeight()
         },
         methods: {
             ...mapActions('soda', [
@@ -187,10 +189,9 @@
                 }
             },
             updateCruveConnectHeight () {
-                if (!this.$refs.stageContainer) {
-                    return
+                if (this.$refs.stageContainer && this.$refs.stageContainer.previousSibling) {
+                    this.cruveHeight = getOuterHeight(this.$refs.stageContainer.previousSibling)
                 }
-                this.cruveHeight = getOuterHeight(this.$refs.stageContainer)
             },
             showContainerPanel () {
                 const { stageIndex, containerIndex } = this
@@ -316,12 +317,11 @@
             z-index: 2;
         }
 
-        &.first-container {
+        &.first-stage-container {
             &:before {
                 display: none;
             }
         }
-
         .container-title {
             display: flex;
             height: $itemHeight;
@@ -398,12 +398,28 @@
             stroke: $primaryColor;
             stroke-width: 1;
             fill: none;
+            z-index: 0;
 
              &.left {
-                left: -$svgWidth + 4;
+                left: $addIconLeft + $addBtnSize / 2 - 2;
+
             }
             &.right {
-                right: -$addIconLeftMargin - $containerMargin;
+                right: -$StageMargin - $addIconLeft - $addBtnSize / 2 - 2;
+            }
+
+            &.first-connect-line {
+                height: 76px;
+                width: $svgWidth;
+                top: -$stageEntryHeight / 2 - 2 - 16px;
+                &.left {
+                    left: -$svgWidth + 4;
+                }
+                &.right {
+                    left: auto;
+                    right: -$addIconLeftMargin - $containerMargin;
+
+                }
             }
         }
     }
