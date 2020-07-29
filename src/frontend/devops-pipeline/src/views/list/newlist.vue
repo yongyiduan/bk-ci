@@ -78,11 +78,7 @@
                     </div>
 
                     <div class="bk-form-item">
-                        <label class="bk-label tip-bottom">{{ $t('template.applySetting') }}
-                            <span v-bk-tooltips.bottom="$t('template.tipsSetting')" class="bottom-start">
-                                <i class="devops-icon icon-info-circle"></i>
-                            </span>
-                        </label>
+                        <label class="bk-label">{{ $t('pipelineDesc') }}</label>
                         <div class="bk-form-content">
                             <input type="text" class="bk-form-input" :placeholder="$t('pipelineDescInputTips')"
                                 name="newPipelineDesc"
