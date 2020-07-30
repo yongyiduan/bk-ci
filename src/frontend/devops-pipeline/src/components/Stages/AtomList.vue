@@ -584,8 +584,8 @@
                     width: 62px;
                 }
                 &:after {
-                    left: 154px;
-                    width: 85px;
+                    left: 138px;
+                    width: 100px;
                 }
             }
             &.is-success {
