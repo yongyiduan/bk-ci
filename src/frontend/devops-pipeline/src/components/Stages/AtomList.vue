@@ -246,7 +246,7 @@
                 const list = atom.reviewUsers || (atom.data && atom.data.input && atom.data.input.reviewers)
                 const reviewUsers = list.map(user => user.split(';').map(val => val.trim())).reduce((prev, curr) => {
                     return prev.concat(curr)
-                })
+                }, [])
                 return reviewUsers
             },
             showPropertyPanel (elementIndex) {
