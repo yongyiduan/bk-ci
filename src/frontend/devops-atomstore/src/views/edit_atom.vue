@@ -76,7 +76,7 @@
                         </p>
                     </bk-checkbox>
                 </bk-checkbox-group>
-                <div v-if="formErrors.envError" class="error-tips env-error"> {{ $t('store.字段有误，请重新选择') }} </div>
+                <div v-if="formErrors.envError" class="error-tips env-error"> {{ $t('store.需要选择编译环境') }} </div>
                 <div class="bk-form-item">
                     <label class="bk-label"> {{ $t('store.功能标签') }} </label>
                     <div class="bk-form-content template-item-content">
