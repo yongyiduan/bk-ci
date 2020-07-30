@@ -246,7 +246,7 @@
                 const list = atom.reviewUsers || (atom.data && atom.data.input && atom.data.input.reviewers)
                 const reviewUsers = list.map(user => user.split(';').map(val => val.trim())).reduce((prev, curr) => {
                     return prev.concat(curr)
-                })
+                }, [])
                 return reviewUsers
             },
             showPropertyPanel (elementIndex) {
@@ -564,7 +564,7 @@
 
         .quality-atom {
             margin-left: 84px;
-            width: 70px;
+            width: 55px;
             border-radius: 12px;
             z-index: 9;
             .atom-title {
@@ -622,7 +622,7 @@
             }
             .handler-list {
                 position: absolute;
-                right: 10px;
+                right: 0;
                 span {
                     color: $primaryColor;
                     font-size: 12px;
