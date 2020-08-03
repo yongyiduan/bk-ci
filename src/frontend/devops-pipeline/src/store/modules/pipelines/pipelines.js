@@ -45,7 +45,7 @@ function rootCommit (commit, ACTION_CONST, payload) {
 const state = {
     pipelineList: [],
     curPipeline: {},
-    curPipelineAtomParams: {},
+    curPipelineAtomParams: null,
     allPipelineList: [],
     hasCreatePermission: false,
     pipelineSetting: {},
