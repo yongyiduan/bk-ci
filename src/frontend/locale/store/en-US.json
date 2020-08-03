@@ -52,7 +52,7 @@
     "填写相关信息中": "Fill in the relevant information",
     "未设置可见范围时，仅微扩展成员可以安装到名下项目中使用。设置后，对应组织架构的用户可以在研发商店中安装使用": "When the visible range is not set, only micro-extended members can be installed and used in projects under their names. After setting, users corresponding to the organizational structure can be installed and used in the R&D store",
     "查看微扩展详情": "View micro expansion details",
-    "testTip": "Go to the corresponding extension point of the debugging project to verify the micro extension function<br/>If you find a problem, after modifying the code, click the Rebuild entry below, build again, and test again<br/>If the test is OK, click the test completed entry below to continue the publishing process",
+    "testTip": "Go to the corresponding extension point of the debugging project to verify the micro extension function<br/>If you find a problem, after modifying the code, click the Rebuild entry below, build again, and test again<br/>If the test is OK, Click the next button below to continue the publishing process",
     "正在初始化，请耐心等候": "Initializing, please wait patiently",
     "发起重新构建成功": "Successfully initiated rebuild",
     "从工蜂自动同步": "Automatic synchronization from git",
