@@ -144,12 +144,11 @@
             paste (e) {
                 e.preventDefault()
 
-                const value = e.clipboardData.getData('text')
-                const validateRes = this.validate(value)
-
+                const clipText = e.clipboardData.getData('text')
+                const { value, isExist, isVar } = this.validate(clipText)
                 try {
-                    if (value && validateRes.reg && validateRes.target.length > 3) {
-                        if (validateRes.isEixt > -1) {
+                    if (value && isVar && value.length > 3) {
+                        if (isExist > -1) {
                             throw new Error(`${value}${this.$t('editPage.atomForm.hasExisted')}`)
                         } else {
                             this.selectList(value)
@@ -158,13 +157,13 @@
                         const temp = []
                         const tagList = []
                         const errList = []
-                        let resList = value.split(';')
-
-                        resList = resList.filter(item => item)
+                        const resList = value.split(';').filter(item => item)
 
                         resList.forEach(item => {
-                            if (item.match(/^[a-zA-Z][a-zA-Z_]+/g)) {
-                                temp.push(item.match(/^[a-zA-Z][a-zA-Z_]+/g).join(''))
+                            const reg = /^[a-z][a-z_]+/ig
+                            const matchResult = item.match(reg)
+                            if (matchResult) {
+                                temp.push(matchResult.join(''))
                             } else {
                                 errList.push(item)
                             }
@@ -336,6 +335,7 @@
                     case 186:
                     case 188:
                     case 13:
+                        e.preventDefault()
                         this.isEdit = true
                         if (this.showList) {
                             this.selectList(this.list[this.focusList])
@@ -354,14 +354,12 @@
                 }
             },
             validate (value) {
-                const target = value.replace(/\s/g, '')
-                const resObj = {
-                    target,
-                    reg: this.checkVariable(target),
-                    isEixt: this.selectedList.indexOf(target)
+                const trimVal = value.replace(/[\s\r\n]/g, '')
+                return {
+                    value: trimVal,
+                    isVar: this.checkVariable(trimVal),
+                    isExist: this.selectedList.indexOf(trimVal)
                 }
-
-                return resObj
             },
             /**
              *  更新样式
