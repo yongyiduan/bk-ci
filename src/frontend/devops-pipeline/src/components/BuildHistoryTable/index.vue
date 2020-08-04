@@ -24,7 +24,6 @@
                             }"
                         >
                         </i>
-
                     </span>
                 </template>
                 <template v-else-if="col.prop === 'stageStatus'" v-slot="props">
@@ -89,14 +88,14 @@
                     </div>
                 </template>
                 <template v-else-if="col.prop === 'errorCode'" v-slot="props">
-                    <div class="remark-cell">
-                        <div class="error">
-                            <i :title="$t('userError')" v-if="props.row.errorType === 'USER'" class="devops-icon icon-user "></i>
-                            <i :title="$t('systemError')" v-else-if="props.row.errorType === 'SYSTEM'" class="devops-icon icon-cog"></i>
-                            <span v-if="props.row.errorCode">{{ props.row.errorCode + ': ' + props.row. errorMsg }} </span>
-                            <span v-else>--</span>
+                    <template v-if="Array.isArray(props.row.errorInfoList) && props.row.errorInfoList.length > 0">
+                        <div @click.stop="" class="errorCode-item" v-for="item in props.row.errorInfoList" :key="item.taskId">
+                            <i :title="$t('userError')" v-if="item.errorType === 'USER'" class="devops-icon icon-user "></i>
+                            <i :title="$t('systemError')" v-else-if="item.errorType === 'SYSTEM'" class="devops-icon icon-cog"></i>
+                            <span v-if="item.errorCode">{{ item.errorCode + ': ' + item. errorMsg }} </span>
                         </div>
-                    </div>
+                    </template>
+                    <span v-else>--</span>
                 </template>
                 <template v-else v-slot="props">
                     {{ props.row[col.prop] }}
@@ -232,7 +231,8 @@
                         sumSize: convertFileSize(sumSize, 'B'),
                         artifactories: needShowAll ? artifactories.slice(0, 11) : artifactories,
                         visible: this.visibleIndex === index,
-                        stageStatus
+                        stageStatus,
+                        errorInfoList: !active && Array.isArray(item.errorInfoList) && item.errorInfoList.length > 1 ? item.errorInfoList.slice(0, 1) : item.errorInfoList
                     }
                 })
             },
@@ -248,7 +248,7 @@
                 return this.data[this.visibleIndex].needShowAll
             },
             columnList () {
-                return this.columns.map(key => this.column[key])
+                return this.columns.map(key => this.column[key]).filter(m => !!m)
             },
             column () {
                 Object.keys(this.BUILD_HISTORY_TABLE_COLUMNS_MAP).map(item => {
