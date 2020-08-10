@@ -406,6 +406,7 @@
         "canChooseList": "Selectable list",
         "choosedList": "Chosen list",
         "triggerType": "Trigger type",
+        "errorCode": "Error Code",
         "remark": "Remark",
         "noBuildRecords": " No build records",
         "noPermissionTips": " You don't have permission to view this pipeline. Please switch to another project or apply for permission",
@@ -432,8 +433,7 @@
         "fileUnit": "{0} files",
         "completedLog": "full-log",
         "artifactList": "Artifacts",
-        "showAll": "Show all",
-        "errorCode": "Error Code"
+        "showAll": "Show all"
     },
     "preview": {
         "introVersion": "Recommended version",

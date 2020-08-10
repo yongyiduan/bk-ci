@@ -89,9 +89,9 @@
                 return res
             },
 
-            async queryList (page = 1, pageSize) {
+            async queryList (page = 1, pageSize, isRefresh = false) {
                 try {
-                    this.isLoading = true
+                    this.isLoading = !isRefresh
                     const res = await this.fetchData(page, pageSize)
                     return res
                 } catch (e) {
@@ -117,10 +117,10 @@
                 }
             },
 
-            async updateList () {
+            async updateList (isRefresh = false) {
                 const { list, pageSize } = this
                 const len = list.length
-                const res = await this.queryList(1, len > pageSize ? len : pageSize)
+                const res = await this.queryList(1, len > pageSize ? len : pageSize, isRefresh)
 
                 this.list = res.records
 
