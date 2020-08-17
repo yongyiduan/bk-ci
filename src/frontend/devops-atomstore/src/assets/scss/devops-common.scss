@@ -404,70 +404,6 @@ input[disabled="disabled"] {
 }
 
 .g-progress-item {
-display: flex;
-align-items: flex-start;
-margin: 10px 0;
-font-size: 14px;
-line-height: 19px;
-.g-progress-label {
-    display: inline-block;
-    width: 100px;
-    margin-right: 14px;
-    color: $fontWeightColor;
-    text-align: right;
-}
-.g-progress-content {
-    flex: 1;
-    color: $fontBlack;
-    word-break: break-all;
-    max-width: calc(100vw - 400px);
-    /deep/ .v-note-panel {
-        border: none;
-        .v-show-content {
-            padding: 0 !important;
-            background: $bgHoverColor !important;
-            p {
-                margin: 0;
-            }
-        }
-    }
-}
-}
-.g-progress-image {
-    float: right;
-    width: 100px;
-    height: 100px;
-}
-.g-slide-left-enter-active,
-.g-slide-left-leave-active,
-.g-slide-right-enter-active,
-.g-slide-right-leave-active {
-    will-change: transform;
-    transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
-    position: absolute;
-    width: 100%;
-.manage-detail-header {
-    transition: none;
-    display: none;
-}
-}
-.g-slide-left-enter {
-    transform: translateX(100%);
-}
-.g-slide-left-leave-active {
-    opacity: 0;
-    transform: translateX(-100%);
-}
-
-.g-slide-right-enter {
-    transform: translateX(-100%);
-}
-.g-slide-right-leave-active {
-    opacity: 0;
-    transform: translateX(100%);
-}
-
-.g-progress-item {
     display: flex;
     align-items: flex-start;
     margin: 10px 0;
@@ -501,4 +437,33 @@ line-height: 19px;
     float: right;
     width: 100px;
     height: 100px;
+}
+
+.g-slide-left-enter-active,
+.g-slide-left-leave-active,
+.g-slide-right-enter-active,
+.g-slide-right-leave-active {
+    will-change: transform;
+    transition: all 0.5s cubic-bezier(0.42, 0, 0.58, 1);
+    position: absolute;
+    width: 100%;
+.manage-detail-header {
+    transition: none;
+    display: none;
+}
+}
+.g-slide-left-enter {
+    transform: translateX(100%);
+}
+.g-slide-left-leave-active {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.g-slide-right-enter {
+    transform: translateX(-100%);
+}
+.g-slide-right-leave-active {
+    opacity: 0;
+    transform: translateX(100%);
 }
