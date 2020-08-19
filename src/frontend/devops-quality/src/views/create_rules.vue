@@ -1219,7 +1219,7 @@
                 return element.some(item => item.params.asynchronous)
             },
             checkAtomCount (element) {
-                return element.some(item => item.count > 1)
+                return element.filter(item => item.cnName === this.createRuleForm.controlPointName).some(item => item.count > 1)
             },
             updatePipelineStatus (pipelineId) {
                 const target = this.createRuleForm.pipelineList.map(item => {
