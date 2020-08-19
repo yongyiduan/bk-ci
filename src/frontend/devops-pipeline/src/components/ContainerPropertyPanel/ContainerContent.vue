@@ -124,11 +124,11 @@
                 </form-field>
             </section>
 
-            <form-field :label="$t('editPage.workspace')" v-if="isThirdParty">
+            <form-field :label="$t('editPage.workspace')" v-if="isThirdParty && !isPCGBuildType">
                 <vuex-input :disabled="!editable" name="workspace" :value="container.dispatchType.workspace" :handle-change="changeBuildResource" :placeholder="$t('editPage.workspaceTips')" />
             </form-field>
 
-            <form-field v-if="buildResourceType === 'THIRD_PARTY_PCG'">
+            <form-field v-if="isPCGBuildType">
                 <atom-checkbox
                     class="show-build-resource"
                     :value="!!container.dispatchType.useRoot"
@@ -325,6 +325,9 @@
             },
             isThirdParty () {
                 return this.isThirdPartyContainer(this.container)
+            },
+            isPCGBuildType () {
+                return this.buildResourceType === 'THIRD_PARTY_PCG'
             },
             isDocker () {
                 return this.isDockerBuildResource(this.container)
