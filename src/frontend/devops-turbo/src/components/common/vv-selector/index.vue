@@ -9,8 +9,8 @@
         :clearable="clearable"
         @selected="itemSelected"
         @toggle="visibleToggle">
-        <bk-option v-for="(option, index) in list"
-            :key="index"
+        <bk-option v-for="option in list"
+            :key="option[settingKey]"
             :id="option[settingKey]"
             :option="option"
             :name="option[displayKey]">
