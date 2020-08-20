@@ -72,6 +72,7 @@ declare var GW_URL_PREFIX: string
 declare var DOCS_URL_PREFIX: string
 declare var DEVOPS_LS_VERSION: string
 declare var ENTERPRISE_VERSION: string
+declare var VERSION_TYPE: string
 declare module '*.png'
 
 declare const X_DEVOPS_PROJECT_ID: string

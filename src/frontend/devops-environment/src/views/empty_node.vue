@@ -7,7 +7,6 @@
         </div>
         <div class="create-node-row" v-else>
             <template v-if="isExtendTx">
-                <bk-button theme="primary" class="create-node-btn" @click="toCreateNode">{{ $t('environment.create') }}</bk-button>
                 <bk-dropdown-menu :align="'right'"
                     @show="dropdownShow"
                     @hide="dropdownHide"
@@ -47,11 +46,6 @@
                 isDropdownShow: false
             }
         },
-        computed: {
-            isExtendTx () {
-                return VERSION_TYPE === 'tencent'
-            }
-        },
         methods: {
             dropdownShow () {
                 this.isDropdownShow = true
@@ -82,13 +76,12 @@
 
         .create-node-row {
             margin-top: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
             .bk-button {
                 width: 120px;
-            }
-
-            .create-node-btn {
-                margin-right: 4px;
             }
 
             .create-env-btn {

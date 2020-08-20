@@ -215,9 +215,6 @@
             },
             curUserInfo () {
                 return window.userInfo
-            },
-            isExtendTx () {
-                return VERSION_TYPE === 'tencent'
             }
         },
         watch: {

@@ -4,8 +4,6 @@
             <div slot="left">{{ $t('environment.node') }}</div>
             <div slot="right" v-if="nodeList.length > 0">
                 <template v-if="isExtendTx">
-                    <bk-button theme="primary" class="create-node-btn"
-                        @click="toCreateNode">{{ $t('environment.new') }}</bk-button>
                     <bk-dropdown-menu :align="'right'"
                         @show="dropdownIsShow('show')"
                         @hide="dropdownIsShow('hide')"
@@ -24,7 +22,7 @@
                         </ul>
                     </bk-dropdown-menu>
                 </template>
-                <bk-button theme="primary" class="import-vmbuild-btn" v-else @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
+                <bk-button v-else theme="primary" class="import-vmbuild-btn" @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
             </div>
         </content-header>
         <section class="sub-view-port" v-bkloading="{
@@ -174,7 +172,6 @@
 
             <empty-node v-if="showContent && !nodeList.length"
                 :to-import-node="toImportNode"
-                :to-create-node="toCreateNode"
                 :empty-info="emptyInfo"
             ></empty-node>
         </section>
@@ -319,9 +316,6 @@
             },
             userInfo () {
                 return window.userInfo
-            },
-            isExtendTx () {
-                return VERSION_TYPE === 'tencent'
             }
         },
         watch: {
@@ -437,37 +431,6 @@
                     this.isDropdownShow = true
                 } else {
                     this.isDropdownShow = false
-                }
-            },
-            async toCreateNode () {
-                try {
-                    const res = await this.$store.dispatch('environment/requestVmQuta', {
-                        projectId: this.projectId
-                    })
-
-                    if (res.devCloudVmEnabled) {
-                        this.$store.commit('environment/modifyProcessHead', {
-                            process: 'modelType',
-                            current: 0
-                        })
-                        this.$router.push({ name: 'createNode' })
-                    } else {
-                        const message = `${this.$t('environment.project')}${this.projectId}${this.$t('environment.nodeInfo.devCloudApply')}`
-                        const theme = 'warning'
-
-                        this.$bkMessage({
-                            message,
-                            theme
-                        })
-                    }
-                } catch (err) {
-                    const message = err.message ? err.message : err
-                    const theme = 'error'
-
-                    this.$bkMessage({
-                        message,
-                        theme
-                    })
                 }
             },
             toNodeDetail (node) {
@@ -934,10 +897,6 @@
         min-width: 1126px;
         height: 100%;
         overflow: hidden;
-
-        .create-node-btn {
-            margin-right: 6px;
-        }
 
         .prompt-operator,
         .edit-operator {
