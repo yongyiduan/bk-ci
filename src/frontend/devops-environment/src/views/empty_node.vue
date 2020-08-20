@@ -52,10 +52,6 @@
             align-items: center;
             justify-content: center;
 
-            .bk-button {
-                width: 120px;
-            }
-
             .create-env-btn {
                 margin-left: 4px;
             }
