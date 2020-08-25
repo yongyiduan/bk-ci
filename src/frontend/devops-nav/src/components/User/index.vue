@@ -115,8 +115,7 @@
             }
         }
         logout (): void {
-            bkLogout.logout()
-            window.location.href = LOGIN_SERVICE_URL + '/?c_url=' + window.location.href
+          window.location.href = window.getLoginUrl()
         }
     }
 </script>
