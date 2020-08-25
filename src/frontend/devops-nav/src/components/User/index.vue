@@ -115,6 +115,7 @@
             }
         }
         logout (): void {
+          bkLogout.logout()
           window.location.href = window.getLoginUrl()
         }
     }
