@@ -17,7 +17,6 @@
 
 <script>
     import { mapActions, mapGetters } from 'vuex'
-    import breadCrumbs from '@/components/bread-crumbs.vue'
     import ideInfo from '../../components/common/detail-info/ide'
     import breadCrumbs from '@/components/bread-crumbs.vue'
     import atomInfo from '../../components/common/detail-info/atom'
