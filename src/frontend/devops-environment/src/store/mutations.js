@@ -18,22 +18,9 @@
  */
 
 const mutations = {
-    modifyProcessHead: (state, { process, current }) => {
-        Object.assign(state.processHeadConf, { process, current })
-    },
     selectModelApply: (state, { obj }) => {
         Object.assign(state, {
             currentSelectedModel: obj
-        })
-    },
-    updatePublicImages: (state, { list }) => {
-        Object.assign(state, {
-            publicDockerList: list
-        })
-    },
-    updateCustomizeImages: (state, { list }) => {
-        Object.assign(state, {
-            customizeDockerList: list
         })
     },
     updateDevCloudQuta: (state, { res }) => {

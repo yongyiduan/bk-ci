@@ -20,7 +20,6 @@
 import Vue from 'vue'
 
 const prefix = 'environment/api'
-const imagePrefix = 'image/api'
 const vue = new Vue()
 
 const actions = {
@@ -49,26 +48,10 @@ const actions = {
         })
     },
     /**
-     * VM机型
-     */
-    requestVmModelList ({ commit }, { projectId }) {
-        return vue.$ajax.get(`${prefix}/user/cluster/${projectId}/getVmModelList`).then(response => {
-            return response
-        })
-    },
-    /**
      * Bcs镜像
      */
     requestImageList ({ commit }, { projectId }) {
         return vue.$ajax.get(`${prefix}/user/cluster/${projectId}/getImageList`).then(response => {
-            return response
-        })
-    },
-    /**
-     * 配额台数
-     */
-    requestVmQuta ({ commit }, { projectId }) {
-        return vue.$ajax.get(`${prefix}/user/cluster/${projectId}/getProjectInfo`).then(response => {
             return response
         })
     },
@@ -252,33 +235,6 @@ const actions = {
      */
     updateDisplayName ({ commit }, { projectId, nodeHashId, params }) {
         return vue.$ajax.post(`${prefix}/user/envnode/${projectId}/${nodeHashId}/updateDisplayName`, params).then(response => {
-            return response
-        })
-    },
-
-    /**
-     * 获取DevCloud机型列表
-     */
-    requestDevCloudModel ({ commit }, { projectId }) {
-        return vue.$ajax.get(`${prefix}/user/devcloud/${projectId}/getModelList`).then(response => {
-            return response
-        })
-    },
-
-    /**
-     * 获取项目DevCloud构建镜像列表
-     */
-    requestPublicDockers ({ commit }, { projectId, isPublic }) {
-        return vue.$ajax.get(`${imagePrefix}/user/image/${projectId}/listDevCloudImages/${isPublic}`).then(response => {
-            return response
-        })
-    },
-
-    /**
-     * 添加DevCloud虚拟机
-     */
-    applyDocker ({ commit }, { projectId, params }) {
-        return vue.$ajax.post(`${prefix}/user/devcloud/${projectId}/addDevCloudVm`, params).then(response => {
             return response
         })
     },

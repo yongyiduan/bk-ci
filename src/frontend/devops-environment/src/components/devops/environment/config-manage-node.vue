@@ -77,7 +77,7 @@
                         <div class="table-node-item node-item-agstatus">{{ $t('environment.nodeInfo.gseAgentStatus') }}</div>
                     </div>
                     <div class="table-node-body">
-                        <template v-for="(col, index) of rowList">    
+                        <template v-for="(col, index) of rowList">
                             <div class="table-node-row" :key="index" v-if="col.isDisplay">
                                 <div class="table-node-item node-item-checkbox">
                                     <bk-checkbox

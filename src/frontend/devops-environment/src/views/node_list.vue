@@ -4,27 +4,10 @@
             <div slot="left">{{ $t('environment.node') }}</div>
             <div slot="right" v-if="nodeList.length > 0">
                 <template v-if="isExtendTx">
-                    <bk-button theme="primary" class="create-node-btn"
-                        @click="toCreateNode">{{ $t('environment.new') }}</bk-button>
-                    <bk-dropdown-menu :align="'right'"
-                        @show="dropdownIsShow('show')"
-                        @hide="dropdownIsShow('hide')"
-                        ref="dropdown">
-                        <bk-button slot="dropdown-trigger">
-                            <span>{{ $t('environment.import') }}</span>
-                            <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                        </bk-button>
-                        <ul class="bk-dropdown-list" slot="dropdown-content">
-                            <li>
-                                <a href="javascript:;" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</a>
-                            </li>
-                            <li>
-                                <a href="javascript:;" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</a>
-                            </li>
-                        </ul>
-                    </bk-dropdown-menu>
+                    <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
+                    <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
                 </template>
-                <bk-button theme="primary" class="import-vmbuild-btn" v-else @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
+                <bk-button v-else theme="primary" class="import-vmbuild-btn" @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
             </div>
         </content-header>
         <section class="sub-view-port" v-bkloading="{
@@ -174,7 +157,6 @@
 
             <empty-node v-if="showContent && !nodeList.length"
                 :to-import-node="toImportNode"
-                :to-create-node="toCreateNode"
                 :empty-info="emptyInfo"
             ></empty-node>
         </section>
@@ -236,7 +218,6 @@
                 isAgent: false,
                 isMultipleBtn: false,
                 isEditNodeStatus: false,
-                isDropdownShow: false, // 导入菜单
                 showContent: false, // 内容显示
                 hasPermission: true, // 构建机权限
                 showTooltip: false,
@@ -319,9 +300,6 @@
             },
             userInfo () {
                 return window.userInfo
-            },
-            isExtendTx () {
-                return VERSION_TYPE === 'tencent'
             }
         },
         watch: {
@@ -431,44 +409,6 @@
             toNodeApplyPerm (row) {
                 const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}` : PERM_URL_PREFIX
                 window.open(url, '_blank')
-            },
-            dropdownIsShow (isShow) {
-                if (isShow === 'show') {
-                    this.isDropdownShow = true
-                } else {
-                    this.isDropdownShow = false
-                }
-            },
-            async toCreateNode () {
-                try {
-                    const res = await this.$store.dispatch('environment/requestVmQuta', {
-                        projectId: this.projectId
-                    })
-
-                    if (res.devCloudVmEnabled) {
-                        this.$store.commit('environment/modifyProcessHead', {
-                            process: 'modelType',
-                            current: 0
-                        })
-                        this.$router.push({ name: 'createNode' })
-                    } else {
-                        const message = `${this.$t('environment.project')}${this.projectId}${this.$t('environment.nodeInfo.devCloudApply')}`
-                        const theme = 'warning'
-
-                        this.$bkMessage({
-                            message,
-                            theme
-                        })
-                    }
-                } catch (err) {
-                    const message = err.message ? err.message : err
-                    const theme = 'error'
-
-                    this.$bkMessage({
-                        message,
-                        theme
-                    })
-                }
             },
             toNodeDetail (node) {
                 if (this.canShowDetail(node)) {
@@ -934,10 +874,6 @@
         min-width: 1126px;
         height: 100%;
         overflow: hidden;
-
-        .create-node-btn {
-            margin-right: 6px;
-        }
 
         .prompt-operator,
         .edit-operator {

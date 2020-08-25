@@ -44,7 +44,8 @@ module.exports = {
     ],
     globals: {
         'LOGOUT_SERVICE_URL': false,
-        'DEVOPS_LS_VERSION': false
+        'DEVOPS_LS_VERSION': false,
+        'VERSION_TYPE': false
     },
     overrides: [
         {

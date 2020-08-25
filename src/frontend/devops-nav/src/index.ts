@@ -83,7 +83,7 @@ Vue.prototype.iframeUtil = iframeUtil(router)
 Vue.prototype.$showAskPermissionDialog = showAskPermissionDialog
 Vue.prototype.$setLocale = setLocale
 Vue.prototype.$localeList = localeList
-
+Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
 // 判断localStorage版本, 旧版本需要清空
 judgementLsVersion()
 

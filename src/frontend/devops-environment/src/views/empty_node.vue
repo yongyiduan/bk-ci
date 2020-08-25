@@ -7,24 +7,8 @@
         </div>
         <div class="create-node-row" v-else>
             <template v-if="isExtendTx">
-                <bk-button theme="primary" class="create-node-btn" @click="toCreateNode">{{ $t('environment.create') }}</bk-button>
-                <bk-dropdown-menu :align="'right'"
-                    @show="dropdownShow"
-                    @hide="dropdownHide"
-                    ref="dropdown">
-                    <bk-button slot="dropdown-trigger">
-                        <span>{{ $t('environment.import') }}</span>
-                        <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
-                    </bk-button>
-                    <ul class="bk-dropdown-list" slot="dropdown-content">
-                        <li>
-                            <a href="javascript:;" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</a>
-                        </li>
-                        <li>
-                            <a href="javascript:;" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</a>
-                        </li>
-                    </ul>
-                </bk-dropdown-menu>
+                <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
+                <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
             </template>
             <bk-button theme="primary" class="import-node-btn" v-else @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
         </div>
@@ -41,24 +25,6 @@
             emptyInfo: Object,
             toCreateNode: Function,
             toImportNode: Function
-        },
-        data () {
-            return {
-                isDropdownShow: false
-            }
-        },
-        computed: {
-            isExtendTx () {
-                return VERSION_TYPE === 'tencent'
-            }
-        },
-        methods: {
-            dropdownShow () {
-                this.isDropdownShow = true
-            },
-            dropdownHide () {
-                this.isDropdownShow = false
-            }
         }
     }
 </script>
@@ -82,14 +48,9 @@
 
         .create-node-row {
             margin-top: 28px;
-
-            .bk-button {
-                width: 120px;
-            }
-
-            .create-node-btn {
-                margin-right: 4px;
-            }
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
             .create-env-btn {
                 margin-left: 4px;
