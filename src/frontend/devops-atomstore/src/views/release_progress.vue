@@ -217,6 +217,14 @@
             breadCrumbs
         },
 
+        filters: {
+            levelFilter (val) {
+                const local = window.devops || {}
+                if (val === 'LOGIN_PUBLIC') return local.$t('store.是')
+                else return local.$t('store.否')
+            }
+        },
+
         data () {
             return {
                 permission: true,

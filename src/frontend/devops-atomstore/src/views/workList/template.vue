@@ -31,21 +31,7 @@
                 <bk-table-column :label="$t('store.所属项目')" prop="projectName"></bk-table-column>
                 <bk-table-column :label="$t('store.状态')">
                     <template slot-scope="props">
-                        <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
-                            v-if="props.row.templateStatus === 'AUDITING'">
-                            <div class="rotate rotate1"></div>
-                            <div class="rotate rotate2"></div>
-                            <div class="rotate rotate3"></div>
-                            <div class="rotate rotate4"></div>
-                            <div class="rotate rotate5"></div>
-                            <div class="rotate rotate6"></div>
-                            <div class="rotate rotate7"></div>
-                            <div class="rotate rotate8"></div>
-                        </div>
-                        <span class="atom-status-icon success" v-if="props.row.templateStatus === 'RELEASED'"></span>
-                        <span class="atom-status-icon fail" v-if="props.row.templateStatus === 'GROUNDING_SUSPENSION'"></span>
-                        <span class="atom-status-icon obtained" v-if="props.row.templateStatus === 'AUDIT_REJECT' || props.row.templateStatus === 'UNDERCARRIAGED'"></span>
-                        <span class="atom-status-icon devops-icon icon-initialize" v-if="props.row.templateStatus === 'INIT'"></span>
+                        <status :status="calcStatus(props.row.templateStatus)"></status>
                         <span>{{ $t(templateStatusMap[props.row.templateStatus]) }}</span>
                     </template>
                 </bk-table-column>
@@ -192,11 +178,13 @@
 <script>
     import { getQueryString, debounce } from '@/utils/index'
     import formTips from '@/components/common/formTips/index'
+    import status from './status'
     import { templateStatusList } from '@/store/constants'
 
     export default {
         components: {
-            formTips
+            formTips,
+            status
         },
 
         data () {
@@ -481,8 +469,9 @@
             },
 
             routerAtoms (code) {
+                const name = VERSION_TYPE === 'ee' ? 'setting' : 'visible'
                 this.$router.push({
-                    name: 'setting',
+                    name,
                     params: {
                         code,
                         type: 'template'

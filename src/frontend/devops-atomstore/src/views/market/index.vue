@@ -1,7 +1,7 @@
 <template>
     <article class="store-home">
         <bread-crumbs :bread-crumbs="navList" :type="filterData.pipeType">
-            <router-link :to="{ name: `${filterData.pipeType || 'atom'}Work` }" class="g-title-work"> {{ $t('store.工作台') }} </router-link>
+            <router-link v-if="filterData.pipeType !== 'ide'" :to="{ name: `${filterData.pipeType || 'atom'}Work` }" class="g-title-work"> {{ $t('store.工作台') }} </router-link>
         </bread-crumbs>
 
         <main class="store-main" @scroll.passive="mainScroll">
@@ -114,7 +114,8 @@
                     { type: 'atom', des: this.$t('store.流水线插件') },
                     { type: 'template', des: this.$t('store.流水线模板') },
                     { type: 'ide', des: this.$t('store.IDE插件') },
-                    { type: 'image', des: this.$t('store.容器镜像') }
+                    { type: 'image', des: this.$t('store.容器镜像') },
+                    { type: 'service', des: this.$t('store.微扩展') }
                 ]
             }
         },
@@ -142,6 +143,12 @@
                         break
                     case 'image':
                         name = this.$t('store.容器镜像')
+                        break
+                    case 'ide':
+                        name = this.$t('store.IDE插件')
+                        break
+                    case 'service':
+                        name = this.$t('store.微扩展')
                         break
                     default:
                         name = this.$t('store.流水线插件')

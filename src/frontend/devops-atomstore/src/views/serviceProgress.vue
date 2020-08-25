@@ -1,18 +1,8 @@
 <template>
     <article v-bkloading="{ isLoading }" class="service-progress-home">
-        <h3 class="market-home-title">
-            <icon class="title-icon" name="color-logo-store" size="25" />
-            <p class="title-name">
-                <span class="back-home" @click="toAtomStore"> {{ $t('store.研发商店') }} </span>
-                <i class="right-arrow banner-arrow"></i>
-                <span class="banner-des back-home" @click="toServiceList"> {{ $t('store.工作台') }} </span>
-                <i class="right-arrow banner-arrow"></i>
-                <span class="banner-des back-home" @click="toServiceDetail"> {{serviceDetail.serviceCode}} </span>
-                <i class="right-arrow banner-arrow"></i>
-                <span class="banner-des">{{$t('store.上架/升级微扩展')}}</span>
-            </p>
-            <a class="title-work" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.微扩展指引') }} </a>
-        </h3>
+        <bread-crumbs :bread-crumbs="navList" type="service">
+            <a class="g-title-work" target="_blank" href="https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086"> {{ $t('store.微扩展指引') }} </a>
+        </bread-crumbs>
         <article v-if="!isLoading" class="service-progress-main">
             <header class="progress-header">
                 <bk-steps ext-cls="progress-steps" :status="currentStepStatus" :steps="progressStatus" :cur-step="currentStepIndex"></bk-steps>
@@ -94,23 +84,25 @@
 
 <script>
     import { mapActions } from 'vuex'
-    import build from '../components/common/progressSteps/build'
+    import breadCrumbs from '@/components/bread-crumbs.vue'
+    import testEnvPrepare from '../components/common/progressSteps/test-env-prepare'
     import test from '../components/common/progressSteps/test'
     import commit from '../components/common/progressSteps/commit'
     import approve from '../components/common/progressSteps/approve'
     import begin from '../components/common/progressSteps/begin'
     import end from '../components/common/progressSteps/end'
-    import deploy from '../components/common/progressSteps/deploy'
+    import online from '../components/common/progressSteps/online'
 
     export default {
         components: {
-            build,
+            breadCrumbs,
+            testEnvPrepare,
             test,
             commit,
             approve,
             begin,
             end,
-            deploy
+            online
         },
 
         filters: {
@@ -177,6 +169,15 @@
                         break
                 }
                 return res
+            },
+
+            navList () {
+                return [
+                    { name: this.$t('store.工作台') },
+                    { name: this.$t('store.微扩展'), to: { name: 'serviceWork' } },
+                    { name: this.serviceDetail.serviceCode, to: { name: 'overView', params: { code: this.serviceDetail.serviceCode, type: 'service' } } },
+                    { name: this.$t('store.上架/升级微扩展') }
+                ]
             }
         },
 
@@ -195,15 +196,6 @@
                 'requestServiceProcess',
                 'requestServiceCancelRelease'
             ]),
-
-            toServiceDetail () {
-                this.$router.push({
-                    name: 'serviceOverview',
-                    params: {
-                        serviceCode: this.serviceDetail.serviceCode
-                    }
-                })
-            },
 
             showDetail () {
                 this.isShowDetail = true
@@ -252,12 +244,12 @@
                 const serviceId = params.serviceId || ''
                 const iconMap = {
                     begin: 'order-shape',
-                    build: 'execute',
+                    testEnvPrepare: 'execute',
                     test: 'script-files',
                     commit: 'edit2',
                     approve: 'panel-permission',
                     end: 'check-1',
-                    deploy: 'panels'
+                    online: 'panels'
                 }
 
                 return this.requestServiceProcess(serviceId).then((res) => {
@@ -290,12 +282,7 @@
             },
 
             toServiceList () {
-                this.$router.push({
-                    name: 'workList',
-                    params: {
-                        type: 'service'
-                    }
-                })
+                this.$router.push({ name: 'serviceWork' })
             },
 
             toAtomStore () {
@@ -414,7 +401,7 @@
 
     .service-progress-main {
         width: 95vw;
-        height: calc(100% - 116px);
+        height: calc(100% - 5.6vh - 66px);
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
         margin: 33px auto;
         background: $white;

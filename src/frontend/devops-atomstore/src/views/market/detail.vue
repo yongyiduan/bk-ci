@@ -1,7 +1,7 @@
 <template>
     <article class="detail-home" v-bkloading="{ isLoading }">
         <bread-crumbs :bread-crumbs="navList" :type="type">
-            <router-link :to="{ name: 'atomWork' }" class="g-title-work"> {{ $t('store.工作台') }} </router-link>
+            <router-link :to="{ name: 'atomWork' }" class="g-title-work" v-if="type !== 'ide'"> {{ $t('store.工作台') }} </router-link>
         </bread-crumbs>
 
         <main class="store-main" v-if="!isLoading">
@@ -17,6 +17,7 @@
 
 <script>
     import { mapActions, mapGetters } from 'vuex'
+    import breadCrumbs from '@/components/bread-crumbs.vue'
     import ideInfo from '../../components/common/detail-info/ide'
     import breadCrumbs from '@/components/bread-crumbs.vue'
     import atomInfo from '../../components/common/detail-info/atom'
@@ -33,9 +34,9 @@
             ideInfo,
             imageInfo,
             detailScore,
+            serviceInfo,
             codeSection,
-            breadCrumbs,
-            serviceInfo
+            breadCrumbs
         },
 
         data () {
@@ -86,6 +87,12 @@
                         break
                     case 'image':
                         name = this.$t('store.容器镜像')
+                        break
+                    case 'ide':
+                        name = this.$t('store.IDE插件')
+                        break
+                    case 'service':
+                        name = this.$t('store.微扩展')
                         break
                     default:
                         name = this.$t('store.流水线插件')
@@ -208,14 +215,6 @@
                     detail.detailId = serviceDetail.serviceId
                     detail.name = serviceDetail.serviceName
                     this.setDetail(detail)
-                })
-            },
-
-            backToStore () {
-                Object.assign(this.markerQuey, { pipeType: this.type })
-                this.$router.push({
-                    name: 'atomHome',
-                    query: this.markerQuey
                 })
             }
         }
