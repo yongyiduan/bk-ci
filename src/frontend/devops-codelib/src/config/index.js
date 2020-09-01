@@ -55,7 +55,7 @@ export const codelibConfig = {
         typeName: 'codeTGit'
     },
     tgit_https: {
-        credentialTypes: 'USERNAME_PASSWORD',
+        credentialTypes: 'USERNAME_PASSWORD,TOKEN_USERNAME_PASSWORD',
         label: 'TGit',
         typeName: 'codeTGit'
     }
