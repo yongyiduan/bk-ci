@@ -344,7 +344,9 @@
                         projectCode: '',
                         atomCode: '',
                         name: '',
-                        language: ''
+                        language: '',
+                        authType: 'OAUTH',
+                        visibilityLevel: 'LOGIN_PUBLIC'
                     }
                 }
             },

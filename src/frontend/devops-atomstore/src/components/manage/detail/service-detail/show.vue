@@ -16,7 +16,7 @@
                 </li>
                 <li class="detail-item">
                     <span class="detail-label">{{ $t('store.调试项目') }}：</span>
-                    <span>{{ detail.initProjectCode || '--' }}</span>
+                    <span>{{ detail.projectCode || '--' }}</span>
                 </li>
                 <li class="detail-item">
                     <span class="detail-label">{{ $t('store.功能标签') }}：</span>
