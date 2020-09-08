@@ -8,7 +8,7 @@
             <template v-for="typeLabel in codelibTypes">
                 <li v-if="!isExtendTx || typeLabel !== 'Gitlab' || isBlueKing"
                     :key="typeLabel" @click="createCodelib(typeLabel)">
-                    {{ `${typeLabel} ${$t('codelib.repo')}` }}
+                    {{ $t(`codelib.${typeLabel}`) + $t('codelib.repo') }}
                 </li>
             </template>
         </ul>
