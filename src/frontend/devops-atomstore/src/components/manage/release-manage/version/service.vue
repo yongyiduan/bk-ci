@@ -52,7 +52,7 @@
         data () {
             return {
                 progressStatus: ['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING', 'RELEASE_DEPLOYING', 'RELEASE_DEPLOY_FAIL'],
-                upgradeStatus: ['AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION']
+                upgradeStatus: ['INIT', 'UNDERCARRIAGED', 'AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION']
             }
         },
 
