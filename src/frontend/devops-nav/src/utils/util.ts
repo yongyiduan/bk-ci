@@ -205,3 +205,10 @@ export function toggleDialog (options) {
     }
     eventBus.$emit('update-extension-dialog', options)
 }
+export class HttpError extends Error {
+    code = 500
+    constructor (code, message = 'http request error message') {
+        super(message)
+        this.code = code
+    }
+}

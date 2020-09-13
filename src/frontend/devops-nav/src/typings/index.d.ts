@@ -42,19 +42,19 @@ interface Window {
     detachEvent(event: string, listener: EventListener): void
 }
 interface subService {
-    collected: boolean
-    css_url: string
-    id: string
-    iframe_url: string
-    inject_type: string
-    show_project_list: boolean
-    show_nav: boolean
-    js_url: string
-    link: string
-    name: string
-    status: string
-    link_new: string,
-    project_id_type: string
+    'collected': boolean
+    'css_url': string
+    'id': string
+    'iframe_url': string
+    'inject_type': string
+    'show_project_list': boolean
+    'show_nav': boolean
+    'js_url': string
+    'link': string
+    'name': string
+    'status': string
+    'link_new': string,
+    'project_id_type': string
 }
 
 interface Permission {
@@ -67,12 +67,14 @@ declare module '*.vue' {
     export default Vue
 }
 
-declare var LOGIN_SERVICE_URL: string
-declare var GW_URL_PREFIX: string
-declare var DOCS_URL_PREFIX: string
-declare var DEVOPS_LS_VERSION: string
-declare var ENTERPRISE_VERSION: string
-declare var VERSION_TYPE: string
+declare const LOGIN_SERVICE_URL: string
+declare const GW_URL_PREFIX: string
+declare const DOCS_URL_PREFIX: string
+declare const DEVOPS_LS_VERSION: string
+declare const ENTERPRISE_VERSION: string
+declare const VERSION_TYPE: string
+declare const PERM_URL_PREFIX: string
 declare module '*.png'
 
 declare const X_DEVOPS_PROJECT_ID: string
+

@@ -23,7 +23,8 @@ import {
     SET_SERVICES,
     TOGGLE_PERMISSION_DIALOG,
     SET_CURRENT_NOTICE,
-    SET_SERVICE_HOOKS
+    SET_SERVICE_HOOKS,
+    AUTH_API_URL_PREFIX
 } from './constants'
 
 const actions: ActionTree<RootState, any> = {
@@ -133,7 +134,7 @@ const actions: ActionTree<RootState, any> = {
     changeProjectLogo (_, { projectCode, formData }) {
         return Request.put(`${PROJECT_API_URL_PREFIX}/user/projects/${projectCode}/logo/`, formData)
     },
-    closePreviewTips ({ commit }) {
+    closePreviewTips ({ commit }: ActionContext<RootState, RootState>) {
         commit(CLOSE_PREVIEW_TIPS)
     },
     getAnnouncement () {
@@ -141,6 +142,12 @@ const actions: ActionTree<RootState, any> = {
     },
     setAnnouncement ({ commit }, payload) {
         commit(SET_CURRENT_NOTICE, payload)
+    },
+    getPermRedirectUrl (_, payload) {
+        return Request.post(`${AUTH_API_URL_PREFIX}/user/auth/permissionUrl`, payload)
+    },
+    hasCreateProjectPermission () {
+        return Request.get(`${PROJECT_API_URL_PREFIX}/user/projects/hasCreatePermission`)
     }
 }
 

@@ -21,9 +21,9 @@ interface RootState {
 }
 
 interface Link {
-    name: string
-    link: string
-    create_time: string
+    'name': string
+    'link': string
+    'create_time': string
 }
 
 interface Demo {

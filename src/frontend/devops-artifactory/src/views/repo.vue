@@ -122,7 +122,7 @@
                             <div class="detail-info">
                                 <div class="detail-info-label"><span>Info</span></div>
                                 <ul>
-                                    <template v-for="(item, key) of sideSliderConfig.detailData.info">    
+                                    <template v-for="(item, key) of sideSliderConfig.detailData.info">
                                         <li
                                             v-if="!(lastClickItem.folder && item.key === 'size')"
                                             :key="`detail${key}`">

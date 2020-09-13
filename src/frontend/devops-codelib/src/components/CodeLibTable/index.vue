@@ -141,18 +141,10 @@
             },
 
             deleteCodeLib ({ repositoryHashId, aliasName }) {
-                const subHeader = this.$createElement(
-                    'p',
-                    {
-                        style: {
-                            textAlign: 'center'
-                        }
-                    },
-                    `${this.$t('codelib.deleteCodelib')}${aliasName}`
-                )
                 this.$bkInfo({
-                    subHeader,
-                    title: this.$t('codelib.confirm'),
+                    theme: 'warning',
+                    type: 'warning',
+                    subTitle: this.$t('codelib.deleteCodelib', [aliasName]),
                     confirmFn: () => {
                         const { projectId, currentPage, pageSize, count, totalPages } = this
                         this.isLoading = true
@@ -178,10 +170,27 @@
                                 this.switchPage(currentPage, pageSize)
                             }
                         }).catch((e) => {
-                            this.$bkMessage({
-                                message: e.message,
-                                theme: 'error'
-                            })
+                            if (e.code === 403) {
+                                this.$showAskPermissionDialog({
+                                    noPermissionList: [{
+                                        actionId: this.$permissionActionMap.edit,
+                                        resourceId: this.$permissionResourceMap.code,
+                                        instanceId: [{
+                                            id: repositoryHashId,
+                                            name: aliasName
+                                        }],
+                                        projectId: this.projectId
+                                    }],
+                                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${
+                                        this.projectId
+                                    }&service_code=code&role_manager=repertory`
+                                })
+                            } else {
+                                this.$bkMessage({
+                                    message: e.message,
+                                    theme: 'error'
+                                })
+                            }
                         }).finally(() => {
                             this.isLoading = false
                         })

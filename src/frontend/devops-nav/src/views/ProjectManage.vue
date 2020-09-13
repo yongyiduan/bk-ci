@@ -19,7 +19,7 @@
                         <bk-button
                             theme="primary"
                             icon="icon-plus"
-                            @click="togglePMDialog(true)"
+                            @click="!hasCreatePermission ? togglePMDialog(true) : applyCreatePermission()"
                         >
                             {{ $t('addProject') }}
                         </bk-button>
@@ -212,6 +212,7 @@
             </template>
             <empty-tips
                 v-else
+                :show-lock="true"
                 :title="$t('notFindProject')"
                 :desc="$t('notFindProjectTips')"
             >
@@ -224,7 +225,8 @@
                 </bk-button>
                 <a
                     class="empty-btns-item"
-                    href="/console/perm/apply-join-project"
+                    href="javascript:;"
+                    @click="toApplyPermission"
                 >
                     <bk-button theme="success">{{ $t('applyProject') }}</bk-button>
                 </a>
@@ -261,6 +263,7 @@
         @Action getProjects
         @Action toggleProjectEnable
         @Action changeProjectLogo
+        @Action hasCreateProjectPermission
 
         isFilterByOffline: boolean = false
         showlogoDialog: boolean = false
@@ -281,6 +284,7 @@
             limitList: [10, 15, 20, 25, 30],
             count: 0
         }
+        hasCreatePermission: boolean = true
         matchColorList: string[] = [
             'green',
             'yellow',
@@ -312,6 +316,16 @@
 
         created () {
             this.fetchAllProjects()
+            this.checkCreatePermission()
+        }
+
+        async checkCreatePermission () {
+          try {
+            const hasCreatePermission = await this.hasCreateProjectPermission()
+            this.hasCreatePermission = hasCreatePermission
+          } catch (e) {
+            this.hasCreatePermission = false
+          }
         }
 
         async fetchAllProjects () {
@@ -391,8 +405,23 @@
 
         goProject ({ projectCode, enabled }): void {
             if (enabled) {
-                window.open(`/console/perm/my-project?project_code=${projectCode}`, '_blank')
+                window.open(`${PERM_URL_PREFIX}perm/my-project?project_code=${projectCode}`, '_blank')
             }
+        }
+        
+        toApplyPermission () {
+            this.tencentPermission('/console/perm/apply-join-project')
+        }
+
+        applyCreatePermission () {
+            this.$showAskPermissionDialog({
+                noPermissionList: [{
+                    actionId: this.$permissionActionMap.create,
+                    resourceId: this.$permissionResourceMap.project,
+                    instanceId: []
+                }],
+                applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project`
+            })
         }
 
         goServiceManage ({ projectCode }): void {
@@ -421,10 +450,19 @@
                         await this.getProjects(true)
                         return true
                     } catch (error) {
-                        msg = error.message || ((enabled ? this.$t('disableLabel') : this.$t('enableLabel')) + projectName + this.$t('projectFail'))
+                        if (error.code === 403) {
+                        //   this.applyPermission(this.$permissionActionMap.edit, this.$permissionResourceMap.project, [{
+                        //     id: projectCode,
+                        //     type: this.$permissionResourceTypeMap.PROJECT
+                        //   }])
+                            this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=project&project_code=${projectCode}&service_code=project&role_manager=project`)
+                        } else {
+                            msg = error.message || ((enabled ? this.$t('disableLabel') : this.$t('enableLabel')) + projectName + this.$t('projectFail'))
+                        }
+                        
                         return true
                     } finally {
-                        this.$bkMessage({
+                        msg && this.$bkMessage({
                             theme,
                             message: msg
                         })

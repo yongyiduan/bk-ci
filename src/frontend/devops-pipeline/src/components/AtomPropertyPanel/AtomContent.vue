@@ -357,83 +357,28 @@
                 if (this.isNewAtomTemplate(this.htmlTemplateVersion)) {
                     return NormalAtomV2
                 }
-                switch (this.atomCode) {
-                    case 'comDistribution':
-                    case 'cloudStone':
-                    case 'openStatePushFile':
-                    case 'gseKitProcRunCmdDev':
-                    case 'gseKitProcRunCmdProd':
-                        return AtomFormWithAppID
-                    case 'timerTrigger':
-                        return TimerTrigger
-                    case 'linuxScript':
-                    case 'windowsScript':
-                        return BuildScript
-                    case 'linuxPaasCodeCCScript':
-                        return Codecc
-                    case 'unity3dBuild':
-                        return Unity3dBuild
-                    case 'gcloud':
-                        return Gcloud
-                    case 'jobExecuteTaskExt':
-                        return JobExecuteTaskExt
-                    case 'buildArchiveGet':
-                        return BuildArchiveGet
-                    case 'jobDevOpsFastExecuteScript':
-                        return JobDevopsFastExecuteScript
-                    case 'tclsAddVersion':
-                        return Tcls
-                    case 'jobDevOpsFastPushFile':
-                        return JobDevOpsFastPushFile
-                    case 'jobDevOpsExecuteTaskExt':
-                        return JobDevopsExecuteTaskExt
-                    case 'zhiyunInstanceMaintenance':
-                        return ZhiyunInstanceMaintenance
-                    case 'CODE_GIT':
-                    case 'CODE_GITLAB':
-                        return CodePullGitX
-                    case 'CODE_SVN':
-                        return CodePullSvn
-                    case 'zhiyunUpdateAsyncEX':
-                        return ZhiyunUpdateAsyncEX
-                    case 'tcmElement':
-                        return Tcm
-                    case 'iosCertInstall':
-                        return IosCertInstall
-                    case 'bcsContainerOp':
-                        return BcsContainerOp
-                    case 'bcsContainerOpByName':
-                        return NewBcsContainerOp
-                    case 'acrossProjectDistribution':
-                        return CrossDistribute
-                    case 'experience':
-                        return VersionExperience
-                    case 'wetestElement':
-                        return WeTest
-                    case 'jobCloudsFastPush':
-                        return jobCloudsFastPush
-                    case 'jobCloudsFastExecuteScript':
-                        return jobCloudsFastExecuteScript
-                    case 'sendRTXNotify':
-                        return SendWechatNotify
-                    case 'reportArchive':
-                    case 'reportArchiveService':
-                        return ReportArchive
-                    case 'codeGitWebHookTrigger':
-                        return CodeGitWebHookTrigger
-                    case 'codeSVNWebHookTrigger':
-                        return CodeSvnWebHookTrigger
-                    case 'GITHUB':
-                        return PullGithub
-                    case 'codeGithubWebHookTrigger':
-                        return CodeGithubWebHookTrigger
-                    case 'pushImageToThirdRepo':
-                        return PushImageToThirdRepo
-                    case 'subPipelineCall':
-                        return SubPipelineCall
-                    default:
-                        return NormalAtom
+                const atomMap = {
+                    timerTrigger: TimerTrigger,
+                    linuxScript: BuildScript,
+                    windowsScript: BuildScript,
+                    unity3dBuild: Unity3dBuild,
+                    buildArchiveGet: BuildArchiveGet,
+                    CODE_GIT: CodePullGitX,
+                    CODE_GITLAB: CodePullGitX,
+                    CODE_SVN: CodePullSvn,
+                    iosCertInstall: IosCertInstall,
+                    acrossProjectDistribution: CrossDistribute,
+                    sendRTXNotify: SendWechatNotify,
+                    reportArchive: ReportArchive,
+                    reportArchiveService: ReportArchive,
+                    codeGitWebHookTrigger: CodeGitWebHookTrigger,
+                    codeSVNWebHookTrigger: CodeSvnWebHookTrigger,
+                    GITHUB: PullGithub,
+                    codeGithubWebHookTrigger: CodeGithubWebHookTrigger,
+                    pushImageToThirdRepo: PushImageToThirdRepo,
+                    subPipelineCall: SubPipelineCall
                 }
+                return atomMap[this.atomCode] || NormalAtom
             }
         },
         watch: {
@@ -585,7 +530,7 @@
                 const hasVaildRule = ruleList.some(item =>
                     item.taskId === this.element.atomCode
                     && (item.ruleList.every(rule => !rule.gatewayId)
-                    || item.ruleList.some(rule => this.element.name.indexOf(rule.gatewayId) > -1))
+                        || item.ruleList.some(rule => this.element.name.indexOf(rule.gatewayId) > -1))
                 )
                 return hasVaildRule
             },

@@ -403,12 +403,21 @@
                 this.$toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_creator=env_node` : PERM_URL_PREFIX
-                window.open(url, '_blank')
+                // this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
+                //     id: this.projectId,
+                //     type: this.$permissionResourceTypeMap.PROJECT
+                // }])
+                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_creator=env_node`)
             },
             toNodeApplyPerm (row) {
-                const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}` : PERM_URL_PREFIX
-                window.open(url, '_blank')
+                // this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
+                //     id: this.projectId,
+                //     type: this.$permissionResourceTypeMap.PROJECT
+                // }, {
+                //     id: row.nodeHashId,
+                //     type: this.$permissionResourceTypeMap.ENVIRONMENT_ENV_NODE
+                // }])
+                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}`)
             },
             toNodeDetail (node) {
                 if (this.canShowDetail(node)) {
@@ -423,18 +432,11 @@
                 const id = row.nodeHashId
 
                 params.push(id)
-
-                const h = this.$createElement
-                const content = h('p', {
-                    style: {
-                        textAlign: 'center'
-                    }
-                }, `${this.$t('environment.nodeInfo.deleteNodetips', [row.displayName])}`)
-
                 this.$bkInfo({
                     theme: 'warning',
                     type: 'warning',
-                    subHeader: content,
+                    title: this.$t('environment.delete'),
+                    subTitle: `${this.$t('environment.nodeInfo.deleteNodetips', [row.displayName])}`,
                     confirmFn: async () => {
                         let message, theme
                         try {
@@ -446,10 +448,25 @@
                             message = this.$t('environment.successfullyDeleted')
                             theme = 'success'
                         } catch (err) {
-                            message = err.data ? err.data.message : err
-                            theme = 'error'
+                            if (err.code === 403) {
+                                this.$showAskPermissionDialog({
+                                    noPermissionList: [{
+                                        actionId: this.$permissionActionMap.delete,
+                                        resourceId: this.$permissionResourceMap.envNode,
+                                        instanceId: [{
+                                            id,
+                                            name: row.nodeId
+                                        }],
+                                        projectId: this.projectId
+                                    }],
+                                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}`
+                                })
+                            } else {
+                                message = err.data ? err.data.message : err
+                                theme = 'error'
+                            }
                         } finally {
-                            this.$bkMessage({
+                            message && this.$bkMessage({
                                 message,
                                 theme
                             })
@@ -462,16 +479,9 @@
              * 构建机信息
              */
             async changeCreatedUser (id) {
-                const h = this.$createElement
-                const content = h('p', {
-                    style: {
-                        textAlign: 'center'
-                    }
-                }, `${this.$t('environment.nodeInfo.modifyOperatorTips')}？`)
-
                 this.$bkInfo({
                     title: this.$t('environment.nodeInfo.modifyImporter'),
-                    subHeader: content,
+                    subTitle: this.$t('environment.nodeInfo.modifyOperatorTips'),
                     confirmFn: async () => {
                         let message, theme
                         const params = {}
@@ -485,13 +495,8 @@
                             message = this.$t('environment.successfullyModified')
                             theme = 'success'
                         } catch (err) {
-                            const message = err.message ? err.message : err
-                            const theme = 'error'
-
-                            this.$bkMessage({
-                                message,
-                                theme
-                            })
+                            message = err.message ? err.message : err
+                            theme = 'error'
                         } finally {
                             this.$bkMessage({
                                 message,
@@ -744,10 +749,11 @@
             },
             async saveEdit (node) {
                 const valid = await this.$validator.validate()
+                const displayName = this.curEditNodeDisplayName.trim()
                 if (valid) {
                     let message, theme
                     const params = {
-                        displayName: this.curEditNodeDisplayName.trim()
+                        displayName
                     }
 
                     try {
@@ -760,10 +766,24 @@
                         message = this.$t('environment.successfullyModified')
                         theme = 'success'
                     } catch (err) {
-                        message = err.message ? err.message : err
-                        theme = 'error'
+                        if (err.code === 403) {
+                            this.$showAskPermissionDialog({
+                                noPermissionList: [{
+                                    actionId: this.$permissionActionMap.edit,
+                                    resourceId: this.$permissionResourceMap.envNode,
+                                    instanceId: [{
+                                        id: node.nodeHashId,
+                                        name: displayName
+                                    }],
+                                    projectId: this.projectId
+                                }]
+                            })
+                        } else {
+                            message = err.message ? err.message : err
+                            theme = 'error'
+                        }
                     } finally {
-                        this.$bkMessage({
+                        message && this.$bkMessage({
                             message,
                             theme
                         })

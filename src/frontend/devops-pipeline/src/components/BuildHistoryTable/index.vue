@@ -92,7 +92,7 @@
                         <div @click.stop="" class="error-code-item" v-for="item in props.row.errorInfoList" :key="item.taskId">
                             <i :title="$t('userError')" v-if="item.errorType === 1" class="devops-icon icon-user "></i>
                             <i :title="$t(item.errorType === 0 ? 'systemError' : item.errorType === 2 ? 'thirdPartyError' : 'pluginError' )" v-else class="devops-icon icon-cog"></i>
-                            <span :title="item.errorMsg" v-if="item.errorMsg">{{ item.errorMsg }} </span>
+                            <span :title="item.errorMsg" v-if="item.errorCode">{{ item. errorMsg }} </span>
                         </div>
                     </template>
                     <span v-else>--</span>
@@ -480,13 +480,15 @@
                         theme = 'error'
                     }
                 } catch (err) {
-                    if (err.code === 403) { // 没有权限执行
-                        // this.setPermissionConfig(`流水线：${this.curPipeline.pipelineName}`, '执行')
-                        return
-                    } else {
-                        message = err.message || err
-                        theme = 'error'
-                    }
+                    this.handleError(err, [{
+                        actionId: this.$permissionActionMap.execute,
+                        resourceId: this.$permissionResourceMap.pipeline,
+                        instanceId: [{
+                            id: this.$route.params.pipelineId,
+                            name: this.$route.params.pipelineId
+                        }],
+                        projectId: this.$route.params.projectId
+                    }])
                 } finally {
                     delete this.retryingMap[buildId]
                     message && this.$showTips({

@@ -36,7 +36,7 @@ import PortalVue from 'portal-vue' // eslint-disable-line
 import createLocale from '../../locale'
 import '@icon-cool/bk-icon-devops/src/index'
 import log from '@blueking/log'
-
+import { actionMap, resourceMap, resourceTypeMap } from '../../common-lib/permission-conf'
 import bkMagic from 'bk-magic-vue'
 // 全量引入 bk-magic-vue 样式
 require('bk-magic-vue/dist/bk-magic-vue.min.css')
@@ -61,6 +61,62 @@ VeeValidate.Validator.localize(validDictionary)
 ExtendsCustomRules(VeeValidate.Validator.extend)
 
 Vue.prototype.$setLocale = setLocale
+Vue.prototype.$permissionActionMap = actionMap
+Vue.prototype.$permissionResourceMap = resourceMap
+Vue.prototype.$permissionResourceTypeMap = resourceTypeMap
+Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
+
+Vue.mixin({
+    computed: {
+        roleMap () {
+            return {
+                executor: 'role_executor',
+                manager: 'role_manager',
+                viewer: 'role_viewer',
+                creator: 'role_creator'
+            }
+        }
+    },
+    methods: {
+        tencentPermission (url) {
+            const permUrl = this.isExtendTx ? url : PERM_URL_PREFIX
+            window.open(permUrl, '_blank')
+        },
+        // handleError (e, permissionAction, instance, projectId, resourceMap = this.$permissionResourceMap.pipeline) {
+        handleError (e, noPermissionList, applyPermissionUrl) {
+            if (e.code === 403) { // 没有权限编辑
+                this.$showAskPermissionDialog({
+                    noPermissionList,
+                    applyPermissionUrl
+                })
+            } else {
+                this.$showTips({
+                    message: e.message || e,
+                    theme: 'error'
+                })
+            }
+        },
+        /**
+         * 设置权限弹窗的参数
+         */
+        setPermissionConfig (resourceId, actionId, instanceId = [], projectId = this.$route.params.projectId, applyPermissionUrl) {
+            this.$showAskPermissionDialog({
+                noPermissionList: [{
+                    actionId,
+                    resourceId,
+                    instanceId,
+                    projectId
+                }],
+                applyPermissionUrl
+            })
+        },
+
+        getPermUrlByRole (projectId, pipelineId, role = this.roleMap.viewer) {
+            return `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&${role}=pipeline${pipelineId ? `:${pipelineId}` : ''}`
+        }
+        
+    }
+})
 
 global.pipelineVue = new Vue({
     el: '#app',

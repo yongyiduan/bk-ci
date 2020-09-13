@@ -15,7 +15,7 @@
             <bk-table v-if="showContent && envList.length"
                 size="small"
                 :data="envList"
-                :row-class-name="'env-item-row'"
+                :row-class-name="getRowClsName"
                 @row-click="toEnvDetail">
                 <bk-table-column :label="$t('environment.envInfo.name')" prop="name"></bk-table-column>
                 <bk-table-column :label="$t('environment.envInfo.type')" prop="envType">
@@ -37,7 +37,7 @@
                 </bk-table-column>
                 <bk-table-column :label="$t('environment.operation')" width="160">
                     <template slot-scope="props">
-                        <span class="handler-text" @click.stop="confirmDelete(props.row)">{{ $t('environment.delete') }}</span>
+                        <span :class="{ 'handler-text': props.row.canDelete, 'no-env-delete-permission': !props.row.canDelete }" @click.stop="confirmDelete(props.row)">{{ $t('environment.delete') }}</span>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -86,6 +86,10 @@
             await this.init()
         },
         methods: {
+            getRowClsName ({ row }) {
+                console.log(row)
+                return `env-item-row ${!row.canEdit ? '' : 'env-row-useless'}`
+            },
             async init () {
                 const {
                     loading
@@ -140,18 +144,16 @@
              */
             async confirmDelete (row) {
                 const id = row.envHashId
-
-                const h = this.$createElement
-                const content = h('p', {
-                    style: {
-                        textAlign: 'center'
-                    }
-                }, `${this.$t('environment.deleteConfirmTips', [row.name])}`)
-
+                if (!row.canDelete) {
+                    this.askEnvDeletePermission(id, row.name)
+                    return
+                }
+                
                 this.$bkInfo({
-                    subHeader: content,
-                    theme: 'warning',
                     type: 'warning',
+                    theme: 'warning',
+                    title: this.$t('environment.delete'),
+                    subTitle: this.$t('environment.envInfo.deleteEnvTips', [row.name]),
                     confirmFn: async () => {
                         let message, theme
                         try {
@@ -163,8 +165,12 @@
                             message = this.$t('environment.successfullyDeleted')
                             theme = 'success'
                         } catch (err) {
-                            message = err.data ? err.data.message : err
-                            theme = 'error'
+                            if (err.code === 403) {
+                                this.askEnvDeletePermission(id, row.name)
+                            } else {
+                                message = err.data ? err.data.message : err
+                                theme = 'error'
+                            }
                         } finally {
                             this.$bkMessage({
                                 message,
@@ -179,18 +185,47 @@
              * 跳转环境详情
              */
             toEnvDetail (row) {
-                this.$router.push({
-                    name: 'envDetail',
-                    params: {
-                        envId: row.envHashId
-                    }
-                })
+                if (row.canUse) {
+                    this.$router.push({
+                        name: 'envDetail',
+                        params: {
+                            envId: row.envHashId
+                        }
+                    })
+                } else {
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.use,
+                            resourceId: this.$permissionResourceMap.environment,
+                            instanceId: [{
+                                id: row.envHashId,
+                                name: row.name
+                            }],
+                            projectId: this.projectId
+                        }]
+                    })
+                }
             },
             /**
              * 处理时间格式
              */
             localConvertTime (timestamp) {
                 return convertTime(timestamp * 1000)
+            },
+
+            askEnvDeletePermission (id, name) {
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        actionId: this.$permissionActionMap.delete,
+                        resourceId: this.$permissionResourceMap.environment,
+                        instanceId: [{
+                            id,
+                            name
+                        }],
+                        projectId: this.projectId
+                    }],
+                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=environment&project_code=${this.projectId}&service_code=environment&role_creator=environment`
+                })
             }
         }
     }
@@ -214,6 +249,16 @@
         }
         .env-item-row {
             cursor: pointer;
+            &.env-row-useless {
+              cursor: url('../images/cursor-lock.png'), auto;
+              color: $fontLigtherColor;
+              .node-count-item {
+                color: $fontLigtherColor;
+              }
+            }
+            .no-env-delete-permission {
+              cursor: url('../images/cursor-lock.png'), auto;
+            }
         }
 
         .node-count-item,

@@ -33,7 +33,8 @@ const serviceList = [
     'notify',
     'repository',
     'ticket',
-    'store'
+    'store',
+    'auth'
 ]
 export const [
     PROJECT_API_URL_PREFIX,
@@ -49,7 +50,8 @@ export const [
     NOTIFY_API_URL_PREFIX,
     REPOSITORY_API_URL_PREFIX,
     TICKET_API_URL_PREFIX,
-    STORE_API_URL_PREFIX
+    STORE_API_URL_PREFIX,
+    AUTH_API_URL_PREFIX
 ] = serviceList.map(s => `${s}/api`)
 
 export const EMPTY_PROJECT: Project = {

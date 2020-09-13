@@ -43,6 +43,7 @@
                                 {{ output.description }}
                             </div>
                         </bk-popover>
+                        <copy-icon :value="`\${${namespace ? `${namespace}_${key}` : key}}`"></copy-icon>
                     </p>
                 </div>
             </div>
@@ -66,6 +67,7 @@
     import NameSpaceVar from '@/components/atomFormField/NameSpaceVar'
     import DynamicParameter from '@/components/AtomFormComponent/DynamicParameter'
     import { getAtomDefaultValue } from '@/store/modules/atom/atomUtil'
+    import copyIcon from '@/components/copyIcon'
     export default {
         name: 'normal-atom-v2',
         components: {
@@ -77,7 +79,8 @@
             Parameter,
             Tips,
             NameSpaceVar,
-            DynamicParameter
+            DynamicParameter,
+            copyIcon
         },
         mixins: [atomMixin, validMixins],
         computed: {

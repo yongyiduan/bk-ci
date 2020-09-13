@@ -401,20 +401,24 @@
                     }
                 } catch (e) {
                     if (e.code === 403) {
-                        this.iframeUtil.showAskPermissionDialog({
-                            noPermissionList: [
-                                {
-                                    resource: this.$t('codelib.codelib'),
-                                    option: repositoryHashId ? this.$t('codelib.edit') : this.$t('codelib.create')
-                                }
-                            ],
-                            applyPermissionUrl: this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${
+                        const actionId = this.$permissionActionMap[repositoryHashId ? 'edit' : 'create']
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                actionId,
+                                resourceId: this.$permissionResourceMap.code,
+                                instanceId: repositoryHashId ? [{
+                                    id: repositoryHashId,
+                                    name: codelib.aliasName
+                                }] : null,
+                                projectId
+                            }],
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${
                                 projectId
                             }&service_code=code&${
                                 repositoryHashId
                                     ? `role_manager=repertory`
                                     : 'role_creator=repertory'
-                            }` : PERM_URL_PREFIX
+                            }`
                         })
                     } else {
                         this.$bkMessage({

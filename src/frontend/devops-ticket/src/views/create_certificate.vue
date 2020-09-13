@@ -203,8 +203,11 @@
             },
 
             goToApplyPerm () {
-                const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&role_creator=cert` : PERM_URL_PREFIX
-                window.open(url, '_blank')
+                // this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.cert, [{
+                //     id: this.projectId,
+                //     type: this.$permissionResourceTypeMap.PROJECT
+                // }])
+                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&role_creator=certificate`)
             },
 
             async requestCertDetail (callBack) {
@@ -251,6 +254,17 @@
                         message = this.$t('ticket.cert.successfullyCreatedCert')
                     }
                 } catch (err) {
+                    if (err.code === 403) {
+                        const actionId = this.isEdit ? this.$permissionActionMap.edit : this.$permissionActionMap.create
+                        const instanceId = this.isEdit ? [{
+                            id: formData.certId,
+                            type: this.$permissionResourceTypeMap.TICKET_CERT
+                        }] : []
+                        this.applyPermission(actionId, this.$permissionResourceMap.cert, [{
+                            id: this.projectId,
+                            type: this.$permissionResourceTypeMap.PROJECT
+                        }, ...instanceId])
+                    }
                     message = err.message ? err.message : err
                     theme = 'error'
                 } finally {
