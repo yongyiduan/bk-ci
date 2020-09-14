@@ -74,8 +74,8 @@
                             <component v-validate="($t(obj.label) === $t('ticket.credential.sshKey') && localConfig.credential[obj.modelName] === '******') ? {} : obj.rule" v-if="obj.type !== 'password' || !showPwdCon[obj.modelName]" :is="obj.component" :name="key" :handle-change="updateElement" v-model="localConfig.credential[obj.modelName]" v-bind="obj" :placeholder="$t(obj.placeholder)" :class="{ 'is-danger': errors.has(key) }"></component>
                             <component v-validate="obj.rule" v-if="obj.type === 'password' && showPwdCon[obj.modelName]" :is="obj.component" :name="key" :handle-change="updateElement" v-model="localConfig.credential[obj.modelName]" type="text" v-bind="obj" :placeholder="$t(obj.placeholder)" :class="{ 'is-danger': errors.has(key) }"></component>
                             <i v-if="obj.type === 'password' && localConfig.credential[obj.modelName] !== '******'" @click="toggleShowPwdCon(obj.modelName)" :class="showPwdCon[obj.modelName] ? 'devops-icon icon-hide' : 'devops-icon icon-eye'"></i>
-                            <a v-if="$t(obj.label) === $t('ticket.credential.privateToken')" target="_blank" :href="`${CODEGIT_URL_PREFIX}/profile/account`" class="text-link link-tips">{{ $t('ticket.view') }}</a>
-                            <a v-if="$t(obj.label) === $t('ticket.credential.accessToken')" target="_blank" :href="`${GITLAB_URL_PREFIX}/profile/personal_access_tokens`" class="text-link link-tips">{{ $t('ticket.view') }}</a>
+                            <!-- <a v-if="$t(obj.label) === $t('ticket.credential.privateToken')" target="_blank" :href="`${CODEGIT_URL_PREFIX}/profile/account`" class="text-link link-tips">{{ $t('ticket.view') }}</a> -->
+                            <!-- <a v-if="$t(obj.label) === $t('ticket.credential.accessToken')" target="_blank" :href="`${GITLAB_URL_PREFIX}/profile/personal_access_tokens`" class="text-link link-tips">{{ $t('ticket.view') }}</a> -->
                             <p class="error-tips"
                                 v-show="errors.has(key)">
                                 {{$t(obj.errorMsg)}}
@@ -131,8 +131,6 @@
         },
         data () {
             return {
-                CODEGIT_URL_PREFIX: CODEGIT_URL_PREFIX,
-                GITLAB_URL_PREFIX: GITLAB_URL_PREFIX,
                 showContent: false,
                 hasPermission: true,
                 newModel: {},
