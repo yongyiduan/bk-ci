@@ -51,5 +51,8 @@
     "gitlabRule": "start by http://gitlab-paas.open.oa.com and end with .git",
     "gitCodeInternalRule": "start by git@git.code.oa.com and end with .git",
     "tgitHttpRule": "start by https://git.tencent.com and end with .git",
-    "tgitRule": "start by git@git.tencent.com and end with .git"
+    "tgitRule": "start by git@git.tencent.com and end with .git",
+    "SVN": "SVN",
+    "Github": "Github",
+    "Gitlab": "Gitlab"
 }
