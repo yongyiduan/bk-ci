@@ -51,15 +51,15 @@
 
         data () {
             return {
-                progressStatus: ['COMMITTING', 'BUILDING', 'BUILD_FAIL', 'TESTING', 'AUDITING'],
-                upgradeStatus: ['AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION']
+                progressStatus: ['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING', 'RELEASE_DEPLOYING', 'RELEASE_DEPLOY_FAIL'],
+                upgradeStatus: ['INIT', 'UNDERCARRIAGED', 'AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION']
             }
         },
 
         computed: {
             disableAddVersion () {
                 const firstVersion = this.versionList[0] || {}
-                return this.upgradeStatus.indexOf(firstVersion.atomStatus) === -1
+                return this.upgradeStatus.indexOf(firstVersion.serviceStatus) === -1
             }
         },
 

@@ -280,8 +280,8 @@
                     trigger: 'blur'
                 },
                 alpRule: {
-                    validator: (val) => (/^[a-z][a-z0-9-]*$/.test(val)),
-                    message: this.$t('store.由小写英文字母、数字和中划线组成，且需以小写英文字母开头'),
+                    validator: (val) => (/^[a-z][a-z0-9-]*(?<=[a-z0-9])$/.test(val)),
+                    message: this.$t('store.由小写英文字母、数字和中划线组成，且需以小写英文字母开头，以字母或数字结尾'),
                     trigger: 'blur'
                 },
                 nameRule: {
