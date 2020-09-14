@@ -203,15 +203,15 @@
                                 })
                                 message = this.$t('ticket.cert.successfullyDeletedCert')
                                 theme = 'success'
+                                this.requestList()
                             } catch (err) {
                                 message = err.data ? err.data.message : err
                                 theme = 'error'
                             } finally {
-                                this.$bkMessage({
+                                message && this.$bkMessage({
                                     message,
                                     theme
                                 })
-                                this.requestList()
                             }
                         }
                     })
