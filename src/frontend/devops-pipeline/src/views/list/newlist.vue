@@ -1062,7 +1062,7 @@
                             name: prePipeline.pipelineName
                         }],
                         projectId
-                    }], this.getPermUrlByRole(this.projectId, prePipeline.pipelineId, this.roleMap.manager))
+                    }], this.getPermUrlByRole(projectId, prePipeline.pipelineId, this.roleMap.manager))
                 } finally {
                     setTimeout(() => {
                         copyConfig.loading = false

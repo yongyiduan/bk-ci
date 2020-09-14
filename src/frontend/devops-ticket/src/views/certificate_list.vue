@@ -193,7 +193,7 @@
                     this.$bkInfo({
                         theme: 'warning',
                         type: 'warning',
-                        title: `${this.$t('ticket.cert.deleteCertTips', [cert.certId])}?`,
+                        subTitle: this.$t('ticket.cert.deleteCertTips', [cert.certId]),
                         confirmFn: async () => {
                             let message, theme
                             try {

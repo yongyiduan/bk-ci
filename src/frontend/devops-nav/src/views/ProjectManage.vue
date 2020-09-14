@@ -451,11 +451,17 @@
                         return true
                     } catch (error) {
                         if (error.code === 403) {
-                        //   this.applyPermission(this.$permissionActionMap.edit, this.$permissionResourceMap.project, [{
-                        //     id: projectCode,
-                        //     type: this.$permissionResourceTypeMap.PROJECT
-                        //   }])
-                            this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=project&project_code=${projectCode}&service_code=project&role_manager=project`)
+                            this.$showAskPermissionDialog({
+                              noPermissionList: [{
+                                  actionId: this.$permissionActionMap.edit,
+                                  resourceId: this.$permissionResourceMap.project,
+                                  instanceId: [{
+                                    id: projectCode,
+                                    name: projectName
+                                  }],
+                                  applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=project&project_code=${projectCode}&service_code=project&role_manager=project`
+                              }]
+                            })
                         } else {
                             msg = error.message || ((enabled ? this.$t('disableLabel') : this.$t('enableLabel')) + projectName + this.$t('projectFail'))
                         }

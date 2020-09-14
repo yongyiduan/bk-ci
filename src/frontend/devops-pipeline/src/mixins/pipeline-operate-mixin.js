@@ -141,7 +141,7 @@ export default {
                     actionId: this.$permissionActionMap.execute,
                     resourceId: this.$permissionResourceMap.pipeline,
                     instanceId: [{
-                        id: target.pipelineId,
+                        id: pipelineId,
                         name: target.pipelineName
                     }],
                     projectId
@@ -233,7 +233,7 @@ export default {
                     actionId: this.$permissionActionMap.edit,
                     resourceId: this.$permissionResourceMap.pipeline,
                     instanceId: [{
-                        id: prePipeline.pipelineId,
+                        id: pipelineId,
                         name: prePipeline.pipelineName
                     }],
                     projectId
@@ -274,7 +274,7 @@ export default {
                     actionId: this.$permissionActionMap.edit,
                     resourceId: this.$permissionResourceMap.pipeline,
                     instanceId: [{
-                        id: this.curPipeline.pipelineId,
+                        id: pipelineId,
                         name: this.curPipeline.pipelineName
                     }],
                     projectId

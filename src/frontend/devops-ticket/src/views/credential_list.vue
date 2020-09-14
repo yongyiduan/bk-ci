@@ -162,7 +162,7 @@
                         width: 500,
                         theme: 'warning',
                         type: 'warning',
-                        title: `${this.$t('ticket.credential.deleteCredentialTips', [credential.credentialId])}`,
+                        subTitle: this.$t('ticket.credential.deleteCredentialTips', [credential.credentialId]),
                         confirmFn: async () => {
                             let message, theme
 

@@ -432,7 +432,7 @@
                         actionId: this.$permissionActionMap.create,
                         resourceId: this.$permissionResourceMap.pipeline,
                         instanceId: [],
-                        projectId: this.this.$route.params.projectId
+                        projectId: this.$route.params.projectId
                     }], this.getPermUrlByRole(this.$route.params.projectId, null, this.roleMap.creator))
                 } finally {
                     this.isDisabled = false
