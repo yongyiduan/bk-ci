@@ -19,7 +19,7 @@
                         <bk-button
                             theme="primary"
                             icon="icon-plus"
-                            @click="hasCreatePermission ? togglePMDialog(true) : applyCreatePermission()"
+                            @click="togglePMDialog(true)"
                         >
                             {{ $t('addProject') }}
                         </bk-button>
@@ -316,7 +316,7 @@
 
         created () {
             this.fetchAllProjects()
-            this.checkCreatePermission()
+            // this.checkCreatePermission()
         }
 
         async checkCreatePermission () {
