@@ -87,8 +87,7 @@
         },
         methods: {
             getRowClsName ({ row }) {
-                console.log(row)
-                return `env-item-row ${!row.canEdit ? '' : 'env-row-useless'}`
+                return `env-item-row ${row.canUse ? '' : 'env-row-useless'}`
             },
             async init () {
                 const {
@@ -202,7 +201,8 @@
                                 name: row.name
                             }],
                             projectId: this.projectId
-                        }]
+                        }],
+                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=environment&project_code=${this.projectId}&service_code=environment&role_creator=environment:${row.envHashId}`
                     })
                 }
             },
