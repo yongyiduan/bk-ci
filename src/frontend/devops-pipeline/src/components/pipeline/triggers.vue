@@ -22,8 +22,7 @@
     export default {
         props: {
             beforeExec: {
-                type: Function,
-                default: () => () => {}
+                type: Function
             },
             canManualStartup: {
                 type: Boolean,
