@@ -18,7 +18,7 @@
                     <component :is="panel.component" v-bind="panel.bindData" @hideColumnPopup="toggleColumnsSelectPopup(false)"></component>
                 </bk-tab-panel>
             </bk-tab>
-            <mini-map :stages="pipeline.stages" scroll-class=".bk-tab-section" v-if="!isLoading && currentTab === 'pipeline'"></mini-map>
+            <mini-map :stages="pipeline.stages" scroll-class=".bk-tab-section" v-if="!isLoading && pipeline && currentTab === 'pipeline'"></mini-map>
         </template>
     </section>
 </template>
@@ -43,7 +43,7 @@
         mixins: [pipelineOperateMixin],
         data () {
             return {
-                isLoading: true,
+                isLoading: false,
                 hasNoPermission: false,
                 leaving: false,
                 confirmMsg: this.$t('editPage.confirmMsg'),
@@ -182,7 +182,8 @@
             this.addLeaveListenr()
         },
         beforeDestroy () {
-            this.setPipeline()
+            this.setPipeline(null)
+            this.resetPipelineSetting()
             this.removeLeaveListenr()
             this.setPipelineEditing(false)
             this.setSaveStatus(false)
@@ -214,18 +215,21 @@
                 'updatePipelineSetting',
                 'updatePipelineAuthority',
                 'fetchRoleList',
-                'requestProjectGroupAndUsers'
+                'requestProjectGroupAndUsers',
+                'resetPipelineSetting'
             ]),
             ...mapActions('soda', [
                 'requestQualityAtom',
                 'requestInterceptAtom'
             ]),
             init () {
-                this.isLoading = true
-                this.requestPipeline(this.$route.params)
-                this.requestPipelineSetting(this.$route.params)
-                this.getRoleList()
-                this.requestProjectGroupAndUsers(this.$route.params)
+                if (this.pipelineId) {
+                    this.isLoading = true
+                    this.requestPipeline(this.$route.params)
+                    this.requestPipelineSetting(this.$route.params)
+                    this.getRoleList()
+                    this.requestProjectGroupAndUsers(this.$route.params)
+                }
             },
             switchTab (tab) {
                 this.$router.push({
@@ -277,10 +281,12 @@
                 })
             },
             requestInterceptAtom () {
-                this.$store.dispatch('soda/requestInterceptAtom', {
-                    projectId: this.projectId,
-                    pipelineId: this.pipelineId
-                })
+                if (this.pipelineId) {
+                    this.$store.dispatch('soda/requestInterceptAtom', {
+                        projectId: this.projectId,
+                        pipelineId: this.pipelineId
+                    })
+                }
             },
             requestMatchTemplateRules (templateId) {
                 this.$store.dispatch('soda/requestMatchTemplateRuleList', {
