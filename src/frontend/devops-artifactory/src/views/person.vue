@@ -472,8 +472,12 @@
                             path: lastClickItem.fullPath
                         })
                         const pipelineId = res.pipelineId
-                        const resource = res.pipelineName ? `流水线:${res.pipelineName}` : '流水线'
-                        this.setPermissionConfig(resource, '分享构件', pipelineId)
+                        const instance = [{
+                            id: pipelineId,
+                            name: res.pipelineName || pipelineId
+                        }]
+                        // 分享构件
+                        this.setPermissionConfig(instance, pipelineId)
                     } else {
                         theme = 'error'
                         message = err.message || err
@@ -488,15 +492,16 @@
             shareCancel () {
                 this.shareConfig.isShow = false
             },
-            setPermissionConfig (resource, option, pipelineId) {
-                const role = 'role_viewer'
-                const params = {
-                    noPermissionList: [
-                        { resource: resource, option: option }
-                    ],
-                    applyPermissionUrl: this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&${role}=pipeline:${pipelineId}` : PERM_URL_PREFIX
-                }
-                this.$showAskPermissionDialog(params)
+            setPermissionConfig (instanceId, pipelineId) {
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        actionId: this.$permissionActionMap.view,
+                        resourceId: this.$permissionResourceMap.pipeline,
+                        instanceId,
+                        projectId: this.projectId
+                    }],
+                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_viewer=pipeline:${pipelineId}`
+                })
             },
             cancelHandler () {
                 this.permissionConfig.isShow = false
@@ -552,8 +557,12 @@
                             path: item.fullPath
                         })
                         const pipelineId = res.pipelineId
-                        const resource = res.pipelineName ? `流水线:${res.pipelineName}` : '流水线'
-                        this.setPermissionConfig(resource, '下载构件', pipelineId)
+                        const instance = [{
+                            id: pipelineId,
+                            name: res.pipelineName || pipelineId
+                        }]
+                        // 下载构件
+                        this.setPermissionConfig(instance, pipelineId)
                     } else {
                         this.$bkMessage({
                             theme: 'error',

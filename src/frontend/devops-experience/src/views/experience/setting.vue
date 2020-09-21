@@ -270,14 +270,18 @@
                         this.dialogLoading.isLoading = false
                     }
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '体验组', option: '编辑' }
-                        ],
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.edit,
+                            resourceId: this.$permissionResourceMap.experienceGroup,
+                            instanceId: [{
+                                id: row.groupHashId,
+                                name: row.groupHashId
+                            }],
+                            projectId: this.projectId
+                        }],
                         applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=group:${row.groupHashId}`
-                    }
-
-                    this.$showAskPermissionDialog(params)
+                    })
                 }
             },
             toDeleteGruop (row) {
@@ -310,14 +314,18 @@
                         }
                     })
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '体验组', option: '删除' }
-                        ],
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.delete,
+                            resourceId: this.$permissionResourceMap.experienceGroup,
+                            instanceId: [{
+                                id: row.groupHashId,
+                                name: row.groupHashId
+                            }],
+                            projectId: this.projectId
+                        }],
                         applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=group:${row.groupHashId}`
-                    }
-
-                    this.$showAskPermissionDialog(params)
+                    })
                 }
             }
         }

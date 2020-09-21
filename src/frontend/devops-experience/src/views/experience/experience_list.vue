@@ -130,7 +130,6 @@
              */
             async requestList () {
                 try {
-                    console.log(typeof this.getIsShowExpired)
                     const res = await this.$store.dispatch('experience/requestExpList', {
                         projectId: this.projectId,
                         params: {
@@ -205,14 +204,7 @@
                         }
                     })
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '版本体验', option: '编辑' }
-                        ],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=task:${row.experienceHashId}`
-                    }
-
-                    this.$showAskPermissionDialog(params)
+                    this.askExpEditPermission(row)
                 }
             },
             async toDropOff (row) {
@@ -245,14 +237,7 @@
                         }
                     })
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '版本体验', option: '编辑' }
-                        ],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=task:${row.experienceHashId}`
-                    }
-
-                    this.$showAskPermissionDialog(params)
+                    this.askExpEditPermission(row)
                 }
             },
             toggleExpired (isExpired) {
@@ -272,6 +257,21 @@
                     params: {
                         projectId: this.projectId
                     }
+                })
+            },
+
+            askExpEditPermission (row) {
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        actionId: this.$permissionActionMap.edit,
+                        resourceId: this.$permissionResourceMap.experience,
+                        instanceId: [{
+                            id: row.experienceHashId,
+                            name: row.experienceHashId
+                        }],
+                        projectId: this.projectId
+                    }],
+                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=task:${row.experienceHashId}`
                 })
             }
         }

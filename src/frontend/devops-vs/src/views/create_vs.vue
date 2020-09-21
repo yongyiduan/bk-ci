@@ -282,14 +282,18 @@
                 if (result) {
                     this.confirmScan(row, type)
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '流水线', option: '执行' }
-                        ],
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.execute,
+                            resourceId: this.$permissionResourceMap.pipeline,
+                            instanceId: [{
+                                id: this.selectInfo.pipelineId,
+                                name: this.selectInfo.pipelineId
+                            }],
+                            projectId: this.projectId
+                        }],
                         applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=pipeline&role_executor=pipeline:${this.selectInfo.pipelineId}`
-                    }
-
-                    this.$showAskPermissionDialog(params)
+                    })
                 }
             },
             confirmScan (row, type) {
