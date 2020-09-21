@@ -255,7 +255,8 @@
             stageIndex: Number,
             stages: Array,
             editable: Boolean,
-            title: String
+            title: String,
+            showDebugDockerBtn: Boolean
         },
         data () {
             return {
@@ -393,9 +394,6 @@
                 const { apps, container: { buildEnv } } = this
                 const selectedApps = Object.keys(buildEnv)
                 return Object.keys(apps).filter(app => !selectedApps.includes(app))
-            },
-            showDebugDockerBtn () {
-                return this.routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && this.buildResource && (this.routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (this.routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
             },
             imageCredentialOption () {
                 return {

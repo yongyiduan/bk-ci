@@ -6,7 +6,7 @@
                 <bk-button theme="warning" @click="startDebug">{{ $t('editPage.docker.debugConsole') }}</bk-button>
             </div>
         </header>
-        <container-content v-bind="$props" slot="content" ref="container"></container-content>
+        <container-content v-bind="$props" slot="content" ref="container" :show-debug-docker-btn="showDebugDockerBtn"></container-content>
     </bk-sideslider>
 </template>
 
@@ -77,13 +77,9 @@
                 }
             },
 
-            buildResource () {
-                return this.container.dispatchType.value
-            },
-
             showDebugDockerBtn () {
                 const routeName = this.$route.name
-                return routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && this.buildResource && (routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
+                return routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && (routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
             }
         },
 
