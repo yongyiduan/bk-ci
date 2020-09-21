@@ -127,7 +127,10 @@
                         }
                     } catch (e) {
                         if (e.code === 403) { // 没有权限编辑
-                            this.setPermissionConfig(`${this.$t('pipeline')}：${this.pipeline.name}`, this.$t('edit'))
+                            this.setPermissionConfig([{
+                                id: this.pipelineId,
+                                name: this.pipeline.name
+                            }])
                         } else {
                             this.$showTips({
                                 message: e.message,
@@ -221,7 +224,10 @@
                     }
                 } catch (e) {
                     if (e.code === 403) { // 没有权限编辑
-                        this.setPermissionConfig(`${this.$t('pipeline')}：${this.pipeline.name}`, this.$t('edit'))
+                        this.setPermissionConfig([{
+                            id: this.pipelineId,
+                            name: this.pipeline.name
+                        }])
                     } else {
                         this.$showTips({
                             message: e.message,
@@ -233,13 +239,15 @@
                     this.btnDisabled = false
                 }
             },
-            setPermissionConfig (resource, option) {
+            setPermissionConfig (instanceId) {
                 this.$showAskPermissionDialog({
                     noPermissionList: [{
-                        resource,
-                        option
+                        actionId: this.$permissionActionMap.edit,
+                        resourceId: this.$permissionResourceMap.pipeline,
+                        instanceId,
+                        projectId: this.projectId
                     }],
-                    applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&${option === '执行' ? 'role_executor' : 'role_manager'}=pipeline:${this.pipelineId}`
+                    applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
                 })
             },
             updatePipelineToTurbo (pipeline) {

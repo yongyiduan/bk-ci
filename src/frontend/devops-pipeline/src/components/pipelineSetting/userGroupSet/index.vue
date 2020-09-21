@@ -68,6 +68,7 @@
 <script>
     import UserGroupings from '@/components/pipelineSetting/UserGroupings'
     import { mapActions, mapState } from 'vuex'
+    import { HttpError } from '@/utils/util'
     import * as cookie from 'js-cookie'
 
     export default {
@@ -214,13 +215,7 @@
                     const res = await this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.get('backend_csrftoken') } })
                     if (res) {
                         if (res.code === 403) {
-                            this.$showAskPermissionDialog({
-                                noPermissionList: [{
-                                    resource: `${this.$t('pipeline')}: ${this.pipelineSetting.pipelineName}`,
-                                    option: this.$t('settings.owner')
-                                }],
-                                applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
-                            })
+                            throw new HttpError(403, res.message)
                         } else {
                             this.$showTips({
                                 message: `${this.pipelineSetting.pipelineName}${this.$t('updateSuc')}`,
@@ -231,13 +226,7 @@
                     }
                 } catch (err) {
                     if (err.code === 403) { // 没有权限执行
-                        this.$showAskPermissionDialog({
-                            noPermissionList: [{
-                                resource: `${this.$t('pipeline')}: ${this.pipelineSetting.pipelineName}`,
-                                option: this.$t('settings.owner')
-                            }],
-                            applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
-                        })
+                        this.askManagePermission()
                     } else {
                         this.$showTips({
                             message: err.message || err,
@@ -253,6 +242,20 @@
             },
             exit () {
                 this.$emit('cancel')
+            },
+            askManagePermission () {
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        actionId: this.$permissionActionMap.manage,
+                        resourceId: this.$permissionResourceMap.pipeline,
+                        instanceId: [{
+                            id: this.pipelineId,
+                            name: this.pipelineSetting.pipelineName
+                        }],
+                        projectId: this.projectId
+                    }],
+                    applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
+                })
             }
         }
     }

@@ -332,9 +332,7 @@
             })
 
             bus.$off('set-permission')
-            bus.$on('set-permission', (resource, option, pipelineId) => {
-                this.setPermissionConfig(resource, option, pipelineId)
-            })
+            bus.$on('set-permission', this.setPermissionConfig)
             this.sendMoocQuerySearch()
         },
 
@@ -396,7 +394,15 @@
                 }
             },
             toggleCreatePermission () {
-                this.setPermissionConfig(this.$t('pipeline'), this.$t('create'), '')
+                this.$showAskPermissionDialog({
+                    noPermissionList: [{
+                        actionId: this.$permissionActionMap.create,
+                        resourceId: this.$permissionResourceMap.pipeline,
+                        instanceId: [],
+                        projectId: this.projectId
+                    }],
+                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project`
+                })
             },
             localConvertMStoString (num) {
                 return convertMStoString(num)
@@ -873,7 +879,10 @@
                     feConfig.isRunning = true
                 } catch (err) {
                     if (err.code === 403) { // 没有权限执行
-                        this.setPermissionConfig(`${this.$t('pipeline')}：${curPipeline.pipelineName}`, this.$t('exec'), curPipeline.pipelineId)
+                        this.setPermissionConfig(this.$permissionResourceMap.pipeline, this.$permissionActionMap.execute, [{
+                            id: curPipeline.pipelineId,
+                            name: curPipeline.pipelineName
+                        }], projectId, this.getPermUrlByRole(projectId, curPipeline.pipelineId, this.roleMap.executor))
                         return
                     } else {
                         feConfig.status = 'known_error'
@@ -942,14 +951,15 @@
                         }
                     })
                 } catch (err) {
-                    if (err.code === 403) { // 没有权限终止
-                        this.setPermissionConfig(`${this.$t('pipeline')}：${target.pipelineName}`, this.$t('exec'), target.pipelineId)
-                    } else {
-                        this.$showTips({
-                            message: err.message || err,
-                            theme: 'error'
-                        })
-                    }
+                    this.handleError(err, [{
+                        actionId: this.$permissionActionMap.execute,
+                        resourceId: this.$permissionResourceMap.pipeline,
+                        instanceId: [{
+                            id: target.pipelineId,
+                            name: target.pipelineName
+                        }],
+                        projectId
+                    }], this.getPermUrlByRole(projectId, target.pipelineId, this.roleMap.executor))
                 } finally {
                     feConfig.buttonAllow.terminatePipeline = true
                 }
@@ -1084,12 +1094,15 @@
                                 message = this.$t('deleteSuc')
                                 theme = 'success'
                             } catch (err) {
-                                if (err.code === 403) { // 没有权限删除
-                                    this.setPermissionConfig(`${this.$t('pipeline')}：${curPipeline.pipelineName}`, this.$t('delete'), curPipeline.pipelineId)
-                                } else {
-                                    message = err.message || err
-                                    theme = 'error'
-                                }
+                                this.handleError(err, [{
+                                    actionId: this.$permissionActionMap.delete,
+                                    resourceId: this.$permissionResourceMap.pipeline,
+                                    instanceId: [{
+                                        id: curPipeline.pipelineId,
+                                        name: curPipeline.pipelineName
+                                    }],
+                                    projectId: this.projectId
+                                }], this.getPermUrlByRole(this.projectId, curPipeline.pipelineId, this.roleMap.manager))
                             } finally {
                                 message && this.$showTips({
                                     message,
@@ -1198,7 +1211,23 @@
                 } catch (err) {
                     if (err.code === 403) { // 没有权限复制
                         this.copyDialogConfig.isShow = false
-                        this.setPermissionConfig(`${this.$t('pipeline')}：${prePipeline.pipelineName}`, this.$t('edit'), prePipeline.pipelineId)
+                        this.handleError(err, [{
+                            actionId: this.$permissionActionMap.create,
+                            resourceId: this.$permissionResourceMap.pipeline,
+                            instanceId: [{
+                                id: prePipeline.pipelineId,
+                                name: prePipeline.pipelineName
+                            }],
+                            projectId
+                        }, {
+                            actionId: this.$permissionActionMap.edit,
+                            resourceId: this.$permissionResourceMap.pipeline,
+                            instanceId: [{
+                                id: prePipeline.pipelineId,
+                                name: prePipeline.pipelineName
+                            }],
+                            projectId
+                        }], this.getPermUrlByRole(projectId, prePipeline.pipelineId, this.roleMap.manager))
                     } else {
                         message = err.message || err
                         theme = 'error'
@@ -1223,30 +1252,6 @@
 
                 copyConfig.newPipelineName = ''
                 copyConfig.newPipelineDesc = ''
-            },
-            /**
-             * 设置权限弹窗的参数
-             */
-            setPermissionConfig (resource, option, pipelineId) {
-                let role = 'role_manager'
-                switch (option) {
-                    case this.$t('create'):
-                        role = 'role_creator'
-                        break
-                    case this.$t('exec'):
-                        role = 'role_executor'
-                        break
-                    case this.$t('newlist.view'):
-                        role = 'role_viewer'
-                        break
-                }
-                this.$showAskPermissionDialog({
-                    noPermissionList: [{
-                        resource,
-                        option
-                    }],
-                    applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&${role}=pipeline:${pipelineId}`
-                })
             }
         }
     }
