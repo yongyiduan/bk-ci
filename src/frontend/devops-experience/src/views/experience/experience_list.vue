@@ -267,7 +267,7 @@
                         resourceId: this.$permissionResourceMap.experience,
                         instanceId: [{
                             id: row.experienceHashId,
-                            name: row.experienceHashId
+                            name: row.name
                         }],
                         projectId: this.projectId
                     }],

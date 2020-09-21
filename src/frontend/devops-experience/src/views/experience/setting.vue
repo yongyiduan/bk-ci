@@ -276,7 +276,7 @@
                             resourceId: this.$permissionResourceMap.experienceGroup,
                             instanceId: [{
                                 id: row.groupHashId,
-                                name: row.groupHashId
+                                name: row.name
                             }],
                             projectId: this.projectId
                         }],
@@ -320,7 +320,7 @@
                             resourceId: this.$permissionResourceMap.experienceGroup,
                             instanceId: [{
                                 id: row.groupHashId,
-                                name: row.groupHashId
+                                name: row.name
                             }],
                             projectId: this.projectId
                         }],
