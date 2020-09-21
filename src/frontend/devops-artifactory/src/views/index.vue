@@ -212,14 +212,16 @@
                         })
                     })
                 } catch (err) {
-                    if (err.code === 403) { // 没有权限下载
-                        const params = {
-                            noPermissionList: [
-                                { resource: '版本仓库', option: '查看' }
-                            ],
-                            applyPermissionUrl: this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=artifactory&project_code=${this.projectId}&service_code=artifactory&role_manager=artifactory` : PERM_URL_PREFIX
-                        }
-                        this.$showAskPermissionDialog(params)
+                    if (err.code === 403) { // 没有查看权限
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                actionId: this.$permissionActionMap.view,
+                                resourceId: this.$permissionResourceMap.artifactory,
+                                instanceId: [],
+                                projectId: this.projectId
+                            }],
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=artifactory&project_code=${this.projectId}&service_code=artifactory&role_manager=artifactory`
+                        })
                     }
                     // this.$bkMessage({
                     //     message: err ? err.message : err,

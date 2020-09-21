@@ -260,10 +260,19 @@
                             id: formData.certId,
                             type: this.$permissionResourceTypeMap.TICKET_CERT
                         }] : []
-                        this.applyPermission(actionId, this.$permissionResourceMap.cert, [{
-                            id: this.projectId,
-                            type: this.$permissionResourceTypeMap.PROJECT
-                        }, ...instanceId])
+                        
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                actionId,
+                                resourceId: this.$permissionResourceMap.envNode,
+                                instanceId: [{
+                                    id: this.projectId,
+                                    type: this.$permissionResourceTypeMap.PROJECT
+                                }, ...instanceId],
+                                projectId: this.projectId
+                            }],
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&${this.isEdit ? 'role_manager' : 'role_creator'}=certificate${this.isEdit ? `:${formData.certId}` : ''}`
+                        })
                     }
                     message = err.message ? err.message : err
                     theme = 'error'

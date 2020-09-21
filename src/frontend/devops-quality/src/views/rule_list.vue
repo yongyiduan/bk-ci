@@ -501,28 +501,27 @@
             },
             toDeleteRule (row) {
                 if (row.permissions.canDelete) {
-                    const h = this.$createElement
-                    const content = h('p', {
-                        style: {
-                            textAlign: 'center'
-                        }
-                    }, `确定删除规则(${row.name})？`)
-
                     this.$bkInfo({
-                        title: `删除`,
-                        subHeader: content,
+                        type: 'warning',
+                        theme: 'warning',
+                        subTitle: `确定删除规则(${row.name})？`,
                         confirmFn: async () => {
                             this.deleteRule(row.ruleHashId)
                         }
                     })
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '质量红线', option: '删除规则' }
-                        ],
-                        applyPermissionUrl: this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}` : PERM_URL_PREFIX
-                    }
-                    this.$showAskPermissionDialog(params)
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.delete,
+                            resourceId: this.$permissionResourceMap.rule,
+                            instanceId: [{
+                                id: row.ruleHashId,
+                                name: row.name
+                            }],
+                            projectId: this.projectId
+                        }],
+                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}`
+                    })
                 }
             },
             async toSwitchRule (row) {
@@ -647,13 +646,18 @@
                         }
                     })
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '质量红线', option: '编辑规则' }
-                        ],
-                        applyPermissionUrl: this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}` : PERM_URL_PREFIX
-                    }
-                    this.$showAskPermissionDialog(params)
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.edit,
+                            resourceId: this.$permissionResourceMap.rule,
+                            instanceId: [{
+                                id: row.ruleHashId,
+                                name: row.name
+                            }],
+                            projectId: this.projectId
+                        }],
+                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}`
+                    })
                 }
             },
             switchRule (row) {
@@ -674,13 +678,18 @@
                         }
                     })
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '质量红线', option: '启用和停用规则' }
-                        ],
-                        applyPermissionUrl: this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}` : PERM_URL_PREFIX
-                    }
-                    this.$showAskPermissionDialog(params)
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.enable,
+                            resourceId: this.$permissionResourceMap.rule,
+                            instanceId: [{
+                                id: row.ruleHashId,
+                                name: row.name
+                            }],
+                            projectId: this.projectId
+                        }],
+                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}`
+                    })
                 }
             },
             async toShowSlider (ruleHashId, type) {
