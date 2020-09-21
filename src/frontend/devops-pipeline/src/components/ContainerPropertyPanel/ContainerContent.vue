@@ -685,8 +685,13 @@
                     if (err.code === 403) {
                         this.$showAskPermissionDialog({
                             noPermissionList: [{
-                                resource: this.$t('pipeline'),
-                                option: this.$t('edit')
+                                actionId: this.$permissionActionMap.edit,
+                                resourceId: this.$permissionResourceMap.pipeline,
+                                instanceId: [{
+                                    id: this.pipelineId,
+                                    name: this.pipelineId
+                                }],
+                                projectId: this.projectId
                             }],
                             applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
                         })
