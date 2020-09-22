@@ -44,6 +44,7 @@ const privateSetting = () => import(/* webpackChunkName: 'setting' */ '@/views/m
 const releaseManage = () => import(/* webpackChunkName: 'releaseManage' */ '@/views/manage/release-manage/index.vue') // 研发商店管理页面
 const version = () => import(/* webpackChunkName: 'releaseManage' */ '@/views/manage/release-manage/version.vue') // 研发商店管理页面
 const environment = () => import(/* webpackChunkName: 'releaseManage' */ '@/views/manage/release-manage/environment.vue') // 研发商店管理页面
+const codeCheck = () => import(/* webpackChunkName: 'releaseManage' */ '@/views/manage/release-manage/code-check.vue') // 研发商店管理页面
 
 const editAtom = () => import(/* webpackChunkName: 'editAtom' */ '@/views/edit_atom.vue') // 上架/升级流水线插件
 const releaseProgress = () => import(/* webpackChunkName: 'releaseProgress' */ '@/views/release_progress.vue') // 发布进度
@@ -223,6 +224,10 @@ const routes = [
                                 path: 'environment',
                                 name: 'environment',
                                 component: environment
+                            }, {
+                                path: 'check',
+                                name: 'check',
+                                component: codeCheck
                             }
                         ]
                     }
