@@ -6,7 +6,7 @@
                 <bk-button theme="warning" @click="startDebug">{{ $t('editPage.docker.debugConsole') }}</bk-button>
             </div>
         </header>
-        <container-content v-bind="$props" slot="content" ref="container" :show-debug-docker-btn="showDebugDockerBtn"></container-content>
+        <container-content v-bind="$props" slot="content" ref="container"></container-content>
     </bk-sideslider>
 </template>
 
@@ -36,7 +36,8 @@
                 'getContainer',
                 'getContainers',
                 'getStage',
-                'isDockerBuildResource'
+                'isDockerBuildResource',
+                'checkShowDebugDockerBtn'
             ]),
 
             visible: {
@@ -48,10 +49,6 @@
                         isShow: value
                     })
                 }
-            },
-
-            isDocker () {
-                return this.isDockerBuildResource(this.container)
             },
 
             stage () {
@@ -69,17 +66,8 @@
                 return this.getContainer(containers, containerIndex)
             },
 
-            buildResourceType () {
-                try {
-                    return this.container.dispatchType.buildType
-                } catch (e) {
-                    return ''
-                }
-            },
-
             showDebugDockerBtn () {
-                const routeName = this.$route.name
-                return routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && (routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
+                return this.checkShowDebugDockerBtn(this.container, this.$route.name, this.execDetail)
             }
         },
 

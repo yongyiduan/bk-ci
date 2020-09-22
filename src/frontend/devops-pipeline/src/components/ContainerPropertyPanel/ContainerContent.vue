@@ -1,8 +1,8 @@
 <template>
-    <section v-if="container" :class="{ &quot;readonly&quot;: !editable }" class="container-property-panel bk-form bk-form-vertical">
-        <form-field :required="true" :label="$t('name')" :is-error="errors.has(&quot;name&quot;)" :error-msg="errors.first(&quot;name&quot;)">
+    <section v-if="container" :class="{ 'readonly': !editable }" class="container-property-panel bk-form bk-form-vertical">
+        <form-field :required="true" :label="$t('name')" :is-error="errors.has('name')" :error-msg="errors.first('name')">
             <div class="container-resource-name">
-                <vuex-input :disabled="!editable" input-type="text" :placeholder="$t('nameInputTips')" name="name" v-validate.initial="&quot;required&quot;" :value="container.name" :handle-change="handleContainerChange" />
+                <vuex-input :disabled="!editable" input-type="text" :placeholder="$t('nameInputTips')" name="name" v-validate.initial="'required'" :value="container.name" :handle-change="handleContainerChange" />
                 <atom-checkbox
                     v-if="isVmContainer(container)"
                     class="show-build-resource"
@@ -15,7 +15,6 @@
                 </atom-checkbox>
             </div>
         </form-field>
-
         <form v-if="isVmContainer(container)" v-bkloading="{ isLoading: !apps || !containerModalId || isLoadingImage }">
             <form-field :label="$t('editPage.resourceType')">
                 <selector
@@ -41,7 +40,7 @@
                 <span class="bk-form-help" v-if="isPublicResourceType">{{ $t('editPage.publicResTips') }}</span>
             </form-field>
 
-            <form-field :label="$t('editPage.image')" v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && !isLoadingImage" :required="true" :is-error="errors.has(&quot;buildImageVersion&quot;) || errors.has(&quot;buildResource&quot;)" :error-msg="$t('editPage.imageErrMgs')">
+            <form-field :label="$t('editPage.image')" v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && !isLoadingImage" :required="true" :is-error="errors.has('buildImageVersion') || errors.has('buildResource')" :error-msg="$t('editPage.imageErrMgs')">
                 <enum-input
                     name="imageType"
                     :list="imageTypeList"
@@ -55,7 +54,7 @@
                         <span :class="[{ disable: !editable }, { 'not-recommend': buildImageRecommendFlag === false }, 'image-named']" :title="buildImageRecommendFlag === false ? $t('editPage.notRecomendImage') : buildImageName">{{buildImageName || $t('editPage.chooseImage')}}</span>
                         <bk-button theme="primary" @click.stop="chooseImage" :disabled="!editable">{{buildImageCode ? $t('editPage.reElection') : $t('editPage.select')}}</bk-button>
                     </section>
-                    <bk-select @change="changeImageVersion" :value="buildImageVersion" searchable class="image-tag" :loading="isVersionLoading" :disabled="!editable" v-validate.initial="&quot;required&quot;" name="buildImageVersion">
+                    <bk-select @change="changeImageVersion" :value="buildImageVersion" searchable class="image-tag" :loading="isVersionLoading" :disabled="!editable" v-validate.initial="'required'" name="buildImageVersion">
                         <bk-option v-for="option in versionList"
                             :key="option.versionValue"
                             :id="option.versionValue"
@@ -65,10 +64,10 @@
                     </bk-select>
                 </section>
 
-                <bk-input v-else @change="changeThirdImage" :value="buildResource" :disabled="!editable" class="bk-image" :placeholder="$t('editPage.thirdImageHolder')" v-validate.initial="&quot;required&quot;" name="buildResource"></bk-input>
+                <bk-input v-else @change="changeThirdImage" :value="buildResource" :disabled="!editable" class="bk-image" :placeholder="$t('editPage.thirdImageHolder')" v-validate.initial="'required'" name="buildResource"></bk-input>
             </form-field>
 
-            <form-field :label="$t('editPage.assignResource')" v-if="buildResourceType !== 'MACOS' && !isPublicResourceType && containerModalId && !['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)" :required="true" :is-error="errors.has(&quot;buildResource&quot;)" :error-msg="errors.first(&quot;buildResource&quot;)" :desc="buildResourceType === &quot;THIRD_PARTY_AGENT_ENV&quot; ? this.$t('editPage.thirdSlaveTips') : &quot;&quot;">
+            <form-field :label="$t('editPage.assignResource')" v-if="buildResourceType !== 'MACOS' && !isPublicResourceType && containerModalId && !['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)" :required="true" :is-error="errors.has('buildResource')" :error-msg="errors.first('buildResource')" :desc="buildResourceType === 'THIRD_PARTY_AGENT_ENV' ? this.$t('editPage.thirdSlaveTips') : ''">
                 <container-env-node :disabled="!editable"
                     :os="container.baseOS"
                     :container-id="containerModalId"
@@ -79,8 +78,8 @@
                     :handle-change="changeBuildResource"
                     :add-thrid-slave="addThridSlave"
                     :value="buildResource"
-                    :has-error="errors.has(&quot;buildResource&quot;)"
-                    v-validate.initial="&quot;required&quot;"
+                    :has-error="errors.has('buildResource')"
+                    v-validate.initial="'required'"
                     name="buildResource"
                 />
             </form-field>
@@ -255,8 +254,7 @@
             stageIndex: Number,
             stages: Array,
             editable: Boolean,
-            title: String,
-            showDebugDockerBtn: Boolean
+            title: String
         },
         data () {
             return {
@@ -286,7 +284,9 @@
                 'getContainerModalId',
                 'isThirdPartyContainer',
                 'isPublicResource',
-                'isDockerBuildResource'
+                'isDockerBuildResource',
+                'isPublicDevCloudContainer',
+                'getRealSeqId'
             ]),
             imageTypeList () {
                 return [
@@ -346,6 +346,9 @@
                 } catch (e) {
                     return ''
                 }
+            },
+            isPublicDevCloud () {
+                return this.isPublicDevCloudContainer(this.container)
             },
             xcodeVersion () {
                 return this.container.dispatchType.xcodeVersion
@@ -641,7 +644,7 @@
                 })
             },
             async startDebug () {
-                const vmSeqId = this.getRealSeqId()
+                const vmSeqId = this.getRealSeqId(this.stages, this.stageIndex, this.containerIndex)
                 let url = ''
                 const tab = window.open('about:blank')
                 try {
@@ -673,7 +676,7 @@
                                 url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}`
                             }
                         }
-                    } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
+                    } else if (this.isPublicDevCloud) {
                         const buildIdStr = this.buildId ? `&buildId=${this.buildId}` : ''
                         url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
@@ -700,19 +703,6 @@
                         })
                     }
                 }
-            },
-            getRealSeqId () {
-                let i = 0
-                let seqId = 0
-                this.stages && this.stages.map((stage, sIndex) => {
-                    stage.containers.map((container, cIndex) => {
-                        if (sIndex === this.stageIndex && cIndex === this.containerIndex) {
-                            seqId = i
-                        }
-                        i++
-                    })
-                })
-                return seqId
             },
             appBinPath (value, key) {
                 const { container: { baseOS }, apps } = this
