@@ -179,13 +179,10 @@
                     }).catch(() => {})
             },
             async getLinkDetail (containerId, targetIp) {
-                if (!containerId || !targetIp) {
-                    this.showTips({
-                        theme: 'error',
-                        message: this.$t('editPage.docker.abnormalParams')
-                    })
-                }
                 try {
+                    if (!containerId || !targetIp) {
+                        throw Error(this.$t('editPage.docker.abnormalParams'))
+                    }
                     const execId = await this.$store.dispatch('soda/getDockerExecId', {
                         targetIp,
                         containerId,
@@ -197,7 +194,10 @@
                     this.resizeUrl = `docker-console-resize?pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIp=${targetIp}`
                     this.url = `ws://${PROXY_URL_PREFIX}/docker-console-new?eventId=${execId}&pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIP=${targetIp}&containerId=${containerId}`
                 } catch (err) {
-                    this.$showTips(err.message || err)
+                    this.$showTips({
+                        message: err.message,
+                        theme: 'error'
+                    })
                 }
             },
             addLeaveListenr () {
