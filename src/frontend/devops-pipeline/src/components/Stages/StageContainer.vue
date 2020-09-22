@@ -95,8 +95,10 @@
             ]),
             ...mapGetters('atom', [
                 'isTriggerContainer',
-                'isDockerBuildResource',
-                'getAllContainers'
+                'getAllContainers',
+                'isPublicDevCloudContainer',
+                'getRealSeqId',
+                'checkShowDebugDockerBtn'
             ]),
             showCheckedToatal () {
                 const { isTriggerContainer, container, $route } = this
@@ -115,9 +117,6 @@
             projectId () {
                 return this.$route.params.projectId
             },
-            isDocker () {
-                return this.isDockerBuildResource(this.container)
-            },
             buildResourceType () {
                 try {
                     return this.container.dispatchType.buildType
@@ -125,8 +124,11 @@
                     return 'DOCKER'
                 }
             },
+            isPublicDevCloud () {
+                return this.isPublicDevCloudContainer(this.container)
+            },
             showDebugBtn () {
-                return this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && (this.container.status === 'FAILED' && this.$route.name === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion)
+                return this.checkShowDebugDockerBtn(this.container, this.$route.name, this.execDetail) && this.container.status === 'FAILED'
             },
             containerDisabled () {
                 return !!(this.container.jobControlOption && this.container.jobControlOption.enable === false) || this.stageDisabled
@@ -207,7 +209,7 @@
                 })
             },
             async debugDocker () {
-                const vmSeqId = this.getRealSeqId()
+                const vmSeqId = this.getRealSeqId(this.execDetail.model.stages, this.stageIndex, this.containerIndex)
                 const projectId = this.$route.params.projectId
                 const pipelineId = this.$route.params.pipelineId
                 const buildId = this.$route.params.buildNo
@@ -229,7 +231,7 @@
                         if (res === true) {
                             url = `${WEB_URL_PIRFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
                         }
-                    } else if (this.buildResourceType === 'PUBLIC_DEVCLOUD') {
+                    } else if (this.isPublicDevCloud) {
                         const buildIdStr = buildId ? `&buildId=${buildId}` : ''
                         url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
@@ -256,19 +258,6 @@
                         })
                     }
                 }
-            },
-            getRealSeqId () {
-                let i = 0
-                let seqId = 0
-                this.execDetail && this.execDetail.model.stages && this.execDetail.model.stages.map((stage, sIndex) => {
-                    stage.containers.map((container, cIndex) => {
-                        if (sIndex === this.stageIndex && cIndex === this.containerIndex) {
-                            seqId = i
-                        }
-                        i++
-                    })
-                })
-                return seqId
             },
             copyContainer () {
                 try {

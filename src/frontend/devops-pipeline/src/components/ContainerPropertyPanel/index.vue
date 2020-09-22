@@ -36,7 +36,8 @@
                 'getContainer',
                 'getContainers',
                 'getStage',
-                'isDockerBuildResource'
+                'isDockerBuildResource',
+                'checkShowDebugDockerBtn'
             ]),
 
             visible: {
@@ -48,10 +49,6 @@
                         isShow: value
                     })
                 }
-            },
-
-            isDocker () {
-                return this.isDockerBuildResource(this.container)
             },
 
             stage () {
@@ -69,17 +66,8 @@
                 return this.getContainer(containers, containerIndex)
             },
 
-            buildResourceType () {
-                try {
-                    return this.container.dispatchType.buildType
-                } catch (e) {
-                    return ''
-                }
-            },
-
             showDebugDockerBtn () {
-                const routeName = this.$route.name
-                return routeName !== 'templateEdit' && this.container.baseOS === 'LINUX' && (this.isDocker || this.buildResourceType === 'PUBLIC_DEVCLOUD') && (routeName === 'pipelinesEdit' || this.container.status === 'RUNNING' || (routeName === 'pipelinesDetail' && this.execDetail && this.execDetail.buildNum === this.execDetail.latestBuildNum && this.execDetail.curVersion === this.execDetail.latestVersion))
+                return this.checkShowDebugDockerBtn(this.container, this.$route.name, this.execDetail)
             }
         },
 

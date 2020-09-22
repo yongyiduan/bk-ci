@@ -8,7 +8,7 @@
             <span @click="currentTab = 'log'" :class="{ active: currentTab === 'log' }">{{ $t('execDetail.log') }}</span><span @click="currentTab = 'setting'" :class="{ active: currentTab === 'setting' }">{{ $t('execDetail.setting') }}</span>
         </span>
         <span slot="tool"
-            v-if="currentTab === 'setting' && $refs.container.showDebugDockerBtn"
+            v-if="currentTab === 'setting' && showDebugDockerBtn"
             class="head-tool"
             @click="$refs.container.startDebug"
         >{{ $t('editPage.docker.debugConsole') }}</span>
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+    import { mapState, mapGetters } from 'vuex'
     import jobLog from './log/jobLog'
     import detailContainer from './detailContainer'
     import ContainerContent from '@/components/ContainerPropertyPanel/ContainerContent'
@@ -57,6 +57,10 @@
                 'editingElementPos'
             ]),
 
+            ...mapGetters('atom', [
+                'checkShowDebugDockerBtn'
+            ]),
+
             downLoadJobLink () {
                 const editingElementPos = this.editingElementPos
                 const fileName = encodeURI(encodeURI(`${editingElementPos.stageIndex + 1}-${editingElementPos.containerIndex + 1}-${this.currentJob.name}`))
@@ -77,6 +81,9 @@
             pluginList () {
                 const startUp = { name: 'Set up job', status: this.currentJob.startVMStatus, id: `startVM-${this.currentJob.id}`, executeCount: this.currentJob.executeCount || 1 }
                 return [startUp, ...this.currentJob.elements]
+            },
+            showDebugDockerBtn () {
+                return this.checkShowDebugDockerBtn(this.currentJob, this.$route.name, this.execDetail)
             }
         }
     }
