@@ -294,6 +294,7 @@
         "previewDiff": "Arrange preview",
         "templateInstantiation": " Instantiate templates",
         "templateVersion": "Template version",
+        "templateVersionErrTips": "Please select Template version first",
         "applyTemplateSetting": "Apply template settings simultaneously",
         "applySettingTips": "When ticked, the template settings will be applied to instantiated pipelines",
         "newPipelineName": "Name of instantiated pipeline",
