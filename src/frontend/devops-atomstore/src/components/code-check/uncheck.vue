@@ -1,0 +1,35 @@
+<template>
+    <section class="code-ckeck-status">
+        <i class="bk-icon icon-info-circle status-icon"></i>
+        <section class="code-check-summary">
+            <h3 class="summary-head">未进行过检查</h3>
+            <h5 class="summary-desc">使用腾讯代码分析检查，将从代码缺陷、安全漏洞、代码规范、圈复杂度、重复率等角度进行扫描，未产品质量保驾护航</h5>
+        </section>
+        <bk-button theme="primary" class="code-check-button" @click="startCodeCC" :disabled="startChecking">开始检查</bk-button>
+    </section>
+</template>
+
+<script>
+    export default {
+        data () {
+            return {
+                startChecking: false
+            }
+        },
+
+        methods: {
+            startCodeCC () {
+                this.startChecking = true
+                this.$emit('startCodeCC').finally(() => {
+                    this.startChecking = false
+                })
+            }
+        }
+    }
+</script>
+
+<style lang="scss" scoped>
+    .icon-info-circle {
+        color: #c4c6cc;
+    }
+</style>

@@ -1,75 +1,187 @@
 <template>
-    <main>
-        <fail></fail>
-        <section class="code-check-detail">
-            <h3 class="detail-title score">
-                评分<span>计算公式 <icon name="tiaozhuan" :size="10"></icon> </span>
-            </h3>
-            <ul class="score-list float-left">
-                <li v-for="score in scoreList" :key="score" class="score-detail">
-                    <p class="score-circle">
-                        <span class="circle-main"></span>
-                        <span class="sector-group">
-                            <span class="circle-sector"
-                                v-for="(item, index) in getColorList(score)"
-                                :key="item.color"
-                                :style="{
-                                    color: item.color,
-                                    transform: `${stratTransition ? `rotate(${item.deg}deg)` : ''}`,
-                                    transition: `transform 5.555ms linear ${5.555 * index}ms`,
-                                    zIndex: 36 - index
-                                }">
+    <main class="code-check-main" v-bkloading="{ isLoading }">
+        <component :is="status"
+            :codecc-url="codeScore.codeccUrl"
+            :commit-id="codeScore.commitId"
+            :repo-url="codeScore.repoURL"
+            :message="message"
+            @startCodeCC="startCodeCC"
+        ></component>
+        <template v-if="['success', 'fail', 'unqualified'].includes(status)">
+            <section class="code-check-detail">
+                <h3 class="detail-title score">
+                    评分<a class="score-rule"><span>计算公式</span><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
+                </h3>
+                <ul class="score-list float-left">
+                    <li v-for="scoreItem in scoreList" :key="scoreItem.name" class="score-detail">
+                        <p class="score-circle">
+                            <span class="circle-main"></span>
+                            <span class="sector-group">
+                                <span class="circle-sector"
+                                    v-for="(item, index) in getColorList(scoreItem.score)"
+                                    :key="item.color"
+                                    :style="{
+                                        color: item.color,
+                                        transform: `${stratTransition ? `rotate(${item.deg}deg)` : ''}`,
+                                        transition: `transform 5.555ms linear ${5.555 * index}ms`,
+                                        zIndex: 36 - index
+                                    }">
+                                </span>
                             </span>
-                        </span>
-                    </p>
-                    <p class="score-rate">
-                        <span class="score-num"><bk-animate-number :value="score"></bk-animate-number></span>
-                        <span class="score-title">代码安全</span>
-                    </p>
-                </li>
-            </ul>
-        </section>
-        <section class="code-check-detail">
-            <h3 class="detail-title">问题汇总</h3>
-            <ul class="float-left">
-                <li v-for="problem in problemList" :key="problem" class="problem-item">
-                    <p class="problem-desc">
-                        <span class="english-name">Coverity</span>
-                        <span class="problem-name">代码缺陷</span>
-                    </p>
-                    <p class="problem-num">
-                        <span class="num">3</span>
-                        <span class="unit">个</span>
-                    </p>
-                </li>
-            </ul>
-        </section>
+                        </p>
+                        <p class="score-rate">
+                            <span class="score-num"><bk-animate-number :value="scoreItem.score" :digits="3"></bk-animate-number></span>
+                            <span class="score-title">{{ scoreItem.name }}</span>
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section class="code-check-detail problem-detail">
+                <h3 class="detail-title">问题汇总</h3>
+                <ul class="float-left problem-list">
+                    <li v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item">
+                        <p class="problem-desc">
+                            <span class="english-name">{{ analysisResult.displayName }}</span>
+                            <span class="problem-name" :style="{ color: getToolColor(analysisResult.toolName) }">{{ analysisResult.type }}</span>
+                        </p>
+                        <p class="problem-num">
+                            <span class="num">{{ analysisResult.defectCount }}</span>
+                            <span class="unit">{{ getToolUnit(analysisResult.toolName) }}</span>
+                        </p>
+                    </li>
+                    <bk-exception class="exception-wrap-item exception-part" type="empty" scene="part" v-if="!codeScore.lastAnalysisResultList || codeScore.lastAnalysisResultList.length <= 0">
+                        未发现代码质量问题
+                    </bk-exception>
+                </ul>
+            </section>
+        </template>
     </main>
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+    import api from '../../api'
     import fail from './fail'
+    import uncheck from './uncheck'
+    import success from './success'
+    import doing from './doing'
+    import unqualified from './unqualified'
+
+    const statusMap = {
+        0: 'success',
+        1: 'fail',
+        2: 'uncheck',
+        3: 'doing'
+    }
 
     export default {
         components: {
-            fail
+            fail,
+            uncheck,
+            success,
+            doing,
+            unqualified
         },
 
         data () {
             return {
-                scoreList: [60, 99, 100],
-                problemList: [1, 2, 3, 4, 5, 6, 7],
-                stratTransition: false
+                status: '',
+                message: '',
+                stratTransition: false,
+                codeScore: {},
+                isLoading: false,
+                statusData: {},
+                scoreList: []
+            }
+        },
+
+        computed: {
+            ...mapGetters('store', {
+                'detail': 'getDetail'
+            }),
+
+            storeType () {
+                const typeMap = {
+                    atom: 'ATOM',
+                    image: 'IMAGE',
+                    service: 'SERVICE'
+                }
+                const type = this.$route.params.type
+                return typeMap[type]
+            },
+
+            storeCode () {
+                const keyMap = {
+                    atom: 'atomCode',
+                    image: 'imageCode',
+                    service: 'serviceCode'
+                }
+                const type = this.$route.params.type
+                const key = keyMap[type]
+                return this.detail[key]
             }
         },
 
         mounted () {
-            setTimeout(() => {
-                this.stratTransition = true
-            }, 20)
+            this.isLoading = true
+            this.getCodeScore().finally(() => {
+                this.isLoading = false
+                this.$nextTick(() => {
+                    this.stratTransition = true
+                })
+            })
         },
 
         methods: {
+            startCodeCC () {
+                return api.startCodecc(this.storeType, this.storeCode).then(() => {
+                    this.$bkMessage({ message: '启动插件扫描成功', theme: 'success' })
+                    return this.getCodeScore()
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                })
+            },
+
+            getCodeScore () {
+                return api.getCodeScore(this.storeType, this.storeCode).then((res = {}) => {
+                    this.codeScore = res.data || {}
+                    this.message = res.message || ''
+                    this.scoreList = [
+                        { name: '代码安全', score: this.codeScore.codeSecurityScore },
+                        { name: '代码规范', score: this.codeScore.codeStyleScore },
+                        { name: '代码度量', score: this.codeScore.codeMeasureScore }
+                    ]
+                    // 设置当前扫描状态
+                    this.status = statusMap[this.codeScore.status]
+                    if (!res.qualifiedFlag && this.status === 'success') this.status = 'unqualified'
+                    // 如果执行中，则轮询状态
+                    if (this.status === 'doing') {
+                        setTimeout(() => {
+                            this.getCodeScore()
+                        }, 1000)
+                    }
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                })
+            },
+
+            getToolColor (toolName) {
+                const toolColorMap = {
+                    'CLOC': '#979ba5',
+                    'WOODPECKER-SENSITIVE': '#ea3636'
+                }
+
+                return toolColorMap[toolName] || '#ff9c01'
+            },
+
+            getToolUnit (toolName) {
+                const toolUnitMap = {
+                    'CLOC': '行'
+                }
+
+                return toolUnitMap[toolName] || '个'
+            },
+
             getColorList (score) {
                 const colorMap = {
                     '^100$': {
@@ -119,6 +231,11 @@
 </script>
 
 <style lang="scss" scoped>
+    .code-check-main {
+        height: 100%;
+        padding-bottom: 20px;
+        overflow-y: auto;
+    }
     .code-check-detail {
         padding: 40px 3.2vh 0;
         .detail-title {
@@ -128,6 +245,18 @@
         }
         .score {
             margin-bottom: 26px;
+        }
+        .score-rule {
+            font-weight: normal;
+            font-size: 12px;
+            color: #3a84ff;
+            margin-left: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
+        .score-icon {
+            margin-left: 5.8px;
         }
     }
     .float-left {
@@ -155,7 +284,7 @@
                 border-radius: 50%;
                 overflow: hidden;
                 background: #f0f1f5;
-                margin-right: 24px;
+                margin-right: 20px;
                 .circle-main {
                     position: absolute;
                     top: 20px;
@@ -196,7 +325,7 @@
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                width: 60px;
+                width: 116px;
                 .score-num {
                     line-height: 45px;
                     font-size: 32px;
@@ -227,7 +356,6 @@
             align-items: center;
             flex-direction: column;
             .english-name {
-                font-weight: medium;
                 line-height: 22px;
                 font-size: 16px;
                 color: #63656e;
@@ -241,7 +369,6 @@
         }
         .problem-num {
             .num {
-                font-weight: medium;
                 font-size: 32px;
                 line-height: 45px;
                 color: #313238;
@@ -274,6 +401,67 @@
             .english-name, .num, .unit {
                 color: #3a84ff;
             }
+        }
+    }
+    /deep/ .exception-wrap-item {
+        margin-top: 16px;
+        .exception-image {
+            object-fit: none;
+        }
+    }
+    /deep/ .code-check-tip {
+        margin: 30px 3.2vh 0;
+        background: #f0f8ff;
+        border: 1px solid #c5daff;
+        border-radius: 2px;
+        line-height: 30px;
+        color: #63656e;
+        font-size: 12px;
+        .icon-info-circle {
+            margin: 0 9px 0 11px;
+            color: #419bf9;
+            font-size: 14px;
+        }
+    }
+    /deep/ .code-ckeck-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 3.2vh;
+        border-bottom: 1px solid #f0f1f5;
+        .status-icon {
+            font-size: 46px;
+            margin-right: 21px;
+        }
+        .code-check-summary {
+            flex: 1;
+            color: #63656e;
+            font-size: 12px;
+            line-height: 17px;
+            .summary-head {
+                color: #313238;
+                line-height: 28px;
+                font-size: 20px;
+                font-weight: normal;
+            }
+            .summary-desc {
+                display: inline-block;
+                margin: 3px 0 5px;
+                font-weight: normal;
+            }
+            .summary-link {
+                opacity: 0.9;
+                font-weight: normal;
+                line-height: 16px;
+            }
+            .link-txt {
+                color: #3a84ff;
+                cursor: pointer;
+                margin: 0 8px;
+            }
+        }
+        .code-check-button {
+            margin-top: 10px;
         }
     }
 </style>
