@@ -116,11 +116,21 @@
                         :rules="[requireRule]"
                         error-display-type="normal"
                     >
-                        <bk-select v-model="relateImageData.form.projectCode" searchable :placeholder="$t('store.请选择项目')" @change="toggleProjectList">
-                            <bk-option v-for="option in projectList"
-                                :key="option.projectCode"
-                                :id="option.projectCode"
-                                :name="option.projectName">
+                        <bk-select v-model="relateImageData.form.projectCode"
+                            @change="toggleProjectList"
+                            searchable
+                            :placeholder="$t('store.请选择项目')"
+                            :enable-virtual-scroll="projectList && projectList.length > 3000"
+                            :list="projectList"
+                            id-key="projectCode"
+                            display-key="projectName"
+                        >
+                            <bk-option
+                                v-for="item in projectList"
+                                :key="item.projectCode"
+                                :id="item.projectCode"
+                                :name="item.projectName"
+                            >
                             </bk-option>
                             <a href="/console/pm" slot="extension" target="_blank"> {{ $t('store.新增项目') }} </a>
                         </bk-select>
