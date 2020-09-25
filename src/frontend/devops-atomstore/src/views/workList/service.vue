@@ -147,11 +147,20 @@
                         :rules="[requireRule]"
                         error-display-type="normal"
                     >
-                        <bk-select v-model="relateServiceData.form.projectCode" searchable :placeholder="$t('store.请选择项目')">
-                            <bk-option v-for="option in projectList"
-                                :key="option.project_code"
-                                :id="option.project_code"
-                                :name="option.project_name">
+                        <bk-select v-model="relateServiceData.form.projectCode"
+                            searchable
+                            :placeholder="$t('store.请选择项目')"
+                            :enable-virtual-scroll="projectList && projectList.length > 3000"
+                            :list="projectList"
+                            id-key="projectCode"
+                            display-key="projectName"
+                        >
+                            <bk-option
+                                v-for="item in projectList"
+                                :key="item.projectCode"
+                                :id="item.projectCode"
+                                :name="item.projectName"
+                            >
                             </bk-option>
                             <a href="/console/pm" slot="extension" target="_blank"> {{ $t('store.新增项目') }} </a>
                         </bk-select>
