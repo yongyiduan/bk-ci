@@ -571,7 +571,7 @@
                 let errorCount = 0
                 let ref = ''
 
-                if (!this.atomForm.logoUrl) {
+                if (!this.atomForm.logoUrl && !this.atomForm.iconData) {
                     this.formErrors.logoUrlError = true
                     ref = ref || 'logoUrlError'
                     errorCount++
@@ -658,6 +658,7 @@
                         publisher: this.atomForm.publisher,
                         versionContent: this.atomForm.versionContent,
                         logoUrl: this.atomForm.logoUrl || undefined,
+                        iconData: this.atomForm.iconData || undefined,
                         summary: this.atomForm.summary || undefined,
                         description: this.atomForm.description || undefined,
                         visibilityLevel: this.atomForm.visibilityLevel,

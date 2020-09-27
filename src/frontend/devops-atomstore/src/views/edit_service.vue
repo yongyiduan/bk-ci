@@ -161,6 +161,7 @@
                     summary: '',
                     description: '',
                     logoUrl: '',
+                    iconData: '',
                     releaseType: '',
                     version: '1.0.0',
                     publisher: '',
@@ -244,7 +245,7 @@
 
             submitService () {
                 this.$refs.serviceForm.validate().then(() => {
-                    if (!this.form.logoUrl) {
+                    if (!this.form.logoUrl && !this.form.iconData) {
                         this.logoErr = true
                         const err = { field: 'selectLogo' }
                         throw err
