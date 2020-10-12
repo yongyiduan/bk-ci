@@ -52,13 +52,14 @@
     <script src="<%=htmlWebpackPlugin.options.urlPrefix %>/console/static/devops-utils.js?t="></script>
     <script>
         var X_DEVOPS_PROJECT_ID = 'X-DEVOPS-PROJECT-ID'
-        var AJAX_URL_PIRFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__/ms'
-        var WEB_URL_PIRFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__/console'
-        var WS_URL_PREFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__/ms'
+        var AJAX_URL_PIRFIX = '__BK_CI_PUBLIC_URL__/ms'
+        var WEB_URL_PIRFIX = '__BK_CI_PUBLIC_URL__/console'
+        var WS_URL_PREFIX = '__BK_CI_PUBLIC_URL__/ms'
+        var GW_URL_PREFIX =   '__BK_CI_PUBLIC_URL__'
+        var PERM_URL_PIRFIX = '__BK_CI_PUBLIC_URL__'
+        var DOCS_URL_PREFIX = '__BK_CI_DOCS_URL__'
+        var BADGE_URL_PREFIX = '__BK_CI_BADGE_URL__'
         var PROXY_URL_PREFIX = 'devnet.devops.oa.com'
-        var PERM_URL_PIRFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__'
-        var DOCS_URL_PREFIX = 'http://iwiki.oa.com'
-        var GW_URL_PREFIX = '__HTTP_SCHEMA__://__BKCI_FQDN__'
     </script>
 </body>
 </html>
