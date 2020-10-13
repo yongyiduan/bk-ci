@@ -266,8 +266,7 @@
             stageIndex: Number,
             stages: Array,
             editable: Boolean,
-            title: String,
-            showDebugDockerBtn: Boolean
+            title: String
         },
         data () {
             return {

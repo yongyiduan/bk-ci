@@ -6,13 +6,16 @@
                 <p v-if="!nameEditing">{{ container.name }} ({{ stageIndex + 1}}-{{ containerIndex + 1}})</p>
                 <i @click="toggleEditName(true)" class="devops-icon icon-edit" :class="nameEditing ? 'editing' : ''" />
             </div>
+            <div v-if="showDebugDockerBtn" :class="!editable ? 'control-bar' : 'debug-btn'">
+                <bk-button theme="warning" @click="startDebug">{{ $t('editPage.docker.debugConsole') }}</bk-button>
+            </div>
         </header>
-        <container-content v-bind="$props" slot="content" ref="container" :show-debug-docker-btn="showDebugDockerBtn"></container-content>
+        <container-content v-bind="$props" slot="content" ref="container"></container-content>
     </bk-sideslider>
 </template>
 
 <script>
-    import { mapActions, mapState } from 'vuex'
+    import { mapActions, mapState, mapGetters } from 'vuex'
     import ContainerContent from './ContainerContent'
 
     export default {
@@ -36,6 +39,9 @@
             ...mapState('atom', [
                 'execDetail',
                 'isPropertyPanelVisible'
+            ]),
+            ...mapGetters('atom', [
+                'checkShowDebugDockerBtn'
             ]),
             container () {
                 try {
@@ -77,6 +83,9 @@
                         name: value
                     }
                 })
+            },
+            startDebug () {
+                this.$refs.container.startDebug()
             }
         }
     }
