@@ -93,6 +93,9 @@
             currentTab () {
                 return this.$route.params.tab || 'pipeline'
             },
+            isDraftEdit () {
+                return this.$route.name === 'pipelineImportEdit'
+            },
             panels () {
                 return [{
                             name: 'pipeline',
@@ -123,7 +126,7 @@
                                 }
                             }
                         },
-                        {
+                        ...(this.isDraftEdit ? [] : [{
                             name: 'auth',
                             label: this.$t('settings.auth'),
                             component: 'AuthorityTab',
@@ -142,7 +145,7 @@
                                     })
                                 }
                             }
-                        },
+                        }]),
                         {
                             name: 'baseSetting',
                             label: this.$t('editPage.baseSetting'),
@@ -223,7 +226,7 @@
                 'requestInterceptAtom'
             ]),
             init () {
-                if (this.pipelineId) {
+                if (!this.isDraftEdit && this.pipelineId) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
