@@ -1052,8 +1052,7 @@
                         instanceId: [{
                             id: prePipeline.pipelineId,
                             name: prePipeline.pipelineName
-                        }],
-                        projectId
+                        }]
                     }, {
                         actionId: this.$permissionActionMap.edit,
                         resourceId: this.$permissionResourceMap.pipeline,
