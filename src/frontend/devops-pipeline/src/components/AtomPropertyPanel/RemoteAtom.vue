@@ -38,7 +38,7 @@
         },
         computed: {
             atomVersion () {
-                return '1.0.0'
+                return (this.atom.atomCode === 'CodeccCheckAtom' || this.atom.atomCode === 'CodeccCheckAtomDebug') ? '1.0.0' : this.atom.version
             },
             atomCode () {
                 return this.atom.atomCode || 'CodeccCheckAtom'
