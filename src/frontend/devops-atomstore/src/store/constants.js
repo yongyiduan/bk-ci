@@ -38,7 +38,9 @@ export const atomStatusMap = {
     'RELEASED': 'store.已发布',
     'GROUNDING_SUSPENSION': 'store.上架中止',
     'UNDERCARRIAGING': 'store.下架中',
-    'UNDERCARRIAGED': 'store.已下架'
+    'UNDERCARRIAGED': 'store.已下架',
+    'CODECCING': 'store.代码检查中',
+    'CODECC_FAIL': 'store.代码检查失败'
 }
 export const templateStatusList = {
     'INIT': 'store.初始化',

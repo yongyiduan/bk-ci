@@ -1,5 +1,7 @@
 {
     "store": "Store",
+    "代码检查中": "Code checking",
+    "代码检查失败": "Code check failed",
     "代码质量": "Code Quality",
     "修改环境变量": "Modify environment variables",
     "变更前": "Before change",

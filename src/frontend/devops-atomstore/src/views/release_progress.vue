@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 <div class="detail-title version-detail-title" v-if="!isOver">
-                    <code-check v-if="true" class="detail-code-check"></code-check>
+                    <code-check v-if="curStep.code === 'CODECC'" class="detail-code-check"></code-check>
                     <template v-else>
                         <p class="form-title"> {{ $t('store.版本详情') }} </p>
                         <hr class="cut-line">
