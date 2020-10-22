@@ -4,6 +4,7 @@
             :codecc-url="codeScore.codeccUrl"
             :commit-id="codeScore.commitId"
             :repo-url="codeScore.repoURL"
+            :start-checking="startChecking"
             :message="message"
             @startCodeCC="startCodeCC"
         ></component>
@@ -83,6 +84,11 @@
             unqualified
         },
 
+        props: {
+            code: String,
+            type: String
+        },
+
         data () {
             return {
                 status: '',
@@ -90,6 +96,7 @@
                 stratTransition: false,
                 codeScore: {},
                 isLoading: false,
+                startChecking: false,
                 statusData: {},
                 scoreList: []
             }
@@ -107,7 +114,7 @@
                     service: 'SERVICE'
                 }
                 const type = this.$route.params.type
-                return typeMap[type]
+                return typeMap[type] || this.type
             },
 
             storeCode () {
@@ -118,7 +125,7 @@
                 }
                 const type = this.$route.params.type
                 const key = keyMap[type]
-                return this.detail[key]
+                return this.detail[key] || this.code
             }
         },
 
@@ -134,17 +141,20 @@
 
         methods: {
             startCodeCC () {
+                this.startChecking = true
                 return api.startCodecc(this.storeType, this.storeCode).then(() => {
                     this.$bkMessage({ message: '启动插件扫描成功', theme: 'success' })
                     return this.getCodeScore()
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => {
+                    this.startChecking = false
                 })
             },
 
             getCodeScore () {
                 return api.getCodeScore(this.storeType, this.storeCode).then((res = {}) => {
-                    this.codeScore = res.data || {}
+                    this.codeScore = res || {}
                     this.message = res.message || ''
                     this.scoreList = [
                         { name: '代码安全', score: this.codeScore.codeSecurityScore },

@@ -11,18 +11,13 @@
 
 <script>
     export default {
-        data () {
-            return {
-                startChecking: false
-            }
+        props: {
+            startChecking: Boolean
         },
 
         methods: {
             startCodeCC () {
-                this.startChecking = true
-                this.$emit('startCodeCC').finally(() => {
-                    this.startChecking = false
-                })
+                this.$emit('startCodeCC')
             }
         }
     }

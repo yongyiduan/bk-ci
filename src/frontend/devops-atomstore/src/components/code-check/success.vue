@@ -16,13 +16,8 @@
         props: {
             codeccUrl: String,
             commitId: String,
-            repoUrl: String
-        },
-
-        data () {
-            return {
-                startChecking: false
-            }
+            repoUrl: String,
+            startChecking: Boolean
         },
 
         computed: {
@@ -33,10 +28,7 @@
 
         methods: {
             startCodeCC () {
-                this.startChecking = true
-                this.$emit('startCodeCC').finally(() => {
-                    this.startChecking = false
-                })
+                this.$emit('startCodeCC')
             },
 
             goToLink (url) {

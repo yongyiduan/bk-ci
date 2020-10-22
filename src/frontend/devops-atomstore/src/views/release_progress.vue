@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 <div class="detail-title version-detail-title" v-if="!isOver">
-                    <code-check v-if="curStep.code === 'CODECC'" class="detail-code-check"></code-check>
+                    <code-check v-if="curStep.code === 'codecc' && versionDetail.atomCode" class="detail-code-check" :code="versionDetail.atomCode" type="ATOM"></code-check>
                     <template v-else>
                         <p class="form-title"> {{ $t('store.版本详情') }} </p>
                         <hr class="cut-line">
@@ -316,7 +316,7 @@
                 ]
             },
             curStep () {
-                return this.progressStatus.find((step) => (step.status === 'doing')) || (this.progressStatus.length && this.progressStatus[this.progressStatus.length - 1]) || {}
+                return this.progressStatus.find((step) => (['fail', 'doing'].includes(step.status))) || (this.progressStatus.length && this.progressStatus[this.progressStatus.length - 1]) || {}
             }
         },
 

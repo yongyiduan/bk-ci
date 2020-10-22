@@ -17,13 +17,8 @@
     export default {
         props: {
             codeccUrl: String,
-            message: String
-        },
-
-        data () {
-            return {
-                startChecking: false
-            }
+            message: String,
+            startChecking: Boolean
         },
 
         computed: {
@@ -34,10 +29,7 @@
 
         methods: {
             startCodeCC () {
-                this.startChecking = true
-                this.$emit('startCodeCC').finally(() => {
-                    this.startChecking = false
-                })
+                this.$emit('startCodeCC')
             },
 
             goToCodecc () {
