@@ -154,14 +154,6 @@
                             <div v-if="atomErrors.languageError" class="error-tips"> {{ $t('store.开发语言不能为空') }} </div>
                         </div>
                     </div>
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.自定义前端') }} </label>
-                        <div class="bk-form-content atom-item-content">
-                            <bk-radio-group v-model="createAtomForm.frontendType">
-                                <bk-radio :title="entry.title" :value="entry.value" v-for="(entry, key) in frontendTypeList" :key="key">{{ entry.label }}</bk-radio>
-                            </bk-radio-group>
-                        </div>
-                    </div>
                     <template v-if="!isEnterprise">
                         <div class="bk-form-item is-required">
                             <label class="bk-label"> {{ $t('store.授权方式') }} </label>
@@ -185,6 +177,14 @@
                             <div class="bk-form-content atom-item-content">
                                 <bk-input v-model="createAtomForm.privateReason" type="textarea" :placeholder="$t('store.请输入不开源原因')" @input="atomErrors.privateReasonError = false"></bk-input>
                                 <p v-if="atomErrors.privateReasonError" class="error-tips"> {{ $t('store.不开源原因不能为空') }} </p>
+                            </div>
+                        </div>
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.自定义前端') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-radio-group v-model="createAtomForm.frontendType">
+                                    <bk-radio :title="entry.title" :value="entry.value" v-for="(entry, key) in frontendTypeList" :key="key">{{ entry.label }}</bk-radio>
+                                </bk-radio-group>
                             </div>
                         </div>
                         <form-tips :tips-content="createTips" class="atom-tip"></form-tips>
@@ -309,13 +309,13 @@
                 authTypeList: [
                     { label: this.$t('store.工蜂OAUTH'), value: 'OAUTH' }
                 ],
+                frontendTypeList: [
+                    { label: this.$t('store.是'), value: 'SPECIAL', title: this.$t('sotre.需自行开发插件输入页面。详见插件开发指引') },
+                    { label: this.$t('store.否'), value: 'NORMAL', title: this.$t('store.仅需按照规范定义好输入字段，系统将自动渲染页面') }
+                ],
                 isOpenSource: [
                     { label: this.$t('store.是'), value: 'LOGIN_PUBLIC' },
                     { label: this.$t('store.否'), value: 'PRIVATE', disable: true, title: this.$t('store.若有特殊原因无法开源，请联系蓝盾助手（务必联系蓝盾助手，自行修改工蜂项目配置会失效，每次升级插件时将根据插件配置自动刷新）') }
-                ],
-                frontendTypeList: [
-                    { label: this.$t('store.是'), value: 'SPECIAL', title: this.$t('store.需自行开发插件输入页面,详见插件开发指引') },
-                    { label: this.$t('store.否'), value: 'NORMAL', title: this.$t('store.仅需按照规范定义好输入字段，系统将自动渲染页面') }
                 ],
                 promptList: [
                     this.$t('store.1、插件市场不再展示插件'),
