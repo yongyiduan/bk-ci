@@ -38,13 +38,16 @@
         },
         computed: {
             atomVersion () {
-                return '1.0.0'
+                return this.atom.version || '1.0.0'
+            },
+            atomCode () {
+                return this.atom.atomCode
             },
             atomCode () {
                 return this.atom.atomCode || 'CodeccCheckAtom'
             },
             src () {
-                return `${PERM_URL_PIRFIX}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
+                return `${AJAX_URL_PIRFIX}/artifactory/resource/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
             }
         },
         mounted () {
