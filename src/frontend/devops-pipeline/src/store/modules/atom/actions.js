@@ -69,7 +69,8 @@ import {
     SET_SAVE_STATUS,
     SET_AUTH_EDITING,
     TOGGLE_REVIEW_DIALOG,
-    TOGGLE_STAGE_REVIEW_PANEL
+    TOGGLE_STAGE_REVIEW_PANEL,
+    SET_IMPORTED_JSON
 } from './constants'
 import { PipelineEditActionCreator, actionCreator } from './atomUtil'
 import { hashID, randomString } from '@/utils/util'
@@ -486,5 +487,8 @@ export default {
 
     getMacXcodeVersion () {
         return request.get(`${MACOS_API_URL_PREFIX}/user/xcodeVersions`)
+    },
+    setImportedPipelineJson ({ commit }, importedJson) {
+        commit(SET_IMPORTED_JSON, importedJson)
     }
 }
