@@ -126,7 +126,7 @@
                                 }
                             }
                         },
-                        {
+                        ...(this.isDraftEdit ? [] : [{
                             name: 'auth',
                             label: this.$t('settings.auth'),
                             component: 'AuthorityTab',
@@ -145,7 +145,7 @@
                                     })
                                 }
                             }
-                        },
+                        }]),
                         {
                             name: 'baseSetting',
                             label: this.$t('editPage.baseSetting'),
@@ -226,10 +226,12 @@
                 'requestInterceptAtom'
             ]),
             init () {
-                if (!this.isDraftEdit) {
+                if (!this.isDraftEdit && this.pipelineId) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
+                    this.getRoleList()
+                    this.requestProjectGroupAndUsers(this.$route.params)
                 }
             },
             switchTab (tab) {
