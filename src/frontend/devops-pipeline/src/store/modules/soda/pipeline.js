@@ -320,22 +320,22 @@ export const actions = {
         })
     },
     startDebugDocker: async ({ commit }, data) => {
-        return request.post(`dispatch/api/user/dockerhost/startDebug/`, data).then(response => {
+        return request.post(`dispatch-docker/api/user/dockerhost/startDebug/`, data).then(response => {
             return response.data
         })
     },
     stopDebugDocker: async ({ commit }, { projectId, pipelineId, vmSeqId }) => {
-        return request.post(`dispatch/api/user/dockerhost/stopDebug/${projectId}/${pipelineId}/${vmSeqId}`).then(response => {
+        return request.post(`dispatch-docker/api/user/dockerhost/stopDebug/${projectId}/${pipelineId}/${vmSeqId}`).then(response => {
             return response.data
         })
     },
     getContainerInfoByBuildId: ({ commit }, { projectId, pipelineId, buildId, vmSeqId }) => {
-        return request.get(`dispatch/api/user/dockerhost/getContainerInfo/${projectId}/${pipelineId}/${buildId}/${vmSeqId}`).then(response => {
+        return request.get(`dispatch-docker/api/user/dockerhost/getContainerInfo/${projectId}/${pipelineId}/${buildId}/${vmSeqId}`).then(response => {
             return response.data
         })
     },
     getContainerInfo: ({ commit }, { projectId, pipelineId, vmSeqId }) => {
-        return request.get(`dispatch/api/user/dockerhost/getDebugStatus/${projectId}/${pipelineId}/${vmSeqId}`).then(response => {
+        return request.get(`dispatch-docker/api/user/dockerhost/getDebugStatus/${projectId}/${pipelineId}/${vmSeqId}`).then(response => {
             return response.data
         })
     },
