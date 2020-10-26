@@ -44,7 +44,7 @@
                 return this.atom.atomCode || 'CodeccCheckAtom'
             },
             src () {
-                return `${AJAX_URL_PIRFIX}/artifactory/resource/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
+                return `${GW_URL_PREFIX}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
             }
         },
         mounted () {
