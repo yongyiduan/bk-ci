@@ -31,7 +31,7 @@
                             </span>
                         </p>
                         <p class="score-rate">
-                            <span class="score-num"><bk-animate-number :value="scoreItem.score" :digits="3"></bk-animate-number></span>
+                            <span class="score-num"><bk-animate-number :value="scoreItem.score" :digits="2"></bk-animate-number></span>
                             <span class="score-title">{{ scoreItem.name }}</span>
                         </p>
                     </li>
@@ -86,7 +86,8 @@
 
         props: {
             code: String,
-            type: String
+            type: String,
+            id: String
         },
 
         data () {
@@ -126,6 +127,17 @@
                 const type = this.$route.params.type
                 const key = keyMap[type]
                 return this.detail[key] || this.code
+            },
+
+            storeId () {
+                const keyMap = {
+                    atom: 'atomId',
+                    image: 'imageId',
+                    service: 'serviceId'
+                }
+                const type = this.$route.params.type
+                const key = keyMap[type]
+                return this.detail[key] || this.id
             }
         },
 
@@ -142,7 +154,7 @@
         methods: {
             startCodeCC () {
                 this.startChecking = true
-                return api.startCodecc(this.storeType, this.storeCode).then(() => {
+                return api.startCodecc(this.storeType, this.storeCode, this.storeId).then(() => {
                     this.$bkMessage({ message: '启动插件扫描成功', theme: 'success' })
                     return this.getCodeScore()
                 }).catch((err) => {
@@ -194,15 +206,15 @@
 
             getColorList (score) {
                 const colorMap = {
-                    '^100$': {
+                    '^100\.[0-9]{2}$': {
                         start: { r: 66, g: 214, b: 179 },
                         end: { r: 171, g: 249, b: 176 }
                     },
-                    '^[9][0-9]$': {
+                    '^[9][0-9]\.[0-9]{2}$': {
                         start: { r: 247, g: 107, b: 28 },
                         end: { r: 250, g: 217, b: 97 }
                     },
-                    '^[^9]?[0-9]$': {
+                    '^[0-8]?[0-9]\.[0-9]{2}$': {
                         start: { r: 234, g: 54, b: 54 },
                         end: { r: 253, g: 156, b: 156 }
                     }
@@ -217,7 +229,7 @@
                 function getColor (curScore) {
                     const rate = curScore / score
                     const rgb = []
-                    const { start, end } = curColorRange || {};
+                    const { start = {}, end = {} } = curColorRange || {};
                     ['r', 'g', 'b'].forEach((key) => {
                         const colorNum = (end[key] - start[key]) * rate + start[key]
                         rgb.push(colorNum)

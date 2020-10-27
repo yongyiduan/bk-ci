@@ -43,7 +43,7 @@ export default {
         return vue.$ajax.get(`${prefix}/user/store/codecc/types/${storeType}/codes/${storeCode}/measurement`)
     },
 
-    startCodecc (storeType, storeCode) {
-        return vue.$ajax.post(`${prefix}/user/store/codecc/types/${storeType}/codes/${storeCode}/task/start`)
+    startCodecc (storeType, storeCode, storeId) {
+        return vue.$ajax.post(`${prefix}/user/store/codecc/types/${storeType}/codes/${storeCode}/task/start?storeId=${storeId}`)
     }
 }
