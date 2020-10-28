@@ -120,14 +120,6 @@
                         <label class="bk-label"> {{ $t('store.调试项目') }} </label>
                         <div class="bk-form-content atom-item-content is-tooltips">
                             <div style="min-width: 100%">
-                                <big-select v-model="createAtomForm.projectCode" @selected="selectedProject" :searchable="true" @toggle="toggleProjectList" :options="projectList" setting-key="projectCode" display-key="projectName" :placeholder="$t('store.请选择调试项目')">
-                                    <div slot="extension" style="cursor: pointer;">
-                                        <a :href="itemUrl" target="_blank">
-                                            <i class="devops-icon icon-plus-circle" />
-                                            {{ itemText }}
-                                        </a>
-                                    </div>
-                                </big-select>
                                 <bk-select v-model="createAtomForm.projectCode"
                                     @selected="selectedProject"
                                     @toggle="toggleProjectList"
