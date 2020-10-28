@@ -21,13 +21,95 @@
 const jobOptionConfigMixin = {
     data () {
         return {
-            JOB_OPTION: {
+            JOB_MUTUAL: {
+                enable: {
+                    default: false
+                },
+                mutexGroupName: {
+                    rule: {
+                        mutualGroup: true
+                    },
+                    component: 'vuex-input',
+                    label: this.$t('storeMap.mutualGroupName'),
+                    placeholder: this.$t('storeMap.mutualGroupNamePlaceholder'),
+                    default: '',
+                    required: true
+                },
+                queueEnable: {
+                    rule: {},
+                    type: 'boolean',
+                    component: 'atom-checkbox',
+                    text: this.$t('storeMap.queueEnable'),
+                    default: false
+                },
+                timeout: {
+                    rule: { 'numeric': true, 'max_value': 10080, 'min_value': 1 },
+                    component: 'vuex-input',
+                    label: this.$t('storeMap.mutualTimeout'),
+                    placeholder: this.$t('storeMap.mutualTimeoutPlaceholder'),
+                    default: '900',
+                    required: true,
+                    isHidden: (mutexGroup) => {
+                        return !(mutexGroup && mutexGroup.queueEnable)
+                    }
+                },
+                queue: {
+                    rule: { 'numeric': true, 'max_value': 10, 'min_value': 1 },
+                    component: 'vuex-input',
+                    label: this.$t('storeMap.queueLabel'),
+                    placeholder: this.$t('storeMap.queuePlaceholder'),
+                    default: '5',
+                    required: true,
+                    isHidden: (mutexGroup) => {
+                        return !(mutexGroup && mutexGroup.queueEnable)
+                    }
+                }
+            }
+        }
+    },
+    computed: {
+        JOB_OPTION () {
+            return {
                 enable: {
                     rule: {},
                     type: 'boolean',
                     component: 'atom-checkbox',
                     text: this.$t('storeMap.enableJob'),
                     default: true
+                },
+                dependOnType: {
+                    component: 'enum-input',
+                    label: this.$t('storeMap.dependOn'),
+                    desc: this.$t('storeMap.dependOnDesc'),
+                    default: 'ID',
+                    list: [
+                        {
+                            label: this.$t('storeMap.dependOnId'),
+                            value: 'ID'
+                        },
+                        {
+                            label: this.$t('storeMap.dependOnName'),
+                            value: 'NAME'
+                        }
+                    ]
+                },
+                dependOnId: {
+                    component: 'selector',
+                    default: [],
+                    multiSelect: true,
+                    list: this.dependOnList,
+                    isHidden: (jobOption) => {
+                        return !(jobOption && (jobOption.dependOnType === 'ID' || !jobOption.dependOnType))
+                    }
+                },
+                dependOnName: {
+                    rule: {},
+                    component: 'vuex-input',
+                    default: '',
+                    placeholder: this.$t('storeMap.dependOnNamePlaceholder'),
+                    isHidden: (jobOption) => {
+                        return !(jobOption && jobOption.dependOnType === 'NAME')
+                    }
                 },
                 timeout: {
                     rule: { 'numeric': true, 'max_value': 10080 },
@@ -64,59 +146,31 @@ const jobOptionConfigMixin = {
                     default: [{ key: 'param1', value: '' }],
                     label: this.$t('storeMap.customVar'),
                     allowNull: false,
-                    isHidden: `function (jobOptoin) {
-                        return !(jobOptoin && (jobOptoin.runCondition === 'CUSTOM_VARIABLE_MATCH' || jobOptoin.runCondition === 'CUSTOM_VARIABLE_MATCH_NOT_RUN'))
-                    }`
+                    isHidden: (jobOption) => {
+                        return !(jobOption && (jobOption.runCondition === 'CUSTOM_VARIABLE_MATCH' || jobOption.runCondition === 'CUSTOM_VARIABLE_MATCH_NOT_RUN'))
+                    }
                 },
                 customCondition: {
                     isHidden: true,
                     default: ''
                 }
-            },
-            JOB_MUTUAL: {
-                enable: {
-                    default: false
-                },
-                mutexGroupName: {
-                    rule: {
-                        mutualGroup: true
-                    },
-                    component: 'vuex-input',
-                    label: this.$t('storeMap.mutualGroupName'),
-                    placeholder: this.$t('storeMap.mutualGroupNamePlaceholder'),
-                    default: '',
-                    required: true
-                },
-                queueEnable: {
-                    rule: {},
-                    type: 'boolean',
-                    component: 'atom-checkbox',
-                    text: this.$t('storeMap.queueEnable'),
-                    default: false
-                },
-                timeout: {
-                    rule: { 'numeric': true, 'max_value': 10080, 'min_value': 1 },
-                    component: 'vuex-input',
-                    label: this.$t('storeMap.mutualTimeout'),
-                    placeholder: this.$t('storeMap.mutualTimeoutPlaceholder'),
-                    default: '900',
-                    required: true,
-                    isHidden: `function (mutexGroup) {
-                        return !(mutexGroup && mutexGroup.queueEnable)
-                    }`
-                },
-                queue: {
-                    rule: { 'numeric': true, 'max_value': 10, 'min_value': 1 },
-                    component: 'vuex-input',
-                    label: this.$t('storeMap.queueLabel'),
-                    placeholder: this.$t('storeMap.queuePlaceholder'),
-                    default: '5',
-                    required: true,
-                    isHidden: `function (mutexGroup) {
-                        return !(mutexGroup && mutexGroup.queueEnable)
-                    }`
-                }
             }
+        },
+        dependOnList () {
+            const list = []
+            // if (!this.stage.containers || this.stage.containers.length <= 1) return list
+            this.stage.containers && this.stage.containers.map((container, index) => {
+                if (index !== this.containerIndex) {
+                    list.push(
+                        {
+                            id: container.jobId || Math.random(),
+                            name: `Job${this.stageIndex + 1}-${index + 1}${!container.jobId ? ' (该job未设置Job ID)' : ' (Job ID: ' + container.jobId + ')'} `,
+                            disabled: !container.jobId
+                        }
+                    )
+                }
+            })
+            return list
         }
     },
     methods: {

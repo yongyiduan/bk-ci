@@ -138,6 +138,7 @@
     import NormalAtomV2 from './NormalAtomV2'
     import CodeGitWebHookTrigger from './CodeGitWebHookTrigger'
     import SubPipelineCall from './SubPipelineCall'
+    import ManualReviewUserTask from './ManualReviewUserTask'
     import Logo from '@/components/Logo'
 
     export default {
@@ -181,6 +182,7 @@
             PushImageToThirdRepo,
             CodeGitWebHookTrigger,
             SubPipelineCall,
+            ManualReviewUserTask,
             Logo
         },
         props: {
@@ -391,7 +393,8 @@
                     GITHUB: PullGithub,
                     codeGithubWebHookTrigger: CodeGithubWebHookTrigger,
                     pushImageToThirdRepo: PushImageToThirdRepo,
-                    subPipelineCall: SubPipelineCall
+                    subPipelineCall: SubPipelineCall,
+                    manualReviewUserTask: ManualReviewUserTask
                 }
                 return atomMap[this.atomCode] || NormalAtom
             }
@@ -545,7 +548,7 @@
                 const hasVaildRule = ruleList.some(item =>
                     item.taskId === this.element.atomCode
                     && (item.ruleList.every(rule => !rule.gatewayId)
-                    || item.ruleList.some(rule => this.element.name.indexOf(rule.gatewayId) > -1))
+                        || item.ruleList.some(rule => this.element.name.indexOf(rule.gatewayId) > -1))
                 )
                 return hasVaildRule
             },
