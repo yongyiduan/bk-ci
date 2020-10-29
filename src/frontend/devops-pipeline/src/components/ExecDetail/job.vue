@@ -17,6 +17,7 @@
                 :plugin-list="pluginList"
                 :build-id="execDetail.id"
                 :down-load-link="downLoadJobLink"
+                :execute-count="executeCount"
                 ref="jobLog"
             />
             <container-content v-show="currentTab === 'setting'"
@@ -65,9 +66,7 @@
                 const editingElementPos = this.editingElementPos
                 const fileName = encodeURI(encodeURI(`${editingElementPos.stageIndex + 1}-${editingElementPos.containerIndex + 1}-${this.currentJob.name}`))
                 const jobId = this.currentJob.containerId
-                // to add job exec
-                const currentExe = 1
-                return `${AJAX_URL_PIRFIX}/log/api/user/logs/${this.$route.params.projectId}/${this.$route.params.pipelineId}/${this.execDetail.id}/download?jobId=${jobId}&executeCount=${currentExe}&fileName=${fileName}`
+                return `${AJAX_URL_PIRFIX}/log/api/user/logs/${this.$route.params.projectId}/${this.$route.params.pipelineId}/${this.execDetail.id}/download?jobId=${jobId}&fileName=${fileName}`
             },
 
             currentJob () {
@@ -84,6 +83,11 @@
             },
             showDebugDockerBtn () {
                 return this.checkShowDebugDockerBtn(this.currentJob, this.$route.name, this.execDetail)
+            },
+
+            executeCount () {
+                const executeCountList = this.pluginList.map((plugin) => plugin.executeCount || 1)
+                return Math.max(...executeCountList)
             }
         }
     }
