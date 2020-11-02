@@ -6,6 +6,7 @@
             :repo-url="codeScore.repoURL"
             :start-checking="startChecking"
             :message="message"
+            :last-analysis-time="codeScore.lastAnalysisTime"
             @startCodeCC="startCodeCC"
         ></component>
         <template v-if="['success', 'fail', 'unqualified'].includes(status)">
@@ -156,6 +157,7 @@
                 this.startChecking = true
                 return api.startCodecc(this.storeType, this.storeCode, this.storeId).then(() => {
                     this.$bkMessage({ message: '启动插件扫描成功', theme: 'success' })
+                    this.$emit('startCodeCC')
                     return this.getCodeScore()
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
@@ -205,31 +207,31 @@
             },
 
             getColorList (score) {
-                const colorMap = {
-                    '^100\.[0-9]{2}$': {
-                        start: { r: 66, g: 214, b: 179 },
-                        end: { r: 171, g: 249, b: 176 }
-                    },
-                    '^[9][0-9]\.[0-9]{2}$': {
-                        start: { r: 247, g: 107, b: 28 },
-                        end: { r: 250, g: 217, b: 97 }
-                    },
-                    '^[0-8]?[0-9]\.[0-9]{2}$': {
-                        start: { r: 234, g: 54, b: 54 },
-                        end: { r: 253, g: 156, b: 156 }
+                function getRgb (score) {
+                    const colorMap = {
+                        max: {
+                            start: { r: 66, g: 214, b: 179 },
+                            end: { r: 171, g: 249, b: 176 }
+                        },
+                        success: {
+                            start: { r: 247, g: 107, b: 28 },
+                            end: { r: 250, g: 217, b: 97 }
+                        },
+                        fail: {
+                            start: { r: 234, g: 54, b: 54 },
+                            end: { r: 253, g: 156, b: 156 }
+                        }
                     }
-                }
 
-                let curColorRange = {}
-                Object.keys(colorMap).forEach((key) => {
-                    const reg = new RegExp(key)
-                    if (reg.test(score)) curColorRange = colorMap[key]
-                })
+                    if (score >= 100) return colorMap.max
+                    if (score >= 90 && score < 100) return colorMap.success
+                    if (score < 90) return colorMap.fail
+                }
 
                 function getColor (curScore) {
                     const rate = curScore / score
                     const rgb = []
-                    const { start = {}, end = {} } = curColorRange || {};
+                    const { start = {}, end = {} } = getRgb(+score) || {};
                     ['r', 'g', 'b'].forEach((key) => {
                         const colorNum = (end[key] - start[key]) * rate + start[key]
                         rgb.push(colorNum)

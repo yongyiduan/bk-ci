@@ -8,7 +8,7 @@
                 <h5 class="summary-desc">{{ message }}</h5>
             </section>
             <bk-button :theme="isInDetailPage ? 'default' : 'primary'" class="code-check-button" :disabled="startChecking" @click="goToCodecc">查看详情</bk-button>
-            <bk-button theme="primary" v-if="isInDetailPage" class="code-check-button" @click="startCodeCC">重新检查</bk-button>
+            <bk-button theme="primary" v-if="isInDetailPage" class="code-check-button" @click="startCodeCC" :loading="startChecking">重新检查</bk-button>
         </section>
     </section>
 </template>

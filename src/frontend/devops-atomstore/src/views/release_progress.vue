@@ -66,7 +66,13 @@
                     </div>
                 </div>
                 <div class="detail-title version-detail-title" v-if="!isOver">
-                    <code-check v-if="curStep.code === 'codecc' && versionDetail.atomCode" class="detail-code-check" :id="versionDetail.atomId" :code="versionDetail.atomCode" type="ATOM"></code-check>
+                    <code-check v-if="curStep.code === 'codecc' && versionDetail.atomCode"
+                        class="detail-code-check"
+                        :id="versionDetail.atomId"
+                        :code="versionDetail.atomCode"
+                        type="ATOM"
+                        @startCodeCC="handleRelease"
+                    ></code-check>
                     <template v-else>
                         <p class="form-title"> {{ $t('store.版本详情') }} </p>
                         <hr class="cut-line">

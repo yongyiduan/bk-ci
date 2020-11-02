@@ -10,10 +10,6 @@
     export default {
         components: {
             codeCheck
-        },
-
-        created () {
-            console.log(233)
         }
     }
 </script>
