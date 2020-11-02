@@ -4,7 +4,7 @@
         <section class="code-ckeck-status">
             <i class="bk-icon icon-exclamation-circle status-icon"></i>
             <section class="code-check-summary">
-                <h3 class="summary-head">代码检查任务失败</h3>
+                <h3 class="summary-head">代码检查出现异常</h3>
                 <h5 class="summary-desc">{{ message }}</h5>
             </section>
             <bk-button :theme="isInDetailPage ? 'default' : 'primary'" class="code-check-button" :disabled="startChecking" @click="goToCodecc">查看详情</bk-button>
