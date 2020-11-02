@@ -39,8 +39,8 @@ export default {
         return vue.$ajax.delete(`${prefix}/user/store/env/var/types/${storeType}/codes/${storeCode}?varNames=${varNames}`)
     },
 
-    getCodeScore (storeType, storeCode) {
-        return vue.$ajax.get(`${prefix}/user/store/codecc/types/${storeType}/codes/${storeCode}/measurement`)
+    getCodeScore (storeType, storeCode, params) {
+        return vue.$ajax.get(`${prefix}/user/store/codecc/types/${storeType}/codes/${storeCode}/measurement`, { params })
     },
 
     startCodecc (storeType, storeCode, storeId) {
