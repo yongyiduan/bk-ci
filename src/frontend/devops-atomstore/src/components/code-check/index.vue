@@ -167,9 +167,7 @@
             },
 
             getCodeScore () {
-                const params = [this.storeType, this.storeCode]
-                if (this.$route.name !== 'check') params.push({ storeId: this.storeId })
-                return api.getCodeScore(...params).then((res = {}) => {
+                return api.getCodeScore(this.storeType, this.storeCode, { storeId: this.storeId }).then((res = {}) => {
                     this.codeScore = res || {}
                     this.message = res.message || ''
                     this.scoreList = [
