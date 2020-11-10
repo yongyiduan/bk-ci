@@ -253,22 +253,6 @@
                             <div v-if="curHandlerAtom.error" class="error-tips"> {{ $t('store.下架原因不能为空') }} </div>
                         </div>
                     </div>
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.缓冲期') }} </label>
-                        <div class="bk-form-content">
-                            <bk-select v-model="buffer" searchable>
-                                <bk-option v-for="(option, index) in bufferLength"
-                                    :key="index"
-                                    :id="option.value"
-                                    :name="option.label"
-                                    @click.native="selectedBuffer"
-                                    :placeholder="$t('store.请选择缓冲期')"
-                                >
-                                </bk-option>
-                            </bk-select>
-                            <div v-if="atomErrors.bufferError" class="error-tips"> {{ $t('store.缓冲期不能为空') }} </div>
-                        </div>
-                    </div>
                     <form-tips :tips-content="offlineTips" :prompt-list="promptList"></form-tips>
                     <div class="form-footer">
                         <button class="bk-button bk-primary" type="button" @click="submitofflineAtom()"> {{ $t('store.提交') }} </button>
