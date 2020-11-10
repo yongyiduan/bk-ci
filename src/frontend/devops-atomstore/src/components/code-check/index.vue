@@ -12,7 +12,7 @@
         <template v-if="['success', 'fail', 'unqualified'].includes(status)">
             <section class="code-check-detail">
                 <h3 class="detail-title score">
-                    评分<a class="score-rule"><span>计算公式</span><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
+                    评分<a class="score-rule"><a class="g-title-work" href="https://iwiki.woa.com/x/kvMMBw" target="_blank">计算公式</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
                 </h3>
                 <ul class="score-list float-left">
                     <li v-for="scoreItem in scoreList" :key="scoreItem.name" class="score-detail">
@@ -155,10 +155,12 @@
         methods: {
             startCodeCC () {
                 this.startChecking = true
-                return api.startCodecc(this.storeType, this.storeCode, this.storeId).then(() => {
+                const params = [this.storeType, this.storeCode]
+                if (this.$route.name !== 'check') params.push(this.storeId)
+                return api.startCodecc(...params).then((res) => {
                     this.$bkMessage({ message: '启动插件扫描成功', theme: 'success' })
                     this.$emit('startCodeCC')
-                    return this.getCodeScore()
+                    return this.getCodeScore(res)
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
@@ -166,8 +168,11 @@
                 })
             },
 
-            getCodeScore () {
-                return api.getCodeScore(this.storeType, this.storeCode, { storeId: this.storeId }).then((res = {}) => {
+            getCodeScore (buildId) {
+                const params = [this.storeType, this.storeCode]
+                if (this.$route.name !== 'check') params.push({ storeId: this.storeId })
+                else params.push({ buildId })
+                return api.getCodeScore(...params).then((res = {}) => {
                     this.codeScore = res || {}
                     this.message = res.message || ''
                     this.scoreList = [
