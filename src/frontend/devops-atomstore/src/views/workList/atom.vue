@@ -144,7 +144,6 @@
                                         </a>
                                     </div>
                                 </bk-select>
-
                                 <div v-if="atomErrors.projectError" class="error-tips"> {{ $t('store.项目不能为空') }} </div>
                             </div>
                             <bk-popover placement="right" width="400">
