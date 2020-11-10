@@ -617,7 +617,7 @@
         "performance": "Model",
         "cpuUnit": "C",
         "workspace": "workspace on",
-        "workspaceTips": "Default: [Agent installation directory]/workspace/[pipeline ID]/",
+        "workspaceTips": "If not filled, the it will be saved in [Agent installation directory]/workspace/[pipeline ID]/src by default",
         "useRootText": "Execute as root(please check it if you use codecc atom in this job)",
         "useRootDesc": "If checked, landun agent will run as root, or it will run as mqq; and if you use codecc in this job, you must check this option",
         "envDependency": "Mount dependent software over NFS",
