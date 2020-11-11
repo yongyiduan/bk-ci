@@ -40,8 +40,8 @@
             </section>
             <section class="code-check-detail problem-detail">
                 <h3 class="detail-title">问题汇总</h3>
-                <ul class="float-left problem-list">
-                    <li v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item">
+                <section class="float-left problem-list">
+                    <a v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item" :href="analysisResult.toolUrl" target="_blank">
                         <p class="problem-desc">
                             <span class="english-name">{{ analysisResult.displayName }}</span>
                             <span class="problem-name" :style="{ color: getToolColor(analysisResult.toolName) }">{{ analysisResult.type }}</span>
@@ -50,11 +50,11 @@
                             <span class="num">{{ analysisResult.defectCount }}</span>
                             <span class="unit">{{ getToolUnit(analysisResult.toolName) }}</span>
                         </p>
-                    </li>
+                    </a>
                     <bk-exception class="exception-wrap-item exception-part" type="empty" scene="part" v-if="!codeScore.lastAnalysisResultList || codeScore.lastAnalysisResultList.length <= 0">
                         未发现代码质量问题
                     </bk-exception>
-                </ul>
+                </section>
             </section>
         </template>
     </main>
@@ -146,9 +146,9 @@
             this.isLoading = true
             this.getCodeScore().finally(() => {
                 this.isLoading = false
-                this.$nextTick(() => {
+                setTimeout(() => {
                     this.stratTransition = true
-                })
+                }, 10)
             })
         },
 
@@ -186,7 +186,7 @@
                     // 如果执行中，则轮询状态
                     if (this.status === 'doing') {
                         setTimeout(() => {
-                            this.getCodeScore()
+                            this.getCodeScore(buildId)
                         }, 1000)
                     }
                 }).catch((err) => {
