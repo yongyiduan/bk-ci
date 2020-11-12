@@ -41,7 +41,7 @@
             <section class="code-check-detail problem-detail">
                 <h3 class="detail-title">问题汇总</h3>
                 <section class="float-left problem-list">
-                    <a v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item" :href="analysisResult.toolUrl" target="_blank">
+                    <a v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item" :href="analysisResult.defectUrl" target="_blank">
                         <p class="problem-desc">
                             <span class="english-name">{{ analysisResult.displayName }}</span>
                             <span class="problem-name" :style="{ color: getToolColor(analysisResult.toolName) }">{{ analysisResult.type }}</span>
@@ -187,7 +187,7 @@
                     if (this.status === 'doing') {
                         setTimeout(() => {
                             this.getCodeScore(buildId)
-                        }, 1000)
+                        }, 30000)
                     }
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
