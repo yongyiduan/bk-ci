@@ -392,7 +392,7 @@
             handleRelease (res) {
                 const curStatus = this.progressStatus.find(step => step.status === 'doing') || {}
                 const nextStatus = res.processInfos.find(step => step.status === 'doing') || {}
-                const time = curStatus.code === 'codecc' && nextStatus.code === 'approve' ? 2000 : 0
+                const time = curStatus.code === 'codecc' && ['end', 'approve', undefined].includes(nextStatus.code) ? 2000 : 0
                 setTimeout(() => {
                     this.progressStatus = res.processInfos
                     this.permission = res.opPermission
