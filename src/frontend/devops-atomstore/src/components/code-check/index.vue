@@ -3,7 +3,7 @@
         <component :is="status"
             :codecc-url="codeScore.codeccUrl"
             :commit-id="codeScore.commitId"
-            :repo-url="codeScore.repoURL"
+            :repo-url="codeScore.repoUrl"
             :start-checking="startChecking"
             :message="message"
             :last-analysis-time="codeScore.lastAnalysisTime"
