@@ -318,6 +318,7 @@
         "deleteTemplateTips": "delete template ( {0} ) ?"
     },
     "newlist": {
+        "exportYamlTip": "Prebuild is a set of CI solutions integrated with IDE designed by Blue Shield in order to improve development efficiency and find problems in the code faster and earlier.",
         "exportJsonTip": "Through the import function, you can quickly create a pipeline, and you can also implement cross-project and cross-blue shield platform pipeline import.",
         "chooseExport": "Choose the export file format",
         "defaultViews": "My views",
