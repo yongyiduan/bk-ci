@@ -12,7 +12,7 @@
             :last-analysis-time="codeScore.lastAnalysisTime"
             @startCodeCC="startCodeCC"
         ></component>
-        <template v-if="['success', 'fail', 'unqualified'].includes(status)">
+        <template v-if="['success', 'unqualified'].includes(status)">
             <section class="code-check-detail">
                 <h3 class="detail-title score">
                     评分<a class="score-rule"><a class="g-title-work" href="https://iwiki.woa.com/x/kvMMBw" target="_blank">计算公式</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
