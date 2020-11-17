@@ -36,7 +36,8 @@
                                     <span :class="[{ disable: !permission }, 'rebuild-btn']"
                                         :title="permissionMsg"
                                         v-if="(entry.code === 'build' && entry.status === 'fail') ||
-                                            (entry.code === 'build' && entry.status === 'success' && progressStatus[index + 1].status === 'doing')"
+                                            (entry.code === 'build' && entry.status === 'success' && progressStatus[index + 1].status === 'doing')
+                                            || (entry.code === 'build' && curStep.status === 'fail' && curStep.code === 'codecc')"
                                         @click.stop="rebuild"
                                     > {{ $t('store.重新构建') }} <i class="col-line" v-if="!isEnterprise"></i></span>
                                     <span class="log-btn"
@@ -392,7 +393,7 @@
             handleRelease (res) {
                 const curStatus = this.progressStatus.find(step => step.status === 'doing') || {}
                 const nextStatus = res.processInfos.find(step => step.status === 'doing') || {}
-                const time = curStatus.code === 'codecc' && ['end', 'approve', undefined].includes(nextStatus.code) ? 2000 : 0
+                const time = curStatus.code === 'codecc' && ['end', 'approve', undefined].includes(nextStatus.code) ? 3000 : 0
                 setTimeout(() => {
                     this.progressStatus = res.processInfos
                     this.permission = res.opPermission
