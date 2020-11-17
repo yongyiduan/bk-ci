@@ -6,7 +6,7 @@
             <section class="code-check-summary">
                 <h3 class="summary-head">代码质量不合格</h3>
                 <h5 class="summary-desc">{{ `代码安全 &gt;= ${ codeSecurityQualifiedScore } 分，代码规范 &gt;= ${ codeStyleQualifiedScore } 分，代码度量 &gt;= ${ codeMeasureQualifiedScore } 分时合格` }}</h5>
-                <h5 class="summary-link" v-if="isInDetailPage">最近检查:<span class="link-txt" @click="goToLink(repoUrl)">{{ commitId }}</span>2019-02-15 14:32:49 <span class="link-txt" @click="goToLink(codeccUrl)">查看详情</span></h5>
+                <h5 class="summary-link" v-if="isInDetailPage">最近检查:<span class="link-txt" @click="goToLink(repoUrl)">{{ commitId | commitFilter }}</span>2019-02-15 14:32:49 <span class="link-txt" @click="goToLink(codeccUrl)">查看详情</span></h5>
             </section>
             <bk-button theme="primary" class="code-check-button" v-if="isInDetailPage" @click="startCodeCC" :loading="startChecking">重新检查</bk-button>
             <bk-button theme="primary" class="code-check-button" v-else @click="goToLink(codeccUrl)">查看详情</bk-button>
@@ -16,6 +16,12 @@
 
 <script>
     export default {
+        filters: {
+            commitFilter (val) {
+                return (val || '').slice(0, 7)
+            }
+        },
+
         props: {
             codeccUrl: String,
             commitId: String,
