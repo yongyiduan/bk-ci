@@ -1,14 +1,14 @@
 <template>
     <section>
-        <p class="code-check-tip"><i class="bk-icon icon-info-circle"></i>代码检查任务执行失败，请点击重新检查进行重试，或联系CodeCC助手</p>
+        <p class="code-check-tip"><i class="bk-icon icon-info-circle"></i>{{ $t('store.代码检查任务执行失败，请重新检查，或联系CodeCC助手') }}</p>
         <section class="code-ckeck-status">
             <i class="bk-icon icon-exclamation-circle status-icon"></i>
             <section class="code-check-summary">
-                <h3 class="summary-head">代码检查出现异常</h3>
+                <h3 class="summary-head">{{ $t('store.代码检查出现异常') }}</h3>
                 <h5 class="summary-desc">{{ message }}</h5>
             </section>
-            <bk-button :theme="isInDetailPage ? 'default' : 'primary'" class="code-check-button" :disabled="startChecking" @click="goToCodecc">查看详情</bk-button>
-            <bk-button theme="primary" v-if="isInDetailPage" class="code-check-button" @click="startCodeCC" :loading="startChecking">重新检查</bk-button>
+            <bk-button :theme="isInDetailPage ? 'default' : 'primary'" class="code-check-button" :disabled="startChecking" @click="goToCodecc">{{ $t('store.查看详情') }}</bk-button>
+            <bk-button theme="primary" v-if="isInDetailPage" class="code-check-button" @click="startCodeCC" :loading="startChecking">{{ $t('store.重新检查') }}</bk-button>
         </section>
     </section>
 </template>

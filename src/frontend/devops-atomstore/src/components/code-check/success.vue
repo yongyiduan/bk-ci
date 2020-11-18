@@ -2,12 +2,12 @@
     <section class="code-ckeck-status">
         <i class="bk-icon icon-check-circle status-icon"></i>
         <section class="code-check-summary">
-            <h3 class="summary-head">代码质量合格</h3>
-            <h5 class="summary-desc">{{ `代码安全 &gt;= ${ codeSecurityQualifiedScore } 分，代码规范 &gt;= ${ codeStyleQualifiedScore } 分，代码度量 &gt;= ${ codeMeasureQualifiedScore } 分时合格` }}</h5>
-            <h5 class="summary-link" v-if="isInDetailPage">最近检查:<span class="link-txt" @click="goToLink(repoUrl)">{{ commitId | commitFilter }}</span>{{ lastAnalysisTime | timeFilter }} <span class="link-txt" @click="goToLink(codeccUrl)">查看详情</span></h5>
+            <h3 class="summary-head">{{ $t('store.代码质量合格') }}</h3>
+            <h5 class="summary-desc">{{ $t('store.codeMeasurement', [codeSecurityQualifiedScore, codeStyleQualifiedScore, codeMeasureQualifiedScore]) }}</h5>
+            <h5 class="summary-link" v-if="isInDetailPage">{{ $t('store.最近检查') }}:<span class="link-txt" @click="goToLink(repoUrl)">{{ commitId | commitFilter }}</span>{{ lastAnalysisTime | timeFilter }} <span class="link-txt" @click="goToLink(codeccUrl)">{{ $t('store.查看详情') }}</span></h5>
         </section>
-        <bk-button theme="primary" class="code-check-button" :loading="startChecking" @click="startCodeCC" v-if="isInDetailPage">重新检查</bk-button>
-        <bk-button theme="primary" class="code-check-button" @click="goToLink(codeccUrl)" v-else>查看详情</bk-button>
+        <bk-button theme="primary" class="code-check-button" :loading="startChecking" @click="startCodeCC" v-if="isInDetailPage">{{ $t('store.重新检查') }}</bk-button>
+        <bk-button theme="primary" class="code-check-button" @click="goToLink(codeccUrl)" v-else>{{ $t('store.查看详情') }}</bk-button>
     </section>
 </template>
 

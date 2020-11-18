@@ -15,7 +15,7 @@
         <template v-if="['success', 'unqualified'].includes(status)">
             <section class="code-check-detail">
                 <h3 class="detail-title score">
-                    评分<a class="score-rule"><a class="g-title-work" href="https://iwiki.woa.com/x/kvMMBw" target="_blank">计算公式</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
+                    {{ $t('store.评分') }}<a class="score-rule"><a class="g-title-work" href="https://iwiki.woa.com/x/kvMMBw" target="_blank">{{ $t('store.计算公式') }}</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
                 </h3>
                 <ul class="score-list float-left">
                     <li v-for="scoreItem in scoreList" :key="scoreItem.name" class="score-detail">
@@ -42,7 +42,7 @@
                 </ul>
             </section>
             <section class="code-check-detail problem-detail">
-                <h3 class="detail-title">问题汇总</h3>
+                <h3 class="detail-title">{{ $t('store.问题汇总') }}</h3>
                 <section class="float-left problem-list">
                     <a v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item" :href="analysisResult.defectUrl" target="_blank">
                         <p class="problem-desc">
@@ -55,7 +55,7 @@
                         </p>
                     </a>
                     <bk-exception class="exception-wrap-item exception-part" type="empty" scene="part" v-if="!codeScore.lastAnalysisResultList || codeScore.lastAnalysisResultList.length <= 0">
-                        未发现代码质量问题
+                        {{ $t('store.未发现代码质量问题') }}
                     </bk-exception>
                 </section>
             </section>
@@ -161,7 +161,7 @@
                 const params = [this.storeType, this.storeCode]
                 if (this.$route.name !== 'check') params.push(this.storeId)
                 return api.startCodecc(...params).then((res) => {
-                    this.$bkMessage({ message: '启动插件扫描成功', theme: 'success' })
+                    this.$bkMessage({ message: this.$t('store.启动插件扫描成功'), theme: 'success' })
                     this.$emit('startCodeCC')
                     return this.getCodeScore(res)
                 }).catch((err) => {
@@ -179,9 +179,9 @@
                     this.codeScore = res || {}
                     this.message = res.message || ''
                     this.scoreList = [
-                        { name: '代码安全', score: this.codeScore.codeSecurityScore },
-                        { name: '代码规范', score: this.codeScore.codeStyleScore },
-                        { name: '代码度量', score: this.codeScore.codeMeasureScore }
+                        { name: this.$t('store.代码安全'), score: this.codeScore.codeSecurityScore },
+                        { name: this.$t('store.代码规范'), score: this.codeScore.codeStyleScore },
+                        { name: this.$t('store.代码度量'), score: this.codeScore.codeMeasureScore }
                     ]
                     // 设置当前扫描状态
                     this.status = statusMap[this.codeScore.status]
@@ -208,10 +208,10 @@
 
             getToolUnit (toolName) {
                 const toolUnitMap = {
-                    'CLOC': '行'
+                    'CLOC': this.$t('store.行')
                 }
 
-                return toolUnitMap[toolName] || '个'
+                return toolUnitMap[toolName] || this.$t('store.个')
             },
 
             getColorList (score) {
