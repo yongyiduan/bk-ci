@@ -196,10 +196,7 @@
             },
 
             async toApplyPermission () {
-                const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${
-                    this.projectId
-                }&service_code=code&role_creator=repertory` : PERM_URL_PREFIX
-                this.applyPermission(url)
+                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=code&role_creator=repertory`)
             },
 
             goCreatePermission () {

@@ -8,7 +8,7 @@
             <span @click="currentTab = 'log'" :class="{ active: currentTab === 'log' }">{{ $t('execDetail.log') }}</span><span @click="currentTab = 'setting'" :class="{ active: currentTab === 'setting' }">{{ $t('execDetail.setting') }}</span>
         </span>
         <span slot="tool"
-            v-if="currentTab === 'setting' && $refs.container.showDebugDockerBtn"
+            v-if="currentTab === 'setting' && showDebugDockerBtn"
             class="head-tool"
             @click="$refs.container.startDebug"
         >{{ $t('editPage.docker.debugConsole') }}</span>
@@ -17,6 +17,7 @@
                 :plugin-list="pluginList"
                 :build-id="execDetail.id"
                 :down-load-link="downLoadJobLink"
+                :execute-count="executeCount"
                 ref="jobLog"
             />
             <container-content v-show="currentTab === 'setting'"
@@ -31,7 +32,7 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+    import { mapState, mapGetters } from 'vuex'
     import jobLog from './log/jobLog'
     import detailContainer from './detailContainer'
     import ContainerContent from '@/components/ContainerPropertyPanel/ContainerContent'
@@ -57,13 +58,15 @@
                 'editingElementPos'
             ]),
 
+            ...mapGetters('atom', [
+                'checkShowDebugDockerBtn'
+            ]),
+
             downLoadJobLink () {
                 const editingElementPos = this.editingElementPos
                 const fileName = encodeURI(encodeURI(`${editingElementPos.stageIndex + 1}-${editingElementPos.containerIndex + 1}-${this.currentJob.name}`))
                 const jobId = this.currentJob.containerId
-                // to add job exec
-                const currentExe = 1
-                return `${AJAX_URL_PIRFIX}/log/api/user/logs/${this.$route.params.projectId}/${this.$route.params.pipelineId}/${this.execDetail.id}/download?jobId=${jobId}&executeCount=${currentExe}&fileName=${fileName}`
+                return `${AJAX_URL_PIRFIX}/log/api/user/logs/${this.$route.params.projectId}/${this.$route.params.pipelineId}/${this.execDetail.id}/download?jobId=${jobId}&fileName=${fileName}`
             },
 
             currentJob () {
@@ -77,6 +80,14 @@
             pluginList () {
                 const startUp = { name: 'Set up job', status: this.currentJob.startVMStatus, id: `startVM-${this.currentJob.id}`, executeCount: this.currentJob.executeCount || 1 }
                 return [startUp, ...this.currentJob.elements]
+            },
+            showDebugDockerBtn () {
+                return this.checkShowDebugDockerBtn(this.currentJob, this.$route.name, this.execDetail)
+            },
+
+            executeCount () {
+                const executeCountList = this.pluginList.map((plugin) => plugin.executeCount || 1)
+                return Math.max(...executeCountList)
             }
         }
     }

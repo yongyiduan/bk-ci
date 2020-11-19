@@ -51,7 +51,7 @@
                             v-if="props.row.atomStatus === 'INIT' || props.row.atomStatus === 'UNDERCARRIAGED'"
                             @click="editHandle('shelfAtom', props.row.atomId)"> {{ $t('store.上架') }} </span>
                         <span class="obtained-btn"
-                            v-if="props.row.atomStatus === 'AUDIT_REJECT' || props.row.atomStatus === 'RELEASED' || (props.row.atomStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
+                            v-if="['AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION'].includes(props.row.atomStatus) && props.row.releaseFlag"
                             @click="offline(props.row)"> {{ $t('store.下架') }} </span>
                         <span class="schedule-btn"
                             v-if="['COMMITTING', 'BUILDING', 'BUILD_FAIL', 'TESTING', 'AUDITING', 'CODECCING', 'CODECC_FAIL'].includes(props.row.atomStatus)"
@@ -119,14 +119,30 @@
                         <label class="bk-label"> {{ $t('store.调试项目') }} </label>
                         <div class="bk-form-content atom-item-content is-tooltips">
                             <div style="min-width: 100%">
-                                <big-select v-model="createAtomForm.projectCode" @selected="selectedProject" :searchable="true" @toggle="toggleProjectList" :options="projectList" setting-key="projectCode" display-key="projectName" :placeholder="$t('store.请选择调试项目')">
+                                <bk-select v-model="createAtomForm.projectCode"
+                                    @selected="selectedProject"
+                                    @toggle="toggleProjectList"
+                                    searchable
+                                    :placeholder="$t('store.请选择调试项目')"
+                                    :enable-virtual-scroll="projectList && projectList.length > 3000"
+                                    :list="projectList"
+                                    id-key="projectCode"
+                                    display-key="projectName"
+                                >
+                                    <bk-option
+                                        v-for="item in projectList"
+                                        :key="item.projectCode"
+                                        :id="item.projectCode"
+                                        :name="item.projectName"
+                                    >
+                                    </bk-option>
                                     <div slot="extension" style="cursor: pointer;">
                                         <a :href="itemUrl" target="_blank">
                                             <i class="devops-icon icon-plus-circle" />
                                             {{ itemText }}
                                         </a>
                                     </div>
-                                </big-select>
+                                </bk-select>
                                 <div v-if="atomErrors.projectError" class="error-tips"> {{ $t('store.项目不能为空') }} </div>
                             </div>
                             <bk-popover placement="right" width="400">
@@ -178,6 +194,14 @@
                                 <p v-if="atomErrors.privateReasonError" class="error-tips"> {{ $t('store.不开源原因不能为空') }} </p>
                             </div>
                         </div>
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.自定义前端') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-radio-group v-model="createAtomForm.frontendType">
+                                    <bk-radio :title="entry.title" :value="entry.value" v-for="(entry, key) in frontendTypeList" :key="key">{{ entry.label }}</bk-radio>
+                                </bk-radio-group>
+                            </div>
+                        </div>
                         <form-tips :tips-content="createTips" class="atom-tip"></form-tips>
                     </template>
                     <div class="form-footer">
@@ -215,19 +239,16 @@
                         </div>
                     </div>
                     <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.缓冲期') }} </label>
+                        <label class="bk-label"> {{ $t('store.下架原因') }} </label>
                         <div class="bk-form-content">
-                            <bk-select v-model="buffer" searchable>
-                                <bk-option v-for="(option, index) in bufferLength"
-                                    :key="index"
-                                    :id="option.value"
-                                    :name="option.label"
-                                    @click.native="selectedBuffer"
-                                    :placeholder="$t('store.请选择缓冲期')"
-                                >
-                                </bk-option>
-                            </bk-select>
-                            <div v-if="atomErrors.bufferError" class="error-tips"> {{ $t('store.缓冲期不能为空') }} </div>
+                            <bk-input :placeholder="$t('store.请输入下架原因')"
+                                name="reason"
+                                @change="curHandlerAtom.error = curHandlerAtom.reason === ''"
+                                type="textarea"
+                                :rows="3"
+                                v-model="curHandlerAtom.reason">
+                            </bk-input>
+                            <div v-if="curHandlerAtom.error" class="error-tips"> {{ $t('store.下架原因不能为空') }} </div>
                         </div>
                     </div>
                     <form-tips :tips-content="offlineTips" :prompt-list="promptList"></form-tips>
@@ -237,6 +258,37 @@
                 </form>
             </template>
         </bk-sideslider>
+
+        <bk-dialog v-model="deleteObj.visible"
+            render-directive="if"
+            theme="primary"
+            ext-cls="delete-dialog-wrapper"
+            :title="$t('store.确定删除插件', [deleteObj.name])"
+            width="500"
+            footer-position="center"
+            :mask-close="false"
+            :auto-close="false"
+        >
+            <bk-form ref="deleteForm" class="delete-form" :label-width="0" :model="deleteObj.formData">
+                <p>{{$t('store.删除时将清理数据，包括工蜂代码库。删除后不可恢复！')}}</p>
+                <p>{{$t('store.deleteAtomTip', [deleteObj.atomCode])}}</p>
+                <bk-form-item property="projectName">
+                    <bk-input
+                        maxlength="60"
+                        v-model="deleteObj.formData.atomCode"
+                        :placeholder="$t('store.请输入插件标识')">
+                    </bk-input>
+                </bk-form-item>
+            </bk-form>
+            <div class="dialog-footer" slot="footer">
+                <bk-button
+                    theme="danger"
+                    :loading="deleteObj.loading"
+                    :disabled="deleteObj.atomCode !== deleteObj.formData.atomCode"
+                    @click="requestDeleteAtom(deleteObj.formData.atomCode)">{{ $t('store.删除') }}</bk-button>
+                <bk-button @click="handleDeleteCancel" :disabled="deleteObj.loading">{{ $t('store.取消') }}</bk-button>
+            </div>
+        </bk-dialog>
     </main>
 </template>
 
@@ -256,8 +308,6 @@
             return {
                 atomStatusList: atomStatusMap,
                 hasOauth: true,
-                bufferError: false,
-                buffer: '',
                 searchName: '',
                 gitOAuthUrl: '',
                 itemUrl: '/console/pm',
@@ -269,34 +319,37 @@
                 authTypeList: [
                     { label: this.$t('store.工蜂OAUTH'), value: 'OAUTH' }
                 ],
+                frontendTypeList: [
+                    { label: this.$t('store.是'), value: 'SPECIAL', title: this.$t('sotre.需自行开发插件输入页面。详见插件开发指引') },
+                    { label: this.$t('store.否'), value: 'NORMAL', title: this.$t('store.仅需按照规范定义好输入字段，系统将自动渲染页面') }
+                ],
                 isOpenSource: [
                     { label: this.$t('store.是'), value: 'LOGIN_PUBLIC' },
                     { label: this.$t('store.否'), value: 'PRIVATE', disable: true, title: this.$t('store.若有特殊原因无法开源，请联系蓝盾助手（务必联系蓝盾助手，自行修改工蜂项目配置会失效，每次升级插件时将根据插件配置自动刷新）') }
                 ],
                 promptList: [
                     this.$t('store.1、插件市场不再展示插件'),
-                    this.$t('store.2、已安装插件的项目不能再添加插件到流水线'),
-                    this.$t('store.3、已使用插件的流水线可以继续使用，但有插件已下架标识')
+                    this.$t('store.2、已使用插件的流水线可以继续使用，但有插件已下架标识')
                 ],
-                curHandlerAtom: {},
-                bufferLength: [
-                    { label: this.$t('store.0天'), value: '0' },
-                    { label: this.$t('store.7天'), value: '7' },
-                    { label: this.$t('store.15天'), value: '15' }
-                ],
+                curHandlerAtom: {
+                    name: '',
+                    atomCode: '',
+                    reason: '',
+                    error: false
+                },
                 createAtomForm: {
                     projectCode: '',
                     atomCode: '',
                     name: '',
                     language: '',
                     authType: 'OAUTH',
-                    visibilityLevel: 'LOGIN_PUBLIC'
+                    visibilityLevel: 'LOGIN_PUBLIC',
+                    frontendType: 'NORMAL'
                 },
                 isLoading: false,
                 atomErrors: {
                     projectError: false,
                     languageError: false,
-                    bufferError: false,
                     openSourceError: false,
                     privateReasonError: false
                 },
@@ -318,6 +371,15 @@
                     current: 1,
                     count: 1,
                     limit: 10
+                },
+                deleteObj: {
+                    visible: false,
+                    atomCode: '',
+                    name: '',
+                    formData: {
+                        atomCode: ''
+                    },
+                    loading: false
                 }
             }
         },
@@ -350,12 +412,6 @@
                         authType: 'OAUTH',
                         visibilityLevel: 'LOGIN_PUBLIC'
                     }
-                }
-            },
-            'offlinesideConfig.show' (val) {
-                if (!val) {
-                    this.atomErrors.bufferError = false
-                    this.buffer = ''
                 }
             },
             searchName () {
@@ -400,6 +456,37 @@
                 return icon
             },
 
+            addImage (pos, file) {
+                this.uploadimg(pos, file)
+            },
+            async uploadimg (pos, file) {
+                const formData = new FormData()
+                const config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+                let message, theme
+                formData.append('file', file)
+
+                try {
+                    const res = await this.$store.dispatch('store/uploadFile', {
+                        formData,
+                        config
+                    })
+
+                    this.$refs.mdHook.$img2Url(pos, res)
+                } catch (err) {
+                    message = err.message ? err.message : err
+                    theme = 'error'
+
+                    this.$bkMessage({
+                        message,
+                        theme
+                    })
+                    this.$refs.mdHook.$refs.toolbar_left.$imgDel(pos)
+                }
+            },
             getLanguage () {
                 this.$store.dispatch('store/getDevelopLanguage').then((res) => {
                     this.languageList = (res || []).map(({ language }) => ({ name: language, language }))
@@ -512,6 +599,7 @@
                         theme = 'success'
                         this.cancelCreateAtom()
                         this.routerAtoms(this.createAtomForm.atomCode)
+                        this.requestList()
                     } catch (err) {
                         message = err.message ? err.message : err
                         theme = 'error'
@@ -521,45 +609,42 @@
                             theme
                         })
                         this.createAtomsideConfig.isLoading = false
-                        this.requestList()
-                        if (theme === 'success') {
-                            this.cancelCreateAtom()
-                        }
                     }
                 }
             },
 
             async submitofflineAtom () {
-                if (this.buffer === '') {
-                    this.atomErrors.bufferError = true
-                } else {
-                    let message, theme
-                    const params = {
-                        bufferDay: this.buffer
-                    }
+                if (this.curHandlerAtom.reason === '') {
+                    this.curHandlerAtom.error = true
+                    return
+                }
 
-                    this.offlinesideConfig.isLoading = true
-                    try {
-                        await this.$store.dispatch('store/offlineAtom', {
-                            atomCode: this.curHandlerAtom.atomCode,
-                            params: params
-                        })
+                let message, theme
+                const params = {
+                    reason: this.curHandlerAtom.reason
+                }
 
-                        message = this.$t('store.提交成功')
-                        theme = 'success'
-                        this.offlinesideConfig.show = false
-                        this.requestList()
-                    } catch (err) {
-                        message = err.message ? err.message : err
-                        theme = 'error'
-                    } finally {
-                        this.$bkMessage({
-                            message,
-                            theme
-                        })
+                this.offlinesideConfig.isLoading = true
+                try {
+                    await this.$store.dispatch('store/offlineAtom', {
+                        atomCode: this.curHandlerAtom.atomCode,
+                        params: params
+                    })
 
-                        this.offlinesideConfig.isLoading = false
-                    }
+                    message = this.$t('store.提交成功')
+                    theme = 'success'
+                    this.offlinesideConfig.show = false
+                    this.requestList()
+                } catch (err) {
+                    message = err.message ? err.message : err
+                    theme = 'error'
+                } finally {
+                    this.$bkMessage({
+                        message,
+                        theme
+                    })
+
+                    this.offlinesideConfig.isLoading = false
                 }
             },
 
@@ -576,10 +661,6 @@
 
             selectedLanguage () {
                 this.atomErrors.languageError = false
-            },
-
-            selectedBuffer () {
-                this.atomErrors.bufferError = false
             },
 
             cancelCreateAtom () {
@@ -619,7 +700,10 @@
 
             offline (form) {
                 this.offlinesideConfig.show = true
-                this.curHandlerAtom = form
+                this.curHandlerAtom.name = form.name
+                this.curHandlerAtom.atomCode = form.atomCode
+                this.curHandlerAtom.reason = ''
+                this.curHandlerAtom.error = false
             },
 
             installAHandle (code) {
@@ -643,6 +727,7 @@
             async requestDeleteAtom (atomCode) {
                 let message, theme
                 try {
+                    this.deleteObj.loading = true
                     await this.$store.dispatch('store/requestDeleteAtom', {
                         atomCode
                     })
@@ -650,10 +735,12 @@
                     message = this.$t('store.删除成功')
                     theme = 'success'
                     this.requestList()
+                    this.handleDeleteCancel()
                 } catch (err) {
                     message = message = err.message ? err.message : err
                     theme = 'error'
                 } finally {
+                    this.deleteObj.loading = false
                     this.$bkMessage({
                         message,
                         theme
@@ -662,21 +749,44 @@
             },
 
             deleteAtom (row) {
-                const h = this.$createElement
-                const subHeader = h('p', {
-                    style: {
-                        textAlign: 'center'
-                    }
-                }, this.$t('store.确定删除插件', [row.name]))
+                this.deleteObj.visible = true
+                this.deleteObj.formData.atomCode = ''
+                this.deleteObj.atomCode = row.atomCode
+                this.deleteObj.name = row.name
+            },
 
-                this.$bkInfo({
-                    title: this.$t('store.删除'),
-                    subHeader,
-                    confirmFn: async () => {
-                        this.requestDeleteAtom(row.atomCode)
-                    }
-                })
+            handleDeleteCancel () {
+                this.deleteObj.visible = false
+                this.deleteObj.formData.atomCode = ''
+                this.deleteObj.atomCode = ''
+                this.deleteObj.name = ''
             }
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    /deep/ .delete-dialog-wrapper {
+        .bk-form-item{
+            .bk-label {
+                padding: 0;
+            }
+        }
+        p {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .bk-dialog-footer {
+            text-align: center;
+            padding: 0 65px 40px;
+            background-color: #fff;
+            border: none;
+            border-radius: 0;
+        }
+        .dialog-footer {
+            button {
+                width: 86px;
+            }
+        }
+    }
+</style>

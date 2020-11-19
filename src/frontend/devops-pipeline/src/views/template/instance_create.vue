@@ -51,7 +51,7 @@
                     <div class="instance-pipeline">
                         <label class="conf-title">{{ $t('template.newPipelineName') }}</label>
                         <div class="pipeline-name-box">
-                            <div :class="{ &quot;pipeline-item&quot;: true, &quot;active-item&quot;: entry.selected, &quot;unselect-hover&quot;: !entry.selected }"
+                            <div :class="{ 'pipeline-item': true, 'active-item': entry.selected, 'unselect-hover': !entry.selected }"
                                 v-for="(entry, index) in pipelineNameList" :key="index" @click="lastCilckPipeline(index)">{{ entry.pipelineName }}
                                 <i class="delete-btn" v-if="!hashVal" @click="deletePipelineName(index)"></i>
                             </div>
@@ -80,11 +80,11 @@
                                 </div>
                                 <div class="params-flex-col" ref="buildForm">
                                     <form-field :required="true" :label="$t('buildNum')">
-                                        <vuex-input :disabled="disabled" input-type="number" name="buildNo" placeholder="BuildNo" v-validate.initial="&quot;required|numeric&quot;" :value="param.buildParams.buildNo" :handle-change="handleBuildNoChange" />
+                                        <vuex-input :disabled="disabled" input-type="number" name="buildNo" placeholder="BuildNo" v-validate.initial="'required|numeric'" :value="param.buildParams.buildNo" :handle-change="handleBuildNoChange" />
                                         <p v-if="errors.has('buildNo')" :class="errors.has('buildNo') ? 'error-tips' : 'normal-tips'">{{ $t('template.buildNumErrTips') }}</p>
                                     </form-field>
-                                    <form-field class="flex-colspan-2" :required="true" :is-error="errors.has(&quot;buildNoType&quot;)" :error-msg="errors.first(&quot;buildNoType&quot;)">
-                                        <enum-input :list="buildNoRules" :disabled="disabled" name="buildNoType" v-validate.initial="&quot;required|string&quot;" :value="param.buildParams.buildNoType" :handle-change="handleBuildNoChange" />
+                                    <form-field class="flex-colspan-2" :required="true" :is-error="errors.has('buildNoType')" :error-msg="errors.first('buildNoType')">
+                                        <enum-input :list="buildNoRules" :disabled="disabled" name="buildNoType" v-validate.initial="'required|string'" :value="param.buildParams.buildNoType" :handle-change="handleBuildNoChange" />
                                     </form-field>
                                 </div>
                             </div>
@@ -289,7 +289,11 @@
                     this.pipelineNameList.forEach(item => {
                         item.params = [].concat(this.deepCopy(this.paramList))
                         item.pipelineParams = item.params.filter(item => this.buildNoParams.indexOf(item.id) === -1)
-                        item.versionParams = item.params.filter(item => this.buildNoParams.indexOf(item.id) > -1)
+                        item.versionParams = item.params.filter(item => this.buildNoParams.indexOf(item.id) > -1).map((param) => {
+                            param.label = param.desc
+                            param.desc = param.id
+                            return param
+                        })
                         item.paramValues = this.deepCopy(this.paramValues)
                         item.buildParams = this.buildParams && this.buildParams.buildNoType ? this.deepCopy(this.buildParams) : false
                     })
@@ -323,7 +327,11 @@
                         }, {})
                         pipelineItem.params = [].concat(this.deepCopy(data[item].param))
                         pipelineItem.pipelineParams = pipelineItem.params.filter(item => this.buildNoParams.indexOf(item.id) === -1)
-                        pipelineItem.versionParams = pipelineItem.params.filter(item => this.buildNoParams.indexOf(item.id) > -1)
+                        pipelineItem.versionParams = pipelineItem.params.filter(item => this.buildNoParams.indexOf(item.id) > -1).map((param) => {
+                            param.label = param.desc
+                            param.desc = param.id
+                            return param
+                        })
                         pipelineItem.paramValues = paramValues
                     }
                     this.pipelineNameList.push(pipelineItem)
@@ -380,7 +388,13 @@
             comfireHandler (data) {
                 const tmpParam = [].concat(this.deepCopy(this.paramList))
                 const pipelineParams = tmpParam.filter(item => this.buildNoParams.indexOf(item.id) === -1)
-                const versionParams = tmpParam.filter(item => this.buildNoParams.indexOf(item.id) > -1)
+                const versionParams = tmpParam.filter((item) => {
+                    return this.buildNoParams.indexOf(item.id) > -1
+                }).map((param) => {
+                    param.label = param.desc
+                    param.desc = param.id
+                    return param
+                })
 
                 const newPipeline = {
                     pipelineName: data,
@@ -694,6 +708,9 @@
                     margin-top: 20px;
                     width: 46%;
                     height: 40px;
+                    .bk-form-content {
+                        position: relative;
+                    }
                 }
             }
             .template-params-content {

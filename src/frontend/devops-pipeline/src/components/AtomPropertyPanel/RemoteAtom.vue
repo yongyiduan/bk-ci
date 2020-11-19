@@ -38,13 +38,13 @@
         },
         computed: {
             atomVersion () {
-                return '1.0.0'
+                return (this.atom.atomCode === 'CodeccCheckAtom' || this.atom.atomCode === 'CodeccCheckAtomDebug') ? '1.0.0' : this.atom.version
             },
             atomCode () {
                 return this.atom.atomCode || 'CodeccCheckAtom'
             },
             src () {
-                return `${PERM_URL_PIRFIX}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
+                return `${GW_URL_PREFIX}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
             }
         },
         mounted () {

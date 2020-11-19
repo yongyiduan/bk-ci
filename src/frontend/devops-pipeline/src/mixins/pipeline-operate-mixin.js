@@ -227,8 +227,7 @@ export default {
                     instanceId: [{
                         id: prePipeline.pipelineId,
                         name: prePipeline.pipelineName
-                    }],
-                    projectId
+                    }]
                 }, {
                     actionId: this.$permissionActionMap.edit,
                     resourceId: this.$permissionResourceMap.pipeline,
@@ -507,15 +506,26 @@ export default {
                 ...pipelineSetting,
                 projectId: projectId
             })
-            // 请求执行构建
-            return this.$ajax.post(`/${PROCESS_API_URL_PREFIX}/user/pipelines/${projectId}/${pipelineId}/saveAll`, {
+            const body = {
                 model: {
                     ...pipeline,
                     name: finalSetting.pipelineName,
                     desc: finalSetting.desc
                 },
                 setting: finalSetting
-            })
+            }
+            if (!pipelineId) {
+                return this.importPipelineAndSetting(body)
+            }
+
+            // 请求执行构建
+            return this.$ajax.post(`${PROCESS_API_URL_PREFIX}/user/pipelines/${projectId}/${pipelineId}/saveAll`, body)
+        },
+        importPipelineAndSetting (body) {
+            const { projectId } = this.$route.params
+
+            // 请求执行构建
+            return this.$ajax.post(`${PROCESS_API_URL_PREFIX}/user/pipelines/projects/${projectId}/upload`, body)
         },
         async save () {
             const { pipelineId, projectId } = this.$route.params
@@ -537,7 +547,10 @@ export default {
                     theme: 'success'
                 })
                 this.fetchPipelineList()
-                return true
+                return {
+                    code: 0,
+                    data: responses
+                }
             } catch (e) {
                 this.handleError(e, [{
                     actionId: this.$permissionActionMap.edit,
@@ -548,7 +561,10 @@ export default {
                     }],
                     projectId
                 }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.manager))
-                return false
+                return {
+                    code: e.code,
+                    message: e.message
+                }
             } finally {
                 this.setSaveStatus(false)
             }
@@ -600,8 +616,7 @@ export default {
         },
         async toApplyPermission (role) {
             const { projectId, pipelineId } = this.$route.params
-            const url = this.getPermUrlByRole(projectId, pipelineId, role)
-            window.open(url, '_blank')
+            this.tencentPermission(PERM_URL_PIRFIX + this.getPermUrlByRole(projectId, pipelineId, role))
             // try {
             //     const { projectId } = this.$route.params
             //     const redirectUrl = await this.$ajax.post(`${AUTH_URL_PREFIX}/user/auth/permissionUrl`, [{

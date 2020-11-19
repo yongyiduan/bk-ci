@@ -66,7 +66,7 @@
                     :tip="$t('store.支持mp4、ogg、webm格式，不超过4个，每个不超过50M')"
                 ></upload>
             </bk-form-item>
-            <bk-form-item :rules="[requireRule('Logo')]" :required="true" property="logoUrl" error-display-type="normal" class="edit-logo">
+            <bk-form-item :required="true" property="logoUrl" error-display-type="normal" class="edit-logo">
                 <select-logo :form="formData" type="SERVICE" :is-err="false" ref="logoUrlError"></select-logo>
             </bk-form-item>
             <bk-form-item>

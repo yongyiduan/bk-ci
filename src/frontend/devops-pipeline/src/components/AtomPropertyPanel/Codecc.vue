@@ -558,7 +558,10 @@
                         }
                     } catch (e) {
                         if (e.code === 403) { // 没有权限编辑
-                            this.setPermissionConfig(`流水线：${this.pipeline.name}`, '编辑')
+                            this.setPermissionConfig(this.$permissionResourceMap.pipeline, this.$permissionActionMap.edit, [{
+                                id: this.pipeline.pipelineId,
+                                name: this.pipeline.name
+                            }], params.projectId, this.getPermUrlByRole(params.projectId, this.pipeline.pipelineId, this.roleMap.manager))
                         } else {
                             this.$showTips({
                                 message: e.message,
@@ -662,7 +665,10 @@
                     }
                 } catch (e) {
                     if (e.code === 403) { // 没有权限编辑
-                        this.setPermissionConfig(`流水线：${this.pipeline.name}`, '编辑')
+                        this.setPermissionConfig(this.$permissionResourceMap.pipeline, this.$permissionActionMap.edit, [{
+                            id: this.pipeline.pipelineId,
+                            name: this.pipeline.name
+                        }], params.projectId, this.getPermUrlByRole(params.projectId, this.pipeline.pipelineId, this.roleMap.manager))
                     } else {
                         this.$showTips({
                             message: e.message,

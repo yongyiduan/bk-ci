@@ -303,6 +303,7 @@
                     }
                 })
                 this.newModel = this.getTicketByType(id)
+                this.localConfig.credentialType = id
                 this.localConfig.credential = {
                     v1: '',
                     v2: '',

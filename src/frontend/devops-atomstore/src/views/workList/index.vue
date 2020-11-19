@@ -249,7 +249,7 @@
         }
         .form-footer {
             margin-top: 26px;
-            margin-left: 97px;
+            margin-left: 100px;
             button {
                 height: 32px;
                 line-height: 30px;
@@ -271,7 +271,7 @@
             margin-top: 20px;
         }
         .prompt-offline {
-            margin-left: 97px;
+            margin-left: 100px;
             margin-top: 20px;
             i {
                 position: relative;

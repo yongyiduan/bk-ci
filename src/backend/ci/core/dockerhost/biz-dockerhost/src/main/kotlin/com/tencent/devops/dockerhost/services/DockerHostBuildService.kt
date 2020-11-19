@@ -34,12 +34,16 @@ import com.github.dockerjava.api.exception.UnauthorizedException
 import com.github.dockerjava.api.model.AuthConfig
 import com.github.dockerjava.api.model.AuthConfigurations
 import com.github.dockerjava.api.model.BuildResponseItem
+import com.github.dockerjava.api.model.ExposedPort
 import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.api.model.HostConfig
+import com.github.dockerjava.api.model.Ports
 import com.github.dockerjava.api.model.PullResponseItem
 import com.github.dockerjava.api.model.PushResponseItem
+import com.github.dockerjava.api.model.Statistics
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientBuilder
+import com.github.dockerjava.core.InvocationBuilder
 import com.github.dockerjava.core.command.LogContainerResultCallback
 import com.github.dockerjava.core.command.PullImageResultCallback
 import com.github.dockerjava.core.command.PushImageResultCallback
@@ -65,9 +69,11 @@ import com.tencent.devops.dockerhost.pojo.CheckImageRequest
 import com.tencent.devops.dockerhost.pojo.CheckImageResponse
 import com.tencent.devops.dockerhost.pojo.DockerBuildParam
 import com.tencent.devops.dockerhost.pojo.DockerRunParam
+import com.tencent.devops.dockerhost.pojo.DockerRunPortBinding
 import com.tencent.devops.dockerhost.utils.CommonUtils
 import com.tencent.devops.dockerhost.utils.ENTRY_POINT_CMD
 import com.tencent.devops.dockerhost.utils.RandomUtil
+import com.tencent.devops.dockerhost.utils.SigarUtil
 import com.tencent.devops.process.engine.common.VMUtils
 import com.tencent.devops.store.pojo.image.enums.ImageRDTypeEnum
 import org.apache.commons.lang3.StringUtils
@@ -86,18 +92,14 @@ import javax.annotation.PostConstruct
 @Component
 class DockerHostBuildService(
     private val dockerHostConfig: DockerHostConfig,
-    private val environment: Environment
+    private val environment: Environment,
+    private val dockerHostBuildApi: DockerHostBuildResourceApi,
+    private val alertApi: AlertApi
 ) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(DockerHostBuildService::class.java)
     }
-
-    private val dockerHostBuildApi: DockerHostBuildResourceApi =
-        DockerHostBuildResourceApi(if ("codecc_build" == dockerHostConfig.dockerhostMode) "ms/dispatch-codecc" else "ms/dispatch")
-
-    private val alertApi: AlertApi =
-        AlertApi(if ("codecc_build" == dockerHostConfig.dockerhostMode) "ms/dispatch-codecc" else "ms/dispatch")
 
     private val config = DefaultDockerClientConfig.createDefaultConfigBuilder()
         .withDockerConfig(dockerHostConfig.dockerConfig)
@@ -350,6 +352,30 @@ class DockerHostBuildService(
             httpLongDockerCli.removeContainerCmd(dockerBuildInfo.containerId).exec()
         } catch (e: Throwable) {
             logger.error("Stop the container failed, containerId: ${dockerBuildInfo.containerId}, error msg: $e")
+        } finally {
+            // 找出所有跟本次构建关联的dockerRun启动容器并停止容器
+            val containerInfo = httpLongDockerCli.listContainersCmd().withStatusFilter(setOf("running")).exec()
+            for (container in containerInfo) {
+                try {
+                    // logger.info("${dockerBuildInfo.buildId}|${dockerBuildInfo.vmSeqId} containerName: ${container.names[0]}")
+                    val containerName = container.names[0]
+                    if (containerName.contains(getDockerRunStopPattern(dockerBuildInfo))) {
+                        logger.info("${dockerBuildInfo.buildId}|${dockerBuildInfo.vmSeqId} stop dockerRun container, containerId: ${container.id}")
+                        httpLongDockerCli.stopContainerCmd(container.id).withTimeout(15).exec()
+                    }
+                } catch (e: Exception) {
+                    logger.error("${dockerBuildInfo.buildId}|${dockerBuildInfo.vmSeqId} Stop dockerRun container failed, containerId: ${container.id}", e)
+                }
+            }
+        }
+    }
+
+    private fun getDockerRunStopPattern(dockerBuildInfo: DockerHostBuildInfo): String {
+        // 用户取消操作
+        return if (dockerBuildInfo.vmSeqId == 0) {
+            "dockerRun-${dockerBuildInfo.buildId}"
+        } else {
+            "dockerRun-${dockerBuildInfo.buildId}-${dockerBuildInfo.vmSeqId}"
         }
     }
 
@@ -416,49 +442,64 @@ class DockerHostBuildService(
             val dockerfilePath = Paths.get(workspace + dockerBuildParam.dockerFile).normalize().toString()
             val baseDirectory = File(buildDir)
             val dockerfile = File(dockerfilePath)
-            val imageNameTag =
+/*            val imageNameTag =
                 getImageNameWithTag(
                     repoAddr = repoAddr,
                     projectId = projectId,
                     imageName = dockerBuildParam.imageName,
                     imageTag = dockerBuildParam.imageTag,
                     outer = outer
-                )
+                )*/
+
+            val imageNameTagSet = mutableSetOf<String>()
+            if (dockerBuildParam.imageTagList.isNotEmpty()) {
+                dockerBuildParam.imageTagList.forEach {
+                    imageNameTagSet.add(getImageNameWithTag(
+                        repoAddr = repoAddr,
+                        projectId = projectId,
+                        imageName = dockerBuildParam.imageName,
+                        imageTag = it,
+                        outer = outer
+                    ))
+                }
+            } else {
+                imageNameTagSet.add(getImageNameWithTag(
+                    repoAddr = repoAddr,
+                    projectId = projectId,
+                    imageName = dockerBuildParam.imageName,
+                    imageTag = dockerBuildParam.imageTag,
+                    outer = outer
+                ))
+            }
 
             logger.info("Build docker image, workspace: $workspace, buildDir:$buildDir, dockerfile: $dockerfilePath")
-            logger.info("Build docker image, imageNameTag: $imageNameTag")
+            logger.info("Build docker image, imageNameTag: $imageNameTagSet")
             val step = dockerClient.buildImageCmd().withNoCache(true)
                 .withPull(true)
                 .withBuildAuthConfigs(authConfigurations)
                 .withBaseDirectory(baseDirectory)
                 .withDockerfile(dockerfile)
-                .withTags(setOf(imageNameTag))
+                .withTags(imageNameTagSet)
             args.map { it.trim().split("=") }.forEach {
                 step.withBuildArg(it.first(), it.last())
             }
             step.exec(MyBuildImageResultCallback(buildId, elementId, dockerHostBuildApi))
                 .awaitImageId()
 
-            logger.info("Build image success, now push to repo, image name and tag: $imageNameTag")
-            dockerClient.pushImageCmd(imageNameTag)
-                .withAuthConfig(authConfig)
-                .exec(MyPushImageResultCallback(buildId, elementId, dockerHostBuildApi))
-                .awaitCompletion()
+            imageNameTagSet.parallelStream().forEach {
+                logger.info("Build image success, now push to repo, image name and tag: $it")
+                dockerClient.pushImageCmd(it)
+                    .withAuthConfig(authConfig)
+                    .exec(MyPushImageResultCallback(buildId, elementId, dockerHostBuildApi))
+                    .awaitCompletion()
 
-            logger.info("Push image success, now remove local image, image name and tag: $imageNameTag")
-
-            try {
-                httpLongDockerCli.removeImageCmd(
-                    getImageNameWithTag(
-                        repoAddr = repoAddr,
-                        projectId = projectId,
-                        imageName = dockerBuildParam.imageName,
-                        imageTag = dockerBuildParam.imageTag
-                    )
-                ).exec()
-                logger.info("Remove local image success")
-            } catch (e: Throwable) {
-                logger.error("Docker rmi failed, msg: ${e.message}")
+                logger.info("Push image success, now remove local image, image name and tag: $it")
+                try {
+                    httpLongDockerCli.removeImageCmd(it).exec()
+                    logger.info("Remove local image success")
+                } catch (e: Throwable) {
+                    logger.error("Docker rmi failed, msg: ${e.message}")
+                }
             }
 
             return Pair(true, null)
@@ -485,7 +526,7 @@ class DockerHostBuildService(
         vmSeqId: String,
         buildId: String,
         dockerRunParam: DockerRunParam
-    ): Pair<String, Int> {
+    ): Triple<String, Int, List<DockerRunPortBinding>> {
         try {
             val imageName = CommonUtils.normalizeImageName(dockerRunParam.imageName)
             // docker pull
@@ -555,21 +596,45 @@ class DockerHostBuildService(
             logger.info("env is $env")
             val binds = DockerBindLoader.loadBinds(dockerBuildInfo)
 
+            val dockerRunPortBindingList = mutableListOf<DockerRunPortBinding>()
+            val hostIp = CommonUtils.getInnerIP()
+            val portBindings = Ports()
+            dockerRunParam.portList?.forEach {
+                val localPort = getAvailableHostPort()
+                if (localPort == 0) {
+                    throw ContainerException("No enough port to use in dockerRun. startPort: ${dockerHostConfig.dockerRunStartPort}")
+                }
+                val tcpContainerPort: ExposedPort = ExposedPort.tcp(it)
+                portBindings.bind(tcpContainerPort, Ports.Binding.bindPort(localPort))
+                dockerRunPortBindingList.add(DockerRunPortBinding(hostIp, it, localPort))
+            }
+
             val containerName = "dockerRun-${dockerBuildInfo.buildId}-${dockerBuildInfo.vmSeqId}-${RandomUtil.randomString()}"
-            val container = httpLongDockerCli.createContainerCmd(imageName)
-                .withName(containerName)
-                .withCmd(dockerRunParam.command)
-                .withEnv(env)
-                .withVolumes(DockerVolumeLoader.loadVolumes(dockerBuildInfo))
-                .withHostConfig(HostConfig().withBinds(binds).withNetworkMode("bridge"))
-                .withWorkingDir(dockerHostConfig.volumeWorkspace)
-                .exec()
+
+            val container = if (dockerRunParam.command.isEmpty() || dockerRunParam.command.equals("[]")) {
+                httpLongDockerCli.createContainerCmd(imageName)
+                    .withName(containerName)
+                    .withEnv(env)
+                    .withVolumes(DockerVolumeLoader.loadVolumes(dockerBuildInfo))
+                    .withHostConfig(HostConfig().withBinds(binds).withNetworkMode("bridge").withPortBindings(portBindings))
+                    .withWorkingDir(dockerHostConfig.volumeWorkspace)
+                    .exec()
+            } else {
+                httpLongDockerCli.createContainerCmd(imageName)
+                    .withName(containerName)
+                    .withCmd(dockerRunParam.command)
+                    .withEnv(env)
+                    .withVolumes(DockerVolumeLoader.loadVolumes(dockerBuildInfo))
+                    .withHostConfig(HostConfig().withBinds(binds).withNetworkMode("bridge").withPortBindings(portBindings))
+                    .withWorkingDir(dockerHostConfig.volumeWorkspace)
+                    .exec()
+            }
 
             logger.info("Created container $container")
             val timestamp = (System.currentTimeMillis() / 1000).toInt()
             httpLongDockerCli.startContainerCmd(container.id).exec()
 
-            return Pair(container.id, timestamp)
+            return Triple(container.id, timestamp, dockerRunPortBindingList)
         } catch (er: Throwable) {
             val errorLog = "[$buildId]|启动容器失败，错误信息:${er.message}"
             logger.error(errorLog, er)
@@ -640,6 +705,68 @@ class DockerHostBuildService(
             logger.error("[$containerId]| getDockerRunExitCode error.", e)
             Constants.DOCKER_EXIST_CODE
         }
+    }
+
+    /**
+     * 监控系统负载，超过一定阈值，对于占用负载较高的容器，主动降低负载
+     */
+    fun monitorSystemLoad() {
+        logger.info("Monitor systemLoad cpu: ${SigarUtil.getAverageLongCpuLoad()}, mem: ${SigarUtil.getAverageLongMemLoad()}")
+        if (SigarUtil.getAverageLongCpuLoad() > 90 || SigarUtil.getAverageLongMemLoad() > 80) {
+            checkContainerStats()
+        }
+    }
+
+    private fun checkContainerStats() {
+        val containerInfo = httpLongDockerCli.listContainersCmd().withStatusFilter(setOf("running")).exec()
+        for (container in containerInfo) {
+            val statistics = getContainerStats(container.id)
+            if (statistics != null) {
+                val systemCpuUsage = statistics.cpuStats.systemCpuUsage ?: 0
+                val cpuUsage = statistics.cpuStats.cpuUsage!!.totalUsage ?: 0
+                val preSystemCpuUsage = statistics.preCpuStats.systemCpuUsage ?: 0
+                val preCpuUsage = statistics.preCpuStats.cpuUsage!!.totalUsage ?: 0
+                val cpuUsagePer = ((cpuUsage - preCpuUsage) * 100) / (systemCpuUsage - preSystemCpuUsage)
+
+                // 优先判断CPU
+                val elasticityCpuThreshold = dockerHostConfig.elasticityCpuThreshold ?: 80
+                logger.info("containerId: ${container.id} | checkContainerStats cpuUsagePer: $cpuUsagePer, cpuThreshold: $elasticityCpuThreshold")
+                if (cpuUsagePer >= elasticityCpuThreshold) {
+                    resetContainer(container.id)
+                    continue
+                }
+
+                if (statistics.memoryStats != null && statistics.memoryStats.usage != null && statistics.memoryStats.limit != null) {
+                    val memUsage = statistics.memoryStats.usage!! * 100 / statistics.memoryStats.limit!!
+                    val elasticityMemThreshold = dockerHostConfig.elasticityMemThreshold ?: 80
+                    logger.info("containerId: ${container.id} | checkContainerStats memUsage: $memUsage, memThreshold: $elasticityMemThreshold")
+                    if (memUsage >= elasticityMemThreshold) {
+                        resetContainer(container.id)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getContainerStats(containerId: String): Statistics? {
+        val asyncResultCallback = InvocationBuilder.AsyncResultCallback<Statistics>()
+        httpDockerCli.statsCmd(containerId).withNoStream(true).exec(asyncResultCallback)
+        return try {
+            val stats = asyncResultCallback.awaitResult()
+            asyncResultCallback.close()
+            stats
+        } catch (e: Exception) {
+            logger.error("containerId: $containerId get containerStats error.", e)
+            null
+        }
+    }
+
+    private fun resetContainer(containerId: String) {
+        val memReservation = dockerHostConfig.elasticityMemReservation ?: 32 * 1024 * 1024 * 1024L
+        val cpuPeriod = dockerHostConfig.elasticityCpuPeriod ?: 10000
+        val cpuQuota = dockerHostConfig.elasticityCpuQuota ?: 80000
+        httpDockerCli.updateContainerCmd(containerId).withMemoryReservation(memReservation).withCpuPeriod(cpuPeriod).withCpuQuota(cpuQuota).exec()
+        logger.info("<<<< Trigger container reset, containerId: $containerId, memReservation: $memReservation, cpuPeriod: $cpuPeriod, cpuQuota: $cpuQuota")
     }
 
     fun clearContainers() {
@@ -843,6 +970,19 @@ class DockerHostBuildService(
         }
 
         return false
+    }
+
+    private fun getAvailableHostPort(): Int {
+        val startPort = dockerHostConfig.dockerRunStartPort ?: 20000
+        for (i in startPort..(startPort + 1000)) {
+            if (!CommonUtils.isPortUsing("127.0.0.1", i)) {
+                return i
+            } else {
+                continue
+            }
+        }
+
+        return 0
     }
 
     inner class MyBuildImageResultCallback internal constructor(

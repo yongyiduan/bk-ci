@@ -310,8 +310,10 @@
                     if (e.code === 403) { // 没有权限创建
                         this.$showAskPermissionDialog({
                             noPermissionList: [{
-                                resource: this.$t('pipeline'),
-                                option: this.$t('create')
+                                actionId: this.$permissionActionMap.create,
+                                resourceId: this.$permissionResourceMap.pipeline,
+                                instanceId: [],
+                                projectId: this.$route.params.projectId
                             }],
                             applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.$route.params.projectId}&service_code=pipeline&role_creator=pipeline`
                         })

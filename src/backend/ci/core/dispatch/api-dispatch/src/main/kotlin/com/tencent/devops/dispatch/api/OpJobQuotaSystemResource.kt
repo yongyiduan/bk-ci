@@ -40,6 +40,7 @@ import javax.ws.rs.PUT
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
 
 @Api(tags = ["OP_JOBS_SYSTEM_QUOTA"], description = "Job默认配额管理")
@@ -47,6 +48,23 @@ import javax.ws.rs.core.MediaType
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 interface OpJobQuotaSystemResource {
+
+    @ApiOperation("统计已运行的配额信息")
+    @GET
+    @Path("/all/statistics")
+    fun statistics(
+        @ApiParam(value = "分页大小", required = false)
+        @QueryParam("limit")
+        limit: Int?,
+        @ApiParam(value = "偏移", required = false)
+        @QueryParam("offset")
+        offset: Int?
+    ): Result<Map<String, Any>>
+
+    @ApiOperation("获取全部的JOB配额信息")
+    @GET
+    @Path("/all/list")
+    fun list(): Result<List<JobQuotaSystem>>
 
     @ApiOperation("获取系统默认JOB配额信息")
     @GET
@@ -83,5 +101,14 @@ interface OpJobQuotaSystemResource {
         jobQuotaVmType: JobQuotaVmType,
         @ApiParam(value = "Job配额信息", required = true)
         jobQuota: JobQuotaSystem
+    ): Result<Boolean>
+
+    @ApiOperation("清零当月已运行时间")
+    @POST
+    @Path("/clear/vm/{vmType}")
+    fun restore(
+        @ApiParam(value = "构建机类型", required = true)
+        @PathParam("vmType")
+        vmType: JobQuotaVmType
     ): Result<Boolean>
 }

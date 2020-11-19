@@ -405,7 +405,7 @@
 
         goProject ({ projectCode, enabled }): void {
             if (enabled) {
-                window.open(`${PERM_URL_PREFIX}perm/my-project?project_code=${projectCode}`, '_blank')
+                window.open(`/console/perm/my-project?project_code=${projectCode}`, '_blank')
             }
         }
         

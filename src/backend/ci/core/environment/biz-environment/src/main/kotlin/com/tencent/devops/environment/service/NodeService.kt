@@ -32,6 +32,7 @@ import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.util.HashUtil
 import com.tencent.devops.common.auth.api.AuthPermission
 import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.common.websocket.dispatch.WebSocketDispatcher
 import com.tencent.devops.environment.constant.EnvironmentMessageCode.ERROR_ENV_NO_DEL_PERMISSSION
 import com.tencent.devops.environment.constant.EnvironmentMessageCode.ERROR_NODE_CHANGE_USER_NOT_SUPPORT
 import com.tencent.devops.environment.constant.EnvironmentMessageCode.ERROR_NODE_NAME_DUPLICATE
@@ -62,7 +63,9 @@ class NodeService @Autowired constructor(
     private val envNodeDao: EnvNodeDao,
     private val thirdPartyAgentDao: ThirdPartyAgentDao,
     private val slaveGatewayService: SlaveGatewayService,
-    private val environmentPermissionService: EnvironmentPermissionService
+    private val environmentPermissionService: EnvironmentPermissionService,
+    private val nodeWebsocketService: NodeWebsocketService,
+    private val webSocketDispatcher: WebSocketDispatcher
 ) {
 
     fun deleteNodes(userId: String, projectId: String, nodeHashIds: List<String>) {
@@ -92,6 +95,9 @@ class NodeService @Autowired constructor(
             existNodeIdList.forEach {
                 environmentPermissionService.deleteNode(projectId, it)
             }
+            webSocketDispatcher.dispatch(
+                    nodeWebsocketService.buildDetailMessage(projectId, userId)
+            )
         }
     }
 
@@ -365,6 +371,9 @@ class NodeService @Autowired constructor(
             if (nodeInDb.displayName != displayName) {
                 environmentPermissionService.updateNode(userId, projectId, nodeId, displayName)
             }
+            webSocketDispatcher.dispatch(
+                    nodeWebsocketService.buildDetailMessage(projectId, userId)
+            )
         }
     }
 
@@ -379,21 +388,13 @@ class NodeService @Autowired constructor(
         return validRecordList.map { NodeStringIdUtils.getNodeBaseInfo(it) }
     }
 
-    fun listByPage(projectId: String, page: Int?, pageSize: Int?): Page<NodeBaseInfo> {
-        var limit = page ?: 1
-        if (limit <= 0) {
-            limit = 1
-        }
-        var offset = pageSize ?: 10
-        if (offset > 50) {
-            offset = 50
-        }
-        val nodeInfos = nodeDao.listPageForAuth(dslContext, limit, offset, projectId)
+    fun listByPage(projectId: String, offset: Int?, limit: Int?): Page<NodeBaseInfo> {
+        val nodeInfos = nodeDao.listPageForAuth(dslContext, offset!!, limit!!, projectId)
         val count = nodeDao.countForAuth(dslContext, projectId)
         return Page(
             count = count.toLong(),
-            page = limit,
-            pageSize = offset,
+            page = offset!!,
+            pageSize = limit!!,
             records = nodeInfos.map { NodeStringIdUtils.getNodeBaseInfo(it) }
         )
     }

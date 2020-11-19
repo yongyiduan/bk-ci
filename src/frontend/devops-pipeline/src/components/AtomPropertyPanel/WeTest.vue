@@ -118,8 +118,10 @@
                     if (e.code === 403) {
                         this.$showAskPermissionDialog({
                             noPermissionList: [{
-                                resource: this.$t('editPage.atomForm.wetestResName'),
-                                option: this.$t('view')
+                                actionId: this.$permissionActionMap.view,
+                                resourceId: this.$permissionResourceMap.pipeline,
+                                instanceId: [],
+                                projectId: this.$route.params.projectId
                             }],
                             applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=wetest&project_code=${this.$route.params.projectId}&service_code=wetest&role_viewer=wetest`
                         })

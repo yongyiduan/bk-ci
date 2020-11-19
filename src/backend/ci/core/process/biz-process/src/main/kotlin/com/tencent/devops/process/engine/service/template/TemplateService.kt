@@ -38,10 +38,7 @@ import com.tencent.devops.common.api.util.PageUtil
 import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.common.auth.api.AuthPermission
-import com.tencent.devops.common.auth.api.AuthPermissionApi
-import com.tencent.devops.common.auth.api.AuthResourceType
 import com.tencent.devops.common.auth.api.pojo.BkAuthGroup
-import com.tencent.devops.common.auth.code.PipelineAuthServiceCode
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.container.Container
@@ -144,9 +141,7 @@ class TemplateService @Autowired constructor(
     private val pipelineGroupService: PipelineGroupService,
     private val modelTaskIdGenerator: ModelTaskIdGenerator,
     private val paramService: ParamService,
-    private val modelCheckPlugin: ModelCheckPlugin,
-    private val authPermissionApi: AuthPermissionApi,
-    private val pipelineAuthServiceCode: PipelineAuthServiceCode
+    private val modelCheckPlugin: ModelCheckPlugin
 ) {
 
     fun createTemplate(projectId: String, userId: String, template: Model): String {
@@ -339,7 +334,12 @@ class TemplateService @Autowired constructor(
         return dslContext.transactionResult { configuration ->
             val context = DSL.using(configuration)
             val pipelines =
-                templatePipelineDao.listPipeline(context, templateId, PipelineInstanceTypeEnum.CONSTRAINT.type, version)
+                templatePipelineDao.listPipeline(
+                    dslContext = context,
+                    templateId = templateId,
+                    instanceType = PipelineInstanceTypeEnum.CONSTRAINT.type,
+                    version = version
+                )
             if (pipelines.isNotEmpty) {
                 logger.warn("There are ${pipelines.size} pipeline attach to $templateId of version $version")
                 throw ErrorCodeException(
@@ -348,6 +348,27 @@ class TemplateService @Autowired constructor(
             }
             templateDao.delete(dslContext, templateId, setOf(version)) == 1
         }
+    }
+
+    fun deleteTemplate(projectId: String, userId: String, templateId: String, versionName: String): Boolean {
+        logger.info("Start to delete the template [$projectId|$userId|$templateId|$versionName]")
+        checkPermission(projectId, userId)
+        dslContext.transaction { configuration ->
+            val context = DSL.using(configuration)
+            val pipelines =
+                templatePipelineDao.listPipeline(
+                    dslContext = context,
+                    templateId = templateId,
+                    instanceType = PipelineInstanceTypeEnum.CONSTRAINT.type,
+                    versionName = versionName
+                )
+            if (pipelines.isNotEmpty) {
+                logger.warn("There are ${pipelines.size} pipeline attach to $templateId of versionName $versionName")
+                throw ErrorCodeException(errorCode = ProcessMessageCode.TEMPLATE_CAN_NOT_DELETE_WHEN_HAVE_INSTANCE)
+            }
+            templateDao.delete(dslContext = dslContext, templateId = templateId, versionName = versionName)
+        }
+        return true
     }
 
     fun updateTemplate(
@@ -1304,7 +1325,6 @@ class TemplateService @Autowired constructor(
                         pipelineName = it.pipelineName,
                         buildNo = it.buildNo,
                         param = it.param,
-                        instanceFromTemplate = true,
                         labels = labels
                     )
                     instanceModel.templateId = templateId
@@ -1355,7 +1375,6 @@ class TemplateService @Autowired constructor(
         pipelineName: String,
         buildNo: BuildNo?,
         param: List<BuildFormProperty>?,
-        instanceFromTemplate: Boolean,
         labels: List<String>? = null
     ): Model {
         val model = pipelineService.instanceModel(
@@ -1363,7 +1382,7 @@ class TemplateService @Autowired constructor(
             pipelineName = pipelineName,
             buildNo = buildNo,
             param = param,
-            instanceFromTemplate = instanceFromTemplate,
+            instanceFromTemplate = true,
             labels = labels
         )
 
@@ -1373,14 +1392,14 @@ class TemplateService @Autowired constructor(
         var codeCCTaskCnName: String? = null
         var codeCCTaskName: String? = null
 
-        instanceModel.stages.forEach { stage ->
+        instanceModel.stages.forEach outer@{ stage ->
             stage.containers.forEach { container ->
                 container.elements.forEach { element ->
                     if (element is LinuxPaasCodeCCScriptElement) {
                         codeCCTaskId = element.codeCCTaskId
                         codeCCTaskCnName = element.codeCCTaskCnName
                         codeCCTaskName = element.codeCCTaskName
-                        return@forEach
+                        return@outer
                     }
                 }
             }
@@ -1601,11 +1620,7 @@ class TemplateService @Autowired constructor(
         val pipelineSettings =
             pipelineSettingDao.getSettings(dslContext, pipelineIds).groupBy { it.pipelineId }
         logger.info("Get the pipeline settings - $pipelineSettings")
-        val hasPermissionList = authPermissionApi.getUserResourceByPermission(
-            userId, pipelineAuthServiceCode,
-            AuthResourceType.PIPELINE_DEFAULT, projectId, AuthPermission.EDIT,
-            null
-        )
+        val hasPermissionList = pipelinePermissionService.getResourceByPermission(userId = userId, projectId = projectId, permission = AuthPermission.EDIT)
 
         val templatePipelines = associatePipelines.map {
             val pipelineSetting = pipelineSettings[it.pipelineId]
@@ -1671,14 +1686,7 @@ class TemplateService @Autowired constructor(
             logger.info("Get the pipelineIds - $associatePipelines")
             val pipelineSettings = pipelineSettingDao.getSettings(dslContext, pipelineIds).groupBy { it.pipelineId }
             logger.info("Get the pipeline settings - $pipelineSettings")
-            val hasPermissionList = authPermissionApi.getUserResourceByPermission(
-                user = userId,
-                serviceCode = pipelineAuthServiceCode,
-                resourceType = AuthResourceType.PIPELINE_DEFAULT,
-                projectCode = projectId,
-                permission = AuthPermission.EDIT,
-                supplier = null
-            )
+            val hasPermissionList = pipelinePermissionService.getResourceByPermission(userId = userId, projectId = projectId, permission = AuthPermission.EDIT)
 
             val templatePipelines = associatePipelines.map {
                 val pipelineSetting = pipelineSettings[it.pipelineId]
@@ -1723,7 +1731,7 @@ class TemplateService @Autowired constructor(
             throw ErrorCodeException(defaultMessage = "模板名不能为空字符串",
                 errorCode = ProcessMessageCode.TEMPLATE_NAME_CAN_NOT_NULL)
         }
-        modelCheckPlugin.checkModelIntegrity(model = template)
+        modelCheckPlugin.checkModelIntegrity(model = template, projectId = null)
         checkPipelineParam(template)
     }
 

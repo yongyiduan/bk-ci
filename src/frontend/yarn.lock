@@ -209,10 +209,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@blueking/log@1.0.3":
-  version "1.0.3"
-  resolved "http://r.tnpm.oa.com/@blueking/log/download/@blueking/log-1.0.3.tgz#0b7e09218329312e3aac590a31a78105bf51c25b"
-  integrity sha1-C34JIYMpMS46rFkKMaeBBb9Rwls=
+"@blueking/log@1.1.1":
+  version "1.1.1"
+  resolved "http://r.tnpm.oa.com/@blueking/log/download/@blueking/log-1.1.1.tgz#fb20d91a12ff7344ff5302547d7cef59b22de0ab"
+  integrity sha1-+yDZGhL/c0T/UwJUfXzvWbIt4Ks=
 
 "@commitlint/cli@^9.1.1":
   version "9.1.2"
@@ -3034,12 +3034,13 @@ binary-extensions@^1.0.0:
   resolved "http://r.tnpm.oa.com/binary-extensions/download/binary-extensions-1.13.1.tgz#598afe54755b2868a5330d2aff9d4ebb53209b65"
   integrity sha1-WYr+VHVbKGilMw0q/51Ou1Mgm2U=
 
-bk-magic-vue@2.1.12:
-  version "2.1.12"
-  resolved "http://r.tnpm.oa.com/@tencent/bk-magic-vue/download/@tencent/bk-magic-vue-2.1.12.tgz#2391fb86affb7595c8cddccf49fdaf604fd374a6"
-  integrity sha1-I5H7hq/7dZXIzdzPSf2vYE/TdKY=
+bk-magic-vue@2.2.5:
+  version "2.2.5"
+  resolved "http://r.tnpm.oa.com/@tencent/bk-magic-vue/download/@tencent/bk-magic-vue-2.2.5.tgz#0bd773d0856be544238302be20fbe945fc3b3afb"
+  integrity sha1-C9dz0IVr5UQjgwK+IPvpRfw7Ovs=
   dependencies:
-    tinycolor2 "^1.4.1"
+    tinycolor2 "^1.4.1"  
+
 
 block-stream@*:
   version "0.0.9"
