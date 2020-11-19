@@ -42,7 +42,7 @@
                 </ul>
             </section>
             <section class="code-check-detail problem-detail">
-                <h3 class="detail-title">{{ $t('store.问题汇总') }}</h3>
+                <h3 class="detail-title">{{ $t('store.总览') }}</h3>
                 <section class="float-left problem-list">
                     <a v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item" :href="analysisResult.defectUrl" target="_blank">
                         <p class="problem-desc">

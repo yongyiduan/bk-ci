@@ -1,5 +1,6 @@
 {
     "store": "Store",
+    "总览": "Overview",
     "codeMeasurement": "Code safety >= {0} points, code specification >= {1} points, code measurement >= {2} time sharing qualified",
     "代码质量合格": "Code quality is qualified",
     "最近检查": "Recent check",
