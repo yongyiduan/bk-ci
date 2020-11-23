@@ -27,8 +27,8 @@ const actions = {
     /**
      * 用户组列表
      */
-    requestGroupList ({ commit }, { projectId }) {
-        return vue.$ajax.get(`${prefix}/user/groups/${projectId}/list`)
+    requestGroupList ({ commit }, { projectId, params }) {
+        return vue.$ajax.get(`${prefix}/user/groups/${projectId}/list`, { params })
     },
     /**
      * 流水线列表
