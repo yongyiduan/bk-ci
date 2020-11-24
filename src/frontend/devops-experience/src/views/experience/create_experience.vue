@@ -110,7 +110,7 @@
                             >
                             </bk-input>
                         </bk-form-item>
-                        <bk-form-item label="通知方式">
+                        <bk-form-item label="通知方式" desc="三种通知方式均不会对公开体验生效" desc-type="icon" desc-icon="icon-info-circle">
                             <div class="bkdevop-checkbox-group">
                                 <bk-checkbox v-for="(col, index) in noticeTypeList" :key="index" v-model="col.isChecked">{{ col.name }}</bk-checkbox>
                             </div>
