@@ -172,6 +172,7 @@
             },
 
             getCodeScore (buildId) {
+                if (!this.storeType || !this.storeCode) return
                 const params = [this.storeType, this.storeCode]
                 if (this.$route.name !== 'check') params.push({ storeId: this.storeId })
                 else params.push({ buildId })
