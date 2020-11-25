@@ -1,65 +1,70 @@
 <template>
     <main class="code-check-main" v-bkloading="{ isLoading }">
-        <component :is="status"
-            :codecc-url="codeScore.codeccUrl"
-            :commit-id="codeScore.commitId"
-            :repo-url="codeScore.repoUrl"
-            :start-checking="startChecking"
-            :code-style-qualified-score="codeScore.codeStyleQualifiedScore"
-            :code-security-qualified-score="codeScore.codeSecurityQualifiedScore"
-            :code-measure-qualified-score="codeScore.codeMeasureQualifiedScore"
-            :message="message"
-            :last-analysis-time="codeScore.lastAnalysisTime"
-            @startCodeCC="startCodeCC"
-        ></component>
-        <template v-if="['success', 'unqualified'].includes(status)">
-            <section class="code-check-detail">
-                <h3 class="detail-title score">
-                    {{ $t('store.评分') }}<a class="score-rule"><a class="g-title-work" href="https://iwiki.woa.com/x/kvMMBw" target="_blank">{{ $t('store.计算公式') }}</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
-                </h3>
-                <ul class="score-list float-left">
-                    <li v-for="scoreItem in scoreList" :key="scoreItem.name" class="score-detail">
-                        <p class="score-circle">
-                            <span class="circle-main"></span>
-                            <span class="sector-group">
-                                <span class="circle-sector"
-                                    v-for="(item, index) in getColorList(scoreItem.score)"
-                                    :key="item.color"
-                                    :style="{
-                                        color: item.color,
-                                        transform: `${stratTransition ? `rotate(${item.deg}deg)` : ''}`,
-                                        transition: `transform 5.555ms linear ${5.555 * index}ms`,
-                                        zIndex: 36 - index
-                                    }">
+        <template v-if="!apiErr">
+            <component :is="status"
+                :codecc-url="codeScore.codeccUrl"
+                :commit-id="codeScore.commitId"
+                :repo-url="codeScore.repoUrl"
+                :start-checking="startChecking"
+                :code-style-qualified-score="codeScore.codeStyleQualifiedScore"
+                :code-security-qualified-score="codeScore.codeSecurityQualifiedScore"
+                :code-measure-qualified-score="codeScore.codeMeasureQualifiedScore"
+                :message="message"
+                :last-analysis-time="codeScore.lastAnalysisTime"
+                @startCodeCC="startCodeCC"
+            ></component>
+            <template v-if="['success', 'unqualified'].includes(status)">
+                <section class="code-check-detail">
+                    <h3 class="detail-title score">
+                        {{ $t('store.评分') }}<a class="score-rule"><a class="g-title-work" href="https://iwiki.woa.com/x/kvMMBw" target="_blank">{{ $t('store.计算公式') }}</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
+                    </h3>
+                    <ul class="score-list float-left">
+                        <li v-for="scoreItem in scoreList" :key="scoreItem.name" class="score-detail">
+                            <p class="score-circle">
+                                <span class="circle-main"></span>
+                                <span class="sector-group">
+                                    <span class="circle-sector"
+                                        v-for="(item, index) in getColorList(scoreItem.score)"
+                                        :key="item.color"
+                                        :style="{
+                                            color: item.color,
+                                            transform: `${stratTransition ? `rotate(${item.deg}deg)` : ''}`,
+                                            transition: `transform 5.555ms linear ${5.555 * index}ms`,
+                                            zIndex: 36 - index
+                                        }">
+                                    </span>
                                 </span>
-                            </span>
-                        </p>
-                        <p class="score-rate">
-                            <span class="score-num"><bk-animate-number :value="scoreItem.score" :digits="2"></bk-animate-number></span>
-                            <span class="score-title">{{ scoreItem.name }}</span>
-                        </p>
-                    </li>
-                </ul>
-            </section>
-            <section class="code-check-detail problem-detail">
-                <h3 class="detail-title">{{ $t('store.总览') }}</h3>
-                <section class="float-left problem-list">
-                    <a v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item" :href="analysisResult.defectUrl" target="_blank">
-                        <p class="problem-desc">
-                            <span class="english-name">{{ analysisResult.displayName }}</span>
-                            <span class="problem-name" :style="{ color: getToolColor(analysisResult.toolName) }">{{ analysisResult.type }}</span>
-                        </p>
-                        <p class="problem-num">
-                            <span class="num">{{ analysisResult.defectCount }}</span>
-                            <span class="unit">{{ getToolUnit(analysisResult.toolName) }}</span>
-                        </p>
-                    </a>
-                    <bk-exception class="exception-wrap-item exception-part" type="empty" scene="part" v-if="!codeScore.lastAnalysisResultList || codeScore.lastAnalysisResultList.length <= 0">
-                        {{ $t('store.未发现代码质量问题') }}
-                    </bk-exception>
+                            </p>
+                            <p class="score-rate">
+                                <span class="score-num"><bk-animate-number :value="scoreItem.score" :digits="2"></bk-animate-number></span>
+                                <span class="score-title">{{ scoreItem.name }}</span>
+                            </p>
+                        </li>
+                    </ul>
                 </section>
-            </section>
+                <section class="code-check-detail problem-detail">
+                    <h3 class="detail-title">{{ $t('store.总览') }}</h3>
+                    <section class="float-left problem-list">
+                        <a v-for="analysisResult in codeScore.lastAnalysisResultList" :key="analysisResult.toolName" class="problem-item" :href="analysisResult.defectUrl" target="_blank">
+                            <p class="problem-desc">
+                                <span class="english-name">{{ analysisResult.displayName }}</span>
+                                <span class="problem-name" :style="{ color: getToolColor(analysisResult.toolName) }">{{ analysisResult.type }}</span>
+                            </p>
+                            <p class="problem-num">
+                                <span class="num">{{ analysisResult.defectCount }}</span>
+                                <span class="unit">{{ getToolUnit(analysisResult.toolName) }}</span>
+                            </p>
+                        </a>
+                        <bk-exception class="exception-wrap-item exception-part" type="empty" scene="part" v-if="!codeScore.lastAnalysisResultList || codeScore.lastAnalysisResultList.length <= 0">
+                            {{ $t('store.未发现代码质量问题') }}
+                        </bk-exception>
+                    </section>
+                </section>
+            </template>
         </template>
+        <bk-exception class="exception-wrap-item" type="500" v-else>
+            <span>{{apiErrMessage}}</span>
+        </bk-exception>
     </main>
 </template>
 
@@ -103,7 +108,9 @@
                 isLoading: false,
                 startChecking: false,
                 statusData: {},
-                scoreList: []
+                scoreList: [],
+                apiErr: false,
+                apiErrMessage: ''
             }
         },
 
@@ -165,6 +172,8 @@
                     this.$emit('startCodeCC')
                     return this.getCodeScore(res)
                 }).catch((err) => {
+                    this.apiErr = true
+                    this.apiErrMessage = err.message
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
                     this.startChecking = false
@@ -194,6 +203,8 @@
                         }, 30000)
                     }
                 }).catch((err) => {
+                    this.apiErr = true
+                    this.apiErrMessage = err.message
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 })
             },
@@ -264,6 +275,9 @@
 </script>
 
 <style lang="scss" scoped>
+    /deep/ .bk-exception-text {
+        margin-top: -50px;
+    }
     .code-check-main {
         height: 100%;
         padding-bottom: 20px;
