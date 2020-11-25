@@ -9,7 +9,7 @@
                 <h5 class="summary-link" v-if="isInDetailPage">{{ $t('store.最近检查') }}:<span class="link-txt" @click="goToLink(repoUrl)">{{ commitId | commitFilter }}</span>{{ lastAnalysisTime | timeFilter }} <span class="link-txt" @click="goToLink(codeccUrl)">{{ $t('store.查看详情') }}</span></h5>
             </section>
             <bk-button theme="primary" class="code-check-button" v-if="isInDetailPage" @click="startCodeCC" :loading="startChecking">{{ $t('store.重新检查') }}</bk-button>
-            <bk-button theme="primary" class="code-check-button" v-else @click="goToLink(codeccUrl)">{{ $t('store.查看详情') }}</bk-button>
+            <bk-button theme="primary" class="code-check-button" v-else-if="codeccUrl" @click="goToLink(codeccUrl)">{{ $t('store.查看详情') }}</bk-button>
         </section>
     </section>
 </template>

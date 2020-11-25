@@ -8,7 +8,7 @@
                 <h5 class="summary-desc">{{ message }}</h5>
             </section>
             <bk-button theme="primary" class="code-check-button" @click="startCodeCC" :loading="startChecking">{{ $t('store.重新检查') }}</bk-button>
-            <bk-button class="code-check-button" :disabled="startChecking" @click="goToCodecc">{{ $t('store.查看详情') }}</bk-button>
+            <bk-button class="code-check-button" :disabled="startChecking" @click="goToCodecc" v-if="codeccUrl">{{ $t('store.查看详情') }}</bk-button>
         </section>
     </section>
 </template>
