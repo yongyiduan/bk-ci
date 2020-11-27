@@ -319,6 +319,7 @@
         "deleteTemplateTips": "是否删除模板 ( {0} ) ?"
     },
     "newlist": {
+        "exportYamlTip": "Prebuild 是蓝盾为了提高开发效率，更快更早地发现代码中的问题设计的一套和IDE集成的CI解决方案。",
         "exportJsonTip": "通过导入功能，可以快速创建流水线，也可以实现跨项目、跨蓝盾平台的流水线导入。",
         "chooseExport": "选择导出的文件格式",
         "defaultViews": "我的常用视图",
