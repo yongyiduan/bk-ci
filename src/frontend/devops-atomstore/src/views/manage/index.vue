@@ -36,7 +36,14 @@
                 panelMap: {
                     atom: [
                         { label: this.$t('store.概览'), name: 'overView' },
-                        { label: this.$t('store.发布管理'), name: 'release', children: [{ label: this.$t('store.版本管理'), name: 'version' }], showChildTab: true },
+                        { label: this.$t('store.发布管理'),
+                          name: 'release',
+                          children: [
+                              { label: this.$t('store.版本管理'), name: 'version' },
+                              { label: this.$t('store.代码质量'), name: 'check' }
+                          ],
+                          showChildTab: true
+                        },
                         { label: this.$t('store.协作审批'), name: 'approval' },
                         { label: this.$t('store.基本信息'), name: 'detail', children: [{ name: 'show' }, { name: 'edit' }], showChildTab: false },
                         { label: this.$t('store.基本设置'),

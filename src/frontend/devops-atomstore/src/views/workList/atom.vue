@@ -54,8 +54,7 @@
                             v-if="['AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION'].includes(props.row.atomStatus) && props.row.releaseFlag"
                             @click="offline(props.row)"> {{ $t('store.下架') }} </span>
                         <span class="schedule-btn"
-                            v-if="props.row.atomStatus === 'COMMITTING' || props.row.atomStatus === 'BUILDING' || props.row.atomStatus === 'BUILD_FAIL'
-                                || props.row.atomStatus === 'TESTING' || props.row.atomStatus === 'AUDITING'"
+                            v-if="['COMMITTING', 'BUILDING', 'BUILD_FAIL', 'TESTING', 'AUDITING', 'CODECCING', 'CODECC_FAIL'].includes(props.row.atomStatus)"
                             @click="routerProgress(props.row)"> {{ $t('store.进度') }} </span>
                         <span class="delete-btn" v-if="!props.row.releaseFlag" @click="deleteAtom(props.row)"> {{ $t('store.删除') }} </span>
                     </template>
@@ -436,12 +435,14 @@
                     case 'TESTING':
                     case 'AUDITING':
                     case 'UNDERCARRIAGING':
+                    case 'CODECCING':
                         icon = 'doing'
                         break
                     case 'RELEASED':
                         icon = 'success'
                         break
                     case 'GROUNDING_SUSPENSION':
+                    case 'CODECC_FAIL':
                         icon = 'fail'
                         break
                     case 'AUDIT_REJECT':
