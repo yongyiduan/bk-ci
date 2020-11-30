@@ -453,7 +453,8 @@
                 try {
                     await this.$store.dispatch('store/rebuild', {
                         atomId: this.routerParams.atomId,
-                        projectId: this.versionDetail.projectCode
+                        projectId: this.versionDetail.projectCode,
+                        initProject: this.versionDetail.initProjectCode
                     })
 
                     message = this.$t('store.操作成功')
