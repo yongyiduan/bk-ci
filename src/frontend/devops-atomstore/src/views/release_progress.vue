@@ -72,6 +72,7 @@
                         :id="versionDetail.atomId"
                         :code="versionDetail.atomCode"
                         type="ATOM"
+                        ref="codecheck"
                         @startCodeCC="handleRelease"
                     ></code-check>
                     <template v-else>
@@ -394,6 +395,7 @@
                 const curStatus = this.progressStatus.find(step => step.status === 'doing') || {}
                 const nextStatus = res.processInfos.find(step => step.status === 'doing') || {}
                 const time = curStatus.code === 'codecc' && ['end', 'approve', undefined].includes(nextStatus.code) ? 3000 : 0
+                if (curStatus.code === 'codecc' && nextStatus.code === 'codecc') this.$refs.codecheck && this.$refs.codecheck.getCodeScore()
                 setTimeout(() => {
                     this.progressStatus = res.processInfos
                     this.permission = res.opPermission
