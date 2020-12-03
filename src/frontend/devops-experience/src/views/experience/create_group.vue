@@ -78,7 +78,7 @@
         data () {
             return {
                 isDropdownShow: false,
-                placeholder: '仅填写项目组内的人员有效',
+                placeholder: '全公司人员有效',
                 userGroupList: [],
                 isLoading: false
             }
