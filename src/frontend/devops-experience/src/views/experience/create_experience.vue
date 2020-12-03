@@ -12,23 +12,29 @@
                 <bk-form class="experience-form" v-model="createReleaseForm">
                     <template v-if="hasPermission">
                         <div class="version-name">
-                            <bk-form-item label="版本名称" :required="true" property="name" :rule="[{ required: true }]">
+                            <bk-form-item label="ipa/apk文件" :required="true" property="name" :rule="[{ required: true }]">
                                 <bk-input
                                     placeholder="请从版本仓库中选择一个ipa或apk文件"
                                     name="releaseName"
                                     disabled
                                     v-model="createReleaseForm.name"
                                 />
-                            
                             </bk-form-item>
                             <span :class="{ 'prompt-tips': true, 'is-unedit': isEdit }" :disabled="isEdit" @click="toShowPackageList">从版本仓库获取</span>
                         </div>
-                        <bk-form-item style="margin-top: 20px" label="版本标题" :required="true">
+                        <bk-form-item style="margin-top: 20px" label="体验名称" :required="true" property="experienceName">
+                            <bk-input
+                                v-model="createReleaseForm.experienceName"
+                                placeholder="请输入体验名称"
+                                :rule="[{ required: true }]"
+                                maxlength="20" />
+                        </bk-form-item>
+                        <bk-form-item label="版本标题" :required="true">
                             <bk-input
                                 v-model="createReleaseForm.versionTitle"
                                 placeholder="请输入版本标题"
                                 :rule="[{ required: true }]"
-                                maxlength="20" />
+                                maxlength="100" />
                         </bk-form-item>
                         <bk-form-item label="版本号">
                             <span class="version-number-info">{{ createReleaseForm.version_no || '--' }}</span>
@@ -37,7 +43,7 @@
                             <bk-input
                                 type="textarea"
                                 placeholder="请填写版本描述"
-                                maxlength="128"
+                                maxlength="2000"
                                 name="releaseDesc"
                                 v-model="createReleaseForm.desc"
                                 :class="{ 'is-error': errorFormHandler.nameError }"
@@ -59,13 +65,6 @@
                                 placeholder="请输入产品负责人，多个产品负责人以逗号分割"
                                 @change="productResult"
                                 :rule="[{ required: true }]" />
-                        </bk-form-item>
-                        <bk-form-item label="体验名称" :required="true" property="experienceName">
-                            <bk-input
-                                v-model="createReleaseForm.experienceName"
-                                placeholder="请输入体验名称"
-                                :rule="[{ required: true }]"
-                                maxlength="20" />
                         </bk-form-item>
                         <bk-form-item label="体验结束日期" :required="true" property="end_date">
                             <bk-date-picker
@@ -99,7 +98,7 @@
                             </span>
                         </bk-form-item>
                         <bk-form-item label="附加内部人员" property="internal_list">
-                            <bk-member-selector placeholder="仅填写项目组内的人员有效" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
+                            <bk-member-selector placeholder="全公司人员有效" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
                         </bk-form-item>
                         <bk-form-item label="附加外部QQ" property="external_list">
                             <bk-input type="textarea"
