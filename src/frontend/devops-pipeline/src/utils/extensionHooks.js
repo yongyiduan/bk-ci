@@ -1,5 +1,6 @@
 export const ARTIFACT_HOOK_CONST = 'PIPELINE.BUILD.ARTIFACTS'
 export const PIPELINE_HISTORY_TAB_HOOK_CONST = 'PIPELINE.HISTORY.TAB'
+export const PIPELINE_EXECUTE_DETAIL_HOOK_CONST = 'PIPELINE.EXECUTE.TAB'
 
 export const Hooks = [
     {
@@ -7,5 +8,8 @@ export const Hooks = [
     },
     {
         hookType: PIPELINE_HISTORY_TAB_HOOK_CONST
+    },
+    {
+        hookType: PIPELINE_EXECUTE_DETAIL_HOOK_CONST
     }
 ]

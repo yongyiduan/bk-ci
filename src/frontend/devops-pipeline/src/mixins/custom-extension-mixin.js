@@ -10,6 +10,7 @@ export default {
         ...mapGetters([
             'artifactHooks',
             'extensionTabsHooks',
+            'extensionExecuteDetailTabsHooks',
             'hookKeyMap'
         ]),
         hookIds () {

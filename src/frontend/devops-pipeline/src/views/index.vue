@@ -16,7 +16,7 @@
         methods: {
             ...mapActions('atom', [
                 'fetchContainers',
-                'fetchAtoms',
+                // 'fetchAtoms',
                 'fetchStageTagList'
             ]),
             fetchData () {
@@ -24,9 +24,9 @@
                 this.fetchContainers({
                     projectCode
                 })
-                this.fetchAtoms({
-                    projectCode
-                })
+                // this.fetchAtoms({
+                //     projectCode
+                // })
                 this.fetchStageTagList()
             }
         }
