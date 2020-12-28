@@ -94,8 +94,8 @@ export default {
     setAuthEditing ({ commit }, editing) {
         commit(SET_AUTH_EDITING, editing)
     },
-    triggerStage ({ commit }, { projectId, pipelineId, buildNo, stageId, cancel }) {
-        return request.post(`/${PROCESS_API_URL_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildNo}/stages/${stageId}/manualStart?cancel=${cancel}`)
+    triggerStage ({ commit }, { projectId, pipelineId, buildNo, stageId, cancel, reviewParams }) {
+        return request.post(`/${PROCESS_API_URL_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildNo}/stages/${stageId}/manualStart?cancel=${cancel}`, { reviewParams })
     },
     async fetchStageTagList ({ commit }) {
         try {
