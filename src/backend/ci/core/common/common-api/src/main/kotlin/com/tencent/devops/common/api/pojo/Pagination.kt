@@ -24,15 +24,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.process.pojo
+package com.tencent.devops.common.api.pojo
 
 import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-@ApiModel("项目的流水线回调配置")
-data class ProjectPipelineCallBack(
-    val id: Long? = null,
-    val projectId: String,
-    val callBackUrl: String,
-    val events: String,
-    val secretToken: String?
+@ApiModel("分页数据包装模型")
+data class Pagination<out T>(
+    @ApiModelProperty("是否有下一页", required = true)
+    val hasNext: Boolean,
+    @ApiModelProperty("数据", required = true)
+    val records: List<T>
 )

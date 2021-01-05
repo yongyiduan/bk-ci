@@ -12,30 +12,59 @@
                 <bk-form class="experience-form" v-model="createReleaseForm">
                     <template v-if="hasPermission">
                         <div class="version-name">
-                            <bk-form-item label="版本名称" :required="true" property="name" :rule="[{ required: true }]">
+                            <bk-form-item label="ipa/apk文件" :required="true" property="name" :rule="[{ required: true }]">
                                 <bk-input
                                     placeholder="请从版本仓库中选择一个ipa或apk文件"
                                     name="releaseName"
                                     disabled
                                     v-model="createReleaseForm.name"
                                 />
-                            
                             </bk-form-item>
                             <span :class="{ 'prompt-tips': true, 'is-unedit': isEdit }" :disabled="isEdit" @click="toShowPackageList">从版本仓库获取</span>
                         </div>
-                        <bk-form-item style="margin-top: 20px" label="版本号">
+                        <bk-form-item style="margin-top: 20px" label="体验名称" :required="true" property="experienceName">
+                            <bk-input
+                                v-model="createReleaseForm.experienceName"
+                                placeholder="请输入体验名称"
+                                :rule="[{ required: true }]"
+                                maxlength="20" />
+                        </bk-form-item>
+                        <bk-form-item label="版本标题" :required="true">
+                            <bk-input
+                                v-model="createReleaseForm.versionTitle"
+                                placeholder="请输入版本标题"
+                                :rule="[{ required: true }]"
+                                maxlength="100" />
+                        </bk-form-item>
+                        <bk-form-item label="版本号">
                             <span class="version-number-info">{{ createReleaseForm.version_no || '--' }}</span>
                         </bk-form-item>
                         <bk-form-item label="版本描述" property="desc">
                             <bk-input
                                 type="textarea"
                                 placeholder="请填写版本描述"
-                                maxlength="128"
+                                maxlength="2000"
                                 name="releaseDesc"
                                 v-model="createReleaseForm.desc"
                                 :class="{ 'is-error': errorFormHandler.nameError }"
                             >
                             </bk-input>
+                        </bk-form-item>
+                        <bk-form-item label="产品类别" :required="true" property="categoryId">
+                            <bk-select v-model="createReleaseForm.categoryId">
+                                <bk-option v-for="option in categoryList"
+                                    :key="option.id"
+                                    :id="option.id"
+                                    :name="option.name">
+                                </bk-option>
+                            </bk-select>
+                        </bk-form-item>
+                        <bk-form-item label="产品负责人" property="productOwner">
+                            <bk-input
+                                v-model="createReleaseForm.productOwner"
+                                placeholder="请输入产品负责人，多个产品负责人以逗号分割"
+                                @change="productResult"
+                                :rule="[{ required: true }]" />
                         </bk-form-item>
                         <bk-form-item label="体验结束日期" :required="true" property="end_date">
                             <bk-date-picker
@@ -69,7 +98,7 @@
                             </span>
                         </bk-form-item>
                         <bk-form-item label="附加内部人员" property="internal_list">
-                            <bk-member-selector placeholder="仅填写项目组内的人员有效" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
+                            <bk-member-selector placeholder="全公司人员有效" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
                         </bk-form-item>
                         <bk-form-item label="附加外部QQ" property="external_list">
                             <bk-input type="textarea"
@@ -80,7 +109,7 @@
                             >
                             </bk-input>
                         </bk-form-item>
-                        <bk-form-item label="通知方式">
+                        <bk-form-item label="通知方式" desc="三种通知方式均不会对公开体验生效" desc-type="icon" desc-icon="icon-info-circle">
                             <div class="bkdevop-checkbox-group">
                                 <bk-checkbox v-for="(col, index) in noticeTypeList" :key="index" v-model="col.isChecked">{{ col.name }}</bk-checkbox>
                             </div>
@@ -156,6 +185,12 @@
                 groupIdDesc: '可发通知至企业微信群。群ID获取方法：将"DevOpsRobot(蓝盾机器人)" 拉进群，手动@DevOpsRobot(蓝盾机器人)并输入关键字"会话ID",发送后即可获取群ID',
                 experienceGroup: [],
                 groupIdStorage: [],
+                categoryList: [
+                    { id: 1, name: '游戏' },
+                    { id: 2, name: '工具' },
+                    { id: 3, name: '生活' },
+                    { id: 3, name: '社交' }
+                ],
                 noticeTypeList: [
                     { name: '企业微信', value: 'RTX', isChecked: false },
                     { name: '邮件', value: 'EMAIL', isChecked: false },
@@ -170,7 +205,11 @@
                 createReleaseForm: {
                     name: '',
                     version_no: '',
+                    versionTitle: '',
                     desc: '',
+                    experienceName: '',
+                    categoryId: 0,
+                    productOwner: [],
                     end_date: new Date(),
                     internal_list: [],
                     external_list: '',
@@ -260,7 +299,11 @@
                         end_date: '',
                         internal_list: [],
                         external_list: '',
-                        notice_list: ''
+                        notice_list: '',
+                        versionTitle: '',
+                        experienceName: '',
+                        categoryId: 1,
+                        productOwner: []
                     }
                 }
             },
@@ -289,9 +332,11 @@
 
                 try {
                     const res = await this.$store.dispatch('experience/requestGroupList', {
-                        projectId: this.projectId
+                        projectId: this.projectId,
+                        params: {
+                            returnPublic: true
+                        }
                     })
-
                     this.experienceGroup.splice(0, this.experienceGroup.length)
                     res.records.map(item => {
                         item.isChecked = false
@@ -321,7 +366,6 @@
                         projectId: this.projectId,
                         experienceHashId: this.experienceHashId
                     })
-
                     this.createReleaseForm.name = res.name
                     this.createReleaseForm.path = res.path
                     this.createReleaseForm.artifactoryType = res.artifactoryType
@@ -329,6 +373,10 @@
                     this.createReleaseForm.end_date = this.localConvertTime(res.expireDate).split(' ')[0]
                     this.query.initDate = this.createReleaseForm.end_date
                     this.createReleaseForm.desc = res.remark
+                    this.createReleaseForm.versionTitle = res.versionTitle
+                    this.createReleaseForm.experienceName = res.experienceName
+                    this.createReleaseForm.categoryId = res.categoryId
+                    this.createReleaseForm.productOwner = res.productOwner
                     this.createReleaseForm.external_list = res.outerUsers
                     this.createReleaseForm.internal_list = res.innerUsers
                     this.createReleaseForm.enableWechatGroups = res.enableWechatGroups
@@ -433,6 +481,9 @@
             },
             textdisplayResult () {
                 this.createReleaseForm.external_list = this.createReleaseForm.external_list.replace(/[^\d;,]/g, '')
+            },
+            productResult () {
+                this.createReleaseForm.productOwner = this.createReleaseForm.productOwner.split(',')
             },
             validate () {
                 let errorCount = 0
@@ -594,7 +645,11 @@
                             innerUsers: this.createReleaseForm.internal_list,
                             enableWechatGroups: this.createReleaseForm.enableWechatGroups,
                             experienceGroups: [],
-                            notifyTypes: []
+                            notifyTypes: [],
+                            experienceName: this.createReleaseForm.experienceName,
+                            versionTitle: this.createReleaseForm.versionTitle,
+                            categoryId: this.createReleaseForm.categoryId,
+                            productOwner: this.createReleaseForm.productOwner
                         }
 
                         if (this.createReleaseForm.enableWechatGroups) {
