@@ -212,7 +212,7 @@
                     item.group_list = item.selected
                 })
                 try {
-                    const res = await this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.get('backend_csrftoken') } })
+                    const res = await this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.get('paas_perm_csrftoken') } })
                     if (res) {
                         if (res.code === 403) {
                             throw new HttpError(403, res.message)
