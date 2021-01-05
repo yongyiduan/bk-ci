@@ -221,7 +221,7 @@
     import breadCrumbs from '@/components/bread-crumbs.vue'
     import codeCheck from '@/components/code-check'
 
-    const CSRFToken = cookie.get('backend_csrftoken')
+    const CSRFToken = cookie.get('paas_perm_csrftoken')
 
     export default {
         components: {
