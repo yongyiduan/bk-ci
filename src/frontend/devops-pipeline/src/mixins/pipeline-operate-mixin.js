@@ -389,7 +389,7 @@ export default {
                     return item
                 })
             }
-            return this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.get('backend_csrftoken') } })
+            return this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.get('paas_perm_csrftoken') } })
         },
         getPipelineSetting () {
             const { pipelineSetting } = this
@@ -590,7 +590,7 @@ export default {
                     resourceId: this.$permissionResourceMap.pipeline,
                     instanceId: [{
                         id: pipelineId,
-                        name: this.pipeline.name
+                        name: this.pipeline ? this.pipeline.name : ''
                     }],
                     projectId
                 }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.manager))
@@ -653,6 +653,12 @@ export default {
                 newParam: {
                     params: paramList
                 }
+            })
+        },
+        handleError (err) {
+            this.$showTips({
+                message: err.message,
+                theme: 'error'
             })
         }
     }
