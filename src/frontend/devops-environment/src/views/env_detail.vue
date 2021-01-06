@@ -872,7 +872,7 @@
 
                         if (this.curEnvDetail.envType === 'BUILD') {
                             for (let i = 0; i < target.length; i++) {
-                                if (target[i] && str.indexOf(target[i]) > -1 && ['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType) && item.canUse) {
+                                if (target[i] && str === target[i] && ['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType) && item.canUse) {
                                     item.isDisplay = true
                                     break
                                 } else {
@@ -881,7 +881,7 @@
                             }
                         } else {
                             for (let i = 0; i < target.length; i++) {
-                                if (target[i] && str.indexOf(target[i]) > -1 && !(['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType)) && item.canUse) {
+                                if (target[i] && str === target[i] && !(['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType)) && item.canUse) {
                                     item.isDisplay = true
                                     break
                                 } else {
