@@ -20,7 +20,7 @@
                                 @click.prevent="gotoPage(service)"
                             >
                                 <Logo
-                                    :name="service.key"
+                                    :name="service.logoUrl"
                                     size="16"
                                 />
 
