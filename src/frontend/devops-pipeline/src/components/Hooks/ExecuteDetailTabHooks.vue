@@ -20,6 +20,11 @@
                 loaded: false
             }
         },
+        watch: {
+            tabData (newData) {
+                this.syncData(newData)
+            }
+        },
         methods: {
             handleIframeLoad () {
                 this.loaded = true
