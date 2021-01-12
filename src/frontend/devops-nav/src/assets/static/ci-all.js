@@ -161,8 +161,14 @@ const tencentCI = {};
     
     exports[SYNC_CUSTOME_DATA] = function (params) {
         console.log(params)
-        window.data = params
-        triggerEvent('data:' + SYNC_CUSTOME_DATA, JSON.parse(params))
+        try {
+            const paramsObj = JSON.parse(params)
+            window.BK_DEVOPS_MICRO_EXTENSION_DATA = paramsObj
+            // window.data = paramsObj;
+            triggerEvent('data:' + SYNC_CUSTOME_DATA, paramsObj)
+        } catch (error) {
+            console.error('micro extension: params error', error)
+        }
     }
 
     /**

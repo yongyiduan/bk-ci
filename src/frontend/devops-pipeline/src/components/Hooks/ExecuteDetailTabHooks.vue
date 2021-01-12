@@ -1,5 +1,5 @@
 <template>
-    <div class="build-history-ext-tab-content" v-bkloading="{ isLoading: !loaded }">
+    <div class="execute-detail-tab-content" v-bkloading="{ isLoading: !loaded }">
         <iframe :src="hookIframeUrl" ref="extensionIframe" @load="handleIframeLoad">
         </iframe>
     </div>
@@ -7,7 +7,7 @@
 
 <script>
     export default {
-        name: 'history-tabs-hooks',
+        name: 'execute-detail-tabs-hooks',
         props: {
             tabData: {
                 type: Object,
@@ -47,7 +47,7 @@
 
 <style lang='scss'>
     @import '../../scss/mixins/ellipsis';
-    .build-history-ext-tab-content {
+    .execute-detail-tab-content {
         height: 100%;
         > iframe {
             width: 100%;

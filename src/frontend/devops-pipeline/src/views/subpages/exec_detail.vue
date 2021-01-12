@@ -94,7 +94,9 @@
     import { convertMStoStringByRule } from '@/utils/util'
     import Logo from '@/components/Logo'
     import MiniMap from '@/components/MiniMap'
+    import customExtMixin from '@/mixins/custom-extension-mixin'
     import AtomPropertyPanel from '@/components/AtomPropertyPanel'
+    import { ExecuteDetailTabHooks } from '@/components/Hooks/'
 
     export default {
         components: {
@@ -113,7 +115,7 @@
             MiniMap,
             AtomPropertyPanel
         },
-        mixins: [pipelineOperateMixin, pipelineConstMixin],
+        mixins: [pipelineOperateMixin, pipelineConstMixin, customExtMixin],
 
         data () {
             return {
@@ -160,39 +162,60 @@
             ...mapState([
                 'fetchError'
             ]),
-
+            hooks () {
+                return this.extensionExecuteDetailTabsHooks
+            },
+            extensionTabs () {
+                return this.extensions.map(ext => ({
+                    name: ext.serviceName,
+                    label: ext.serviceName,
+                    component: ExecuteDetailTabHooks,
+                    bindData: {
+                        tabData: {
+                            ...ext.props.data,
+                            projectId: this.routerParams.projectId,
+                            pipelineId: this.routerParams.pipelineId,
+                            buildId: this.routerParams.buildNo,
+                            userInfo: this.$userInfo
+                        },
+                        hookIframeUrl: this.getResUrl(ext.props.entryResUrl || 'index.html', ext.baseUrl)
+                    }
+                }))
+            },
             panels () {
                 return [{
-                    name: 'executeDetail',
-                    label: this.$t('details.executeDetail'),
-                    component: 'stages',
-                    className: 'exec-pipeline',
-                    bindData: {
-                        editable: false,
-                        isExecDetail: true,
-                        stages: this.execDetail && this.execDetail.model && this.execDetail.model.stages
-                    }
-                }, {
-                    name: 'partView',
-                    label: this.$t('details.partView'),
-                    className: '',
-                    component: 'view-part',
-                    bindData: {}
-                }, {
-                    name: 'codeRecords',
-                    label: this.$t('details.codeRecords'),
-                    className: '',
-                    component: 'code-record',
-                    bindData: {}
-                }, {
-                    name: 'output',
-                    label: this.$t('details.outputReport'),
-                    className: '',
-                    component: 'output-option',
-                    bindData: {
-                        curPipeline: this.execDetail && this.execDetail.model
-                    }
-                }]
+                            name: 'executeDetail',
+                            label: this.$t('details.executeDetail'),
+                            component: 'stages',
+                            className: 'exec-pipeline',
+                            bindData: {
+                                editable: false,
+                                isExecDetail: true,
+                                stages: this.execDetail && this.execDetail.model && this.execDetail.model.stages
+                            }
+                        }, {
+                            name: 'partView',
+                            label: this.$t('details.partView'),
+                            className: '',
+                            component: 'view-part',
+                            bindData: {}
+                        }, {
+                            name: 'codeRecords',
+                            label: this.$t('details.codeRecords'),
+                            className: '',
+                            component: 'code-record',
+                            bindData: {}
+                        }, {
+                            name: 'output',
+                            label: this.$t('details.outputReport'),
+                            className: '',
+                            component: 'output-option',
+                            bindData: {
+                                curPipeline: this.execDetail && this.execDetail.model
+                            }
+                        },
+                        ...this.extensionTabs
+                ]
             },
             showLog: {
                 get () {

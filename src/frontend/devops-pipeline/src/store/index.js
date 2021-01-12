@@ -33,7 +33,7 @@ import {
     FETCH_ERROR,
     SET_SERVICE_HOOKS
 } from './constants'
-import { ARTIFACT_HOOK_CONST, PIPELINE_HISTORY_TAB_HOOK_CONST } from '../utils/extensionHooks'
+import { ARTIFACT_HOOK_CONST, PIPELINE_EXECUTE_DETAIL_HOOK_CONST, PIPELINE_HISTORY_TAB_HOOK_CONST } from '../utils/extensionHooks'
 Vue.use(Vuex)
 
 function getHookByHTMLPath (htmlPath) {
@@ -125,6 +125,7 @@ export default new Vuex.Store({
             return null
         },
         artifactHooks: getHookByHTMLPath(ARTIFACT_HOOK_CONST),
-        extensionTabsHooks: getHookByHTMLPath(PIPELINE_HISTORY_TAB_HOOK_CONST)
+        extensionTabsHooks: getHookByHTMLPath(PIPELINE_HISTORY_TAB_HOOK_CONST),
+        extensionExecuteDetailTabsHooks: getHookByHTMLPath(PIPELINE_EXECUTE_DETAIL_HOOK_CONST)
     }
 })

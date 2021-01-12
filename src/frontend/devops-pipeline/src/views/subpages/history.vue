@@ -70,7 +70,11 @@
                     label: ext.serviceName,
                     component: HistoryTabsHooks,
                     bindData: {
-                        tabData: ext.props.data,
+                        tabData: {
+                            projectId: this.projectId,
+                            pipelineId: this.pipelineId,
+                            ...ext.props.data
+                        },
                         hookIframeUrl: this.getResUrl(ext.props.entryResUrl || 'index.html', ext.baseUrl)
                     }
                 }))
