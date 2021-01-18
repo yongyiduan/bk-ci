@@ -78,15 +78,18 @@
 
             async fetchData (page = 1, pageSize = this.pageSize) {
                 const res = await this.dataFetcher(page, pageSize)
-                this.list = page === 1 ? res.records : [
-                    ...this.list,
-                    ...res.records
-                ]
+                if (res) {
+                    this.list = page === 1 ? res.records : [
+                        ...this.list,
+                        ...res.records
+                    ]
 
-                this.currentPage = Math.ceil(this.list.length / pageSize)
-                this.hasNext = this.currentPage < res.totalPages
-                this.totals = res.count
-                return res
+                    this.currentPage = Math.ceil(this.list.length / pageSize)
+
+                    this.hasNext = this.currentPage < res.totalPages
+                    this.totals = res.count
+                    return res
+                }
             },
 
             async queryList (page = 1, pageSize, isRefresh = false) {
