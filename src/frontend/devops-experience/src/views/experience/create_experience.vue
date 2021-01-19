@@ -9,11 +9,12 @@
                 title: loading.title
             }">
             <template v-if="!loading.isLoading">
-                <bk-form class="experience-form" v-model="createReleaseForm">
+                <bk-form class="experience-form" ref="form" :model="createReleaseForm" :rules="rules">
                     <template v-if="hasPermission">
                         <div class="version-name">
-                            <bk-form-item label="ipa/apk文件" :required="true" property="name" :rule="[{ required: true }]">
+                            <bk-form-item label="ipa/apk文件" :required="true" property="name">
                                 <bk-input
+                                    ref="releaseName"
                                     placeholder="请从版本仓库中选择一个ipa或apk文件"
                                     name="releaseName"
                                     disabled
@@ -26,10 +27,9 @@
                             <bk-input
                                 v-model="createReleaseForm.experienceName"
                                 placeholder="请输入体验名称"
-                                :rule="[{ required: true }]"
                                 maxlength="20" />
                         </bk-form-item>
-                        <bk-form-item label="版本标题" :required="true">
+                        <bk-form-item label="版本标题" :required="true" property="versionTitle">
                             <bk-input
                                 v-model="createReleaseForm.versionTitle"
                                 placeholder="请输入版本标题"
@@ -39,7 +39,7 @@
                         <bk-form-item label="版本号">
                             <span class="version-number-info">{{ createReleaseForm.version_no || '--' }}</span>
                         </bk-form-item>
-                        <bk-form-item label="版本描述" property="desc">
+                        <bk-form-item label="版本描述" property="desc" :required="true">
                             <bk-input
                                 type="textarea"
                                 placeholder="请填写版本描述"
@@ -75,9 +75,9 @@
                             >
                             </bk-date-picker>
                         </bk-form-item>
-                        <bk-form-item label="选择体验组" :required="true">
+                        <bk-form-item label="选择体验组" :required="true" property="experienceGroups">
                             <div class="bkdevop-checkbox-group">
-                                <bk-checkbox v-for="(col, index) in experienceGroup" :key="index" v-model="col.isChecked" class="exp-group-item">
+                                <bk-checkbox v-for="(col, index) in experienceGroup" :key="index" v-model="col.isChecked" @change="handleGroupChange" class="exp-group-item">
                                     {{ col.name }}
                                     <bk-popover :delay="500" placement="bottom">
                                         <i class="devops-icon icon-member-list"></i>
@@ -189,7 +189,7 @@
                     { id: 1, name: '游戏' },
                     { id: 2, name: '工具' },
                     { id: 3, name: '生活' },
-                    { id: 3, name: '社交' }
+                    { id: 4, name: '社交' }
                 ],
                 noticeTypeList: [
                     { name: '企业微信', value: 'RTX', isChecked: false },
@@ -208,14 +208,15 @@
                     versionTitle: '',
                     desc: '',
                     experienceName: '',
-                    categoryId: 0,
+                    categoryId: null,
                     productOwner: [],
                     end_date: new Date(),
                     internal_list: [],
                     external_list: '',
                     notice_list: '',
                     wechatGroups: '',
-                    enableWechatGroups: false
+                    enableWechatGroups: false,
+                    experienceGroups: []
                 },
                 dialogLoading: {
                     isLoading: false,
@@ -302,8 +303,9 @@
                         notice_list: '',
                         versionTitle: '',
                         experienceName: '',
-                        categoryId: 1,
-                        productOwner: []
+                        categoryId: null,
+                        productOwner: [],
+                        experienceGroups: []
                     }
                 }
             },
@@ -316,6 +318,27 @@
             this.query.beginDate = new Date()
             if (this.isEdit) {
                 this.requestExperienceDetail()
+            }
+            this.rules = {
+                name: [
+                    { required: true, message: '请选择ipa/apk文件', trigger: 'change' }
+                ],
+                experienceName: [
+                    { required: true, message: '请输入体验名称', trigger: 'blur' }
+                ],
+                versionTitle: [
+                    { required: true, message: '请输入版本标题', trigger: 'blur' }
+                ],
+                desc: [
+                    { required: true, message: '请输入版本描述', trigger: 'blur' }
+
+                ],
+                categoryId: [
+                    { required: true, message: '请选择产品类别', trigger: 'blur' }
+                ],
+                experienceGroups: [
+                    { required: true, message: '请选择体验组', trigger: 'blur' }
+                ]
             }
         },
         mounted () {
@@ -355,6 +378,16 @@
                     this.loading.isLoading = false
                 }
             },
+            handleGroupChange (val) {
+                const newExperienceGroups = []
+                this.experienceGroup.forEach(item => {
+                    if (item.isChecked) {
+                        newExperienceGroups.push(item.groupHashId)
+                    }
+                })
+                this.createReleaseForm.experienceGroups = newExperienceGroups
+                this.$refs.form.validate()
+            },
             /**
              * 获取体验详情
              */
@@ -380,6 +413,7 @@
                     this.createReleaseForm.external_list = res.outerUsers
                     this.createReleaseForm.internal_list = res.innerUsers
                     this.createReleaseForm.enableWechatGroups = res.enableWechatGroups
+                    this.createReleaseForm.experienceGroups = res.experienceGroups
                     if (res.enableWechatGroups) {
                         this.createReleaseForm.wechatGroups = res.wechatGroups
                     }
@@ -548,6 +582,8 @@
                             this.createReleaseForm.path = obj.fullPath
                             this.createReleaseForm.artifactoryType = obj.artifactoryType
                             this.errorFormHandler.nameError = false
+                            console.log(this.$refs.releaseName)
+                            this.$refs.form.validate()
                         } catch (err) {
                             const message = err.message ? err.message : err
                             const theme = 'error'
@@ -619,125 +655,129 @@
                 })
                 localStorage.setItem('groupIdStr', this.groupIdStorage.sort().join(';'))
             },
-            async submitFn () {
-                const isValid = this.submitValidate()
-
-                if (isValid) {
-                    let message
-                    const theme = 'error'
-                   
-                    if (!this.createReleaseForm.desc) {
-                        message = '请填写版本描述'
-
-                        this.$bkMessage({
-                            message,
-                            theme
-                        })
-                    } else {
-                        const params = {
-                            name: this.createReleaseForm.name,
-                            path: this.createReleaseForm.path,
-                            artifactoryType: this.createReleaseForm.artifactoryType,
-                            version: this.createReleaseForm.version_no,
-                            expireDate: Date.parse(this.createReleaseForm.end_date) / 1000,
-                            remark: this.createReleaseForm.desc || undefined,
-                            outerUsers: this.createReleaseForm.external_list,
-                            innerUsers: this.createReleaseForm.internal_list,
-                            enableWechatGroups: this.createReleaseForm.enableWechatGroups,
-                            experienceGroups: [],
-                            notifyTypes: [],
-                            experienceName: this.createReleaseForm.experienceName,
-                            versionTitle: this.createReleaseForm.versionTitle,
-                            categoryId: this.createReleaseForm.categoryId,
-                            productOwner: this.createReleaseForm.productOwner
-                        }
-
-                        if (this.createReleaseForm.enableWechatGroups) {
-                            params.wechatGroups = this.wechatGroupCompletion()
-                        } else {
-                            params.wechatGroups = ''
-                        }
-
-                        this.experienceGroup.forEach(item => {
-                            if (item.isChecked) {
-                                params.experienceGroups.push(item.groupHashId)
-                            }
-                        })
-
-                        this.noticeTypeList.forEach(item => {
-                            if (item.isChecked) {
-                                params.notifyTypes.push(item.value)
-                            }
-                        })
-
-                        let message, theme
-
-                        this.loading.isLoading = true
-
-                        try {
-                            if (this.$route.params.experienceId) {
-                                await this.$store.dispatch('experience/editExperience', {
-                                    projectId: this.projectId,
-                                    experienceHashId: this.experienceHashId,
-                                    params
+            submitFn () {
+                this.$refs.form.validate()
+                    .then(async (validator) => {
+                        const isValid = this.submitValidate()
+            
+                        if (isValid) {
+                            let message
+                            const theme = 'error'
+                            
+                            if (!this.createReleaseForm.desc) {
+                                message = '请填写版本描述'
+            
+                                this.$bkMessage({
+                                    message,
+                                    theme
                                 })
-
-                                message = '编辑体验成功'
-                                theme = 'success'
                             } else {
-                                const payload = {
-                                    path: params.path,
-                                    artifactoryType: params.artifactoryType
-                                }
+                                const newExperienceGroups = []
 
-                                const result = await this.$store.dispatch('experience/requestHasPermission', {
-                                    projectId: this.projectId,
-                                    payload
+                                this.experienceGroup.forEach(item => {
+                                    if (item.isChecked) {
+                                        newExperienceGroups.push(item.groupHashId)
+                                    }
                                 })
+                                this.createReleaseForm.experienceGroups = newExperienceGroups
 
-                                if (result) {
-                                    await this.$store.dispatch('experience/createExperience', {
-                                        projectId: this.projectId,
-                                        params
-                                    })
-
-                                    message = '新增体验成功'
-                                    theme = 'success'
-                                } else {
-                                    this.$showAskPermissionDialog({
-                                        noPermissionList: [{
-                                            actionId: this.$permissionActionMap.execute,
-                                            resourceId: this.$permissionResourceMap.pipeline,
-                                            instanceId: [{
-                                                id: this.curPipelineId,
-                                                name: this.curPipelineId
-                                            }],
-                                            projectId: this.projectId
-                                        }],
-                                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=pipeline&role_executor=pipeline:${this.curPipelineId}`
-                                    })
+                                const params = {
+                                    name: this.createReleaseForm.name,
+                                    path: this.createReleaseForm.path,
+                                    artifactoryType: this.createReleaseForm.artifactoryType,
+                                    version: this.createReleaseForm.version_no,
+                                    expireDate: Date.parse(this.createReleaseForm.end_date) / 1000,
+                                    remark: this.createReleaseForm.desc || undefined,
+                                    outerUsers: this.createReleaseForm.external_list,
+                                    innerUsers: this.createReleaseForm.internal_list,
+                                    enableWechatGroups: this.createReleaseForm.enableWechatGroups,
+                                    experienceGroups: this.createReleaseForm.experienceGroups,
+                                    notifyTypes: [],
+                                    experienceName: this.createReleaseForm.experienceName,
+                                    versionTitle: this.createReleaseForm.versionTitle,
+                                    categoryId: this.createReleaseForm.categoryId,
+                                    productOwner: this.createReleaseForm.productOwner
                                 }
-                            }
-                        } catch (err) {
-                            message = err.message ? err.message : err
-                            theme = 'error'
-                        } finally {
-                            this.$bkMessage({
-                                message,
-                                theme
-                            })
-
-                            this.loading.isLoading = false
-
-                            if (theme === 'success') {
+            
                                 if (this.createReleaseForm.enableWechatGroups) {
-                                    this.setGroupidStorage(params.wechatGroups)
+                                    params.wechatGroups = this.wechatGroupCompletion()
+                                } else {
+                                    params.wechatGroups = ''
                                 }
-                                this.toExperienceList()
+
+                                console.log(this.createReleaseForm.experienceGroups, 'this.createReleaseForm.experienceGroupsthis.createReleaseForm.experienceGroups')
+            
+                                this.noticeTypeList.forEach(item => {
+                                    if (item.isChecked) {
+                                        params.notifyTypes.push(item.value)
+                                    }
+                                })
+            
+                                let message, theme
+            
+                                this.loading.isLoading = true
+            
+                                try {
+                                    if (this.$route.params.experienceId) {
+                                        await this.$store.dispatch('experience/editExperience', {
+                                            projectId: this.projectId,
+                                            experienceHashId: this.experienceHashId,
+                                            params
+                                        })
+            
+                                        message = '编辑体验成功'
+                                        theme = 'success'
+                                    } else {
+                                        const payload = {
+                                            path: params.path,
+                                            artifactoryType: params.artifactoryType
+                                        }
+            
+                                        const result = await this.$store.dispatch('experience/requestHasPermission', {
+                                            projectId: this.projectId,
+                                            payload
+                                        })
+            
+                                        if (result) {
+                                            await this.$store.dispatch('experience/createExperience', {
+                                                projectId: this.projectId,
+                                                params
+                                            })
+            
+                                            message = '新增体验成功'
+                                            theme = 'success'
+                                        } else {
+                                            const params = {
+                                                noPermissionList: [
+                                                    { resource: '流水线', option: '执行' }
+                                                ],
+                                                applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=pipeline&role_executor=pipeline:${this.curPipelineId}`
+                                            }
+            
+                                            this.$showAskPermissionDialog(params)
+                                        }
+                                    }
+                                } catch (err) {
+                                    message = err.message ? err.message : err
+                                    theme = 'error'
+                                } finally {
+                                    this.$bkMessage({
+                                        message,
+                                        theme
+                                    })
+            
+                                    this.loading.isLoading = false
+            
+                                    if (theme === 'success') {
+                                        if (this.createReleaseForm.enableWechatGroups) {
+                                            this.setGroupidStorage(params.wechatGroups)
+                                        }
+                                        this.toExperienceList()
+                                    }
+                                }
                             }
                         }
-                    }
-                }
+                    })
             },
             /**
              * 处理时间格式
