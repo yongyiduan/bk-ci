@@ -188,10 +188,10 @@
         }
 
         @Watch('underlineProjectList')
-        handleProjectListChange (projectList, oldList) {
+        handleProjectListChange (projectList) {
             if (this.$refs.iframeEle) {
                 const childWin = this.$refs.iframeEle.contentWindow
-                this.iframeUtil.syncProjectList(childWin, this.projectList)
+                this.iframeUtil.syncProjectList(childWin, projectList)
             }
         }
 

@@ -36,7 +36,6 @@
  */
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const AssetPlugin = require('../webpackPlugin/assets-webpack-plugin')
-const ReplacePlugin = require('../webpackPlugin/replace-webpack-plugin')
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin')
 const SpriteLoaderPlugin = require('svg-sprite-loader/plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
@@ -115,15 +114,7 @@ module.exports = (env = {}, argv) => {
                 from: path.join(__dirname, './src/assets/static'),
                 to: `${dist}/static`
             }
-        ]),
-        ...(isDev
-            ? [
-                new ReplacePlugin({
-                    '__HTTP_SCHEMA__://__BKCI_STATIC_FQDN__': 'http://dev.static.devops.oa.com',
-                    '__BK_CI_PUBLIC_URL__': urlPrefix
-                })
-            ]
-            : [])
+        ])
     ]
     config.devServer.historyApiFallback = {
         rewrites: [{ from: /^\/console/, to: '/console/index.html' }]

@@ -309,7 +309,7 @@
         }
 
         @Watch('projectList', { deep: true })
-        watchProjects (val): void {
+        watchProjects (): void {
             this.initList()
             this.reloadCurPage()
         }
@@ -563,7 +563,7 @@
                 } else {
                     const reader = new FileReader()
                     reader.readAsDataURL(file)
-                    reader.onload = evts => {
+                    reader.onload = () => {
                         this.selectedUrl = reader.result
                     }
                     this.selectedFile = e.target.files

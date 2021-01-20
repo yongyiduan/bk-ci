@@ -68,13 +68,13 @@ declare module '*.vue' {
 }
 
 declare const LOGIN_SERVICE_URL: string
-declare const GW_URL_PREFIX: string
+declare const API_URL_PREFIX: string
 declare const DOCS_URL_PREFIX: string
 declare const DEVOPS_LS_VERSION: string
 declare const ENTERPRISE_VERSION: string
 declare const VERSION_TYPE: string
 declare const PERM_URL_PREFIX: string
+
 declare module '*.png'
 
 declare const X_DEVOPS_PROJECT_ID: string
-

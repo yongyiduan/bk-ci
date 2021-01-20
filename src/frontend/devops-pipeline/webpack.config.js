@@ -18,7 +18,6 @@
  */
 const path = require('path')
 const webpack = require('webpack')
-const ReplacePlugin = require('../webpackPlugin/replace-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const webpackBaseConfig = require('../webpack.base')
@@ -62,10 +61,7 @@ module.exports = (env, argv) => {
             context: __dirname,
             manifest: require('./dist/manifest.json')
         }),
-        new CopyWebpackPlugin([{ from: path.join(__dirname, './dist'), to: dist }]),
-        ...(isProd ? [] : [new ReplacePlugin({
-            '__BK_CI_PUBLIC_URL__': urlPrefix
-        })])
+        new CopyWebpackPlugin([{ from: path.join(__dirname, './dist'), to: dist }])
     ]
     config.devServer.historyApiFallback = {
         rewrites: [
