@@ -89,7 +89,6 @@ module.exports = (env = {}, argv) => {
             filename: isDev
                 ? 'index.html'
                 : `${dist}/frontend#console#index.html`,
-            urlPrefix,
             inject: false,
             DEVOPS_LS_VERSION: lsVersion
         }),

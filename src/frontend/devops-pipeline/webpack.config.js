@@ -25,7 +25,6 @@ const getConfig = require('./constConfig.js')
 
 module.exports = (env, argv) => {
     const isProd = argv.mode === 'production'
-    const urlPrefix = env && env.name ? `${env.name}` : ''
     const envDist = env && env.dist ? env.dist : 'frontend'
     const version = env && env.version ? env.version : 'tencent'
     const extUrlPrefix = env && env.name ? `${env.name}-` : ''
@@ -54,7 +53,6 @@ module.exports = (env, argv) => {
             template: 'index.html',
             inject: true,
             VENDOR_LIBS: `/pipeline/main.dll.js?v=${Math.random()}`,
-            urlPrefix,
             extUrlPrefix
         }),
         new webpack.DllReferencePlugin({
