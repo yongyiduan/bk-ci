@@ -25,7 +25,7 @@ const localeAliasMap = {
     'us': 'en-US'
 }
 
-const BK_CI_DOMAIN = 'oa.com'
+const BK_CI_DOMAIN = 'woa.com'
 
 function getLsLocale () {
     try {
@@ -39,7 +39,7 @@ function getLsLocale () {
 function setLsLocale (locale) {
     const formateLocale = localeAliasMap[locale] === 'zh-CN' ? 'zh-cn' : 'en'
     if (typeof cookies.set === 'function') {
-        cookies.remove(LS_KEY, { domain: '.oa.com', path: '/' }) // remove oa language cookie
+        cookies.remove(LS_KEY, { domain: BK_CI_DOMAIN, path: '/' }) // remove oa language cookie
         cookies.set(LS_KEY, formateLocale, { domain: BK_CI_DOMAIN, path: '/', expires: 365 })
     }
 }
@@ -48,7 +48,7 @@ export default (r) => {
     Vue.use(VueI18n)
     const { messages, localeList } = importAll(r)
     // remove old language cookie
-    cookies.remove(LS_KEY, { domain: '.devops.oa.com', path: '/' })
+    // cookies.remove(LS_KEY, { domain: '.devops.oa.com', path: '/' })
     
     const initLocale = getLsLocale()
     // export localeList
