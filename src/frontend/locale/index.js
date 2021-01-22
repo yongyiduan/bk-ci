@@ -25,7 +25,7 @@ const localeAliasMap = {
     'us': 'en-US'
 }
 
-const BK_CI_DOMAIN = 'woa.com'
+const BK_CI_DOMAIN = document.domain.split('.').slice(-2).join('.')
 
 function getLsLocale () {
     try {
