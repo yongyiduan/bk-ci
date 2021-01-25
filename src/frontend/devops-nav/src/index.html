@@ -74,7 +74,7 @@
     <!-- end devops:assets -->
     
     <script>
-        var API_URL_PREFIX = '/ms'     // api接口前缀
+        var API_URL_PREFIX = 'http://dev.devops.oa.com/ms'     // api接口前缀
         var PERM_URL_PREFIX = '__BK_PAAS_PUBLIC_URL__/o/bk_iam_app' // EE PERM URL PREFIX
         var DOCS_URL_PREFIX = '__BK_CI_DOCS_URL__'  // 文档中心域名
         var LOGIN_SERVICE_URL = '__BK_CI_PAAS_LOGIN_URL__' // 蓝鲸PaaS登录入口
@@ -241,7 +241,7 @@
         }
 
         function fetchAssetsJSON () {
-            return asyncGet('/assets_bundle.json?t=' + Math.random())
+            return asyncGet('http://dev.devops.oa.com/assets_bundle.json?t=' + Math.random())
         }
 
         function fetchAllProjects () {
@@ -281,6 +281,13 @@
                         var cssUrl = assetMod ? joinUrl([ '', mod, assetMod.css ]) : children[j].css_url
                         children[j].js_url = jsUrl
                         children[j].css_url = cssUrl
+                    } else if (children[j].inject_type === 'iframe') {
+                      try {
+                        var iframeUrl = new URL(/^https?\:/.test(children[j].iframe_url) ? children[j].iframe_url : location.protocol + children[j].iframe_url);
+                        children[j].iframe_url = location.origin + iframeUrl.pathname
+                      } catch (error) {
+                        console.log(children[j], error) 
+                      }
                     }
                     serviceMap[mod] = children[j]
 
