@@ -74,7 +74,7 @@ export function getVersionConfig () {
 }
 
 export function pluginUrlParse (originUrl, query) {
-    const url = originUrl.replace('http://devops.oa.com/ms', '/ms')
+    const url = originUrl.replace(/^https?\:\/\/((dev|test)\.)?devops\.oa\.com\/ms/, '')
     /* eslint-disable */
     return new Function('ctx', `return '${url.replace(PLUGIN_URL_PARAM_REG, '\'\+ (ctx.hasOwnProperty(\'$1\') ? ctx[\'$1\'] : "") \+\'')}'`)(query)
     /* eslint-enable */
