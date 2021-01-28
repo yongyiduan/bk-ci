@@ -281,6 +281,8 @@
                         var cssUrl = assetMod ? joinUrl([ '', mod, assetMod.css ]) : children[j].css_url
                         children[j].js_url = jsUrl
                         children[j].css_url = cssUrl
+                    } else if (children[j].inject_type === 'iframe') {
+                      children[j].iframe_url = joinUrl([ location.origin, children[j].iframe_url ])
                     }
                     serviceMap[mod] = children[j]
 
