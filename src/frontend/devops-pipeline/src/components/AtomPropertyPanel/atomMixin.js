@@ -40,6 +40,8 @@ import CodeModeInput from '@/components/atomFormField/CodeModeInput'
 import ParamsView from '@/components/atomFormField/ParamsView'
 import SvnpathInput from '@/components/atomFormField/SvnpathInput'
 import KeyValue from '@/components/atomFormField/KeyValue'
+import DefineParam from '@/components/AtomFormComponent/DefineParam'
+import NotifyType from '@/components/AtomFormComponent/notifyType'
 import KeyValueNormal from '@/components/atomFormField/KeyValueNormal'
 import NameSpaceVar from '@/components/atomFormField/NameSpaceVar'
 import RouteTips from '@/components/atomFormField/RouteTips'
@@ -50,6 +52,8 @@ import GroupIdSelector from '@/components/atomFormField/groupIdSelector'
 import RemoteCurlUrl from '@/components/atomFormField/RemoteCurlUrl'
 import AutoComplete from '@/components/atomFormField/AutoComplete'
 import { urlJoin, rely } from '../../utils/util'
+import { CHECK_PARAM_LIST, CHECK_DEFAULT_PARAM } from '@/store/modules/atom/paramsConfig'
+import { deepCopy } from '@/utils/util'
 
 const atomMixin = {
     props: {
@@ -89,6 +93,8 @@ const atomMixin = {
         SvnpathInput,
         KeyValue,
         KeyValueNormal,
+        DefineParam,
+        NotifyType,
         NameSpaceVar,
         RouteTips,
         CheckInline,
@@ -103,6 +109,14 @@ const atomMixin = {
         ]),
         isThirdParty () {
             return this.isThirdPartyContainer(this.container)
+        },
+        paramsList () {
+            return CHECK_PARAM_LIST.map(item => {
+                return {
+                    id: item.id,
+                    name: this.$t(`storeMap.${item.name}`)
+                }
+            })
         }
     },
     methods: {
@@ -155,6 +169,31 @@ const atomMixin = {
                 atom: this.element,
                 [name]: value
             })
+        },
+        handleParamTypeChange (payload) {
+            const params = this.element['params']
+
+            const { value, paramIndex } = payload
+            const newParams = [
+                ...params.slice(0, paramIndex),
+                {
+                    ...deepCopy(CHECK_DEFAULT_PARAM[value]),
+                    key: params[paramIndex].key,
+                    paramIdKey: params[paramIndex].paramIdKey
+                },
+                ...params.slice(paramIndex + 1)
+            ]
+
+            this.handleUpdateElement('params', newParams)
+        },
+        handleUpdateParam (payload) {
+            const { key, value, paramIndex } = payload
+            const param = this.element['params']
+            param[paramIndex][key] = value
+            this.handleUpdateElement('params', param)
+        },
+        handleUpdateParamId (payload) {
+            this.handleUpdateParam(payload)
         },
         handlePath (path = '', getFileName = false) {
             if (path.startsWith('./')) {
