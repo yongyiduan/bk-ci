@@ -2084,6 +2084,11 @@
   resolved "http://r.tnpm.oa.com/@sinonjs/text-encoding/download/@sinonjs/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha1-jaXGUwkVZT86Hzj9XxAdjD+AecU=
 
+"@tencent/bkchart.js@^1.0.2-beta.4":
+  version "1.0.2-beta.5"
+  resolved "http://r.tnpm.oa.com/@tencent/bkchart.js/-/@tencent/bkchart.js-1.0.2-beta.5.tgz#8690cb7c1ae0cea92a53bb1fc246abfc8c1885cf"
+  integrity sha512-zzpSxX2joZQUFWFA/3yxYUtD2gWmGDe1iwE6pZRT+Z9g+aouUl5sk8872BPiMkJVRPk1y/BcDDS8loll5NghFA==
+
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "http://r.tnpm.oa.com/@types/color-name/download/@types/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
