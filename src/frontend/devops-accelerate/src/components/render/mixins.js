@@ -1,6 +1,6 @@
 export default {
     props: {
-        paramEnum: Array,
+        paramEnum: Object,
         paramKey: String,
         isEdit: Boolean,
         paramValue: Object
@@ -9,8 +9,9 @@ export default {
     computed: {
         displayValue () {
             const value = this.paramValue[this.paramKey]
-            const curEnum = this.paramEnum.find((param) => (param.id === +value)) || {}
-            return curEnum.name
+            const keys = Object.keys(this.paramEnum) || []
+            const curKey = keys.find((key) => (+this.paramEnum[key] === +value)) || ''
+            return curKey
         }
     },
 

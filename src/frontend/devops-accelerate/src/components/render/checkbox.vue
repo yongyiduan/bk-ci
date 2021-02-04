@@ -1,7 +1,7 @@
 <template>
     <bk-checkbox-group :value="paramValue[paramKey]" v-if="isEdit" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width">
-        <bk-checkbox :value="param.id" v-for="param in paramEnum" :key="param.id">
-            {{ param.name }}
+        <bk-checkbox :value="value" v-for="(key, value) in paramEnum" :key="key">
+            {{ key }}
         </bk-checkbox>
     </bk-checkbox-group>
     <span v-else>{{ displayValue }}</span>
