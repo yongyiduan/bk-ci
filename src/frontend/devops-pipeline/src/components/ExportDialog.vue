@@ -45,18 +45,18 @@
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/export`
                     },
                     {
-                        title: 'Prebuild Yaml',
+                        title: 'PreCI Yaml',
                         icon: 'export-prebuild',
                         tips: this.$t('newlist.exportYamlTip'),
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
-                        tipsLink: 'https://iwiki.woa.com/display/DevOps/Prebuild'
+                        tipsLink: 'https://iwiki.woa.com/x/ruhACw'
                     },
                     {
                         title: '工蜂CI Yaml',
                         icon: 'export-ci',
-                        tips: this.$t('newlist.exportJGitciTip'),
+                        tips: this.$t('newlist.exportGitciTip'),
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
-                        tipsLink: 'https://iwiki.woa.com/pages/viewpage.action?pageId=10732866'
+                        tipsLink: 'https://iwiki.woa.com/x/QBcLAQ'
                     }
                 ]
             }
