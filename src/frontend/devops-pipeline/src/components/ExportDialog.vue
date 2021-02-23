@@ -1,7 +1,7 @@
 <template>
     <bk-dialog
         :value="isShow"
-        :width="600"
+        :width="836"
         :auto-close="false"
         :show-footer="false"
         :title="$t('newlist.chooseExport')"
@@ -50,6 +50,13 @@
                         tips: this.$t('newlist.exportYamlTip'),
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
                         tipsLink: 'https://iwiki.woa.com/display/DevOps/Prebuild'
+                    },
+                    {
+                        title: '工蜂CI Yaml',
+                        icon: 'export-ci',
+                        tips: this.$t('newlist.exportJGitciTip'),
+                        exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
+                        tipsLink: 'https://iwiki.woa.com/pages/viewpage.action?pageId=10732866'
                     }
                 ]
             }
