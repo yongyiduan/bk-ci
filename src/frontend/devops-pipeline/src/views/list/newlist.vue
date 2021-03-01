@@ -1205,7 +1205,6 @@
         }
         .row-task-count,
         .row-build-count {
-            display: block;
             width: 30px;
             height: 30px;
             line-height: 30px;
