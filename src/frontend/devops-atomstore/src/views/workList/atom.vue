@@ -311,11 +311,11 @@
                 </p>
                 <p class="dialog-tip">
                     {{$t('store.3、插件发开者有义务按照')}}
-                    <a href="https://github.com/ci-plugins/ci-plugins-wiki/blob/master/specification/plugin_dev.md" class="text-link" target="_blank">{{$t('store.《插件开发规范》')}}</a>
+                    <a href="https://iwiki.woa.com/x/6wTl" class="text-link" target="_blank">{{$t('store.《插件开发规范》')}}</a>
                     {{$t('store.对插件进行升级维护，保证插件功能正常。')}}</p>
                 <p class="dialog-tip">
                     {{$t('store.4、插件需提供详细的使用指引合和执行日志、清晰明确的错误码信息和相关的修复指引（见')}}
-                    <a href="https://github.com/ci-plugins/ci-plugins-wiki/blob/master/specification/plugin_output_error.md" class="text-link" target="_blank">{{$t('store.《插件错误码规范》')}}</a>
+                    <a href="https://iwiki.woa.com/x/kK7-F" class="text-link" target="_blank">{{$t('store.《插件错误码规范》')}}</a>
                     {{$t('store.），协助使用者快速定位和解决问题。')}}
                 </p>
                 <span class="delete-form-item">
