@@ -365,7 +365,7 @@
                         instanceId: [],
                         projectId: this.projectId
                     }],
-                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project`
+                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_creator=pipeline:`
                 })
             },
             localConvertMStoString (num) {
