@@ -261,7 +261,7 @@
                 initJobType: '',
                 initReleaseType: '',
                 descTemplate: '',
-                docsLink: 'http://iwiki.oa.com/pages/viewpage.action?pageId=15008942',
+                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008942`,
                 showContent: false,
                 isUploading: false,
                 initOs: [],

@@ -1,7 +1,7 @@
 <template>
     <article class="edit-image-home">
         <bread-crumbs :bread-crumbs="navList" type="image">
-            <a class="g-title-work" target="_blank" href="http://iwiki.oa.com/pages/viewpage.action?pageId=22118721"> {{ $t('store.镜像指引') }} </a>
+            <a class="g-title-work" target="_blank" :href="docsLink"> {{ $t('store.镜像指引') }} </a>
         </bread-crumbs>
         <main v-bkloading="{ isLoading }" class="edit-content">
             <bk-form ref="imageForm" class="edit-image" label-width="150" :model="form" v-show="!isLoading">
@@ -280,6 +280,7 @@
                     category: '',
                     agentTypeScope: []
                 },
+                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=22118721`,
                 ticketList: [],
                 classifys: [],
                 labelList: [],
