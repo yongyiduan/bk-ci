@@ -19,7 +19,9 @@
                     <bk-tab-panel v-for="(panel, index) in timeGap" v-bind="panel" :key="index"></bk-tab-panel>
                 </bk-tab>
             </header>
-            <canvas class="take-time" height="323"></canvas>
+            <div class="canvas-wrapper">
+                <canvas class="take-time"></canvas>
+            </div>
         </section>
 
         <section class="g-accelerate-chart-box chart">
@@ -29,7 +31,9 @@
                     <bk-tab-panel v-for="(panel, index) in timeGap" v-bind="panel" :key="index"></bk-tab-panel>
                 </bk-tab>
             </header>
-            <canvas class="build-num" height="323"></canvas>
+            <div class="canvas-wrapper">
+                <canvas class="build-num"></canvas>
+            </div>
         </section>
     </article>
 </template>
@@ -92,10 +96,12 @@
 
         watch: {
             takeTimeDateType () {
+                this.takeTimeChart.destroy()
                 this.drawTakeTimeChart()
             },
 
             buildNumDateType () {
+                this.buildNumChart.destroy()
                 this.drawBuildNum()
             }
         },
@@ -129,32 +135,24 @@
                                     fill: true,
                                     backgroundColor: 'rgba(43, 124, 255,0.3)',
                                     borderColor: 'rgba(43, 124, 255,1)',
-                                    tension: 0,
+                                    lineTension: 0,
                                     borderWidth: 2,
                                     pointRadius: 0,
                                     pointHitRadius: 3,
                                     pointHoverRadius: 3,
-                                    data: res.map(x => x.estimateTime),
-                                    datalabels: {
-                                        align: 'start',
-                                        anchor: 'start'
-                                    }
+                                    data: res.map(x => x.estimateTime)
                                 },
                                 {
                                     label: '实际耗时',
                                     fill: true,
                                     backgroundColor: 'rgba(0, 204, 158, 0.3)',
                                     borderColor: 'rgba(0, 204, 158, 1)',
-                                    tension: 0,
+                                    lineTension: 0,
                                     borderWidth: 2,
                                     pointRadius: 0,
                                     pointHitRadius: 3,
                                     pointHoverRadius: 3,
-                                    data: res.map(x => x.executeTime),
-                                    datalabels: {
-                                        align: 'end',
-                                        anchor: 'end'
-                                    }
+                                    data: res.map(x => x.executeTime)
                                 }
                             ]
                         },
@@ -164,25 +162,32 @@
                             plugins: {
                                 tooltip: {
                                     mode: 'x',
-                                    intersect: false,
-                                    usePointStyle: true
+                                    intersect: false
                                 },
                                 legend: {
                                     position: 'top',
                                     legendIcon: 'arc',
                                     align: 'start',
                                     labels: {
-                                        padding: 20,
+                                        padding: 10,
                                         usePointStyle: true,
                                         pointStyle: 'dash'
                                     }
-                                }
-                            },
-                            crosshair: {
-                                enabled: true,
-                                line: {
-                                    color: '#3a84ff',
-                                    width: 0.5
+                                },
+                                crosshair: {
+                                    enabled: true,
+                                    mode: 'x',
+                                    style: {
+                                        x: {
+                                            enabled: true,
+                                            color: '#cde0ff',
+                                            weight: 1,
+                                            borderStyle: 'solid'
+                                        },
+                                        y: {
+                                            enabled: false
+                                        }
+                                    }
                                 }
                             },
                             scales: {
@@ -209,7 +214,10 @@
                                         display: false
                                     },
                                     ticks: {
-                                        padding: 10
+                                        padding: 10,
+                                        sampleSize: 20,
+                                        autoSkip: true,
+                                        maxRotation: 0
                                     }
                                 }
                             }
@@ -242,19 +250,30 @@
                         },
                         options: {
                             responsive: true,
-                            legend: {
-                                display: false
-                            },
-                            crosshair: {
-                                enabled: true,
-                                line: {
-                                    color: '#3a84ff',
-                                    width: 0.5
+                            maintainAspectRatio: false,
+                            plugins: {
+                                tooltip: {
+                                    mode: 'x',
+                                    intersect: false
+                                },
+                                legend: {
+                                    display: false
+                                },
+                                crosshair: {
+                                    enabled: true,
+                                    mode: 'x',
+                                    style: {
+                                        x: {
+                                            enabled: true,
+                                            color: '#cde0ff',
+                                            weight: 1,
+                                            borderStyle: 'solid'
+                                        },
+                                        y: {
+                                            enabled: false
+                                        }
+                                    }
                                 }
-                            },
-                            tooltips: {
-                                mode: 'nearest',
-                                intersect: false
                             },
                             scales: {
                                 yAxes: {
@@ -280,7 +299,10 @@
                                         display: false
                                     },
                                     ticks: {
-                                        padding: 10
+                                        padding: 10,
+                                        sampleSize: 20,
+                                        autoSkip: true,
+                                        maxRotation: 0
                                     }
                                 }
                             }
@@ -333,9 +355,9 @@
     }
     .chart {
         margin-bottom: 10.59px;
-        height: 360px;
-        .take-time, .build-num {
-            height: 323px;
+        height: calc(50% - 56.115px);
+        .canvas-wrapper {
+            height: calc(100% - 20px);
             width: 100%;
         }
         &:last-child {

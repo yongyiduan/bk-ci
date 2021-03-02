@@ -46,7 +46,7 @@
         </bk-form>
         <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save" :loading="isLoading">保存</bk-button>
         <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancle" :disabled="isLoading">取消</bk-button>
-        <span class="g-accelerate-edit-button" @click="isEdit = true" v-if="!onlyEdit"><logo name="edit-small" size="20"></logo>编辑</span>
+        <span class="g-accelerate-edit-button" @click="isEdit = true" v-if="!onlyEdit"><logo name="edit" size="16"></logo>编辑</span>
     </section>
 </template>
 
