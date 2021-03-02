@@ -1,7 +1,10 @@
 <template>
     <section class="g-accelerate-box task-setting">
-        <h3 class="create-title g-accelerate-deep-black-font">设置</h3>
-        <bk-form :label-width="120" :model="copyFormData">
+        <h3 class="create-title g-accelerate-deep-black-font" @click="showIPSetting = !showIPSetting">
+            <logo name="right-shape" size="16" :class="showIPSetting ? 'right-down right-shape' : 'right-shape'"></logo>
+            设置
+        </h3>
+        <bk-form :label-width="120" :model="copyFormData" v-if="showIPSetting">
             <bk-form-item label="IP白名单" property="ip">
                 <template v-if="isEdit">
                     <bk-input type="textarea"
@@ -10,13 +13,14 @@
                         :maxlength="100"
                         v-model="copyFormData.whiteList">
                     </bk-input>
+                    <p class="ip-tip">默认为“0.0.0.0”，即不限制加速任务来源。若需限制来源，请在此填写允许的来源IP，多个以英文分号分隔。</p>
                 </template>
                 <span v-else class="g-accelerate-text-break">{{ formData.whiteList }}</span>
             </bk-form-item>
         </bk-form>
         <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save">保存</bk-button>
         <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancel">取消</bk-button>
-        <span class="g-accelerate-edit-button" @click="isEdit = true" v-if="!onlyEdit"><logo name="edit-small" size="20"></logo>编辑</span>
+        <span class="g-accelerate-edit-button" @click="(isEdit = true, showIPSetting = true)" v-if="!onlyEdit"><logo name="edit-small" size="20"></logo>编辑</span>
     </section>
 </template>
 
@@ -43,7 +47,8 @@
             return {
                 isEdit: this.onlyEdit,
                 copyFormData: {},
-                isLoadng: false
+                isLoadng: false,
+                showIPSetting: false
             }
         },
 
@@ -85,9 +90,31 @@
             font-size: 14px;
             line-height: 22px;
             margin-bottom: 17px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
         }
     }
+
     .double-width {
         width: 7.1rem;
+    }
+
+    .right-shape {
+        transition: 200ms transform;
+        transform: rotate(0deg);
+        color: #979ba5;
+        margin-left: -16px;
+        margin-right: 5px;
+        &.right-down {
+            transform: rotate(90deg);
+        }
+    }
+
+    .ip-tip {
+        margin-top: 4px;
+        line-height: 20px;
+        font-size: 12px;
+        color: #979BA5;
     }
 </style>

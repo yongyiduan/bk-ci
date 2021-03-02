@@ -52,6 +52,6 @@
     "public:external": "cross-env NODE_ENV=external webpack --mode production"
   },
   "dependencies": {
-    "@tencent/bkchart.js": "^1.0.2-beta.4"
+    "@blueking/bkcharts": "^2.0.6"
   }
 }

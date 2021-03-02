@@ -43,22 +43,28 @@
         methods: {
             submit () {
                 this.isLoading = true
-                const basicForm = this.$refs.basic.copyFormData
+                const basicComponent = this.$refs.basic
+                const basicForm = basicComponent.copyFormData
                 const paramForm = this.$refs.param.copyFormData
                 const settingForm = this.$refs.setting.copyFormData
-                const postData = {
-                    ...basicForm,
-                    configParam: paramForm.configParam,
-                    whiteList: settingForm.whiteList,
-                    projectId: this.$route.params.projectId
-                }
-                addTurboPlan(postData).then(() => {
-                    this.$bkMessage({ theme: 'success', message: '添加成功' })
-                    this.$router.push({ name: 'taskSuccess' })
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoading = false
+
+                basicComponent.$refs.createTask.validate().then(() => {
+                    const postData = {
+                        ...basicForm,
+                        configParam: paramForm.configParam,
+                        whiteList: settingForm.whiteList,
+                        projectId: this.$route.params.projectId
+                    }
+                    addTurboPlan(postData).then(() => {
+                        this.$bkMessage({ theme: 'success', message: '添加成功' })
+                        this.$router.push({ name: 'taskSuccess' })
+                    }).catch((err) => {
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    }).finally(() => {
+                        this.isLoading = false
+                    })
+                }, (validator) => {
+                    this.$bkMessage({ message: validator.content || validator, theme: 'error' })
                 })
             },
 

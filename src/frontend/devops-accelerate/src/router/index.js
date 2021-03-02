@@ -19,7 +19,7 @@ const routers = [
         component: home,
         children: [
             {
-                path: '',
+                path: 'overview',
                 name: 'overview',
                 component: overview
             },

@@ -58,20 +58,21 @@
                 @page-change="pageChanged"
                 @page-limit-change="pageLimitChange"
                 @row-click="goToDetail"
+                @sort-change="sortChange"
             >
                 <bk-table-column label="编号" type="index" width="60"></bk-table-column>
-                <bk-table-column label="流水线/构建机">
+                <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
                     <template slot-scope="props">
                         <span>{{ props.row.pipelineName || props.row.clientIp }}</span>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="未加速耗时" prop="estimateTimeValue"></bk-table-column>
-                <bk-table-column label="实际耗时" prop="executeTimeValue"></bk-table-column>
-                <bk-table-column label="节省率" prop="turboRatio"></bk-table-column>
-                <bk-table-column label="开始时间" prop="startTime"></bk-table-column>
-                <bk-table-column label="状态">
+                <bk-table-column label="未加速耗时" prop="estimateTimeValue" sortable></bk-table-column>
+                <bk-table-column label="实际耗时" prop="executeTimeValue" sortable></bk-table-column>
+                <bk-table-column label="节省率" prop="turboRatio" sortable></bk-table-column>
+                <bk-table-column label="开始时间" prop="startTime" sortable></bk-table-column>
+                <bk-table-column label="状态" prop="status" sortable>
                     <template slot-scope="props">
-                        <span>{{ props.row.status }}</span>
+                        <task-status :status="props.row.status"></task-status>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -81,8 +82,13 @@
 
 <script>
     import { getHistoryList, getHistorySearchList } from '@/api'
+    import taskStatus from '../../components/task-status.vue'
 
     export default {
+        components: {
+            taskStatus
+        },
+
         data () {
             return {
                 pagination: {
@@ -101,16 +107,35 @@
                 isLoadingSearch: false,
                 planInfo: {},
                 pipelineInfo: {},
-                statusInfo: {}
+                statusInfo: {},
+                sortField: undefined,
+                sortType: undefined
             }
         },
 
         created () {
+            this.initFilter()
             this.getHistoryList()
             this.getHistorySearchList()
         },
 
         methods: {
+            sortChange (sort) {
+                const sortMap = {
+                    ascending: 'ASC',
+                    descending: 'DESC'
+                }
+                this.sortField = sort.prop
+                this.sortType = sortMap[sort.order]
+                this.getHistoryList()
+            },
+
+            initFilter () {
+                const query = this.$route.query || {}
+                if (query.planId) this.turboPlanId = [query.planId]
+                if (query.id) this.pipelineId = [query.id]
+            },
+
             getHistorySearchList () {
                 const projectId = this.$route.params.projectId
                 this.isLoadingSearch = true
@@ -135,7 +160,13 @@
                     turboPlanId: this.turboPlanId,
                     projectId: this.$route.params.projectId
                 }
-                getHistoryList(this.pagination.current, this.pagination.limit, postData).then((res = {}) => {
+                const queryData = {
+                    pageNum: this.pagination.current,
+                    pageSize: this.pagination.limit,
+                    sortField: this.sortField,
+                    sortType: this.sortType
+                }
+                getHistoryList(queryData, postData).then((res = {}) => {
                     this.historyList = res.records || []
                     this.pagination.count = res.count
                 }).catch((err) => {
@@ -204,5 +235,8 @@
     }
     .clear-btn {
         margin-left: 8px;
+    }
+    /deep/ .bk-table-row {
+        cursor: pointer;
     }
 </style>

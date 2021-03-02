@@ -23,13 +23,19 @@
             </section>
         </section>
 
-        <bk-button theme="primary">关闭</bk-button>
+        <bk-button theme="primary" @click="goToList">关闭</bk-button>
     </article>
 </template>
 
 <script>
     export default {
-        
+        methods: {
+            goToList () {
+                this.$router.push({
+                    name: 'taskList'
+                })
+            }
+        }
     }
 </script>
 

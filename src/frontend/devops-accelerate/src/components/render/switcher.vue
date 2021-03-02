@@ -3,7 +3,6 @@
         :value="paramValue[paramKey]"
         @change="changeParamValue"
         v-bind="$props"
-        class="g-accelerate-single-width"
     ></bk-switcher>
     <span v-else>{{ paramValue[paramKey] }}</span>
 </template>

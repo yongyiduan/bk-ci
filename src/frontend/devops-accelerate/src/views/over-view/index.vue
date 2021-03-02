@@ -4,7 +4,9 @@
             <li class="card g-accelerate-box" v-for="card in taskCards" :key="card.label">
                 <logo :name="card.icon" size="42" class="card-logo"></logo>
                 <h5>
-                    <p class="g-accelerate-black-font">{{ card.num }}</p>
+                    <p class="g-accelerate-black-font">
+                        <bk-animate-number :value="card.num" :digits="card.digit"></bk-animate-number>
+                    </p>
                     <span class="g-accelerate-gray-font">{{ card.label }}</span>
                 </h5>
             </li>
@@ -34,7 +36,7 @@
 
 <script>
     import { getOverViewStatData, getCompileNumberTrend, getTimeConsumingTrend } from '@/api'
-    import BKChart from '@tencent/bkchart.js'
+    import BKChart from '@blueking/bkcharts'
     import logo from '../../components/logo'
 
     export default {
@@ -48,22 +50,26 @@
                     instanceNum: {
                         label: '加速方案数',
                         num: 0,
-                        icon: 'acceleration-plan'
+                        icon: 'acceleration-plan',
+                        digit: 0
                     },
                     executeCount: {
                         label: '加速次数',
                         num: 0,
-                        icon: 'accelerations-num'
+                        icon: 'accelerations-num',
+                        digit: 0
                     },
                     executeTimeHour: {
                         label: '总耗时(h)',
                         num: 0,
-                        icon: 'total-time'
+                        icon: 'total-time',
+                        digit: 2
                     },
                     savingRate: {
                         label: '节省耗时(h)',
                         num: 0,
-                        icon: 'save-time'
+                        icon: 'save-time',
+                        digit: 2
                     }
                 },
                 timeGap: [
@@ -123,35 +129,53 @@
                                     fill: true,
                                     backgroundColor: 'rgba(43, 124, 255,0.3)',
                                     borderColor: 'rgba(43, 124, 255,1)',
-                                    lineTension: 0,
+                                    tension: 0,
                                     borderWidth: 2,
                                     pointRadius: 0,
                                     pointHitRadius: 3,
                                     pointHoverRadius: 3,
-                                    data: res.map(x => x.estimateTime)
+                                    data: res.map(x => x.estimateTime),
+                                    datalabels: {
+                                        align: 'start',
+                                        anchor: 'start'
+                                    }
                                 },
                                 {
                                     label: '实际耗时',
                                     fill: true,
                                     backgroundColor: 'rgba(0, 204, 158, 0.3)',
                                     borderColor: 'rgba(0, 204, 158, 1)',
-                                    lineTension: 0,
+                                    tension: 0,
                                     borderWidth: 2,
                                     pointRadius: 0,
                                     pointHitRadius: 3,
                                     pointHoverRadius: 3,
-                                    data: res.map(x => x.executeTime)
+                                    data: res.map(x => x.executeTime),
+                                    datalabels: {
+                                        align: 'end',
+                                        anchor: 'end'
+                                    }
                                 }
                             ]
                         },
                         options: {
+                            maintainAspectRatio: false,
                             responsive: true,
-                            legend: {
-                                position: 'top',
-                                legendIcon: 'arc',
-                                align: 'start',
-                                labels: {
-                                    padding: 15
+                            plugins: {
+                                tooltip: {
+                                    mode: 'x',
+                                    intersect: false,
+                                    usePointStyle: true
+                                },
+                                legend: {
+                                    position: 'top',
+                                    legendIcon: 'arc',
+                                    align: 'start',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true,
+                                        pointStyle: 'dash'
+                                    }
                                 }
                             },
                             crosshair: {
@@ -160,10 +184,6 @@
                                     color: '#3a84ff',
                                     width: 0.5
                                 }
-                            },
-                            tooltips: {
-                                mode: 'nearest',
-                                intersect: false
                             },
                             scales: {
                                 yAxes: {

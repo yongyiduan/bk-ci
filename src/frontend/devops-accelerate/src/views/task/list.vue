@@ -8,13 +8,19 @@
         <main v-bkloading="{ isLoading }">
             <section v-for="task in taskList" :key="task" class="g-accelerate-box task-card">
                 <span :class="['open-icon', { 'is-open': task.topStatus === 'true' }]" @click="modifyTurboPlanTopStatus(task)">
-                    <logo name="check-1" class="icon-check"></logo>
+                    <logo name="thumbtack" class="icon-thumbtack"></logo>
                 </span>
 
                 <h3 class="card-head" @click="toggleShowCard(task)">
                     <p class="task-name">
-                        <span class="g-accelerate-deep-black-font name-desc"><span class="g-accelerate-text-overflow">{{ task.planName }}</span><span class="name-detail" @click="$router.push({ name: 'taskDetail', params: { id: task.planId } })">{{ task.engineCode }}</span></span>
-                        <span class="g-accelerate-gray-font name-hash g-accelerate-text-overflow">{{ task.planId }}</span>
+                        <span class="g-accelerate-deep-black-font name-desc" @click.stop="$router.push({ name: 'taskDetail', params: { id: task.planId } })">
+                            <span class="g-accelerate-text-overflow">{{ task.planName }}</span>
+                            <span class="name-detail">{{ task.engineCode }}</span>
+                        </span>
+                        <span class="g-accelerate-gray-font name-hash g-accelerate-text-overflow">
+                            {{ task.planId }}
+                            <logo name="copy" class="icon-copy" size="16" @click.native.stop="copy(task.planId)"></logo>
+                        </span>
                     </p>
                     <span class="task-line"></span>
                     <p class="task-rate">
@@ -40,25 +46,33 @@
                     <logo name="right-shape" size="16" :class="showIds.includes(task.planId) ? 'task-right-down task-right-shape' : 'task-right-shape'"></logo>
                 </h3>
 
-                <transition name="fade">
-                    <bk-table class="task-records g-accelerate-scroll-table" v-if="showIds.includes(task.planId)"
-                        :data="task.tableList"
-                        :outer-border="false"
-                        :header-border="false"
-                        :header-cell-style="{ background: '#f5f6fa' }"
-                        :pagination="task.pagination"
-                        v-bkloading="{ isLoading: task.loading }"
-                        @page-change="pageChanged"
-                        @page-limit-change="pageLimitChange"
-                    >
-                        <bk-table-column label="流水线/构建机" prop="pipelineName"></bk-table-column>
-                        <bk-table-column label="加速次数" prop="executeCount"></bk-table-column>
-                        <bk-table-column label="平均耗时" prop="averageExecuteTimeSecond"></bk-table-column>
-                        <bk-table-column label="节省率" prop="turboRatio"></bk-table-column>
-                        <bk-table-column label="最新开始时间" prop="latestStartTime"></bk-table-column>
-                        <bk-table-column label="最新状态" prop="latestStatus"></bk-table-column>
-                    </bk-table>
-                </transition>
+                <bk-table class="task-records g-accelerate-scroll-table" v-if="showIds.includes(task.planId)"
+                    :data="task.tableList"
+                    :outer-border="false"
+                    :header-border="false"
+                    :header-cell-style="{ background: '#f5f6fa' }"
+                    :pagination="task.pagination"
+                    v-bkloading="{ isLoading: task.loading }"
+                    @page-change="(page) => pageChanged(page, task)"
+                    @page-limit-change="(currentLimit) => pageLimitChange(currentLimit, task)"
+                    @sort-change="(sort) => sortChange(sort, task)"
+                    @row-click="(row) => rowClick(row, task)"
+                >
+                    <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
+                        <template slot-scope="props">
+                            <span>{{ props.row.pipelineName || props.row.clientIp }}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column label="加速次数" prop="executeCount" sortable></bk-table-column>
+                    <bk-table-column label="平均耗时" prop="averageExecuteTimeSecond" sortable></bk-table-column>
+                    <bk-table-column label="节省率" prop="turboRatio" sortable></bk-table-column>
+                    <bk-table-column label="最新开始时间" prop="latestStartTime" sortable></bk-table-column>
+                    <bk-table-column label="最新状态" prop="latestStatus" sortable>
+                        <template slot-scope="props">
+                            <task-status :status="props.row.latestStatus"></task-status>
+                        </template>
+                    </bk-table-column>
+                </bk-table>
             </section>
         </main>
     </article>
@@ -66,11 +80,14 @@
 
 <script>
     import { getPlanList, getPlanInstanceDetail, modifyTurboPlanTopStatus } from '@/api'
+    import { copy } from '../../assets/js/util'
     import logo from '../../components/logo'
+    import taskStatus from '../../components/task-status'
 
     export default {
         components: {
-            logo
+            logo,
+            taskStatus
         },
 
         data () {
@@ -93,7 +110,13 @@
 
         created () {
             this.isLoading = true
-            this.getPlanList().finally(() => {
+            this.getPlanList().then(() => {
+                const firstTask = this.taskList[0]
+                if (firstTask) {
+                    this.getPlanInstanceDetail(firstTask)
+                    this.showIds.push(firstTask.planId)
+                }
+            }).finally(() => {
                 this.isLoading = false
             })
         },
@@ -109,6 +132,10 @@
         },
 
         methods: {
+            copy (value) {
+                copy(value)
+            },
+
             modifyTurboPlanTopStatus (row) {
                 const topStatus = row.topStatus === 'true' ? 'false' : 'true'
                 modifyTurboPlanTopStatus(row.planId, topStatus).then(() => {
@@ -125,6 +152,8 @@
                         item.pagination = { current: 1, count: 1, limit: 10 }
                         item.tableList = []
                         item.loading = false
+                        item.sortField = undefined
+                        item.sortType = undefined
                         return item
                     })
                     this.turboPlanCount = res.turboPlanCount
@@ -151,7 +180,13 @@
             getPlanInstanceDetail (task) {
                 const pagination = task.pagination || {}
                 task.loading = true
-                getPlanInstanceDetail(task.planId, pagination.current, pagination.limit).then((res) => {
+                const queryData = {
+                    pageNum: pagination.current,
+                    pageSize: pagination.limit,
+                    sortField: task.sortField,
+                    sortType: task.sortType
+                }
+                getPlanInstanceDetail(task.planId, queryData).then((res) => {
                     task.tableList = res.records || []
                     task.pagination.count = res.count
                 }).catch((err) => {
@@ -161,12 +196,36 @@
                 })
             },
 
-            pageChanged (page) {
-                console.log(page)
+            pageChanged (page, task) {
+                task.pagination.current = page
+                this.getPlanInstanceDetail(task)
             },
 
-            pageLimitChange (currentLimit, prevLimit) {
-                console.log(currentLimit, prevLimit)
+            pageLimitChange (currentLimit, task) {
+                if (currentLimit === task.pagination.limit) return
+
+                task.pagination.current = 1
+                task.pagination.limit = currentLimit
+                this.getPlanInstanceDetail(task)
+            },
+
+            sortChange (sort, task) {
+                const sortMap = {
+                    ascending: 'ASC',
+                    descending: 'DESC'
+                }
+                task.sortField = sort.prop
+                task.sortType = sortMap[sort.order]
+                this.getPlanInstanceDetail(task)
+            },
+
+            rowClick (row, task) {
+                const id = row.pipelineName || row.clientIp
+                const planId = task.planId
+                this.$router.push({
+                    name: 'history',
+                    query: { id, planId }
+                })
             },
 
             addTask () {
@@ -204,22 +263,25 @@
         cursor: pointer;
         position: relative;
         overflow: hidden;
+        &:hover {
+            box-shadow: 0 2px 3px 0 rgba(0,0,0,0.15);
+        }
         .open-icon {
             position: absolute;
-            left: -16px;
-            top: -16px;
-            width: 33px;
-            height: 33px;
+            left: -22px;
+            top: -22px;
+            width: 45px;
+            height: 45px;
             transform: rotate(45deg);
             background: #DCDEE5;
             &.is-open {
                 background: #3a84ff;
             }
-            .icon-check {
+            .icon-thumbtack {
                 color: #fff;
                 position: absolute;
-                right: 0;
-                top: 11px;
+                right: 3px;
+                top: 16px;
                 transform: rotate(-45deg);
             }
         }
@@ -236,15 +298,20 @@
             max-width: calc(100% - 380px - 3.76rem);
             .name-desc {
                 line-height: 22px;
-                margin-bottom: 4px;
-                display: flex;
-                align-items: center;
+                display: inline-block;
             }
             .name-hash {
                 font-size: 12px;
                 line-height: 20px;
+                margin-top: 5px;
+                display: flex;
+                align-items: center;
+                .icon-copy {
+                    margin-left: 4px;
+                }
             }
             .name-detail {
+                display: inline-block;
                 background: #e1ecff;
                 color: #3a84ff;
                 border-radius: 2px;
@@ -252,6 +319,7 @@
                 font-size: 12px;
                 line-height: 20px;
                 margin: 0 6px;
+                vertical-align: bottom;
             }
         }
         .task-line {
@@ -280,16 +348,19 @@
         }
         .task-right-shape {
             transition: 200ms transform;
-            transform: rotate(-90deg);
+            transform: rotate(90deg);
             color: #979ba5;
             &.task-right-down {
-                transform: rotate(90deg);
+                transform: rotate(-90deg);
             }
         }
         .task-records {
             margin: 19px 28px 0;
             padding-bottom: 27px;
             width: calc(100% - 56px);
+        }
+        /deep/ .bk-table-row {
+            cursor: pointer;
         }
     }
 </style>

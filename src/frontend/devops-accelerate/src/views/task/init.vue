@@ -1,28 +1,18 @@
 <template>
-    <article class="list-init-home">
+    <article class="list-init-home" v-bkloading="{ isloading }">
         <main class="g-accelerate-box init-main">
             <section class="init-title">
                 <h3 class="title-main g-accelerate-deep-black-font">欢迎使用 Turbo 加速方案</h3>
                 <p class="title-main-content">Turbo 基于分布式编译、缓存、容器技术，旨在为用户提供高效、稳定、便捷的加速服务，提升研发效率。已经支持 Linux 下的 C/C++ 后台服务编译，Windows 下的 UE4 代码编译等多场景下的加速。</p>
                 <h5 class="title-recommend g-accelerate-deep-black-font">为你推荐的加速模式</h5>
-                <h5 class="recommend-task">
+                <h5 class="recommend-task" v-for="(recommend, index) in recommendList" :key="index">
                     <p class="task-main">
-                        <span class="task-title g-accelerate-deep-black-font">Disttask-cc</span>
-                        <span class="task-desc g-accelerate-gray-font">自研引擎，Linux下C/C++后台服务编译加速，后台服务编译加速，可缩短 80% 左右的编译时间。</span>
+                        <span class="task-title g-accelerate-deep-black-font">{{ recommend.engineName }}</span>
+                        <span class="task-desc g-accelerate-gray-font">{{ recommend.desc }}</span>
                     </p>
                     <p class="task-buttons">
-                        <bk-button text class="task-doc">查看文档</bk-button>
-                        <bk-button class="task-use" @click="goToCreate">立即使用</bk-button>
-                    </p>
-                </h5>
-                <h5 class="recommend-task">
-                    <p class="task-main">
-                        <span class="task-title g-accelerate-deep-black-font">Disttask-mix</span>
-                        <span class="task-desc g-accelerate-gray-font">自研引擎，macOS下的Unity纹理渲染+代码编译加速，Unity代码编译加速和纹理渲染加速</span>
-                    </p>
-                    <p class="task-buttons">
-                        <bk-button text class="task-doc">查看文档</bk-button>
-                        <bk-button class="task-use" @click="goToCreate">立即使用</bk-button>
+                        <bk-button text class="task-doc" @click="goToDoc(recommend.docUrl)">查看文档</bk-button>
+                        <bk-button class="task-use" @click="goToCreate(recommend.engineCode)">立即使用</bk-button>
                     </p>
                 </h5>
             </section>
@@ -32,10 +22,43 @@
 </template>
 
 <script>
+    import { getRecommendList } from '@/api'
+
     export default {
+        data () {
+            return {
+                isloading: false,
+                recommendList: []
+            }
+        },
+
+        created () {
+            this.getRecommendList()
+        },
+
         methods: {
-            goToCreate () {
-                this.$router.push({ name: 'taskCreate' })
+            getRecommendList () {
+                this.isloading = true
+                getRecommendList().then((res) => {
+                    this.recommendList = res || []
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isloading = false
+                })
+            },
+
+            goToDoc (docUrl) {
+                window.open(docUrl, '_blank')
+            },
+
+            goToCreate (engineCode) {
+                this.$router.push({
+                    name: 'taskCreate',
+                    query: {
+                        engineCode
+                    }
+                })
             }
         }
     }
@@ -45,7 +68,7 @@
     .list-init-home {
         padding: .2rem;
         width: 100%;
-        height: calc(100vh - 5.96vh);
+        height: calc(100vh - 5.96vh - 50px);
         margin: 0 auto;
         .init-main {
             height: 100%;

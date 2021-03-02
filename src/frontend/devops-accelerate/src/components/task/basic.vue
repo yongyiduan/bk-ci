@@ -1,28 +1,37 @@
 <template>
     <section class="g-accelerate-box basic-info">
         <h3 class="create-title g-accelerate-deep-black-font">基本信息</h3>
-        <bk-form :label-width="120" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }">
+        <bk-form :label-width="120" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }" ref="createTask">
             <bk-form-item label="方案ID" property="openStatus">
                 <template v-if="isEdit">
                     <bk-input v-model="copyFormData.planId" class="single-width" placeholder="系统自动生成，方案的唯一标识" disabled></bk-input>
-                    <bk-checkbox v-model="copyFormData.openStatus">开启方案</bk-checkbox>
+                    <bk-checkbox v-model="copyFormData.openStatus" v-bk-tooltips="{ content: '若不开启，配置不生效' }">开启方案</bk-checkbox>
                 </template>
-                <span v-else class="g-accelerate-text-break">{{ copyFormData.planId }}</span>
+                <span v-else class="g-accelerate-text-break plan-id">
+                    <span>{{ copyFormData.planId }}</span>
+                    <logo name="copy" @click.native="copyValue(copyFormData.planId)" size="16" class="icon-copy"></logo>
+                    <span v-if="copyFormData.openStatus" class="plan-open plan-common">
+                        <logo name="check" class="plan-icon" size="10"></logo>已开启
+                    </span>
+                    <span v-else class="plan-close plan-common">
+                        <logo name="suspend" class="plan-icon"></logo>已禁用
+                    </span>
+                </span>
             </bk-form-item>
-            <bk-form-item label="方案名称" required property="planName">
+            <bk-form-item label="方案名称" required property="planName" :rules="[requireRule('方案名称'), nameRule]" error-display-type="normal">
                 <template v-if="isEdit">
                     <bk-input v-model="copyFormData.planName" class="single-width"></bk-input>
                 </template>
                 <span v-else class="g-accelerate-text-break">{{ formData.planName }}</span>
             </bk-form-item>
-            <bk-form-item label="加速模式" required property="name">
+            <bk-form-item label="加速模式" required property="engineCode" :rules="[requireRule('加速模式')]" error-display-type="normal">
                 <template v-if="isEdit && onlyEdit">
                     <span>根据你的加速场景选择适用的模式</span>
                     <ul class="accelerate-model-list">
-                        <li v-for="item in engineList" :key="item" :class="['single-width', 'accelerate-model-item', 'g-accelerate-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]" @click="toggleChoose(item)">
+                        <li v-for="item in engineList" :key="item" :class="['single-width', 'accelerate-model-item', 'g-accelerate-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]" @click="chooseMode(item)">
                             <p class="item-title g-accelerate-black-font">{{ item.engineCode }}</p>
                             <span class="item-desc g-accelerate-gray-font">{{ item.desc }}</span>
-                            <logo name="check-1" :size="10" class="item-check"></logo>
+                            <logo name="check" :size="10" class="item-check"></logo>
                         </li>
                     </ul>
                 </template>
@@ -32,7 +41,7 @@
                 <template v-if="isEdit">
                     <bk-input v-model="copyFormData.desc" type="textarea" class="double-width" :maxlength="200"></bk-input>
                 </template>
-                <span v-else class="g-accelerate-text-break">{{ formData.desc }}</span>
+                <span v-else class="g-accelerate-text-break">{{ formData.desc || '-' }}</span>
             </bk-form-item>
         </bk-form>
         <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save" :loading="isLoading">保存</bk-button>
@@ -45,6 +54,7 @@
     import { mapActions } from 'vuex'
     import { getEngineList, modifyTaskBasic } from '@/api'
     import logo from '@/components/logo'
+    import { copy } from '@/assets/js/util'
 
     export default {
         components: {
@@ -67,7 +77,12 @@
                 copyFormData: {},
                 engineList: [],
                 isLoading: false,
-                isLoadingEngine: false
+                isLoadingEngine: false,
+                nameRule: {
+                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-]+$/.test(val) && val.length <= 30),
+                    message: '以汉字、英文字母、数字、连字符(-)、下划线(_)组成，不超过30个字',
+                    trigger: 'blur'
+                }
             }
         },
 
@@ -79,16 +94,32 @@
         methods: {
             ...mapActions('accelerate', ['setParamConfig']),
 
+            copyValue (planId) {
+                copy(planId)
+            },
+
+            requireRule (name) {
+                return {
+                    required: true,
+                    message: this.$t('accelerate.validateMessage', [name, '必填项']),
+                    trigger: 'blur'
+                }
+            },
+
             save () {
-                this.isLoading = true
-                modifyTaskBasic(this.copyFormData).then(() => {
-                    this.$bkMessage({ theme: 'success', message: '修改成功' })
-                    this.$emit('update:formData', this.copyFormData)
-                    this.isEdit = false
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoading = false
+                this.$refs.createTask.validate().then(() => {
+                    this.isLoading = true
+                    modifyTaskBasic(this.copyFormData).then(() => {
+                        this.$bkMessage({ theme: 'success', message: '修改成功' })
+                        this.$emit('update:formData', this.copyFormData)
+                        this.isEdit = false
+                    }).catch((err) => {
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    }).finally(() => {
+                        this.isLoading = false
+                    })
+                }, (validator) => {
+                    this.$bkMessage({ message: validator.content || validator, theme: 'error' })
                 })
             },
 
@@ -97,20 +128,13 @@
                 this.isEdit = false
             },
 
-            toggleChoose (item) {
+            chooseMode (item) {
                 const enginCode = item.engineCode
                 const formData = JSON.parse(JSON.stringify(this.formData))
-                if (this.copyFormData.engineCode === enginCode) {
-                    this.copyFormData.engineCode = ''
-                    this.copyFormData.paramConfig = []
-                    formData.paramConfig = []
-                    this.setParamConfig([])
-                } else {
-                    this.copyFormData.engineCode = enginCode
-                    this.copyFormData.paramConfig = item.paramConfig
-                    formData.paramConfig = item.paramConfig
-                    this.setParamConfig(item.paramConfig)
-                }
+                this.copyFormData.engineCode = enginCode
+                this.copyFormData.paramConfig = item.paramConfig
+                formData.paramConfig = item.paramConfig
+                this.setParamConfig(item.paramConfig)
                 this.$emit('update:formData', formData)
             },
 
@@ -118,10 +142,9 @@
                 this.isLoadingEngine = true
                 getEngineList().then((res = []) => {
                     this.engineList = res
-                    const curEngine = res.find((item) => (this.copyFormData.engineCode && item.engineCode === this.copyFormData.engineCode))
-                    if (curEngine) {
-                        this.setParamConfig(curEngine.paramConfig)
-                    }
+                    const engineCode = this.copyFormData.engineCode || this.$route.query.engineCode
+                    const curEngine = res.find((item) => (engineCode && item.engineCode === engineCode)) || {}
+                    this.chooseMode(curEngine)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -137,6 +160,35 @@
 
     .basic-info {
         position: relative;
+    }
+
+    .plan-id {
+        display: flex;
+        align-items: center;
+        .icon-copy {
+            margin: 0 16px 0 4px;
+            cursor: pointer;
+        }
+        .plan-common {
+            display: flex;
+            align-items: center;
+            line-height: 18px;
+            padding: 0 5px;
+            font-size: 12px;
+        }
+        .plan-open {
+            border: 1px solid #3a84ff;
+            border-radius: 2px;
+            color: #3a84ff;
+        }
+        .plan-close {
+            border: 1px solid #c4c6cc;
+            border-radius: 2px;
+            color: #c4c6cc;
+        }
+        .plan-icon {
+            margin-right: 3px;
+        }
     }
 
     .accelerate-model-engine {

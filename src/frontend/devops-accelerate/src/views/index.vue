@@ -1,5 +1,5 @@
 <template>
-    <article class="accelerate-home">
+    <article class="accelerate-home" v-bkloadng="{ isloading }">
         <bk-tab :active.sync="active" @tab-change="gotoPage" type="unborder-card" class="home-nav g-accelerate-box-without-radius">
             <bk-tab-panel v-for="(panel, index) in panels"
                 v-bind="panel"
@@ -11,6 +11,8 @@
 </template>
 
 <script>
+    import { getPlanList } from '@/api'
+
     export default {
         data () {
             return {
@@ -19,7 +21,8 @@
                     { name: 'task', label: '加速方案', count: 20 },
                     { name: 'history', label: '加速历史', count: 30 }
                 ],
-                active: 'overview'
+                active: 'overview',
+                isloading: false
             }
         },
 
@@ -50,7 +53,27 @@
                     history: 'history',
                     historyDetail: 'history'
                 }
-                this.active = activeMap[name] || 'overview'
+                const curActive = activeMap[name]
+                if (curActive) this.active = curActive
+                else this.goToInitPage()
+            },
+
+            goToInitPage () {
+                this.isloading = true
+                const projectId = this.$route.params.projectId
+                return getPlanList(projectId, 1).then((res) => {
+                    if (res.turboPlanCount <= 0) {
+                        this.$router.replace({ name: 'taskInit' })
+                        this.active = 'task'
+                    } else {
+                        this.$router.replace({ name: 'overview' })
+                        this.active = 'overview'
+                    }
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isloading = false
+                })
             },
 
             gotoPage (name) {
