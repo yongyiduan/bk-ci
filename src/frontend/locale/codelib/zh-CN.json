@@ -54,5 +54,7 @@
     "Github": "Github",
     "Gitlab": "Gitlab",
     "Git": "工蜂内网",
-    "TGit": "工蜂外网"
+    "TGit": "工蜂外网",
+    "authType": "授权方式",
+    "authIdentity": "授权身份"
 }
