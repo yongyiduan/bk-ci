@@ -56,5 +56,7 @@
     "Github": "Github",
     "Gitlab": "Gitlab",
     "Git": "Git",
-    "TGit": "TGit"
+    "TGit": "TGit",
+    "authType": "Authorization method",
+    "authIdentity": "Authorized identity"
 }
