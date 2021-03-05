@@ -1,7 +1,7 @@
 <template>
     <bk-dialog
         :value="isShow"
-        :width="600"
+        :width="836"
         :auto-close="false"
         :show-footer="false"
         :title="$t('newlist.chooseExport')"
@@ -45,11 +45,18 @@
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/export`
                     },
                     {
-                        title: 'Prebuild Yaml',
+                        title: 'PreCI Yaml',
                         icon: 'export-prebuild',
                         tips: this.$t('newlist.exportYamlTip'),
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
-                        tipsLink: 'https://iwiki.woa.com/display/DevOps/Prebuild'
+                        tipsLink: 'https://iwiki.woa.com/x/ruhACw'
+                    },
+                    {
+                        title: '工蜂CI Yaml',
+                        icon: 'export-ci',
+                        tips: this.$t('newlist.exportGitciTip'),
+                        exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
+                        tipsLink: 'https://iwiki.woa.com/x/QBcLAQ'
                     }
                 ]
             }

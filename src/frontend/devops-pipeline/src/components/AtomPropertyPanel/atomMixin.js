@@ -40,6 +40,8 @@ import CodeModeInput from '@/components/atomFormField/CodeModeInput'
 import ParamsView from '@/components/atomFormField/ParamsView'
 import SvnpathInput from '@/components/atomFormField/SvnpathInput'
 import KeyValue from '@/components/atomFormField/KeyValue'
+import DefineParam from '@/components/AtomFormComponent/DefineParam'
+import NotifyType from '@/components/AtomFormComponent/notifyType'
 import KeyValueNormal from '@/components/atomFormField/KeyValueNormal'
 import NameSpaceVar from '@/components/atomFormField/NameSpaceVar'
 import RouteTips from '@/components/atomFormField/RouteTips'
@@ -89,6 +91,8 @@ const atomMixin = {
         SvnpathInput,
         KeyValue,
         KeyValueNormal,
+        DefineParam,
+        NotifyType,
         NameSpaceVar,
         RouteTips,
         CheckInline,

@@ -47,12 +47,14 @@ import com.tencent.devops.project.dao.ProjectDao
 import com.tencent.devops.project.dispatch.ProjectDispatcher
 import com.tencent.devops.project.jmx.api.ProjectJmxApi
 import com.tencent.devops.project.jmx.api.ProjectJmxApi.Companion.PROJECT_LIST
+import com.tencent.devops.project.pojo.ProjectBaseInfo
 import com.tencent.devops.project.pojo.ProjectCreateExtInfo
 import com.tencent.devops.project.pojo.ProjectCreateInfo
 import com.tencent.devops.project.pojo.ProjectLogo
 import com.tencent.devops.project.pojo.ProjectUpdateInfo
 import com.tencent.devops.project.pojo.ProjectVO
 import com.tencent.devops.project.pojo.Result
+import com.tencent.devops.project.pojo.enums.ProjectChannelCode
 import com.tencent.devops.project.pojo.enums.ProjectValidateType
 import com.tencent.devops.project.pojo.mq.ProjectUpdateBroadCastEvent
 import com.tencent.devops.project.pojo.mq.ProjectUpdateLogoBroadCastEvent
@@ -135,7 +137,14 @@ abstract class AbsProjectServiceImpl @Autowired constructor(
     /**
      * 创建项目信息
      */
-    override fun create(userId: String, projectCreateInfo: ProjectCreateInfo, accessToken: String?, createExtInfo: ProjectCreateExtInfo, defaultProjectId: String?): String {
+    override fun create(
+        userId: String,
+        projectCreateInfo: ProjectCreateInfo,
+        accessToken: String?,
+        createExtInfo: ProjectCreateExtInfo,
+        defaultProjectId: String?,
+        projectChannel: ProjectChannelCode
+    ): String {
         logger.info("create project| $userId | $accessToken| $createExtInfo | $projectCreateInfo")
         if (createExtInfo.needValidate!!) {
             validate(ProjectValidateType.project_name, projectCreateInfo.projectName)
@@ -174,15 +183,24 @@ abstract class AbsProjectServiceImpl @Autowired constructor(
 
             try {
                 dslContext.transaction { configuration ->
+                    val projectInfo = organizationMarkUp(projectCreateInfo, userDeptDetail)
                     val context = DSL.using(configuration)
-                    projectDao.create(context, userId, logoAddress, projectCreateInfo, userDeptDetail, projectId!!)
+                    projectDao.create(
+                        dslContext = context,
+                        userId = userId,
+                        logoAddress = logoAddress,
+                        projectCreateInfo = projectInfo,
+                        userDeptDetail = userDeptDetail,
+                        projectId = projectId!!,
+                        channelCode = projectChannel
+                    )
 
                     try {
                         createExtProjectInfo(
                             userId = userId,
                             projectId = projectId!!,
                             accessToken = accessToken,
-                            projectCreateInfo = projectCreateInfo,
+                            projectCreateInfo = projectInfo,
                             createExtInfo = createExtInfo
                         )
                     } catch (e: Exception) {
@@ -532,6 +550,30 @@ abstract class AbsProjectServiceImpl @Autowired constructor(
         )
     }
 
+    override fun getMinId(): Long {
+        return projectDao.getMinId(dslContext)
+    }
+
+    override fun getMaxId(): Long {
+        return projectDao.getMaxId(dslContext)
+    }
+
+    override fun getProjectListById(
+        minId: Long,
+        maxId: Long
+    ): List<ProjectBaseInfo> {
+        val list = ArrayList<ProjectBaseInfo>()
+        projectDao.getProjectListById(dslContext, minId, maxId)?.map {
+            list.add(
+                ProjectBaseInfo(
+                    id = it["ID"] as Long,
+                    englishName = it["ENGLISH_NAME"] as String
+                )
+            )
+        }
+        return list
+    }
+
     override fun verifyUserProjectPermission(userId: String, projectId: String, permission: AuthPermission, accessToken: String?): Boolean {
         return validatePermission(projectId, userId, permission)
     }
@@ -551,6 +593,8 @@ abstract class AbsProjectServiceImpl @Autowired constructor(
     abstract fun updateInfoReplace(projectUpdateInfo: ProjectUpdateInfo)
 
     abstract fun drawFile(projectCode: String): File
+
+    abstract fun organizationMarkUp(projectCreateInfo: ProjectCreateInfo, userDeptDetail: UserDeptDetail): ProjectCreateInfo
 
     abstract fun modifyProjectAuthResource(projectCode: String, projectName: String)
 

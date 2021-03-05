@@ -122,7 +122,7 @@
                 isOverflow: false,
                 isDropdownShow: false,
                 timer: -1,
-                docsLink: 'http://iwiki.oa.com/pages/viewpage.action?pageId=15008944',
+                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008944`,
                 progressStatus: [{
                     'name': this.$t('store.开始'),
                     'step': 1,

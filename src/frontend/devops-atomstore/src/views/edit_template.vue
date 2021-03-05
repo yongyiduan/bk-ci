@@ -167,7 +167,7 @@
             return {
                 showContent: false,
                 descTemplate: '',
-                docsLink: 'http://iwiki.oa.com/pages/viewpage.action?pageId=15008944',
+                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008944`,
                 sortList: [],
                 labelList: [],
                 categoryList: [],

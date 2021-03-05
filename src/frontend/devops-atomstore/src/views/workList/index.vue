@@ -36,26 +36,26 @@
                     { name: 'atomWork',
                       label: this.$t('store.流水线插件'),
                       links: [
-                          { name: this.$t('store.插件指引'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=15008942' },
+                          { name: this.$t('store.插件指引'), link: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008942` },
                           { name: this.$t('store.debugTask'), link: `/console/pipeline/${currentProjectCode}/atomDebug` }
                       ]
                     },
                     { name: 'templateWork',
                       label: this.$t('store.流水线模板'),
                       links: [
-                          { name: this.$t('store.模版指引'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=15008944' }
+                          { name: this.$t('store.模版指引'), link: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008944` }
                       ]
                     },
                     { name: 'imageWork',
                       label: this.$t('store.容器镜像'),
                       links: [
-                          { name: this.$t('store.镜像指引'), link: 'http://iwiki.oa.com/pages/viewpage.action?pageId=22118721' }
+                          { name: this.$t('store.镜像指引'), link: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=22118721` }
                       ]
                     },
                     { name: 'serviceWork',
                       label: this.$t('store.微扩展'),
                       links: [
-                          { name: this.$t('store.微扩展指引'), link: 'https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=103523086' }
+                          { name: this.$t('store.微扩展指引'), link: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=103523086` }
                       ]
                     }
                 ]

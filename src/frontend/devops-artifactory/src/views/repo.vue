@@ -488,7 +488,7 @@
                             previewConfig.isShow = true
                             previewConfig.canShowExt = true
                             previewConfig.title = `文件预览（${col.name}）`
-                            previewConfig.context = context2.data
+                            previewConfig.context = context2
                         } catch (err) {
                             this.$bkMessage({
                                 theme: 'error',
