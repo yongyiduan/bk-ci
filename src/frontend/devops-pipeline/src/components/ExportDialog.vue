@@ -45,7 +45,7 @@
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/export`
                     },
                     {
-                        title: 'PreCI Yaml',
+                        title: 'PreCI',
                         icon: 'export-prebuild',
                         tips: this.$t('newlist.exportYamlTip'),
                         exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
