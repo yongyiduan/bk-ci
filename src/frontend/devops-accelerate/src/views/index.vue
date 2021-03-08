@@ -26,10 +26,28 @@
             }
         },
 
+        computed: {
+            projectId () {
+                return this.$route.params.projectId
+            }
+        },
+
+        watch: {
+            '$route.name': {
+                handler (name) {
+                    this.setActive(name)
+                },
+                immediate: true
+            },
+
+            projectId () {
+                this.goToInitPage()
+            }
+        },
+
         created () {
             window.addEventListener('resize', this.flexible, false)
             this.flexible()
-            this.setDefaultActive()
         },
 
         beforeDestroy () {
@@ -40,8 +58,7 @@
         },
 
         methods: {
-            setDefaultActive () {
-                const name = this.$route.name
+            setActive (name) {
                 const activeMap = {
                     overview: 'overview',
                     task: 'task',
@@ -55,17 +72,16 @@
                 }
                 const curActive = activeMap[name]
                 if (curActive) this.active = curActive
-                else this.goToInitPage()
+                else this.goToInitPage(true)
             },
 
-            goToInitPage () {
+            goToInitPage (needInit) {
                 this.isloading = true
-                const projectId = this.$route.params.projectId
-                return getPlanList(projectId, 1).then((res) => {
+                return getPlanList(this.projectId, 1).then((res) => {
                     if (res.turboPlanCount <= 0) {
                         this.$router.replace({ name: 'taskInit' })
                         this.active = 'task'
-                    } else {
+                    } else if (needInit) {
                         this.$router.replace({ name: 'overview' })
                         this.active = 'overview'
                     }

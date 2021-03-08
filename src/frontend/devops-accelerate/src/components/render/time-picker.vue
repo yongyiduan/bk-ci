@@ -1,6 +1,5 @@
 <template>
-    <bk-time-picker :value="paramValue[paramKey]" v-if="isEdit" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width"></bk-time-picker>
-    <span v-else>{{ paramValue[paramKey] }}</span>
+    <bk-time-picker :value="paramValue[paramKey]" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width"></bk-time-picker>
 </template>
 
 <script>

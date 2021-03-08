@@ -1,13 +1,11 @@
 <template>
-    <bk-radio-group v-if="isEdit"
-        :value="paramValue[paramKey]"
+    <bk-radio-group :value="paramValue[paramKey]"
         @change="changeParamValue"
         v-bind="$props"
         class="g-accelerate-single-width"
     >
-        <bk-radio :value="value" v-for="(key, value) in paramEnum" :key="key" class="g-accelerate-mr-10">{{ key }}</bk-radio>
+        <bk-radio :value="param.paramValue" :disabled="disabled" v-for="(param, index) in paramEnum" :key="index" class="g-accelerate-mr-10">{{ param.paramName }}</bk-radio>
     </bk-radio-group>
-    <span v-else>{{ displayValue }}</span>
 </template>
 
 <script>

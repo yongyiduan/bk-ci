@@ -4,13 +4,8 @@
             <bk-breadcrumb-item :to="{ name: 'taskList' }">方案列表</bk-breadcrumb-item>
             <bk-breadcrumb-item>新增加速方案</bk-breadcrumb-item>
         </bk-breadcrumb>
-
         <task-basic :form-data.sync="formData" ref="basic" />
-
         <task-param :form-data.sync="formData" ref="param" />
-
-        <task-setting :form-data.sync="formData" ref="setting" />
-
         <bk-button theme="primary" @click="submit">提交</bk-button>
         <bk-button @click="cancel">取消</bk-button>
     </article>
@@ -19,14 +14,12 @@
 <script>
     import taskBasic from '@/components/task/basic'
     import taskParam from '@/components/task/param'
-    import taskSetting from '@/components/task/setting'
     import { addTurboPlan } from '@/api'
 
     export default {
         components: {
             taskBasic,
-            taskParam,
-            taskSetting
+            taskParam
         },
 
         data () {
@@ -44,20 +37,25 @@
             submit () {
                 this.isLoading = true
                 const basicComponent = this.$refs.basic
+                const basicFormComponent = basicComponent.$refs.createTask
                 const basicForm = basicComponent.copyFormData
-                const paramForm = this.$refs.param.copyFormData
-                const settingForm = this.$refs.setting.copyFormData
+                const paramComponent = this.$refs.param
+                const paramForm = paramComponent.copyFormData
 
-                basicComponent.$refs.createTask.validate().then(() => {
+                Promise.all([basicFormComponent.validate(), paramComponent.validate()]).then(() => {
                     const postData = {
                         ...basicForm,
                         configParam: paramForm.configParam,
-                        whiteList: settingForm.whiteList,
                         projectId: this.$route.params.projectId
                     }
                     addTurboPlan(postData).then(() => {
                         this.$bkMessage({ theme: 'success', message: '添加成功' })
-                        this.$router.push({ name: 'taskSuccess' })
+                        this.$router.push({
+                            name: 'taskSuccess',
+                            query: {
+                                engineCode: postData.engineCode
+                            }
+                        })
                     }).catch((err) => {
                         this.$bkMessage({ theme: 'error', message: err.message || err })
                     }).finally(() => {

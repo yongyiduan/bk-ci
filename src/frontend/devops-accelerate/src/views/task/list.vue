@@ -60,7 +60,13 @@
                 >
                     <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
                         <template slot-scope="props">
-                            <span>{{ props.row.pipelineName || props.row.clientIp }}</span>
+                            <a v-if="props.row.pipelineName"
+                                class="g-accelerate-click-text"
+                                :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/edit`"
+                                target="_blank"
+                                @click.stop
+                            >{{ props.row.pipelineName }}</a>
+                            <span else>{{ props.row.clientIp }}</span>
                         </template>
                     </bk-table-column>
                     <bk-table-column label="加速次数" prop="executeCount" sortable></bk-table-column>
@@ -108,17 +114,14 @@
             }
         },
 
+        watch: {
+            projectId () {
+                this.initData()
+            }
+        },
+
         created () {
-            this.isLoading = true
-            this.getPlanList().then(() => {
-                const firstTask = this.taskList[0]
-                if (firstTask) {
-                    this.getPlanInstanceDetail(firstTask)
-                    this.showIds.push(firstTask.planId)
-                }
-            }).finally(() => {
-                this.isLoading = false
-            })
+            this.initData()
         },
 
         mounted () {
@@ -132,6 +135,20 @@
         },
 
         methods: {
+            initData () {
+                this.isLoading = true
+                this.pageNum = 1
+                this.getPlanList().then(() => {
+                    const firstTask = this.taskList[0]
+                    if (firstTask) {
+                        this.getPlanInstanceDetail(firstTask)
+                        this.showIds = [firstTask.planId]
+                    }
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
             copy (value) {
                 copy(value)
             },
@@ -220,11 +237,16 @@
             },
 
             rowClick (row, task) {
-                const id = row.pipelineName || row.clientIp
+                const pipelineId = row.pipelineId
+                const clientIp = row.clientIp
                 const planId = task.planId
                 this.$router.push({
                     name: 'history',
-                    query: { id, planId }
+                    query: {
+                        pipelineId,
+                        planId,
+                        clientIp
+                    }
                 })
             },
 

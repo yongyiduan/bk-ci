@@ -19,8 +19,8 @@ module.exports = {
         return vue.$ajax.get(`${prefix}/turboPlan/planId/${planId}`)
     },
 
-    getEngineList () {
-        return vue.$ajax.get(`${prefix}/turboEngineConfig/list`)
+    getEngineList (projectId) {
+        return vue.$ajax.get(`${prefix}/turboEngineConfig/list/projectId/${projectId}`)
     },
 
     modifyTaskBasic (form) {
@@ -70,5 +70,9 @@ module.exports = {
 
     getRecommendList () {
         return vue.$ajax.get(`${prefix}/turboEngineConfig/recommend/list`)
+    },
+
+    getEngineDetail (engineCode) {
+        return vue.$ajax.get(`${prefix}/turboEngineConfig/engineCode/${engineCode}`)
     }
 }

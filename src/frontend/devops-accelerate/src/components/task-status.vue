@@ -1,6 +1,6 @@
 <template>
-    <span>
-        <logo :name="lowerCaseProp()"></logo>{{ getStatusName() }}
+    <span class="status-component">
+        <logo :name="lowerCaseProp()" :class="`${status} status-logo`"></logo>{{ getStatusName() }}
     </span>
 </template>
 
@@ -18,17 +18,17 @@
 
         methods: {
             lowerCaseProp () {
-                (this.status || '').toLowerCase()
+                return (this.status || '').toLowerCase()
             },
 
             getStatusName () {
                 const statusMap = {
-                    INIT: '初始化',
-                    STAGING: '排队中',
-                    STARTING: '准备阶段',
-                    RUNNING: '正在加速',
-                    FINISH: '成功',
-                    FAILED: '失败'
+                    init: '初始化',
+                    staging: '排队中',
+                    starting: '准备阶段',
+                    running: '正在加速',
+                    finish: '成功',
+                    failed: '失败'
                 }
                 return statusMap[this.status]
             }
@@ -37,5 +37,17 @@
 </script>
 
 <style lang="scss" scoped>
-    
+    .status-component {
+        display: flex;
+        align-items: center;
+        .status-logo {
+            margin-right: 6px;
+        }
+        .failed {
+            color: #fd9c9c;
+        }
+        .finish {
+            color: #86e7a9;
+        }
+    }
 </style>

@@ -1,10 +1,9 @@
 <template>
-    <bk-checkbox-group :value="paramValue[paramKey]" v-if="isEdit" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width">
-        <bk-checkbox :value="value" v-for="(key, value) in paramEnum" :key="key" class="g-accelerate-mr-10">
-            {{ key }}
+    <bk-checkbox-group :value="paramValue[paramKey]" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width">
+        <bk-checkbox :disabled="disabled" :value="param.paramValue" v-for="(param, index) in paramEnum" :key="index" class="g-accelerate-mr-10">
+            {{ param.paramName }}
         </bk-checkbox>
     </bk-checkbox-group>
-    <span v-else>{{ displayValue }}</span>
 </template>
 
 <script>

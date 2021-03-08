@@ -1,6 +1,5 @@
 <template>
-    <bk-input v-if="isEdit" :value="paramValue[paramKey]" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width"></bk-input>
-    <span v-else>{{ paramValue[paramKey] }}</span>
+    <bk-input :value="paramValue[paramKey]" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width"></bk-input>
 </template>
 
 <script>

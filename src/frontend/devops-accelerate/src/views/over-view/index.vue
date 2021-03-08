@@ -103,6 +103,14 @@
             buildNumDateType () {
                 this.buildNumChart.destroy()
                 this.drawBuildNum()
+            },
+
+            projectId () {
+                this.takeTimeChart.destroy()
+                this.buildNumChart.destroy()
+                this.getSummaryCount()
+                this.drawTakeTimeChart()
+                this.drawBuildNum()
             }
         },
 
@@ -162,7 +170,8 @@
                             plugins: {
                                 tooltip: {
                                     mode: 'x',
-                                    intersect: false
+                                    intersect: false,
+                                    singleInRange: true
                                 },
                                 legend: {
                                     position: 'top',
@@ -254,7 +263,8 @@
                             plugins: {
                                 tooltip: {
                                     mode: 'x',
-                                    intersect: false
+                                    intersect: false,
+                                    enableItemActive: true
                                 },
                                 legend: {
                                     display: false

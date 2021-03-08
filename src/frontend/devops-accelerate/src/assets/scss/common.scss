@@ -82,3 +82,23 @@
 .g-accelerate-mr-10 {
     margin-right: 10px;
 }
+
+.g-accelerate-task-tip {
+    .tip-title {
+        line-height: 20px;
+        margin-bottom: -5px;
+    }
+    .tip-subtitle {
+        line-height: 22px;
+        margin-bottom: 6px;
+        margin-top: 19px;
+    }
+    .tip-word {
+        display: block;
+        line-height: 22px;
+        margin-bottom: 6px;
+    }
+    .tip-link {
+        margin-left: 10px;
+    }
+}

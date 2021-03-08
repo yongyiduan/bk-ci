@@ -1,9 +1,14 @@
+function isEmpty (val) {
+    return [null, undefined, ''].includes(val)
+}
+
 export default {
     props: {
         paramEnum: Object,
         paramKey: String,
-        isEdit: Boolean,
-        paramValue: Object
+        disabled: Boolean,
+        paramValue: Object,
+        defaultValue: [String, Array, Object]
     },
 
     computed: {
@@ -15,11 +20,18 @@ export default {
         }
     },
 
+    created () {
+        this.handleDefaultValue()
+    },
+
     methods: {
+        handleDefaultValue () {
+            const curValue = (this.paramValue)[this.paramKey]
+            if (isEmpty(curValue)) this.changeParamValue(this.defaultValue)
+        },
+
         changeParamValue (val) {
-            const paramValue = JSON.parse(JSON.stringify(this.paramValue))
-            paramValue[this.paramKey] = val
-            this.$emit('update:paramValue', paramValue)
+            this.$emit('value-change', this.paramKey, val)
         }
     }
 }

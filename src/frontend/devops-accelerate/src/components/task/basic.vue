@@ -10,17 +10,17 @@
                 <span v-else class="g-accelerate-text-break plan-id">
                     <span>{{ copyFormData.planId }}</span>
                     <logo name="copy" @click.native="copyValue(copyFormData.planId)" size="16" class="icon-copy"></logo>
-                    <span v-if="copyFormData.openStatus" class="plan-open plan-common">
+                    <span v-if="copyFormData.openStatus" class="plan-open plan-common" @click="toggleOpen(false)">
                         <logo name="check" class="plan-icon" size="10"></logo>已开启
                     </span>
-                    <span v-else class="plan-close plan-common">
+                    <span v-else class="plan-close plan-common" @click="toggleOpen(true)">
                         <logo name="suspend" class="plan-icon"></logo>已禁用
                     </span>
                 </span>
             </bk-form-item>
             <bk-form-item label="方案名称" required property="planName" :rules="[requireRule('方案名称'), nameRule]" error-display-type="normal">
                 <template v-if="isEdit">
-                    <bk-input v-model="copyFormData.planName" class="single-width"></bk-input>
+                    <bk-input v-model="copyFormData.planName" class="single-width" placeholder="以汉字、英文字母、数字、连字符(-)、下划线(_)组成，不超过30个字"></bk-input>
                 </template>
                 <span v-else class="g-accelerate-text-break">{{ formData.planName }}</span>
             </bk-form-item>
@@ -46,7 +46,7 @@
         </bk-form>
         <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save" :loading="isLoading">保存</bk-button>
         <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancle" :disabled="isLoading">取消</bk-button>
-        <span class="g-accelerate-edit-button" @click="isEdit = true" v-if="!onlyEdit"><logo name="edit" size="16"></logo>编辑</span>
+        <span class="g-accelerate-edit-button" @click="isEdit = true" v-if="!onlyEdit && !isEdit"><logo name="edit" size="16"></logo>编辑</span>
     </section>
 </template>
 
@@ -86,13 +86,32 @@
             }
         },
 
+        computed: {
+            projectId () {
+                return this.$route.params.projectId
+            }
+        },
+
+        watch: {
+            projectId: {
+                handler () {
+                    this.getEngineList()
+                },
+                immediate: true
+            }
+        },
+
         created () {
             this.copyFormData = JSON.parse(JSON.stringify(this.formData))
-            this.getEngineList()
         },
 
         methods: {
             ...mapActions('accelerate', ['setParamConfig']),
+
+            toggleOpen (isOpen) {
+                this.copyFormData.openStatus = isOpen
+                this.save()
+            },
 
             copyValue (planId) {
                 copy(planId)
@@ -109,7 +128,11 @@
             save () {
                 this.$refs.createTask.validate().then(() => {
                     this.isLoading = true
-                    modifyTaskBasic(this.copyFormData).then(() => {
+                    const postData = {
+                        ...this.copyFormData,
+                        projectId: this.projectId
+                    }
+                    modifyTaskBasic(postData).then(() => {
                         this.$bkMessage({ theme: 'success', message: '修改成功' })
                         this.$emit('update:formData', this.copyFormData)
                         this.isEdit = false
@@ -134,13 +157,15 @@
                 this.copyFormData.engineCode = enginCode
                 this.copyFormData.paramConfig = item.paramConfig
                 formData.paramConfig = item.paramConfig
+                formData.userManual = item.userManual
                 this.setParamConfig(item.paramConfig)
                 this.$emit('update:formData', formData)
             },
 
             getEngineList () {
                 this.isLoadingEngine = true
-                getEngineList().then((res = []) => {
+                const projectId = this.projectId
+                getEngineList(projectId).then((res = []) => {
                     this.engineList = res
                     const engineCode = this.copyFormData.engineCode || this.$route.query.engineCode
                     const curEngine = res.find((item) => (engineCode && item.engineCode === engineCode)) || {}
@@ -175,6 +200,7 @@
             line-height: 18px;
             padding: 0 5px;
             font-size: 12px;
+            cursor: pointer;
         }
         .plan-open {
             border: 1px solid #3a84ff;

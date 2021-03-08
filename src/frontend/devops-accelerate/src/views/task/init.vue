@@ -8,7 +8,7 @@
                 <h5 class="recommend-task" v-for="(recommend, index) in recommendList" :key="index">
                     <p class="task-main">
                         <span class="task-title g-accelerate-deep-black-font">{{ recommend.engineName }}</span>
-                        <span class="task-desc g-accelerate-gray-font">{{ recommend.desc }}</span>
+                        <span class="task-desc g-accelerate-gray-font">{{ recommend.recommendReason }}</span>
                     </p>
                     <p class="task-buttons">
                         <bk-button text class="task-doc" @click="goToDoc(recommend.docUrl)">查看文档</bk-button>
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-    import { getRecommendList } from '@/api'
+    import { getRecommendList, getPlanList } from '@/api'
 
     export default {
         data () {
@@ -32,11 +32,35 @@
             }
         },
 
+        computed: {
+            projectId () {
+                return this.$route.params.projectId
+            }
+        },
+
+        watch: {
+            projectId () {
+                this.judgeHasPlan()
+            }
+        },
+
         created () {
             this.getRecommendList()
         },
 
         methods: {
+            judgeHasPlan () {
+                return getPlanList(this.projectId, 1).then((res) => {
+                    if (res.turboPlanCount > 0) {
+                        this.$router.replace({ name: 'overview' })
+                    }
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isloading = false
+                })
+            },
+
             getRecommendList () {
                 this.isloading = true
                 getRecommendList().then((res) => {

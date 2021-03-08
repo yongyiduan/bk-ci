@@ -3,42 +3,17 @@
         <main class="g-accelerate-box history-list-main">
             <header class="filter-area">
                 <bk-select multiple
-                    :value="turboPlanId"
-                    @change="(options) => chooseFilter('turboPlanId', options)"
+                    :value="filter.value"
+                    @change="(options) => chooseFilter(filter.key, options)"
                     searchable
                     show-select-all
                     class="single-width"
                     :loading="isLoadingSearch"
+                    v-for="filter in filterList"
+                    :key="filter.key"
+                    :placeholder="filter.placeholder"
                 >
-                    <bk-option v-for="(value, key) in planInfo"
-                        :key="key"
-                        :id="key"
-                        :name="value">
-                    </bk-option>
-                </bk-select>
-                <bk-select multiple
-                    :value="pipelineId"
-                    @change="(options) => chooseFilter('pipelineId', options)"
-                    searchable
-                    show-select-all
-                    class="single-width"
-                    :loading="isLoadingSearch"
-                >
-                    <bk-option v-for="(value, key) in pipelineInfo"
-                        :key="key"
-                        :id="key"
-                        :name="value">
-                    </bk-option>
-                </bk-select>
-                <bk-select multiple
-                    :value="status"
-                    @change="(options) => chooseFilter('status', options)"
-                    searchable
-                    show-select-all
-                    class="single-width"
-                    :loading="isLoadingSearch"
-                >
-                    <bk-option v-for="(value, key) in statusInfo"
+                    <bk-option v-for="(value, key) in filter.list"
                         :key="key"
                         :id="key"
                         :name="value">
@@ -63,18 +38,24 @@
                 <bk-table-column label="编号" type="index" width="60"></bk-table-column>
                 <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
                     <template slot-scope="props">
-                        <span>{{ props.row.pipelineName || props.row.clientIp }}</span>
+                        <a v-if="props.row.pipelineName"
+                            class="g-accelerate-click-text"
+                            :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/edit`"
+                            target="_blank"
+                            @click.stop
+                        >{{ props.row.pipelineName }}</a>
+                        <span else>{{ props.row.clientIp }}</span>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="未加速耗时" prop="estimateTimeValue" sortable></bk-table-column>
-                <bk-table-column label="实际耗时" prop="executeTimeValue" sortable></bk-table-column>
-                <bk-table-column label="节省率" prop="turboRatio" sortable></bk-table-column>
-                <bk-table-column label="开始时间" prop="startTime" sortable></bk-table-column>
                 <bk-table-column label="状态" prop="status" sortable>
                     <template slot-scope="props">
                         <task-status :status="props.row.status"></task-status>
                     </template>
                 </bk-table-column>
+                <bk-table-column label="开始时间" prop="startTime" sortable></bk-table-column>
+                <bk-table-column label="未加速耗时" prop="estimateTimeValue" sortable></bk-table-column>
+                <bk-table-column label="实际耗时" prop="executeTimeValue" sortable></bk-table-column>
+                <bk-table-column label="节省率" prop="turboRatio" sortable></bk-table-column>
             </bk-table>
         </main>
     </article>
@@ -99,6 +80,7 @@
                 historyList: [],
                 turboPlanId: [],
                 pipelineId: [],
+                clientIp: [],
                 status: [],
                 startTime: '',
                 endTime: '',
@@ -108,15 +90,43 @@
                 planInfo: {},
                 pipelineInfo: {},
                 statusInfo: {},
+                clientIpInfo: [],
                 sortField: undefined,
                 sortType: undefined
             }
         },
 
+        computed: {
+            filterList () {
+                const clientIpList = {};
+                (this.clientIpInfo || []).forEach((clientIp) => {
+                    clientIpList[clientIp] = clientIp
+                })
+                return [
+                    { key: 'turboPlanId', list: this.planInfo, value: this.turboPlanId, placeholder: '请选择加速方案' },
+                    { key: 'pipelineId', list: this.pipelineInfo, value: this.pipelineId, placeholder: '请选择流水线' },
+                    { key: 'clientIp', list: clientIpList, value: this.clientIp, placeholder: '请选择构建机' },
+                    { key: 'status', list: this.statusInfo, value: this.status, placeholder: '请选择状态' }
+                ]
+            },
+
+            projectId () {
+                return this.$route.params.projectId
+            }
+        },
+
+        watch: {
+            projectId: {
+                handler () {
+                    this.getHistoryList()
+                    this.getHistorySearchList()
+                },
+                immediate: true
+            }
+        },
+
         created () {
             this.initFilter()
-            this.getHistoryList()
-            this.getHistorySearchList()
         },
 
         methods: {
@@ -133,16 +143,17 @@
             initFilter () {
                 const query = this.$route.query || {}
                 if (query.planId) this.turboPlanId = [query.planId]
-                if (query.id) this.pipelineId = [query.id]
+                if (query.pipelineId) this.pipelineId = [query.pipelineId]
+                if (query.clientIp) this.clientIp = [query.clientIp]
             },
 
             getHistorySearchList () {
-                const projectId = this.$route.params.projectId
                 this.isLoadingSearch = true
-                getHistorySearchList(projectId).then((res) => {
+                getHistorySearchList(this.projectId).then((res) => {
                     this.planInfo = res.planInfo || {}
                     this.pipelineInfo = res.pipelineInfo || {}
                     this.statusInfo = res.statusInfo || {}
+                    this.clientIpInfo = res.clientIpInfo || []
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -158,7 +169,7 @@
                     pipelineId: this.pipelineId,
                     status: this.status,
                     turboPlanId: this.turboPlanId,
-                    projectId: this.$route.params.projectId
+                    projectId: this.projectId
                 }
                 const queryData = {
                     pageNum: this.pagination.current,

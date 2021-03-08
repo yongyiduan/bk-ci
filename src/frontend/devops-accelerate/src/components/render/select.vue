@@ -1,12 +1,11 @@
 <template>
-    <bk-select :value="paramValue[paramKey]" v-if="isEdit" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width">
-        <bk-option v-for="(key, value) in paramEnum"
-            :key="key"
-            :id="value"
-            :name="key">
+    <bk-select :value="paramValue[paramKey]" @change="changeParamValue" v-bind="$props" class="g-accelerate-single-width">
+        <bk-option v-for="(param, index) in paramEnum"
+            :key="index"
+            :id="param.paramValue"
+            :name="param.paramName">
         </bk-option>
     </bk-select>
-    <span v-else>{{ displayValue }}</span>
 </template>
 
 <script>
