@@ -327,7 +327,7 @@
         "updateDialogContent": "The instances are being updated. An email will be notified After the update is completed"
     },
     "newlist": {
-        "exportYamlTip": "PreCI is a set of CI solutions integrated with IDE designed by Blue Shield in order to improve development efficiency and find problems in the code faster and earlier.",
+        "exportYamlTip": "PreCI is a set of solutions provided by Blue Shield DevOps for developers' pre-CI R&D activities, which can detect problems as early as possible before submitting code and improve code quality. Including IDE plug-ins and command line tools.",
         "exportJsonTip": "Through the import function, you can quickly create a pipeline, and you can also implement cross-project and cross-blue shield platform pipeline import.",
         "exportGitciTip": "Git CI is a collaboration between Blue Shield and Git, introducing the concept of Pipeline as Code, supporting a set of solutions that define pipelines through coding; it facilitates collaboration and version control, and is more in line with development habits.",
         "chooseExport": "Choose the export file format",
