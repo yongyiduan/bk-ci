@@ -75,7 +75,7 @@
                     <bk-table-column label="最新开始时间" prop="latestStartTime" sortable></bk-table-column>
                     <bk-table-column label="最新状态" prop="latestStatus" sortable>
                         <template slot-scope="props">
-                            <task-status :status="props.row.latestStatus"></task-status>
+                            <task-status :status="props.row.latestStatus" :message="props.row.message"></task-status>
                         </template>
                     </bk-table-column>
                 </bk-table>

@@ -1,6 +1,6 @@
 <template>
     <span class="status-component">
-        <logo :name="lowerCaseProp()" :class="`${status} status-logo`"></logo>{{ getStatusName() }}
+        <logo :name="lowerCaseProp()" :class="`${status} status-logo`"></logo><span :class="{ error: message }" v-bk-tooltips="{ content: message, disabled: !message }">{{ getStatusName() }}</span>
     </span>
 </template>
 
@@ -13,7 +13,8 @@
         },
 
         props: {
-            status: String
+            status: String,
+            message: String
         },
 
         methods: {
@@ -48,6 +49,9 @@
         }
         .finish {
             color: #86e7a9;
+        }
+        .error {
+            text-decoration: underline dotted #fd9c9c;
         }
     }
 </style>

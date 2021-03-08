@@ -49,7 +49,7 @@
                 </bk-table-column>
                 <bk-table-column label="状态" prop="status" sortable>
                     <template slot-scope="props">
-                        <task-status :status="props.row.status"></task-status>
+                        <task-status :status="props.row.status" :message="props.row.message"></task-status>
                     </template>
                 </bk-table-column>
                 <bk-table-column label="开始时间" prop="startTime" sortable></bk-table-column>
