@@ -25,17 +25,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.artifactory
+package com.tencent.devops.quality
 
-import com.tencent.devops.artifactory.service.impl.DiskArchiveFileServiceImpl
+import com.tencent.devops.common.auth.api.AuthPermissionApi
+import com.tencent.devops.common.auth.api.AuthResourceApi
+import com.tencent.devops.common.auth.code.QualityAuthServiceCode
+import com.tencent.devops.quality.service.QualityPermissionService
+import com.tencent.devops.quality.service.SampleQualityPermissionServiceImpl
+import org.springframework.boot.autoconfigure.AutoConfigureOrder
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
+import org.springframework.core.Ordered
 
+@Suppress("UNUSED")
 @Configuration
-class SampleArtifactoryServiceConfig {
+@ConditionalOnWebApplication
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
+class QualityConfiguration {
 
     @Bean
-    @Primary
-    fun archiveFileService() = DiskArchiveFileServiceImpl()
+    @ConditionalOnProperty(prefix = "auth", name = ["idProvider"], havingValue = "sample")
+    fun sampleProjectPermissionService(
+        authPermissionApi: AuthPermissionApi,
+        authResourceApi: AuthResourceApi,
+        qualityAuthServiceCode: QualityAuthServiceCode
+    ): QualityPermissionService = SampleQualityPermissionServiceImpl(
+        authPermissionApi = authPermissionApi,
+        authResourceApi = authResourceApi,
+        qualityAuthServiceCode = qualityAuthServiceCode
+    )
 }
