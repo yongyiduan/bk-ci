@@ -1,15 +1,15 @@
 <template>
-    <bk-dropdown-menu v-if="hasExts" align="right">
-        <div slot="dropdown-trigger" class="hook-dropdown-trigger">
+    <bk-popover theme="light" v-if="hasExts" placement="bottom-left" :delay="100">
+        <div class="hook-dropdown-trigger">
             <i class="entry-circle" v-for="i in [1, 2, 3]" :key="i" />
         </div>
-        <ul class="artifactory-operation-hooks" slot="dropdown-content">
+        <ul class="artifactory-operation-hooks" slot="content">
             <li v-for="ext in extensions" :key="ext.serviceId" @click="hookAction(ext)" :title="getExtTooltip(ext)">
                 <img :src="getResUrl(getExtIconUrl(ext), ext.baseUrl)" />
                 <span> {{ ext.serviceName }} </span>
             </li>
         </ul>
-    </bk-dropdown-menu>
+    </bk-popover>
 </template>
 
 <script>
@@ -54,11 +54,10 @@
 
 <style lang='scss'>
     @import '../../scss/mixins/ellipsis';
-
     .hook-dropdown-trigger {
         display: flex;
         width: 25px;
-        height: 100%;
+        height: 25px;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
@@ -85,6 +84,7 @@
         align-items: center;
         max-height: 188px;
         overflow: auto;
+        background: white;
         > li {
             height: 32px;
             vertical-align: middle;
