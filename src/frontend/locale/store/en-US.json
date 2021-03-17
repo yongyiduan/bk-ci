@@ -92,6 +92,7 @@
     "微扩展": "Micro extension",
     "展示给用户的名称，用户根据名称识别微扩展": "The name displayed to the user, and the user recognizes the micro-extension based on the name",
     "请输入扩展名称": "Please enter an extension name",
+    "周": "week",
     "执行成功数": "Number of successful executions",
     "执行失败数": "Number of execution failures",
     "最近三个月内的执行成功率": "Execution success rate in the last three months",
