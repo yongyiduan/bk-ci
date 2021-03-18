@@ -43,12 +43,11 @@
                                     </div>
                                 </div>
                             </bk-popover>
-
                         </div>
                     </div>
                     <!-- 凭据类型 end -->
 
-                    <!-- 凭据标识 start -->
+                    <!-- 凭据名称 start -->
                     <div class="bk-form-item is-required">
                         <label class="bk-label">{{ $t('ticket.id') }}：</label>
                         <div class="bk-form-content">
@@ -67,7 +66,7 @@
                     </div>
                     <!-- 凭据名称 end -->
 
-                    <!-- 凭据名称 start -->
+                    <!-- 凭据别名 start -->
                     <div class="bk-form-item">
                         <label class="bk-label">{{ $t('ticket.name') }}：</label>
                         <div class="bk-form-content">
@@ -77,13 +76,14 @@
                                     'is-danger': errors.has('credentialName')
                                 }"
                             >
+                            <i class="devops-icon icon-info-circle name-icon" v-bk-tooltips="{ content: $t('ticket.credential.nameTips') }"></i>
                             <p class="error-tips"
                                 v-show="errors.has('credentialName')">
                                 {{ `${$t('ticket.credential.validateName')}` }}
                             </p>
                         </div>
                     </div>
-                    <!-- 凭据名称 end -->
+                    <!-- 凭据别名 end -->
 
                     <!-- 凭据内容 start -->
                     <div v-for="(obj, key) in newModel" :key="key" :class="{ &quot;bk-form-item&quot;: true, &quot;is-required&quot;: obj.rules }">
@@ -435,6 +435,10 @@
                 font-size: 12px;
                 padding-top: 6px;
             }
+        }
+        .devops-icon.name-icon {
+            padding-left: 0;
+            margin-left: 4px;
         }
         .bk-form-input, .bk-form-password, .bk-selector, .bk-form-textarea {
             width: 90%
