@@ -38,13 +38,11 @@
                 <bk-table-column label="编号" type="index" width="60"></bk-table-column>
                 <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
                     <template slot-scope="props">
-                        <a v-if="props.row.pipelineName"
-                            class="g-accelerate-click-text"
-                            :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/edit`"
-                            target="_blank"
-                            @click.stop
-                        >{{ props.row.pipelineName }}</a>
-                        <span else>{{ props.row.clientIp }}</span>
+                        <span v-if="props.row.pipelineName">
+                            {{ props.row.pipelineName }}
+                            <a @click.stop :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/edit`" target="_blank" class="g-accelerate-click-text"><logo name="cc-jump-link" class="jump-link" size="14"></logo></a>
+                        </span>
+                        <span v-else>{{ props.row.clientIp }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column label="状态" prop="status" sortable>
@@ -64,10 +62,12 @@
 <script>
     import { getHistoryList, getHistorySearchList } from '@/api'
     import taskStatus from '../../components/task-status.vue'
+    import logo from '../../components/logo'
 
     export default {
         components: {
-            taskStatus
+            taskStatus,
+            logo
         },
 
         data () {
@@ -246,6 +246,9 @@
     }
     .clear-btn {
         margin-left: 8px;
+    }
+    .jump-link {
+        vertical-align: sub;
     }
     /deep/ .bk-table-row {
         cursor: pointer;

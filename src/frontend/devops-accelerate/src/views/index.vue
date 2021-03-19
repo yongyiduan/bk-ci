@@ -1,9 +1,12 @@
 <template>
     <article class="accelerate-home" v-bkloadng="{ isloading }">
-        <bk-tab :active.sync="active" @tab-change="gotoPage" type="unborder-card" class="home-nav g-accelerate-box-without-radius">
+        <bk-tab :active.sync="active" type="unborder-card" class="home-nav g-accelerate-box-without-radius">
             <bk-tab-panel v-for="(panel, index) in panels"
                 v-bind="panel"
                 :key="index">
+                <template slot="label">
+                    <section @click="gotoPage(panel.name)" class="home-nav-tab">{{ panel.label }}</section>
+                </template>
             </bk-tab-panel>
         </bk-tab>
         <router-view class="accelerate-main"></router-view>
@@ -120,6 +123,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        .home-nav-tab {
+            cursor: pointer;
+        }
         /deep/ .bk-tab-header {
             background-color: #fff;
             height: 5.96vh;
@@ -131,6 +137,7 @@
                     line-height: 5.96vh;
                     height: 5.96vh;
                     color: #63656e;
+                    padding: 0;
                     &::after {
                         height: 3px;
                     }
@@ -139,6 +146,7 @@
                     }
                     .bk-tab-label {
                         font-size: 16px;
+                        width: 100%;
                     }
                 }
             }

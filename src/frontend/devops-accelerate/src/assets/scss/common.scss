@@ -84,21 +84,35 @@
 }
 
 .g-accelerate-task-tip {
+    h5 {
+        font-weight: normal;
+    }
     .tip-title {
         line-height: 20px;
         margin-bottom: -5px;
     }
     .tip-subtitle {
-        line-height: 22px;
-        margin-bottom: 6px;
+        line-height: 14px;
+        margin-bottom: 8px;
         margin-top: 19px;
+        color: #999999;
+        font-size: 14px;
     }
     .tip-word {
         display: block;
         line-height: 22px;
         margin-bottom: 6px;
+        color: #222222;
+        font-size: 14px;
     }
     .tip-link {
         margin-left: 10px;
+    }
+}
+
+.g-accelerate-form-left {
+    .bk-label {
+        text-align: left;
+        padding: 0;
     }
 }

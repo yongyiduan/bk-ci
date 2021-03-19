@@ -2,12 +2,12 @@
     <article class="history-detail-home">
         <bk-breadcrumb separator-class="bk-icon icon-angle-right" class="bread-crumb">
             <bk-breadcrumb-item :to="{ name: 'history' }">历史列表</bk-breadcrumb-item>
-            <bk-breadcrumb-item>{{ detail.elapsedTime }} 详情</bk-breadcrumb-item>
+            <bk-breadcrumb-item>{{ detail.recordName }} 详情</bk-breadcrumb-item>
         </bk-breadcrumb>
 
         <section class="g-accelerate-box hisory-detail-data" v-bkloading="{ isloading }">
             <header class="detail-header">
-                <span class="header-title">{{ detail.elapsedTime }}</span>
+                <span class="header-title">{{ detail.recordName }}</span>
                 <span class="header-time">
                     <span><span>开始时间：</span><span>{{ detail.startTime }}</span></span>
                     <span><span>总耗时：</span><span>{{ detail.elapsedTime }}</span></span>
@@ -18,7 +18,7 @@
                 <li class="task-item" v-for="task in detail.displayFields" :key="task.fieldName">
                     <span class="task-title">{{ task.fieldName }}:</span>
                     <span class="task-value">{{ task.fieldValue }}</span>
-                    <logo name="tiaozhuan" prefix="" class="task-link" @click.native="openLink(task.linkAddress)" v-if="task.linkAddress"></logo>
+                    <logo name="cc-jump-link" class="task-link" @click.native="openLink(task.linkAddress)" v-if="task.linkAddress"></logo>
                 </li>
             </ul>
         </section>
@@ -76,7 +76,7 @@
                 font-size: 14px;
             }
             .bk-breadcrumb-item:last-child {
-                color: #000;
+                color: #000000;
             }
         }
     }
@@ -87,18 +87,23 @@
             line-height: 22px;
             margin-bottom: 17px;
             display: flex;
+            justify-content: space-between;
             .header-title {
                 color: #000;
-                flex: 1;
             }
             .header-time {
-                flex: 1;
                 color: #63656e;
                 display: flex;
                 align-items: center;
+                line-height: 18px;
                 >:first-child {
                     display: inline-block;
-                    margin-right: 70px;
+                    padding-right: 35px;
+                    border-right: 1px solid #D8D8D8;
+                }
+                >:last-child {
+                    display: inline-block;
+                    margin-left: 35px;
                 }
             }
         }
@@ -110,7 +115,7 @@
                 clear: both;
             }
             .task-item {
-                width: 50%;
+                width: 100%;
                 float: left;
                 line-height: 22px;
                 margin-top: 16px;
@@ -118,11 +123,11 @@
                 align-items: center;
                 .task-title {
                     display: inline-block;
-                    width: 100px;
-                    color: #979ba5;
+                    width: 150px;
+                    color: #999999;
                 }
                 .task-value {
-                    color: #63656e;
+                    color: #222222;
                 }
                 .task-link {
                     color: #3a84ff;

@@ -2,24 +2,24 @@
     <article class="task-detail-home" v-bkloading="{ isLoading }">
         <bk-breadcrumb separator-class="bk-icon icon-angle-right" class="bread-crumb">
             <bk-breadcrumb-item :to="{ name: 'taskList' }">方案列表</bk-breadcrumb-item>
-            <bk-breadcrumb-item>编辑加速方案</bk-breadcrumb-item>
+            <bk-breadcrumb-item>查看加速方案</bk-breadcrumb-item>
         </bk-breadcrumb>
 
         <section class="task-detail-body" v-if="!isLoading">
             <main class="task-detail-left">
-                <task-basic :form-data.sync="formData" :only-edit="false" />
+                <task-basic :form-data.sync="formData" :only-edit="false" ref="basic" />
                 <task-param :form-data.sync="formData" :only-edit="false" />
             </main>
 
-            <main class="task-detail-right">
-                <section class="g-accelerate-box g-accelerate-task-tip task-use">
+            <main class="task-detail-right g-accelerate-box">
+                <section class="g-accelerate-task-tip task-use">
                     <h3 class="create-title g-accelerate-deep-black-font">使用方式</h3>
-                    <template v-html="formData.userManual"></template>
+                    <section v-html="engineDetail.userManual"></section>
                 </section>
 
-                <section class="g-accelerate-box task-record">
+                <section class="task-record">
                     <h3 class="create-title g-accelerate-deep-black-font">更新记录</h3>
-                    <bk-form :label-width="120">
+                    <bk-form :label-width="100" class="g-accelerate-form-left record-form">
                         <bk-form-item label="创建人：">
                             {{ formData.createdBy }}
                         </bk-form-item>
@@ -56,8 +56,17 @@
                 isLoading: false
             }
         },
+        
+        computed: {
+            engineDetail () {
+                const engineCode = this.formData.engineCode
+                const basicForm = this.$refs.basic || {}
+                const engineList = basicForm.engineList || []
+                return engineList.find((engine) => (engine.engineCode === engineCode)) || {}
+            }
+        },
 
-        created () {
+        mounted () {
             this.getPlanDetail()
         },
 
@@ -101,12 +110,29 @@
         .task-detail-right {
             flex: 360;
             line-height: 22px;
+            padding: 0 32px;
             .task-use {
                 margin-bottom: 20px;
-                padding: 26px 32px 67px;
+                padding: 26px 0 67px;
             }
             .task-record {
-                padding: 26px 32px;
+                border-top: 1px solid #DCDEE5;
+                padding: 26px 0;
+            }
+            /deep/ .bk-form {
+                .bk-label {
+                    color: #999;
+                    min-height: 14px;
+                    line-height: 14px;
+                }
+                .bk-form-content {
+                    color: #222222;
+                    min-height: 14px;
+                    line-height: 14px;
+                }
+                .bk-form-item+.bk-form-item {
+                    margin-top: 24px;
+                }
             }
         }
     }

@@ -171,6 +171,7 @@
                                 tooltip: {
                                     mode: 'x',
                                     intersect: false,
+                                    enableItemActive: true,
                                     singleInRange: true
                                 },
                                 legend: {
@@ -211,7 +212,8 @@
                                     },
                                     ticks: {
                                         padding: 10
-                                    }
+                                    },
+                                    min: 0
                                 },
                                 xAxes: {
                                     scaleLabel: {
@@ -264,7 +266,8 @@
                                 tooltip: {
                                     mode: 'x',
                                     intersect: false,
-                                    enableItemActive: true
+                                    enableItemActive: true,
+                                    singleInRange: true
                                 },
                                 legend: {
                                     display: false
@@ -297,7 +300,8 @@
                                     },
                                     ticks: {
                                         padding: 10
-                                    }
+                                    },
+                                    min: 0
                                 },
                                 xAxes: {
                                     scaleLabel: {

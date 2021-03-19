@@ -1,7 +1,7 @@
 <template>
     <section class="g-accelerate-box basic-info">
         <h3 class="create-title g-accelerate-deep-black-font">基本信息</h3>
-        <bk-form :label-width="120" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }" ref="createTask">
+        <bk-form class="g-accelerate-form-left" :label-width="120" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }" ref="createTask">
             <bk-form-item label="方案ID" property="openStatus">
                 <template v-if="isEdit">
                     <bk-input v-model="copyFormData.planId" class="single-width" placeholder="系统自动生成，方案的唯一标识" disabled></bk-input>
@@ -10,17 +10,17 @@
                 <span v-else class="g-accelerate-text-break plan-id">
                     <span>{{ copyFormData.planId }}</span>
                     <logo name="copy" @click.native="copyValue(copyFormData.planId)" size="16" class="icon-copy"></logo>
-                    <span v-if="copyFormData.openStatus" class="plan-open plan-common" @click="toggleOpen(false)">
+                    <span v-if="copyFormData.openStatus" class="plan-open plan-common" @click="toggleOpen(false)" v-bk-tooltips="{ content: '点击禁用当前方案，禁用后，配置将不再生效' }">
                         <logo name="check" class="plan-icon" size="10"></logo>已开启
                     </span>
-                    <span v-else class="plan-close plan-common" @click="toggleOpen(true)">
+                    <span v-else class="plan-close plan-common" @click="toggleOpen(true)" v-bk-tooltips="{ content: '点击开启方案，可以在构建机或流水线中使用' }">
                         <logo name="suspend" class="plan-icon"></logo>已禁用
                     </span>
                 </span>
             </bk-form-item>
             <bk-form-item label="方案名称" required property="planName" :rules="[requireRule('方案名称'), nameRule]" error-display-type="normal">
                 <template v-if="isEdit">
-                    <bk-input v-model="copyFormData.planName" class="single-width" placeholder="以汉字、英文字母、数字、连字符(-)、下划线(_)组成，不超过30个字"></bk-input>
+                    <bk-input v-model="copyFormData.planName" class="single-width" placeholder="以汉字、英文字母、数字、连字符(-)、符号(_+#)组成，不超过30个字"></bk-input>
                 </template>
                 <span v-else class="g-accelerate-text-break">{{ formData.planName }}</span>
             </bk-form-item>
@@ -29,7 +29,7 @@
                     <span>根据你的加速场景选择适用的模式</span>
                     <ul class="accelerate-model-list">
                         <li v-for="item in engineList" :key="item" :class="['single-width', 'accelerate-model-item', 'g-accelerate-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]" @click="chooseMode(item)">
-                            <p class="item-title g-accelerate-black-font">{{ item.engineCode }}</p>
+                            <p class="item-title g-accelerate-black-font">{{ item.engineCode }}<span class="recommend" v-if="item.recommend">（荐）<span></span></span></p>
                             <span class="item-desc g-accelerate-gray-font">{{ item.desc }}</span>
                             <logo name="check" :size="10" class="item-check"></logo>
                         </li>
@@ -79,7 +79,7 @@
                 isLoading: false,
                 isLoadingEngine: false,
                 nameRule: {
-                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-]+$/.test(val) && val.length <= 30),
+                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-_+#]+$/.test(val) && val.length <= 30),
                     message: '以汉字、英文字母、数字、连字符(-)、下划线(_)组成，不超过30个字',
                     trigger: 'blur'
                 }
@@ -247,6 +247,9 @@
             align-items: flex-start;
             justify-content: center;
             cursor: pointer;
+            .recommend {
+                color: #3a84ff;
+            }
             .item-check {
                 display: none;
                 position: absolute;

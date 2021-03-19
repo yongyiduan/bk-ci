@@ -7,11 +7,11 @@
 
         <section class="g-accelerate-box" v-bkloading="{ isloading }">
             <p class="success-tip">
-                <i class="bk-icon check"></i>
+                <logo name="check-circle" size="48"></logo>
                 <span class="g-accelerate-black-font">加速方案提交成功</span>
             </p>
 
-            <section class="g-accelerate-task-tip" v-html="engineDetail.userManual"></section>
+            <section class="g-accelerate-task-tip success-tip-user" v-html="engineDetail.userManual"></section>
         </section>
 
         <bk-button theme="primary" @click="goToList">关闭</bk-button>
@@ -20,8 +20,13 @@
 
 <script>
     import { getEngineDetail } from '@/api'
+    import logo from '../../components/logo'
 
     export default {
+        components: {
+            logo
+        },
+
         data () {
             return {
                 isloading: false,
@@ -84,8 +89,16 @@
         line-height: round(90px * $designToPx);
         font-size: 20px;
         border-bottom: 1px solid #f0f1f5;
+        display: flex;
+        align-items: center;
+        svg {
+            color: #3FC06D;
+        }
+        .g-accelerate-black-font {
+            margin-left: .15rem;
+        }
     }
-    .task-tip {
-        padding: 26px 96px 34px;
+    .success-tip-user {
+        padding: 26px calc(.47rem + 48px) 34px;
     }
 </style>

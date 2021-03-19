@@ -60,13 +60,11 @@
                 >
                     <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
                         <template slot-scope="props">
-                            <a v-if="props.row.pipelineName"
-                                class="g-accelerate-click-text"
-                                :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/edit`"
-                                target="_blank"
-                                @click.stop
-                            >{{ props.row.pipelineName }}</a>
-                            <span else>{{ props.row.clientIp }}</span>
+                            <span v-if="props.row.pipelineName">
+                                {{ props.row.pipelineName }}
+                                <a @click.stop :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/edit`" target="_blank" class="g-accelerate-click-text"><logo name="cc-jump-link" class="jump-link" size="14"></logo></a>
+                            </span>
+                            <span v-else>{{ props.row.clientIp }}</span>
                         </template>
                     </bk-table-column>
                     <bk-table-column label="加速次数" prop="executeCount" sortable></bk-table-column>
@@ -281,14 +279,18 @@
         }
     }
     .task-card {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         cursor: pointer;
         position: relative;
         overflow: hidden;
         &:hover {
             box-shadow: 0 2px 3px 0 rgba(0,0,0,0.15);
+            .open-icon {
+                display: block;
+            }
         }
         .open-icon {
+            display: none;
             position: absolute;
             left: -22px;
             top: -22px;
@@ -297,6 +299,7 @@
             transform: rotate(45deg);
             background: #DCDEE5;
             &.is-open {
+                display: block;
                 background: #3a84ff;
             }
             .icon-thumbtack {
@@ -313,7 +316,7 @@
             align-items: center;
             padding: 0 28px 0 43px;
             font-weight: normal;
-            height: round(110px * $designToPx);
+            height: 110px;
         }
         .task-name {
             flex: 1;
@@ -380,6 +383,9 @@
             margin: 19px 28px 0;
             padding-bottom: 27px;
             width: calc(100% - 56px);
+        }
+        .jump-link {
+            vertical-align: sub;
         }
         /deep/ .bk-table-row {
             cursor: pointer;

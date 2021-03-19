@@ -16,7 +16,7 @@
                     </p>
                 </h5>
             </section>
-            <img src="" class="init-img">
+            <span class="init-img"></span>
         </main>
     </article>
 </template>
@@ -99,7 +99,11 @@
             display: flex;
             .init-img {
                 flex: 38.1;
-                background: #fafbfd
+                background: #fafbfd;
+                background-image: url('../../assets/img/task-init.png');
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
             }
         }
     }

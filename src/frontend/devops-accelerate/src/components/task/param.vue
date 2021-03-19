@@ -1,7 +1,7 @@
 <template>
     <section class="g-accelerate-box task-param">
         <h3 class="create-title g-accelerate-deep-black-font">加速参数</h3>
-        <bk-form :label-width="120" :model="copyFormData.configParam" ref="paramForm">
+        <bk-form class="g-accelerate-form-left" :label-width="120" :model="copyFormData.configParam" ref="paramForm">
             <bk-form-item :label="config.paramName"
                 :property="config.paramKey"
                 v-for="config in paramConfig"
