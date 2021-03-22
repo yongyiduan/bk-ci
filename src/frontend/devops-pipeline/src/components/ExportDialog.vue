@@ -42,20 +42,20 @@
                         title: 'Pipeline Json',
                         icon: 'export-pipeline',
                         tips: this.$t('newlist.exportJsonTip'),
-                        exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/export`
+                        exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/export`
                     },
                     {
                         title: 'PreCI',
                         icon: 'export-prebuild',
                         tips: this.$t('newlist.exportYamlTip'),
-                        exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
+                        exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
                         tipsLink: 'https://iwiki.woa.com/x/ruhACw'
                     },
                     {
                         title: '工蜂CI Yaml',
                         icon: 'export-ci',
                         tips: this.$t('newlist.exportGitciTip'),
-                        exportUrl: `${AJAX_URL_PIRFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
+                        exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
                         tipsLink: 'https://iwiki.woa.com/x/QBcLAQ'
                     }
                 ]

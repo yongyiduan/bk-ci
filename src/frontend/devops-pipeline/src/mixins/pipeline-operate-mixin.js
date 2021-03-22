@@ -616,7 +616,7 @@ export default {
         },
         async toApplyPermission (role) {
             const { projectId, pipelineId } = this.$route.params
-            this.tencentPermission(PERM_URL_PIRFIX + this.getPermUrlByRole(projectId, pipelineId, role))
+            this.tencentPermission(this.getPermUrlByRole(projectId, pipelineId, role))
             // try {
             //     const { projectId } = this.$route.params
             //     const redirectUrl = await this.$ajax.post(`${AUTH_URL_PREFIX}/user/auth/permissionUrl`, [{

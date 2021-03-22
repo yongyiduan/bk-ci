@@ -219,7 +219,6 @@
             changeProject () {
                 this.$toggleProjectMenu(true)
             },
-
             async toApplyPermission () {
                 this.tencentPermission(PERM_URL_PIRFIX + this.getPermUrlByRole(this.$route.params.projectId, this.$route.params.pipelineId, this.roleMap.manager))
             },

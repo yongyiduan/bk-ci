@@ -25,7 +25,7 @@ const localeAliasMap = {
     'us': 'en-US'
 }
 
-const BK_CI_DOMAIN = 'oa.com'
+const BK_CI_DOMAIN = document.domain.split('.').slice(-2).join('.')
 
 function getLsLocale () {
     try {
@@ -67,7 +67,7 @@ export default (r) => {
         if (loadedModule[localeModuleId]) {
             return Promise.resolve()
         }
-        return axios.get(`${WEBSITE_URL}/${module}/${locale}.json?t=${+new Date()}`, {
+        return axios.get(`/${module}/${locale}.json?t=${+new Date()}`, {
             crossdomain: true
         }).then(response => {
             const messages = response.data
