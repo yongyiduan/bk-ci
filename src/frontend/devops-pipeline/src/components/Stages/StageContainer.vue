@@ -241,11 +241,11 @@
                             credentialId: this.container.dispatchType && this.container.dispatchType.credentialId ? this.container.dispatchType.credentialId : ''
                         })
                         if (res === true) {
-                            url = `${WEB_URL_PIRFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                            url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
                         }
                     } else if (this.isPublicDevCloud) {
                         const buildIdStr = buildId ? `&buildId=${buildId}` : ''
-                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
+                        url = `${WEB_URL_PREFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
                     tab.location = url
                 } catch (err) {
@@ -261,7 +261,7 @@
                                 }],
                                 projectId
                             }],
-                            applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&role_manager=pipeline:${pipelineId}`
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&role_manager=pipeline:${pipelineId}`
                         })
                     } else {
                         this.$showTips({

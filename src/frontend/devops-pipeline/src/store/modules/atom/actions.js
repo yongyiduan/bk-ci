@@ -454,7 +454,6 @@ export default {
     },
 
     // 第一次拉取日志
-
     getInitLog ({ commit }, { projectId, pipelineId, buildId, tag, currentExe, subTag }) {
         return request.get(`${API_URL_PREFIX}/${LOG_API_URL_PREFIX}/user/logs/${projectId}/${pipelineId}/${buildId}`, {
             params: {

@@ -114,7 +114,7 @@ Vue.mixin({
         getPermUrlByRole (projectId, pipelineId, role = this.roleMap.viewer) {
             return `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&${role}=pipeline${pipelineId ? `:${pipelineId}` : ''}`
         }
-        
+
     }
 })
 

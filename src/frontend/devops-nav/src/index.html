@@ -27,6 +27,7 @@
     <link rel='preload' as='script' href="/console/static/vue.min.js" />
     <link rel='preload' as='script' href="/console/static/vuex.min.js" />
     <link rel='preload' as='script' href="/console/static/vue-router.min.js" />
+    <link rel="preload" as='script' href="//pingjs.qq.com/h5/stats.js?v2.0.4">
     
     <!-- devops:preload -->
     <% for (key in htmlWebpackPlugin.files.js) { %>
@@ -73,7 +74,6 @@
     <!-- end devops:assets -->
     
     <script>
-
         var API_URL_PREFIX = '/ms'     // api接口前缀
         var PERM_URL_PREFIX = '__BK_PAAS_PUBLIC_URL__/o/bk_iam_app' // EE PERM URL PREFIX
         var DOCS_URL_PREFIX = '__BK_CI_DOCS_URL__'  // 文档中心域名
@@ -151,7 +151,7 @@
         }
         
         window.setProjectIdCookie = function (projectId) {
-          const topDomain = document.domain.split('.').slice(-2).join('.')
+            var topDomain = document.domain.split('.').slice(-2).join('.');
             try {
                 if (projectId) {
                     setCookie(X_DEVOPS_PROJECT_ID, projectId, topDomain)
@@ -281,6 +281,8 @@
                         var cssUrl = assetMod ? joinUrl([ '', mod, assetMod.css ]) : children[j].css_url
                         children[j].js_url = jsUrl
                         children[j].css_url = cssUrl
+                    } else if (children[j].inject_type === 'iframe') {
+                      children[j].iframe_url = joinUrl([ location.origin, children[j].iframe_url ])
                     }
                     serviceMap[mod] = children[j]
 

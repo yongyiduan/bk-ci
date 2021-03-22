@@ -50,7 +50,7 @@
             this.showLocaleList = false
         }
 
-        toggleList (show) {
+        toggleList () {
             this.showLocaleList = !this.showLocaleList
         }
 

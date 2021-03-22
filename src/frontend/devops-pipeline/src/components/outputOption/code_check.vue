@@ -658,11 +658,11 @@
                 this.$toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                const url = `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
+                const url = `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
                 window.open(url, '_blank')
             },
             toLinkCodecc (url) {
-                // const url = `${WEB_URL_PIRFIX}/codecc/${this.projectId}/procontrol/buglist?proj_id=${this.curTaskId}&toolName=COVERITY&projectId=${this.projectId}&buildId=${this.buildNo}`
+                // const url = `${WEB_URL_PREFIX}/codecc/${this.projectId}/procontrol/buglist?proj_id=${this.curTaskId}&toolName=COVERITY&projectId=${this.projectId}&buildId=${this.buildNo}`
                 window.open(url, '_blank')
             }
         },

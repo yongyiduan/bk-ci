@@ -361,7 +361,6 @@
                     { name: this.$t('store.工作台'), to: { name: 'atomWork' } },
                     { name }
                 ]
-
             }
         },
         watch: {
