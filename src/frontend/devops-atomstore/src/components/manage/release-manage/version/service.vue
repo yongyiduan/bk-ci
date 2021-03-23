@@ -22,9 +22,10 @@
             <bk-table-column :label="$t('store.状态')" prop="serviceStatus" :formatter="statusFormatter"></bk-table-column>
             <bk-table-column :label="$t('store.创建人')" prop="creator"></bk-table-column>
             <bk-table-column :label="$t('store.创建时间')" prop="createTime" :formatter="convertTime"></bk-table-column>
-            <bk-table-column :label="$t('store.操作')" width="120" class-name="handler-btn">
+            <bk-table-column :label="$t('store.操作')" width="150" class-name="handler-btn">
                 <template slot-scope="props">
                     <section v-show="!index">
+                        <span class="update-btn" @click="showDetail(props.row.serviceId)">{{ $t('store.查看') }}</span>
                         <span class="update-btn"
                             v-if="props.row.serviceStatus === 'INIT'"
                             @click="$router.push({ name: 'editService', params: { serviceId: props.row.serviceId } })"
@@ -37,22 +38,55 @@
                 </template>
             </bk-table-column>
         </bk-table>
+
+        <bk-sideslider quick-close
+            class="offline-atom-slider"
+            :is-show.sync="hasShowDetail"
+            :title="$t('store.查看详情')"
+            :width="800">
+            <template slot="content">
+                <service-detail :detail="detail" v-bkloading="{ isLoading: detailLoading }" class="version-detail">
+                    <li class="detail-item">
+                        <span class="detail-label">{{ $t('store.版本日志') }}：</span>
+                        <mavon-editor
+                            :editable="false"
+                            default-open="preview"
+                            :subfield="false"
+                            :toolbars-flag="false"
+                            :external-link="false"
+                            :box-shadow="false"
+                            preview-background="#fff"
+                            v-model="detail.versionContent"
+                        />
+                    </li>
+                </service-detail>
+            </template>
+        </bk-sideslider>
     </section>
 </template>
 
 <script>
     import { serviceStatusMap } from '@/store/constants'
     import { convertTime } from '@/utils/index'
+    import serviceDetail from '../../detail/service-detail/show.vue'
 
     export default {
+        components: {
+            serviceDetail
+        },
+
         props: {
-            versionList: Array
+            versionList: Array,
+            pagination: Object
         },
 
         data () {
             return {
                 progressStatus: ['AUDITING', 'COMMITTING', 'BUILDING', 'EDIT', 'BUILD_FAIL', 'TESTING', 'RELEASE_DEPLOYING', 'RELEASE_DEPLOY_FAIL'],
-                upgradeStatus: ['INIT', 'UNDERCARRIAGED', 'AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION']
+                upgradeStatus: ['INIT', 'UNDERCARRIAGED', 'AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION'],
+                hasShowDetail: false,
+                detailLoading: false,
+                detail: {}
             }
         },
 
@@ -64,6 +98,18 @@
         },
 
         methods: {
+            showDetail (serviceId) {
+                this.hasShowDetail = true
+                this.detailLoading = true
+                this.$store.dispatch('store/requestServiceDetail', serviceId).then((res) => {
+                    this.detail = res || {}
+                }).catch((err) => {
+                    this.$bkMessage({ message: err.message || err, theme: 'error' })
+                }).finally(() => {
+                    this.detailLoading = false
+                })
+            },
+
             statusFormatter (row, column, cellValue, index) {
                 return this.$t(serviceStatusMap[cellValue])
             },
@@ -78,3 +124,9 @@
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    .version-detail {
+        padding: 20px;
+    }
+</style>
