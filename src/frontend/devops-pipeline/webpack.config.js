@@ -18,7 +18,6 @@
  */
 const path = require('path')
 const webpack = require('webpack')
-const ReplacePlugin = require('../webpackPlugin/replace-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const webpackBaseConfig = require('../webpack.base')
@@ -26,7 +25,6 @@ const getConfig = require('./constConfig.js')
 
 module.exports = (env, argv) => {
     const isProd = argv.mode === 'production'
-    const urlPrefix = env && env.name ? `${env.name}` : ''
     const envDist = env && env.dist ? env.dist : 'frontend'
     const version = env && env.version ? env.version : 'tencent'
     const extUrlPrefix = env && env.name ? `${env.name}-` : ''
@@ -55,17 +53,13 @@ module.exports = (env, argv) => {
             template: 'index.html',
             inject: true,
             VENDOR_LIBS: `/pipeline/main.dll.js?v=${Math.random()}`,
-            urlPrefix,
             extUrlPrefix
         }),
         new webpack.DllReferencePlugin({
             context: __dirname,
             manifest: require('./dist/manifest.json')
         }),
-        new CopyWebpackPlugin([{ from: path.join(__dirname, './dist'), to: dist }]),
-        ...(isProd ? [] : [new ReplacePlugin({
-            '__BK_CI_PUBLIC_URL__': urlPrefix
-        })])
+        new CopyWebpackPlugin([{ from: path.join(__dirname, './dist'), to: dist }])
     ]
     config.devServer.historyApiFallback = {
         rewrites: [

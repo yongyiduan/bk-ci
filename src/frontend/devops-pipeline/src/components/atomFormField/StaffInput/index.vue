@@ -68,7 +68,7 @@
                 const url = `/project/api/user/users/projects/${this.projectId}/list`
 
                 try {
-                    const res = await ajax.get(`${AJAX_URL_PIRFIX}${url}`).then(response => {
+                    const res = await ajax.get(`${API_URL_PREFIX}${url}`).then(response => {
                         return response.data.data
                     })
 

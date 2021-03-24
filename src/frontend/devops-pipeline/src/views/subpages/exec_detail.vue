@@ -121,7 +121,7 @@
             return {
                 isLoading: true,
                 hasNoPermission: false,
-                linkUrl: WEB_URL_PIRFIX + location.pathname,
+                linkUrl: WEB_URL_PREFIX + location.pathname,
                 noPermissionTipsConfig: {
                     title: this.$t('noPermission'),
                     desc: this.$t('history.noPermissionTips'),

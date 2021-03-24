@@ -688,7 +688,7 @@
                                 vmSeqId
                             })
                             if (res.containerId && res.address) {
-                                url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&containerId=${res.containerId}&targetIp=${res.address}`
+                                url = `${WEB_URL_PREFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&containerId=${res.containerId}&targetIp=${res.address}`
                             }
                         } else {
                             const res = await this.startDebugDocker({
@@ -703,12 +703,12 @@
                                 credentialId: this.buildImageCreId
                             })
                             if (res === true) {
-                                url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}`
+                                url = `${WEB_URL_PREFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}`
                             }
                         }
                     } else if (this.isPublicDevCloud) {
                         const buildIdStr = this.buildId ? `&buildId=${this.buildId}` : ''
-                        url = `${WEB_URL_PIRFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
+                        url = `${WEB_URL_PREFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                     }
                     tab.location = url
                 } catch (err) {
@@ -724,7 +724,7 @@
                                 }],
                                 projectId: this.projectId
                             }],
-                            applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
                         })
                     } else {
                         this.$showTips({
@@ -759,11 +759,11 @@
                 return baseOS === 'LINUX' ? `export ${env.name}=/data/bkdevops/apps/${key}/${value}/${env.path}` : `export ${env.name}=/data/soda/apps/${key}/${value}/${env.path}`
             },
             addThridSlave () {
-                const url = `${WEB_URL_PIRFIX}/environment/${this.projectId}/nodeList?type=${this.container.baseOS}`
+                const url = `${WEB_URL_PREFIX}/environment/${this.projectId}/nodeList?type=${this.container.baseOS}`
                 window.open(url, '_blank')
             },
             addDockerImage () {
-                const url = `${WEB_URL_PIRFIX}/artifactory/${this.projectId}/depot/project-image`
+                const url = `${WEB_URL_PREFIX}/artifactory/${this.projectId}/depot/project-image`
                 window.open(url, '_blank')
             },
             changeShowPerformance (isShow = false) {

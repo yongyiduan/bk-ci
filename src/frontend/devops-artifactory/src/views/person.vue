@@ -576,7 +576,7 @@
              */
             async handlerDownload (event, type) {
                 const url = await this.getDownloadUrl(this.lastClickItem)
-                url && window.open(type ? `${GW_URL_PREFIX}/pc/download/devops_pc_forward.html?downloadUrl=${url}` : url, '_self')
+                url && window.open(type ? `${API_URL_PREFIX}/pc/download/devops_pc_forward.html?downloadUrl=${url}` : url, '_self')
             },
             isApkOrIpa () {
                 const type = this.lastClickItem.name.toUpperCase().substring(this.lastClickItem.name.lastIndexOf('.') + 1)

@@ -136,7 +136,7 @@
                 !this.turboDisabled && this.$emit('handleChange', name, value)
             },
             goTurboLink () {
-                window.open(`${WEB_URL_PIRFIX}/turbo/${this.$route.params.projectId}/acceleration#${this.$route.params.pipelineId}&${this.taskId}`, '_blank')
+                window.open(`${WEB_URL_PREFIX}/turbo/${this.$route.params.projectId}/acceleration#${this.$route.params.pipelineId}&${this.taskId}`, '_blank')
             },
             projLang () {
                 if (this.task.projLang === '1') {

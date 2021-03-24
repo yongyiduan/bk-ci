@@ -122,7 +122,7 @@
             },
             linkWetestDetail (report) {
                 if (report.testId) {
-                    window.open(`${WEB_URL_PIRFIX}/wetest/${this.projectId}/detail/${report.testId}/${report.startUserId}`, '_blank')
+                    window.open(`${WEB_URL_PREFIX}/wetest/${this.projectId}/detail/${report.testId}/${report.startUserId}`, '_blank')
                 }
             },
             wetestUrl (report) {

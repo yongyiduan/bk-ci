@@ -214,7 +214,7 @@
                         const container = response.data.stages[stageIndex]
                         this.elementId = container.containers[containerIndex].elements[elementIndex].id
 
-                        tab.location = `${WEB_URL_PIRFIX}/turbo/${this.projectId}/registration#${this.$route.params.pipelineId}&${this.elementId}`
+                        tab.location = `${WEB_URL_PREFIX}/turbo/${this.projectId}/registration#${this.$route.params.pipelineId}&${this.elementId}`
                     } else {
                         this.$showTips({
                             message: `${pipeline.name}${this.$t('updateFail')}`,
@@ -247,7 +247,7 @@
                         instanceId,
                         projectId: this.projectId
                     }],
-                    applyPermissionUrl: `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
+                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
                 })
             },
             updatePipelineToTurbo (pipeline) {

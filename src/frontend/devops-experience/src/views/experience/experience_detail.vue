@@ -219,7 +219,7 @@
                             projectId: this.projectId,
                             experienceHashId: this.experienceHashId
                         })
-                        const url = type ? `${GW_URL_PREFIX}/pc/download/devops_pc_forward.html?downloadUrl=` + escape(res.url) : res.url
+                        const url = type ? `${API_URL_PREFIX}/pc/download/devops_pc_forward.html?downloadUrl=` + escape(res.url) : res.url
                         window.location.href = url
                         this.requestStatistics()
                     } catch (err) {

@@ -655,7 +655,7 @@
                         const container = response.data.stages[stageIndex]
                         this.elementId = container.containers[containerIndex].elements[elementIndex].id
 
-                        tab.location = `${WEB_URL_PIRFIX}/turbo/${this.projectId}/registration#${this.$route.params.pipelineId}&${this.elementId}`
+                        tab.location = `${WEB_URL_PREFIX}/turbo/${this.projectId}/registration#${this.$route.params.pipelineId}&${this.elementId}`
                     } else {
                         this.$showTips({
                             message: `${pipeline.name}修改失败`,

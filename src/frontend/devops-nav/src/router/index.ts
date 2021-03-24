@@ -88,7 +88,7 @@ function isAmdModule (currentPage: subService): boolean {
 
 const createRouter = (store: any, dynamicLoadModule: any, i18n: any) => {
     counterUser() // 统计用户信息
-    uploadBKCounter(1) // 统计蓝鲸访问信息
+    // uploadBKCounter(1) // 统计蓝鲸访问信息
     const router = new Router({
         mode: 'history',
         routes: routes
@@ -175,21 +175,21 @@ function counterUser (): void {
     })
 }
 
-function uploadBKCounter (count: number = 1): void {
-    try {
-        const date: Date = new Date()
-        const appMsg = {
-            bkdevops: {
-                [`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`]: count
-            }
-        }
-        window.JSONP('http://open.oa.com/app_statistics/liveness/save_jsonp?app_msg=' + JSON.stringify(appMsg), function () {
-            // jsonp callback with data
-        })
-    } catch (e) {
-        console.warn('upload bk error', e)
-    }
-}
+// function uploadBKCounter (count: number = 1): void {
+//     try {
+//         const date: Date = new Date()
+//         const appMsg = {
+//             bkdevops: {
+//                 [`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`]: count
+//             }
+//         }
+//         window.JSONP('http://open.oa.com/app_statistics/liveness/save_jsonp?app_msg=' + JSON.stringify(appMsg), function () {
+//             // jsonp callback with data
+//         })
+//     } catch (e) {
+//         console.warn('upload bk error', e)
+//     }
+// }
 
 function parseOS (): string {
     const { userAgent } = window.navigator

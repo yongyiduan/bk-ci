@@ -197,7 +197,7 @@
                 return this.$route.params.buildNo
             },
             artifactoryUrl () {
-                return `${WEB_URL_PIRFIX}/artifactory/${this.projectId}/?pipelineId=${this.pipelineId}&buildId=${this.buildNo}`
+                return `${WEB_URL_PREFIX}/artifactory/${this.projectId}/?pipelineId=${this.pipelineId}&buildId=${this.buildNo}`
             },
             isMof () {
                 return this.$store.state.curProject.deptName === '魔方工作室群'
@@ -283,7 +283,7 @@
                             path: row.path
                         })
                         const url = isDevnet ? res.url : res.url2
-                        window.location.href = type ? `${GW_URL_PREFIX}/pc/download/devops_pc_forward.html?downloadUrl=${url}` : url
+                        window.location.href = type ? `${API_URL_PREFIX}/pc/download/devops_pc_forward.html?downloadUrl=${url}` : url
                     }
                 } catch (err) {
                     this.handleError(err, [{
