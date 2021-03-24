@@ -69,7 +69,6 @@
                 iframe.postMessage({ atomPropsValue: this.element.data.input, atomPropsModel: this.atomPropsModel.input, containerInfo, currentUserInfo, atomDisabled }, '*')
             },
             receiveMsgFromIframe (e) {
-                // if (location.href.indexOf(e.origin) === 0) return
                 if (!e.data) return
                 if (e.data.atomValue) {
                     this.setPipelineEditing(true)
