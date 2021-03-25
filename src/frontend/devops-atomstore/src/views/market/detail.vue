@@ -207,7 +207,7 @@
 
                 return Promise.all([
                     this.requestService({ serviceCode }),
-                    this.requestServiceStic(serviceCode)
+                    this.requestAtomStatistic({ storeCode: serviceCode, storeType: 'SERVICE' })
                 ]).then(([serviceDetail = {}, serviceStatic = {}]) => {
                     const detail = serviceDetail || {}
                     detail.downloads = serviceStatic.downloads || 0

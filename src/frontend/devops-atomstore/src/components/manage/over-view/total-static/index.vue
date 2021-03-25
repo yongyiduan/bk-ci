@@ -60,8 +60,9 @@
             },
 
             getServiceData () {
-                return this.$store.dispatch('store/requestServiceStic', {
-                    atomCode: this.detail.serviceCode
+                return this.$store.dispatch('store/requestAtomStatistic', {
+                    storeCode: this.detail.serviceCode,
+                    storeType: 'SERVICE'
                 }).then((res) => {
                     this.statisticList = [
                         { name: 'install-num', label: this.$t('store.安装量'), value: res.downloads },
