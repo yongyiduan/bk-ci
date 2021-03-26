@@ -47,6 +47,18 @@
             <template slot="content">
                 <service-detail :detail="detail" v-bkloading="{ isLoading: detailLoading }" class="version-detail">
                     <li class="detail-item">
+                        <span class="detail-label">{{ $t('store.发布者：') }}：</span>
+                        <span>{{ detail.publisher || '--' }}</span>
+                    </li>
+                    <li class="detail-item">
+                        <span class="detail-label">{{ $t('store.发布类型：') }}：</span>
+                        <span>{{ releaseMap[detail.releaseType] || '--' }}</span>
+                    </li>
+                    <li class="detail-item">
+                        <span class="detail-label">{{ $t('store.版本：') }}：</span>
+                        <span>{{ detail.version || '--' }}</span>
+                    </li>
+                    <li class="detail-item">
                         <span class="detail-label">{{ $t('store.版本日志') }}：</span>
                         <mavon-editor
                             :editable="false"
@@ -86,7 +98,13 @@
                 upgradeStatus: ['INIT', 'UNDERCARRIAGED', 'AUDIT_REJECT', 'RELEASED', 'GROUNDING_SUSPENSION'],
                 hasShowDetail: false,
                 detailLoading: false,
-                detail: {}
+                detail: {},
+                releaseMap: {
+                    'NEW': this.$t('store.新上架'),
+                    'INCOMPATIBILITY_UPGRADE': this.$t('store.非兼容式升级'),
+                    'COMPATIBILITY_UPGRADE': this.$t('store.兼容式功能更新'),
+                    'COMPATIBILITY_FIX': this.$t('store.兼容式问题修正')
+                }
             }
         },
 
