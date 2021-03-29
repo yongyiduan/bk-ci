@@ -4,6 +4,10 @@
         <hgroup class="detail-info-group">
             <h3 class="title-with-img">
                 <span :class="{ 'not-recommend': detail.recommendFlag === false }" :title="detail.recommendFlag === false ? $t('store.该插件不推荐使用') : ''">{{detail.name}}</span>
+                <div class="canvas-contain">
+                    <canvas class="atom-chart" v-if="detail.dailyStatisticList && !detail.dailyStatisticList.length"></canvas>
+                    <icon v-else class="chart-empty" name="empty" size="16" />
+                </div>
                 <h5 :title="isPublicTitle" @click="goToCode" :class="{ 'not-public': !isPublic }" v-if="!isEnterprise">
                     <icon class="detail-img" name="gray-git-code" size="14" />
                     <span class="approve-msg">{{ isPublic ? $t('store.源码') : $t('store.未开源') }}</span>
@@ -18,9 +22,6 @@
                     <icon class="detail-img" name="yaml" size="16" />
                     <span class="approve-msg">{{ $t('store.YAML可用') }}</span>
                 </h5>
-                <div class="canvas-contain" v-if="detail.dailyStatisticList && detail.dailyStatisticList.length">
-                    <canvas class="atom-chart"></canvas>
-                </div>
             </h3>
             <h5 class="detail-info">
                 <span> {{ $t('store.发布者：') }} </span><span>{{detail.publisher || '-'}}</span>
@@ -238,8 +239,9 @@
                         labels: dailyStatisticList.map(x => x.statisticsTime),
                         datasets: [
                             {
+                                barThickness: 6,
                                 label: this.$t('store.执行成功率'),
-                                backgroundColor: 'rgba(148, 245, 164, 1)',
+                                backgroundColor: 'rgba(90, 159, 247, 1)',
                                 lineTension: 0,
                                 borderWidth: 0,
                                 pointRadius: 0,
@@ -250,6 +252,7 @@
                         ]
                     },
                     options: {
+                        maintainAspectRatio: false,
                         scales: {
                             x: {
                                 display: false
@@ -397,10 +400,19 @@
         max-width: calc(100% - 314px);
         .canvas-contain {
             height: 20px;
-            width: 40px;
+            width: 64px;
             margin-left: 12px;
-            border-bottom: 1px solid #eee;
-            border-left: 1px solid #eee;
+            padding-right: 12px;
+            border-right: 1px solid #eff1f5;
+            box-sizing: content-box;
+            background: #F9F9F9;
+            background-clip: content-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            .chart-empty {
+                color: #e2e2e2;
+            }
             /deep/ div[data-bkcharts-tooltips] {
                 min-width: 140px;
             }
