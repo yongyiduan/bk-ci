@@ -7,6 +7,7 @@
                 v-for="config in paramConfig"
                 :key="config.paramKey"
                 :required="config.required"
+                :desc="config.tips"
                 :rules="requireRule(config)"
                 error-display-type="normal"
             >

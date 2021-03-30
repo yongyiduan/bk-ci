@@ -99,9 +99,9 @@
             display: flex;
             .init-img {
                 flex: 38.1;
-                background: #fafbfd;
+                background: #fff;
                 background-image: url('../../assets/img/task-init.png');
-                background-size: contain;
+                background-size: auto;
                 background-repeat: no-repeat;
                 background-position: center;
             }

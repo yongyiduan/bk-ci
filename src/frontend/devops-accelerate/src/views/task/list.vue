@@ -203,7 +203,10 @@
                 }
                 getPlanInstanceDetail(task.planId, queryData).then((res) => {
                     task.tableList = res.records || []
-                    task.pagination.count = res.count
+                    if (task.pagination) {
+                        task.pagination.count = res.count
+                        if (task.pagination.count <= task.pagination.limit) task.pagination = undefined
+                    }
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

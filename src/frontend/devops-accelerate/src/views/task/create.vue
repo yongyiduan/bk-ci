@@ -48,12 +48,13 @@
                         configParam: paramForm.configParam,
                         projectId: this.$route.params.projectId
                     }
-                    addTurboPlan(postData).then(() => {
+                    addTurboPlan(postData).then((res) => {
                         this.$bkMessage({ theme: 'success', message: '添加成功' })
                         this.$router.push({
                             name: 'taskSuccess',
                             query: {
-                                engineCode: postData.engineCode
+                                engineCode: postData.engineCode,
+                                planId: res.planId
                             }
                         })
                     }).catch((err) => {

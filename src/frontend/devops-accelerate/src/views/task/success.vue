@@ -7,8 +7,9 @@
 
         <section class="g-accelerate-box" v-bkloading="{ isloading }">
             <p class="success-tip">
-                <logo name="check-circle" size="48"></logo>
+                <logo name="check-circle" size="48" class="icon-success"></logo>
                 <span class="g-accelerate-black-font">加速方案提交成功</span>
+                <span class="success-plan-id g-accelerate-gray-font">方案Id为：{{ $route.query.planId }}<logo name="copy" class="icon-copy" size="16" @click.native="copy"></logo></span>
             </p>
 
             <section class="g-accelerate-task-tip success-tip-user" v-html="engineDetail.userManual"></section>
@@ -20,7 +21,8 @@
 
 <script>
     import { getEngineDetail } from '@/api'
-    import logo from '../../components/logo'
+    import { copy } from '@/assets/js/util'
+    import logo from '@/components/logo'
 
     export default {
         components: {
@@ -49,6 +51,10 @@
                 }).finally(() => {
                     this.isloading = false
                 })
+            },
+
+            copy () {
+                copy(this.$route.query.planId)
             },
 
             goToList () {
@@ -86,16 +92,27 @@
     .success-tip {
         height: round(90px * $designToPx);
         padding: 0 .32rem;
-        line-height: round(90px * $designToPx);
         font-size: 20px;
         border-bottom: 1px solid #f0f1f5;
         display: flex;
         align-items: center;
-        svg {
+        .icon-success {
             color: #3FC06D;
         }
         .g-accelerate-black-font {
             margin-left: .15rem;
+        }
+        .success-plan-id {
+            font-size: 14px;
+            display: flex;
+            align-items: flex-end;
+            height: 24px;
+            margin-left: 10px;
+            line-height: 16px;
+            .icon-copy {
+                cursor: pointer;
+                margin-left: 4px;
+            }
         }
     }
     .success-tip-user {

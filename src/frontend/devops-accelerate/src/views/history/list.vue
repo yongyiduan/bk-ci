@@ -40,7 +40,7 @@
                     <template slot-scope="props">
                         <span v-if="props.row.pipelineName">
                             {{ props.row.pipelineName }}
-                            <a @click.stop :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/edit`" target="_blank" class="g-accelerate-click-text"><logo name="cc-jump-link" class="jump-link" size="14"></logo></a>
+                            <a @click.stop :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/detail/${props.row.devopsBuildId}`" target="_blank" class="g-accelerate-click-text"><logo name="cc-jump-link" class="jump-link" size="14"></logo></a>
                         </span>
                         <span v-else>{{ props.row.clientIp }}</span>
                     </template>
