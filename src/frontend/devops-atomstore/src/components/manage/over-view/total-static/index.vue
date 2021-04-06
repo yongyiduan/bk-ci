@@ -67,7 +67,7 @@
                     this.statisticList = [
                         { name: 'install-num', label: this.$t('store.安装量'), value: res.downloads },
                         { name: 'comment-num', label: this.$t('store.评论数'), value: res.commentCnt },
-                        { name: 'rate', label: this.$t('store.星级'), value: res.score }
+                        { name: 'rate', label: this.$t('store.星级'), value: res.score || '--' }
                     ]
                 })
             }
