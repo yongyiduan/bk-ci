@@ -105,6 +105,10 @@
                         label: this.$t('accessCenter')
                     },
                     {
+                        to: '/console/preci/',
+                        label: this.$t('PreCI')
+                    },
+                    {
                         cb: this.logout,
                         label: this.$t('logout')
                     }
