@@ -8,8 +8,27 @@
 </template>
 
 <script>
+    import { mapState, mapGetters, mapActions } from 'vuex'
     export default {
         computed: {
+            ...mapState('environment', [
+                'extensions'
+            ]),
+            ...mapGetters('environment', {
+                hookIds: 'asideNavBarExtIds'
+            }),
+            extNav () {
+                console.log(this.extensions)
+                return this.extensions.map((ext) => ({
+                    id: 'extPage',
+                    name: ext.serviceName,
+                    icon: 'devops-icon icon-placeholder',
+                    params: {
+                        itemId: ext.itemId,
+                        serviceCode: ext.serviceCode
+                    }
+                }))
+            },
             nav () {
                 return {
                     icon: 'environment',
@@ -45,15 +64,32 @@
                                     icon: 'devops-icon icon-node'
                                 }
                             ]
-                        }
+                        },
+                        ...this.extNav
                     ]
                 }
             }
         },
+        watch: {
+            hookIds: {
+                handler: function (hookIds) {
+                    hookIds && this.getEnvironmentExtensions({
+                        projectCode: this.$route.params.projectId,
+                        hookIds: hookIds
+                    })
+                },
+                immediate: true
+            }
+        },
         methods: {
+            ...mapActions('environment', [
+                'getEnvironmentExtensions'
+            ]),
             menuClick (name) {
+                const item = this.nav.menu.find(navItem => navItem.id === name)
                 this.$router.push({
-                    name
+                    name,
+                    params: item.params
                 })
             }
         }
