@@ -43,6 +43,7 @@
                     <span class="detail-label">{{ $t('store.媒体信息') }}：</span>
                     <media-list class="media-list" :list="detail.mediaList" v-if="detail.mediaList.length"></media-list>
                 </li>
+                <slot></slot>
             </ul>
         </section>
     </article>
