@@ -188,15 +188,20 @@
         }
 
         get recentVisitService (): object[] {
-            const recentVisitService = localStorage.getItem('recentVisitService')
-            const recentVisitServiceList = recentVisitService ? JSON.parse(recentVisitService) : []
-            return recentVisitServiceList.map(service => {
-                const serviceObj = window.serviceObject.serviceMap[service.key] || {}
-                return {
-                    ...service,
-                    ...serviceObj
-                }
-            })
+            try {
+                const recentVisitService = localStorage.getItem('recentVisitService')
+                const recentVisitServiceList = recentVisitService ? JSON.parse(recentVisitService) : []
+                return recentVisitServiceList.map(service => {
+                    const serviceObj = window.serviceObject.serviceMap[service.key] || {}
+                    return {
+                        ...service,
+                        ...serviceObj
+                    }
+                })
+            } catch (error) {
+                console.error(error)
+                return []
+            }
         }
 
         get serviceCount (): number {
