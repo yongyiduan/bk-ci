@@ -18,7 +18,6 @@
                 hookIds: 'asideNavBarExtIds'
             }),
             extNav () {
-                console.log(this.extensions)
                 return this.extensions.map((ext) => ({
                     id: 'extPage',
                     name: ext.serviceName,
@@ -68,17 +67,26 @@
                         ...this.extNav
                     ]
                 }
+            },
+            projectCode () {
+                return this.$route.params.projectId
             }
         },
         watch: {
             hookIds: {
                 handler: function (hookIds) {
                     hookIds && this.getEnvironmentExtensions({
-                        projectCode: this.$route.params.projectId,
+                        projectCode: this.projectCode,
                         hookIds: hookIds
                     })
                 },
                 immediate: true
+            },
+            projectCode: function (projectCode) {
+                this.getEnvironmentExtensions({
+                    projectCode,
+                    hookIds: this.hookIds
+                })
             }
         },
         methods: {
