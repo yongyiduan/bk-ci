@@ -36,8 +36,8 @@
             },
             iframeUrl () {
                 console.log(this.service.baseUrl)
-                // return this.service ? this.getResUrl(this.service.props.entryResUrl, this.service.baseUrl) : ''
-                return this.service ? this.getResUrl('http://local.devops.oa.com') : ''
+                return this.service ? this.getResUrl(this.service.props.entryResUrl, this.service.baseUrl) : ''
+                // return this.service ? this.getResUrl('http://local.devops.oa.com') : ''
             }
         },
         methods: {
