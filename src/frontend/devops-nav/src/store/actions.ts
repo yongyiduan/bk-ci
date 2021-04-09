@@ -32,7 +32,6 @@ const actions: ActionTree<RootState, any> = {
     async fetchServiceHooks ({ commit }: ActionContext<RootState, any>, { serviceId }: any) {
         try {
             const extHooks = await Request.get(`${PROJECT_API_URL_PREFIX}/user/ext/items/list?serviceId=${serviceId}`)
-            console.log(extHooks)
             commit(SET_SERVICE_HOOKS, {
                 extHooks: extHooks,
                 serviceId

@@ -6,7 +6,7 @@
 
         <section class="sub-view-port">
             <template v-if="service">
-                <iframe class="environment-view-port-iframe" :src="iframeUrl"></iframe>
+                <iframe class="environment-view-port-iframe" ref="extensionIframe" :src="iframeUrl" @load="handlePageLoad"></iframe>
             </template>
         </section>
     </div>
@@ -36,8 +36,8 @@
             },
             iframeUrl () {
                 console.log(this.service.baseUrl)
-                return this.service ? this.getResUrl(this.service.props.entryResUrl, this.service.baseUrl) : ''
-                // return this.service ? this.getResUrl('http://machine-use.dev-gray.ext.devops.oa.com') : ''
+                // return this.service ? this.getResUrl(this.service.props.entryResUrl, this.service.baseUrl) : ''
+                return this.service ? this.getResUrl('http://local.devops.oa.com') : ''
             }
         },
         methods: {
@@ -49,6 +49,22 @@
             },
             getResUrl (url = 'index.html', baseURL) {
                 return this.isAbsoluteURL(url) ? url : this.urlJoin(baseURL, 'static', url)
+            },
+            handlePageLoad () {
+                this.syncData({
+                    ...this.$route.params
+                })
+            },
+            syncData (data) {
+                try {
+                    // @ts-ignore
+                    this.$refs.extensionIframe.contentWindow.postMessage({
+                        action: 'syncCustomData',
+                        params: JSON.stringify(data)
+                    }, '*')
+                } catch (e) {
+                    console.warn('can not find extensionIframe')
+                }
             }
         }
     }
