@@ -314,5 +314,6 @@ export default {
     defaultBuildNo: state => defaultBuildNo,
     getPlatformList: state => platformList,
     getAtomModalKey: state => getAtomModalKey,
-    isNewAtomTemplate: state => isNewAtomTemplate
+    isNewAtomTemplate: state => isNewAtomTemplate,
+    atomVersionChangedKeys: state => state.atomVersionChangedKeys
 }

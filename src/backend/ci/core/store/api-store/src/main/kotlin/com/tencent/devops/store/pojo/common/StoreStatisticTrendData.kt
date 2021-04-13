@@ -25,19 +25,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.pojo.atom
+package com.tencent.devops.store.pojo.common
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
-@ApiModel("插件统计信息")
-data class AtomStatistic(
-    @ApiModelProperty("下载量")
-    val downloads: Int,
-    @ApiModelProperty("评论量")
-    val commentCnt: Int,
-    @ApiModelProperty("星级评分")
-    val score: Double?,
-    @ApiModelProperty("流水线个数")
-    val pipelineCnt: Int
+@ApiModel("统计趋势数据")
+data class StoreStatisticTrendData(
+    @ApiModelProperty("执行失败总数")
+    val totalFailNum: Int,
+    @ApiModelProperty("执行失败总数详情")
+    val totalFailDetail: Map<String, Any>?,
+    @ApiModelProperty("每日统计信息列表")
+    val dailyStatisticList: List<StoreDailyStatistic>?
 )

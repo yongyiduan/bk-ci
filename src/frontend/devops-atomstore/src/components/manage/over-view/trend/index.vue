@@ -1,17 +1,19 @@
 <template>
-    <common></common>
+    <component v-bind="$props" :is="type"></component>
 </template>
 
 <script>
-    import common from './common'
+    import atom from './atom'
+    import service from './service'
 
     export default {
         components: {
-            common
+            atom,
+            service
         },
 
         props: {
-            datail: Object,
+            detail: Object,
             type: String
         }
     }
