@@ -182,13 +182,8 @@
                 this.addMemberObj.isShow = true
                 if (!this.isEnterprise) {
                     this.isLoadingMember = true
-                    const user = window.userInfo || {}
-                    const username = user.username
-                    const curMem = this.memberList.find((member) => {
-                        return member.userName === username
-                    }) || {}
                     this.$store.dispatch('store/requestProjectMember', {
-                        projectCode: curMem.projectCode
+                        projectCode: this.detail.projectCode
                     }).then((res) => {
                         this.projectMemberList = (res || []).map(x => ({ id: x, name: x }))
                     }).catch(err => this.$bkMessage({ message: err.message || err, theme: 'error' })).finally(() => {
