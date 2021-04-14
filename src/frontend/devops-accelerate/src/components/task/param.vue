@@ -60,6 +60,12 @@
             ...mapGetters('accelerate', ['paramConfig'])
         },
 
+        watch: {
+            paramConfig () {
+                this.copyFormData.configParam = {}
+            }
+        },
+
         created () {
             this.copyFormData = JSON.parse(JSON.stringify(this.formData))
         },

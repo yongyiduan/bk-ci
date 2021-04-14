@@ -35,7 +35,6 @@
 
         methods: {
             submit () {
-                this.isLoading = true
                 const basicComponent = this.$refs.basic
                 const basicFormComponent = basicComponent.$refs.createTask
                 const basicForm = basicComponent.copyFormData
@@ -43,6 +42,7 @@
                 const paramForm = paramComponent.copyFormData
 
                 Promise.all([basicFormComponent.validate(), paramComponent.validate()]).then(() => {
+                    this.isLoading = true
                     const postData = {
                         ...basicForm,
                         configParam: paramForm.configParam,
