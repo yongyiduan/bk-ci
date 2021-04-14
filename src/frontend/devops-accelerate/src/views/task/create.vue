@@ -54,7 +54,7 @@
                             name: 'taskSuccess',
                             query: {
                                 engineCode: postData.engineCode,
-                                planId: res.planId
+                                planId: res
                             }
                         })
                     }).catch((err) => {
