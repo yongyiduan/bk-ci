@@ -71,6 +71,7 @@ export function extendParsePathAlias (type, path, authType, svnType) {
     let reg = ''
     let msg = ''
     let alias = ''
+    let nameMatchIndex = 1
     const codelibLocaleObj = window.devops.$i18n.t('codelib')
     const preReg = /\_proj\/(branches|tags|trunk|release|document)(\/[\w\W\.\-\/\+]*)?$/i
 
@@ -80,8 +81,9 @@ export function extendParsePathAlias (type, path, authType, svnType) {
             msg = `${codelibLocaleObj.githubRule}${type}${codelibLocaleObj.address}`
             break
         case (authType === 'OAUTH') || (isGit(type) && authType === 'HTTP'):
-            reg = /^https?\:\/\/git\.code\.w?oa\.com[\:|\/](.*)\.git$/
+            reg = /^https?\:\/\/git((\.code\.w?)|(\.w))oa\.com[\:|\/](.*)\.git$/
             msg = `${codelibLocaleObj.httpsRule}${type}${codelibLocaleObj.address}`
+            nameMatchIndex = 4
             break
         case isSvn(type) && svnType === 'ssh':
             if (path.match(preReg)) {
@@ -122,7 +124,7 @@ export function extendParsePathAlias (type, path, authType, svnType) {
     const matchResult = path.match(reg)
 
     return matchResult ? {
-        alias: alias || matchResult[1]
+        alias: alias || matchResult[nameMatchIndex]
     } : {
         msg
     }
