@@ -8,6 +8,7 @@
             @click.stop="toggleUserInfo"
         >
             {{ username }}
+            <span class="user-header-hint" />
             <i v-if="!disabled" class="devops-icon icon-down-shape" />
         </div>
         <div
@@ -40,6 +41,7 @@
                             class="user-menu-item"
                             @click.stop="item.cb"
                         >{{ item.label }}</span>
+                        <span v-if="item.showHint" class="user-hint" />
                     </li>
                 </ul>
             </slot>
@@ -106,7 +108,8 @@
                     },
                     {
                         to: '/console/preci/',
-                        label: this.$t('PreCI')
+                        label: this.$t('PreCI'),
+                        showHint: true
                     },
                     {
                         cb: this.logout,
@@ -142,6 +145,14 @@
             height: 100%;
             padding:0 12px;
             align-items: center;
+            .user-header-hint {
+                display: inline-block;
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background-color: red;
+                margin: 0 5px;
+            }
         }
 
         .devops-icon.icon-down-shape {
@@ -201,6 +212,15 @@
                         &:hover {
                             color: $aHoverColor;
                         }
+                    }
+                    .user-hint {
+                        display: inline-block;
+                        width: 6px;
+                        height: 6px;
+                        border-radius: 50%;
+                        background-color: red;
+                        position: relative;
+                        top: -2px;
                     }
                 }
             }
