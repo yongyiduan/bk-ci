@@ -182,8 +182,8 @@
                     }
                 ],
                 subscriptionList: [
-                    { label: this.$t('settings.buildSuc'), name: 'success' },
-                    { label: this.$t('settings.buildFail'), name: 'fail' }
+                    { label: this.$t('settings.whenSuc'), name: 'success' },
+                    { label: this.$t('settings.whenFail'), name: 'fail' }
                 ],
                 curNavTab: { label: this.$t('settings.buildSuc'), name: 'success' },
                 noticeList: [
