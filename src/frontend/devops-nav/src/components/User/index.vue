@@ -8,7 +8,7 @@
             @click.stop="toggleUserInfo"
         >
             {{ username }}
-            <span class="user-header-hint" />
+            <span v-if="$route.path !== '/console/preci'" class="user-header-hint" />
             <i v-if="!disabled" class="devops-icon icon-down-shape" />
         </div>
         <div
