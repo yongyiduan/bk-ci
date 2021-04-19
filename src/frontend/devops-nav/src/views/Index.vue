@@ -139,6 +139,10 @@
                 })
             })
 
+            eventBus.$on('change-extension-route', options => {
+              this.$router.push(options.url)
+            })
+
             if (this.currentPage) {
                 this.fetchServiceHooks({
                     serviceId: this.currentPage.id

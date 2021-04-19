@@ -31,7 +31,8 @@ import atom from './modules/atom'
 
 import {
     FETCH_ERROR,
-    SET_SERVICE_HOOKS
+    SET_SERVICE_HOOKS,
+    STORE_API_URL_PREFIX
 } from './constants'
 import { ARTIFACT_HOOK_CONST, PIPELINE_EXECUTE_DETAIL_HOOK_CONST, PIPELINE_HISTORY_TAB_HOOK_CONST } from '../utils/extensionHooks'
 Vue.use(Vuex)
@@ -98,7 +99,7 @@ export default new Vuex.Store({
             commit(SET_SERVICE_HOOKS, hooks)
         },
         fetchExtensionByHookId: ({ commit }, { projectCode, itemIds }) => {
-            return request.get(`${API_URL_PREFIX}/store/api/user/ext/services/items/projects/${projectCode}/list?itemIds=${itemIds}`)
+            return request.get(`${STORE_API_URL_PREFIX}/user/ext/services/items/projects/${projectCode}/list?itemIds=${itemIds}`)
         },
         requestProjectDetail: async ({ commit }, { projectId }) => {
             return ajax.get(API_URL_PREFIX + `/project/api/user/projects/${projectId}/`).then(response => {

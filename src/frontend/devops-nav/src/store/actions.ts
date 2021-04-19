@@ -24,14 +24,14 @@ import {
     TOGGLE_PERMISSION_DIALOG,
     SET_CURRENT_NOTICE,
     SET_SERVICE_HOOKS,
-    AUTH_API_URL_PREFIX
+    AUTH_API_URL_PREFIX,
+    STORE_API_URL_PREFIX
 } from './constants'
 
 const actions: ActionTree<RootState, any> = {
     async fetchServiceHooks ({ commit }: ActionContext<RootState, any>, { serviceId }: any) {
         try {
             const extHooks = await Request.get(`${PROJECT_API_URL_PREFIX}/user/ext/items/list?serviceId=${serviceId}`)
-            console.log(extHooks)
             commit(SET_SERVICE_HOOKS, {
                 extHooks: extHooks,
                 serviceId
@@ -39,6 +39,9 @@ const actions: ActionTree<RootState, any> = {
         } catch (error) {
             console.log(error)
         }
+    },
+    fetchExtensionByHookId: (_, { projectCode, itemIds }) => {
+        return Request.get(`${STORE_API_URL_PREFIX}/user/ext/services/items/projects/${projectCode}/list?itemIds=${itemIds}`)
     },
     togglePermissionDialog ({ commit }: ActionContext<RootState, any>, visible: boolean) {
         commit(TOGGLE_PERMISSION_DIALOG, visible)
