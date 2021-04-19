@@ -37,7 +37,7 @@
                             {{ item.label }}
                         </router-link>
                         <span
-                            v-else-if="item.cb"
+                            v-else-if="$route.path !== '/console/preci' && item.cb"
                             class="user-menu-item"
                             @click.stop="item.cb"
                         >{{ item.label }}</span>
@@ -92,10 +92,6 @@
             if (show !== oldVal) {
                 this.togglePopupShow(show)
             }
-        }
-        
-        created () {
-            console.log(this.$route, 'test222222222')
         }
 
         get menu (): object[] {
