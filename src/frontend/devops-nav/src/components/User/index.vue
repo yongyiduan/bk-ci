@@ -37,11 +37,11 @@
                             {{ item.label }}
                         </router-link>
                         <span
-                            v-else-if="$route.path !== '/console/preci' && item.cb"
+                            v-else-if="item.cb"
                             class="user-menu-item"
                             @click.stop="item.cb"
                         >{{ item.label }}</span>
-                        <span v-if="item.showHint" class="user-hint" />
+                        <span v-if="$route.path !== '/console/preci' && item.showHint" class="user-hint" />
                     </li>
                 </ul>
             </slot>
