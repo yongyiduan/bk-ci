@@ -93,6 +93,10 @@
                 this.togglePopupShow(show)
             }
         }
+        
+        created () {
+            console.log(this.$route, 'test222222222')
+        }
 
         get menu (): object[] {
             try {
