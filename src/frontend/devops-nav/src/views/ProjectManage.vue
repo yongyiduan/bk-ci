@@ -72,12 +72,7 @@
                                 <div class="info">
                                     <p class="title">
                                         <template v-if="props.row.approvalStatus !== 2">
-                                            <a
-                                                v-bk-tooltips="{ content: $t('accessDeny.noOperateAccessTip') }"
-                                                href="javascript:void(0)"
-                                                class="bk-text-button is-disabled"
-                                                :title="$t('accessDeny.noOperateAccess')"
-                                            >{{ props.row.projectName }}</a>
+                                            <span class="is-disabled">{{ props.row.projectName }}</span>
                                         </template>
                                         <template v-else>
                                             <a
@@ -663,6 +658,13 @@
                 > .title {
                     @include ellipsis();
                     display: block;
+                }
+                .title-text {
+                    color: #333948;
+                }
+                .is-disabled {
+                    color: #e6e6e6 !important;
+                    cursor: not-allowed;
                 }
             }
 
