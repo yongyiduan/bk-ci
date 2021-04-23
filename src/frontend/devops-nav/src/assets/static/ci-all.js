@@ -27,6 +27,7 @@ const tencentCI = {};
     const CREATE_ASIDE_PANEL = 'createAsidePanel'
     const CLOSE_ASIDE_PANEL = 'closeAsidePanel'
     const CLOSE_EXT_DIALOG = 'closeExtDialog'
+    const GO_TO_PAGE = 'goToPage'
     const SYNC_CUSTOME_DATA = 'syncCustomData'
     const SHOW_TIPS = 'showTips'
 
@@ -126,6 +127,18 @@ const tencentCI = {};
             params
         })
     }
+
+    /**
+     * 跳转页面
+     * @method goToPage
+     */
+    
+     exports[GO_TO_PAGE] = function (params) {
+      communicateOuter({
+          action: GO_TO_PAGE,
+          params
+      })
+  }
 
     /**
      * 创建一个侧边栏

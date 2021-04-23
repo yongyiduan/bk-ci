@@ -1,5 +1,5 @@
 import eventBus from './eventBus'
-import { toggleAsidePanel, toggleDialog } from './util'
+import { toggleAsidePanel, toggleDialog, goToPage } from './util'
 
 interface UrlParam {
     url: string
@@ -63,6 +63,8 @@ function iframeUtil (router: any) {
             show: false
         })
     }
+
+    utilMap.goToPage = goToPage
 
     utilMap.syncUrl = function ({ url, refresh = false }: UrlParam): void {
         let addMoocUrl = url

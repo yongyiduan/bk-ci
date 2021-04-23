@@ -21,15 +21,20 @@ export default {
         },
         hasExts () {
             return Array.isArray(this.extensions) && this.extensions.length > 0
+        },
+        projectCode () {
+            return this.$route.params && this.$route.params.projectId ? this.$route.params.projectId : ''
         }
     },
     watch: {
         hookIds: {
             handler: function (hooksIds) {
-                console.log(hooksIds)
-                this.fetchExt(hooksIds)
+                this.fetchExt(this.projectCode, hooksIds)
             },
             immediate: true
+        },
+        projectCode: function (projectCode) {
+            this.fetchExt(projectCode, this.hooksIds)
         }
     },
     methods: {
@@ -42,11 +47,11 @@ export default {
         getExtIconUrl (ext) {
             return ext.props && ext.props.iconUrl ? ext.props.iconUrl : ext.iconUrl
         },
-        async fetchExt (itemIds) {
+        async fetchExt (projectCode, itemIds) {
             console.log('itemIds', itemIds)
             try {
                 const res = await this.fetchExtensionByHookId({
-                    projectCode: this.$route.params.projectId,
+                    projectCode,
                     itemIds
                 })
                 let extensions = []

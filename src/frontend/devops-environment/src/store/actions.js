@@ -18,6 +18,7 @@
  */
 
 import Vue from 'vue'
+import { SET_ENVIRONMENT_EXTENSIONS } from './constants'
 
 const prefix = 'environment/api'
 const vue = new Vue()
@@ -345,6 +346,40 @@ const actions = {
         return vue.$ajax.get(`${prefix}/user/environment/thirdPartyAgent/projects/${params.projectId}/nodes/${params.nodeHashId}/queryDiskioMetrix?timeRange=${params.timeRange}`).then(response => {
             return response
         })
+    },
+
+    async getEnvironmentExtensions ({ commit, rootState, dispatch, rootGetters }, { projectCode, hookIds }) {
+        try {
+            const serviceHooks = rootGetters.getServiceHooks(rootState.currentPage.id) || []
+            const hookKeyMap = serviceHooks.reduce((acc, hook) => {
+                acc[hook.itemId] = hook
+                return acc
+            }, {})
+            const res = await dispatch('fetchExtensionByHookId', {
+                projectCode,
+                itemIds: hookIds
+            }, { root: true })
+            let extensions = []
+            const extensionMap = res.reduce((extensionMap, ext) => {
+                const extServiceList = ext.extServiceList.map(item => ({
+                    ...hookKeyMap[ext.itemId],
+                    ...item
+                }))
+                extensionMap[ext.itemId] = [
+                    ...extServiceList
+                ]
+
+                extensions = [
+                    ...extensions,
+                    ...extServiceList
+                ]
+
+                return extensionMap
+            }, {})
+            commit(SET_ENVIRONMENT_EXTENSIONS, { extensionMap, extensions })
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 

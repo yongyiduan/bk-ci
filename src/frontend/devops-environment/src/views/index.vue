@@ -8,8 +8,26 @@
 </template>
 
 <script>
+    import { mapState, mapGetters, mapActions } from 'vuex'
     export default {
         computed: {
+            ...mapState('environment', [
+                'extensions'
+            ]),
+            ...mapGetters('environment', {
+                hookIds: 'asideNavBarExtIds'
+            }),
+            extNav () {
+                return this.extensions.map((ext) => ({
+                    id: 'extPage',
+                    name: ext.serviceName,
+                    icon: 'devops-icon icon-placeholder',
+                    params: {
+                        itemId: ext.itemId,
+                        serviceCode: ext.serviceCode
+                    }
+                }))
+            },
             nav () {
                 return {
                     icon: 'environment',
@@ -45,15 +63,41 @@
                                     icon: 'devops-icon icon-node'
                                 }
                             ]
-                        }
+                        },
+                        ...this.extNav
                     ]
                 }
+            },
+            projectCode () {
+                return this.$route.params.projectId
+            }
+        },
+        watch: {
+            hookIds: {
+                handler: function (hookIds) {
+                    hookIds && this.getEnvironmentExtensions({
+                        projectCode: this.projectCode,
+                        hookIds: hookIds
+                    })
+                },
+                immediate: true
+            },
+            projectCode: function (projectCode) {
+                this.getEnvironmentExtensions({
+                    projectCode,
+                    hookIds: this.hookIds
+                })
             }
         },
         methods: {
+            ...mapActions('environment', [
+                'getEnvironmentExtensions'
+            ]),
             menuClick (name) {
+                const item = this.nav.menu.find(navItem => navItem.id === name)
                 this.$router.push({
-                    name
+                    name,
+                    params: item.params
                 })
             }
         }
