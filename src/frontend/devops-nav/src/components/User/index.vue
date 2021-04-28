@@ -8,7 +8,7 @@
             @click.stop="toggleUserInfo"
         >
             {{ username }}
-            <span v-if="$route.path !== '/console/preci'" class="user-header-hint" />
+            <span v-if="!isHideHint" class="user-header-hint" />
             <i v-if="!disabled" class="devops-icon icon-down-shape" />
         </div>
         <div
@@ -32,7 +32,7 @@
                             v-if="item.to"
                             class="user-menu-item"
                             :to="item.to"
-                            @click.native="hideUserInfo"
+                            @click.native="hideUserInfo(item.to)"
                         >
                             {{ item.label }}
                         </router-link>
@@ -41,20 +41,21 @@
                             class="user-menu-item"
                             @click.stop="item.cb"
                         >{{ item.label }}</span>
-                        <span v-if="$route.path !== '/console/preci' && item.showHint" class="user-hint" />
+                        <span v-if="!isHideHint" class="user-hint" />
                     </li>
                 </ul>
             </slot>
         </div>
     </div>
 </template>
-
 <script lang="ts">
     import Vue from 'vue'
     import { Component, Prop, Watch } from 'vue-property-decorator'
     import { Action } from 'vuex-class'
     import bkLogout from '../../utils/bklogout.js'
     import { clickoutside } from '../../directives/index'
+
+    const IS_HIDE_HINT = 'IS_HIDE_HINT'
 
     @Component({
         directives: {
@@ -83,8 +84,11 @@
             }
         }
 
-        hideUserInfo (): void {
+        hideUserInfo (to): void {
             this.show = false
+            if (to === '/console/preci/') {
+                localStorage.setItem(IS_HIDE_HINT, '1')
+            }
         }
 
         @Watch('show')
@@ -92,6 +96,10 @@
             if (show !== oldVal) {
                 this.togglePopupShow(show)
             }
+        }
+
+        created () {
+            this.isHideHint = Number(localStorage.getItem(IS_HIDE_HINT)) || 0
         }
 
         get menu (): object[] {
@@ -108,8 +116,7 @@
                     },
                     {
                         to: '/console/preci/',
-                        label: this.$t('PreCI'),
-                        showHint: true
+                        label: this.$t('PreCI')
                     },
                     {
                         cb: this.logout,
