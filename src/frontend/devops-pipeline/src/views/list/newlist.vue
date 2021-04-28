@@ -1165,7 +1165,6 @@
             cursor: pointer;
         }
         .table-list-name {
-            max-width: 300px;
             padding-left: 30px;
         }
         .table-list-progress {
