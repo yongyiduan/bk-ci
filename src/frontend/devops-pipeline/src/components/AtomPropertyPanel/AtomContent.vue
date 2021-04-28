@@ -143,6 +143,7 @@
     import AtomFormWithAppID from './AtomFormWithAppID'
     import NormalAtomV2 from './NormalAtomV2'
     import CodeGitWebHookTrigger from './CodeGitWebHookTrigger'
+    import CodeGitlabWebHookTrigger from './CodeGitlabWebHookTrigger'
     import SubPipelineCall from './SubPipelineCall'
     import ManualReviewUserTask from './ManualReviewUserTask'
     import Logo from '@/components/Logo'
@@ -399,6 +400,7 @@
                     reportArchive: ReportArchive,
                     reportArchiveService: ReportArchive,
                     codeGitWebHookTrigger: CodeGitWebHookTrigger,
+                    codeGitlabWebHookTrigger: CodeGitlabWebHookTrigger,
                     codeSVNWebHookTrigger: CodeSvnWebHookTrigger,
                     GITHUB: PullGithub,
                     codeGithubWebHookTrigger: CodeGithubWebHookTrigger,
