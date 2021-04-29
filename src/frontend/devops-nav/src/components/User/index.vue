@@ -41,7 +41,7 @@
                             class="user-menu-item"
                             @click.stop="item.cb"
                         >{{ item.label }}</span>
-                        <span v-if="!isHideHint && isShowHint" class="user-hint" />
+                        <span v-if="!isHideHint && to.isShowHint" class="user-hint" />
                     </li>
                 </ul>
             </slot>
