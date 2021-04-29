@@ -87,8 +87,8 @@
         hideUserInfo (to): void {
             this.show = false
             if (to === '/console/preci/') {
-                this.isHideHint = Number(localStorage.getItem(IS_HIDE_HINT)) || 0
                 localStorage.setItem(IS_HIDE_HINT, '1')
+                this.isHideHint = Number(localStorage.getItem(IS_HIDE_HINT)) || 1
             }
         }
 
