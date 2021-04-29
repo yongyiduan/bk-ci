@@ -23,7 +23,7 @@
                             </bk-form-item>
                             <span :class="{ 'prompt-tips': true, 'is-unedit': isEdit }" :disabled="isEdit" @click="toShowPackageList">从版本仓库获取</span>
                         </div>
-                        <bk-form-item style="margin-top: 20px" label="体验名称" :required="true" property="experienceName">
+                        <bk-form-item style="margin-top: 20px" label="体验名称" property="experienceName">
                             <bk-input
                                 v-model="createReleaseForm.experienceName"
                                 placeholder="请输入体验名称"
@@ -634,14 +634,17 @@
             async submitFn () {
                 let message
                 const theme = 'error'
-                if (!this.createReleaseForm.desc || !this.createReleaseForm.name || !this.createReleaseForm.end_date || !this.createReleaseForm.experienceName
-                    || !this.createReleaseForm.versionTitle || !this.createReleaseForm.categoryId || !this.createReleaseForm.experienceGroups.length) {
+                if (!this.createReleaseForm.desc
+                    || !this.createReleaseForm.name
+                    || !this.createReleaseForm.end_date
+                    || !this.createReleaseForm.versionTitle
+                    || !this.createReleaseForm.categoryId
+                    || !this.createReleaseForm.experienceGroups.length) {
                     if (!this.createReleaseForm.experienceGroups.length) message = '请选择体验组'
                     if (!this.createReleaseForm.end_date) message = '请选择体验结束日期'
                     if (this.createReleaseForm.categoryId === null) message = '请选择产品类别'
                     if (!this.createReleaseForm.desc) message = '请填写版本描述'
                     if (!this.createReleaseForm.versionTitle) message = '请填写版本标题'
-                    if (!this.createReleaseForm.experienceName) message = '请填写体验名称'
                     if (!this.createReleaseForm.name) message = '请选择ipa/apk文件'
                     this.$bkMessage({
                         message,
