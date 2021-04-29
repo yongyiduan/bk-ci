@@ -63,11 +63,16 @@
         watch: {
             paramConfig () {
                 this.copyFormData.configParam = {}
-            }
-        },
+            },
 
-        created () {
-            this.copyFormData = JSON.parse(JSON.stringify(this.formData))
+            formData: {
+                handler (val) {
+                    if (JSON.stringify(val) === JSON.stringify(this.copyFormData)) return
+
+                    this.copyFormData = JSON.parse(JSON.stringify(this.formData))
+                },
+                immediate: true
+            }
         },
 
         methods: {
