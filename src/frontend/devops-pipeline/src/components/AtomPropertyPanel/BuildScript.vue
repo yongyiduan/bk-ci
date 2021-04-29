@@ -153,9 +153,11 @@
                             if (!this.taskId) {
                                 this.banAllBooster = value
                                 this.$bkInfo({
-                                    subTitle: this.$t('editPage.atomForm.createTurbo'),
+                                    subTitle: this.$t('editPage.atomForm.turboOffline'),
                                     closeIcon: false,
-                                    confirmFn: this.goRegist,
+                                    confirmFn () {
+                                        this.banAllBooster = false
+                                    },
                                     cancelFn: () => {
                                         this.banAllBooster = false
                                     }
