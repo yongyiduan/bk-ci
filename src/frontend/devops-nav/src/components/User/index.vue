@@ -41,7 +41,7 @@
                             class="user-menu-item"
                             @click.stop="item.cb"
                         >{{ item.label }}</span>
-                        <span v-if="!isHideHint" class="user-hint" />
+                        <span v-if="!isHideHint && isShowHint" class="user-hint" />
                     </li>
                 </ul>
             </slot>
@@ -87,6 +87,7 @@
         hideUserInfo (to): void {
             this.show = false
             if (to === '/console/preci/') {
+                this.isHideHint = Number(localStorage.getItem(IS_HIDE_HINT)) || 0
                 localStorage.setItem(IS_HIDE_HINT, '1')
             }
         }
@@ -116,7 +117,8 @@
                     },
                     {
                         to: '/console/preci/',
-                        label: this.$t('PreCI')
+                        label: this.$t('PreCI'),
+                        isShowHint: true
                     },
                     {
                         cb: this.logout,
