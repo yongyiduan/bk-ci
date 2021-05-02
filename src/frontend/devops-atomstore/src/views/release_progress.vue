@@ -476,7 +476,7 @@
                     theme = 'success'
                     // this.requestRelease(this.routerParams.atomId)
                 } catch (err) {
-                    if ([2120030, 2120031].includes(err.status)) {
+                    if ([2120030, 2120031].includes(err.code)) {
                         this.confirmSubmit(err.message, () => this.rebuild(true))
                         return
                     }
