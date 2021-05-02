@@ -38,7 +38,7 @@
                                         v-if="(entry.code === 'build' && entry.status === 'fail') ||
                                             (entry.code === 'build' && entry.status === 'success' && progressStatus[index + 1].status === 'doing')
                                             || (entry.code === 'build' && curStep.status === 'fail' && curStep.code === 'codecc')"
-                                        @click.stop="rebuild"
+                                        @click.stop="rebuild(false)"
                                     > {{ $t('store.重新构建') }} <i class="col-line" v-if="!isEnterprise"></i></span>
                                     <span class="log-btn"
                                         v-if="entry.code === 'build' && entry.status !== 'undo' && !isEnterprise"
