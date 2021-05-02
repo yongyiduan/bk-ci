@@ -459,7 +459,7 @@
                 }
             },
 
-            async rebuild () {
+            async rebuild (fieldCheckConfirmFlag) {
                 if (!this.permission) return
 
                 let message, theme
@@ -468,20 +468,25 @@
                     await this.$store.dispatch('store/rebuild', {
                         atomId: this.routerParams.atomId,
                         projectId: this.versionDetail.projectCode,
-                        initProject: this.versionDetail.initProjectCode
+                        initProject: this.versionDetail.initProjectCode,
+                        fieldCheckConfirmFlag
                     })
 
                     message = this.$t('store.操作成功')
                     theme = 'success'
                     // this.requestRelease(this.routerParams.atomId)
                 } catch (err) {
+                    if ([2120030, 2120031].includes(err.status)) {
+                        this.confirmSubmit(err.message, () => this.rebuild(true))
+                        return
+                    }
+
                     message = err.message ? err.message : err
                     theme = 'error'
                 } finally {
-                    this.$bkMessage({
-                        message,
-                        theme
-                    })
+                    if (message) {
+                        this.$bkMessage({ message, theme })
+                    }
                 }
             },
             readLog () {
