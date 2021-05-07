@@ -35,7 +35,7 @@
                 routekey: {},
                 panelMap: {
                     atom: [
-                        { label: this.$t('store.概览'), name: 'overView' },
+                        { label: this.$t('store.概览'), name: 'overView', children: [{ name: 'statisticData' }, { name: 'statisticPipeline' }], showChildTab: false },
                         { label: this.$t('store.发布管理'),
                           name: 'release',
                           children: [
