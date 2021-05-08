@@ -48,6 +48,7 @@ import {
     ADD_STAGE,
     CONTAINER_TYPE_SELECTION_VISIBLE,
     SET_INSERT_STAGE_INDEX,
+    SET_INSERT_STAGE_ISFINALLY,
     SET_PIPELINE,
     SET_BUILD_PARAM,
     DELETE_ATOM_PROP,
@@ -298,6 +299,7 @@ export default {
         }
     },
     setInertStageIndex: actionCreator(SET_INSERT_STAGE_INDEX),
+    setInsertStageIsFinally: actionCreator(SET_INSERT_STAGE_ISFINALLY),
     toggleStageSelectPopup: actionCreator(CONTAINER_TYPE_SELECTION_VISIBLE),
     addStage: PipelineEditActionCreator(ADD_STAGE),
     deleteStage: ({ commit }, payload) => {
