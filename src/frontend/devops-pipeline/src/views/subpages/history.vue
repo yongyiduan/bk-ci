@@ -52,7 +52,6 @@
             ...mapGetters('pipelines', {
                 'statusMap': 'getStatusMap',
                 'pipelineList': 'getPipelineList',
-                'curPipeline': 'getCurPipeline',
                 'hisPageStatus': 'getHisPageStatus'
             }),
             hooks () {
