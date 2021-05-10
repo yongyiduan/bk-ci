@@ -106,8 +106,9 @@ export function extendParsePathAlias (type, path, authType, svnType) {
             msg = `${codelibLocaleObj.httpsRule}${type}${codelibLocaleObj.address}`
             break
         case isGit(type):
-            reg = /^git@git\.code\.w?oa\.com[\:|\/](.*)\.git$/
+            reg = /^git@git((\.code\.w?)|(\.w))oa\.com[\:|\/](.*)\.git$/
             msg = `${codelibLocaleObj.gitCodeInternalRule}${type}${codelibLocaleObj.address}`
+            nameMatchIndex = 4
             break
         case (authType === 'T_GIT_OAUTH') || (isTGit(type) && authType === 'HTTPS'):
             reg = /^https\:\/\/git(\.code)?\.tencent\.com[\:|\/](.*)\.git$/
