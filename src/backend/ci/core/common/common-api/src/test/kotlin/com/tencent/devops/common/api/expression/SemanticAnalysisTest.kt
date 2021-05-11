@@ -25,19 +25,55 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.auth.utils
+package com.tencent.devops.common.api.expression
 
-import java.nio.charset.Charset
-import java.util.Base64
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
+import org.junit.Test
 
-object StringUtils {
-    fun decodeAuth(token: String): Pair<String, String> {
-        val str = if (token.contains("Basic ")) {
-            token.substringAfter("Basic ")
-        } else {
-            token
+class SemanticAnalysisTest {
+
+    @Test
+    fun analysis1() {
+        val str = "a == a"
+        val items = Lex(str.toList().toMutableList()).getToken()
+        try {
+            assertEquals(true, SemanticAnalysis(items).analysis())
+        } catch (e: Exception) {
+            fail()
         }
-        val decodeStr = String(Base64.getDecoder().decode(str), Charset.forName("UTF-8"))
-        return Pair(decodeStr.substringBefore(":"), decodeStr.substringAfter(":"))
+    }
+
+    @Test
+    fun analysis2() {
+        val str = " a==a "
+        val items = Lex(str.toList().toMutableList()).getToken()
+        try {
+            assertEquals(true, SemanticAnalysis(items).analysis())
+        } catch (e: Exception) {
+            fail()
+        }
+    }
+
+    @Test
+    fun analysis3() {
+        val str = "'push'==  'push' && (true && (bbb != aaa && 1 <= 2 )) && (( !true == false) || (!false != false ))  "
+        val items = Lex(str.toList().toMutableList()).getToken()
+        try {
+            assertEquals(true, SemanticAnalysis(items).analysis())
+        } catch (e: Exception) {
+            fail()
+        }
+    }
+
+    @Test
+    fun analysis4() {
+        val str = "'push'== 'push' && (true && (bbb != aaa && 1 >= 2 )) && (( !true == false) || (!false != false )) "
+        val items = Lex(str.toList().toMutableList()).getToken()
+        try {
+            assertEquals(false, SemanticAnalysis(items).analysis())
+        } catch (e: Exception) {
+            fail()
+        }
     }
 }

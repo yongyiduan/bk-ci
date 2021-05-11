@@ -48,6 +48,7 @@ import {
     ADD_STAGE,
     CONTAINER_TYPE_SELECTION_VISIBLE,
     SET_INSERT_STAGE_INDEX,
+    SET_INSERT_STAGE_ISFINALLY,
     SET_PIPELINE,
     SET_BUILD_PARAM,
     DELETE_ATOM_PROP,
@@ -298,6 +299,7 @@ export default {
         }
     },
     setInertStageIndex: actionCreator(SET_INSERT_STAGE_INDEX),
+    setInsertStageIsFinally: actionCreator(SET_INSERT_STAGE_ISFINALLY),
     toggleStageSelectPopup: actionCreator(CONTAINER_TYPE_SELECTION_VISIBLE),
     addStage: PipelineEditActionCreator(ADD_STAGE),
     deleteStage: ({ commit }, payload) => {
@@ -454,24 +456,27 @@ export default {
     },
 
     // 第一次拉取日志
-    getInitLog ({ commit }, { projectId, pipelineId, buildId, tag, currentExe, subTag }) {
-        return request.get(`${LOG_API_URL_PREFIX}/user/logs/${projectId}/${pipelineId}/${buildId}`, {
+
+    getInitLog ({ commit }, { projectId, pipelineId, buildId, tag, currentExe, subTag, debug }) {
+        return request.get(`${API_URL_PREFIX}/${LOG_API_URL_PREFIX}/user/logs/${projectId}/${pipelineId}/${buildId}`, {
             params: {
                 tag,
                 executeCount: currentExe,
-                subTag
+                subTag,
+                debug
             }
         })
     },
 
     // 后续拉取日志
-    getAfterLog ({ commit }, { projectId, pipelineId, buildId, tag, currentExe, lineNo, subTag }) {
-        return request.get(`${LOG_API_URL_PREFIX}/user/logs/${projectId}/${pipelineId}/${buildId}/after`, {
+    getAfterLog ({ commit }, { projectId, pipelineId, buildId, tag, currentExe, lineNo, subTag, debug }) {
+        return request.get(`${API_URL_PREFIX}/${LOG_API_URL_PREFIX}/user/logs/${projectId}/${pipelineId}/${buildId}/after`, {
             params: {
                 start: lineNo,
                 executeCount: currentExe,
                 tag,
-                subTag
+                subTag,
+                debug
             }
         })
     },

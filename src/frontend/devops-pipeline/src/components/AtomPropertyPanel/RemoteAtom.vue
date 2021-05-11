@@ -43,8 +43,11 @@
             atomCode () {
                 return this.atom.atomCode || 'CodeccCheckAtom'
             },
+            pipelineId () {
+                return this.$route.params.pipelineId || ''
+            },
             src () {
-                return `${location.origin}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}`
+                return `${location.origin}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}&pipelineId=${this.pipelineId}`
             }
         },
         mounted () {
@@ -66,7 +69,16 @@
                 const atomDisabled = this.disabled || false
                 this.loading = false
                 const iframe = document.getElementById('atom-iframe').contentWindow
-                iframe.postMessage({ atomPropsValue: this.element.data.input, atomPropsModel: this.atomPropsModel.input, containerInfo, currentUserInfo, atomDisabled }, '*')
+                iframe.postMessage({
+                    atomPropsValue: this.element.data.input,
+                    atomPropsModel: this.atomPropsModel.input,
+                    containerInfo,
+                    currentUserInfo,
+                    atomDisabled,
+                    hostInfo: {
+                        ...this.$route.params
+                    }
+                }, '*')
             },
             receiveMsgFromIframe (e) {
                 if (!e.data) return
