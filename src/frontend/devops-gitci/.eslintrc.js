@@ -26,7 +26,8 @@ module.exports = {
         AJAX_URL_PREFIX: false,
         AJAX_MOCK_PARAM: false,
         LOGIN_URL: false,
-        USER_INFO_URL: false
+        USER_INFO_URL: false,
+        LOGIN_SERVICE_URL: false
     },
     // add your custom rules hered
     rules: {

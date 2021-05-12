@@ -22,13 +22,28 @@ const axiosInstance = axios.create({
  */
 axiosInstance.interceptors.request.use(config => config, error => Promise.reject(error))
 
-/**
- * response interceptor
- */
-axiosInstance.interceptors.response.use(
-    response => response.data,
-    error => Promise.reject(error)
-)
+function getLoginUrl () {
+    const cUrl = location.origin + location.pathname + encodeURIComponent(location.search)
+    if (/=%s/.test(LOGIN_SERVICE_URL)) {
+        return LOGIN_SERVICE_URL.replace(/%s/, cUrl)
+    } else {
+        const loginUrl = new URL(LOGIN_SERVICE_URL)
+        if (/=$/.test(loginUrl.search)) {
+            return LOGIN_SERVICE_URL + cUrl
+        } else {
+            loginUrl.searchParams.append('c_url', cUrl)
+            return loginUrl.href
+        }
+    }
+}
+
+axiosInstance.interceptors.response.use(response => response.data, error => {
+    const { status: httpStatus } = error.response
+    if (httpStatus === 401) {
+        location.href = getLoginUrl()
+    }
+    Promise.reject(error)
+})
 
 const http = {
     queue: new RequestQueue(),
