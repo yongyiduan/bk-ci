@@ -10,7 +10,11 @@
     "build": "better-npm-run build",
     "build:analyzer": "better-npm-run build:analyzer",
     "dll": "better-npm-run dll",
-    "public:master": "better-npm-run build"
+    "public": "better-npm-run build",
+    "public:dev": "better-npm-run build",
+    "public:test": "better-npm-run build",
+    "public:master": "better-npm-run build",
+    "public:external": "better-npm-run build"
   },
   "keywords": [],
   "license": "ISC",
