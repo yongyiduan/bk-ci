@@ -6,11 +6,16 @@
 import path from 'path'
 import prodEnv from './prod.env'
 import devEnv from './dev.env'
+import yargs from 'yargs'
+
+const argv = yargs.default({ 'dist': 'frontend' }).argv
+const envDist = argv.env && argv.env.dist ? argv.env.dist : 'frontend'
+const dist = path.resolve(__dirname, `../../${envDist}/gitci`)
 
 export default {
     build: {
         env: prodEnv,
-        assetsRoot: path.resolve(__dirname, '../dist'),
+        assetsRoot: dist,
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         productionSourceMap: true,
