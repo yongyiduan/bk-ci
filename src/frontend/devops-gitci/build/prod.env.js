@@ -13,5 +13,6 @@ export default {
     LOGIN_URL: JSON.stringify(''),
     AJAX_URL_PREFIX: JSON.stringify('http://dev.devops.oa.com'),
     AJAX_MOCK_PARAM: JSON.stringify(''),
-    USER_INFO_URL: JSON.stringify('')
+    USER_INFO_URL: JSON.stringify(''),
+    STATIC_URL: JSON.stringify('/static')
 }
