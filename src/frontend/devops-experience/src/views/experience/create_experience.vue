@@ -12,7 +12,7 @@
                 <bk-form class="experience-form" ref="form" :model="createReleaseForm">
                     <template v-if="hasPermission">
                         <div class="version-name">
-                            <bk-form-item label="ipa/apk文件" :required="true" property="name">
+                            <bk-form-item label="ipa/apk文件" label-width="160" :required="true" property="name">
                                 <bk-input
                                     ref="releaseName"
                                     placeholder="请从版本仓库中选择一个ipa或apk文件"
@@ -23,23 +23,38 @@
                             </bk-form-item>
                             <span :class="{ 'prompt-tips': true, 'is-unedit': isEdit }" :disabled="isEdit" @click="toShowPackageList">从版本仓库获取</span>
                         </div>
-                        <bk-form-item style="margin-top: 20px" label="体验名称" :required="true" property="experienceName">
+                        <bk-form-item
+                            style="margin-top: 20px"
+                            label="应用名称"
+                            :required="true"
+                            label-width="160"
+                            desc-type="icon"
+                            desc-icon="icon-info-circle"
+                            desc="展示于蓝盾App上的应用名。如果为空，将自动获取ipa/apk内置的应用名"
+                            property="experienceName">
                             <bk-input
                                 v-model="createReleaseForm.experienceName"
-                                placeholder="请输入体验名称"
+                                placeholder="请输入应用名称"
                                 maxlength="20" />
                         </bk-form-item>
-                        <bk-form-item label="版本标题" :required="true" property="versionTitle">
+                        <bk-form-item
+                            label="版本标题"
+                            :required="true"
+                            label-width="160"
+                            desc-type="icon"
+                            desc-icon="icon-info-circle"
+                            desc="该体验版本的标志性说明"
+                            property="versionTitle">
                             <bk-input
                                 v-model="createReleaseForm.versionTitle"
                                 placeholder="请输入版本标题"
                                 :rule="[{ required: true }]"
                                 maxlength="100" />
                         </bk-form-item>
-                        <bk-form-item label="版本号">
+                        <bk-form-item label="版本号" label-width="160">
                             <span class="version-number-info">{{ createReleaseForm.version_no || '--' }}</span>
                         </bk-form-item>
-                        <bk-form-item label="版本描述" property="desc" :required="true">
+                        <bk-form-item label="版本描述" property="desc" label-width="160" :required="true">
                             <bk-input
                                 type="textarea"
                                 placeholder="请填写版本描述"
@@ -50,7 +65,7 @@
                             >
                             </bk-input>
                         </bk-form-item>
-                        <bk-form-item label="产品类别" :required="true" property="categoryId">
+                        <bk-form-item label="产品类别" :required="true" label-width="160" property="categoryId">
                             <bk-select v-model="createReleaseForm.categoryId">
                                 <bk-option v-for="option in categoryList"
                                     :key="option.id"
@@ -59,23 +74,23 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="产品负责人" property="productOwner">
+                        <bk-form-item label="产品负责人" label-width="160" :required="true" property="productOwner">
                             <bk-input
                                 v-model="createReleaseForm.productOwner"
-                                placeholder="请输入产品负责人，多个产品负责人以逗号分割"
+                                placeholder="请输入英文名，多个产品负责人以英文逗号分隔"
                                 @change="productResult"
                                 :rule="[{ required: true }]" />
                         </bk-form-item>
-                        <bk-form-item label="体验结束日期" :required="true" property="end_date">
+                        <bk-form-item label="体验结束时间" label-width="160" :required="true" property="end_date">
                             <bk-date-picker
-                                placeholder="请选择体验结束日期"
+                                placeholder="请选择体验结束时间"
                                 v-model="createReleaseForm.end_date"
                                 :start-date="query.beginDate"
                                 :quick-select="false"
                             >
                             </bk-date-picker>
                         </bk-form-item>
-                        <bk-form-item label="选择体验组" :required="true" property="experienceGroups">
+                        <bk-form-item label="体验组" :required="true" label-width="160" property="experienceGroups">
                             <div class="bkdevop-checkbox-group">
                                 <bk-checkbox v-for="(col, index) in experienceGroup" :key="index" v-model="col.isChecked" @change="handleGroupChange" class="exp-group-item">
                                     {{ col.name }}
@@ -85,8 +100,8 @@
                                             <p style="max-width: 300px; text-align: left; white-space: normal;word-break: break-all;font-weight: 400;">内部人员名单：
                                                 <span v-for="(entry, uIndex) in col.innerUsers" :key="uIndex">{{ entry.replace('"', '') }}<span v-if="index !== (col.innerUsers.length - 1)">,</span></span>
                                             </p>
-                                            <p style="max-width: 300px; text-align: left; white-space: normal;word-break: break-all;font-weight: 400;">外部QQ名单：
-                                                <span>{{ col.outerUsers }}</span>
+                                            <p style="max-width: 300px; text-align: left; white-space: normal;word-break: break-all;font-weight: 400;">外部人员名单：
+                                                <span>{{ col.outerUsers.join(',') }}</span>
                                             </p>
                                         </template>
                                     </bk-popover>
@@ -97,19 +112,36 @@
                                 新增体验组
                             </span>
                         </bk-form-item>
-                        <bk-form-item label="附加内部人员" property="internal_list">
-                            <bk-member-selector placeholder="全公司人员有效" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
+                        <bk-form-item
+                            label="附加内部体验人员"
+                            desc-type="icon"
+                            desc-icon="icon-info-circle"
+                            desc="全公司人员有效"
+                            label-width="160"
+                            property="internal_list">
+                            <bk-member-selector placeholder="请输入英文名，多个体验人员以英文逗号分隔" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
                         </bk-form-item>
-                        <bk-form-item label="附加外部QQ" property="external_list">
-                            <bk-input type="textarea"
+                        <bk-form-item label="附加外部体验人员" label-width="160" property="external_list">
+                            <!-- <bk-input type="textarea"
                                 placeholder="请输入QQ号，以逗号或分号分隔"
                                 name="externalList"
                                 v-model="createReleaseForm.external_list"
-                                :onkeyup="textdisplayResult()"
-                            >
-                            </bk-input>
+                            > -->
+                            <!-- :onkeyup="textdisplayResult()" -->
+                            <!-- </bk-input> -->
+                            <bk-select :disabled="false" v-model="createReleaseForm.external_list"
+                                ext-cls="select-custom"
+                                ext-popover-cls="select-popover-custom"
+                                multiple
+                                searchable>
+                                <bk-option v-for="option in outersList"
+                                    :key="option.id"
+                                    :id="option.id"
+                                    :name="option.name">
+                                </bk-option>
+                            </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知方式" desc="三种通知方式均不会对公开体验生效" desc-type="icon" desc-icon="icon-info-circle">
+                        <bk-form-item label="通知方式" label-width="160" desc="三种通知方式均不会对公开体验生效" desc-type="icon" desc-icon="icon-info-circle">
                             <div class="bkdevop-checkbox-group">
                                 <bk-checkbox v-for="(col, index) in noticeTypeList" :key="index" v-model="col.isChecked">{{ col.name }}</bk-checkbox>
                             </div>
@@ -147,7 +179,9 @@
                     <div class="value-item" :title="row.value">{{ row.value }}</div>
                 </div>
             </div>
-            <experience-group :node-select-conf="nodeSelectConf"
+            <experience-group
+                :node-select-conf="nodeSelectConf"
+                :outers-list="outersList"
                 :create-group-form="createGroupForm"
                 :loading="dialogLoading"
                 :on-change="onChange"
@@ -197,6 +231,7 @@
                     { name: '微信', value: 'WECHAT', isChecked: false }
                 ],
                 metaList: [],
+                outersList: [],
                 loading: {
                     isLoading: false,
                     title: ''
@@ -318,6 +353,7 @@
             this.query.beginDate = new Date()
             if (this.isEdit) {
                 this.requestExperienceDetail()
+                this.fetchOutersList()
             }
         },
         mounted () {
@@ -366,6 +402,36 @@
                 })
                 this.createReleaseForm.experienceGroups = newExperienceGroups
             },
+            /**
+             * 获取外部体验人员列表
+             */
+            async fetchOutersList () {
+                this.loading.isLoading = true
+                try {
+                    const res = await this.$store.dispatch('experience/fetchOutersList', {
+                        projectId: this.projectId,
+                        experienceHashId: this.experienceHashId
+                    })
+                    this.outersList = []
+                    res.forEach(item => {
+                        this.outersList.push({
+                            id: item.username,
+                            name: item.username
+                        })
+                    })
+                } catch (err) {
+                    const message = err.message ? err.message : err
+                    const theme = 'error'
+
+                    this.$bkMessage({
+                        message,
+                        theme
+                    })
+                } finally {
+                    this.loading.isLoading = false
+                }
+            },
+
             /**
              * 获取体验详情
              */
@@ -490,9 +556,6 @@
                 if (this.nodeSelectConf.isShow) {
                     this.createGroupForm.external_list = this.createGroupForm.external_list.replace(/[^\d;,]/g, '')
                 }
-            },
-            textdisplayResult () {
-                this.createReleaseForm.external_list = this.createReleaseForm.external_list.replace(/[^\d;,]/g, '')
             },
             productResult () {
                 this.createReleaseForm.productOwner = this.createReleaseForm.productOwner.split(',')
@@ -635,10 +698,11 @@
                 let message
                 const theme = 'error'
                 if (!this.createReleaseForm.desc || !this.createReleaseForm.name || !this.createReleaseForm.end_date || !this.createReleaseForm.experienceName
-                    || !this.createReleaseForm.versionTitle || !this.createReleaseForm.categoryId || !this.createReleaseForm.experienceGroups.length) {
+                    || !this.createReleaseForm.versionTitle || !this.createReleaseForm.categoryId || !this.createReleaseForm.productOwner.length || !this.createReleaseForm.experienceGroups.length) {
                     if (!this.createReleaseForm.experienceGroups.length) message = '请选择体验组'
                     if (!this.createReleaseForm.end_date) message = '请选择体验结束日期'
                     if (this.createReleaseForm.categoryId === null) message = '请选择产品类别'
+                    if (!this.createReleaseForm.productOwner.length) message = '请填写产品负责人'
                     if (!this.createReleaseForm.desc) message = '请填写版本描述'
                     if (!this.createReleaseForm.versionTitle) message = '请填写版本标题'
                     if (!this.createReleaseForm.experienceName) message = '请填写体验名称'
@@ -656,7 +720,6 @@
                         }
                     })
                     this.createReleaseForm.experienceGroups = newExperienceGroups
-
                     const params = {
                         name: this.createReleaseForm.name,
                         path: this.createReleaseForm.path,
@@ -665,6 +728,7 @@
                         expireDate: Date.parse(this.createReleaseForm.end_date) / 1000,
                         remark: this.createReleaseForm.desc || undefined,
                         outerUsers: this.createReleaseForm.external_list,
+                        // outerUsers: this.createReleaseForm.external_list,
                         innerUsers: this.createReleaseForm.internal_list,
                         enableWechatGroups: this.createReleaseForm.enableWechatGroups,
                         experienceGroups: this.createReleaseForm.experienceGroups,
@@ -674,15 +738,12 @@
                         categoryId: this.createReleaseForm.categoryId,
                         productOwner: this.createReleaseForm.productOwner
                     }
-            
                     if (this.createReleaseForm.enableWechatGroups) {
                         params.wechatGroups = this.wechatGroupCompletion()
                     } else {
                         params.wechatGroups = ''
                     }
 
-                    console.log(this.createReleaseForm.experienceGroups, 'this.createReleaseForm.experienceGroupsthis.createReleaseForm.experienceGroups')
-            
                     this.noticeTypeList.forEach(item => {
                         if (item.isChecked) {
                             params.notifyTypes.push(item.value)
@@ -692,7 +753,6 @@
                     let message, theme
             
                     this.loading.isLoading = true
-            
                     try {
                         if (this.$route.params.experienceId) {
                             await this.$store.dispatch('experience/editExperience', {
