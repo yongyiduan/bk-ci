@@ -41,14 +41,27 @@
                     </ul>
                 </bk-dropdown-menu>
             </bk-form-item>
-            <bk-form-item label="外部QQ" property="external_list">
-                <bk-input
+            <bk-form-item label="外部人员" property="external_list">
+                <bk-select
+                    v-model="createGroupForm.external_list"
+                    ext-cls="select-custom"
+                    ext-popover-cls="select-popover-custom"
+                    :disabled="false"
+                    multiple
+                    searchable>
+                    <bk-option v-for="option in outersList"
+                        :key="option.id"
+                        :id="option.id"
+                        :name="option.name">
+                    </bk-option>
+                </bk-select>
+                <!-- <bk-input
                     type="textarea"
                     placeholder="请输入QQ号，以逗号或分号分隔"
                     name="groupExternalList"
                     :onkeyup="displayResult()"
                     v-model="createGroupForm.external_list"
-                />
+                /> -->
             </bk-form-item>
             <bk-form-item label="描述" property="desc">
                 <bk-input
@@ -73,7 +86,11 @@
             errorHandler: Object,
             onChange: Function,
             cancelFn: Function,
-            displayResult: Function
+            displayResult: Function,
+            outersList: {
+                type: Array,
+                default: () => []
+            }
         },
         data () {
             return {
