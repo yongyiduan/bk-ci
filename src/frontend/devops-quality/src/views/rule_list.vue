@@ -94,6 +94,12 @@
                 :quick-close="sideSliderConfig.quickClose"
                 :width="sideSliderConfig.width"
                 @hidden="closrSlider">
+                <template slot="header">
+                    <div class="rule-side-header">
+                        <p>{{ ruleDetail.name }}</p>
+                        <a @click="handleGoEditRule">编辑</a>
+                    </div>
+                </template>
                 <template slot="content">
                     <div class="rule-slider-info"
                         v-if="sideSliderConfig.show && ruleDetail"
@@ -326,7 +332,8 @@
                     current: 1,
                     count: 0,
                     limit: 10
-                }
+                },
+                ruleHashId: null
             }
         },
         computed: {
@@ -636,6 +643,15 @@
                     }
                 })
             },
+            handleGoEditRule () {
+                this.$router.push({
+                    name: 'editRule',
+                    params: {
+                        projectId: this.projectId,
+                        ruleId: this.ruleHashId
+                    }
+                })
+            },
             editRule (row) {
                 if (row.permissions.canEdit) {
                     this.$router.push({
@@ -693,6 +709,7 @@
                 }
             },
             async toShowSlider (ruleHashId, type) {
+                this.ruleHashId = ruleHashId
                 this.curActiveTab = type === 'detail' ? 'detailInfo' : 'recordDate'
                 this.lastClickRule = ruleHashId
                 this.sideSliderConfig.isLoading = true
@@ -841,6 +858,15 @@
         .bk-sideslider-content {
             height: calc(100% - 60px);
             overflow: hidden;
+        }
+        .rule-side-header {
+            display: flex;
+            justify-content: space-between;
+            padding-right: 48px;
+            a {
+                cursor: pointer;
+                color: #3a84ff;
+            }
         }
         .rule-slider-info {
             height: 100%;
