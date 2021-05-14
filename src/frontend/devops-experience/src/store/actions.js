@@ -141,6 +141,13 @@ const actions = {
     requestUserGroup ({ commit }, { projectId }) {
         return vue.$ajax.get(`${prefix}/user/groups/${projectId}/projectGroupAndUsers`)
     },
+
+    /**
+     * 获取外部体验人员
+     */
+    fetchOutersList ({ commit }, { projectId }) {
+        return vue.$ajax.get(`${prefix}/user/experiences/outer/list?projectId=${projectId}`)
+    },
     updateCurSelectedFile ({ commit }, { selectFile }) {
         commit(UPDATE_SELECTED_FILE, {
             fileInfo: selectFile
