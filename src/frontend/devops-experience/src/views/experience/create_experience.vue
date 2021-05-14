@@ -352,8 +352,8 @@
             this.query.beginDate = new Date()
             if (this.isEdit) {
                 this.requestExperienceDetail()
-                this.fetchOutersList()
             }
+            this.fetchOutersList()
         },
         mounted () {
             this.groupIdStorage = localStorage.getItem('groupIdStr') ? localStorage.getItem('groupIdStr').split(';').filter(item => item) : []
@@ -406,6 +406,7 @@
              */
             async fetchOutersList () {
                 this.loading.isLoading = true
+                console.log(111)
                 try {
                     const res = await this.$store.dispatch('experience/fetchOutersList', {
                         projectId: this.projectId,
