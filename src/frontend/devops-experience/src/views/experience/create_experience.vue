@@ -26,7 +26,6 @@
                         <bk-form-item
                             style="margin-top: 20px"
                             label="应用名称"
-                            :required="true"
                             label-width="160"
                             desc-type="icon"
                             desc-icon="icon-info-circle"
@@ -697,15 +696,14 @@
             async submitFn () {
                 let message
                 const theme = 'error'
-                if (!this.createReleaseForm.desc || !this.createReleaseForm.name || !this.createReleaseForm.end_date || !this.createReleaseForm.experienceName
-                    || !this.createReleaseForm.versionTitle || !this.createReleaseForm.categoryId || !this.createReleaseForm.productOwner.length || !this.createReleaseForm.experienceGroups.length) {
+                if (!this.createReleaseForm.desc || !this.createReleaseForm.name || !this.createReleaseForm.end_date || !this.createReleaseForm.versionTitle || !this.createReleaseForm.categoryId || !this.createReleaseForm.productOwner.length || !this.createReleaseForm.experienceGroups.length) {
                     if (!this.createReleaseForm.experienceGroups.length) message = '请选择体验组'
                     if (!this.createReleaseForm.end_date) message = '请选择体验结束日期'
                     if (this.createReleaseForm.categoryId === null) message = '请选择产品类别'
                     if (!this.createReleaseForm.productOwner.length) message = '请填写产品负责人'
                     if (!this.createReleaseForm.desc) message = '请填写版本描述'
                     if (!this.createReleaseForm.versionTitle) message = '请填写版本标题'
-                    if (!this.createReleaseForm.experienceName) message = '请填写体验名称'
+                    // if (!this.createReleaseForm.experienceName) message = '请填写体验名称'
                     if (!this.createReleaseForm.name) message = '请选择ipa/apk文件'
                     this.$bkMessage({
                         message,
