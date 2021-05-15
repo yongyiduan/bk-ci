@@ -1,3 +1,4 @@
+@import './conf.css';
 
 .aside-nav {
     min-width: 240px;
@@ -15,28 +16,58 @@
         display: flex;
         align-items: center;
         border-bottom: 1px solid #dde4eb;
-        margin-bottom: 11px;
         .bk-icon {
             font-size: 34px;
             margin-right: 4px;
-            color: #3a84ff;
             cursor: pointer;
+            &:hover {
+                color: #3a84ff;
+            }
         }
     }
     .nav-item {
-        line-height: 42px;
-        padding: 0 18px;
+        position: relative;
+        line-height: 40px;
+        height: 40px;
         cursor: pointer;
         font-size: 14px;
-        color: #63656E;
         display: flex;
         align-items: center;
         &.active {
-            background: #e1ecff;
-            color: #478cff;
+            background: #e0ecff;
+            color: #3c96ff;
+            &:after {
+                content: '';
+                height: 40px;
+                width: 3px;
+                position: absolute;
+                right: 0;
+                background: #3c96ff;
+            }
         }
         svg {
-            margin-right: 12px;
+            margin: 0 16px 0 18px;
         }
+    }
+}
+
+.warning {
+    color: $warningColor;
+}
+.danger {
+    color: $dangerColor;
+}
+.success {
+    color: $successColor;
+}
+
+.update-btn {
+    color: #3a84ff;
+    margin-right: 15px;
+    display: inline-block;
+    cursor: pointer;
+    &.disabled {
+        cursor: not-allowed;
+        color: #c4c6cc;
     }
 }

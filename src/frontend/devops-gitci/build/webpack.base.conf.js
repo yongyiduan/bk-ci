@@ -4,20 +4,18 @@
  */
 
 import webpack from 'webpack'
-import CopyWebpackPlugin from 'copy-webpack-plugin'
 import { VueLoaderPlugin } from 'vue-loader'
 import friendlyFormatter from 'eslint-friendly-formatter'
-
 import { resolve, assetsPath } from './util'
 import config from './config'
-
 const isProd = process.env.NODE_ENV === 'production'
 
 export default {
     output: {
         path: isProd ? config.build.assetsRoot : config.dev.assetsRoot,
         filename: '[name].js',
-        publicPath: isProd ? config.build.assetsPublicPath : config.dev.assetsPublicPath
+        publicPath: isProd ? config.build.assetsPublicPath : config.dev.assetsPublicPath,
+        globalObject: 'this'
     },
 
     resolve: {
@@ -49,6 +47,7 @@ export default {
             },
             {
                 test: /\.vue$/,
+                include: [resolve('src'), resolve('node_modules/@blueking/log'), resolve('../node_modules/@blueking/log')],
                 use: {
                     loader: 'vue-loader',
                     options: {
@@ -63,6 +62,7 @@ export default {
             },
             {
                 test: /\.js$/,
+                include: [resolve('src'), resolve('node_modules/@blueking/log'), resolve('../node_modules/@blueking/log')],
                 use: {
                     loader: 'babel-loader',
                     options: {

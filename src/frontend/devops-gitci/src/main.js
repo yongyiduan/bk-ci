@@ -12,10 +12,11 @@ import store from '@/store'
 import '@/common/bkmagic'
 import '@icon-cool/bk-icon-gitci/src/index'
 import icon from '@/components/icon'
-import { injectCSRFTokenToHeaders } from '@/api'
+import log from '@blueking/log'
 
-injectCSRFTokenToHeaders()
 Vue.component('icon', icon)
+Vue.use(log)
+
 global.mainComponent = new Vue({
     el: '#app',
     router,

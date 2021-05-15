@@ -41,6 +41,17 @@ const webpackConfig = merge(baseConf, {
                         }
                     }
                 ]
+            },
+            {
+                test: /\.(js|vue)$/,
+                loader: 'eslint-loader',
+                enforce: 'pre',
+                include: [path.resolve(__dirname, '..', 'src')],
+                exclude: /node_modules/,
+                options: {
+                    fix: true,
+                    formatter: require('eslint-friendly-formatter')
+                }
             }
         ]
     },

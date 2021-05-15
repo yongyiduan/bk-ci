@@ -7,7 +7,7 @@
             </h5>
 
             <opt-menu v-if="editable">
-                <li>节点列表</li>
+                <li @click="goToAgentList">节点列表</li>
                 <li>删除</li>
             </opt-menu>
         </header>
@@ -74,6 +74,10 @@
                     theme = 'danger'
                 }
                 return theme
+            },
+
+            goToAgentList () {
+                this.$router.push({ name: 'agentList' })
             }
         }
     }
@@ -115,7 +119,7 @@
                 font-size: 12px;
                 line-height: 14px;
                 height: 14px;
-                color: #63656e;
+                color: #7b7d8a;
                 display: inline-block;
                 width: 100%;
                 margin-bottom: 7px;

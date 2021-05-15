@@ -217,7 +217,7 @@
             submitData () {
                 this.$refs.credentialForm.validate(() => {
                     let method = setting.createTicket
-                    const params = ['linetest', this.formData]
+                    const params = [this.$route.params.projectId, this.formData]
                     if (this.isEdit) {
                         method = setting.modifyTicket
                         params.push(this.formData.credentialId)

@@ -5,16 +5,16 @@
 
 import Vue from 'vue'
 import axios from 'axios'
-import cookie from 'cookie'
-
 import CachedPromise from './cached-promise'
 import RequestQueue from './request-queue'
 import { bus } from '../common/bus'
 
 // axios 实例
 const axiosInstance = axios.create({
+    baseURL: AJAX_URL_PREFIX,
     withCredentials: true,
-    baseURL: AJAX_URL_PREFIX
+    xsrfCookieName: 'paas_perm_csrftoken',
+    xsrfHeaderName: 'X-CSRFToken'
 })
 
 /**
@@ -234,15 +234,3 @@ function getCancelToken () {
 Vue.prototype.$http = http
 
 export default http
-
-/**
- * 向 http header 注入 CSRFToken，CSRFToken key 值与后端一起协商制定
- */
-export function injectCSRFTokenToHeaders () {
-    const CSRFToken = cookie.parse(document.cookie).csrftoken
-    if (CSRFToken !== undefined) {
-        axiosInstance.defaults.headers.common['X-CSRFToken'] = CSRFToken
-    } else {
-        console.warn('Can not find csrftoken in document.cookie')
-    }
-}

@@ -9,7 +9,7 @@
             :outer-border="false"
             :header-border="false"
             :header-cell-style="{ background: '#fafbfd' }"
-            :height="Math.min(appHeight - 152, 106 + credentialList.length * 42)"
+            :height="tableHeight"
             @page-change="pageChange"
             @page-limit-change="pageLimitChange"
             class="credential-table"
@@ -69,7 +69,15 @@
         },
 
         computed: {
-            ...mapGetters(['appHeight'])
+            ...mapGetters(['appHeight']),
+
+            tableHeight () {
+                return Math.min(this.appHeight - 152, 106 + (Math.max(this.credentialList.length, 3)) * 42)
+            },
+
+            projectId () {
+                return this.$route.params.projectId
+            }
         },
 
         created () {
@@ -83,7 +91,7 @@
                     pageSize: this.pagination.limit
                 }
                 this.isLoading = true
-                setting.getTicketList('linetest', params).then((res) => {
+                setting.getTicketList(this.projectId, params).then((res) => {
                     const data = res.data || {}
                     this.pagination.count = data.count || 0
                     this.credentialList = data.records || []
@@ -96,7 +104,7 @@
 
             requestDelete () {
                 this.isDelLoading = true
-                setting.deleteTicket('linetest', this.deleteObj.id).then(() => {
+                setting.deleteTicket(this.projectId, this.deleteObj.id).then(() => {
                     this.getTicketList()
                     this.deleteObj.show = false
                 }).catch((err) => {
@@ -157,17 +165,5 @@
         align-items: center;
         justify-content: space-between;
         margin-bottom: 20px;
-    }
-    .credential-table {
-        .update-btn {
-            color: #3a84ff;
-            margin-right: 15px;
-            display: inline-block;
-            cursor: pointer;
-            &.disabled {
-                cursor: not-allowed;
-                color: #c4c6cc;
-            }
-        }
     }
 </style>

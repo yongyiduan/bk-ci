@@ -34,7 +34,7 @@
                 font-size: 12px;
                 padding: 0 9px;
                 cursor: pointer;
-                color: #63656E;
+                color: #7b7d8a;
                 &:hover {
                     background: #e1ecff;
                     color: #3a84ff;

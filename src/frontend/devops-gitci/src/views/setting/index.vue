@@ -63,7 +63,7 @@
             },
 
             backHome () {
-                this.goToPage({ name: 'pipelines' })
+                this.goToPage({ name: 'buildList', params: this.$route.params })
             }
         }
     }

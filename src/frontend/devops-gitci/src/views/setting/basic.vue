@@ -11,6 +11,11 @@
             <section class="main-checkbox">
                 <bk-checkbox :value="'value1'" class="checkbox">Lock MR merge</bk-checkbox>
             </section>
+
+            <h5 class="main-title">Config enable</h5>
+            <section class="main-checkbox">
+                <bk-checkbox :value="'value1'" class="checkbox">Enable CI</bk-checkbox>
+            </section>
         </section>
 
         <bk-button theme="primary" class="basic-btn">保存</bk-button>
@@ -38,7 +43,7 @@
         }
         .main-checkbox {
             padding-bottom: 25px;
-            &:nth-child(2) {
+            &:not(:last-child) {
                 border-bottom: 1px solid #f0f1f5;
             }
         }

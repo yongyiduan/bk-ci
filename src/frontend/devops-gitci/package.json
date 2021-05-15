@@ -46,9 +46,11 @@
     }
   },
   "dependencies": {
-    "@icon-cool/bk-icon-gitci": "0.0.3",
-    "bk-magic-vue": "2.3.0",
+    "@blueking/log": "1.1.9",
+    "@icon-cool/bk-icon-gitci": "0.0.6",
     "axios": "~0.18.0",
+    "bk-magic-vue": "2.3.0",
+    "codemirror": "^5.61.0",
     "cookie": "~0.4.0",
     "jsonp": "~0.2.1",
     "vue": "~2.5.22",
@@ -75,6 +77,8 @@
     "babel-loader": "~8.0.6",
     "babel-plugin-istanbul": "~5.1.4",
     "babel-plugin-lodash": "~3.3.4",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-plugin-transform-vue-jsx": "^3.7.0",
     "better-npm-run": "~0.1.1",
     "body-parser": "~1.19.0",
     "chalk": "~2.4.2",

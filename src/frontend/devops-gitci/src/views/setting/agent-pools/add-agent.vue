@@ -98,8 +98,8 @@
                     { id: 'WINDOWS', name: 'Windows' }
                 ],
                 navList: [
-                    { link: { name: 'agentPools' }, title: 'Agent pools' },
-                    { link: { name: 'agentPools' }, title: this.$route.params.pool },
+                    { link: { name: 'agentPools' }, title: 'Agent Pools' },
+                    { link: { name: 'agentList' }, title: 'Agent List' },
                     { link: '', title: 'Add Agent' }
                 ],
                 architectures: ['x64'],
@@ -122,6 +122,12 @@
             }
         },
 
+        computed: {
+            projectId () {
+                return this.$route.params.projectId
+            }
+        },
+
         created () {
             this.getZoneList()
         },
@@ -135,7 +141,7 @@
 
             getZoneList () {
                 this.isLoading = true
-                setting.getThirdAgentZoneList('linetest', this.machine.system).then((res) => {
+                setting.getThirdAgentZoneList(this.projectId, this.machine.system).then((res) => {
                     this.zones = res.data || []
                     this.machine.zone = (this.zones[0] || {}).zoneName
                     return this.getThirdAgentLink()
@@ -147,7 +153,7 @@
             },
 
             getThirdAgentLink () {
-                return setting.getThirdAgentLink('linetest', this.machine.system, this.machine.zone).then((res) => {
+                return setting.getThirdAgentLink(this.projectId, this.machine.system, this.machine.zone).then((res) => {
                     const data = res.data || {}
                     this.machine.link = data.link
                     this.machine.agentId = data.agentId
@@ -159,7 +165,7 @@
 
             getAgentStatus () {
                 this.isRefresh = true
-                return setting.getThirdAgentStatus('linetest', this.machine.agentId).then((res) => {
+                return setting.getThirdAgentStatus(this.projectId, this.machine.agentId).then((res) => {
                     this.agentStatus = res.data || {}
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -173,8 +179,8 @@
 
 <style lang="postcss" scoped>
     .add-agent-head {
-        height: 48px;
-        line-height: 48px;
+        height: 49px;
+        line-height: 49px;
         background: #fff;
         box-shadow: 0 2px 5px 0 rgba(51,60,72,0.03);
         padding: 0 25.5px;
@@ -199,7 +205,7 @@
             padding: 0 19px;
             margin-top: 16px;
             .filter-title {
-                color: #63656E;
+                color: #7b7d8a;
                 display: inline-block;
                 margin-right: 8px;
             }
@@ -233,7 +239,7 @@
                 padding: 12px;
                 line-height: 17px;
                 font-size: 12px;
-                color: #63656E;
+                color: #7b7d8a;
                 .gray {
                     color: #979ba5;
                     display: block;
