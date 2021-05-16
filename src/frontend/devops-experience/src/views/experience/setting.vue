@@ -34,7 +34,7 @@
                                         <span class="handler-outer">{{ props.row.outerUsersCount }}</span>
                                         <template slot="content">
                                             <p style="max-width: 300px; text-align: left; white-space: normal;word-break: break-all;font-weight: 400;">
-                                                <span>{{ props.row.outerUsers.replace(';', ',') }}</span>
+                                                <span>{{ props.row.outerUsers.join(',') }}</span>
                                             </p>
                                         </template>
                                     </bk-popover>

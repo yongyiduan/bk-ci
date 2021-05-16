@@ -39,7 +39,7 @@
                                 </div>
                             </div>
                             <div class="bk-tab2-pane" v-else-if="curTab === 'external'">
-                                <div class="release-list-textarea">{{ curReleaseDetail.external_list }}</div>
+                                <div class="release-list-textarea">{{ curReleaseDetail.external_list.join(',') }}</div>
                             </div>
                         </bk-tab-panel>
                     </bk-tab>
@@ -110,7 +110,7 @@
                     },
                     {
                         name: 'external',
-                        label: '附加外部邮箱'
+                        label: '附加外部人员'
                     }
                 ]
             }
