@@ -8,11 +8,13 @@
             </bk-tab-panel>
         </bk-tab>
 
-        <code-section :code="yml" limit-height height="calc(100% - 50px)"></code-section>
+        <code-section :code="ymlObj[active]" limit-height :height="`${height}px`"></code-section>
     </article>
 </template>
 
 <script>
+    import { mapState } from 'vuex'
+    import { pipelines } from '@/http'
     import codeSection from '@/components/code-section'
 
     export default {
@@ -23,11 +25,31 @@
         data () {
             return {
                 panels: [
-                    { label: 'Parsed YAML', name: 'parsed' },
-                    { label: 'Original YAML', name: 'original' }
+                    { label: 'Parsed YAML', name: 'parsedYaml' },
+                    { label: 'Original YAML', name: 'originYaml' }
                 ],
-                active: 'parsed',
-                yml: ''
+                active: 'parsedYaml',
+                ymlObj: {}
+            }
+        },
+
+        computed: {
+            ...mapState(['projectId', 'appHeight']),
+
+            height () {
+                return this.appHeight - 255
+            }
+        },
+
+        created () {
+            this.getYaml()
+        },
+
+        methods: {
+            getYaml () {
+                pipelines.getPipelineBuildYaml(this.projectId, this.$route.params.buildId).then((res) => {
+                    this.ymlObj = res
+                })
             }
         }
     }
@@ -35,6 +57,7 @@
 
 <style lang="postcss" scoped>
     .detail-config {
+        overflow: hidden;
         /deep/ .bk-tab-section {
             padding: 0;
             border: none;

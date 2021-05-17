@@ -1,8 +1,12 @@
 import api from '../api'
-const PROJECT_API_URL_PERFIX = 'ms/project/api/user'
+import { PROJECT_PERFIX } from './perfix'
 
 export default {
     getUserInfo () {
-        return api.get(`${PROJECT_API_URL_PERFIX}/users`)
+        return api.get(`${PROJECT_PERFIX}/user/users`)
+    },
+
+    getProjectId () {
+        return api.get(`${PROJECT_PERFIX}/user/users`)
     }
 }

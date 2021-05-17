@@ -2,7 +2,7 @@
     <article class="agent-pools" @scroll.passive="mainScroll">
         <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 60 && scrollTop < 1030 }">Default agent pools</h3>
         <section class="agent-pools-container">
-            <agent-pool-card class="agent-pool" :editable="false"></agent-pool-card>
+            <agent-pool-card class="agent-pool" :editable="false" v-for="pool in thirdPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
         </section>
 
         <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 1030 }">
@@ -10,14 +10,17 @@
             <bk-button @click="showAddPool" class="add-pool" theme="primary" size="small">Add Pool</bk-button>
         </h3>
         <section class="agent-pools-container">
-            <agent-pool-card class="agent-pool"></agent-pool-card>
+            <agent-pool-card class="agent-pool" @refresh="getThirdPoolList" v-for="pool in thirdPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
+            <bk-exception class="exception-wrap-item" type="empty"> </bk-exception>
         </section>
 
-        <add-pool :show.sync="isShowAddPool"></add-pool>
+        <add-pool :show.sync="isShowAddPool" @refresh="getThirdPoolList"></add-pool>
     </article>
 </template>
 
 <script>
+    import { setting } from '@/http'
+    import { mapState } from 'vuex'
     import agentPoolCard from '@/components/setting/agent-pool-card'
     import addPool from '@/components/setting/add-pool'
 
@@ -30,11 +33,38 @@
         data () {
             return {
                 isShowAddPool: false,
-                scrollTop: 0
+                scrollTop: 0,
+                systemPools: [],
+                thirdPools: []
             }
         },
 
+        computed: {
+            ...mapState(['projectId'])
+        },
+
+        created () {
+            this.initData()
+        },
+
         methods: {
+            initData () {
+                this.isLoading = true
+                Promise.all([setting.getEnvironmentList(this.projectId), setting.getSystemPoolDetail()]).then(([thirdPool = {}, systemPool = {}]) => {
+                    this.thirdPools = thirdPool.data || []
+                    this.systemPools = []
+                    const clusterLoad = systemPool.data.clusterLoad
+                    for (const name in clusterLoad) {
+                        const element = clusterLoad[name]
+                        this.systemPools.push({ name, ...element })
+                    }
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
             showAddPool () {
                 this.isShowAddPool = true
             },
@@ -86,6 +116,15 @@
             margin-top: 20px;
             &:not(:nth-child(4n + 1)) {
                 margin-left: 20px;
+            }
+        }
+        .exception-wrap-item {
+            /deep/ img {
+                width: 420px;
+            }
+            /deep/ .bk-exception-text {
+                margin-top: -50px;
+                font-size: 18px;
             }
         }
     }

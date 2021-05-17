@@ -9,7 +9,7 @@
         <main class="add-agent-body">
             <h3 class="agent-tips">
                 <span>Adding a self-hosted agent requires that you download and install the agent.</span>
-                <bk-link theme="primary">Learn more about self-hosted agents</bk-link>
+                <bk-link theme="primary" href="https://iwiki.woa.com/x/2ebDKw" target="_blank">Learn more about self-hosted agents</bk-link>
             </h3>
 
             <section class="agent-filter">
@@ -41,25 +41,11 @@
             </section>
 
             <section class="agent-info use-tip">
-                <h3>Download</h3>
-                <p>
-                    <span class="gray"># Create a folder</span>
-                    <span class="mb10">$ mkdir /data/landun && cd  /data/landun</span>
-                    <span class="gray"># Download the latest runner package</span>
-                    <span class="mb10">{{ machine.link }}</span>
-                    <span class="gray"># Download the latest runner package</span>
-                    <span>$ mkdir /data/landun && cd  /data/landun</span>
-                </p>
-
-                <h3>Install</h3>
-                <p>
-                    <span class="gray"># Install and run it!</span>
-                    <span>$ cd landun_devops_agent && ./install.sh </span>
-                </p>
+                <section v-html="computedHtml"></section>
 
                 <h3>Refresh to confirm</h3>
                 <p v-bkloading="{ isLoading: isRefresh }" class="agent-status">
-                    <bk-button text @click="getAgentStatus" v-if="agentStatus.status === 'UN_IMPORT'" class="agent-refresh">Click to show the runner</bk-button>
+                    <bk-button text @click="getAgentStatus" v-if="agentStatus.status === 'UN_IMPORT'" class="agent-refresh">Click to show the agent</bk-button>
                     <section v-else>
                         {{ agentStatus.hostname }}
                     </section>
@@ -67,7 +53,7 @@
             </section>
 
             <h3 class="self-hosted-agent">Using your self-hosted agent</h3>
-            <section class="agent-info self-agent">
+            <section class="agent-info">
                 <h3>Using by pool</h3>
                 <p>
                     <span class="gray"># Use this YAML in your piepline file for each job</span>
@@ -75,10 +61,6 @@
                     <span class="block">&nbsp;&nbsp;self-hosted: true</span>
                     <span class="block">&nbsp;&nbsp;pool-name: my_pool_name</span>
                 </p>
-                <span class="self-agent-more">
-                    You can add tags to agents for grouping.
-                    <bk-link theme="primary">Learn more</bk-link>
-                </span>
             </section>
 
             <bk-button class="back-list" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
@@ -88,6 +70,7 @@
 
 <script>
     import { setting } from '@/http'
+    import { mapState } from 'vuex'
 
     export default {
         data () {
@@ -123,8 +106,31 @@
         },
 
         computed: {
-            projectId () {
-                return this.$route.params.projectId
+            ...mapState(['projectId']),
+
+            computedHtml () {
+                const unixHtml = `
+                    <h3>Download & Install</h3>
+                    <p>
+                        <span class="gray"># Create a folder</span>
+                        <span class="mb10">$ mkdir /data/landun && cd  /data/landun</span>
+                        <span class="gray"># Download and install the latest agent package</span>
+                        <span class="mb10">${this.machine.link}</span>
+                        <span class="gray"># Run it!</span>
+                        <span>$ cd landun_devops_agent && ./install.sh </span>
+                    </p>
+                `
+                const windowHtml = `
+                    <h3>Download & Install</h3>
+                    <p>
+                        <span class="mb10">1. Download the latest agent<a href="${this.machine.link}" target="_blank">Click here to download agent</a></span>
+                        <span class="mb10">2. Create a folder, such as C:\\data\\landun</span>
+                        <span class="mb10">3. Extract the installer to C:\\data\\landun</span>
+                        <span class="mb10">4. Execute install.bat by administrator</span>
+                        <span class="mb10">5. In order to read user environment, please change the setup user from system to the login user, such as tencent\\zhangsan<a href="https://iwiki.woa.com/x/ZNMrAg" target="_blank">Learn more</a></span>
+                    </p>
+                `
+                return this.machine.system === 'WINDOWS' ? windowHtml : unixHtml
             }
         },
 
@@ -133,8 +139,6 @@
         },
 
         methods: {
-            submitData () {},
-
             backToPoolList () {
                 this.$router.back()
             },
@@ -228,11 +232,11 @@
         .agent-info {
             background: #fff;
             overflow: hidden;
-            h3 {
+            /deep/ h3 {
                 color: #313328;
                 margin: 17px 0 0 20px;
             }
-            p {
+            /deep/ p {
                 margin: 8.6px 20px 24px;
                 background: #fafbfd;
                 border: 1px solid #e1e3e9;
@@ -248,6 +252,10 @@
                 .mb10 {
                     display: block;
                     margin-bottom: 10px;
+                    a {
+                        color: #3a84ff;
+                        margin-left: 10px;
+                    }
                 }
                 .block {
                     display: block;
@@ -258,20 +266,6 @@
                 .agent-refresh {
                     width: 100%;
                     height: 100%;
-                }
-            }
-        }
-        .self-agent {
-            p {
-                margin-bottom: 13px;
-            }
-            .self-agent-more {
-                margin: 13px 20px;
-                display: block;
-                color: #979ba5;
-                font-size: 12px;
-                a {
-                    margin-left: 8px;
                 }
             }
         }

@@ -5,34 +5,34 @@
 
 import Vue from 'vue'
 import Vuex from 'vuex'
-import http from '@/api'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
         user: {},
-        appHeight: window.innerHeight
+        appHeight: window.innerHeight,
+        projectId: '',
+        curPipeline: {}
     },
-    getters: {
-        user: state => state.user,
-        appHeight: state => state.appHeight
-    },
+    getters: {},
     mutations: {
         updateUser (state, user) {
             state.user = Object.assign({}, user)
+        },
+        setProjectId (state, projectId) {
+            state.projectId = projectId
+        },
+        setCurPipeline (state, pipeline) {
+            state.curPipeline = pipeline
         }
     },
     actions: {
-        userInfo (context, config = {}) {
-            const url = ''
-            // mock 的地址，示例先使用 mock 地址
-            const mockUrl = url + (url.indexOf('?') === -1 ? '?' : '&') + '=index&invoke=getUserInfo'
-            return http.get(mockUrl, {}, config).then(response => {
-                const userData = response.data || {}
-                context.commit('updateUser', userData)
-                return userData
-            })
+        setProjectId ({ commit }, projectId) {
+            commit('setProjectId', projectId)
+        },
+        setCurPipeline ({ commit }, pipeline) {
+            commit('setCurPipeline', pipeline)
         }
     }
 })

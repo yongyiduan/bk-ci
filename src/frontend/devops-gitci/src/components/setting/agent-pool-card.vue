@@ -1,5 +1,5 @@
 <template>
-    <section class="agent-pool-card">
+    <section class="agent-pool-card" v-bkloading="{ isLoading: isDeleteing }">
         <header class="card-header">
             <h5 class="header-info">
                 <span class="info-title">docker</span>
@@ -8,7 +8,7 @@
 
             <opt-menu v-if="editable">
                 <li @click="goToAgentList">节点列表</li>
-                <li>删除</li>
+                <li @click="deletePool">删除</li>
             </opt-menu>
         </header>
 
@@ -36,12 +36,12 @@
             </li>
         </ul>
         <bk-button @click="addAgent" class="card-button" v-if="editable">Add agent</bk-button>
-        <bk-button @click="addAgent" class="card-button" v-if="editable">关联</bk-button>
     </section>
 </template>
 
 <script>
     import optMenu from '@/components/opt-menu'
+    import { setting } from '@/http'
 
     export default {
         components: {
@@ -52,10 +52,28 @@
             editable: {
                 type: Boolean,
                 default: true
+            },
+            pool: Object
+        },
+
+        data () {
+            return {
+                isDeleteing: false
             }
         },
 
         methods: {
+            deletePool () {
+                this.isDeleteing = true
+                setting.deleteEnvironment(this.pool.envHashId).then(() => {
+                    this.$emit('refresh')
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isDeleteing = false
+                })
+            },
+
             addAgent () {
                 this.$router.push({
                     name: 'addAgent',
@@ -132,10 +150,7 @@
     }
     .card-button {
         margin: 0 4px 0 24px;
-        width: 156px;
+        width: 320px;
         font-size: 12px;
-        +.card-button {
-            margin: 0;
-        }
     }
 </style>

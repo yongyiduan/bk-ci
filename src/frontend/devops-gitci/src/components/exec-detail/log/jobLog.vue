@@ -19,6 +19,7 @@
     import statusIcon from '../status'
     import { uuid } from '@/utils'
     import { pipelines } from '@/http'
+    import { mapState } from 'vuex'
 
     export default {
         components: {
@@ -49,6 +50,8 @@
         },
 
         computed: {
+            ...mapState(['projectId']),
+
             curDownLink () {
                 return `${this.downLoadLink}&executeCount=${this.curExe}`
             }
@@ -93,7 +96,7 @@
                 let postData = this.logPostData[id]
                 if (!postData) {
                     postData = this.logPostData[id] = {
-                        projectId: this.$route.params.projectId,
+                        projectId: this.projectId,
                         pipelineId: this.$route.params.pipelineId,
                         buildId: this.buildId,
                         tag: id,

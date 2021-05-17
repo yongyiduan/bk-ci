@@ -58,6 +58,12 @@
             }
         },
 
+        watch: {
+            code () {
+                this.codeEditor.setValue(this.code || '')
+            }
+        },
+
         mounted () {
             this.initCodeMirror()
         },

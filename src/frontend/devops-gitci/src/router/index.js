@@ -27,11 +27,11 @@ const agentDetail = () => import(/* webpackChunkName: 'setting' */'@/views/setti
 
 const routes = [
     {
-        path: '/:projectId',
+        path: '/:workspace/:projectPath',
         component: main,
         children: [
             {
-                path: '',
+                path: ':pipelineId?',
                 component: pipeline,
                 children: [
                     {

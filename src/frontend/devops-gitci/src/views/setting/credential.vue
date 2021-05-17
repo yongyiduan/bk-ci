@@ -41,7 +41,7 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapState } from 'vuex'
     import { setting } from '@/http'
     import EditCredential from '@/components/setting/edit-credential'
 
@@ -69,14 +69,10 @@
         },
 
         computed: {
-            ...mapGetters(['appHeight']),
+            ...mapState(['appHeight', 'projectId']),
 
             tableHeight () {
                 return Math.min(this.appHeight - 152, 106 + (Math.max(this.credentialList.length, 3)) * 42)
-            },
-
-            projectId () {
-                return this.$route.params.projectId
             }
         },
 

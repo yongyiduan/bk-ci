@@ -1,30 +1,74 @@
 <template>
-    <article class="setting-basic-home">
+    <article class="setting-basic-home" v-bkloading="{ isLoading }">
         <section class="basic-main">
             <h5 class="main-title">Config listening events</h5>
             <section class="main-checkbox">
-                <bk-checkbox :value="'value1'" class="checkbox">Build pushed branches</bk-checkbox>
-                <bk-checkbox :value="'value2'" class="checkbox">Build pushed merge request</bk-checkbox>
+                <bk-checkbox v-model="form.buildPushedBranches" class="checkbox">Build pushed branches</bk-checkbox>
+                <bk-checkbox v-model="form.buildPushedPullRequest" class="checkbox">Build pushed merge request</bk-checkbox>
             </section>
 
             <h5 class="main-title">Config merge request</h5>
             <section class="main-checkbox">
-                <bk-checkbox :value="'value1'" class="checkbox">Lock MR merge</bk-checkbox>
+                <bk-checkbox v-model="form.enableMrBlock" class="checkbox">Lock MR merge</bk-checkbox>
             </section>
 
             <h5 class="main-title">Config enable</h5>
             <section class="main-checkbox">
-                <bk-checkbox :value="'value1'" class="checkbox">Enable CI</bk-checkbox>
+                <bk-checkbox v-model="form.enableCi" class="checkbox">Enable CI</bk-checkbox>
             </section>
         </section>
 
-        <bk-button theme="primary" class="basic-btn">保存</bk-button>
+        <bk-button theme="primary" class="basic-btn" @click="saveSetting" :loading="isSaving">保存</bk-button>
     </article>
 </template>
 
 <script>
+    import { setting } from '@/http'
+    import { mapState } from 'vuex'
+
     export default {
-        
+        data () {
+            return {
+                form: {
+                    projectId: this.projectId
+                },
+                isSaving: false,
+                isLoading: false
+            }
+        },
+
+        computed: {
+            ...mapState(['projectId'])
+        },
+
+        created () {
+            this.getSetting()
+        },
+
+        methods: {
+            getSetting () {
+                this.isLoading = true
+                setting.getSetting().then((res) => {
+                    const data = res.data
+                    Object.assign(this.form, data)
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            saveSetting () {
+                this.isSaving = true
+                setting.saveSetting(this.form).then(() => {
+                    this.$bkMessage({ theme: 'success', message: '保存成功' })
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isSaving = false
+                })
+            }
+        }
     }
 </script>
 

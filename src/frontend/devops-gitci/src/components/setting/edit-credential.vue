@@ -32,6 +32,7 @@
 
 <script>
     import { setting } from '@/http'
+    import { mapState } from 'vuex'
 
     export default {
         props: {
@@ -175,6 +176,8 @@
         },
 
         computed: {
+            ...mapState(['projectId']),
+
             computedTicket () {
                 return this.ticketTypes.find((x) => (x.id === this.formData.credentialType))
             },
@@ -217,7 +220,7 @@
             submitData () {
                 this.$refs.credentialForm.validate(() => {
                     let method = setting.createTicket
-                    const params = [this.$route.params.projectId, this.formData]
+                    const params = [this.projectId, this.formData]
                     if (this.isEdit) {
                         method = setting.modifyTicket
                         params.push(this.formData.credentialId)

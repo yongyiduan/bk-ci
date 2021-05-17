@@ -5,7 +5,7 @@
                 <icon name="export-ci" size="44"></icon>
                 <span class="ci-name">Tencent CI</span>
                 <icon name="git" size="18" class="gray-icon"></icon>
-                <span class="git-project-path">bkdevops-plugins-test/fayenodejstesa</span>
+                <span class="git-project-path">{{ `${$route.params.workspace}/${$route.params.projectPath}` }}</span>
                 <icon name="setting"
                     size="18"
                     :class="{ setting: true, 'gray-icon': $route.name === 'pipelines', 'blue-icon': $route.name !== 'pipelines' }"
@@ -26,12 +26,13 @@
                 </bk-dropdown-menu>
             </section>
         </header>
-        <router-view class="gitci-content"></router-view>
+        <router-view class="gitci-content" v-if="!isLoading"></router-view>
     </article>
 </template>
 
 <script>
     import { common } from '@/http'
+    import { mapActions } from 'vuex'
 
     export default {
         name: 'app',
@@ -41,28 +42,35 @@
                 userInfo: {
                     name: '',
                     img: ''
-                }
+                },
+                isLoading: true
             }
         },
 
         created () {
-            this.getUserInfo()
+            this.initData()
         },
 
         methods: {
+            ...mapActions(['setProjectId']),
+
             goToSetting () {
                 this.$router.push({ name: 'basicSetting', params: this.$route.params })
             },
 
-            getUserInfo () {
-                common.getUserInfo().then((res) => {
-                    const data = res.data || {}
+            initData () {
+                this.isLoading = true
+                Promise.all([common.getUserInfo(), common.getProjectId()]).then(([userInfo]) => {
+                    const data = userInfo.data || {}
                     this.userInfo = {
                         name: data.username,
                         img: data.avatarUrl
                     }
+                    this.setProjectId('git_10709275')
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
                 })
             },
 

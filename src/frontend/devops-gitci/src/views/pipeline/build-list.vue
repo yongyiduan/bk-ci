@@ -2,10 +2,12 @@
     <article class="pipelines-main">
         <header class="main-head">
             <span>
-                <span class="pipeline-name">All</span>
-                <span class="yml-name">.ci/frontend-ci.yml</span>
-                <icon name="cc-jump-link" size="16"></icon>
-                <span class="pipeline-status">已禁用</span>
+                <span class="pipeline-name">{{ curPipeline.displayName }}</span>
+                <template v-if="curPipeline.filePath">
+                    <span class="yml-name">{{ curPipeline.filePath }}</span>
+                    <icon name="cc-jump-link" size="16"></icon>
+                </template>
+                <span class="pipeline-status" v-if="!curPipeline.enabled">已禁用</span>
             </span>
             <opt-menu>
                 <li @click="showTriggle = true">触发构建</li>
@@ -14,8 +16,9 @@
         </header>
 
         <section class="main-body">
-            <section class="build-filter">
-                <bk-select v-model="filterData[key]" v-for="(list, key) in filterList" :key="key" class="filter-select" :placeholder="key" multiple>
+            <section class="build-filter" v-bkloading="{ isLoading: isLoadingFilter }">
+                <bk-input v-model="filterData.commitMsg" class="filter-item" placeholder="Commit Message"></bk-input>
+                <bk-select v-model="filterData[key]" v-for="(list, key) in filterList" :key="key" class="filter-item" :placeholder="key" multiple>
                     <bk-option v-for="option in list"
                         :key="option.id"
                         :id="option.id"
@@ -28,6 +31,7 @@
             <bk-table :data="buildList"
                 :header-cell-style="{ background: '#fafbfd' }"
                 :height="Math.min(appHeight - 331, 43 + buildList.length * 72)"
+                v-bkloading="{ isLoading }"
                 @row-click="goToBuildDetail"
                 class="build-table"
                 size="large"
@@ -37,18 +41,22 @@
                         <section class="commit-message">
                             <i class="bk-icon icon-check-1"></i>
                             <p>
-                                <span class="message">feat: dockerhost-buildImage支持多个tag，支持--target</span>
-                                <span class="info">#126：Merge requests [!{{props.row}}] opened by xxx</span>
+                                <span class="message">{{ props.row.gitRequestEvent.commitMsg }}</span>
+                                <span class="info">#{{ props.row.buildHistory.buildNum }}：<a @click.stop.prevent="goToDetail(props.row)">{{ getCommitDesc(props.row) }}</a></span>
                             </p>
                         </section>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="Branch" prop="branch"></bk-table-column>
-                <bk-table-column label="Consume">
+                <bk-table-column label="Branch" width="200">
+                    <template slot-scope="props">
+                        <span>{{ props.row.gitRequestEvent.branch }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column label="Consume" width="200">
                     <template slot-scope="props">
                         <p class="consume">
-                            <span class="consume-item"><i class="bk-icon icon-clock"></i>38 seconds</span>
-                            <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{props.row}} days ago</span>
+                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.currentTimestamp }}</span>
+                            <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{ props.row.buildHistory.endTime }}</span>
                         </p>
                     </template>
                 </bk-table-column>
@@ -106,7 +114,8 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapState } from 'vuex'
+    import { pipelines } from '@/http'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
 
@@ -118,40 +127,125 @@
 
         data () {
             return {
-                buildList: [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                buildList: [],
                 compactPaging: {
                     limit: 10,
                     current: 1,
-                    count: 100
+                    count: 0
                 },
                 filterData: {
-                    commit: [],
-                    actor: [],
+                    commitMsg: '',
+                    triggerUser: [],
                     branch: [],
                     event: [],
                     status: []
                 },
                 filterList: {
-                    commit: [],
-                    actor: [],
+                    triggerUser: [],
                     branch: [],
                     event: [],
                     status: []
                 },
+                isLoadingFilter: false,
                 isLoading: false,
                 showTriggle: false,
                 branchList: [],
-                commitList: [],
                 formData: {}
 
             }
         },
 
         computed: {
-            ...mapGetters(['appHeight'])
+            ...mapState(['appHeight', 'curPipeline', 'projectId'])
+        },
+
+        watch: {
+            curPipeline: {
+                handler () {
+                    this.getFilterData()
+                    this.getBuildData()
+                },
+                immediate: true
+            },
+            filterData: {
+                handler () {
+                    this.getBuildData()
+                },
+                deep: true
+            }
         },
 
         methods: {
+            getFilterData () {
+                this.isLoadingFilter = true
+                Promise.all([
+                    pipelines.getPipelineBuildBranchList(this.projectId),
+                    pipelines.getPipelineBuildMemberList(this.projectId)
+                ]).then(([branchInfo, memberInfo]) => {
+                    this.filterList.branch = (branchInfo.records || []).map((branch) => ({ name: branch.branchName, id: branch.branchName }))
+                    this.filterList.triggerUser = memberInfo.records || []
+                    this.filterList.event = [
+                        { name: 'PUSH', id: 'PUSH' },
+                        { name: 'TAG', id: 'TAG' },
+                        { name: 'MERGE', id: 'MERGE' },
+                        { name: 'MANUAL', id: 'MANUAL' }
+                    ]
+                    this.filterList.status = [
+                        { name: '成功', id: 'SUCCEED' },
+                        { name: '失败', id: 'FAILED' },
+                        { name: '取消', id: 'CANCELED' }
+                    ]
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoadingFilter = false
+                })
+            },
+
+            getBuildData () {
+                const params = {
+                    page: this.compactPaging.current,
+                    pageSize: this.compactPaging.limit,
+                    pipelineId: this.curPipeline.pipelineId,
+                    ...this.filterData
+                }
+                this.isLoading = true
+                pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
+                    this.buildList = res.records || []
+                    this.compactPaging.count = res.count
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            getCommitDesc ({ gitRequestEvent }) {
+                let res = ''
+                switch (gitRequestEvent.objectKind) {
+                    case 'push':
+                    case 'tag_push':
+                        res = `Commit ${gitRequestEvent.commitId} pushed by ${gitRequestEvent.userId}`
+                        break
+                    case 'merge_request':
+                        const actionMap = {
+                            'push-update': 'updated',
+                            'reopen': 'reopened',
+                            'open': 'opened'
+                        }
+                        res = `Merge requests [!${gitRequestEvent.mergeRequestId}] ${actionMap[gitRequestEvent.extensionAction]} by ${gitRequestEvent.userId}`
+                        break
+                    case 'manual':
+                        res = `Manual by ${gitRequestEvent.userId}`
+                        break
+                }
+                return res
+            },
+
+            goToDetail (row) {
+                console.log(row)
+            },
+
             goToAgentDetail (row) {
                 console.log(row)
             },
@@ -162,15 +256,16 @@
                 this.$router.push({
                     name: 'buildDetail',
                     params: {
-                        buildId: row
+                        buildId: row.buildHistory.id,
+                        pipelineId: row.pipelineId
                     }
                 })
             },
 
             resetFilter () {
                 this.filterData = {
-                    commit: [],
-                    actor: [],
+                    commitMsg: '',
+                    triggerUser: [],
                     branch: [],
                     event: [],
                     status: []
@@ -231,7 +326,7 @@
                 display: flex;
                 align-items: center;
                 margin-bottom: 17px;
-                .filter-select {
+                .filter-item {
                     width: 160px;
                     margin-right: 8px;
                 }

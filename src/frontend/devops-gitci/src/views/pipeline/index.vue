@@ -1,24 +1,24 @@
 <template>
     <article class="pipelines-home">
-        <aside class="aside-nav">
+        <aside class="aside-nav" v-bkloading="{ isLoading }">
             <h3 class="nav-title">
                 Pipelines
                 <i class="bk-icon icon-plus" @click="showAddYml"></i>
             </h3>
 
-            <ul>
-                <li v-for="pipeline in pipelineList"
-                    :key="pipeline.name"
+            <ul v-if="!isLoading">
+                <li v-for="(pipeline, index) in pipelineList"
+                    :key="index"
                     @click="choosePipeline(pipeline)"
-                    :class="{ 'nav-item': true, active: curPipeline.id === pipeline.id }"
+                    :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId }"
                 >
                     <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
-                    {{ pipeline.name }}
+                    {{ pipeline.displayName }}
                 </li>
             </ul>
         </aside>
 
-        <router-view class="pipelines-main"></router-view>
+        <router-view class="pipelines-main" v-if="!isLoading"></router-view>
 
         <bk-sideslider :is-show.sync="isShowAddYml" :quick-close="true" :width="622" title="新增流水线">
             <bk-form :model="ymlData" ref="ymlForm" slot="content" class="yml-form" form-type="vertical">
@@ -47,7 +47,9 @@
 </template>
 
 <script>
+    import { mapState, mapActions } from 'vuex'
     import codeSection from '@/components/code-section'
+    import { pipelines } from '@/http'
 
     export default {
         components: {
@@ -56,26 +58,53 @@
 
         data () {
             return {
-                pipelineList: [
-                    { name: 'All pipeline', id: 0, icon: 'all' },
-                    { name: 'Codecc check', id: 1 },
-                    { name: 'Backend CI', id: 2 },
-                    { name: 'Forntend CI', id: 3 }
-                ],
-                curPipeline: { name: 'All pipeline', id: 0, icon: 'all' },
-                isShowAddYml: false,
+                pipelineList: [],
                 branchList: [],
                 ymlData: {},
+                isShowAddYml: false,
                 isLoading: false
             }
         },
 
+        computed: {
+            ...mapState(['projectId', 'curPipeline'])
+        },
+
+        created () {
+            this.initList()
+        },
+
         methods: {
+            ...mapActions(['setCurPipeline']),
+
+            initList () {
+                this.isLoading = true
+                pipelines.getPipelineList(this.projectId).then((res) => {
+                    const allPipeline = { displayName: 'All pipeline', enabled: true, icon: 'all' }
+                    this.pipelineList = [allPipeline, ...(res || [])]
+                    this.setDefaultPipeline()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            setDefaultPipeline () {
+                const pipelineId = this.$route.params.pipelineId
+                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.pipelineList[0]
+                this.setCurPipeline(curPipeline)
+            },
+
             choosePipeline (pipeline) {
-                this.curPipeline = pipeline
+                this.setCurPipeline(pipeline)
+                const params = {}
+                if (pipeline.pipelineId) {
+                    params.pipelineId = pipeline.pipelineId
+                }
                 this.$router.push({
                     name: 'buildList',
-                    params: this.$route.params
+                    params
                 })
             },
 

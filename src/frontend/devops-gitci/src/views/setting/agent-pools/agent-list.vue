@@ -54,7 +54,7 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapState } from 'vuex'
 
     export default {
         data () {
@@ -74,7 +74,7 @@
         },
 
         computed: {
-            ...mapGetters(['appHeight']),
+            ...mapState(['appHeight']),
 
             tableHeight () {
                 return Math.min(this.appHeight - 152, 106 + (Math.max(this.agentList.length, 3)) * 42)

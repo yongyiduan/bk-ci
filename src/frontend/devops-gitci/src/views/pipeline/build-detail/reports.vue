@@ -36,6 +36,7 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
     import { pipelines } from '@/http'
 
     export default {
@@ -46,21 +47,25 @@
                 reportIndex: 0
             }
         },
+
         computed: {
+            ...mapState(['projectId', 'curPipeline']),
+
             chooseReport () {
                 return this.reportList.find((report, index) => (index === this.reportIndex)) || {}
             }
         },
+
         created () {
             this.initData()
         },
+
         methods: {
             initData () {
-                const routeParam = this.$route.params || {}
                 const postData = {
-                    projectId: routeParam.projectId,
-                    pipelineId: routeParam.pipelineId,
-                    buildId: routeParam.buildId
+                    projectId: this.projectId,
+                    pipelineId: this.curPipeline.pipelineId,
+                    buildId: this.$route.params.buildId
                 }
                 this.isLoading = true
                 pipelines.requestReportList(postData).then((res) => {

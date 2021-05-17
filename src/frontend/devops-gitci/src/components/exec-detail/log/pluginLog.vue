@@ -8,6 +8,8 @@
 <script>
     import { uuid } from '@/utils'
     import { pipelines } from '@/http'
+    import { mapState } from 'vuex'
+
     export default {
         props: {
             plugin: Object,
@@ -32,9 +34,7 @@
         },
 
         computed: {
-            projectId () {
-                return this.$route.params.projectId
-            },
+            ...mapState(['projectId']),
 
             pipelineId () {
                 return this.$route.params.pipelineId

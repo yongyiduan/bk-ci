@@ -25,6 +25,7 @@
 <script>
     import { convertFileSize } from '@/utils'
     import { pipelines } from '@/http'
+    import { mapState } from 'vuex'
 
     export default {
         data () {
@@ -34,24 +35,29 @@
                 artifactories: []
             }
         },
+
+        computed: {
+            ...mapState(['projectId', 'curPipeline'])
+        },
+
         created () {
             this.initData()
         },
+
         methods: {
             initData () {
-                const routeParam = this.$route.params || {}
                 const postData = {
-                    projectId: routeParam.projectId,
+                    projectId: this.projectId,
                     params: {
                         props: {
-                            buildId: routeParam.buildId,
-                            pipelineId: routeParam.pipelineId
+                            buildId: this.$route.params.buildId,
+                            pipelineId: this.curPipeline.pipelineId
                         }
                     }
                 }
                 const permissionData = {
-                    projectId: routeParam.projectId,
-                    pipelineId: routeParam.pipelineId,
+                    projectId: this.projectId,
+                    pipelineId: this.curPipeline.pipelineId,
                     permission: 'DOWNLOAD'
                 }
                 this.isLoading = true
@@ -75,7 +81,7 @@
                 Promise.all([
                     pipelines.requestDevnetGateway(),
                     pipelines.requestDownloadUrl({
-                        projectId: this.$route.params.projectId,
+                        projectId: this.projectId,
                         artifactoryType: row.artifactoryType,
                         path: row.path
                     })
