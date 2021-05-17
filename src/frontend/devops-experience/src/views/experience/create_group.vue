@@ -55,13 +55,6 @@
                         :name="option.name">
                     </bk-option>
                 </bk-select>
-                <!-- <bk-input
-                    type="textarea"
-                    placeholder="请输入QQ号，以逗号或分号分隔"
-                    name="groupExternalList"
-                    :onkeyup="displayResult()"
-                    v-model="createGroupForm.external_list"
-                /> -->
             </bk-form-item>
             <bk-form-item label="描述" property="desc">
                 <bk-input
@@ -86,7 +79,6 @@
             errorHandler: Object,
             onChange: Function,
             cancelFn: Function,
-            displayResult: Function,
             outersList: {
                 type: Array,
                 default: () => []

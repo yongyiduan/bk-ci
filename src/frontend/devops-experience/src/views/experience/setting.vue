@@ -66,7 +66,6 @@
                 :loading="dialogLoading"
                 :on-change="onChange"
                 :error-handler="errorHandler"
-                :display-result="displayResult"
                 @after-submit="afterCreateGroup"
                 :cancel-fn="cancelFn"
             >
@@ -110,7 +109,7 @@
                     idEdit: false,
                     name: '',
                     internal_list: [],
-                    external_list: '',
+                    external_list: [],
                     desc: ''
                 },
                 errorHandler: {
@@ -235,7 +234,7 @@
                     groupHashId: '',
                     name: '',
                     internal_list: [],
-                    external_list: '',
+                    external_list: [],
                     desc: ''
                 }
                 this.nodeSelectConf.title = '新增体验组'
@@ -243,11 +242,6 @@
             },
             onChange (tags) {
                 this.createGroupForm.internal_list = tags
-            },
-            displayResult () {
-                if (this.nodeSelectConf.isShow) {
-                    this.createGroupForm.external_list = this.createGroupForm.external_list.replace(/[^\d;,]/g, '')
-                }
             },
             validate () {
                 let errorCount = 0

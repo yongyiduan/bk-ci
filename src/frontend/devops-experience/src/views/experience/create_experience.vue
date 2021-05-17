@@ -121,13 +121,6 @@
                             <bk-member-selector placeholder="请输入英文名，多个体验人员以英文逗号分隔" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
                         </bk-form-item>
                         <bk-form-item label="附加外部体验人员" label-width="160" property="external_list">
-                            <!-- <bk-input type="textarea"
-                                placeholder="请输入QQ号，以逗号或分号分隔"
-                                name="externalList"
-                                v-model="createReleaseForm.external_list"
-                            > -->
-                            <!-- :onkeyup="textdisplayResult()" -->
-                            <!-- </bk-input> -->
                             <bk-select :disabled="false" v-model="createReleaseForm.external_list"
                                 ext-cls="select-custom"
                                 ext-popover-cls="select-popover-custom"
@@ -185,7 +178,6 @@
                 :loading="dialogLoading"
                 :on-change="onChange"
                 :error-handler="errorHandler"
-                :display-result="displayResult"
                 @after-submit="afterCreateGroup"
                 :cancel-fn="cancelFn"></experience-group>
 
@@ -246,7 +238,7 @@
                     productOwner: [],
                     end_date: new Date(),
                     internal_list: [],
-                    external_list: '',
+                    external_list: [],
                     notice_list: '',
                     wechatGroups: '',
                     enableWechatGroups: false,
@@ -282,7 +274,7 @@
                     idEdit: false,
                     name: '',
                     internal_list: [],
-                    external_list: '',
+                    external_list: [],
                     desc: ''
                 },
                 errorHandler: {
@@ -333,7 +325,7 @@
                         desc: '',
                         end_date: '',
                         internal_list: [],
-                        external_list: '',
+                        external_list: [],
                         notice_list: '',
                         versionTitle: '',
                         experienceName: '',
@@ -541,7 +533,7 @@
                     groupHashId: '',
                     name: '',
                     internal_list: [],
-                    external_list: '',
+                    external_list: [],
                     desc: ''
                 }
                 this.nodeSelectConf.title = '新增体验组'
@@ -550,11 +542,7 @@
             onChange (tags) {
                 this.createGroupForm.internal_list = tags
             },
-            displayResult () {
-                if (this.nodeSelectConf.isShow) {
-                    this.createGroupForm.external_list = this.createGroupForm.external_list.replace(/[^\d;,]/g, '')
-                }
-            },
+            
             productResult () {
                 this.createReleaseForm.productOwner = this.createReleaseForm.productOwner.split(',')
             },
@@ -725,7 +713,6 @@
                         expireDate: Date.parse(this.createReleaseForm.end_date) / 1000,
                         remark: this.createReleaseForm.desc || undefined,
                         outerUsers: this.createReleaseForm.external_list,
-                        // outerUsers: this.createReleaseForm.external_list,
                         innerUsers: this.createReleaseForm.internal_list,
                         enableWechatGroups: this.createReleaseForm.enableWechatGroups,
                         experienceGroups: this.createReleaseForm.experienceGroups,
