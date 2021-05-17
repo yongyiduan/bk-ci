@@ -406,13 +406,11 @@
              */
             async fetchOutersList () {
                 this.loading.isLoading = true
-                console.log(111)
                 try {
                     const res = await this.$store.dispatch('experience/fetchOutersList', {
                         projectId: this.projectId,
                         experienceHashId: this.experienceHashId
                     })
-                    this.outersList = []
                     res.forEach(item => {
                         this.outersList.push({
                             id: item.username,

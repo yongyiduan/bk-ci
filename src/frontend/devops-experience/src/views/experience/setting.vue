@@ -34,7 +34,7 @@
                                         <span class="handler-outer">{{ props.row.outerUsersCount }}</span>
                                         <template slot="content">
                                             <p style="max-width: 300px; text-align: left; white-space: normal;word-break: break-all;font-weight: 400;">
-                                                <span>{{ props.row.outerUsers.replace(';', ',') }}</span>
+                                                <span>{{ props.row.outerUsers.join(',') }}</span>
                                             </p>
                                         </template>
                                     </bk-popover>
@@ -59,8 +59,10 @@
                 </bk-tab-panel>
             </bk-tab>
 
-            <experience-group :node-select-conf="nodeSelectConf"
+            <experience-group
+                :node-select-conf="nodeSelectConf"
                 :create-group-form="createGroupForm"
+                :outers-list="outersList"
                 :loading="dialogLoading"
                 :on-change="onChange"
                 :error-handler="errorHandler"
@@ -88,6 +90,7 @@
                 curTab: 'experienceGroup',
                 experienceList: [],
                 showContent: false,
+                outersList: [],
                 loading: {
                     isLoading: false,
                     title: ''
@@ -145,6 +148,7 @@
         },
         async mounted () {
             await this.init()
+            this.fetchOutersList()
         },
         methods: {
             async init () {
@@ -166,6 +170,33 @@
                     setTimeout(() => {
                         this.loading.isLoading = false
                     }, 1000)
+                }
+            },
+            /**
+             * 获取外部体验人员列表
+             */
+            async fetchOutersList () {
+                this.loading.isLoading = true
+                try {
+                    const res = await this.$store.dispatch('experience/fetchOutersList', {
+                        projectId: this.projectId
+                    })
+                    res.forEach(item => {
+                        this.outersList.push({
+                            id: item.username,
+                            name: item.username
+                        })
+                    })
+                } catch (err) {
+                    const message = err.message ? err.message : err
+                    const theme = 'error'
+
+                    this.$bkMessage({
+                        message,
+                        theme
+                    })
+                } finally {
+                    this.loading.isLoading = false
                 }
             },
             /**
