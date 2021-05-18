@@ -56,7 +56,7 @@
                     </div>
                 </div>
             </div>
-            <form-field :label="$t('settings.notice')" style="margin-bottom: 0px">
+            <form-field :label="$t('settings.notify')" style="margin-bottom: 0px">
                 <bk-tab :active="curNavTab.name" type="unborder-card" @tab-change="changeCurTab">
                     <bk-tab-panel
                         v-for="(entry, index) in subscriptionList"
@@ -182,10 +182,10 @@
                     }
                 ],
                 subscriptionList: [
-                    { label: this.$t('settings.buildFail'), name: 'fail' },
-                    { label: this.$t('settings.buildSuc'), name: 'success' }
+                    { label: this.$t('settings.whenSuc'), name: 'success' },
+                    { label: this.$t('settings.whenFail'), name: 'fail' }
                 ],
-                curNavTab: { label: this.$t('settings.buildFail'), name: 'fail' },
+                curNavTab: { label: this.$t('settings.buildSuc'), name: 'success' },
                 noticeList: [
                     { id: 1, name: this.$t('settings.rtxNotice'), value: 'RTX' },
                     { id: 4, name: this.$t('settings.emailNotice'), value: 'EMAIL' },
