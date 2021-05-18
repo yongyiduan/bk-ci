@@ -58,12 +58,12 @@
                 this.curSetting = this.settingList[settingIndex]
             },
 
-            goToPage ({ name }) {
-                this.$router.push({ name })
+            goToPage ({ name, params }) {
+                this.$router.push({ name, params })
             },
 
             backHome () {
-                this.goToPage({ name: 'buildList', params: this.$route.params })
+                this.goToPage({ name: 'buildList', params: { pipelineId: 'all' } })
             }
         }
     }

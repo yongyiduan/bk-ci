@@ -1,4 +1,4 @@
-import api from '../api'
+import api from './ajax'
 import { ENVIRNMENT_PERFIX, TICKET_PERFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX } from './perfix'
 
 export default {

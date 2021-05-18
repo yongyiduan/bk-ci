@@ -20,26 +20,32 @@
 
         <router-view class="pipelines-main" v-if="!isLoading"></router-view>
 
-        <bk-sideslider :is-show.sync="isShowAddYml" :quick-close="true" :width="622" title="新增流水线">
-            <bk-form :model="ymlData" ref="ymlForm" slot="content" class="yml-form" form-type="vertical">
-                <bk-form-item label="yml" :rules="[requireRule('yml')]" :required="true" property="branch" error-display-type="normal">
-                    <code-section :code="ymlData.yml" :read-only="false" :cursor-blink-rate="530"></code-section>
+        <bk-sideslider @hidden="hidden" :is-show.sync="isShowAddYml" :quick-close="true" :width="622" title="新增流水线">
+            <bk-form :model="yamlData" ref="yamlForm" slot="content" class="yaml-form" form-type="vertical">
+                <bk-form-item label="名称" :rules="[requireRule('名称'), nameRule]" :required="true" property="file_name" error-display-type="normal">
+                    <bk-compose-form-item>
+                        <bk-input value=".ci / " disabled class="yaml-path"></bk-input>
+                        <bk-input v-model="yamlData.file_name" class="yaml-name"></bk-input>
+                    </bk-compose-form-item>
                 </bk-form-item>
-                <bk-form-item label="分支" :rules="[requireRule('分支')]" :required="true" property="branch" error-display-type="normal">
-                    <bk-select v-model="ymlData.credentialType" :clearable="false">
+                <bk-form-item label="yaml" :rules="[requireRule('yaml')]" :required="true" property="content" error-display-type="normal">
+                    <code-section :code.sync="yamlData.content" :read-only="false" :cursor-blink-rate="530"></code-section>
+                </bk-form-item>
+                <bk-form-item label="分支" :rules="[requireRule('分支')]" :required="true" property="branch_name" error-display-type="normal">
+                    <bk-select v-model="yamlData.branch_name" :loading="isLoadingBranches" :clearable="false">
                         <bk-option v-for="option in branchList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
+                            :key="option"
+                            :id="option"
+                            :name="option">
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item label="commit message" :rules="[requireRule('commit message')]" :required="true" property="commitMessage" error-display-type="normal">
-                    <bk-input v-model="ymlData.commitMessage"></bk-input>
+                <bk-form-item label="commit message" :rules="[requireRule('commit message')]" :required="true" property="commit_message" error-display-type="normal">
+                    <bk-input v-model="yamlData.commit_message"></bk-input>
                 </bk-form-item>
                 <bk-form-item>
-                    <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isLoading">提交</bk-button>
-                    <bk-button ext-cls="mr5" title="取消" @click="hidden" :disabled="isLoading">取消</bk-button>
+                    <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isSaving">提交</bk-button>
+                    <bk-button ext-cls="mr5" title="取消" @click="hidden" :disabled="isSaving">取消</bk-button>
                 </bk-form-item>
             </bk-form>
         </bk-sideslider>
@@ -60,9 +66,23 @@
             return {
                 pipelineList: [],
                 branchList: [],
-                ymlData: {},
+                yamlData: {
+                    file_name: '',
+                    content: '',
+                    branch_name: '',
+                    commit_message: ''
+                },
                 isShowAddYml: false,
-                isLoading: false
+                isLoading: false,
+                isLoadingBranches: false,
+                isSaving: false,
+                nameRule: {
+                    validator (val) {
+                        return /^[a-zA-Z0-9_\-\.]+$/.test(val)
+                    },
+                    message: '由大小写英文字母、数字、下划线、中划线和点组件',
+                    trigger: 'blur'
+                }
             }
         },
 
@@ -80,8 +100,15 @@
             initList () {
                 this.isLoading = true
                 pipelines.getPipelineList(this.projectId).then((res) => {
-                    const allPipeline = { displayName: 'All pipeline', enabled: true, icon: 'all' }
-                    this.pipelineList = [allPipeline, ...(res || [])]
+                    const allPipeline = { displayName: 'All pipeline', pipelineId: 'all', enabled: true, icon: 'all' }
+                    const pipelines = (res.records || []).map((pipeline) => ({
+                        displayName: pipeline.displayName,
+                        enabled: pipeline.enabled,
+                        pipelineId: pipeline.pipelineId,
+                        filePath: pipeline.filePath,
+                        branch: pipeline.latestBuildInfo.gitRequestEvent.branch
+                    }))
+                    this.pipelineList = [allPipeline, ...pipelines]
                     this.setDefaultPipeline()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -110,10 +137,52 @@
 
             showAddYml () {
                 this.isShowAddYml = true
+                this.getPipelineBranches()
+            },
+
+            hidden () {
+                this.isShowAddYml = false
+                this.yamlData = {
+                    file_name: '',
+                    content: '',
+                    branch_name: '',
+                    commit_message: ''
+                }
+            },
+
+            getPipelineBranches () {
+                const params = {
+                    projectId: this.projectId,
+                    page: 1,
+                    perPage: 100
+                }
+                this.isLoadingBranches = true
+                pipelines.getPipelineBranches(params).then((res) => {
+                    this.branchList = res
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoadingBranches = false
+                })
             },
 
             submitData () {
-
+                this.$refs.yamlForm.validate().then(() => {
+                    const postData = {
+                        ...this.yamlData,
+                        file_path: `.ci/${this.yamlData.file_name}`
+                    }
+                    this.isSaving = true
+                    pipelines.addPipelineYamlFile(this.projectId, postData).then(() => {
+                        this.hidden()
+                    }).catch((err) => {
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    }).finally(() => {
+                        this.isSaving = false
+                    })
+                }, (err) => {
+                    this.$bkMessage({ theme: 'error', message: err.content || err })
+                })
             },
 
             requireRule (name) {
@@ -144,8 +213,14 @@
         height: 100%;
         background: #f5f6fa;
     }
-    .yml-form {
+    .yaml-form {
         padding: 20px 30px;
+        .yaml-path {
+            width: 50px;
+        }
+        .yaml-name {
+            width: 512px;
+        }
         /deep/ button {
             margin: 8px 10px 0 0;
         }

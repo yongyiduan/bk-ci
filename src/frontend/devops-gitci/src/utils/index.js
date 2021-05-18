@@ -121,3 +121,33 @@ export function convertFileSize (size, unit) {
         return `${calcSize.toFixed(2)}${next || unit}`
     }
 }
+
+export function goCommit (projectUrl, commitId) {
+    if (commitId) {
+        window.open(`${projectUrl}/commit/${commitId}`, '_blank')
+    }
+}
+
+export function goMR (projectUrl, mrId) {
+    if (mrId) {
+        window.open(`${projectUrl}/merge_requests/${mrId}`, '_blank')
+    }
+}
+
+export function goBranch (projectUrl, branchName) {
+    if (branchName) {
+        window.open(`${projectUrl}/tree/${branchName}`, '_blank')
+    }
+}
+
+export function goTag (projectUrl, tag) {
+    if (tag) {
+        window.open(`${projectUrl}/-/tags/${encodeURIComponent(tag)}`, '_blank')
+    }
+}
+
+export function goYaml (projectUrl, branch, yamlName) {
+    if (yamlName) {
+        window.open(`${projectUrl}/blob/${branch}/${yamlName}`, '_blank')
+    }
+}

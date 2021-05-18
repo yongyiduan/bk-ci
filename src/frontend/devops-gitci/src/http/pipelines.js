@@ -1,4 +1,4 @@
-import api from '../api'
+import api from './ajax'
 import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, CHECK_ENV_URL, GITCI_PERFIX } from './perfix'
 
 export default {
@@ -26,71 +26,59 @@ export default {
     },
 
     requestPartFile ({ projectId, params }) {
-        return api.post(`${ARTIFACTORY_PREFIX}/user/artifactories/${projectId}/search`, params).then(response => {
-            return response.data
-        })
+        return api.post(`${ARTIFACTORY_PREFIX}/user/artifactories/${projectId}/search`, params)
     },
 
     requestExecPipPermission ({ projectId, pipelineId, permission }) {
-        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/${pipelineId}/hasPermission?permission=${permission}`).then(response => {
-            return response.data
-        })
+        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/${pipelineId}/hasPermission?permission=${permission}`)
     },
 
     requestDevnetGateway ({ commit }) {
         const baseUrl = CHECK_ENV_URL
-        return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/checkDevnetGateway`, { baseURL: baseUrl }).then(response => {
-            return response.data
-        }).catch(e => {
-            return false
-        })
+        return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/checkDevnetGateway`, { baseURL: baseUrl })
     },
 
     requestDownloadUrl ({ projectId, artifactoryType, path }) {
-        return api.post(`${ARTIFACTORY_PREFIX}/user/artifactories/${projectId}/${artifactoryType}/downloadUrl?path=${encodeURIComponent(path)}`).then(response => {
-            return response.data
-        })
+        return api.post(`${ARTIFACTORY_PREFIX}/user/artifactories/${projectId}/${artifactoryType}/downloadUrl?path=${encodeURIComponent(path)}`)
     },
 
     requestReportList ({ projectId, pipelineId, buildId }) {
-        return api.get(`${PROCESS_PREFIX}/user/reports/${projectId}/${pipelineId}/${buildId}`).then(response => {
-            return response.data
-        })
+        return api.get(`${PROCESS_PREFIX}/user/reports/${projectId}/${pipelineId}/${buildId}`)
     },
 
     getPipelineList (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/pipelines/${projectId}/listInfo`).then(response => {
-            return response.data
-        })
+        return api.get(`${GITCI_PERFIX}/user/pipelines/${projectId}/list`)
     },
 
     getPipelineBuildList (projectId, params) {
-        return api.get(`${GITCI_PERFIX}/user/history/build/list/${projectId}`, { params }).then(response => {
-            return response.data
-        })
+        return api.get(`${GITCI_PERFIX}/user/history/build/list/${projectId}`, { params })
     },
 
     getPipelineBuildBranchList (projectId, params = {}) {
-        return api.get(`${GITCI_PERFIX}/user/history/build/branch/list/${projectId}`, { params }).then(response => {
-            return response.data
-        })
+        return api.get(`${GITCI_PERFIX}/user/history/build/branch/list/${projectId}`, { params })
     },
 
     getPipelineBuildMemberList (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/gitcode/projects/members?projectId=${projectId}`).then(response => {
-            return response.data
-        })
+        return api.get(`${GITCI_PERFIX}/user/gitcode/projects/members?projectId=${projectId}`)
     },
 
     getPipelineBuildDetail (projectId, params) {
-        return api.get(`${GITCI_PERFIX}/user/current/build/detail/${projectId}`, { params }).then(response => {
-            return response.data
-        })
+        return api.get(`${GITCI_PERFIX}/user/current/build/detail/${projectId}`, { params })
     },
 
     getPipelineBuildYaml (projectId, buildId) {
-        return api.get(`${GITCI_PERFIX}/user/trigger/build/getYaml/${projectId}/${buildId}`).then(response => {
-            return response.data
-        })
+        return api.get(`${GITCI_PERFIX}/user/trigger/build/getYaml/${projectId}/${buildId}`)
+    },
+
+    addPipelineYamlFile (projectId, params) {
+        return api.post(`${GITCI_PERFIX}/user/gitcode/projects/repository/files?projectId=${projectId}`, params)
+    },
+
+    getPipelineBranches (params) {
+        return api.get(`${GITCI_PERFIX}/user/gitcode/projects/repository/branches`, { params })
+    },
+
+    getPipelineCommits (params) {
+        return api.get(`${GITCI_PERFIX}/user/gitcode/projects/commits`, { params })
     }
 }

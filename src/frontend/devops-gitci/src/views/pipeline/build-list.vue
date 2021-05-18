@@ -5,12 +5,12 @@
                 <span class="pipeline-name">{{ curPipeline.displayName }}</span>
                 <template v-if="curPipeline.filePath">
                     <span class="yml-name">{{ curPipeline.filePath }}</span>
-                    <icon name="cc-jump-link" size="16"></icon>
+                    <icon name="cc-jump-link" size="16" @click.native="goToGit"></icon>
                 </template>
                 <span class="pipeline-status" v-if="!curPipeline.enabled">已禁用</span>
             </span>
-            <opt-menu>
-                <li @click="showTriggle = true">触发构建</li>
+            <opt-menu v-if="curPipeline.pipelineId">
+                <li @click="showTriggleBuild">触发构建</li>
                 <li>禁用流水线</li>
             </opt-menu>
         </header>
@@ -80,29 +80,32 @@
 
         <bk-sideslider :is-show.sync="showTriggle" :width="622" :quick-close="true" title="Trigger a custom build">
             <bk-form :model="formData" ref="triggleForm" :label-width="500" slot="content" class="triggle-form" form-type="vertical">
-                <bk-form-item label="Select a Branch" :required="true" :rules="[requireRule('分支')]" property="credentialType" error-display-type="normal">
-                    <bk-select v-model="formData.credentialType" :clearable="false">
-                        <bk-option v-for="option in branchList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
+                <bk-form-item label="Select a Branch" :required="true" :rules="[requireRule('分支')]" property="branch" error-display-type="normal">
+                    <bk-select v-model="formData.branch" :clearable="false" :loading="isLoadingBranch" @selected="getBranchCommits">
+                        <bk-option v-for="option in triggerBranches"
+                            :key="option"
+                            :id="option"
+                            :name="option">
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item label="Use a specified historical commit to trigger the build" :required="true" property="credentialType" error-display-type="normal">
-                    <bk-select v-model="formData.credentialType" :clearable="false">
-                        <bk-option v-for="option in commitList"
+                <bk-form-item class="mt15">
+                    <bk-checkbox v-model="formData.useCommitId">Use a specified historical commit to trigger the build</bk-checkbox>
+                </bk-form-item>
+                <bk-form-item label="Select historical commit" :required="true" :rules="[requireRule('commit')]" property="commitId" error-display-type="normal" v-if="formData.useCommitId">
+                    <bk-select v-model="formData.commitId" :clearable="false" :loading="isLoadingCommit">
+                        <bk-option v-for="option in triggerCommits"
                             :key="option.id"
                             :id="option.id"
-                            :name="option.name">
+                            :name="option.message">
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="credentialId" desc="Custom builds exist only on build history and will not appear in your commit history." error-display-type="normal">
-                    <bk-input v-model="formData.credentialId" placeholder="Please enter build message"></bk-input>
+                <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom builds exist only on build history and will not appear in your commit history." error-display-type="normal">
+                    <bk-input v-model="formData.customCommitMsg" placeholder="Please enter build message"></bk-input>
                 </bk-form-item>
-                <bk-form-item label="yml" property="yml">
-                    <code-section :code="formData.yml" :cursor-blink-rate="530" :read-only="false" ref="codeEditor" />
+                <bk-form-item label="yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal">
+                    <code-section :code.sync="formData.yaml" :cursor-blink-rate="530" :read-only="false" ref="codeEditor" />
                 </bk-form-item>
                 <bk-form-item>
                     <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isLoading">提交</bk-button>
@@ -116,6 +119,7 @@
 <script>
     import { mapState } from 'vuex'
     import { pipelines } from '@/http'
+    import { goYaml } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
 
@@ -148,15 +152,23 @@
                 },
                 isLoadingFilter: false,
                 isLoading: false,
+                isLoadingBranch: false,
+                isLoadingCommit: false,
                 showTriggle: false,
-                branchList: [],
-                formData: {}
-
+                formData: {
+                    branch: '',
+                    useCommitId: false,
+                    commitId: '',
+                    customCommitMsg: '',
+                    yaml: ''
+                },
+                triggerBranches: [],
+                triggerCommits: []
             }
         },
 
         computed: {
-            ...mapState(['appHeight', 'curPipeline', 'projectId'])
+            ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectUrl'])
         },
 
         watch: {
@@ -206,8 +218,10 @@
                 const params = {
                     page: this.compactPaging.current,
                     pageSize: this.compactPaging.limit,
-                    pipelineId: this.curPipeline.pipelineId,
                     ...this.filterData
+                }
+                if (this.curPipeline.pipelineId !== 'all') {
+                    params.pipelineId = this.curPipeline.pipelineId
                 }
                 this.isLoading = true
                 pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
@@ -242,6 +256,50 @@
                 return res
             },
 
+            showTriggleBuild () {
+                this.showTriggle = true
+                this.getPipelineBranches()
+            },
+
+            getPipelineBranches (query = {}) {
+                const params = {
+                    page: 1,
+                    perPage: 100,
+                    projectId: this.projectId,
+                    ...query
+                }
+                this.isLoadingBranch = true
+                return pipelines.getPipelineBranches(params).then((res) => {
+                    this.triggerBranches = res || []
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoadingBranch = false
+                })
+            },
+
+            getBranchCommits (value, options, query = {}) {
+                const params = {
+                    page: 1,
+                    perPage: 100,
+                    projectId: this.projectId,
+                    branch: this.formData.branch,
+                    ...query
+                }
+                this.isLoadingCommit = true
+                return pipelines.getPipelineCommits(params).then((res) => {
+                    this.triggerCommits = res || []
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoadingCommit = false
+                })
+            },
+
+            goToGit () {
+                goYaml(this.projectUrl, this.curPipeline.branch, this.curPipeline.filePath)
+            },
+
             goToDetail (row) {
                 console.log(row)
             },
@@ -250,7 +308,24 @@
                 console.log(row)
             },
 
-            submitData () {},
+            submitData () {
+                this.$refs.triggleForm.validate().then(() => {
+                    const postData = {
+                        ...this.formData,
+                        commitId: this.formData.useCommitId ? undefined : this.formData.commitId
+                    }
+                    this.isSaving = true
+                    pipelines.addPipelineYamlFile(this.projectId, postData).then(() => {
+                        this.hidden()
+                    }).catch((err) => {
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    }).finally(() => {
+                        this.isSaving = false
+                    })
+                }, (err) => {
+                    this.$bkMessage({ theme: 'error', message: err.content || err })
+                })
+            },
 
             goToBuildDetail (row) {
                 this.$router.push({

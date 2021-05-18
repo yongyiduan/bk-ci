@@ -2,8 +2,8 @@
     <section class="agent-pool-card" v-bkloading="{ isLoading: isDeleteing }">
         <header class="card-header">
             <h5 class="header-info">
-                <span class="info-title">docker</span>
-                <span class="info-num">Agent：100 / 100</span>
+                <span class="info-title">{{ pool.name }}</span>
+                <span class="info-num">Agent：{{ pool.enableNode }} / {{ pool.totalNode }}</span>
             </h5>
 
             <opt-menu v-if="editable">
@@ -13,26 +13,12 @@
         </header>
 
         <ul class="card-useages">
-            <li class="useage-item">
+            <li class="useage-item" v-for="usage in cpuUsages" :key="usage.name">
                 <span class="item-header">
-                    <span class="header-title">CPU useage</span>
-                    <span class="header-val">0.66%</span>
+                    <span class="header-title">{{ usage.name }}</span>
+                    <span class="header-val">{{ usage.showVal }}%</span>
                 </span>
-                <bk-progress :theme="getTheme(0.2)" :percent="0.2" :show-text="false"></bk-progress>
-            </li>
-            <li class="useage-item">
-                <span class="item-header">
-                    <span class="header-title">CPU useage</span>
-                    <span class="header-val">0.66%</span>
-                </span>
-                <bk-progress :theme="getTheme(0.6)" :percent="0.6" :show-text="false"></bk-progress>
-            </li>
-            <li class="useage-item">
-                <span class="item-header">
-                    <span class="header-title">CPU useage</span>
-                    <span class="header-val">0.66%</span>
-                </span>
-                <bk-progress :theme="getTheme(0.9)" :percent="0.9" :show-text="false"></bk-progress>
+                <bk-progress :theme="getTheme(usage.val)" :percent="usage.val" :show-text="false"></bk-progress>
             </li>
         </ul>
         <bk-button @click="addAgent" class="card-button" v-if="editable">Add agent</bk-button>
@@ -59,6 +45,16 @@
         data () {
             return {
                 isDeleteing: false
+            }
+        },
+
+        computed: {
+            cpuUsages () {
+                return [
+                    { name: '构建机CPU负载', showVal: this.pool.averageCpuLoad, val: this.pool.averageCpuLoad / 100 },
+                    { name: '构建机内存负载', showVal: this.pool.averageMemLoad, val: this.pool.averageMemLoad / 100 },
+                    { name: '构建机硬盘负载', showVal: this.pool.averageDiskLoad, val: this.pool.averageDiskLoad / 100 }
+                ]
             }
         },
 

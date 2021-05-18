@@ -31,7 +31,7 @@ const routes = [
         component: main,
         children: [
             {
-                path: ':pipelineId?',
+                path: 'pipelineId/:pipelineId',
                 component: pipeline,
                 children: [
                     {

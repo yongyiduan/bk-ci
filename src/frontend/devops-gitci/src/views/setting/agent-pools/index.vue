@@ -2,7 +2,7 @@
     <article class="agent-pools" @scroll.passive="mainScroll">
         <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 60 && scrollTop < 1030 }">Default agent pools</h3>
         <section class="agent-pools-container">
-            <agent-pool-card class="agent-pool" :editable="false" v-for="pool in thirdPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
+            <agent-pool-card class="agent-pool" :editable="false" v-for="pool in systemPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
         </section>
 
         <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 1030 }">
@@ -51,9 +51,9 @@
             initData () {
                 this.isLoading = true
                 Promise.all([setting.getEnvironmentList(this.projectId), setting.getSystemPoolDetail()]).then(([thirdPool = {}, systemPool = {}]) => {
-                    this.thirdPools = thirdPool.data || []
+                    this.thirdPools = thirdPool || []
                     this.systemPools = []
-                    const clusterLoad = systemPool.data.clusterLoad
+                    const clusterLoad = systemPool.clusterLoad
                     for (const name in clusterLoad) {
                         const element = clusterLoad[name]
                         this.systemPools.push({ name, ...element })

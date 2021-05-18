@@ -13,6 +13,7 @@ const store = new Vuex.Store({
         user: {},
         appHeight: window.innerHeight,
         projectId: '',
+        projectUrl: '',
         curPipeline: {}
     },
     getters: {},
@@ -20,16 +21,17 @@ const store = new Vuex.Store({
         updateUser (state, user) {
             state.user = Object.assign({}, user)
         },
-        setProjectId (state, projectId) {
-            state.projectId = projectId
+        setProjectInfo (state, projectInfo) {
+            state.projectId = `git_${projectInfo.id}`
+            state.projectUrl = projectInfo.web_url
         },
         setCurPipeline (state, pipeline) {
             state.curPipeline = pipeline
         }
     },
     actions: {
-        setProjectId ({ commit }, projectId) {
-            commit('setProjectId', projectId)
+        setProjectInfo ({ commit }, projectInfo) {
+            commit('setProjectInfo', projectInfo)
         },
         setCurPipeline ({ commit }, pipeline) {
             commit('setCurPipeline', pipeline)

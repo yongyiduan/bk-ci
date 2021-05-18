@@ -30,7 +30,10 @@
         data () {
             return {
                 form: {
-                    projectId: this.projectId
+                    buildPushedBranches: false,
+                    buildPushedPullRequest: false,
+                    enableMrBlock: false,
+                    enableCi: false
                 },
                 isSaving: false,
                 isLoading: false
@@ -48,7 +51,7 @@
         methods: {
             getSetting () {
                 this.isLoading = true
-                setting.getSetting().then((res) => {
+                setting.getSetting(this.projectId).then((res) => {
                     const data = res.data
                     Object.assign(this.form, data)
                 }).catch((err) => {
@@ -60,7 +63,11 @@
 
             saveSetting () {
                 this.isSaving = true
-                setting.saveSetting(this.form).then(() => {
+                const postData = {
+                    projectId: this.projectId,
+                    ...this.form
+                }
+                setting.saveSetting(postData).then(() => {
                     this.$bkMessage({ theme: 'success', message: '保存成功' })
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
