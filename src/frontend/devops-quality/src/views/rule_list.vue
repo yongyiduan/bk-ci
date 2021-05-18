@@ -97,7 +97,7 @@
                 <template slot="header">
                     <div class="rule-side-header">
                         <p>{{ ruleDetail.name }}</p>
-                        <a @click="handleGoEditRule">编辑</a>
+                        <a style="font-weight: normal;" @click="handleGoEditRule">编辑</a>
                     </div>
                 </template>
                 <template slot="content">
