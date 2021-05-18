@@ -52,8 +52,7 @@
             getSetting () {
                 this.isLoading = true
                 setting.getSetting(this.projectId).then((res) => {
-                    const data = res.data
-                    Object.assign(this.form, data)
+                    Object.assign(this.form, res)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

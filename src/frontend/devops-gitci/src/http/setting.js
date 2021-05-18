@@ -31,11 +31,11 @@ export default {
     },
 
     saveSetting (params) {
-        return api.post(`${GITCI_PERFIX}/user/setting/save`, { params })
+        return api.post(`${GITCI_PERFIX}/user/basic/setting/save`, params)
     },
 
     getSetting (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/setting/${projectId}`)
+        return api.get(`${GITCI_PERFIX}/user/basic/setting/${projectId}`)
     },
 
     getSystemPoolDetail () {

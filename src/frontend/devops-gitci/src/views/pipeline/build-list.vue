@@ -9,9 +9,9 @@
                 </template>
                 <span class="pipeline-status" v-if="!curPipeline.enabled">已禁用</span>
             </span>
-            <opt-menu v-if="curPipeline.pipelineId">
+            <opt-menu v-if="curPipeline.pipelineId !== 'all'">
                 <li @click="showTriggleBuild">触发构建</li>
-                <li>禁用流水线</li>
+                <li @click="togglePipelineEnable">{{ curPipeline.enabled ? '禁用流水线' : '启用流水线' }}</li>
             </opt-menu>
         </header>
 
@@ -78,10 +78,10 @@
             />
         </section>
 
-        <bk-sideslider :is-show.sync="showTriggle" :width="622" :quick-close="true" title="Trigger a custom build">
+        <bk-sideslider @hidden="hidden" :is-show.sync="showTriggle" :width="622" :quick-close="true" title="Trigger a custom build">
             <bk-form :model="formData" ref="triggleForm" :label-width="500" slot="content" class="triggle-form" form-type="vertical">
                 <bk-form-item label="Select a Branch" :required="true" :rules="[requireRule('分支')]" property="branch" error-display-type="normal">
-                    <bk-select v-model="formData.branch" :clearable="false" :loading="isLoadingBranch" @selected="getBranchCommits">
+                    <bk-select v-model="formData.branch" :clearable="false" :loading="isLoadingBranch" @selected="selectBranch">
                         <bk-option v-for="option in triggerBranches"
                             :key="option"
                             :id="option"
@@ -90,10 +90,10 @@
                     </bk-select>
                 </bk-form-item>
                 <bk-form-item class="mt15">
-                    <bk-checkbox v-model="formData.useCommitId">Use a specified historical commit to trigger the build</bk-checkbox>
+                    <bk-checkbox v-model="formData.useCommitId" @change="getPipelineBranchYaml">Use a specified historical commit to trigger the build</bk-checkbox>
                 </bk-form-item>
                 <bk-form-item label="Select historical commit" :required="true" :rules="[requireRule('commit')]" property="commitId" error-display-type="normal" v-if="formData.useCommitId">
-                    <bk-select v-model="formData.commitId" :clearable="false" :loading="isLoadingCommit">
+                    <bk-select v-model="formData.commitId" :clearable="false" :loading="isLoadingCommit" @selected="getPipelineBranchYaml">
                         <bk-option v-for="option in triggerCommits"
                             :key="option.id"
                             :id="option.id"
@@ -104,12 +104,12 @@
                 <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom builds exist only on build history and will not appear in your commit history." error-display-type="normal">
                     <bk-input v-model="formData.customCommitMsg" placeholder="Please enter build message"></bk-input>
                 </bk-form-item>
-                <bk-form-item label="yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal">
+                <bk-form-item label="yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal" v-bkloading="{ isLoading: isLoadingYaml }">
                     <code-section :code.sync="formData.yaml" :cursor-blink-rate="530" :read-only="false" ref="codeEditor" />
                 </bk-form-item>
                 <bk-form-item>
-                    <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isLoading">提交</bk-button>
-                    <bk-button ext-cls="mr5" title="取消" @click="hidden" :disabled="isLoading">取消</bk-button>
+                    <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isTriggering">提交</bk-button>
+                    <bk-button ext-cls="mr5" title="取消" @click="hidden" :disabled="isTriggering">取消</bk-button>
                 </bk-form-item>
             </bk-form>
         </bk-sideslider>
@@ -117,7 +117,7 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+    import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
     import { goYaml } from '@/utils'
     import optMenu from '@/components/opt-menu'
@@ -154,6 +154,8 @@
                 isLoading: false,
                 isLoadingBranch: false,
                 isLoadingCommit: false,
+                isLoadingYaml: false,
+                isTriggering: false,
                 showTriggle: false,
                 formData: {
                     branch: '',
@@ -168,7 +170,7 @@
         },
 
         computed: {
-            ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectUrl'])
+            ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectInfo'])
         },
 
         watch: {
@@ -188,6 +190,8 @@
         },
 
         methods: {
+            ...mapActions(['setCurPipeline']),
+
             getFilterData () {
                 this.isLoadingFilter = true
                 Promise.all([
@@ -256,6 +260,18 @@
                 return res
             },
 
+            togglePipelineEnable () {
+                pipelines.toggleEnablePipeline(this.projectId, this.curPipeline.pipelineId, !this.curPipeline.enabled).then(() => {
+                    const pipeline = {
+                        ...this.curPipeline,
+                        enabled: !this.curPipeline.enabled
+                    }
+                    this.setCurPipeline(pipeline)
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
+            },
+
             showTriggleBuild () {
                 this.showTriggle = true
                 this.getPipelineBranches()
@@ -278,6 +294,24 @@
                 })
             },
 
+            hidden () {
+                this.showTriggle = false
+                this.triggerCommits = []
+                this.triggerBranches = []
+                this.formData = {
+                    branch: '',
+                    useCommitId: false,
+                    commitId: '',
+                    customCommitMsg: '',
+                    yaml: ''
+                }
+            },
+
+            selectBranch () {
+                this.getBranchCommits()
+                this.getPipelineBranchYaml()
+            },
+
             getBranchCommits (value, options, query = {}) {
                 const params = {
                     page: 1,
@@ -296,8 +330,23 @@
                 })
             },
 
+            getPipelineBranchYaml () {
+                const params = {
+                    branchName: this.formData.branch,
+                    commitId: this.formData.useCommitId ? this.formData.commitId : undefined
+                }
+                this.isLoadingYaml = true
+                return pipelines.getPipelineBranchYaml(this.projectId, this.curPipeline.pipelineId, params).then((res) => {
+                    this.formData.yaml = res
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoadingYaml = false
+                })
+            },
+
             goToGit () {
-                goYaml(this.projectUrl, this.curPipeline.branch, this.curPipeline.filePath)
+                goYaml(this.projectInfo.web_url, this.curPipeline.branch, this.curPipeline.filePath)
             },
 
             goToDetail (row) {
@@ -312,15 +361,18 @@
                 this.$refs.triggleForm.validate().then(() => {
                     const postData = {
                         ...this.formData,
-                        commitId: this.formData.useCommitId ? undefined : this.formData.commitId
+                        projectId: this.projectId,
+                        commitId: this.formData.useCommitId ? this.formData.commitId : undefined
                     }
-                    this.isSaving = true
-                    pipelines.addPipelineYamlFile(this.projectId, postData).then(() => {
+                    this.isTriggering = true
+                    pipelines.trigglePipeline(this.curPipeline.pipelineId, postData).then(() => {
+                        this.$bkMessage({ theme: 'success', message: '触发成功' })
                         this.hidden()
+                        this.getBuildData()
                     }).catch((err) => {
                         this.$bkMessage({ theme: 'error', message: err.message || err })
                     }).finally(() => {
-                        this.isSaving = false
+                        this.isTriggering = false
                     })
                 }, (err) => {
                     this.$bkMessage({ theme: 'error', message: err.content || err })

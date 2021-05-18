@@ -1,45 +1,10 @@
-import axios from 'axios'
-
-const request = axios.create({
-    baseURL: AJAX_URL_PREFIX,
-    validateStatus: status => {
-        if (status > 400) {
-            console.warn(`HTTP 请求出错 status: ${status}`)
-        }
-        return status >= 200 && status <= 503
-    },
-    withCredentials: true,
-    xsrfCookieName: 'paas_perm_csrftoken',
-    xsrfHeaderName: 'X-CSRFToken'
-})
 
 function errorHandler (error) {
     console.log('error catch', error)
     return Promise.reject(Error('网络出现问题，请检查你的网络是否正常'))
 }
 
-function getLoginUrl () {
-    const cUrl = location.origin + location.pathname + encodeURIComponent(location.search)
-    if (/=%s/.test(LOGIN_SERVICE_URL)) {
-        return LOGIN_SERVICE_URL.replace(/%s/, cUrl)
-    } else {
-        const loginUrl = new URL(LOGIN_SERVICE_URL)
-        if (/=$/.test(loginUrl.search)) {
-            return LOGIN_SERVICE_URL + cUrl
-        } else {
-            loginUrl.searchParams.append('c_url', cUrl)
-            return loginUrl.href
-        }
-    }
-}
-
-request.interceptors.request.use(config => {
-    return config
-}, function (error) {
-    return Promise.reject(error)
-})
-
-request.interceptors.response.use(response => {
+function successHandler (response) {
     const { data: { code, data, message, status }, status: httpStatus } = response
     if (httpStatus === 401) {
         location.href = getLoginUrl()
@@ -64,6 +29,21 @@ request.interceptors.response.use(response => {
         return Promise.reject(errorMsg)
     }
     return data
-}, errorHandler)
+}
 
-export default request
+function getLoginUrl () {
+    const cUrl = location.origin + location.pathname + encodeURIComponent(location.search)
+    if (/=%s/.test(LOGIN_SERVICE_URL)) {
+        return LOGIN_SERVICE_URL.replace(/%s/, cUrl)
+    } else {
+        const loginUrl = new URL(LOGIN_SERVICE_URL)
+        if (/=$/.test(loginUrl.search)) {
+            return LOGIN_SERVICE_URL + cUrl
+        } else {
+            loginUrl.searchParams.append('c_url', cUrl)
+            return loginUrl.href
+        }
+    }
+}
+
+export { errorHandler, successHandler }

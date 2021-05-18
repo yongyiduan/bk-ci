@@ -13,7 +13,7 @@ const store = new Vuex.Store({
         user: {},
         appHeight: window.innerHeight,
         projectId: '',
-        projectUrl: '',
+        projectInfo: {},
         curPipeline: {}
     },
     getters: {},
@@ -23,7 +23,7 @@ const store = new Vuex.Store({
         },
         setProjectInfo (state, projectInfo) {
             state.projectId = `git_${projectInfo.id}`
-            state.projectUrl = projectInfo.web_url
+            state.projectInfo = projectInfo
         },
         setCurPipeline (state, pipeline) {
             state.curPipeline = pipeline

@@ -29,6 +29,7 @@
 <script>
     import { common } from '@/http'
     import { mapActions } from 'vuex'
+    import { modifyRequestCommonHead } from '@/http/ajax'
 
     export default {
         name: 'app',
@@ -73,7 +74,9 @@
                         img: data.avatarUrl
                     }
                     const projectData = projectInfo || {}
+                    const projectId = `git_${projectData.id}`
                     this.setProjectInfo(projectData)
+                    modifyRequestCommonHead({ 'X-DEVOPS-PROJECT-ID': projectId })
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

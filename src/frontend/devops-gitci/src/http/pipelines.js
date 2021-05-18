@@ -80,5 +80,17 @@ export default {
 
     getPipelineCommits (params) {
         return api.get(`${GITCI_PERFIX}/user/gitcode/projects/commits`, { params })
+    },
+
+    getPipelineBranchYaml (projectId, pipelineId, params) {
+        return api.get(`${GITCI_PERFIX}/user/trigger/build/${projectId}/${pipelineId}/yaml`, { params })
+    },
+
+    trigglePipeline (pipelineId, params) {
+        return api.post(`${GITCI_PERFIX}/user/trigger/build/${pipelineId}/startup`, params)
+    },
+
+    toggleEnablePipeline (projectId, pipelineId, enabled) {
+        return api.post(`${GITCI_PERFIX}/user/pipelines/${projectId}/${pipelineId}/enable?enable=${enabled}`)
     }
 }
