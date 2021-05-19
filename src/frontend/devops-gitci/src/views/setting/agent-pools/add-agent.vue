@@ -63,7 +63,8 @@
                 </p>
             </section>
 
-            <bk-button class="back-list" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
+            <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">导入</bk-button>
+            <bk-button class="bottom-btn" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
         </main>
     </article>
 </template>
@@ -101,7 +102,8 @@
                     status: 'UN_IMPORT'
                 },
                 isLoading: false,
-                isRefresh: false
+                isRefresh: false,
+                isAdding: false
             }
         },
 
@@ -175,6 +177,20 @@
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isRefresh = false
+                })
+            },
+
+            importNode () {
+                this.isAdding = true
+                setting.addNodeToSystem(this.projectId, this.machine.agentId).then(() => {
+                    const params = [this.machine.agentId]
+                    return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
+                        this.$bkMessage({ theme: 'success', message: '导入成功' })
+                    })
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isAdding = false
                 })
             }
         }
@@ -269,8 +285,11 @@
                 }
             }
         }
-        .back-list {
+        .bottom-btn {
             margin: 24px 0;
+            +button {
+                margin-left: 15px;
+            }
         }
     }
     /deep/ .bk-link-text {

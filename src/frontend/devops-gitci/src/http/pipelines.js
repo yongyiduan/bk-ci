@@ -91,6 +91,6 @@ export default {
     },
 
     toggleEnablePipeline (projectId, pipelineId, enabled) {
-        return api.post(`${GITCI_PERFIX}/user/pipelines/${projectId}/${pipelineId}/enabled?enable=${enabled}`)
+        return api.post(`${GITCI_PERFIX}/user/pipelines/${projectId}/${pipelineId}/enable?enabled=${enabled}`)
     }
 }

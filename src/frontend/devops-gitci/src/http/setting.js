@@ -62,5 +62,13 @@ export default {
 
     deleteEnvironment (projectId, envHashId) {
         return api.delete(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${envHashId}`)
+    },
+
+    addNodeToPool (projectId, poolId, params) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${poolId}/addNodes`, params)
+    },
+
+    addNodeToSystem (projectId, agentId) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/agents/${agentId}/import`)
     }
 }

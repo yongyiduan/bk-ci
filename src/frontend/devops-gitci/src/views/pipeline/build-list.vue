@@ -1,10 +1,10 @@
 <template>
     <article class="pipelines-main">
         <header class="main-head">
-            <span>
-                <span class="pipeline-name">{{ curPipeline.displayName }}</span>
+            <span class="head-text">
+                <span class="pipeline-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.displayName }}</span>
                 <template v-if="curPipeline.filePath">
-                    <span class="yml-name">{{ curPipeline.filePath }}</span>
+                    <span class="yml-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.filePath }}</span>
                     <icon name="cc-jump-link" size="16" @click.native="goToGit"></icon>
                 </template>
                 <span class="pipeline-status" v-if="!curPipeline.enabled">已禁用</span>
@@ -432,12 +432,19 @@
             justify-content: space-between;
             padding: 0 27px;
             line-height: 20px;
+            .head-text {
+                display: flex;
+                align-items: center;
+            }
             .pipeline-name {
                 color: #313328;
+                max-width: 300px;
+                display: inline-block;
             }
             .yml-name {
                 display: inline-block;
                 margin: 0 3px 0 16px;
+                max-width: 300px;
             }
             svg {
                 vertical-align: sub;

@@ -17,49 +17,50 @@
     export default {
         data () {
             return {
-                type: '404',
-                message: '',
-                title: '',
-                isSaving: false
+                isSaving: false,
+                typeMap: {
+                    404: 404,
+                    499: 'login',
+                    500: 500
+                },
+                messageMap: {
+                    418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
+                    403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目!`,
+                    499: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. ',
+                    500: '系统异常，请稍后重试'
+                },
+                titleMap: {
+                    403: '无业务权限',
+                    404: '页面不存在',
+                    418: '无权限',
+                    499: 'Welcome to Tencent CI.',
+                    500: '系统异常'
+                }
             }
         },
 
         computed: {
             projectPath () {
                 return this.$route.params.workspace + '/' + this.$route.params.projectPath
+            },
+
+            type () {
+                const type = +this.$route.params.type || 404
+                return this.typeMap[type] || '403'
+            },
+
+            message () {
+                const type = +this.$route.params.type || 404
+                return this.messageMap[type]
+            },
+
+            title () {
+                const type = +this.$route.params.type || 404
+                return this.titleMap[type]
             }
         },
 
-        mounted () {
-            this.initStatus()
-        },
-
         methods: {
-            initStatus () {
-                const type = +this.$route.params.type || 404
-                const typeMap = {
-                    404: 404,
-                    499: 'login',
-                    500: 500
-                }
-                const messageMap = {
-                    418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
-                    403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目!`,
-                    499: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. ',
-                    500: '系统异常，请稍后重试'
-                }
-                const titleMap = {
-                    403: '无业务权限',
-                    404: '页面不存在',
-                    418: '无权限',
-                    499: 'Welcome to get started with Tencent CI.',
-                    500: '系统异常'
-                }
-                this.type = typeMap[type] || '403'
-                this.message = messageMap[type]
-                this.title = titleMap[type]
-            },
-
             oauth () {
                 const redirectUrl = location.protocol + '//' + location.host + '/' + this.projectPath
                 this.isSaving = true
@@ -79,7 +80,7 @@
 
 <style lang="postcss" scoped>
     .exception-home {
-        margin-top: 50px;
+        margin-top: calc(50vh - 300px);
     }
     .exception-content {
         display: flex;

@@ -32,9 +32,10 @@
             li {
                 line-height: 32px;
                 font-size: 12px;
-                padding: 0 9px;
+                padding: 0 15px;
                 cursor: pointer;
                 color: #7b7d8a;
+                min-width: 65px;
                 &:hover {
                     background: #e1ecff;
                     color: #3a84ff;

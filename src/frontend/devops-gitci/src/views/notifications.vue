@@ -14,13 +14,37 @@
         </aside>
 
         <main class="notifications-main">
-            <bk-button class="notifications-button" @click="readAll">Mark all as read</bk-button>
+            <section class="notifications-head">
+                <bk-button class="notifications-button" @click="readAll">Mark all as read</bk-button>
+                <span class="head-text">是否只展示已读：</span>
+                <bk-switcher v-model="onlyUnread"></bk-switcher>
+            </section>
             <bk-collapse v-bkloading="{ isLoading }">
                 <bk-collapse-item :name="index" v-for="(notification, index) in notificationList" :key="index">
-                    {{ notification.createTime }}
-                    <div slot="content" class="f13">{{ notification.content.commitMsg }}</div>
+                    {{ notification.time }}
+                    <bk-collapse slot="content">
+                        <bk-collapse-item :name="request.messageTitle" v-for="request in notification.records" :key="request.messageTitle">
+                            <span :class="{ 'message-status': true, 'unread': request.haveRead }"></span>{{ request.messageTitle }} （{{ request.contentAttr.failedNum }} / {{ request.contentAttr.total }}）
+                            <bk-table :data="request.content.buildRecords" slot="content" class="f13">
+                                <bk-table-column>
+                                    <template slot-scope="props">
+                                        {{ props.row.displayName || '--' }}
+                                    </template>
+                                </bk-table-column>
+                                <bk-table-column>
+                                    <template slot-scope="props">
+                                        {{ (props.row.buildHistory || {}).buildNum || '--' }}
+                                    </template>
+                                </bk-table-column>
+                                <bk-table-column prop="reason"></bk-table-column>
+                                <bk-table-column prop="reasonDetail"></bk-table-column>
+                            </bk-table>
+                        </bk-collapse-item>
+                    </bk-collapse>
                 </bk-collapse-item>
             </bk-collapse>
+
+            <bk-exception class="exception-wrap-item exception-part" type="empty" v-if="notificationList.length <= 0"></bk-exception>
 
             <bk-pagination small
                 :current.sync="compactPaging.current"
@@ -41,16 +65,23 @@
         data () {
             return {
                 navList: [
-                    { label: 'Notifications', name: 'notifications', icon: 'notify' }
+                    { label: 'Inbox', name: 'inbox', icon: 'notify' }
                 ],
                 compactPaging: {
                     limit: 10,
                     current: 1,
                     count: 0
                 },
-                curNav: { name: 'notifications' },
+                curNav: { name: 'inbox' },
                 notificationList: [],
+                onlyUnread: false,
                 isLoading: false
+            }
+        },
+
+        watch: {
+            onlyUnread () {
+                this.initData()
             }
         },
 
@@ -61,7 +92,15 @@
         methods: {
             initData () {
                 this.isLoading = true
-                notifications.getUserUnreadMessages(this.compactPaging.current).then((res) => {
+                const params = {
+                    messageType: 'REQUEST',
+                    page: this.compactPaging.current,
+                    pageSize: this.compactPaging.limit
+                }
+                if (this.onlyUnread) {
+                    params.haveRead = false
+                }
+                notifications.getUserMessages(params).then((res) => {
                     this.notificationList = res.records
                     this.compactPaging.count = res.count
                 }).catch((err) => {
@@ -106,8 +145,25 @@
             margin: 25px;
             padding: 25px;
             over-flow: auto;
-            .notifications-button {
+            .notifications-head {
+                display: flex;
+                align-items: center;
                 margin-bottom: 20px;
+                .head-text {
+                    display: inline-block;
+                    margin: 0 3px 0 40px;
+                }
+            }
+            .message-status {
+                display: inline-block;
+                margin: 5px 8px 0 0;
+                height: 15px;
+                width: 15px;
+                border-radius: 100px;
+                background: #f0f1f5;
+                &.unread {
+                    background: #ff5656;
+                }
             }
         }
     }

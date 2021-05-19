@@ -88,7 +88,7 @@
             },
 
             failGetProjectInfo (type) {
-                this.$router.push({ name: 'exception', params: { type } })
+                this.$router.push({ path: `/exception/${type}`, params: { type } })
             },
 
             goToSetting () {
@@ -157,6 +157,10 @@
 
     .gitci-content {
         height: calc(100% - 61px);
+    }
+
+    .bk-dropdown-list li {
+        min-width: 65px;
     }
 
     .user-info {

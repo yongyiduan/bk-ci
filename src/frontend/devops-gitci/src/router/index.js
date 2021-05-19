@@ -90,12 +90,12 @@ const routes = [
                         component: agentPools
                     },
                     {
-                        path: 'add-agent',
+                        path: 'add-agent/:poolId',
                         name: 'addAgent',
                         component: addAgent
                     },
                     {
-                        path: 'agent-list',
+                        path: 'agent-list/:poolId',
                         name: 'agentList',
                         component: agentList
                     },

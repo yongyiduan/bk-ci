@@ -9,8 +9,11 @@
                 <li v-for="setting in settingList"
                     :key="setting.name"
                     @click="goToPage(setting)"
-                    :class="{ 'nav-item': true, active: curSetting.name === setting.name }"
-                ><icon :name="setting.icon" size="18"></icon>{{ setting.label }}</li>
+                    :class="{ 'nav-item text-ellipsis': true, active: curSetting.name === setting.name }"
+                >
+                    <icon :name="setting.icon" size="18"></icon>
+                    <span class="text-ellipsis item-text" v-bk-overflow-tips>{{ setting.label }}</span>
+                </li>
             </ul>
         </aside>
 

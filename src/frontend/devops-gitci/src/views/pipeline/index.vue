@@ -13,7 +13,7 @@
                     :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId }"
                 >
                     <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
-                    {{ pipeline.displayName }}
+                    <span class="text-ellipsis item-text" v-bk-overflow-tips>{{ pipeline.displayName }}</span>
                 </li>
             </ul>
         </aside>

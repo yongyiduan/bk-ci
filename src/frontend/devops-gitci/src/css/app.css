@@ -33,6 +33,7 @@
         font-size: 14px;
         display: flex;
         align-items: center;
+        max-width: 240px;
         &.active {
             background: #e0ecff;
             color: #3c96ff;
@@ -47,6 +48,12 @@
         }
         svg {
             margin: 0 16px 0 18px;
+            min-width: 24px;
+        }
+        .item-text {
+            display: inline-block;
+            width: 180px;
+            padding-right: 10px;
         }
     }
 }
@@ -70,4 +77,10 @@
         cursor: not-allowed;
         color: #c4c6cc;
     }
+}
+
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }

@@ -67,7 +67,6 @@
 
             getLog () {
                 const id = uuid()
-                debugger
                 this.getLog.id = id
                 let logMethod = pipelines.getAfterLog
                 if (this.postData.lineNo <= 0) logMethod = pipelines.getInitLog
