@@ -88,7 +88,7 @@
                 }
                 this.isLoading = true
                 setting.getTicketList(this.projectId, params).then((res) => {
-                    const data = res.data || {}
+                    const data = res || {}
                     this.pagination.count = data.count || 0
                     this.credentialList = data.records || []
                 }).catch((err) => {

@@ -60,6 +60,7 @@
 
         watch: {
             code () {
+                if (this.code === this.codeEditor.getValue()) return
                 this.codeEditor.setValue(this.code || '')
             }
         },

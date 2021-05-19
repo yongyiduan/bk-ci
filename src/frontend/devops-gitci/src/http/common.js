@@ -1,5 +1,5 @@
 import api from './ajax'
-import { PROJECT_PERFIX, GITCI_PERFIX } from './perfix'
+import { PROJECT_PERFIX, GITCI_PERFIX, REPOSITORY_PREFIX } from './perfix'
 
 export default {
     getUserInfo () {
@@ -8,5 +8,9 @@ export default {
 
     getProjectInfo (projectPath) {
         return api.get(`${GITCI_PERFIX}/user/gitcode/projects/info?gitProjectId=${projectPath}`)
+    },
+
+    oauth (redirectUrl) {
+        return api.get(`${REPOSITORY_PREFIX}/user/git/isOauth?redirectUrl=${redirectUrl}`)
     }
 }

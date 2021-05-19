@@ -1,3 +1,4 @@
+import router from '@/router'
 
 function errorHandler (error) {
     console.log('error catch', error)
@@ -14,10 +15,9 @@ function successHandler (response) {
             message: '服务维护中，请稍候...'
         })
     } else if (httpStatus === 418) {
-        console.log('no permission')
+        router.push({ name: 'exception', params: { type: 418 } })
     } else if (httpStatus === 403) {
-        const errorMsg = { httpStatus, code: httpStatus, message }
-        return Promise.reject(errorMsg)
+        router.push({ name: 'exception', params: { type: 403 } })
     } else if ((typeof code !== 'undefined' && code !== 0) || (typeof status !== 'undefined' && status !== 0)) {
         let msg = message
         if (Object.prototype.toString.call(message) === '[object Object]') {

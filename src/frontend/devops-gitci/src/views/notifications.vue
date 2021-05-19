@@ -14,29 +14,11 @@
         </aside>
 
         <main class="notifications-main">
-            <bk-button class="notifications-button">Mark all as read</bk-button>
-            <bk-collapse>
-                <bk-collapse-item name="1">
-                    2021-05-01
-                    <div slot="content" class="f13">Merge requests[!157] opened by fayewang trigger successed (6/6) see more</div>
-                </bk-collapse-item>
-                <bk-collapse-item name="2">
-                    2021-05-02
-                    <div slot="content" class="f13">
-                        Merge requests[!157] opened by fayewang trigger successed (6/6) see more
-                    </div>
-                </bk-collapse-item>
-                <bk-collapse-item name="3">
-                    2021-05-03
-                    <div slot="content" class="f13">
-                        Merge requests[!157] opened by fayewang trigger successed (6/6) see more
-                    </div>
-                </bk-collapse-item>
-                <bk-collapse-item name="4">
-                    2021-05-04
-                    <div slot="content" class="f13">
-                        Merge requests[!157] opened by fayewang trigger successed (6/6) see more
-                    </div>
+            <bk-button class="notifications-button" @click="readAll">Mark all as read</bk-button>
+            <bk-collapse v-bkloading="{ isLoading }">
+                <bk-collapse-item :name="index" v-for="(notification, index) in notificationList" :key="index">
+                    {{ notification.createTime }}
+                    <div slot="content" class="f13">{{ notification.content.commitMsg }}</div>
                 </bk-collapse-item>
             </bk-collapse>
 
@@ -45,6 +27,7 @@
                 :count.sync="compactPaging.count"
                 :limit="compactPaging.limit"
                 :show-limit="false"
+                @change="pageChange"
                 class="notify-paging"
             />
         </main>
@@ -52,6 +35,8 @@
 </template>
 
 <script>
+    import { notifications } from '@/http'
+
     export default {
         data () {
             return {
@@ -61,37 +46,42 @@
                 compactPaging: {
                     limit: 10,
                     current: 1,
-                    count: 100
+                    count: 0
                 },
-                curNav: { name: 'notifications' }
+                curNav: { name: 'notifications' },
+                notificationList: [],
+                isLoading: false
             }
         },
 
-        watch: {
-            '$route.name': {
-                handler (name) {
-                    this.initRoute(name)
-                },
-                immediate: true
-            }
+        created () {
+            this.initData()
         },
 
         methods: {
-            initRoute (name) {
-                let settingIndex = 0
-                switch (name) {
-                    case 'basicSetting':
-                        settingIndex = 0
-                        break
-                    case 'credentialList':
-                        settingIndex = 1
-                        break
-                    case 'agentPools':
-                    case 'addAgent':
-                        settingIndex = 2
-                        break
-                }
-                this.curSetting = this.settingList[settingIndex]
+            initData () {
+                this.isLoading = true
+                notifications.getUserUnreadMessages(this.compactPaging.current).then((res) => {
+                    this.notificationList = res.records
+                    this.compactPaging.count = res.count
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            readAll () {
+                notifications.readAllMessages().then(() => {
+                    this.initData()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
+            },
+
+            pageChange (page) {
+                this.compactPaging.current = page
+                this.initData()
             },
 
             goToPage ({ name }) {

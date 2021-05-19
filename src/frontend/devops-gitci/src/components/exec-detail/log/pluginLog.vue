@@ -19,15 +19,7 @@
 
         data () {
             return {
-                postData: {
-                    projectId: this.projectId,
-                    pipelineId: this.pipelineId,
-                    buildId: this.buildId,
-                    tag: this.plugin.id,
-                    subTag: '',
-                    currentExe: this.plugin.executeCount,
-                    lineNo: 0
-                },
+                postData: {},
                 timeId: '',
                 clearIds: []
             }
@@ -52,6 +44,7 @@
         },
 
         mounted () {
+            this.initPostData()
             this.getLog()
         },
 
@@ -60,8 +53,21 @@
         },
 
         methods: {
+            initPostData () {
+                this.postData = {
+                    projectId: this.projectId,
+                    pipelineId: this.pipelineId,
+                    buildId: this.buildId,
+                    tag: this.plugin.id,
+                    subTag: '',
+                    currentExe: this.plugin.executeCount,
+                    lineNo: 0
+                }
+            },
+
             getLog () {
                 const id = uuid()
+                debugger
                 this.getLog.id = id
                 let logMethod = pipelines.getAfterLog
                 if (this.postData.lineNo <= 0) logMethod = pipelines.getInitLog
@@ -75,16 +81,16 @@
                         let errMessage
                         switch (res.status) {
                             case 1:
-                                errMessage = this.$t('history.logEmpty')
+                                errMessage = '日志为空'
                                 break
                             case 2:
-                                errMessage = this.$t('history.logClear')
+                                errMessage = '日志被清理'
                                 break
                             case 3:
-                                errMessage = this.$t('history.logClose')
+                                errMessage = '日志关闭'
                                 break
                             default:
-                                errMessage = this.$t('history.logErr')
+                                errMessage = '日志错误'
                                 break
                         }
                         scroll.handleApiErr(errMessage)

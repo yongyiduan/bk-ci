@@ -8,7 +8,7 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 const main = () => import(/* webpackChunkName: 'entry' */'@/views/index')
-const notFound = () => import(/* webpackChunkName: 'entry' */'@/views/404')
+const exception = () => import(/* webpackChunkName: 'entry' */'@/views/exception')
 const notifications = () => import(/* webpackChunkName: 'notifications' */'@/views/notifications')
 const pipeline = () => import(/* webpackChunkName: 'pipelines' */'@/views/pipeline')
 const buildList = () => import(/* webpackChunkName: 'pipelines' */'@/views/pipeline/build-list')
@@ -27,20 +27,21 @@ const agentDetail = () => import(/* webpackChunkName: 'setting' */'@/views/setti
 
 const routes = [
     {
-        path: '/:workspace/:projectPath',
+        path: '',
         component: main,
         children: [
             {
-                path: 'pipelineId/:pipelineId',
+                path: 'gitci/:workspace/:projectPath',
                 component: pipeline,
+                name: 'pipeline',
                 children: [
                     {
-                        path: '',
+                        path: 'pipelineId/:pipelineId',
                         name: 'buildList',
                         component: buildList
                     },
                     {
-                        path: 'detail/:buildId',
+                        path: 'pipelineId/:pipelineId/detail/:buildId',
                         name: 'pipelineDetail',
                         component: pipelineDetail,
                         children: [
@@ -69,7 +70,7 @@ const routes = [
                 ]
             },
             {
-                path: 'setting',
+                path: 'gitci/:workspace/:projectPath/setting',
                 name: 'setting',
                 component: setting,
                 children: [
@@ -89,7 +90,7 @@ const routes = [
                         component: agentPools
                     },
                     {
-                        path: 'add-agent/:pool',
+                        path: 'add-agent',
                         name: 'addAgent',
                         component: addAgent
                     },
@@ -106,14 +107,19 @@ const routes = [
                 ]
             },
             {
-                path: 'notifications',
+                path: 'gitci/:workspace/:projectPath/notifications',
                 name: 'notifications',
                 component: notifications
             },
             {
+                path: 'exception/:type',
+                name: 'exception',
+                component: exception
+            },
+            {
                 path: '*',
                 name: '404',
-                component: notFound
+                component: exception
             }
         ]
     }

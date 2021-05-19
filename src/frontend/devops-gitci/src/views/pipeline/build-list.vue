@@ -177,6 +177,7 @@
             curPipeline: {
                 handler () {
                     this.getFilterData()
+                    this.cleanFilterData()
                     this.getBuildData()
                 },
                 immediate: true
@@ -199,7 +200,7 @@
                     pipelines.getPipelineBuildMemberList(this.projectId)
                 ]).then(([branchInfo, memberInfo]) => {
                     this.filterList.branch = (branchInfo.records || []).map((branch) => ({ name: branch.branchName, id: branch.branchName }))
-                    this.filterList.triggerUser = memberInfo.records || []
+                    this.filterList.triggerUser = (memberInfo || []).map((member) => ({ name: member.username, id: member.username }))
                     this.filterList.event = [
                         { name: 'PUSH', id: 'PUSH' },
                         { name: 'TAG', id: 'TAG' },
@@ -216,6 +217,16 @@
                 }).finally(() => {
                     this.isLoadingFilter = false
                 })
+            },
+
+            cleanFilterData () {
+                this.filterData = {
+                    commitMsg: '',
+                    triggerUser: [],
+                    branch: [],
+                    event: [],
+                    status: []
+                }
             },
 
             getBuildData () {

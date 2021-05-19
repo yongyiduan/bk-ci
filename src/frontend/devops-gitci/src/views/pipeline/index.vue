@@ -121,17 +121,23 @@
                 const pipelineId = this.$route.params.pipelineId
                 const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.pipelineList[0]
                 this.setCurPipeline(curPipeline)
+                if (this.$route.name === 'pipeline') {
+                    this.$router.push({
+                        name: 'buildList',
+                        params: {
+                            pipelineId: curPipeline.pipelineId
+                        }
+                    })
+                }
             },
 
             choosePipeline (pipeline) {
                 this.setCurPipeline(pipeline)
-                const params = {}
-                if (pipeline.pipelineId) {
-                    params.pipelineId = pipeline.pipelineId
-                }
                 this.$router.push({
                     name: 'buildList',
-                    params
+                    params: {
+                        pipelineId: pipeline.pipelineId
+                    }
                 })
             },
 

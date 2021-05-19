@@ -46,6 +46,16 @@ export default {
         return api.get(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}`)
     },
 
+    getNodeList (projectId) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/envnode/${projectId}`)
+    },
+
+    deleteNode (projectId, params) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/envnode/${projectId}/deleteNodes`, params).then(response => {
+            return response
+        })
+    },
+
     addEnvironment (projectId, params) {
         return api.post(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}`, params)
     },

@@ -1,20 +1,20 @@
 <template>
-    <article class="agent-pools" @scroll.passive="mainScroll">
-        <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 60 && scrollTop < 1030 }">Default agent pools</h3>
+    <article class="agent-pools" @scroll.passive="mainScroll" v-bkloading="{ isLoading: isLoadingSysPools }">
+        <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 60 && scrollTop < 370 }">Default agent pools</h3>
         <section class="agent-pools-container">
             <agent-pool-card class="agent-pool" :editable="false" v-for="pool in systemPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
         </section>
 
-        <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 1030 }">
+        <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 370 }">
             Self-hosted agent pools
             <bk-button @click="showAddPool" class="add-pool" theme="primary" size="small">Add Pool</bk-button>
         </h3>
-        <section class="agent-pools-container">
-            <agent-pool-card class="agent-pool" @refresh="getThirdPoolList" v-for="pool in thirdPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
-            <bk-exception class="exception-wrap-item" type="empty"> </bk-exception>
+        <section class="agent-pools-container" v-bkloading="{ isLoading: isLoadingThirdPools }">
+            <agent-pool-card class="agent-pool" @refresh="getThirdPool" v-for="pool in thirdPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
+            <bk-exception class="exception-wrap-item" type="empty" v-if="thirdPools.length <= 0"> </bk-exception>
         </section>
 
-        <add-pool :show.sync="isShowAddPool" @refresh="getThirdPoolList"></add-pool>
+        <add-pool :show.sync="isShowAddPool" @refresh="getThirdPool"></add-pool>
     </article>
 </template>
 
@@ -33,6 +33,8 @@
         data () {
             return {
                 isShowAddPool: false,
+                isLoadingThirdPools: false,
+                isLoadingSysPools: false,
                 scrollTop: 0,
                 systemPools: [],
                 thirdPools: []
@@ -44,14 +46,25 @@
         },
 
         created () {
-            this.initData()
+            this.getSystemPool()
+            this.getThirdPool()
         },
 
         methods: {
-            initData () {
-                this.isLoading = true
-                Promise.all([setting.getEnvironmentList(this.projectId), setting.getSystemPoolDetail()]).then(([thirdPool = {}, systemPool = {}]) => {
+            getThirdPool () {
+                this.isLoadingThirdPools = true
+                setting.getEnvironmentList(this.projectId).then((thirdPool) => {
                     this.thirdPools = thirdPool || []
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoadingThirdPools = false
+                })
+            },
+
+            getSystemPool () {
+                this.isLoadingSysPools = true
+                setting.getSystemPoolDetail().then((systemPool) => {
                     this.systemPools = []
                     const clusterLoad = systemPool.clusterLoad
                     for (const name in clusterLoad) {
@@ -61,7 +74,7 @@
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
-                    this.isLoading = false
+                    this.isLoadingSysPools = false
                 })
             },
 

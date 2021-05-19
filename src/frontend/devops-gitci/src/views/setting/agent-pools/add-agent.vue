@@ -146,7 +146,7 @@
             getZoneList () {
                 this.isLoading = true
                 setting.getThirdAgentZoneList(this.projectId, this.machine.system).then((res) => {
-                    this.zones = res.data || []
+                    this.zones = res || []
                     this.machine.zone = (this.zones[0] || {}).zoneName
                     return this.getThirdAgentLink()
                 }).catch((err) => {
@@ -158,7 +158,7 @@
 
             getThirdAgentLink () {
                 return setting.getThirdAgentLink(this.projectId, this.machine.system, this.machine.zone).then((res) => {
-                    const data = res.data || {}
+                    const data = res || {}
                     this.machine.link = data.link
                     this.machine.agentId = data.agentId
                     return this.getAgentStatus()
@@ -170,7 +170,7 @@
             getAgentStatus () {
                 this.isRefresh = true
                 return setting.getThirdAgentStatus(this.projectId, this.machine.agentId).then((res) => {
-                    this.agentStatus = res.data || {}
+                    this.agentStatus = res || {}
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

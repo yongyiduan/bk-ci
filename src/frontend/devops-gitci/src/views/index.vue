@@ -4,9 +4,11 @@
             <span class="header-info">
                 <icon name="export-ci" size="44"></icon>
                 <span class="ci-name">Tencent CI</span>
-                <icon name="git" size="18" class="gray-icon"></icon>
-                <span class="git-project-path">{{ `${$route.params.workspace}/${$route.params.projectPath}` }}</span>
-                <icon name="setting" size="18" :class="computedIconClass" @click.native="goToSetting"></icon>
+                <template v-if="$route.params.workspace && $route.params.projectPath">
+                    <icon name="git" size="18" class="gray-icon"></icon>
+                    <span class="git-project-path">{{ `${$route.params.workspace}/${$route.params.projectPath}` }}</span>
+                    <icon name="setting" size="18" :class="computedIconClass" @click.native="goToSetting"></icon>
+                </template>
             </span>
             <section class="user-info">
                 <img :src="userInfo.img" class="avatar" />
@@ -60,10 +62,6 @@
         methods: {
             ...mapActions(['setProjectInfo']),
 
-            goToSetting () {
-                this.$router.push({ name: 'basicSetting', params: this.$route.params })
-            },
-
             initData () {
                 this.isLoading = true
                 const projectPath = this.$route.params.workspace + '/' + this.$route.params.projectPath
@@ -74,14 +72,27 @@
                         img: data.avatarUrl
                     }
                     const projectData = projectInfo || {}
-                    const projectId = `git_${projectData.id}`
-                    this.setProjectInfo(projectData)
-                    modifyRequestCommonHead({ 'X-DEVOPS-PROJECT-ID': projectId })
+                    if (projectData.id) {
+                        const projectId = `git_${projectData.id}`
+                        this.setProjectInfo(projectData)
+                        modifyRequestCommonHead({ 'X-DEVOPS-PROJECT-ID': projectId })
+                    } else {
+                        this.failGetProjectInfo(499)
+                    }
                 }).catch((err) => {
+                    this.failGetProjectInfo(500)
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
                 })
+            },
+
+            failGetProjectInfo (type) {
+                this.$router.push({ name: 'exception', params: { type } })
+            },
+
+            goToSetting () {
+                this.$router.push({ name: 'basicSetting' })
             },
 
             goLogin () {

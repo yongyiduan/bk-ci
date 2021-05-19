@@ -12,7 +12,7 @@
             </opt-menu>
         </header>
 
-        <ul class="card-useages">
+        <ul class="card-useages" v-if="!editable">
             <li class="useage-item" v-for="usage in cpuUsages" :key="usage.name">
                 <span class="item-header">
                     <span class="header-title">{{ usage.name }}</span>
@@ -21,6 +21,7 @@
                 <bk-progress :theme="getTheme(usage.val)" :percent="usage.val" :show-text="false"></bk-progress>
             </li>
         </ul>
+        <bk-exception class="exception-wrap-item exception-part card-useages" type="empty" scene="part" v-else> </bk-exception>
         <bk-button @click="addAgent" class="card-button" v-if="editable">Add agent</bk-button>
     </section>
 </template>
@@ -28,6 +29,7 @@
 <script>
     import optMenu from '@/components/opt-menu'
     import { setting } from '@/http'
+    import { mapState } from 'vuex'
 
     export default {
         components: {
@@ -49,6 +51,8 @@
         },
 
         computed: {
+            ...mapState(['projectId']),
+
             cpuUsages () {
                 return [
                     { name: '构建机CPU负载', showVal: this.pool.averageCpuLoad, val: this.pool.averageCpuLoad / 100 },
@@ -61,7 +65,7 @@
         methods: {
             deletePool () {
                 this.isDeleteing = true
-                setting.deleteEnvironment(this.pool.envHashId).then(() => {
+                setting.deleteEnvironment(this.projectId, this.pool.envHashId).then(() => {
                     this.$emit('refresh')
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
