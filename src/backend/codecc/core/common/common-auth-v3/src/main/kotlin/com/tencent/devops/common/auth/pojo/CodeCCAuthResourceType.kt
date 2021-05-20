@@ -1,3 +1,6 @@
+package com.tencent.devops.common.auth.pojo
+
+
 /*
  * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
  *
@@ -24,36 +27,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.auth
-
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.tencent.devops.common.auth.api.BSAuthTokenApi
-import com.tencent.devops.common.auth.api.BSCCProjectApi
-import com.tencent.devops.common.auth.api.BkCCProperties
-import com.tencent.devops.common.auth.code.BSPipelineAuthServiceCode
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
-import org.springframework.core.Ordered
-
-@Configuration
-@ConditionalOnWebApplication
-@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
-class CCAutoConfiguration {
-
-    @Bean
-    @Primary
-    fun bkCCProperties() = BkCCProperties()
-
-    @Bean
-    @Primary
-    fun bkCCProjectApi(
-        bsPipelineAuthServiceCode: BSPipelineAuthServiceCode,
-        bkCCProperties: BkCCProperties,
-        objectMapper: ObjectMapper,
-        bsAuthTokenApi: BSAuthTokenApi
-    ) =
-        BSCCProjectApi(bkCCProperties, objectMapper, bsAuthTokenApi, bsPipelineAuthServiceCode)
+enum class CodeCCAuthResourceType(val value: String) {
+    CODECC_TASK("codecc_task"); // codecc任务
 }
