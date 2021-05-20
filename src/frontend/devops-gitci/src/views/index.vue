@@ -1,5 +1,5 @@
 <template>
-    <article class="gitci-main">
+    <article class="gitci-main" v-bkloading="{ isLoading }">
         <header class="gitci-header">
             <span class="header-info">
                 <icon name="export-ci" size="44"></icon>

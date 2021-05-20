@@ -51,7 +51,7 @@ export default {
     },
 
     getPipelineBuildList (projectId, params) {
-        return api.get(`${GITCI_PERFIX}/user/history/build/list/${projectId}`, { params })
+        return api.post(`${GITCI_PERFIX}/user/history/build/list/${projectId}`, params)
     },
 
     getPipelineBuildBranchList (projectId, params = {}) {
@@ -92,5 +92,13 @@ export default {
 
     toggleEnablePipeline (projectId, pipelineId, enabled) {
         return api.post(`${GITCI_PERFIX}/user/pipelines/${projectId}/${pipelineId}/enable?enabled=${enabled}`)
+    },
+
+    updateRemark (projectId, pipelineId, buildId, remark) {
+        return api.post(`${PROCESS_PREFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/updateRemark`, { remark })
+    },
+
+    rebuildPipeline (projectId, pipelineId, buildId, params = {}) {
+        return api.post(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/retry`, { params })
     }
 }

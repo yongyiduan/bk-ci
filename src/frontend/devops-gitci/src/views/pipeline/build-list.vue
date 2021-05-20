@@ -74,6 +74,7 @@
                 :count.sync="compactPaging.count"
                 :limit="compactPaging.limit"
                 :show-limit="false"
+                @change="pageChange"
                 class="build-paging"
             />
         </section>
@@ -178,16 +179,24 @@
                 handler () {
                     this.getFilterData()
                     this.cleanFilterData()
-                    this.getBuildData()
+                    this.initBuildData()
                 },
                 immediate: true
             },
             filterData: {
                 handler () {
-                    this.getBuildData()
+                    this.initBuildData()
                 },
                 deep: true
             }
+        },
+
+        created () {
+            this.loopGetList()
+        },
+
+        beforeDestroy () {
+            clearTimeout(this.loopGetList.loopId)
         },
 
         methods: {
@@ -229,6 +238,27 @@
                 }
             },
 
+            initBuildData () {
+                this.isLoading = true
+                this.getBuildData().finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            pageChange (page) {
+                this.compactPaging.current = page
+                this.initBuildData()
+            },
+
+            loopGetList () {
+                clearTimeout(this.loopGetList.loopId)
+                this.loopGetList.loopId = setTimeout(() => {
+                    this.getBuildData().then(() => {
+                        this.loopGetList()
+                    })
+                }, 5000)
+            },
+
             getBuildData () {
                 const params = {
                     page: this.compactPaging.current,
@@ -238,14 +268,11 @@
                 if (this.curPipeline.pipelineId !== 'all') {
                     params.pipelineId = this.curPipeline.pipelineId
                 }
-                this.isLoading = true
-                pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
+                return pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
                     this.buildList = res.records || []
                     this.compactPaging.count = res.count
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoading = false
                 })
             },
 
@@ -379,7 +406,7 @@
                     pipelines.trigglePipeline(this.curPipeline.pipelineId, postData).then(() => {
                         this.$bkMessage({ theme: 'success', message: '触发成功' })
                         this.hidden()
-                        this.getBuildData()
+                        this.initBuildData()
                     }).catch((err) => {
                         this.$bkMessage({ theme: 'error', message: err.message || err })
                     }).finally(() => {

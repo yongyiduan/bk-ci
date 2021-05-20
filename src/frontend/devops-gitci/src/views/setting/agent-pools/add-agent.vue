@@ -189,9 +189,12 @@
             importNode () {
                 this.isAdding = true
                 setting.addNodeToSystem(this.projectId, this.machine.agentId).then(() => {
-                    const params = [this.$route.params.poolId]
-                    return setting.addNodeToPool(this.projectId, this.machine.agentId, params).then(() => {
-                        this.$bkMessage({ theme: 'success', message: '导入成功' })
+                    return setting.getNodeList(this.projectId).then((res) => {
+                        const curNode = res.find((node) => (node.agentHashId === this.machine.agentId)) || {}
+                        const params = [curNode.nodeHashId]
+                        return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
+                            this.$bkMessage({ theme: 'success', message: '导入成功' })
+                        })
                     })
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
