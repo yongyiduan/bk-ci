@@ -46,8 +46,14 @@
                 <h3>Refresh to confirm</h3>
                 <p v-bkloading="{ isLoading: isRefresh }" class="agent-status">
                     <bk-button text @click="getAgentStatus" v-if="agentStatus.status === 'UN_IMPORT'" class="agent-refresh">Click to show the agent</bk-button>
-                    <section v-else>
-                        {{ agentStatus.hostname }}
+                    <section v-else class="agent-status-info">
+                        <span class="agent-title">{{ agentStatus.hostname }}</span>
+                        <span class="agent-os">
+                            <span class="title">Agent状态 :</span>
+                            <span>{{ agentStatus.status === 'UN_IMPORT_OK' ? '正常' : '异常' }}</span>
+                            <span class="title">操作系统 :</span>
+                            <span>{{ agentStatus.os }}</span>
+                        </span>
                     </section>
                 </p>
             </section>
@@ -183,8 +189,8 @@
             importNode () {
                 this.isAdding = true
                 setting.addNodeToSystem(this.projectId, this.machine.agentId).then(() => {
-                    const params = [this.machine.agentId]
-                    return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
+                    const params = [this.$route.params.poolId]
+                    return setting.addNodeToPool(this.projectId, this.machine.agentId, params).then(() => {
                         this.$bkMessage({ theme: 'success', message: '导入成功' })
                     })
                 }).catch((err) => {
@@ -278,10 +284,32 @@
                 }
             }
             .agent-status {
-                height: 60px;
+                min-height: 60px;
                 .agent-refresh {
                     width: 100%;
                     height: 100%;
+                }
+                .agent-status-info {
+                    color: #63656e;
+                    .agent-title {
+                        font-size: 14px;
+                        line-height: 20px;
+                        display: block;
+                        margin-bottom: 5px;
+                    }
+                    .agent-os {
+                        display: flex;
+                        align-items: center;
+                        font-size: 12px;
+                        .title {
+                            color: #979ba5;
+                            display: inline-block;
+                            margin: 0 7px 0 20px;
+                            &:first-child {
+                                margin-left: 0;
+                            }
+                        }
+                    }
                 }
             }
         }

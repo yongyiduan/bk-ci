@@ -5,7 +5,7 @@
             :header-border="false"
             :header-cell-style="{ background: '#f1f2f3' }"
         >
-            <bk-table-column label="构建名称" width="220" prop="name" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="构件名称" width="220" prop="name" show-overflow-tooltip></bk-table-column>
             <bk-table-column label="路径" prop="fullName" show-overflow-tooltip></bk-table-column>
             <bk-table-column label="文件大小" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
             <bk-table-column label="仓库类型" width="150" prop="artifactoryType" :formatter="repoTypeFormatter" show-overflow-tooltip></bk-table-column>

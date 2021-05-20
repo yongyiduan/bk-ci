@@ -26,7 +26,7 @@
                 ],
                 panels: [
                     { label: '详情', name: 'buildDetail' },
-                    { label: '构建', name: 'buildArtifacts' },
+                    { label: '构件', name: 'buildArtifacts' },
                     { label: '报告', name: 'buildReports' },
                     { label: '配置', name: 'buildConfig' }
                 ],
