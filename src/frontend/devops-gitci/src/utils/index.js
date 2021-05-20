@@ -181,5 +181,15 @@ export function timeFormatter (time, format = 'YYYY-MM-DD hh:mm:ss') {
 }
 
 export function commitIdFormatter (commitId) {
-    return commitId ? commitId.slice(0, 8) : '--'
+    return commitId ? commitId.slice(0, 9) : '--'
+}
+
+export function getbuildTypeIcon (buildType) {
+    const buildTypeIconMap = {
+        manual: 'manual',
+        push: 'commit',
+        tag_push: 'commit',
+        merge_request: 'merge'
+    }
+    return buildTypeIconMap[buildType] || 'well'
 }

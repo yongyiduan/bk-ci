@@ -1,19 +1,18 @@
 <template>
     <article class="build-detail-home" v-bkloading="{ isLoading }">
         <section class="detail-header">
-            <i class="bk-icon icon-check-1"></i>
+            <build-status :status="buildDetail.status" class="header-icon"></build-status>
             <p class="detail-info">
-                <span class="info-title">feat: dockerhost-buildImage支持多个tag，支持--target</span>
-                <span class="info-data">
-                    <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
-                    <span class="info-item text-ellipsis"><icon name="ci-clock" size="14"></icon>{{ buildDetail.spendTime | spendTimeFilter }}</span>
-                    <span class="info-item text-ellipsis"><icon name="user-o" size="14"></icon>{{ buildDetail.userId }}</span>
+                <span class="info-title">
+                    {{ buildDetail.commitMsg }}
+                    <span class="title-item"><icon :name="buildTypeIcon" size="14"></icon></span>
+                    <span class="title-item"><img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}</span>
                 </span>
                 <span class="info-data">
-                    <span class="info-item text-ellipsis"><icon name="ci-commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
-                    <span class="info-item text-ellipsis"><icon name="ci-date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
+                    <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
+                    <span class="info-item text-ellipsis"><icon name="clock" size="14"></icon>{{ buildDetail.spendTime | spendTimeFilter }}</span>
                     <span class="info-item text-ellipsis">
-                        <icon name="bookmark-o" size="14"></icon>
+                        <icon name="message" size="14"></icon>
                         {{ buildDetail.buildHistoryRemark || '--' }}
                         <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark">
                             <div slot="content">
@@ -23,6 +22,10 @@
                             <bk-icon type="edit2" style="font-size: 18px;cursor:pointer" />
                         </bk-popconfirm>
                     </span>
+                </span>
+                <span class="info-data">
+                    <span class="info-item text-ellipsis"><icon name="commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
+                    <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
             </p>
             <bk-button class="detail-button" @click="rebuild" :loading="isRebuilding">重新构建</bk-button>
@@ -34,12 +37,14 @@
 <script>
     import { mapState } from 'vuex'
     import { pipelines } from '@/http'
+    import { preciseDiff, timeFormatter, commitIdFormatter, getbuildTypeIcon } from '@/utils'
     import stages from '@/components/stages'
-    import { preciseDiff, timeFormatter, commitIdFormatter } from '@/utils'
+    import buildStatus from '@/components/build-status'
 
     export default {
         components: {
-            stages
+            stages,
+            buildStatus
         },
 
         filters: {
@@ -67,7 +72,11 @@
         },
 
         computed: {
-            ...mapState(['projectId'])
+            ...mapState(['projectId']),
+
+            buildTypeIcon () {
+                return getbuildTypeIcon(this.buildDetail.objectKind)
+            }
         },
 
         created () {
@@ -103,7 +112,8 @@
                         ...res.gitRequestEvent,
                         buildHistoryRemark: res.buildHistoryRemark,
                         spendTime: modelDetail.endTime - modelDetail.startTime,
-                        startTime: modelDetail.startTime
+                        startTime: modelDetail.startTime,
+                        status: modelDetail.status
                     }
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -145,12 +155,12 @@
         background: #fff;
     }
     .detail-header {
-        padding: 16px 24px;
+        padding: 10px 24px;
         height: 96px;
         box-shadow: 0 1px 0 0 #E3E5EA;
         display: flex;
         align-items: flex-start;
-        .icon-check-1 {
+        .header-icon {
             font-size: 32px;
         }
         .detail-info {
@@ -160,8 +170,36 @@
                 color: #313328;
                 line-height: 24px;
                 height: 24px;
-                display: inline-block;
+                display: flex;
+                align-items: center;
                 margin: 4px 0 4px;
+                .title-item {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    padding-left: 15px;
+                    margin-left: 35px;
+                    height: 20px;
+                    color: #81838a;
+                    font-size: 12px;
+                    &:last-child {
+                        margin-left: 15px;
+                    }
+                    img {
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 100%;
+                        margin-right: 8px;
+                    }
+                    &:before {
+                        position: absolute;
+                        content: '';
+                        left: 0;
+                        height: 12px;
+                        width: 1px;
+                        background: #c8ccd8;
+                    }
+                }
             }
             .info-data {
                 color: #81838a;

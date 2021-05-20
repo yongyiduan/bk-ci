@@ -39,10 +39,10 @@
                 <bk-table-column label="Commit message">
                     <template slot-scope="props">
                         <section class="commit-message">
-                            <i class="bk-icon icon-check-1"></i>
+                            <build-status :status="props.row.buildHistory.status"></build-status>
                             <p>
                                 <span class="message">{{ props.row.gitRequestEvent.commitMsg }}</span>
-                                <span class="info">#{{ props.row.buildHistory.buildNum }}：<a @click.stop.prevent="goToDetail(props.row)">{{ getCommitDesc(props.row) }}</a></span>
+                                <span class="info">#{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
                         </section>
                     </template>
@@ -63,8 +63,8 @@
                 <bk-table-column label="操作" width="150" class-name="handler-btn">
                     <template slot-scope="props">
                         <opt-menu>
-                            <li @click="goToAgentDetail(props.row)">Agent Detail</li>
-                            <li>删除</li>
+                            <li @click="cancelBuild(props.row)" v-if="['RUNNING', 'PREPARE_ENV', 'QUEUE', 'LOOP_WAITING', 'CALL_WAITING'].includes(props.row.buildHistory.status)">取消构建</li>
+                            <li @click="rebuild(props.row)" v-else>重新构建</li>
                         </opt-menu>
                     </template>
                 </bk-table-column>
@@ -123,11 +123,13 @@
     import { goYaml, preciseDiff, timeFormatter } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
+    import buildStatus from '@/components/build-status'
 
     export default {
         components: {
             optMenu,
-            codeSection
+            codeSection,
+            buildStatus
         },
 
         filters: {
@@ -290,7 +292,7 @@
                 switch (gitRequestEvent.objectKind) {
                     case 'push':
                     case 'tag_push':
-                        res = `Commit ${gitRequestEvent.commitId} pushed by ${gitRequestEvent.userId}`
+                        res = `Commit ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
                         break
                     case 'merge_request':
                         const actionMap = {
@@ -308,6 +310,7 @@
             },
 
             togglePipelineEnable () {
+                this.clickEmpty()
                 pipelines.toggleEnablePipeline(this.projectId, this.curPipeline.pipelineId, !this.curPipeline.enabled).then(() => {
                     const pipeline = {
                         ...this.curPipeline,
@@ -396,12 +399,29 @@
                 goYaml(this.projectInfo.web_url, this.curPipeline.branch, this.curPipeline.filePath)
             },
 
-            goToDetail (row) {
-                console.log(row)
+            cancelBuild (row) {
+                this.clickEmpty()
+                pipelines.cancelBuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
+                    this.getBuildData()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
             },
 
-            goToAgentDetail (row) {
-                console.log(row)
+            clickEmpty () {
+                const button = document.createElement('input')
+                button.type = 'button'
+                document.body.appendChild(button)
+                button.click()
+            },
+
+            rebuild (row) {
+                this.clickEmpty()
+                pipelines.rebuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
+                    this.getBuildData()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
             },
 
             submitData () {
@@ -531,7 +551,6 @@
             font-size: 12px;
             .bk-icon {
                 font-size: 32px;
-                color: #2dcb56;
                 margin-right: 8px;
             }
             .message {

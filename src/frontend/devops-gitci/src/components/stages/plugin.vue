@@ -2,7 +2,7 @@
     <section>
         <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [pluginCls]: true }" @click="toggleShowLog">
             <status-icon :status="plugin.status"></status-icon>
-            <span class="plugin-name">{{ plugin.name }}</span>
+            <span class="plugin-name text-ellipsis" v-bk-overflow-tips>{{ plugin.name }}</span>
             <span class="plugin-time" v-bk-tooltips="pluginTime">{{ pluginTime }}</span>
         </section>
 
@@ -87,10 +87,11 @@
         cursor: pointer;
         .plugin-name {
             flex: 1;
+            max-width: 148px;
             color: #7b7d8a;
         }
         .plugin-time {
-            margin: 0 8px 0 2px;
+            margin: 0 0px 0 2px;
         }
         &.first-plugin:before {
             top: -16px;

@@ -100,5 +100,9 @@ export default {
 
     rebuildPipeline (projectId, pipelineId, buildId, params = {}) {
         return api.post(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/retry`, { params })
+    },
+
+    cancelBuildPipeline (projectId, pipelineId, buildId) {
+        return api.delete(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}`)
     }
 }

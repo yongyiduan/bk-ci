@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@blueking/log": "1.1.9",
-    "@icon-cool/bk-icon-gitci": "0.0.7",
+    "@icon-cool/bk-icon-gitci": "0.0.9",
     "axios": "~0.18.0",
     "bk-magic-vue": "2.3.0",
     "codemirror": "^5.61.0",
