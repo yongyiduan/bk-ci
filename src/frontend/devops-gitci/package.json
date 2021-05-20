@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@blueking/log": "1.1.9",
-    "@icon-cool/bk-icon-gitci": "0.0.6",
+    "@icon-cool/bk-icon-gitci": "0.0.7",
     "axios": "~0.18.0",
     "bk-magic-vue": "2.3.0",
     "codemirror": "^5.61.0",
@@ -110,7 +110,7 @@
     "markdown-it-attrs": "~2.3.4",
     "markdown-it-container": "~2.0.0",
     "mini-css-extract-plugin": "~0.6.0",
-    "moment": "~2.24.0",
+    "moment": "^2.24.0",
     "npm": "~6.9.0",
     "open": "~6.3.0",
     "opencollective": "~1.0.3",

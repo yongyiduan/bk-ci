@@ -5,18 +5,24 @@
             <p class="detail-info">
                 <span class="info-title">feat: dockerhost-buildImage支持多个tag，支持--target</span>
                 <span class="info-data">
-                    <span class="info-item">{{ buildDetail.branch }}</span>
-                    <span class="info-item">{{ buildDetail.spendTime | spendTimeFilter }}</span>
-                    <span class="info-item">{{ buildDetail.commitId }}</span>
-                    <span class="info-item">{{ buildDetail.startTime }}</span>
-                    <span class="info-item">{{ buildDetail.buildHistoryRemark || '--' }}</span>
-                    <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark">
-                        <div slot="content">
-                            <h3 class="mb10">修改备注</h3>
-                            <bk-input type="textarea" v-model="remark" placeholder="请输入备注" class="mb10"></bk-input>
-                        </div>
-                        <bk-icon type="edit2" style="font-size: 18px;cursor:pointer" />
-                    </bk-popconfirm>
+                    <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
+                    <span class="info-item text-ellipsis"><icon name="ci-clock" size="14"></icon>{{ buildDetail.spendTime | spendTimeFilter }}</span>
+                    <span class="info-item text-ellipsis"><icon name="user-o" size="14"></icon>{{ buildDetail.userId }}</span>
+                </span>
+                <span class="info-data">
+                    <span class="info-item text-ellipsis"><icon name="ci-commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
+                    <span class="info-item text-ellipsis"><icon name="ci-date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
+                    <span class="info-item text-ellipsis">
+                        <icon name="bookmark-o" size="14"></icon>
+                        {{ buildDetail.buildHistoryRemark || '--' }}
+                        <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark">
+                            <div slot="content">
+                                <h3 class="mb10">修改备注</h3>
+                                <bk-input type="textarea" v-model="remark" placeholder="请输入备注" class="mb10"></bk-input>
+                            </div>
+                            <bk-icon type="edit2" style="font-size: 18px;cursor:pointer" />
+                        </bk-popconfirm>
+                    </span>
                 </span>
             </p>
             <bk-button class="detail-button" @click="rebuild" :loading="isRebuilding">重新构建</bk-button>
@@ -29,7 +35,7 @@
     import { mapState } from 'vuex'
     import { pipelines } from '@/http'
     import stages from '@/components/stages'
-    import { convertMStoString } from '@/utils'
+    import { preciseDiff, timeFormatter, commitIdFormatter } from '@/utils'
 
     export default {
         components: {
@@ -38,7 +44,15 @@
 
         filters: {
             spendTimeFilter (val) {
-                return convertMStoString(val)
+                return preciseDiff(val)
+            },
+
+            timeFilter (val) {
+                return timeFormatter(val)
+            },
+
+            commitFilter (val) {
+                return commitIdFormatter(val)
             }
         },
 
@@ -118,9 +132,8 @@
             loopGetPipelineDetail () {
                 clearTimeout(this.loopGetPipelineDetail.loopId)
                 this.loopGetPipelineDetail.loopId = setTimeout(() => {
-                    this.getPipelineBuildDetail().then(() => {
-                        this.loopGetPipelineDetail()
-                    })
+                    this.getPipelineBuildDetail()
+                    this.loopGetPipelineDetail()
                 }, 5000)
             }
         }
@@ -148,7 +161,7 @@
                 line-height: 24px;
                 height: 24px;
                 display: inline-block;
-                margin: 4px 0 10px;
+                margin: 4px 0 4px;
             }
             .info-data {
                 color: #81838a;
@@ -157,8 +170,17 @@
                 display: flex;
                 align-items: center;
             }
-            .info-item:not(:first-child) {
-                margin-left: 40px;
+            .info-item {
+                width: 200px;
+                display: flex;
+                align-items: center;
+                margin-bottom: 2px;
+                >svg {
+                    margin-right: 8px;
+                }
+                &:not(:first-child) {
+                    margin-left: 40px;
+                }
             }
             .history-remark {
                 margin-bottom: 15px;

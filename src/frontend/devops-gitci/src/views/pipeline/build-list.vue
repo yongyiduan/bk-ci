@@ -55,8 +55,8 @@
                 <bk-table-column label="Consume" width="200">
                     <template slot-scope="props">
                         <p class="consume">
-                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.currentTimestamp }}</span>
-                            <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{ props.row.buildHistory.endTime }}</span>
+                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.totalTime | totalFliter }}</span>
+                            <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{ props.row.buildHistory.startTime | timeFilter }}</span>
                         </p>
                     </template>
                 </bk-table-column>
@@ -120,7 +120,7 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
-    import { goYaml } from '@/utils'
+    import { goYaml, preciseDiff, timeFormatter } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
 
@@ -128,6 +128,16 @@
         components: {
             optMenu,
             codeSection
+        },
+
+        filters: {
+            timeFilter (val) {
+                return timeFormatter(val)
+            },
+
+            totalFliter (val) {
+                return preciseDiff(val)
+            }
         },
 
         data () {
@@ -253,9 +263,8 @@
             loopGetList () {
                 clearTimeout(this.loopGetList.loopId)
                 this.loopGetList.loopId = setTimeout(() => {
-                    this.getBuildData().then(() => {
-                        this.loopGetList()
-                    })
+                    this.getBuildData()
+                    this.loopGetList()
                 }, 5000)
             },
 
