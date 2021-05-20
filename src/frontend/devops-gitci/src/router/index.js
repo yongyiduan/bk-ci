@@ -112,7 +112,7 @@ const routes = [
                 component: notifications
             },
             {
-                path: 'exception/:type',
+                path: 'exception/:type/:workspace?/:projectPath?',
                 name: 'exception',
                 component: exception
             },

@@ -124,17 +124,16 @@
                         let errMessage
                         switch (res.status) {
                             case 1:
-                                errMessage = this.$t('history.logEmpty')
+                                errMessage = '日志为空'
                                 break
                             case 2:
-                                errMessage = this.$t('history.logClear')
+                                errMessage = '日志被清理'
                                 break
                             case 3:
-                                errMessage = this.$t('history.logClose')
+                                errMessage = '日志关闭'
                                 break
                             default:
-                                errMessage = this.$t('history.logErr')
-                                break
+                                errMessage = '日志错误'
                         }
                         ref.handleApiErr(errMessage, id)
                         return

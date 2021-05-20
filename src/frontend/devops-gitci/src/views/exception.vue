@@ -23,12 +23,6 @@
                     499: 'login',
                     500: 500
                 },
-                messageMap: {
-                    418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
-                    403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目!`,
-                    499: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. ',
-                    500: '系统异常，请稍后重试'
-                },
                 titleMap: {
                     403: '无业务权限',
                     404: '页面不存在',
@@ -57,6 +51,15 @@
             title () {
                 const type = +this.$route.params.type || 404
                 return this.titleMap[type]
+            },
+
+            messageMap () {
+                return {
+                    418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
+                    403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目!`,
+                    499: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. ',
+                    500: '系统异常，请稍后重试'
+                }
             }
         },
 

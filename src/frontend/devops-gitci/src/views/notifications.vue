@@ -16,15 +16,18 @@
         <main class="notifications-main">
             <section class="notifications-head">
                 <bk-button class="notifications-button" @click="readAll">Mark all as read</bk-button>
-                <span class="head-text">是否只展示已读：</span>
+                <span class="head-text">是否只展示未读：</span>
                 <bk-switcher v-model="onlyUnread"></bk-switcher>
             </section>
-            <bk-collapse v-bkloading="{ isLoading }">
+            <bk-collapse v-bkloading="{ isLoading }" :active-name="0">
                 <bk-collapse-item :name="index" v-for="(notification, index) in notificationList" :key="index">
                     {{ notification.time }}
                     <bk-collapse slot="content">
                         <bk-collapse-item :name="request.messageTitle" v-for="request in notification.records" :key="request.messageTitle">
-                            <span :class="{ 'message-status': true, 'unread': request.haveRead }"></span>{{ request.messageTitle }} （{{ request.contentAttr.failedNum }} / {{ request.contentAttr.total }}）
+                            <span class="content-message">
+                                <span :class="{ 'message-status': true, 'unread': !request.haveRead }"></span>
+                                {{ request.messageTitle }} （{{ request.contentAttr.failedNum }} / {{ request.contentAttr.total }}）
+                            </span>
                             <bk-table :data="request.content.buildRecords" slot="content" class="f13">
                                 <bk-table-column>
                                     <template slot-scope="props">
@@ -154,9 +157,13 @@
                     margin: 0 3px 0 40px;
                 }
             }
+            .content-message {
+                display: flex;
+                align-items: center;
+            }
             .message-status {
                 display: inline-block;
-                margin: 5px 8px 0 0;
+                margin-right: 8px;
                 height: 15px;
                 width: 15px;
                 border-radius: 100px;

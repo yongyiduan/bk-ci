@@ -88,7 +88,9 @@
             },
 
             failGetProjectInfo (type) {
-                this.$router.push({ path: `/exception/${type}`, params: { type } })
+                if (this.$route.name !== 'exception') {
+                    this.$router.push({ path: `/exception/${type}`, params: { type } })
+                }
             },
 
             goToSetting () {
