@@ -12,7 +12,6 @@
             </section>
             <bk-table class="agent-table"
                 :data="agentList"
-                :pagination="pagination"
                 :outer-border="false"
                 :header-border="false"
                 :header-cell-style="{ background: '#fafbfd' }"

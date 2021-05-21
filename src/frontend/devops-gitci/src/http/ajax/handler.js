@@ -15,9 +15,9 @@ function successHandler (response) {
             message: '服务维护中，请稍候...'
         })
     } else if (httpStatus === 418) {
-        router.push({ name: 'exception', params: { type: 418, ...(router.params || {}) } })
+        router.push({ name: 'exception', params: { type: 418, ...(router.currentRoute.params || {}) } })
     } else if (httpStatus === 403) {
-        router.push({ name: 'exception', params: { type: 403, ...(router.params || {}) } })
+        router.push({ name: 'exception', params: { type: 403, ...(router.currentRoute.params || {}) } })
     } else if ((typeof code !== 'undefined' && code !== 0) || (typeof status !== 'undefined' && status !== 0)) {
         let msg = message
         if (Object.prototype.toString.call(message) === '[object Object]') {
