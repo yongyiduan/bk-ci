@@ -106,7 +106,7 @@
                         enabled: pipeline.enabled,
                         pipelineId: pipeline.pipelineId,
                         filePath: pipeline.filePath,
-                        branch: pipeline.latestBuildInfo.gitRequestEvent.branch
+                        branch: ((pipeline.latestBuildInfo || {}).gitRequestEvent || {}).branch
                     }))
                     this.pipelineList = [allPipeline, ...pipelines]
                     this.setDefaultPipeline()

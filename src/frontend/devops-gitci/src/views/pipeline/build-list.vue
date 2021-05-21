@@ -280,7 +280,13 @@
                     params.pipelineId = this.curPipeline.pipelineId
                 }
                 return pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
-                    this.buildList = res.records || []
+                    this.buildList = (res.records || []).map((build) => {
+                        return {
+                            ...build,
+                            buildHistory: build.buildHistory || {},
+                            gitRequestEvent: build.gitRequestEvent || {}
+                        }
+                    })
                     this.compactPaging.count = res.count
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

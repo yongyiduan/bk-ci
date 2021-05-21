@@ -1,5 +1,5 @@
 <template>
-    <section class="agent-pool-card" v-bkloading="{ isLoading: isDeleteing }">
+    <section class="agent-pool-card">
         <header class="card-header">
             <h5 class="header-info">
                 <span class="info-title">{{ pool.name }}</span>
@@ -9,7 +9,7 @@
 
             <opt-menu v-if="editable">
                 <li @click="goToAgentList">节点列表</li>
-                <li @click="deletePool">删除</li>
+                <li @click="showDelete = true">删除</li>
             </opt-menu>
         </header>
 
@@ -24,6 +24,14 @@
         </ul>
         <bk-exception class="exception-wrap-item exception-part card-useages" type="empty" scene="part" v-else> </bk-exception>
         <bk-button @click="addAgent" class="card-button" v-if="editable">Add agent</bk-button>
+        <bk-dialog v-model="showDelete"
+            theme="danger"
+            :mask-close="false"
+            :loading="isDeleteing"
+            @confirm="deletePool"
+            title="确认删除">
+            是否删除【{{pool.name}}】？
+        </bk-dialog>
     </section>
 </template>
 
@@ -47,6 +55,7 @@
 
         data () {
             return {
+                showDelete: false,
                 isDeleteing: false
             }
         },

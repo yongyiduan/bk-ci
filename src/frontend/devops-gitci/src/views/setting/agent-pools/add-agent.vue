@@ -193,6 +193,7 @@
                         const curNode = res.find((node) => (node.agentHashId === this.machine.agentId)) || {}
                         const params = [curNode.nodeHashId]
                         return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
+                            this.backToPoolList()
                             this.$bkMessage({ theme: 'success', message: '导入成功' })
                         })
                     })
