@@ -43,7 +43,7 @@
                     EXEC_TIMEOUT: 'icon-close-circle-shape',
                     SUCCEED: 'icon-check-circle-shape'
                 }
-                return [iconName, statusMap[this.status], (iconMap[this.status] || 'CANCELED'), this.type]
+                return [iconName, statusMap[this.status], (iconMap[this.status] || 'icon-minus-circle'), this.type]
             }
         }
     }

@@ -72,7 +72,7 @@
             ...mapState(['appHeight', 'projectId']),
 
             tableHeight () {
-                return Math.min(this.appHeight - 152, 106 + (Math.max(this.credentialList.length, 3)) * 42)
+                return Math.min(this.appHeight - 157, 106 + (this.credentialList.length || 3) * 42)
             }
         },
 

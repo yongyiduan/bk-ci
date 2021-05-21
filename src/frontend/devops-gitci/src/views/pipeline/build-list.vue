@@ -30,7 +30,7 @@
 
             <bk-table :data="buildList"
                 :header-cell-style="{ background: '#fafbfd' }"
-                :height="Math.min(appHeight - 331, 43 + buildList.length * 72)"
+                :height="tableHeight"
                 v-bkloading="{ isLoading }"
                 @row-click="goToBuildDetail"
                 class="build-table"
@@ -183,7 +183,11 @@
         },
 
         computed: {
-            ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectInfo'])
+            ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectInfo']),
+
+            tableHeight () {
+                return Math.min(this.appHeight - 331, 43 + (this.buildList.length || 3) * 72)
+            }
         },
 
         watch: {

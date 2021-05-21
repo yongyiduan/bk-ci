@@ -81,11 +81,20 @@
                 <bk-table-column label="最后修改时间" prop="lastModifyTime"></bk-table-column>
                 <bk-table-column label="操作" width="150" class-name="handler-btn">
                     <template slot-scope="props">
-                        <span class="update-btn" @click="deleteAgent(props.row)">删除</span>
+                        <span class="update-btn" @click="showDelete(props.row)">删除</span>
                     </template>
                 </bk-table-column>
             </bk-table>
         </main>
+
+        <bk-dialog v-model="isShowDelete"
+            theme="danger"
+            :mask-close="false"
+            :loading="isDeleteing"
+            @confirm="deleteAgent"
+            title="确认删除">
+            是否删除【{{deleteRow.displayName}}】？
+        </bk-dialog>
     </article>
 </template>
 
@@ -131,7 +140,10 @@
                     'BUILD_IMAGE_SUCCESS': '制作镜像成功',
                     'BUILD_IMAGE_FAILED': '制作镜像失败',
                     'UNKNOWN': '未知'
-                }
+                },
+                isShowDelete: false,
+                isDeleteing: false,
+                deleteRow: {}
             }
         },
 
@@ -139,7 +151,7 @@
             ...mapState(['appHeight', 'projectId']),
 
             tableHeight () {
-                return Math.min(this.appHeight - 152, 106 + (Math.max(this.agentList.length, 3)) * 42)
+                return Math.min(this.appHeight - 152, 43 + (this.agentList.length || 3) * 42)
             }
         },
 
@@ -159,14 +171,20 @@
                 })
             },
 
-            deleteAgent (row) {
-                this.isLoading = true
-                setting.deleteNode(this.projectId, [row.nodeHashId]).then(() => {
+            showDelete (row) {
+                this.isShowDelete = true
+                this.deleteRow = row
+            },
+
+            deleteAgent () {
+                this.isDeleteing = true
+                setting.deleteNode(this.projectId, [this.deleteRow.nodeHashId]).then(() => {
+                    this.isShowDelete = false
                     this.getNodeList()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
-                    this.isLoading = false
+                    this.isDeleteing = false
                 })
             },
 

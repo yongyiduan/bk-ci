@@ -1,6 +1,6 @@
 <template>
     <section>
-        <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [pluginCls]: true }" @click="toggleShowLog">
+        <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [getPipelineStatusClass(plugin.status)]: true }" @click="toggleShowLog">
             <status-icon :status="plugin.status"></status-icon>
             <span class="plugin-name text-ellipsis" v-bk-overflow-tips>{{ plugin.name }}</span>
             <span class="plugin-time" v-bk-tooltips="pluginTime">{{ pluginTime }}</span>
@@ -9,6 +9,7 @@
         <plugin-log @close="toggleShowLog"
             :plugin="plugin"
             :job-index="jobIndex"
+            :plugin-index="pluginIndex"
             :stage-index="stageIndex"
             v-if="showLog"
         ></plugin-log>
@@ -16,7 +17,7 @@
 </template>
 
 <script>
-    import { coverTimer } from '@/utils'
+    import { coverTimer, getPipelineStatusClass } from '@/utils'
     import statusIcon from './status-icon'
     import pluginLog from '../exec-detail/plugin'
 
@@ -42,25 +43,12 @@
         computed: {
             pluginTime () {
                 return this.plugin.elapsed > 36e5 ? '1h' : coverTimer(this.plugin.elapsed)
-            },
-
-            pluginCls () {
-                const statusMap = {
-                    CANCELED: 'warning',
-                    TERMINATE: 'warning',
-                    REVIEWING: 'warning',
-                    REVIEW_ABORT: 'warning',
-                    FAILED: 'danger',
-                    HEARTBEAT_TIMEOUT: 'danger',
-                    QUEUE_TIMEOUT: 'danger',
-                    EXEC_TIMEOUT: 'danger',
-                    SUCCEED: 'success'
-                }
-                return statusMap[this.plugin.status]
             }
         },
 
         methods: {
+            getPipelineStatusClass,
+
             toggleShowLog () {
                 this.showLog = !this.showLog
             }
@@ -83,7 +71,7 @@
         border-radius: 2px;
         font-size: 14px;
         transition: all .4s ease-in-out;
-        border: 1px solid white;
+        border: 1px solid #c3cdd7;
         cursor: pointer;
         .plugin-name {
             flex: 1;

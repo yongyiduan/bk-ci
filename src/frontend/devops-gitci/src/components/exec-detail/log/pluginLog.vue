@@ -13,6 +13,7 @@
     export default {
         props: {
             plugin: Object,
+            pluginIndex: Number,
             stageIndex: Number,
             jobIndex: Number
         },
@@ -75,7 +76,6 @@
                     if (this.clearIds.includes(id)) return
 
                     const scroll = this.$refs.scroll
-                    res = res.data || {}
                     if (res.status !== 0) {
                         let errMessage
                         switch (res.status) {

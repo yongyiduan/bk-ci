@@ -193,3 +193,18 @@ export function getbuildTypeIcon (buildType) {
     }
     return buildTypeIconMap[buildType] || 'well'
 }
+
+export function getPipelineStatusClass (status) {
+    const statusMap = {
+        CANCELED: 'warning',
+        TERMINATE: 'warning',
+        REVIEWING: 'warning',
+        REVIEW_ABORT: 'warning',
+        FAILED: 'danger',
+        HEARTBEAT_TIMEOUT: 'danger',
+        QUEUE_TIMEOUT: 'danger',
+        EXEC_TIMEOUT: 'danger',
+        SUCCEED: 'success'
+    }
+    return statusMap[status]
+}

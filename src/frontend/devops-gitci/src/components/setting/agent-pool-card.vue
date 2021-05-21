@@ -76,6 +76,7 @@
             deletePool () {
                 this.isDeleteing = true
                 setting.deleteEnvironment(this.projectId, this.pool.envHashId).then(() => {
+                    this.showDelete = false
                     this.$emit('refresh')
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

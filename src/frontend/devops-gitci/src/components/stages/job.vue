@@ -1,6 +1,6 @@
 <template>
     <section class="job-home" ref="pipelineJob">
-        <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1 }" @click="toggleShowLog">
+        <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1, [getPipelineStatusClass(job.status)]: true }" @click="toggleShowLog">
             <status-icon :status="job.status" type="job"></status-icon>
             <span class="job-name">{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
             <job-time :job="job"></job-time>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+    import { getPipelineStatusClass } from '@/utils'
     import statusIcon from './status-icon'
     import cruveLine from './cruve-line'
     import plugin from './plugin'
@@ -57,6 +58,8 @@
         },
 
         methods: {
+            getPipelineStatusClass,
+
             initStatus () {
                 const siblingOffsetHeight = this.$refs.pipelineJob.previousElementSibling.offsetHeight + 15
                 const height = this.jobIndex === 0 ? 59 : siblingOffsetHeight
@@ -74,6 +77,8 @@
 </script>
 
 <style lang="postcss" scoped>
+    @import '../../css/conf';
+
     .job-home {
         position: relative;
         margin: 16px 20px 0 20px;
@@ -82,13 +87,21 @@
             margin: 0 0 16px 0;
             width: 240px;
             z-index: 3;
-            background-color: #34d97b;
             color: #fff;
             height: 42px;
             display: flex;
             align-items: center;
             font-weight: 600;
             cursor: pointer;
+            &.danger {
+                background: $dangerColor;
+            }
+            &.success {
+                background: $successColor;
+            }
+            &.warning {
+                background: $warningColor;
+            }
             .job-name {
                 flex: 1;
             }

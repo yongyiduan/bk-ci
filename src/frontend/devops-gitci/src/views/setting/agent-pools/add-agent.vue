@@ -292,6 +292,7 @@
                 .agent-refresh {
                     width: 100%;
                     height: 100%;
+                    line-height: 36px;
                 }
                 .agent-status-info {
                     color: #63656e;
