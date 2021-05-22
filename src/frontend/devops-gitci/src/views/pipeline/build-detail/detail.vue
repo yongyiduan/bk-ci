@@ -144,7 +144,7 @@
                 this.loopGetPipelineDetail.loopId = setTimeout(() => {
                     this.getPipelineBuildDetail()
                     this.loopGetPipelineDetail()
-                }, 5000)
+                }, 2000)
             }
         }
     }

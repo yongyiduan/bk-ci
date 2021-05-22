@@ -9,16 +9,16 @@
                 </template>
                 <span class="pipeline-status" v-if="!curPipeline.enabled">已禁用</span>
             </span>
-            <opt-menu v-if="curPipeline.pipelineId !== 'all'">
+            <opt-menu v-if="curPipeline.pipelineId">
                 <li @click="showTriggleBuild">触发构建</li>
                 <li @click="togglePipelineEnable">{{ curPipeline.enabled ? '禁用流水线' : '启用流水线' }}</li>
             </opt-menu>
         </header>
 
         <section class="main-body">
-            <section class="build-filter" v-bkloading="{ isLoading: isLoadingFilter }">
+            <section class="build-filter">
                 <bk-input v-model="filterData.commitMsg" class="filter-item" placeholder="Commit Message"></bk-input>
-                <bk-select v-model="filterData[key]" v-for="(list, key) in filterList" :key="key" class="filter-item" :placeholder="key" multiple>
+                <bk-select v-model="filterData[key]" v-for="(list, key) in filterList" :key="key" class="filter-item" :placeholder="key" multiple :loading="isLoadingFilter">
                     <bk-option v-for="option in list"
                         :key="option.id"
                         :id="option.id"
@@ -278,10 +278,8 @@
                 const params = {
                     page: this.compactPaging.current,
                     pageSize: this.compactPaging.limit,
+                    pipelineId: this.curPipeline.pipelineId,
                     ...this.filterData
-                }
-                if (this.curPipeline.pipelineId !== 'all') {
-                    params.pipelineId = this.curPipeline.pipelineId
                 }
                 return pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
                     this.buildList = (res.records || []).map((build) => {

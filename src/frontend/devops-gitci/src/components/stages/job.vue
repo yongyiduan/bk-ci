@@ -102,6 +102,9 @@
             &.warning {
                 background: $warningColor;
             }
+            &.running {
+                background: $runningColor;
+            }
             .job-name {
                 flex: 1;
             }

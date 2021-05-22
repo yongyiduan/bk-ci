@@ -14,7 +14,10 @@ const store = new Vuex.Store({
         appHeight: window.innerHeight,
         projectId: '',
         projectInfo: {},
-        curPipeline: {}
+        curPipeline: {},
+        exceptionInfo: {
+            type: 200
+        }
     },
     getters: {},
     mutations: {
@@ -27,6 +30,9 @@ const store = new Vuex.Store({
         },
         setCurPipeline (state, pipeline) {
             state.curPipeline = pipeline
+        },
+        setExceptionInfo (state, exceptionInfo) {
+            state.exceptionInfo = exceptionInfo
         }
     },
     actions: {
@@ -35,6 +41,9 @@ const store = new Vuex.Store({
         },
         setCurPipeline ({ commit }, pipeline) {
             commit('setCurPipeline', pipeline)
+        },
+        setExceptionInfo ({ commit }, exceptionInfo) {
+            commit('setExceptionInfo', exceptionInfo)
         }
     }
 })

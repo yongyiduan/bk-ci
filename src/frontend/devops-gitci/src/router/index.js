@@ -28,20 +28,23 @@ const agentDetail = () => import(/* webpackChunkName: 'setting' */'@/views/setti
 const routes = [
     {
         path: '',
-        component: main,
+        components: {
+            default: main,
+            exception: exception
+        },
         children: [
             {
-                path: 'gitci/:workspace/:projectPath',
+                path: '',
                 component: pipeline,
                 name: 'pipeline',
                 children: [
                     {
-                        path: 'pipelineId/:pipelineId',
+                        path: ':pipelineId?',
                         name: 'buildList',
                         component: buildList
                     },
                     {
-                        path: 'pipelineId/:pipelineId/detail/:buildId',
+                        path: ':pipelineId/detail/:buildId',
                         name: 'pipelineDetail',
                         component: pipelineDetail,
                         children: [
@@ -70,7 +73,7 @@ const routes = [
                 ]
             },
             {
-                path: 'gitci/:workspace/:projectPath/setting',
+                path: 'setting',
                 name: 'setting',
                 component: setting,
                 children: [
@@ -107,14 +110,9 @@ const routes = [
                 ]
             },
             {
-                path: 'gitci/:workspace/:projectPath/notifications',
+                path: 'notifications',
                 name: 'notifications',
                 component: notifications
-            },
-            {
-                path: 'exception/:type/:workspace?/:projectPath?',
-                name: 'exception',
-                component: exception
             },
             {
                 path: '*',
@@ -128,6 +126,19 @@ const routes = [
 const router = new VueRouter({
     mode: 'history',
     routes: routes
+})
+
+// 自动携带项目信息
+router.beforeEach((to, from, next) => {
+    const params = {
+        ...to,
+        hash: to.hash || from.hash
+    }
+    if (to.hash) {
+        next()
+    } else {
+        next(params)
+    }
 })
 
 export default router

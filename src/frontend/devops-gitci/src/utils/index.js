@@ -204,7 +204,12 @@ export function getPipelineStatusClass (status) {
         HEARTBEAT_TIMEOUT: 'danger',
         QUEUE_TIMEOUT: 'danger',
         EXEC_TIMEOUT: 'danger',
-        SUCCEED: 'success'
+        SUCCEED: 'success',
+        RUNNING: 'running',
+        PREPARE_ENV: 'running',
+        QUEUE: 'running',
+        LOOP_WAITING: 'running',
+        CALL_WAITING: 'running'
     }
     return statusMap[status]
 }

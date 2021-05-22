@@ -100,7 +100,7 @@
             initList () {
                 this.isLoading = true
                 pipelines.getPipelineList(this.projectId).then((res) => {
-                    const allPipeline = { displayName: 'All pipeline', pipelineId: 'all', enabled: true, icon: 'all' }
+                    const allPipeline = { displayName: 'All pipeline', enabled: true, icon: 'all' }
                     const pipelines = (res.records || []).map((pipeline) => ({
                         displayName: pipeline.displayName,
                         enabled: pipeline.enabled,
