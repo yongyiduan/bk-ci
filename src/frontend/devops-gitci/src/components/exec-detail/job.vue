@@ -3,14 +3,12 @@
         :title="job.name"
         :status="job.status"
     >
-        <template v-slot:content>
-            <job-log :plugin-list="pluginList"
-                :build-id="$route.params.buildId"
-                :down-load-link="downLoadJobLink"
-                :execute-count="executeCount"
-                ref="jobLog"
-            />
-        </template>
+        <job-log :plugin-list="pluginList"
+            :build-id="$route.params.buildId"
+            :down-load-link="downLoadJobLink"
+            :execute-count="executeCount"
+            ref="jobLog"
+        />
     </detail-container>
 </template>
 
