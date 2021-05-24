@@ -45,15 +45,15 @@
                         403: '无业务权限',
                         404: '页面不存在',
                         418: '无权限',
-                        419: '未开启 Git Ci',
+                        419: '未开启 CI',
                         499: '未查询到项目信息',
                         500: '系统异常',
                         520: 'Welcome to Tencent CI.'
                     },
                     messageMap: {
                         403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目！`,
-                        418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
-                        419: '尚未开启 Git Ci，请先开启，在进行操作！',
+                        418: '尚未进行工蜂 OAUTH 授权，请先授权，再进行操作！',
+                        419: '尚未开启 CI，请先开启，再进行操作！',
                         499: `未查询到工蜂项目 ${this.projectPath} 的信息，请修改后重试`,
                         520: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. '
                     }

@@ -12,7 +12,7 @@ function successHandler (response) {
         location.href = getLoginUrl()
     } else if ([503, 403, 418, 419, 500].includes(httpStatus)) {
         store.dispatch('setExceptionInfo', { type: httpStatus, message })
-        return Promise.reject(errorMsg)
+        return data
     } else if ((typeof code !== 'undefined' && code !== 0) || (typeof status !== 'undefined' && status !== 0)) {
         return Promise.reject(errorMsg)
     }

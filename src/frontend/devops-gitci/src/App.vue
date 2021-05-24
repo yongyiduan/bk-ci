@@ -81,9 +81,7 @@
 
             initData () {
                 this.isLoading = true
-                Promise.all([this.getUserInfo(), this.getProjectInfo()]).then(() => {
-                    return this.loopGetNotifications()
-                }).catch((err) => {
+                Promise.all([this.getUserInfo(), this.getProjectInfo()]).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
@@ -104,6 +102,7 @@
                         common.getProjectInfo(projectPath).then((projectInfo = {}) => {
                             if (projectInfo.id) {
                                 this.setProjectInfo(projectInfo)
+                                this.loopGetNotifications()
                             } else {
                                 this.setExceptionInfo({ type: 499 })
                             }
