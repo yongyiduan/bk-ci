@@ -39,12 +39,12 @@ const routes = [
                 name: 'pipeline',
                 children: [
                     {
-                        path: ':pipelineId?',
+                        path: 'pipelineId/:pipelineId?',
                         name: 'buildList',
                         component: buildList
                     },
                     {
-                        path: ':pipelineId/detail/:buildId',
+                        path: 'pipelineId/:pipelineId/detail/:buildId/:buildNum',
                         name: 'pipelineDetail',
                         component: pipelineDetail,
                         children: [
@@ -93,12 +93,12 @@ const routes = [
                         component: agentPools
                     },
                     {
-                        path: 'add-agent/:poolId',
+                        path: 'add-agent/:poolId/:poolName',
                         name: 'addAgent',
                         component: addAgent
                     },
                     {
-                        path: 'agent-list/:poolId',
+                        path: 'agent-list/:poolId/:poolName',
                         name: 'agentList',
                         component: agentList
                     },
@@ -134,7 +134,7 @@ router.beforeEach((to, from, next) => {
         ...to,
         hash: to.hash || from.hash
     }
-    if (to.hash) {
+    if (to.hash || (!to.hash && !from.hash)) {
         next()
     } else {
         next(params)

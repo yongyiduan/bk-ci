@@ -1,7 +1,7 @@
 <template>
     <article class="add-agent-home">
         <header class="add-agent-head">
-            <bk-breadcrumb>
+            <bk-breadcrumb separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
         </header>
@@ -43,9 +43,9 @@
             <section class="agent-info use-tip">
                 <section v-html="computedHtml"></section>
 
-                <h3>Refresh to confirm</h3>
+                <h3>Connected Agents</h3>
                 <p v-bkloading="{ isLoading: isRefresh }" class="agent-status">
-                    <bk-button text @click="getAgentStatus" v-if="agentStatus.status === 'UN_IMPORT'" class="agent-refresh">Click to show the agent</bk-button>
+                    <span class="agent-refresh" v-if="agentStatus.status === 'UN_IMPORT'">No connected Agents，<bk-button text @click="getAgentStatus">Refresh</bk-button></span>
                     <section v-else class="agent-status-info">
                         <span class="agent-title">{{ agentStatus.hostname }}</span>
                         <span class="agent-os">
@@ -60,18 +60,17 @@
 
             <h3 class="self-hosted-agent">Using your self-hosted agent</h3>
             <section class="agent-info">
-                <h3>Using by pool</h3>
                 <p>
                     <span class="gray"># Use this YAML in your piepline file for each job</span>
                     <span class="block">runs-on:</span>
                     <span class="block">&nbsp;&nbsp;self-hosted: true</span>
-                    <span class="block">&nbsp;&nbsp;pool-name: my_pool_name</span>
+                    <span class="block">&nbsp;&nbsp;pool-name: {{$route.params.poolName}}</span>
                 </p>
             </section>
-
-            <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">导入</bk-button>
-            <bk-button class="bottom-btn" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
         </main>
+
+        <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">导入</bk-button>
+        <bk-button class="bottom-btn" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
     </article>
 </template>
 
@@ -89,7 +88,7 @@
                 ],
                 navList: [
                     { link: { name: 'agentPools' }, title: 'Agent Pools' },
-                    { link: { name: 'agentList' }, title: 'Agent List' },
+                    { link: { name: 'agentList' }, title: this.$route.params.poolName },
                     { link: '', title: 'Add Agent' }
                 ],
                 architectures: ['x64'],
@@ -123,7 +122,7 @@
                         <span class="gray"># Create a folder</span>
                         <span class="mb10">$ mkdir /data/landun && cd  /data/landun</span>
                         <span class="gray"># Download and install the latest agent package</span>
-                        <span class="mb10">${this.machine.link}</span>
+                        <span class="mb10">$ ${this.machine.link}</span>
                         <span class="gray"># Run it!</span>
                         <span>$ cd landun_devops_agent && ./install.sh </span>
                     </p>
@@ -218,7 +217,7 @@
     .add-agent-body {
         padding: 16px 25px;
         overflow-y: auto;
-        max-height: calc(100vh - 108px);
+        max-height: calc(100vh - 176px);
         .agent-tips {
             line-height: 20px;
             font-size: 14px;
@@ -258,9 +257,10 @@
         .agent-info {
             background: #fff;
             overflow: hidden;
+            padding-top: 12px;
             /deep/ h3 {
                 color: #313328;
-                margin: 17px 0 0 20px;
+                margin: 5px 0 0 20px;
             }
             /deep/ p {
                 margin: 8.6px 20px 24px;
@@ -292,7 +292,10 @@
                 .agent-refresh {
                     width: 100%;
                     height: 100%;
+                    display: inline-block;
                     line-height: 36px;
+                    font-size: 14px;
+                    text-align: center;
                 }
                 .agent-status-info {
                     color: #63656e;
@@ -318,11 +321,11 @@
                 }
             }
         }
-        .bottom-btn {
-            margin: 24px 0;
-            +button {
-                margin-left: 15px;
-            }
+    }
+    .bottom-btn {
+        margin: 12px 24px 24px;
+        +button {
+            margin-left: 0;
         }
     }
     /deep/ .bk-link-text {

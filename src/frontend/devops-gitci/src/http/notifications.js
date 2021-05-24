@@ -8,5 +8,13 @@ export default {
 
     readAllMessages () {
         return api.put(`${GITCI_PERFIX}/user/messages/read`)
+    },
+
+    readMessage (id) {
+        return api.put(`${GITCI_PERFIX}/user/messages/${id}/read`)
+    },
+
+    getUnreadNotificationNum () {
+        return api.get(`${GITCI_PERFIX}/user/messages/noread`)
     }
 }

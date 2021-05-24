@@ -1,8 +1,8 @@
 <template>
     <article class="build-detail-home">
         <header class="build-detail-header">
-            <bk-breadcrumb class="header-bread">
-                <bk-breadcrumb-item v-for="(item,index) in list" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
+            <bk-breadcrumb class="header-bread" separator-class="bk-icon icon-angle-right">
+                <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
             <bk-tab :active.sync="active" type="unborder-card" class="header-tab" @tab-change="changeTab">
                 <bk-tab-panel
@@ -17,13 +17,11 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
+
     export default {
         data () {
             return {
-                list: [
-                    { title: 'Frontent CI', link: { name: 'buildList' } },
-                    { title: '# 127' }
-                ],
                 panels: [
                     { label: '详情', name: 'buildDetail' },
                     { label: '构件', name: 'buildArtifacts' },
@@ -31,6 +29,17 @@
                     { label: '配置', name: 'buildConfig' }
                 ],
                 active: 'buildDetail'
+            }
+        },
+
+        computed: {
+            ...mapState(['curPipeline']),
+
+            navList () {
+                return [
+                    { title: this.curPipeline.displayName, link: { name: 'buildList' } },
+                    { title: '# ' + this.$route.params.buildNum }
+                ]
             }
         },
 

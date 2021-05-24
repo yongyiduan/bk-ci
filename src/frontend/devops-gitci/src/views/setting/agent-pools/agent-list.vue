@@ -1,7 +1,7 @@
 <template>
     <article class="agent-list-home">
         <header class="agent-list-head">
-            <bk-breadcrumb>
+            <bk-breadcrumb separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
         </header>
@@ -107,7 +107,7 @@
             return {
                 navList: [
                     { link: { name: 'agentPools' }, title: 'Agent Pools' },
-                    { link: '', title: 'Agent List' }
+                    { link: '', title: this.$route.params.poolName }
                 ],
                 agentList: [],
                 isLoading: false,

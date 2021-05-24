@@ -7,18 +7,13 @@ function errorHandler (error) {
 
 function successHandler (response) {
     const { data: { code, data, message, status }, status: httpStatus } = response
+    const errorMsg = { httpStatus, message, code: code || status }
     if (httpStatus === 401) {
         location.href = getLoginUrl()
-    } else if ([503, 403, 418, 419].includes(httpStatus)) {
+    } else if ([503, 403, 418, 419, 500].includes(httpStatus)) {
         store.dispatch('setExceptionInfo', { type: httpStatus, message })
+        return Promise.reject(errorMsg)
     } else if ((typeof code !== 'undefined' && code !== 0) || (typeof status !== 'undefined' && status !== 0)) {
-        let msg = message
-        if (Object.prototype.toString.call(message) === '[object Object]') {
-            msg = Object.keys(message).map(key => message[key].join(';')).join(';')
-        } else if (Object.prototype.toString.call(message) === '[object Array]') {
-            msg = message.join(';')
-        }
-        const errorMsg = { httpStatus, message: msg, code: code || status }
         return Promise.reject(errorMsg)
     }
     return data

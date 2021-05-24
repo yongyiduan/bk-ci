@@ -30,8 +30,8 @@ export default {
         return api.delete(`${TICKET_PERFIX}/user/credentials/${projectId}/${credentialId}`)
     },
 
-    saveSetting (params) {
-        return api.post(`${GITCI_PERFIX}/user/basic/setting/save`, params)
+    saveSetting (projectId, params) {
+        return api.post(`${GITCI_PERFIX}/user/basic/setting/${projectId}/save`, params)
     },
 
     getSetting (projectId) {
@@ -70,5 +70,13 @@ export default {
 
     addNodeToSystem (projectId, agentId) {
         return api.post(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/agents/${agentId}/import`)
+    },
+
+    toggleEnableCi (enabled, projectInfo) {
+        return api.post(`${GITCI_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo)
+    },
+
+    resetAuthorization (projectId) {
+        return api.post(`${GITCI_PERFIX}/user/basic/setting/${projectId}/user`)
     }
 }

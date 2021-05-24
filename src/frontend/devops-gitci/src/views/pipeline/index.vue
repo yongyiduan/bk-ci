@@ -99,7 +99,21 @@
 
             initList () {
                 this.isLoading = true
-                pipelines.getPipelineList(this.projectId).then((res) => {
+                this.loopGetPipelineList().then(() => {
+                    this.setDefaultPipeline()
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            loopGetPipelineList () {
+                clearTimeout(this.loopGetPipelineList.loopId)
+                this.loopGetPipelineList.loopId = setTimeout(this.loopGetPipelineList, 5000)
+                return this.getPipelineList()
+            },
+
+            getPipelineList () {
+                return pipelines.getPipelineList(this.projectId).then((res) => {
                     const allPipeline = { displayName: 'All pipeline', enabled: true, icon: 'all' }
                     const pipelines = (res.records || []).map((pipeline) => ({
                         displayName: pipeline.displayName,
@@ -109,11 +123,8 @@
                         branch: ((pipeline.latestBuildInfo || {}).gitRequestEvent || {}).branch
                     }))
                     this.pipelineList = [allPipeline, ...pipelines]
-                    this.setDefaultPipeline()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoading = false
                 })
             },
 

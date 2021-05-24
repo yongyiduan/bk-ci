@@ -1,13 +1,13 @@
 <template>
-    <bk-exception :type="type" class="exception-home">
+    <bk-exception :type="infoMap.typeMap[exceptionType] || '403'" class="exception-home">
         <section class="exception-content">
-            <span>{{ title }}</span>
+            <span>{{ infoMap.titleMap[exceptionType] }}</span>
             <span class="exception-title">
-                {{ message }}
-                <bk-link theme="primary" href="https://iwiki.woa.com/x/r3IyKQ" v-if="exceptionInfo.type === 499">Learn more</bk-link>
+                {{ infoMap.messageMap[exceptionType] || exceptionInfo.message || '系统异常，请稍后重试！' }}
+                <bk-link theme="primary" target="blank" href="https://iwiki.woa.com/x/r3IyKQ" v-if="exceptionType === 520">Learn more</bk-link>
             </span>
-            <bk-button theme="primary" v-if="exceptionInfo.type === 418" @click="oauth" :loading="isSaving">OAUTH 授权</bk-button>
-            <bk-button theme="primary" v-if="exceptionInfo.type === 419" @click="enable" :loading="isSaving">开启</bk-button>
+            <bk-button theme="primary" v-if="exceptionType === 418" @click="oauth" :loading="isSaving">OAUTH 授权</bk-button>
+            <bk-button theme="primary" v-if="exceptionType === 419" @click="enable" :loading="isSaving">开启</bk-button>
         </section>
     </bk-exception>
 </template>
@@ -19,52 +19,44 @@
     export default {
         data () {
             return {
-                isSaving: false,
-                typeMap: {
-                    404: 404,
-                    499: 'login',
-                    500: 500
-                },
-                titleMap: {
-                    403: '无业务权限',
-                    404: '页面不存在',
-                    418: '无权限',
-                    419: '未开启 Git Ci',
-                    499: 'Welcome to Tencent CI.',
-                    500: '系统异常'
-                }
+                isSaving: false
             }
         },
 
         computed: {
-            ...mapState(['exceptionInfo', 'projectId']),
+            ...mapState(['exceptionInfo', 'projectId', 'projectInfo']),
 
             projectPath () {
                 return (this.$route.hash || '').slice(1)
             },
 
-            type () {
-                const type = this.exceptionInfo.type || 404
-                return this.typeMap[type] || '403'
+            exceptionType () {
+                return +this.exceptionInfo.type || 404
             },
 
-            message () {
-                const type = this.exceptionInfo.type || 404
-                return this.messageMap[type]
-            },
-
-            title () {
-                const type = this.exceptionInfo.type || 404
-                return this.titleMap[type]
-            },
-
-            messageMap () {
+            infoMap () {
                 return {
-                    418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
-                    403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目！`,
-                    499: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. ',
-                    500: '系统异常，请稍后重试',
-                    419: '尚未开启 Git Ci，请先开启，在进行操作！'
+                    typeMap: {
+                        404: 404,
+                        500: 500,
+                        520: 'login'
+                    },
+                    titleMap: {
+                        403: '无业务权限',
+                        404: '页面不存在',
+                        418: '无权限',
+                        419: '未开启 Git Ci',
+                        499: '未查询到项目信息',
+                        500: '系统异常',
+                        520: 'Welcome to Tencent CI.'
+                    },
+                    messageMap: {
+                        403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目！`,
+                        418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
+                        419: '尚未开启 Git Ci，请先开启，在进行操作！',
+                        499: `未查询到工蜂项目 ${this.projectPath} 的信息，请修改后重试`,
+                        520: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. '
+                    }
                 }
             }
         },
@@ -85,7 +77,7 @@
 
             enable () {
                 this.isSaving = true
-                setting.saveSetting({ projectId: this.projectId, enableCi: true }).then(() => {
+                setting.toggleEnableCi(true, this.projectInfo).then(() => {
                     location.reload()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

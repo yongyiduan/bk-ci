@@ -15,20 +15,22 @@
 
         <main class="notifications-main">
             <section class="notifications-head">
+                <bk-radio-group v-model="onlyUnread" class="head-tab">
+                    <bk-radio-button :value="false">All</bk-radio-button>
+                    <bk-radio-button :value="true">Unread</bk-radio-button>
+                </bk-radio-group>
                 <bk-button class="notifications-button" @click="readAll">Mark all as read</bk-button>
-                <span class="head-text">是否只展示未读：</span>
-                <bk-switcher v-model="onlyUnread"></bk-switcher>
             </section>
-            <bk-collapse v-bkloading="{ isLoading }" :active-name="0">
-                <bk-collapse-item :name="index" v-for="(notification, index) in notificationList" :key="index">
-                    {{ notification.time }}
+            <ul v-bkloading="{ isLoading }">
+                <li v-for="(notification, index) in notificationList" :key="index" class="notification-time">
+                    <span class="notification-item-header">{{ notification.time }}</span>
                     <bk-collapse slot="content">
-                        <bk-collapse-item :name="request.messageTitle" v-for="request in notification.records" :key="request.messageTitle">
+                        <bk-collapse-item :name="request.id" v-for="request in notification.records" :key="request.messageTitle" @click.native="readMessage(request)">
                             <span class="content-message">
                                 <span :class="{ 'message-status': true, 'unread': !request.haveRead }"></span>
                                 {{ request.messageTitle }} （{{ request.contentAttr.failedNum }} / {{ request.contentAttr.total }}）
                             </span>
-                            <bk-table :data="request.content.buildRecords" slot="content" class="f13">
+                            <bk-table :data="request.content.buildRecords" :show-header="false" slot="content" class="notification-table">
                                 <bk-table-column>
                                     <template slot-scope="props">
                                         {{ props.row.displayName || '--' }}
@@ -39,13 +41,13 @@
                                         {{ (props.row.buildHistory || {}).buildNum || '--' }}
                                     </template>
                                 </bk-table-column>
-                                <bk-table-column prop="reason"></bk-table-column>
-                                <bk-table-column prop="reasonDetail"></bk-table-column>
+                                <bk-table-column prop="reason" show-overflow-tooltip></bk-table-column>
+                                <bk-table-column prop="reasonDetail" show-overflow-tooltip></bk-table-column>
                             </bk-table>
                         </bk-collapse-item>
                     </bk-collapse>
-                </bk-collapse-item>
-            </bk-collapse>
+                </li>
+            </ul>
 
             <bk-exception class="exception-wrap-item exception-part" type="empty" v-if="notificationList.length <= 0"></bk-exception>
 
@@ -84,16 +86,16 @@
 
         watch: {
             onlyUnread () {
-                this.initData()
+                this.getMessages()
             }
         },
 
         created () {
-            this.initData()
+            this.getMessages()
         },
 
         methods: {
-            initData () {
+            getMessages () {
                 this.isLoading = true
                 const params = {
                     messageType: 'REQUEST',
@@ -115,15 +117,25 @@
 
             readAll () {
                 notifications.readAllMessages().then(() => {
-                    this.initData()
+                    this.getMessages()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
 
+            readMessage (message) {
+                if (!message.haveRead) {
+                    notifications.readMessage(message.id).then(() => {
+                        this.getMessages()
+                    }).catch((err) => {
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    })
+                }
+            },
+
             pageChange (page) {
                 this.compactPaging.current = page
-                this.initData()
+                this.getMessages()
             },
 
             goToPage ({ name }) {
@@ -152,9 +164,24 @@
                 display: flex;
                 align-items: center;
                 margin-bottom: 20px;
-                .head-text {
-                    display: inline-block;
-                    margin: 0 3px 0 40px;
+                .head-tab {
+                    width: 200px;
+                }
+            }
+            .notification-time {
+                border: 1px solid #f5f6fa;
+                .notification-item-header {
+                    display: block;
+                    line-height: 40px;
+                    padding: 0 10px;
+                    background: #f5f6fa;
+                }
+                .notification-table {
+                    width: calc(100% - 40px);
+                    margin: 0 20px;
+                }
+                /deep/ .bk-collapse-item-content {
+                    margin-bottom: 20px;
                 }
             }
             .content-message {
@@ -164,8 +191,8 @@
             .message-status {
                 display: inline-block;
                 margin-right: 8px;
-                height: 15px;
-                width: 15px;
+                height: 12px;
+                width: 12px;
                 border-radius: 100px;
                 background: #f0f1f5;
                 &.unread {

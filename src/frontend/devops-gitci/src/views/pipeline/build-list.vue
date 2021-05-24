@@ -3,10 +3,10 @@
         <header class="main-head">
             <span class="head-text">
                 <span class="pipeline-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.displayName }}</span>
-                <template v-if="curPipeline.filePath">
-                    <span class="yml-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.filePath }}</span>
-                    <icon name="cc-jump-link" size="16" @click.native="goToGit"></icon>
-                </template>
+                <span class="yml-name text-ellipsis" @click="goToGit" v-if="curPipeline.filePath">
+                    <span v-bk-overflow-tips>{{ curPipeline.filePath }}</span>
+                    <icon name="cc-jump-link" size="16"></icon>
+                </span>
                 <span class="pipeline-status" v-if="!curPipeline.enabled">已禁用</span>
             </span>
             <opt-menu v-if="curPipeline.pipelineId">
@@ -459,7 +459,8 @@
                     name: 'buildDetail',
                     params: {
                         buildId: row.buildHistory.id,
-                        pipelineId: row.pipelineId
+                        pipelineId: row.pipelineId,
+                        buildNum: row.buildHistory.buildNum
                     }
                 })
             },
@@ -509,10 +510,10 @@
                 display: inline-block;
                 margin: 0 3px 0 16px;
                 max-width: 300px;
+                cursor: pointer;
             }
             svg {
                 vertical-align: sub;
-                cursor: pointer;
             }
             .pipeline-status {
                 background: #fafbfd;

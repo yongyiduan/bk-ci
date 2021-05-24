@@ -66,7 +66,7 @@
             },
 
             backHome () {
-                this.goToPage({ name: 'buildList', params: { pipelineId: 'all' } })
+                this.goToPage({ name: 'buildList' })
             }
         }
     }
@@ -78,7 +78,6 @@
         flex-direction: row;
         .setting-main {
             flex: 1;
-            background: #f5f6fa;
         }
     }
 </style>

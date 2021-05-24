@@ -89,7 +89,8 @@
                 this.$router.push({
                     name: 'addAgent',
                     params: {
-                        poolId: this.pool.envHashId
+                        poolId: this.pool.envHashId,
+                        poolName: this.pool.name
                     }
                 })
             },
@@ -106,7 +107,7 @@
             },
 
             goToAgentList () {
-                this.$router.push({ name: 'agentList', params: { poolId: this.pool.envHashId } })
+                this.$router.push({ name: 'agentList', params: { poolId: this.pool.envHashId, poolName: this.pool.name } })
             }
         }
     }

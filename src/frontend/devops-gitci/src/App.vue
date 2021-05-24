@@ -12,26 +12,27 @@
             </span>
             <section class="user-info">
                 <img :src="userInfo.img" class="avatar" />
-                <span class="name">{{ userInfo.name }}</span>
                 <bk-dropdown-menu align="right">
                     <div class="dropdown-trigger-btn" slot="dropdown-trigger">
+                        <span class="name">{{ userInfo.name }}</span>
+                        <span class="unread" v-if="messageNum > 0"></span>
                         <i class="bk-icon icon-down-shape"></i>
                     </div>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
-                        <li><a href="javascript:;" @click="goToNotifications">通知</a></li>
+                        <li :class="{ unread: messageNum > 0 }"><a href="javascript:;" @click="goToNotifications">通知</a></li>
                         <li><a href="javascript:;" @click="goLogin">退出</a></li>
                     </ul>
                 </bk-dropdown-menu>
             </section>
         </header>
+
         <router-view class="gitci-content" v-if="!isLoading" :name="childRouteName"></router-view>
     </article>
 </template>
 
 <script>
-    import { common } from '@/http'
+    import { common, notifications } from '@/http'
     import { mapActions, mapState } from 'vuex'
-    import { modifyRequestCommonHead } from '@/http/ajax'
 
     export default {
         name: 'app',
@@ -42,7 +43,8 @@
                     name: '',
                     img: ''
                 },
-                isLoading: true
+                messageNum: 0,
+                isLoading: false
             }
         },
 
@@ -61,8 +63,17 @@
             }
         },
 
-        created () {
-            this.initData()
+        watch: {
+            '$route.hash': {
+                handler () {
+                    this.initData()
+                },
+                immediate: true
+            }
+        },
+
+        beforeDestroy () {
+            clearTimeout(this.loopGetNotifications.loopId)
         },
 
         methods: {
@@ -70,23 +81,55 @@
 
             initData () {
                 this.isLoading = true
-                const projectPath = (location.hash || '').slice(1)
-                Promise.all([common.getUserInfo(), common.getProjectInfo(projectPath)]).then(([userInfo, projectInfo]) => {
-                    const data = userInfo || {}
-                    this.userInfo = { name: data.username, img: data.avatarUrl }
-                    const projectData = projectInfo || {}
-                    if (projectData.id) {
-                        const projectId = `git_${projectData.id}`
-                        this.setProjectInfo(projectData)
-                        modifyRequestCommonHead({ 'X-DEVOPS-PROJECT-ID': projectId })
-                    } else {
-                        this.setExceptionInfo({ type: 499 })
-                    }
+                Promise.all([this.getUserInfo(), this.getProjectInfo()]).then(() => {
+                    return this.loopGetNotifications()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
                 })
+            },
+
+            getUserInfo () {
+                return common.getUserInfo().then((userInfo = {}) => {
+                    this.userInfo = { name: userInfo.username, img: userInfo.avatarUrl }
+                })
+            },
+
+            getProjectInfo () {
+                return new Promise((resolve, reject) => {
+                    const projectPath = (location.hash || '').slice(1)
+
+                    if (projectPath) {
+                        common.getProjectInfo(projectPath).then((projectInfo = {}) => {
+                            if (projectInfo.id) {
+                                this.setProjectInfo(projectInfo)
+                            } else {
+                                this.setExceptionInfo({ type: 499 })
+                            }
+                            resolve()
+                        }).catch((err) => {
+                            reject(err)
+                        })
+                    } else {
+                        this.setExceptionInfo({ type: 520 })
+                        resolve()
+                    }
+                })
+            },
+
+            getNotifications () {
+                return notifications.getUnreadNotificationNum().then((res) => {
+                    this.messageNum = res || 0
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
+            },
+
+            loopGetNotifications () {
+                clearTimeout(this.loopGetNotifications.loopId)
+                this.getNotifications()
+                this.loopGetNotifications.loopId = setTimeout(this.loopGetNotifications, 5000)
             },
 
             goToSetting () {
@@ -114,6 +157,7 @@
         overflow: hidden;
         font-size: 14px;
         color: #7b7d8a;
+        background: #f5f6fa;
         font-family: -apple-system,PingFang SC,BlinkMacSystemFont,Microsoft YaHei,Helvetica Neue,Arial;
         ::-webkit-scrollbar-thumb {
             background-color: #c4c6cc !important;
@@ -171,6 +215,26 @@
 
     .bk-dropdown-list li {
         min-width: 65px;
+        position: relative;
+    }
+    .unread:before {
+        content: '';
+        position: absolute;
+        right: 16px;
+        top: calc(50% - 3px);
+        width: 8px;
+        height: 8px;
+        border-radius: 100px;
+        background: #ff5656;
+    }
+
+    .dropdown-trigger-btn {
+        cursor: pointer;
+        font-size: 14px;
+        .name {
+            color: #f5f7fa;
+            margin: 0 8px;
+        }
     }
 
     .user-info {
@@ -180,13 +244,6 @@
             width: 25px;
             height: 25px;
             border-radius: 100px;
-        }
-        .name {
-            color: #f5f7fa;
-            margin: 0 8px;
-        }
-        .icon-down-shape {
-            cursor: pointer;
         }
     }
 </style>
