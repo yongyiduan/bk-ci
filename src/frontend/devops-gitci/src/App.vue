@@ -103,6 +103,7 @@
                             if (projectInfo.id) {
                                 this.setProjectInfo(projectInfo)
                                 this.loopGetNotifications()
+                                this.setExceptionInfo({ type: 200 })
                             } else {
                                 this.setExceptionInfo({ type: 499 })
                             }

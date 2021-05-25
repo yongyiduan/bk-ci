@@ -113,7 +113,7 @@
             },
 
             getPipelineList () {
-                return pipelines.getPipelineList(this.projectId).then((res) => {
+                return pipelines.getPipelineList(this.projectId).then((res = {}) => {
                     const allPipeline = { displayName: 'All pipeline', enabled: true, icon: 'all' }
                     const pipelines = (res.records || []).map((pipeline) => ({
                         displayName: pipeline.displayName,
@@ -175,7 +175,7 @@
                 }
                 this.isLoadingBranches = true
                 pipelines.getPipelineBranches(params).then((res) => {
-                    this.branchList = res
+                    this.branchList = res || []
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

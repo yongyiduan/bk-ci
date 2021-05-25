@@ -21,7 +21,7 @@
                 </bk-radio-group>
                 <bk-button class="notifications-button" @click="readAll">Mark all as read</bk-button>
             </section>
-            <ul v-bkloading="{ isLoading }">
+            <ul v-bkloading="{ isLoading }" class="notification-list">
                 <li v-for="(notification, index) in notificationList" :key="index" class="notification-time">
                     <span class="notification-item-header">{{ notification.time }}</span>
                     <bk-collapse slot="content">
@@ -126,7 +126,7 @@
             readMessage (message) {
                 if (!message.haveRead) {
                     notifications.readMessage(message.id).then(() => {
-                        this.getMessages()
+                        message.haveRead = true
                     }).catch((err) => {
                         this.$bkMessage({ theme: 'error', message: err.message || err })
                     })
@@ -167,6 +167,10 @@
                 .head-tab {
                     width: 200px;
                 }
+            }
+            .notification-list {
+                max-height: calc(100% - 90px);
+                overflow: auto;
             }
             .notification-time {
                 border: 1px solid #f5f6fa;

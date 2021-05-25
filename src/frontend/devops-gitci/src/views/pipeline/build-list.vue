@@ -281,7 +281,7 @@
                     pipelineId: this.curPipeline.pipelineId,
                     ...this.filterData
                 }
-                return pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
+                return pipelines.getPipelineBuildList(this.projectId, params).then((res = {}) => {
                     this.buildList = (res.records || []).map((build) => {
                         return {
                             ...build,
@@ -395,7 +395,7 @@
                 }
                 this.isLoadingYaml = true
                 return pipelines.getPipelineBranchYaml(this.projectId, this.curPipeline.pipelineId, params).then((res) => {
-                    this.formData.yaml = res
+                    this.formData.yaml = res || ''
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

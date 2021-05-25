@@ -60,7 +60,7 @@
         methods: {
             getSetting () {
                 this.isLoading = true
-                setting.getSetting(this.projectId).then((res) => {
+                setting.getSetting(this.projectId).then((res = {}) => {
                     Object.assign(this.form, res)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

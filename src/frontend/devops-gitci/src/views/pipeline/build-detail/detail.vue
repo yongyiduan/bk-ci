@@ -90,8 +90,8 @@
         methods: {
             initData () {
                 this.isLoading = true
-                this.getPipelineBuildDetail().then(() => {
-                    this.loopGetPipelineDetail()
+                this.loopGetPipelineDetail().then(() => {
+                    this.remark = this.buildDetail.buildHistoryRemark
                 }).finally(() => {
                     this.isLoading = false
                 })
@@ -106,7 +106,6 @@
                     const modelDetail = res.modelDetail || {}
                     const model = modelDetail.model || {}
                     this.stageList = model.stages
-                    this.remark = res.buildHistoryRemark
                     this.buildDetail = {
                         ...res.gitProjectPipeline,
                         ...res.gitRequestEvent,
@@ -123,7 +122,7 @@
             rebuild () {
                 this.isRebuilding = true
                 pipelines.rebuildPipeline(this.projectId, this.$route.params.pipelineId, this.$route.params.buildId).then(() => {
-                    this.loopGetPipelineDetail()
+                    this.getPipelineBuildDetail()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -141,10 +140,8 @@
 
             loopGetPipelineDetail () {
                 clearTimeout(this.loopGetPipelineDetail.loopId)
-                this.loopGetPipelineDetail.loopId = setTimeout(() => {
-                    this.getPipelineBuildDetail()
-                    this.loopGetPipelineDetail()
-                }, 2000)
+                this.loopGetPipelineDetail.loopId = setTimeout(this.loopGetPipelineDetail, 2000)
+                return this.getPipelineBuildDetail()
             }
         }
     }

@@ -10,9 +10,9 @@ function successHandler (response) {
     const errorMsg = { httpStatus, message, code: code || status }
     if (httpStatus === 401) {
         location.href = getLoginUrl()
-    } else if ([503, 403, 418, 419, 500].includes(httpStatus)) {
+    } else if ([503, 403, 418, 419].includes(httpStatus)) {
         store.dispatch('setExceptionInfo', { type: httpStatus, message })
-        return data
+        return
     } else if ((typeof code !== 'undefined' && code !== 0) || (typeof status !== 'undefined' && status !== 0)) {
         return Promise.reject(errorMsg)
     }
