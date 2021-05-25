@@ -2,7 +2,7 @@
     <section class="stage-home">
         <h3 class="stage-title">
             <span :class="`${stageStatusCls} title-content`">
-                <i :class="`bk-icon ${stageStatusIcon}`"></i>
+                <i :class="stageStatusIcon"></i>
                 {{ stage.name }}
             </span>
             <span class="stage-connector" v-if="stageIndex < stageNum - 1">
@@ -21,7 +21,8 @@
 </template>
 
 <script>
-    import job from './job'
+    import { getPipelineStatusClass, getPipelineStatusIconCls } from '@/components/status'
+    import job from '../job/index'
 
     export default {
         components: {
@@ -36,22 +37,11 @@
 
         computed: {
             stageStatusCls () {
-                return this.stage && this.stage.status ? this.stage.status : ''
+                return getPipelineStatusClass(this.stage.status)
             },
 
             stageStatusIcon () {
-                switch (this.stageStatusCls) {
-                    case 'SUCCEED':
-                        return 'icon-check-circle'
-                    case 'FAILED':
-                        return 'icon-close-circle'
-                    case 'SKIP':
-                        return 'icon-redo-arrow'
-                    case 'RUNNING':
-                        return 'icon-circle-2-1 spin-icon'
-                    default:
-                        return ''
-                }
+                return getPipelineStatusIconCls(this.stage.status)
             }
         }
     }
@@ -83,23 +73,23 @@
             .bk-icon {
                 font-size: 22px;
             }
-            &.SKIP {
+            &.skip {
                 color: #c3cdd7;
                 fill: #c3cdd7;
             }
 
-            &.RUNNING {
+            &.running {
                 background-color: #eff5ff;
                 border-color: #d4e8ff;
                 color: #3c96ff;
             }
-            &.REVIEWING {
+            &.warning {
                 background-color: #f3f3f3;
                 border-color: #d0d8ea;
                 color: black;
             }
 
-            &.FAILED {
+            &.danger {
                 border-color: #ffd4d4;
                 background-color: #fff9f9;
                 color: black;
@@ -107,7 +97,7 @@
                     color: #ff5656;
                 }
             }
-            &.SUCCEED {
+            &.success {
                 background-color: #f3fff6;
                 border-color: #bbefc9;
                 color: black;

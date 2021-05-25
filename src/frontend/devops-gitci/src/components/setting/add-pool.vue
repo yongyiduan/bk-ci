@@ -1,15 +1,15 @@
 <template>
     <bk-sideslider :is-show.sync="show" :quick-close="true" @hidden="hidden" :width="622" title="add pool">
         <bk-form :model="formData" ref="poolForm" slot="content" class="pool-form" form-type="vertical">
-            <bk-form-item label="名称" :required="true" :rules="[requireRule('名称'), nameRule]" property="name" error-display-type="normal">
-                <bk-input v-model="formData.name" placeholder="在 runs-on 关键字下使用，以英文字母、数字、中划线组成，不超过64个字"></bk-input>
+            <bk-form-item label="Pool name" :required="true" :rules="[requireRule('Pool name'), nameRule]" property="name" error-display-type="normal">
+                <bk-input v-model="formData.name" placeholder="Composed of English letters, numbers, and underscores, no more than 64 words"></bk-input>
             </bk-form-item>
-            <bk-form-item label="描述" property="desc">
-                <bk-input type="textarea" v-model="formData.desc" placeholder="请输入描述"></bk-input>
+            <bk-form-item label="Description" property="desc">
+                <bk-input type="textarea" v-model="formData.desc" placeholder="Please enter description"></bk-input>
             </bk-form-item>
             <bk-form-item>
-                <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isSaving">提交</bk-button>
-                <bk-button ext-cls="mr5" title="取消" @click="hidden" :disabled="isSaving">取消</bk-button>
+                <bk-button ext-cls="mr5" theme="primary" title="Submit" @click.stop.prevent="submitData" :loading="isSaving">Submit</bk-button>
+                <bk-button ext-cls="mr5" title="Cancel" @click="hidden" :disabled="isSaving">Cancel</bk-button>
             </bk-form-item>
         </bk-form>
     </bk-sideslider>
@@ -35,7 +35,7 @@
                 },
                 nameRule: {
                     validator: (val) => (/^[a-zA-Z0-9-]{1,64}$/.test(val)),
-                    message: '以英文字母、数字或中划线(-)组成，不超过64个字',
+                    message: 'It is composed of English letters, numbers or dashes (-), no more than 64 characters',
                     trigger: 'blur'
                 },
                 isSaving: false
@@ -63,7 +63,7 @@
             requireRule (name) {
                 return {
                     required: true,
-                    message: name + '是必填项',
+                    message: name + 'is required',
                     trigger: 'blur'
                 }
             },
@@ -74,7 +74,7 @@
                     setting.addEnvironment(this.projectId, this.formData).then(() => {
                         this.hidden()
                         this.$emit('refresh')
-                        this.$bkMessage({ theme: 'success', message: '添加成功' })
+                        this.$bkMessage({ theme: 'success', message: 'Added successfully' })
                     }).catch((err) => {
                         this.$bkMessage({ theme: 'error', message: err.message || err })
                     }).finally(() => {

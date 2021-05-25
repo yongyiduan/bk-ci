@@ -1,7 +1,7 @@
 <template>
     <section class="job-home" ref="pipelineJob">
         <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1, [getPipelineStatusClass(job.status)]: true }" @click="toggleShowLog">
-            <status-icon :status="job.status" type="job"></status-icon>
+            <i :class="[jobStatusIcon, 'job-status']"></i>
             <span class="job-name">{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
             <job-time :job="job"></job-time>
             <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
@@ -23,16 +23,14 @@
 </template>
 
 <script>
-    import { getPipelineStatusClass } from '@/utils'
-    import statusIcon from './status-icon'
+    import { getPipelineStatusClass, getPipelineStatusShapeIconCls } from '@/components/status'
     import cruveLine from './cruve-line'
-    import plugin from './plugin'
+    import plugin from '../plugin/index'
     import jobTime from './job-time'
-    import jobLog from '../exec-detail/job'
+    import jobLog from '@/components/exec-detail/job'
 
     export default {
         components: {
-            statusIcon,
             cruveLine,
             plugin,
             jobTime,
@@ -50,6 +48,12 @@
             return {
                 cruveLineProp: {},
                 showJobLog: false
+            }
+        },
+
+        computed: {
+            jobStatusIcon () {
+                return getPipelineStatusShapeIconCls(this.job.status)
             }
         },
 
@@ -77,7 +81,7 @@
 </script>
 
 <style lang="postcss" scoped>
-    @import '../../css/conf';
+    @import '@/css/conf';
 
     .job-home {
         position: relative;
@@ -92,19 +96,30 @@
             display: flex;
             align-items: center;
             font-weight: 600;
+            background-color: #63656e;
             cursor: pointer;
-            &.danger {
-                background: $dangerColor;
-            }
-            &.success {
-                background: $successColor;
-            }
-            &.warning {
-                background: $warningColor;
+            .job-status {
+                width: 42px;
+                height: 42px;
+                line-height: 42px;
+                color: #fff;
             }
             &.running {
-                background: $runningColor;
+                background-color: #459fff;
             }
+            &.canceled {
+                background-color: #f6b026;
+            }
+            &.danger {
+                background-color: #ff5656;
+            }
+            &.success {
+                background-color: #34d97b;
+            }
+            &.pause {
+                background-color: #ff9801;
+            }
+
             .job-name {
                 flex: 1;
             }

@@ -17,11 +17,12 @@
                 :header-cell-style="{ background: '#fafbfd' }"
                 :height="tableHeight"
                 v-bkloading="{ isLoading }"
+                v-if="agentList.length"
             >
-                <bk-table-column label="别名" prop="displayName"></bk-table-column>
-                <bk-table-column label="内网IP" prop="ip"></bk-table-column>
-                <bk-table-column label="操作系统" prop="osName"></bk-table-column>
-                <bk-table-column label="来源/导入人">
+                <bk-table-column label="Name" prop="displayName"></bk-table-column>
+                <bk-table-column label="IP" prop="ip"></bk-table-column>
+                <bk-table-column label="Operating System" prop="osName"></bk-table-column>
+                <bk-table-column label="Source/Importer">
                     <template slot-scope="props">
                         <div v-if="(props.row.nodeType === 'CC' || props.row.nodeType === 'CMDB') && ((props.row.nodeType === 'CC' && props.row.createdUser !== props.row.operator && props.row.createdUser !== props.row.bakOperator)
                             || (props.row.nodeType === 'CMDB' && props.row.createdUser !== props.row.operator && props.row.bakOperator.split(';').indexOf(props.row.createdUser) === -1))">
@@ -30,11 +31,11 @@
                             </div>
                             <div class="prompt-operator" v-else>
                                 <bk-popover placement="top">
-                                    <span><i class="bk-icon icon-exclamation-circle"></i>责任人已变更，禁止使用</span>
+                                    <span><i class="bk-icon icon-exclamation-circle"></i>The person in charge has been changed and the use is prohibited</span>
                                     <template slot="content">
-                                        <p>当前导入人：<span>{{ props.row.createdUser }}</span></p>
-                                        <p>当前主机责任人：<span>{{ props.row.operator }}</span><span v-if="props.row.nodeType === 'CC'">/{{ props.row.bakOperator }}</span></p>
-                                        <p>请联系主机负责人</p>
+                                        <p>Current importer：<span>{{ props.row.createdUser }}</span></p>
+                                        <p>Current host owner：<span>{{ props.row.operator }}</span><span v-if="props.row.nodeType === 'CC'">/{{ props.row.bakOperator }}</span></p>
+                                        <p>Please contact the person in charge of the host</p>
                                     </template>
                                 </bk-popover>
                             </div>
@@ -45,12 +46,12 @@
                         </div>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="状态" prop="osName">
+                <bk-table-column label="Status" prop="osName">
                     <template slot-scope="props">
                         <div class="table-node-item node-item-status"
                             v-if="props.row.nodeStatus === 'BUILDING_IMAGE' && props.row.nodeType === 'DEVCLOUD'">
                             <span class="node-status-icon normal-stutus-icon"></span>
-                            <span class="node-status">正常</span>
+                            <span class="node-status">normal</span>
                         </div>
                         <div class="table-node-item node-item-status">
                             <!-- 状态icon -->
@@ -77,14 +78,19 @@
                         </div>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="创建/导入时间" prop="createTime"></bk-table-column>
-                <bk-table-column label="最后修改时间" prop="lastModifyTime"></bk-table-column>
-                <bk-table-column label="操作" width="150" class-name="handler-btn">
+                <bk-table-column label="Creation/import time" prop="createTime"></bk-table-column>
+                <bk-table-column label="Last Modified" prop="lastModifyTime"></bk-table-column>
+                <bk-table-column label="Operation" width="150" class-name="handler-btn">
                     <template slot-scope="props">
-                        <span class="update-btn" @click="showDelete(props.row)">删除</span>
+                        <span class="update-btn" @click="showDelete(props.row)">Delete</span>
                     </template>
                 </bk-table-column>
             </bk-table>
+            <section v-else class="table-empty">
+                <h3>Import your first agent</h3>
+                <h5>Agent can be yourself development machine, or the compile machine of your team</h5>
+                <bk-button theme="primary" @click="goToAddAgent">Add Self-hosted agent</bk-button>
+            </section>
         </main>
 
         <bk-dialog v-model="isShowDelete"
@@ -92,8 +98,8 @@
             :mask-close="false"
             :loading="isDeleteing"
             @confirm="deleteAgent"
-            title="确认删除">
-            是否删除【{{deleteRow.displayName}}】？
+            title="Delete">
+            Are you sure to delete【{{deleteRow.displayName}}】？
         </bk-dialog>
     </article>
 </template>
@@ -117,29 +123,29 @@
                 nodeTypeMap: {
                     'CC': 'CC',
                     'CMDB': 'CMDB',
-                    'BCSVM': 'BCS虚拟机',
-                    'THIRDPARTY': '第三方构建机',
-                    'DEVCLOUD': '腾讯自研云（云devnet资源）',
-                    'TSTACK': 'TStack虚拟机',
-                    'OTHER': '其他',
-                    'UNKNOWN': '未知'
+                    'BCSVM': 'BCS virtual machine',
+                    'THIRDPARTY': 'Third-party build machine',
+                    'DEVCLOUD': 'Tencent self-developed cloud (cloud devnet resource)',
+                    'TSTACK': 'TStack virtual machine',
+                    'OTHER': 'Other',
+                    'UNKNOWN': 'Unknow'
                 },
                 nodeStatusMap: {
-                    'NORMAL': '正常',
-                    'ABNORMAL': '异常',
-                    'DELETED': '已删除',
-                    'LOST': '失联',
-                    'CREATING': '正在创建中',
-                    'RUNNING': '安装Agent',
-                    'STARTING': '正在开机中',
-                    'STOPPING': '正在关机中',
-                    'STOPPED': '已关机',
-                    'RESTARTING': '正在重启中',
-                    'DELETING': '正在销毁中',
-                    'BUILDING_IMAGE': '正在制作镜像中',
-                    'BUILD_IMAGE_SUCCESS': '制作镜像成功',
-                    'BUILD_IMAGE_FAILED': '制作镜像失败',
-                    'UNKNOWN': '未知'
+                    'NORMAL': 'normal',
+                    'ABNORMAL': 'abnormal',
+                    'DELETED': 'deleted',
+                    'LOST': 'lost',
+                    'CREATING': 'creating',
+                    'RUNNING': 'Install Agent',
+                    'STARTING': 'Booting up',
+                    'STOPPING': 'Shutting down',
+                    'STOPPED': 'Shut down',
+                    'RESTARTING': 'Restarting',
+                    'DELETING': 'Being destroyed',
+                    'BUILDING_IMAGE': 'Mirroring in progress',
+                    'BUILD_IMAGE_SUCCESS': 'Successfully made the mirror',
+                    'BUILD_IMAGE_FAILED': 'Mirroring failed',
+                    'UNKNOWN': 'Unknow'
                 },
                 isShowDelete: false,
                 isDeleteing: false,
@@ -151,7 +157,7 @@
             ...mapState(['appHeight', 'projectId']),
 
             tableHeight () {
-                return Math.min(this.appHeight - 152, 43 + (this.agentList.length || 3) * 42)
+                return Math.min(this.appHeight - 152, 43 + (this.agentList.length || 4) * 42)
             }
         },
 

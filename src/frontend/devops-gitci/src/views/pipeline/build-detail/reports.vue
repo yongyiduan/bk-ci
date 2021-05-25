@@ -19,7 +19,7 @@
                 v-if="chooseReport.type === 'THIRDPARTY'"
                 class="report-file"
             >
-                <bk-table-column label="名称" show-overflow-tooltip>
+                <bk-table-column label="Name" show-overflow-tooltip>
                     <template slot-scope="props">
                         <icon name="tiaozhuan" size="18" class="jump-icon" />
                         <a :href="props.row.indexFileUrl" target="_blank" class="text-link">{{ props.row.name }}</a>
@@ -30,7 +30,7 @@
         </template>
         <span class="bk-table-empty-text" v-if="!isLoading && reportList.length <= 0">
             <i class="bk-table-empty-icon bk-icon icon-empty"></i>
-            <div>暂无数据</div>
+            <div>No Data</div>
         </span>
     </article>
 </template>
@@ -79,7 +79,7 @@
                         }
                     })
                     this.reportList = innerReports
-                    if (thirdReports.length) this.reportList.push({ name: '第三方报告', thirdReports, type: 'THIRDPARTY' })
+                    if (thirdReports.length) this.reportList.push({ name: 'Third party report', thirdReports, type: 'THIRDPARTY' })
                     if (this.reportList.length <= 0) {
                         this.$emit('hidden')
                     }

@@ -1,9 +1,9 @@
 <template>
     <article class="pipelines-home">
-        <aside class="aside-nav" v-bkloading="{ isLoading }">
+        <aside class="aside-nav section-box" v-bkloading="{ isLoading }">
             <h3 class="nav-title">
                 Pipelines
-                <i class="bk-icon icon-plus" @click="showAddYml"></i>
+                <bk-button size="small" theme="primary" @click="showAddYml">New</bk-button>
             </h3>
 
             <ul v-if="!isLoading">
@@ -20,19 +20,19 @@
 
         <router-view class="pipelines-main" v-if="!isLoading"></router-view>
 
-        <bk-sideslider @hidden="hidden" :is-show.sync="isShowAddYml" :quick-close="true" :width="622" title="新增流水线">
+        <bk-sideslider @hidden="hidden" :is-show.sync="isShowAddYml" :quick-close="true" :width="622" title="New pipeline">
             <bk-form :model="yamlData" ref="yamlForm" slot="content" class="yaml-form" form-type="vertical">
-                <bk-form-item label="名称" :rules="[requireRule('名称'), nameRule]" :required="true" property="file_name" error-display-type="normal">
+                <bk-form-item label="Name" :rules="[requireRule('Name'), nameRule]" :required="true" property="file_name" error-display-type="normal">
                     <bk-compose-form-item>
                         <bk-input value=".ci / " disabled class="yaml-path"></bk-input>
-                        <bk-input v-model="yamlData.file_name" class="yaml-name"></bk-input>
+                        <bk-input v-model="yamlData.file_name" class="yaml-name" placeholder="Please input yaml name"></bk-input>
                     </bk-compose-form-item>
                 </bk-form-item>
-                <bk-form-item label="yaml" :rules="[requireRule('yaml')]" :required="true" property="content" error-display-type="normal">
+                <bk-form-item label="Yaml" :rules="[requireRule('Yaml')]" :required="true" property="content" error-display-type="normal">
                     <code-section :code.sync="yamlData.content" :read-only="false" :cursor-blink-rate="530"></code-section>
                 </bk-form-item>
-                <bk-form-item label="分支" :rules="[requireRule('分支')]" :required="true" property="branch_name" error-display-type="normal">
-                    <bk-select v-model="yamlData.branch_name" :loading="isLoadingBranches" :clearable="false">
+                <bk-form-item label="Branch" :rules="[requireRule('Branch')]" :required="true" property="branch_name" error-display-type="normal">
+                    <bk-select v-model="yamlData.branch_name" :loading="isLoadingBranches" :clearable="false" placeholder="Please select branch">
                         <bk-option v-for="option in branchList"
                             :key="option"
                             :id="option"
@@ -41,11 +41,11 @@
                     </bk-select>
                 </bk-form-item>
                 <bk-form-item label="commit message" :rules="[requireRule('commit message')]" :required="true" property="commit_message" error-display-type="normal">
-                    <bk-input v-model="yamlData.commit_message"></bk-input>
+                    <bk-input v-model="yamlData.commit_message" placeholder="Please input commit message"></bk-input>
                 </bk-form-item>
                 <bk-form-item>
-                    <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isSaving">提交</bk-button>
-                    <bk-button ext-cls="mr5" title="取消" @click="hidden" :disabled="isSaving">取消</bk-button>
+                    <bk-button ext-cls="mr5" theme="primary" title="Submit" @click.stop.prevent="submitData" :loading="isSaving">Submit</bk-button>
+                    <bk-button ext-cls="mr5" title="Cancel" @click="hidden" :disabled="isSaving">Cancel</bk-button>
                 </bk-form-item>
             </bk-form>
         </bk-sideslider>
@@ -80,7 +80,7 @@
                     validator (val) {
                         return /^[a-zA-Z0-9_\-\.]+$/.test(val)
                     },
-                    message: '由大小写英文字母、数字、下划线、中划线和点组件',
+                    message: 'Consists of uppercase and lowercase English letters, numbers, underscores, underscores and dots',
                     trigger: 'blur'
                 }
             }
@@ -205,7 +205,7 @@
             requireRule (name) {
                 return {
                     required: true,
-                    message: name + '是必填项',
+                    message: name + 'is required',
                     trigger: 'blur'
                 }
             }
@@ -216,17 +216,16 @@
 <style lang="postcss" scoped>
     .pipelines-home {
         display: flex;
-        height: 100%;
+        padding: 25px;
+        height: calc(100vh - 60px);
     }
     .nav-title {
         justify-content: space-between;
-        padding-left: 17px;
-        .bk-icon {
-            font-size: 30px;
-        }
+        padding: 0 12px 0 20px;
+        font-size: 16px;
     }
     .pipelines-main {
-        width: calc(100vw - 240px);
+        width: calc(100vw - 290px);
         height: 100%;
         background: #f5f6fa;
     }

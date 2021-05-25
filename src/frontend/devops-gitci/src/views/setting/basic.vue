@@ -17,11 +17,11 @@
 
         <h3 class="setting-basic-head">CI Authorization</h3>
         <section class="basic-main">
-            <h5 class="main-title">Authorized by @{{form.enableUserId}}. When running it, it will use {{form.enableUserId}}'s permission to checkout</h5>
+            <h5 class="main-title">Authorized by @{{form.enableUserId}}. When running, it will use {{form.enableUserId}}'s permission to checkout current repository.</h5>
             <section class="main-checkbox">
                 <bk-button @click="resetAuthorization" :loading="isReseting">Reset Authorization</bk-button>
             </section>
-            <h5 class="main-title">Config enable</h5>
+            <h5 class="main-title">After disable CI, all trigger events will be ignored.</h5>
             <section class="main-checkbox">
                 <bk-button :theme="form.enableCi ? 'danger' : 'primary'" :loading="isToggleEnable" @click="toggleEnable">{{ form.enableCi ? 'Disable CI' : 'Enable CI' }}</bk-button>
             </section>

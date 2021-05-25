@@ -19,8 +19,6 @@ export default {
     },
 
     resolve: {
-        // 指定以下目录寻找第三方模块，避免 webpack 往父级目录递归搜索，
-        // 默认值为 ['node_modules']，会依次查找./node_modules、../node_modules、../../node_modules
         extensions: ['.js', '.vue', '.json'],
         alias: {
             'vue$': 'vue/dist/vue.esm.js',

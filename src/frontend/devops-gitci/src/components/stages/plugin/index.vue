@@ -1,7 +1,7 @@
 <template>
     <section>
         <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [getPipelineStatusClass(plugin.status)]: true }" @click="toggleShowLog">
-            <status-icon :status="plugin.status"></status-icon>
+            <plugin-icon :plugin="plugin"></plugin-icon>
             <span class="plugin-name text-ellipsis" v-bk-overflow-tips>{{ plugin.name }}</span>
             <span class="plugin-time" v-bk-tooltips="pluginTime">{{ pluginTime }}</span>
         </section>
@@ -17,14 +17,15 @@
 </template>
 
 <script>
-    import { coverTimer, getPipelineStatusClass } from '@/utils'
-    import statusIcon from './status-icon'
-    import pluginLog from '../exec-detail/plugin'
+    import { coverTimer } from '@/utils'
+    import { getPipelineStatusClass } from '@/components/status'
+    import pluginLog from '@/components/exec-detail/plugin'
+    import pluginIcon from './plugin-icon'
 
     export default {
         components: {
-            statusIcon,
-            pluginLog
+            pluginLog,
+            pluginIcon
         },
 
         props: {
@@ -57,7 +58,7 @@
 </script>
 
 <style lang="postcss" scoped>
-    @import '../../css/conf';
+    @import '@/css/conf';
 
     .plugin-item {
         position: relative;
@@ -105,6 +106,12 @@
             top: -5px;
             left: 18.5px;
             z-index: 2;
+        }
+        &.canceled, &.waiting {
+            border-color: $warningColor;
+        }
+        &.pause {
+            border-color: $pauseColor;
         }
         &.warning {
             border-color: $warningColor;

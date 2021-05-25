@@ -25,10 +25,10 @@
         data () {
             return {
                 panels: [
-                    { label: 'Parsed YAML', name: 'parsedYaml' },
-                    { label: 'Original YAML', name: 'originYaml' }
+                    { label: 'Original YAML', name: 'originYaml' },
+                    { label: 'Parsed YAML', name: 'parsedYaml' }
                 ],
-                active: 'parsedYaml',
+                active: 'originYaml',
                 ymlObj: {}
             }
         },

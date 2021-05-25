@@ -29,7 +29,7 @@
                         :name="option">
                     </bk-option>
                 </bk-select>
-                <span class="filter-title">地区</span>
+                <span class="filter-title">Area</span>
                 <bk-select v-model="machine.zone" :loading="isLoading" behavior="simplicity" class="filter-select">
                     <bk-option v-for="option in zones"
                         :key="option.zoneName"
@@ -49,9 +49,9 @@
                     <section v-else class="agent-status-info">
                         <span class="agent-title">{{ agentStatus.hostname }}</span>
                         <span class="agent-os">
-                            <span class="title">Agent状态 :</span>
-                            <span>{{ agentStatus.status === 'UN_IMPORT_OK' ? '正常' : '异常' }}</span>
-                            <span class="title">操作系统 :</span>
+                            <span class="title">Agent Status :</span>
+                            <span>{{ agentStatus.status === 'UN_IMPORT_OK' ? 'normal' : 'abnormal' }}</span>
+                            <span class="title">Operating System :</span>
                             <span>{{ agentStatus.os }}</span>
                         </span>
                     </section>
@@ -69,8 +69,8 @@
             </section>
         </main>
 
-        <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">导入</bk-button>
-        <bk-button class="bottom-btn" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
+        <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">Import</bk-button>
+        <bk-button class="bottom-btn" @click="backToAgentList">Back to self-hosted agents listing</bk-button>
     </article>
 </template>
 
@@ -146,8 +146,8 @@
         },
 
         methods: {
-            backToPoolList () {
-                this.$router.back()
+            backToAgentList () {
+                this.$router.push({ name: 'agentList' })
             },
 
             getZoneList () {
@@ -192,8 +192,8 @@
                         const curNode = res.find((node) => (node.agentHashId === this.machine.agentId)) || {}
                         const params = [curNode.nodeHashId]
                         return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
-                            this.backToPoolList()
-                            this.$bkMessage({ theme: 'success', message: '导入成功' })
+                            this.backToAgentList()
+                            this.$bkMessage({ theme: 'success', message: 'Imported successfully' })
                         })
                     })
                 }).catch((err) => {

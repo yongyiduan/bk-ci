@@ -1,7 +1,7 @@
 <template>
-    <article class="build-detail-home" v-bkloading="{ isLoading }">
+    <article class="detail-home" v-bkloading="{ isLoading }">
         <section class="detail-header">
-            <build-status :status="buildDetail.status" class="header-icon"></build-status>
+            <i :class="[getIconClass(buildDetail.status), 'header-icon']"></i>
             <p class="detail-info">
                 <span class="info-title">
                     {{ buildDetail.commitMsg }}
@@ -14,21 +14,21 @@
                     <span class="info-item text-ellipsis">
                         <icon name="message" size="14"></icon>
                         {{ buildDetail.buildHistoryRemark || '--' }}
-                        <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark">
+                        <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark" confirm-text="confirm" cancel-text="cancel">
                             <div slot="content">
-                                <h3 class="mb10">修改备注</h3>
-                                <bk-input type="textarea" v-model="remark" placeholder="请输入备注" class="mb10"></bk-input>
+                                <h3 class="mb10">Edit notes</h3>
+                                <bk-input type="textarea" v-model="remark" placeholder="Please enter a note" class="mb10"></bk-input>
                             </div>
                             <bk-icon type="edit2" style="font-size: 18px;cursor:pointer" />
                         </bk-popconfirm>
                     </span>
                 </span>
                 <span class="info-data">
-                    <span class="info-item text-ellipsis"><icon name="commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
+                    <span class="info-item text-ellipsis text-link" @click="goToCommit(buildDetail.commitId)"><icon name="commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
                     <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
             </p>
-            <bk-button class="detail-button" @click="rebuild" :loading="isRebuilding">重新构建</bk-button>
+            <bk-button class="detail-button" @click="rebuild" :loading="isRebuilding">Re-build</bk-button>
         </section>
         <stages :stages="stageList" class="detail-stages"></stages>
     </article>
@@ -37,14 +37,13 @@
 <script>
     import { mapState } from 'vuex'
     import { pipelines } from '@/http'
-    import { preciseDiff, timeFormatter, commitIdFormatter, getbuildTypeIcon } from '@/utils'
+    import { preciseDiff, timeFormatter, commitIdFormatter, getbuildTypeIcon, goCommit } from '@/utils'
     import stages from '@/components/stages'
-    import buildStatus from '@/components/build-status'
+    import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
 
     export default {
         components: {
-            stages,
-            buildStatus
+            stages
         },
 
         filters: {
@@ -72,7 +71,7 @@
         },
 
         computed: {
-            ...mapState(['projectId']),
+            ...mapState(['projectId', 'projectInfo']),
 
             buildTypeIcon () {
                 return getbuildTypeIcon(this.buildDetail.objectKind)
@@ -142,13 +141,21 @@
                 clearTimeout(this.loopGetPipelineDetail.loopId)
                 this.loopGetPipelineDetail.loopId = setTimeout(this.loopGetPipelineDetail, 2000)
                 return this.getPipelineBuildDetail()
+            },
+
+            getIconClass (status) {
+                return [getPipelineStatusClass(status), ...getPipelineStatusCircleIconCls(status)]
+            },
+
+            goToCommit (commitId) {
+                goCommit(this.projectInfo.web_url, commitId)
             }
         }
     }
 </script>
 
 <style lang="postcss" scoped>
-    .build-detail-home {
+    .detail-home {
         background: #fff;
     }
     .detail-header {
@@ -158,7 +165,17 @@
         display: flex;
         align-items: flex-start;
         .header-icon {
+            width: 32px;
+            height: 32px;
             font-size: 32px;
+            margin-right: 8px;
+            line-height: 32px;
+            &.executing {
+                font-size: 14px;
+            }
+            &.icon-exclamation, &.icon-exclamation-triangle, &.icon-clock {
+                font-size: 24px;
+            }
         }
         .detail-info {
             flex: 1;

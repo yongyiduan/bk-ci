@@ -4,18 +4,19 @@
             :outer-border="false"
             :header-border="false"
             :header-cell-style="{ background: '#f1f2f3' }"
+            empty-text="No Data"
         >
-            <bk-table-column label="构件名称" width="220" prop="name" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="路径" prop="fullName" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="文件大小" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="仓库类型" width="150" prop="artifactoryType" :formatter="repoTypeFormatter" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="操作" width="150">
+            <bk-table-column label="Name" width="220" prop="name" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Path" prop="fullName" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Size" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Type" width="150" prop="artifactoryType" :formatter="repoTypeFormatter" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Operation" width="150">
                 <template slot-scope="props">
                     <bk-button text
                         @click="downLoadFile(props.row)"
                         :disabled="!hasPermission"
-                        v-bk-tooltips="{ content: '你没有该流水线的下载构件权限，无法下载', disabled: hasPermission }"
-                    >下载</bk-button>
+                        v-bk-tooltips="{ content: 'You do not have the permission to download components of the pipeline, and you cannot download', disabled: hasPermission }"
+                    >Download</bk-button>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -94,8 +95,8 @@
             },
             repoTypeFormatter (row, column, cellValue, index) {
                 const typeMap = {
-                    CUSTOM_DIR: '自定义仓库',
-                    PIPELINE: '流水线仓库'
+                    CUSTOM_DIR: 'Custom Artifactory',
+                    PIPELINE: 'Pipeline Artifactory'
                 }
                 return typeMap[cellValue]
             },

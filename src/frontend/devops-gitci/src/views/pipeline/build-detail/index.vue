@@ -1,6 +1,6 @@
 <template>
     <article class="build-detail-home">
-        <header class="build-detail-header">
+        <header class="build-detail-header section-box">
             <bk-breadcrumb class="header-bread" separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
@@ -12,7 +12,7 @@
                 </bk-tab-panel>
             </bk-tab>
         </header>
-        <router-view class="build-detail-main"></router-view>
+        <router-view class="build-detail-main section-box"></router-view>
     </article>
 </template>
 
@@ -23,10 +23,10 @@
         data () {
             return {
                 panels: [
-                    { label: '详情', name: 'buildDetail' },
-                    { label: '构件', name: 'buildArtifacts' },
-                    { label: '报告', name: 'buildReports' },
-                    { label: '配置', name: 'buildConfig' }
+                    { label: 'Build detail', name: 'buildDetail' },
+                    { label: 'Artifacts', name: 'buildArtifacts' },
+                    { label: 'Report', name: 'buildReports' },
+                    { label: 'Configuration', name: 'buildConfig' }
                 ],
                 active: 'buildDetail'
             }
@@ -62,12 +62,14 @@
 </script>
 
 <style lang="postcss" scoped>
+    .build-detail-home {
+        padding-left: 25px;
+    }
     .build-detail-header {
         background: #fff;
-        box-shadow: 0 2px 5px 0 rgba(51,60,72,0.03);
         .header-bread {
-            line-height: 41px;
-            padding: 0 25px;
+            line-height: 30px;
+            padding: 11px 25px 0;
         }
         .header-tab {
             /deep/ .bk-tab-header {
@@ -79,8 +81,8 @@
         }
     }
     .build-detail-main {
-        margin: 25px;
-        height: calc(100vh - 209px);
+        margin-top: 25px;
+        height: calc(100% - 116px);
         overflow: auto;
         background: #fff;
     }
