@@ -193,3 +193,7 @@ export function getbuildTypeIcon (buildType) {
     }
     return buildTypeIconMap[buildType] || 'well'
 }
+
+export function modifyHtmlTitle (title) {
+    document.title = title
+}

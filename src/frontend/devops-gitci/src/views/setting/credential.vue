@@ -12,6 +12,7 @@
             :height="tableHeight"
             @page-change="pageChange"
             @page-limit-change="pageLimitChange"
+            empty-text="No credential yet"
             class="credential-table"
         >
             <bk-table-column label="Code" prop="credentialId"></bk-table-column>

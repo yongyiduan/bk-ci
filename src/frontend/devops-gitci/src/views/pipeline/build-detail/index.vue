@@ -18,6 +18,8 @@
 
 <script>
     import { mapState } from 'vuex'
+    import { modifyHtmlTitle } from '@/utils'
+    import { pipelines } from '@/http'
 
     export default {
         data () {
@@ -33,7 +35,7 @@
         },
 
         computed: {
-            ...mapState(['curPipeline']),
+            ...mapState(['curPipeline', 'projectId']),
 
             navList () {
                 return [
@@ -53,9 +55,27 @@
             }
         },
 
+        created () {
+            this.setHtmlTitle()
+        },
+
         methods: {
             changeTab (name) {
                 this.$router.push({ name })
+            },
+
+            setHtmlTitle () {
+                const params = {
+                    pipelineId: this.$route.params.pipelineId,
+                    buildId: this.$route.params.buildId
+                }
+                return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
+                    const gitRequestEvent = res.gitRequestEvent || {}
+                    const title = gitRequestEvent.commitMsg + ' #' + this.$route.params.buildNum
+                    modifyHtmlTitle(title)
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
             }
         }
     }

@@ -22,6 +22,8 @@
 </template>
 
 <script>
+    import { modifyHtmlTitle } from '@/utils'
+
     export default {
         data () {
             return {
@@ -43,6 +45,10 @@
             }
         },
 
+        created () {
+            this.setHtmlTitle()
+        },
+
         methods: {
             initRoute (name) {
                 let settingIndex = 0
@@ -60,6 +66,12 @@
                         break
                 }
                 this.curSetting = this.settingList[settingIndex]
+            },
+
+            setHtmlTitle () {
+                const projectPath = decodeURIComponent((this.$route.hash || '').slice(1))
+                const title = projectPath + ' : Setting'
+                modifyHtmlTitle(title)
             },
 
             goToPage ({ name, params }) {

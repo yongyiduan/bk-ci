@@ -10,15 +10,15 @@
                 <span class="pipeline-status" v-if="!curPipeline.enabled">Disabled</span>
             </span>
             <opt-menu v-if="curPipeline.pipelineId">
-                <li @click="showTriggleBuild">Trigger build</li>
+                <li @click="showTriggleBuild" :class="{ disabled: !curPipeline.enabled }">Trigger build</li>
                 <li @click="togglePipelineEnable">{{ curPipeline.enabled ? 'Disable pipeline' : 'Enable pipeline' }}</li>
             </opt-menu>
         </header>
 
         <section class="main-body section-box">
             <section class="build-filter">
-                <bk-input v-model="filterData.commitMsg" class="filter-item" placeholder="Commit message"></bk-input>
-                <bk-input v-model="filterData.actor" class="filter-item" placeholder="Actor"></bk-input>
+                <bk-input v-model="filterData.commitMsg" class="filter-item w300" placeholder="Commit message"></bk-input>
+                <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="http://open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
                 <bk-select v-model="filterData[filter.id]" v-for="filter in filterList" :key="filter.id" class="filter-item" :placeholder="filter.placeholder" multiple :loading="isLoadingFilter">
                     <bk-option v-for="option in filter.data"
                         :key="option.id"
@@ -32,6 +32,8 @@
             <bk-table :data="buildList"
                 :header-cell-style="{ background: '#fafbfd' }"
                 :height="tableHeight"
+                :outer-border="false"
+                :header-border="false"
                 v-bkloading="{ isLoading }"
                 @row-click="goToBuildDetail"
                 class="build-table"
@@ -64,8 +66,11 @@
                 <bk-table-column width="150" class-name="handler-btn">
                     <template slot-scope="props">
                         <opt-menu>
-                            <li @click="cancelBuild(props.row)" v-if="['RUNNING', 'PREPARE_ENV', 'QUEUE', 'LOOP_WAITING', 'CALL_WAITING'].includes(props.row.buildHistory.status)">Cancel build</li>
-                            <li @click="rebuild(props.row)" v-else>Re-build</li>
+                            <li @click="cancelBuild(props.row)"
+                                v-if="['RUNNING', 'PREPARE_ENV', 'QUEUE', 'LOOP_WAITING', 'CALL_WAITING'].includes(props.row.buildHistory.status)"
+                                :class="{ disabled: !curPipeline.enabled }"
+                            >Cancel build</li>
+                            <li @click="rebuild(props.row)" v-else :class="{ disabled: !curPipeline.enabled }">Re-build</li>
                         </opt-menu>
                     </template>
                 </bk-table-column>
@@ -121,15 +126,17 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
-    import { goYaml, preciseDiff, timeFormatter } from '@/utils'
+    import { goYaml, preciseDiff, timeFormatter, modifyHtmlTitle } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
+    import BkUserSelector from '@blueking/user-selector'
 
     export default {
         components: {
             optMenu,
-            codeSection
+            codeSection,
+            BkUserSelector
         },
 
         filters: {
@@ -152,7 +159,7 @@
                 },
                 filterData: {
                     commitMsg: '',
-                    actor: '',
+                    triggerUser: [],
                     branch: [],
                     event: [],
                     status: []
@@ -197,7 +204,7 @@
             ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectInfo']),
 
             tableHeight () {
-                return Math.min(this.appHeight - 331, 43 + (this.buildList.length || 3) * 72)
+                return Math.min(this.appHeight - 306, 43 + (this.buildList.length || 3) * 72)
             }
         },
 
@@ -220,6 +227,7 @@
 
         created () {
             this.loopGetList()
+            this.setHtmlTitle()
         },
 
         beforeDestroy () {
@@ -228,6 +236,11 @@
 
         methods: {
             ...mapActions(['setCurPipeline']),
+
+            setHtmlTitle () {
+                const projectPath = (this.$route.hash || '').slice(1)
+                modifyHtmlTitle(decodeURIComponent(projectPath))
+            },
 
             getIconClass (status) {
                 return [getPipelineStatusClass(status), ...getPipelineStatusCircleIconCls(status)]
@@ -258,7 +271,7 @@
             cleanFilterData () {
                 this.filterData = {
                     commitMsg: '',
-                    actor: '',
+                    triggerUser: [],
                     branch: [],
                     event: [],
                     status: []
@@ -290,7 +303,6 @@
                     page: this.compactPaging.current,
                     pageSize: this.compactPaging.limit,
                     pipelineId: this.curPipeline.pipelineId,
-                    triggerUser: this.filterData.actor.split(';').filter(v => v),
                     ...this.filterData
                 }
                 return pipelines.getPipelineBuildList(this.projectId, params).then((res = {}) => {
@@ -343,6 +355,8 @@
             },
 
             showTriggleBuild () {
+                if (!this.curPipeline.enabled) return
+
                 this.showTriggle = true
                 this.getPipelineBranches()
             },
@@ -420,6 +434,8 @@
             },
 
             cancelBuild (row) {
+                if (!this.curPipeline.enabled) return
+
                 this.clickEmpty()
                 pipelines.cancelBuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
                     this.getBuildData()
@@ -436,6 +452,8 @@
             },
 
             rebuild (row) {
+                if (!this.curPipeline.enabled) return
+
                 this.clickEmpty()
                 pipelines.rebuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
                     this.getBuildData()
@@ -480,7 +498,7 @@
             resetFilter () {
                 this.filterData = {
                     commitMsg: '',
-                    actor: '',
+                    triggerUser: [],
                     branch: [],
                     event: [],
                     status: []
@@ -543,7 +561,7 @@
             margin-top: 18px;
             height: calc(100% - 82px);
             background: #fff;
-            padding: 16px 24px 22px;
+            padding: 16px 24px 0;
             .build-filter {
                 display: flex;
                 align-items: center;
@@ -552,9 +570,15 @@
                     width: 200px;
                     margin-right: 8px;
                 }
+                .w300 {
+                    width: 300px;
+                }
+                /deep/ .user-selector-container {
+                    z-index: 5;
+                }
             }
             .build-paging {
-                margin: 12px 0 0;
+                margin: 6px 0 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;

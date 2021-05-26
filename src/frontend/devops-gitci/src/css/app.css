@@ -34,6 +34,9 @@
         display: flex;
         align-items: center;
         max-width: 240px;
+        &.disabled {
+            background: #F5F7FA;
+        }
         &.active {
             background: #e0ecff;
             color: #3c96ff;
@@ -124,4 +127,8 @@
 .section-box {
     box-shadow: 1px 2px 3px 0 rgb(0 0 0 / 5%);
     border: none;
+}
+
+.w200 {
+    width: 200px !important;
 }

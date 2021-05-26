@@ -8,8 +8,8 @@
             </h5>
 
             <opt-menu v-if="editable">
-                <li @click="goToAgentList">Node list</li>
-                <li @click="showDelete = true">Delete</li>
+                <li @click="goToAgentList">Self-hosted Agents</li>
+                <li @click="showDelete = true">Delete Agent Pool</li>
             </opt-menu>
         </header>
 

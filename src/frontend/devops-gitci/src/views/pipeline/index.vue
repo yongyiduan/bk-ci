@@ -10,7 +10,7 @@
                 <li v-for="(pipeline, index) in pipelineList"
                     :key="index"
                     @click="choosePipeline(pipeline)"
-                    :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId }"
+                    :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
                 >
                     <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
                     <span class="text-ellipsis item-text" v-bk-overflow-tips>{{ pipeline.displayName }}</span>
@@ -23,7 +23,7 @@
         <bk-sideslider @hidden="hidden" :is-show.sync="isShowAddYml" :quick-close="true" :width="622" title="New pipeline">
             <bk-form :model="yamlData" ref="yamlForm" slot="content" class="yaml-form" form-type="vertical">
                 <bk-form-item label="Name" :rules="[requireRule('Name'), nameRule]" :required="true" property="file_name" error-display-type="normal">
-                    <bk-compose-form-item>
+                    <bk-compose-form-item class="yaml-name-container">
                         <bk-input value=".ci / " disabled class="yaml-path"></bk-input>
                         <bk-input v-model="yamlData.file_name" class="yaml-name" placeholder="Please input yaml name"></bk-input>
                     </bk-compose-form-item>
@@ -92,6 +92,10 @@
 
         created () {
             this.initList()
+        },
+
+        beforeDestroy () {
+            clearTimeout(this.loopGetPipelineList.loopId)
         },
 
         methods: {
@@ -221,7 +225,8 @@
     }
     .nav-title {
         justify-content: space-between;
-        padding: 0 12px 0 20px;
+        margin: 0 12px 10px 20px;
+        padding: 10px 0;
         font-size: 16px;
     }
     .pipelines-main {
@@ -234,8 +239,11 @@
         .yaml-path {
             width: 50px;
         }
-        .yaml-name {
-            width: 512px;
+        .yaml-name-container {
+            width: 100%;
+            .yaml-name {
+                width: calc(100% - 50px);
+            }
         }
         /deep/ button {
             margin: 8px 10px 0 0;

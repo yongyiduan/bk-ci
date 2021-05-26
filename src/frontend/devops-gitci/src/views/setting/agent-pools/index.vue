@@ -7,7 +7,7 @@
 
         <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 370 }">
             Self-hosted agent pools
-            <bk-button @click="showAddPool" class="add-pool" theme="primary" size="small">Add Pool</bk-button>
+            <bk-button @click="showAddPool" class="add-pool" theme="primary" size="small" v-if="thirdPools.length">Add Pool</bk-button>
         </h3>
         <section class="agent-pools-container" v-bkloading="{ isLoading: isLoadingThirdPools }">
             <agent-pool-card class="agent-pool" @refresh="getThirdPool" v-for="pool in thirdPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>

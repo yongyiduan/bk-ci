@@ -40,6 +40,14 @@
                     background: #e1ecff;
                     color: #3a84ff;
                 }
+                &.disabled {
+                    cursor: not-allowed;
+                    background: #f5f7fa;
+                    &:hover {
+                        color: #7b7d8a;
+                        background: #f5f7fa;
+                    }
+                }
             }
         }
     }

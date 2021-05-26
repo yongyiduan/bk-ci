@@ -30,7 +30,7 @@
         </template>
         <span class="bk-table-empty-text" v-if="!isLoading && reportList.length <= 0">
             <i class="bk-table-empty-icon bk-icon icon-empty"></i>
-            <div>No Data</div>
+            <div>No reports yet</div>
         </span>
     </article>
 </template>

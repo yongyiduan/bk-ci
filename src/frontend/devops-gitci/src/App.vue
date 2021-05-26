@@ -6,7 +6,7 @@
                 <span class="ci-name">Tencent CI</span>
                 <template v-if="$route.hash">
                     <icon name="git" size="18" class="gray-icon"></icon>
-                    <span class="git-project-path">{{ `${decodeURIComponent(($route.hash || '').slice(1))}` }}</span>
+                    <span class="git-project-path" @click="goToCode">{{ decodeURIComponent(($route.hash || '').slice(1)) }}</span>
                     <icon name="setting" size="18" :class="computedIconClass" @click.native="goToSetting"></icon>
                 </template>
             </span>
@@ -19,10 +19,11 @@
                         <i class="bk-icon icon-down-shape"></i>
                     </div>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
-                        <li :class="{ unread: messageNum > 0 }"><a href="javascript:;" @click="goToNotifications">通知</a></li>
-                        <li><a href="javascript:;" @click="goLogin">退出</a></li>
+                        <li :class="{ unread: messageNum > 0 }"><a href="javascript:;" @click="goToNotifications">Notifications</a></li>
+                        <li><a href="javascript:;" @click="goLogin">Login Out</a></li>
                     </ul>
                 </bk-dropdown-menu>
+                <a href="https://iwiki.woa.com/x/klPpK" target="_blank"><i class="bk-icon icon-question-circle-shape"></i></a>
             </section>
         </header>
 
@@ -49,7 +50,7 @@
         },
 
         computed: {
-            ...mapState(['exceptionInfo']),
+            ...mapState(['exceptionInfo', 'projectInfo']),
 
             computedIconClass () {
                 const name = this.$route.name
@@ -145,6 +146,10 @@
 
             goToNotifications () {
                 this.$router.push({ name: 'notifications' })
+            },
+
+            goToCode () {
+                window.open(this.projectInfo.web_url, '_blank')
             }
         }
     }
@@ -157,7 +162,7 @@
         overflow: hidden;
         font-size: 14px;
         color: #7b7d8a;
-        background: #f5f6fa;
+        background: #f5f5f5;
         font-family: -apple-system,PingFang SC,BlinkMacSystemFont,Microsoft YaHei,Helvetica Neue,Arial;
         ::-webkit-scrollbar-thumb {
             background-color: #c4c6cc !important;
@@ -195,6 +200,7 @@
                 display: inline-block;
                 margin: 0 8px;
                 color: #f5f7fa;
+                cursor: pointer;
             }
             .setting {
                 cursor: pointer;
@@ -244,6 +250,14 @@
             width: 25px;
             height: 25px;
             border-radius: 100px;
+            margin-right: 5px;
+        }
+        a {
+            color: #fff;
+        }
+        .icon-question-circle-shape {
+            cursor: pointer;
+            margin-left: 12px;
         }
     }
 </style>

@@ -17,14 +17,14 @@
                         <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark" confirm-text="confirm" cancel-text="cancel">
                             <div slot="content">
                                 <h3 class="mb10">Edit notes</h3>
-                                <bk-input type="textarea" v-model="remark" placeholder="Please enter a note" class="mb10"></bk-input>
+                                <bk-input type="textarea" v-model="remark" placeholder="Please enter a note" class="mb10 w200"></bk-input>
                             </div>
                             <bk-icon type="edit2" style="font-size: 18px;cursor:pointer" />
                         </bk-popconfirm>
                     </span>
                 </span>
                 <span class="info-data">
-                    <span class="info-item text-ellipsis text-link" @click="goToCommit(buildDetail.commitId)"><icon name="commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
+                    <span :class="['info-item', 'text-ellipsis', { 'text-link': buildDetail.commitId }]" @click="goToCommit(buildDetail.commitId)"><icon name="commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
                     <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
             </p>

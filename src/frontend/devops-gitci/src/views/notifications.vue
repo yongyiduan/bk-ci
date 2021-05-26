@@ -9,7 +9,12 @@
                 <li v-for="nav in navList"
                     :key="nav.name"
                     :class="{ 'nav-item': true, active: curNav.name === nav.name }"
-                ><icon :name="nav.icon" size="18"></icon>{{ nav.label }}</li>
+                >
+                    <icon :name="nav.icon" size="18"></icon>
+                    <bk-badge :val="unreadNum" theme="danger" position="right">
+                        <span class="mr10">{{ nav.label }}</span>
+                    </bk-badge>
+                </li>
             </ul>
         </aside>
 
@@ -49,7 +54,7 @@
                 </li>
             </ul>
 
-            <bk-exception class="exception-wrap-item exception-part" type="empty" v-if="notificationList.length <= 0"></bk-exception>
+            <bk-exception class="exception-wrap-item exception-part" type="empty" v-if="notificationList.length <= 0">{{ onlyUnread ? 'No unread notifications' : 'No notifications' }}</bk-exception>
 
             <bk-pagination small
                 :current.sync="compactPaging.current"
@@ -80,7 +85,8 @@
                 curNav: { name: 'inbox' },
                 notificationList: [],
                 onlyUnread: false,
-                isLoading: false
+                isLoading: false,
+                unreadNum: 0
             }
         },
 
@@ -92,6 +98,7 @@
 
         created () {
             this.getMessages()
+            this.getUnreadNum()
         },
 
         methods: {
@@ -118,6 +125,7 @@
             readAll () {
                 notifications.readAllMessages().then(() => {
                     this.getMessages()
+                    this.getUnreadNum()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
@@ -127,10 +135,19 @@
                 if (!message.haveRead) {
                     notifications.readMessage(message.id).then(() => {
                         message.haveRead = true
+                        this.getUnreadNum()
                     }).catch((err) => {
                         this.$bkMessage({ theme: 'error', message: err.message || err })
                     })
                 }
+            },
+
+            getUnreadNum () {
+                return notifications.getUnreadNotificationNum().then((res) => {
+                    this.unreadNum = res || 0
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
             },
 
             pageChange (page) {
@@ -174,6 +191,7 @@
             }
             .notification-time {
                 border: 1px solid #f5f6fa;
+                margin-bottom: 25px;
                 .notification-item-header {
                     display: block;
                     line-height: 40px;
@@ -203,6 +221,11 @@
                     background: #ff5656;
                 }
             }
+        }
+        /deep/ .bk-badge {
+            display: inline-block;
+            margin-left: 15px;
+            line-height: 14px;
         }
     }
     .notify-paging {

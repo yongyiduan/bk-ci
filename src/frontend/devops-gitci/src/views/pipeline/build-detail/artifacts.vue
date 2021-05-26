@@ -4,7 +4,7 @@
             :outer-border="false"
             :header-border="false"
             :header-cell-style="{ background: '#f1f2f3' }"
-            empty-text="No Data"
+            empty-text="No artifacts yet"
         >
             <bk-table-column label="Name" width="220" prop="name" show-overflow-tooltip></bk-table-column>
             <bk-table-column label="Path" prop="fullName" show-overflow-tooltip></bk-table-column>
