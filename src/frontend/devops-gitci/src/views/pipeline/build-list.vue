@@ -19,11 +19,19 @@
             <section class="build-filter">
                 <bk-input v-model="filterData.commitMsg" class="filter-item w300" placeholder="Commit message"></bk-input>
                 <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="http://open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
-                <bk-select v-model="filterData.branch" class="filter-item" placeholder="Branch" multiple :loading="isLoadingFilter">
+                <bk-select v-model="filterData.branch"
+                    class="filter-item"
+                    placeholder="Branch"
+                    multiple
+                    searchable
+                    :loading="isLoadingFilter"
+                    :remote-method="remoteGetBranchList"
+                    @toggle="toggleFilterBranch"
+                >
                     <bk-option v-for="option in branchList"
-                        :key="option.branchName"
-                        :id="option.branchName"
-                        :name="option.branchName">
+                        :key="option"
+                        :id="option"
+                        :name="option">
                     </bk-option>
                 </bk-select>
                 <bk-select v-model="filterData[filter.id]" v-for="filter in filterList" :key="filter.id" class="filter-item" :placeholder="filter.placeholder" multiple>
@@ -133,7 +141,7 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
-    import { goYaml, preciseDiff, timeFormatter, modifyHtmlTitle } from '@/utils'
+    import { goYaml, preciseDiff, timeFormatter, modifyHtmlTitle, debounce } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
@@ -257,14 +265,24 @@
                 return [getPipelineStatusClass(status), ...getPipelineStatusCircleIconCls(status)]
             },
 
-            getBranchList () {
-                this.isLoadingFilter = true
-                pipelines.getPipelineBuildBranchList(this.projectId).then((branchInfo = {}) => {
-                    this.branchList = branchInfo.records || []
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoadingFilter = false
+            toggleFilterBranch (isOpen) {
+                if (isOpen) {
+                    this.isLoadingFilter = true
+                    this.getPipelineBranchApi().then((branchList) => {
+                        this.branchList = branchList
+                        this.isLoadingFilter = false
+                    })
+                }
+            },
+
+            remoteGetBranchList (search) {
+                return new Promise((resolve) => {
+                    debounce(() => {
+                        this.getPipelineBranchApi({ search }).then((branchList) => {
+                            this.branchList = branchList
+                            resolve()
+                        })
+                    })
                 })
             },
 
@@ -358,23 +376,27 @@
                 if (!this.curPipeline.enabled) return
 
                 this.showTriggle = true
-                this.getPipelineBranches()
+                this.isLoadingBranch = true
+                this.getPipelineBranchApi().then((branchList) => {
+                    this.triggerBranches = branchList
+                    this.isLoadingBranch = false
+                })
             },
 
-            getPipelineBranches (query = {}) {
+            getPipelineBranchApi (query = {}) {
                 const params = {
                     page: 1,
                     perPage: 100,
                     projectId: this.projectId,
                     ...query
                 }
-                this.isLoadingBranch = true
-                return pipelines.getPipelineBranches(params).then((res) => {
-                    this.triggerBranches = res || []
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoadingBranch = false
+                return new Promise((resolve, reject) => {
+                    pipelines.getPipelineBranches(params).then((res) => {
+                        resolve(res || [])
+                    }).catch((err) => {
+                        resolve()
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    })
                 })
             },
 

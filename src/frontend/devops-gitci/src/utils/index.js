@@ -197,3 +197,8 @@ export function getbuildTypeIcon (buildType) {
 export function modifyHtmlTitle (title) {
     document.title = title
 }
+
+export function debounce (callBack, eachCallBack) {
+    window.clearTimeout(debounce.timeId)
+    debounce.timeId = window.setTimeout(callBack, 200)
+}
