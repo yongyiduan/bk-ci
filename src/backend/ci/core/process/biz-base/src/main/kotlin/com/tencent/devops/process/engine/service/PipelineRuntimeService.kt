@@ -993,6 +993,8 @@ class PipelineRuntimeService @Autowired constructor(
                             lastTimeBuildContainerRecords.forEach {
                                 if (it.containerId == container.id) { // #958 在Element.initStatus 位置确认重试插件
                                     it.status = BuildStatus.QUEUE.ordinal
+                                    it.startTime = null
+                                    it.endTime = null
                                     it.executeCount += 1
                                     updateContainerExistsRecord.add(it)
                                     return@findHistoryContainer
@@ -1063,6 +1065,8 @@ class PipelineRuntimeService @Autowired constructor(
                         lastTimeBuildStageRecords.forEach {
                             if (it.stageId == stage.id!!) {
                                 it.status = BuildStatus.QUEUE.ordinal
+                                it.startTime = null
+                                it.endTime = null
                                 it.executeCount += 1
                                 updateStageExistsRecord.add(it)
                                 return@findHistoryStage
@@ -1110,6 +1114,7 @@ class PipelineRuntimeService @Autowired constructor(
                     variables = buildVariables
                 )
                 if (buildHistoryRecord != null) {
+                    buildHistoryRecord.endTime = null
                     buildHistoryRecord.status = startBuildStatus.ordinal
                     transactionContext.batchStore(buildHistoryRecord).execute()
                     // 重置状态和人
@@ -1193,7 +1198,7 @@ class PipelineRuntimeService @Autowired constructor(
                         )
                     }
                     // 设置流水线每日构建次数
-                    pipelineSettingService.setCurrentDayBuildCount(pipelineId)
+                    pipelineSettingService.setCurrentDayBuildCount(transactionContext, pipelineId)
                 }
 
                 // 保存链路信息
@@ -1459,6 +1464,8 @@ class PipelineRuntimeService @Autowired constructor(
         container: Container,
         atomElement: Element?
     ) {
+        target.startTime = null
+        target.endTime = null
         target.executeCount = retryCount + 1 // 执行次数增1
         target.status = BuildStatus.QUEUE.ordinal // 进入排队状态
         stage.status = null

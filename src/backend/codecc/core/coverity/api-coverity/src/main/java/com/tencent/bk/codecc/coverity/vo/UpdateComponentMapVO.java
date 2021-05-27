@@ -1,9 +1,9 @@
 /*
- * Tencent is pleased to support the open source community by making BK-CODECC 蓝鲸代码检查平台 available.
+ * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
  *
  * Copyright (C) 2019 THL A29 Limited, a Tencent company.  All rights reserved.
  *
- * BK-CODECC 蓝鲸代码检查平台 is licensed under the MIT license.
+ * BK-CI 蓝鲸持续集成平台 is licensed under the MIT license.
  *
  * A copy of the MIT License is included in this file.
  *
@@ -24,6 +24,31 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+<<<<<<< HEAD:src/backend/ci/ext/blueking/common/common-auth/common-auth-blueking/src/main/kotlin/com/tencent/devops/common/auth/api/pojo/BkDeleteResourceAuthResponse.kt
+package com.tencent.devops.common.auth.api.pojo
+
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.tencent.devops.common.api.util.JsonUtil
+
+data class BkDeleteResourceAuthResponse(
+    val code: Int, // 0
+    val data: Data?,
+    val message: String?,
+    @JsonProperty("request_id")
+    val requestId: String?, // 32655832876747a5b5edc55d83ac6fdf
+    val result: Boolean // true
+) {
+    data class Data(
+        @get:JsonProperty("is_deleted")
+        val deleted: Boolean? // true
+    )
+}
+
+fun main(array: Array<String>) {
+    val d = BkDeleteResourceAuthResponse.Data(true)
+    println(JsonUtil.toJson(d))
+}
+=======
 package com.tencent.bk.codecc.coverity.vo;
 
 import io.swagger.annotations.ApiModel;
@@ -54,3 +79,4 @@ public class UpdateComponentMapVO
     @ApiModelProperty(value = "屏蔽路径列表")
     private List<String> pathList;
 }
+>>>>>>> github/master:src/backend/codecc/core/coverity/api-coverity/src/main/java/com/tencent/bk/codecc/coverity/vo/UpdateComponentMapVO.java

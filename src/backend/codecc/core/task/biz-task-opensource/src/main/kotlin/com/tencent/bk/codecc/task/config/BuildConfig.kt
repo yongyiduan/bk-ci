@@ -30,6 +30,26 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
+<<<<<<< HEAD:src/backend/ci/ext/blueking/common/common-auth/common-auth-blueking/src/main/kotlin/com/tencent/devops/common/auth/AuthProperties.kt
+class AuthProperties {
+    @Value("\${auth.idProvider:#{null}}")
+    val idProvider: String? = null
+    @Value("\${auth.grantType:#{null}}")
+    val grantType: String? = null
+    @Value("\${auth.principalType:#{null}}")
+    val principalType: String? = null
+    @Value("\${auth.envName:#{null}}")
+    val envName: String? = null
+    @Value("\${auth.url:#{null}}")
+    val url: String? = null
+    @Value("\${auth.appCode:#{null}}")
+    val appCode: String? = null
+    @Value("\${auth.appSecret:#{null}}")
+    val appSecret: String? = null
+
+    @Value("\${auth.bkloginUrl:#{null}}")
+    val bkloginUrl: String? = null
+=======
 class BuildConfig {
 
     @Value("\${codeCC.clientImage:#{null}}")
@@ -73,4 +93,5 @@ class BuildConfig {
 
     @Value("\${devCloud.url:#{null}}")
     val devCloudUrl: String = ""
+>>>>>>> github/master:src/backend/codecc/core/task/biz-task-opensource/src/main/kotlin/com/tencent/bk/codecc/task/config/BuildConfig.kt
 }

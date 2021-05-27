@@ -1,0 +1,329 @@
+<template>
+    <article class="add-agent-home">
+        <header class="add-agent-head">
+            <bk-breadcrumb>
+                <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
+            </bk-breadcrumb>
+        </header>
+
+        <main class="add-agent-body">
+            <h3 class="agent-tips">
+                <span>Adding a self-hosted agent requires that you download and install the agent.</span>
+                <bk-link theme="primary" href="https://iwiki.woa.com/x/2ebDKw" target="_blank">Learn more about self-hosted agents</bk-link>
+            </h3>
+
+            <section class="agent-filter">
+                <span class="filter-title">System</span>
+                <bk-select @change="getZoneList" v-model="machine.system" :loading="isLoading" behavior="simplicity" class="filter-select">
+                    <bk-option v-for="option in operateSystems"
+                        :key="option.id"
+                        :id="option.id"
+                        :name="option.name">
+                    </bk-option>
+                </bk-select>
+                <span class="filter-title">Architecture</span>
+                <bk-select v-model="machine.architecture" behavior="simplicity" class="filter-select">
+                    <bk-option v-for="option in architectures"
+                        :key="option"
+                        :id="option"
+                        :name="option">
+                    </bk-option>
+                </bk-select>
+                <span class="filter-title">地区</span>
+                <bk-select v-model="machine.zone" :loading="isLoading" behavior="simplicity" class="filter-select">
+                    <bk-option v-for="option in zones"
+                        :key="option.zoneName"
+                        :id="option.zoneName"
+                        :name="option.showName"
+                        @click.native="getThirdAgentLink">
+                    </bk-option>
+                </bk-select>
+            </section>
+
+            <section class="agent-info use-tip">
+                <section v-html="computedHtml"></section>
+
+                <h3>Refresh to confirm</h3>
+                <p v-bkloading="{ isLoading: isRefresh }" class="agent-status">
+                    <bk-button text @click="getAgentStatus" v-if="agentStatus.status === 'UN_IMPORT'" class="agent-refresh">Click to show the agent</bk-button>
+                    <section v-else class="agent-status-info">
+                        <span class="agent-title">{{ agentStatus.hostname }}</span>
+                        <span class="agent-os">
+                            <span class="title">Agent状态 :</span>
+                            <span>{{ agentStatus.status === 'UN_IMPORT_OK' ? '正常' : '异常' }}</span>
+                            <span class="title">操作系统 :</span>
+                            <span>{{ agentStatus.os }}</span>
+                        </span>
+                    </section>
+                </p>
+            </section>
+
+            <h3 class="self-hosted-agent">Using your self-hosted agent</h3>
+            <section class="agent-info">
+                <h3>Using by pool</h3>
+                <p>
+                    <span class="gray"># Use this YAML in your piepline file for each job</span>
+                    <span class="block">runs-on:</span>
+                    <span class="block">&nbsp;&nbsp;self-hosted: true</span>
+                    <span class="block">&nbsp;&nbsp;pool-name: my_pool_name</span>
+                </p>
+            </section>
+
+            <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">导入</bk-button>
+            <bk-button class="bottom-btn" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
+        </main>
+    </article>
+</template>
+
+<script>
+    import { setting } from '@/http'
+    import { mapState } from 'vuex'
+
+    export default {
+        data () {
+            return {
+                operateSystems: [
+                    { id: 'MACOS', name: 'macOS' },
+                    { id: 'LINUX', name: 'Linux' },
+                    { id: 'WINDOWS', name: 'Windows' }
+                ],
+                navList: [
+                    { link: { name: 'agentPools' }, title: 'Agent Pools' },
+                    { link: { name: 'agentList' }, title: 'Agent List' },
+                    { link: '', title: 'Add Agent' }
+                ],
+                architectures: ['x64'],
+                zones: [],
+                machine: {
+                    system: 'MACOS',
+                    architecture: 'x64',
+                    zone: '',
+                    link: '',
+                    agentId: ''
+                },
+                agentStatus: {
+                    hostname: '',
+                    ip: '',
+                    os: '',
+                    status: 'UN_IMPORT'
+                },
+                isLoading: false,
+                isRefresh: false,
+                isAdding: false
+            }
+        },
+
+        computed: {
+            ...mapState(['projectId']),
+
+            computedHtml () {
+                const unixHtml = `
+                    <h3>Download & Install</h3>
+                    <p>
+                        <span class="gray"># Create a folder</span>
+                        <span class="mb10">$ mkdir /data/landun && cd  /data/landun</span>
+                        <span class="gray"># Download and install the latest agent package</span>
+                        <span class="mb10">${this.machine.link}</span>
+                        <span class="gray"># Run it!</span>
+                        <span>$ cd landun_devops_agent && ./install.sh </span>
+                    </p>
+                `
+                const windowHtml = `
+                    <h3>Download & Install</h3>
+                    <p>
+                        <span class="mb10">1. Download the latest agent<a href="${this.machine.link}" target="_blank">Click here to download agent</a></span>
+                        <span class="mb10">2. Create a folder, such as C:\\data\\landun</span>
+                        <span class="mb10">3. Extract the installer to C:\\data\\landun</span>
+                        <span class="mb10">4. Execute install.bat by administrator</span>
+                        <span class="mb10">5. In order to read user environment, please change the setup user from system to the login user, such as tencent\\zhangsan<a href="https://iwiki.woa.com/x/ZNMrAg" target="_blank">Learn more</a></span>
+                    </p>
+                `
+                return this.machine.system === 'WINDOWS' ? windowHtml : unixHtml
+            }
+        },
+
+        created () {
+            this.getZoneList()
+        },
+
+        methods: {
+            backToPoolList () {
+                this.$router.back()
+            },
+
+            getZoneList () {
+                this.isLoading = true
+                setting.getThirdAgentZoneList(this.projectId, this.machine.system).then((res) => {
+                    this.zones = res || []
+                    this.machine.zone = (this.zones[0] || {}).zoneName
+                    return this.getThirdAgentLink()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            getThirdAgentLink () {
+                return setting.getThirdAgentLink(this.projectId, this.machine.system, this.machine.zone).then((res) => {
+                    const data = res || {}
+                    this.machine.link = data.link
+                    this.machine.agentId = data.agentId
+                    return this.getAgentStatus()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
+            },
+
+            getAgentStatus () {
+                this.isRefresh = true
+                return setting.getThirdAgentStatus(this.projectId, this.machine.agentId).then((res) => {
+                    this.agentStatus = res || {}
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isRefresh = false
+                })
+            },
+
+            importNode () {
+                this.isAdding = true
+                setting.addNodeToSystem(this.projectId, this.machine.agentId).then(() => {
+                    return setting.getNodeList(this.projectId).then((res) => {
+                        const curNode = res.find((node) => (node.agentHashId === this.machine.agentId)) || {}
+                        const params = [curNode.nodeHashId]
+                        return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
+                            this.$bkMessage({ theme: 'success', message: '导入成功' })
+                        })
+                    })
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isAdding = false
+                })
+            }
+        }
+    }
+</script>
+
+<style lang="postcss" scoped>
+    .add-agent-head {
+        height: 49px;
+        line-height: 49px;
+        background: #fff;
+        box-shadow: 0 2px 5px 0 rgba(51,60,72,0.03);
+        padding: 0 25.5px;
+    }
+    .add-agent-body {
+        padding: 16px 25px;
+        overflow-y: auto;
+        max-height: calc(100vh - 108px);
+        .agent-tips {
+            line-height: 20px;
+            font-size: 14px;
+            color: #313328;
+            a {
+                margin-left: 12px;
+            }
+        }
+        .agent-filter {
+            background: #fff;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 19px;
+            margin-top: 16px;
+            .filter-title {
+                color: #7b7d8a;
+                display: inline-block;
+                margin-right: 8px;
+            }
+            .filter-select {
+                width: 160px;
+                margin-right: 32px;
+                /deep/ .bk-select-name {
+                    font-weight: bold;
+                    color: #313328;
+                }
+            }
+        }
+        .use-tip {
+            margin-top: 16px;
+        }
+        .self-hosted-agent {
+            margin: 24px 0 10px;
+            color: #313328;
+        }
+        .agent-info {
+            background: #fff;
+            overflow: hidden;
+            /deep/ h3 {
+                color: #313328;
+                margin: 17px 0 0 20px;
+            }
+            /deep/ p {
+                margin: 8.6px 20px 24px;
+                background: #fafbfd;
+                border: 1px solid #e1e3e9;
+                padding: 12px;
+                line-height: 17px;
+                font-size: 12px;
+                color: #7b7d8a;
+                .gray {
+                    color: #979ba5;
+                    display: block;
+                    margin-bottom: 4px;
+                }
+                .mb10 {
+                    display: block;
+                    margin-bottom: 10px;
+                    a {
+                        color: #3a84ff;
+                        margin-left: 10px;
+                    }
+                }
+                .block {
+                    display: block;
+                }
+            }
+            .agent-status {
+                min-height: 60px;
+                .agent-refresh {
+                    width: 100%;
+                    height: 100%;
+                }
+                .agent-status-info {
+                    color: #63656e;
+                    .agent-title {
+                        font-size: 14px;
+                        line-height: 20px;
+                        display: block;
+                        margin-bottom: 5px;
+                    }
+                    .agent-os {
+                        display: flex;
+                        align-items: center;
+                        font-size: 12px;
+                        .title {
+                            color: #979ba5;
+                            display: inline-block;
+                            margin: 0 7px 0 20px;
+                            &:first-child {
+                                margin-left: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .bottom-btn {
+            margin: 24px 0;
+            +button {
+                margin-left: 15px;
+            }
+        }
+    }
+    /deep/ .bk-link-text {
+        font-size: 12px;
+    }
+</style>
