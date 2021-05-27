@@ -19,7 +19,14 @@
             <section class="build-filter">
                 <bk-input v-model="filterData.commitMsg" class="filter-item w300" placeholder="Commit message"></bk-input>
                 <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="http://open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
-                <bk-select v-model="filterData[filter.id]" v-for="filter in filterList" :key="filter.id" class="filter-item" :placeholder="filter.placeholder" multiple :loading="isLoadingFilter">
+                <bk-select v-model="filterData.branch" class="filter-item" placeholder="Branch" multiple :loading="isLoadingFilter">
+                    <bk-option v-for="option in branchList"
+                        :key="option.branchName"
+                        :id="option.branchName"
+                        :name="option.branchName">
+                    </bk-option>
+                </bk-select>
+                <bk-select v-model="filterData[filter.id]" v-for="filter in filterList" :key="filter.id" class="filter-item" :placeholder="filter.placeholder" multiple>
                     <bk-option v-for="option in filter.data"
                         :key="option.id"
                         :id="option.id"
@@ -164,21 +171,26 @@
                     event: [],
                     status: []
                 },
+                branchList: [],
                 filterList: [
-                    {
-                        id: 'branch',
-                        placeholder: 'Branch',
-                        data: []
-                    },
                     {
                         id: 'event',
                         placeholder: 'Event',
-                        data: []
+                        data: [
+                            { name: 'Push', id: 'PUSH' },
+                            { name: 'Tag push', id: 'TAG' },
+                            { name: 'Merge request', id: 'MERGE' },
+                            { name: 'Manual trigger', id: 'MANUAL' }
+                        ]
                     },
                     {
                         id: 'status',
                         placeholder: 'Status',
-                        data: []
+                        data: [
+                            { name: 'Succeed', id: 'SUCCEED' },
+                            { name: 'Failed', id: 'FAILED' },
+                            { name: 'Cancelled', id: 'CANCELED' }
+                        ]
                     }
                 ],
                 isLoadingFilter: false,
@@ -204,14 +216,13 @@
             ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectInfo']),
 
             tableHeight () {
-                return Math.min(this.appHeight - 306, 43 + (this.buildList.length || 3) * 72)
+                return Math.min(this.appHeight - 292, 43 + (this.buildList.length || 3) * 72)
             }
         },
 
         watch: {
             curPipeline: {
                 handler () {
-                    this.getFilterData()
                     this.cleanFilterData()
                     this.initBuildData()
                 },
@@ -246,21 +257,10 @@
                 return [getPipelineStatusClass(status), ...getPipelineStatusCircleIconCls(status)]
             },
 
-            getFilterData () {
+            getBranchList () {
                 this.isLoadingFilter = true
-                pipelines.getPipelineBuildBranchList(this.projectId).then((branchInfo) => {
-                    this.filterList[0].data = (branchInfo.records || []).map((branch) => ({ name: branch.branchName, id: branch.branchName }))
-                    this.filterList[1].data = [
-                        { name: 'Push', id: 'PUSH' },
-                        { name: 'Tag push', id: 'TAG' },
-                        { name: 'Merge request', id: 'MERGE' },
-                        { name: 'Manual trigger', id: 'MANUAL' }
-                    ]
-                    this.filterList[2].data = [
-                        { name: 'Succeed', id: 'SUCCEED' },
-                        { name: 'Failed', id: 'FAILED' },
-                        { name: 'Cancelled', id: 'CANCELED' }
-                    ]
+                pipelines.getPipelineBuildBranchList(this.projectId).then((branchInfo = {}) => {
+                    this.branchList = branchInfo.records || []
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -518,15 +518,15 @@
 
 <style lang="postcss" scoped>
     .pipelines-main {
-        padding-left: 25px;
+        padding-left: 20px;
         .main-head {
-            height: 64px;
+            height: 50px;
             background: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 27px;
-            line-height: 20px;
+            line-height: 50px;
             .head-text {
                 display: flex;
                 align-items: center;
@@ -558,8 +558,8 @@
         }
 
         .main-body {
-            margin-top: 18px;
-            height: calc(100% - 82px);
+            margin-top: 20px;
+            height: calc(100% - 70px);
             background: #fff;
             padding: 16px 24px 0;
             .build-filter {

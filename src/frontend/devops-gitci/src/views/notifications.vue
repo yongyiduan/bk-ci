@@ -70,6 +70,7 @@
 
 <script>
     import { notifications } from '@/http'
+    import { mapState } from 'vuex'
 
     export default {
         data () {
@@ -90,6 +91,10 @@
             }
         },
 
+        computed: {
+            ...mapState(['projectId'])
+        },
+
         watch: {
             onlyUnread () {
                 this.getMessages()
@@ -107,7 +112,8 @@
                 const params = {
                     messageType: 'REQUEST',
                     page: this.compactPaging.current,
-                    pageSize: this.compactPaging.limit
+                    pageSize: this.compactPaging.limit,
+                    projectId: this.projectId
                 }
                 if (this.onlyUnread) {
                     params.haveRead = false
@@ -123,7 +129,7 @@
             },
 
             readAll () {
-                notifications.readAllMessages().then(() => {
+                notifications.readAllMessages(this.projectId).then(() => {
                     this.getMessages()
                     this.getUnreadNum()
                 }).catch((err) => {
@@ -143,7 +149,7 @@
             },
 
             getUnreadNum () {
-                return notifications.getUnreadNotificationNum().then((res) => {
+                return notifications.getUnreadNotificationNum(this.projectId).then((res) => {
                     this.unreadNum = res || 0
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

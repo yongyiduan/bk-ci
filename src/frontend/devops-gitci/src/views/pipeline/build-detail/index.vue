@@ -1,9 +1,10 @@
 <template>
     <article class="build-detail-home">
-        <header class="build-detail-header section-box">
-            <bk-breadcrumb class="header-bread" separator-class="bk-icon icon-angle-right">
+        <section class="section-box build-detail-header">
+            <bk-breadcrumb class="build-detail-crumb" separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
+
             <bk-tab :active.sync="active" type="unborder-card" class="header-tab" @tab-change="changeTab">
                 <bk-tab-panel
                     v-for="(panel, index) in panels"
@@ -11,8 +12,9 @@
                     :key="index">
                 </bk-tab-panel>
             </bk-tab>
-        </header>
-        <router-view class="build-detail-main section-box"></router-view>
+        </section>
+
+        <router-view class="section-box build-detail-main"></router-view>
     </article>
 </template>
 
@@ -83,27 +85,29 @@
 
 <style lang="postcss" scoped>
     .build-detail-home {
-        padding-left: 25px;
+        padding-left: 20px;
     }
     .build-detail-header {
         background: #fff;
-        .header-bread {
-            line-height: 30px;
-            padding: 11px 25px 0;
+    }
+    .build-detail-crumb {
+        height: 50px;
+        line-height: 50px;
+        padding: 0 27px;
+    }
+    .header-tab {
+        margin-top: -10px;
+        /deep/ .bk-tab-header {
+            padding: 0 14px;
+            background-image: none !important;
         }
-        .header-tab {
-            /deep/ .bk-tab-header {
-                padding: 0 14px;
-            }
-            /deep/ .bk-tab-section {
-                padding: 0;
-            }
+        /deep/ .bk-tab-section {
+            padding: 0;
         }
     }
     .build-detail-main {
-        margin-top: 25px;
-        height: calc(100% - 116px);
-        overflow: auto;
+        margin-top: 20px;
+        height: calc(100% - 120px);
         background: #fff;
     }
 </style>

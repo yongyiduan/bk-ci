@@ -50,7 +50,7 @@
         },
 
         computed: {
-            ...mapState(['exceptionInfo', 'projectInfo']),
+            ...mapState(['exceptionInfo', 'projectInfo', 'projectId']),
 
             computedIconClass () {
                 const name = this.$route.name
@@ -120,7 +120,7 @@
             },
 
             getNotifications () {
-                return notifications.getUnreadNotificationNum().then((res) => {
+                return notifications.getUnreadNotificationNum(this.projectId).then((res) => {
                     this.messageNum = res || 0
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

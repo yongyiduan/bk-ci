@@ -41,7 +41,6 @@
                     buildPushedPullRequest: false,
                     enableMrBlock: false
                 },
-                enabled: true,
                 isSaving: false,
                 isLoading: false,
                 isToggleEnable: false,
@@ -81,9 +80,8 @@
             },
 
             toggleEnable () {
-                const enabled = !this.enabled
                 this.isToggleEnable = true
-                setting.toggleEnableCi(enabled, this.projectInfo).then(() => {
+                setting.toggleEnableCi(!this.form.enableCi, this.projectInfo).then(() => {
                     this.getSetting()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

@@ -39,12 +39,12 @@ const routes = [
                 name: 'pipeline',
                 children: [
                     {
-                        path: 'pipelineId/:pipelineId?',
+                        path: 'pipeline/:pipelineId?',
                         name: 'buildList',
                         component: buildList
                     },
                     {
-                        path: 'pipelineId/:pipelineId/detail/:buildId/:buildNum',
+                        path: 'pipeline/:pipelineId/detail/:buildId/:buildNum',
                         name: 'pipelineDetail',
                         component: pipelineDetail,
                         children: [
