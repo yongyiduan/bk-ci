@@ -24,7 +24,7 @@
                     placeholder="Branch"
                     multiple
                     searchable
-                    :loading="isLoadingFilter"
+                    :loading="isLoadingBranch"
                     :remote-method="remoteGetBranchList"
                     @toggle="toggleFilterBranch"
                 >
@@ -103,8 +103,16 @@
         <bk-sideslider @hidden="hidden" :is-show.sync="showTriggle" :width="622" :quick-close="true" title="Trigger a custom build">
             <bk-form :model="formData" ref="triggleForm" :label-width="500" slot="content" class="triggle-form" form-type="vertical">
                 <bk-form-item label="Branch" :required="true" :rules="[requireRule('Branch')]" property="branch" error-display-type="normal">
-                    <bk-select v-model="formData.branch" :clearable="false" :loading="isLoadingBranch" @selected="selectBranch" placeholder="Select a Branch">
-                        <bk-option v-for="option in triggerBranches"
+                    <bk-select v-model="formData.branch"
+                        :clearable="false"
+                        :loading="isLoadingBranch"
+                        :remote-method="remoteGetBranchList"
+                        searchable
+                        @toggle="toggleFilterBranch"
+                        @selected="selectBranch"
+                        placeholder="Select a Branch"
+                    >
+                        <bk-option v-for="option in branchList"
                             :key="option"
                             :id="option"
                             :name="option">
@@ -115,13 +123,21 @@
                     <bk-checkbox v-model="formData.useCommitId" @change="getPipelineBranchYaml">Use a specified historical commit to trigger the build</bk-checkbox>
                 </bk-form-item>
                 <bk-form-item label="Commit" :required="true" :rules="[requireRule('Commit')]" property="commitId" error-display-type="normal" v-if="formData.useCommitId">
-                    <bk-select v-model="formData.commitId" :clearable="false" :loading="isLoadingCommit" @selected="getPipelineBranchYaml" placeholder="Select a Commit">
-                        <bk-option v-for="option in triggerCommits"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.message">
-                        </bk-option>
-                    </bk-select>
+                    <bk-tag-input placeholder="Select a Commit"
+                        v-model="formData.commitId"
+                        @change="getPipelineBranchYaml"
+                        :max-data="1"
+                        :loading="isLoadingCommit"
+                        :list="triggerCommits"
+                        :tpl="renderCommitList"
+                        tooltip-key="message"
+                        allow-create
+                        save-key="id"
+                        display-key="message"
+                        search-key="message"
+                        trigger="focus"
+                    >
+                    </bk-tag-input>
                 </bk-form-item>
                 <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom builds exist only on build history and will not appear in your commit history." error-display-type="normal">
                     <bk-input v-model="formData.customCommitMsg" placeholder="Please enter build message"></bk-input>
@@ -201,7 +217,6 @@
                         ]
                     }
                 ],
-                isLoadingFilter: false,
                 isLoading: false,
                 isLoadingBranch: false,
                 isLoadingCommit: false,
@@ -211,11 +226,10 @@
                 formData: {
                     branch: '',
                     useCommitId: false,
-                    commitId: '',
+                    commitId: [],
                     customCommitMsg: '',
                     yaml: ''
                 },
-                triggerBranches: [],
                 triggerCommits: []
             }
         },
@@ -267,10 +281,10 @@
 
             toggleFilterBranch (isOpen) {
                 if (isOpen) {
-                    this.isLoadingFilter = true
+                    this.isLoadingBranch = true
                     this.getPipelineBranchApi().then((branchList) => {
                         this.branchList = branchList
-                        this.isLoadingFilter = false
+                        this.isLoadingBranch = false
                     })
                 }
             },
@@ -341,8 +355,10 @@
                 let res = ''
                 switch (gitRequestEvent.objectKind) {
                     case 'push':
-                    case 'tag_push':
                         res = `Commit ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
+                        break
+                    case 'tag_push':
+                        res = `Tag ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
                         break
                     case 'merge_request':
                         const actionMap = {
@@ -376,11 +392,6 @@
                 if (!this.curPipeline.enabled) return
 
                 this.showTriggle = true
-                this.isLoadingBranch = true
-                this.getPipelineBranchApi().then((branchList) => {
-                    this.triggerBranches = branchList
-                    this.isLoadingBranch = false
-                })
             },
 
             getPipelineBranchApi (query = {}) {
@@ -407,7 +418,7 @@
                 this.formData = {
                     branch: '',
                     useCommitId: false,
-                    commitId: '',
+                    commitId: [],
                     customCommitMsg: '',
                     yaml: ''
                 }
@@ -426,6 +437,7 @@
                     branch: this.formData.branch,
                     ...query
                 }
+                this.formData.commitId = []
                 this.isLoadingCommit = true
                 return pipelines.getPipelineCommits(params).then((res) => {
                     this.triggerCommits = res || []
@@ -439,7 +451,7 @@
             getPipelineBranchYaml () {
                 const params = {
                     branchName: this.formData.branch,
-                    commitId: this.formData.useCommitId ? this.formData.commitId : undefined
+                    commitId: this.formData.useCommitId ? this.formData.commitId[0] : undefined
                 }
                 this.isLoadingYaml = true
                 return pipelines.getPipelineBranchYaml(this.projectId, this.curPipeline.pipelineId, params).then((res) => {
@@ -489,7 +501,7 @@
                     const postData = {
                         ...this.formData,
                         projectId: this.projectId,
-                        commitId: this.formData.useCommitId ? this.formData.commitId : undefined
+                        commitId: this.formData.useCommitId ? this.formData.commitId[0] : undefined
                     }
                     this.isTriggering = true
                     pipelines.trigglePipeline(this.curPipeline.pipelineId, postData).then(() => {
@@ -511,8 +523,7 @@
                     name: 'buildDetail',
                     params: {
                         buildId: row.buildHistory.id,
-                        pipelineId: row.pipelineId,
-                        buildNum: row.buildHistory.buildNum
+                        pipelineId: row.pipelineId
                     }
                 })
             },
@@ -533,6 +544,17 @@
                     message: name + 'is required',
                     trigger: 'blur'
                 }
+            },
+
+            renderCommitList (node) {
+                const parentClass = 'bk-selector-node bk-selector-member'
+                const textClass = 'text'
+                const innerHtml = `[${node.id.slice(0, 9)}]: ${node.message}`
+                return (
+                    <div class={parentClass}>
+                        <span class={textClass} domPropsInnerHTML={innerHtml}></span>
+                    </div>
+                )
             }
         }
     }
@@ -668,6 +690,9 @@
         padding: 20px 30px;
         /deep/ button {
             margin: 8px 10px 0 0;
+        }
+        /deep/ .bk-tag-selector .bk-tag-input .tag {
+            max-width: 500px;
         }
     }
 </style>

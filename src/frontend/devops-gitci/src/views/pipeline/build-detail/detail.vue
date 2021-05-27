@@ -5,7 +5,7 @@
             <p class="detail-info">
                 <span class="info-title">
                     {{ buildDetail.commitMsg }}
-                    <span class="title-item"><icon :name="buildTypeIcon" size="14"></icon></span>
+                    <span class="title-item"><icon :name="buildTypeIcon" size="14" v-bk-tooltips="{ content: buildDetail.objectKind, placements: ['top'] }"></icon></span>
                     <span class="title-item"><img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}</span>
                 </span>
                 <span class="info-data">
@@ -28,7 +28,9 @@
                     <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
             </p>
-            <bk-button class="detail-button" @click="rebuild" :loading="isRebuilding">Re-build</bk-button>
+
+            <bk-button class="detail-button" @click="cancleBuild" :loading="isOperating" v-if="buildDetail.status === 'RUNNING'">Cancel Build</bk-button>
+            <bk-button class="detail-button" @click="rebuild" :loading="isOperating" v-else>Re-build</bk-button>
         </section>
         <stages :stages="stageList" class="detail-stages"></stages>
     </article>
@@ -65,7 +67,7 @@
                 stageList: [],
                 buildDetail: {},
                 isLoading: false,
-                isRebuilding: false,
+                isOperating: false,
                 remark: ''
             }
         },
@@ -104,7 +106,7 @@
                 return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
                     const modelDetail = res.modelDetail || {}
                     const model = modelDetail.model || {}
-                    this.stageList = model.stages
+                    this.stageList = (model.stages || []).slice(1)
                     this.buildDetail = {
                         ...res.gitProjectPipeline,
                         ...res.gitRequestEvent,
@@ -119,13 +121,24 @@
             },
 
             rebuild () {
-                this.isRebuilding = true
+                this.isOperating = true
                 pipelines.rebuildPipeline(this.projectId, this.$route.params.pipelineId, this.$route.params.buildId).then(() => {
                     this.getPipelineBuildDetail()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
-                    this.isRebuilding = false
+                    this.isOperating = false
+                })
+            },
+
+            cancleBuild () {
+                this.isOperating = true
+                pipelines.cancelBuildPipeline(this.projectId, this.$route.params.pipelineId, this.$route.params.buildId).then(() => {
+                    this.getPipelineBuildDetail()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isOperating = false
                 })
             },
 

@@ -8,7 +8,7 @@
 
         <main class="agent-list-main">
             <section>
-                <bk-button theme="primary" class="add-agent" @click="goToAddAgent">Add Agent</bk-button>
+                <bk-button theme="primary" class="add-agent" @click="goToAddAgent" v-if="agentList.length">Add Self-hosted agent</bk-button>
             </section>
             <bk-table class="agent-table"
                 :data="agentList"
@@ -19,67 +19,9 @@
                 v-bkloading="{ isLoading }"
                 v-if="agentList.length"
             >
-                <bk-table-column label="Name" prop="displayName"></bk-table-column>
-                <bk-table-column label="IP" prop="ip"></bk-table-column>
-                <bk-table-column label="Operating System" prop="osName"></bk-table-column>
-                <bk-table-column label="Source/Importer">
-                    <template slot-scope="props">
-                        <div v-if="(props.row.nodeType === 'CC' || props.row.nodeType === 'CMDB') && ((props.row.nodeType === 'CC' && props.row.createdUser !== props.row.operator && props.row.createdUser !== props.row.bakOperator)
-                            || (props.row.nodeType === 'CMDB' && props.row.createdUser !== props.row.operator && props.row.bakOperator.split(';').indexOf(props.row.createdUser) === -1))">
-                            <div class="edit-operator" v-if="userInfo.username === props.row.operator || userInfo.username === props.row.bakOperator">
-                                <i class="bk-icon icon-exclamation-circle"></i>
-                            </div>
-                            <div class="prompt-operator" v-else>
-                                <bk-popover placement="top">
-                                    <span><i class="bk-icon icon-exclamation-circle"></i>The person in charge has been changed and the use is prohibited</span>
-                                    <template slot="content">
-                                        <p>Current importer：<span>{{ props.row.createdUser }}</span></p>
-                                        <p>Current host owner：<span>{{ props.row.operator }}</span><span v-if="props.row.nodeType === 'CC'">/{{ props.row.bakOperator }}</span></p>
-                                        <p>Please contact the person in charge of the host</p>
-                                    </template>
-                                </bk-popover>
-                            </div>
-                        </div>
-                        <div v-else>
-                            <span class="node-name">{{ nodeTypeMap[props.row.nodeType] || '-' }}</span>
-                            <span>({{ props.row.createdUser }})</span>
-                        </div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="Status" prop="osName">
-                    <template slot-scope="props">
-                        <div class="table-node-item node-item-status"
-                            v-if="props.row.nodeStatus === 'BUILDING_IMAGE' && props.row.nodeType === 'DEVCLOUD'">
-                            <span class="node-status-icon normal-stutus-icon"></span>
-                            <span class="node-status">normal</span>
-                        </div>
-                        <div class="table-node-item node-item-status">
-                            <!-- 状态icon -->
-                            <span class="node-status-icon normal-stutus-icon" v-if="successStatus.includes(props.row.nodeStatus)"></span>
-                            <span class="node-status-icon abnormal-stutus-icon"
-                                v-if="failStatus.includes(props.row.nodeStatus)">
-                            </span>
-                            <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
-                                v-if="runningStatus.includes(props.row.nodeStatus)">
-                                <div class="rotate rotate1"></div>
-                                <div class="rotate rotate2"></div>
-                                <div class="rotate rotate3"></div>
-                                <div class="rotate rotate4"></div>
-                                <div class="rotate rotate5"></div>
-                                <div class="rotate rotate6"></div>
-                                <div class="rotate rotate7"></div>
-                                <div class="rotate rotate8"></div>
-                            </div>
-                            <!-- 状态值 -->
-                            <span class="install-agent" v-if="props.row.nodeType === 'DEVCLOUD' && props.row.nodeStatus === 'RUNNING'">
-                                {{ nodeStatusMap[props.row.nodeStatus] }}
-                            </span>
-                            <span class="node-status" v-else>{{ nodeStatusMap[props.row.nodeStatus] }}</span>
-                        </div>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="Creation/import time" prop="createTime"></bk-table-column>
-                <bk-table-column label="Last Modified" prop="lastModifyTime"></bk-table-column>
+                <bk-table-column label="Display Name" prop="displayName"></bk-table-column>
+                <bk-table-column label="OS" prop="osName"></bk-table-column>
+                <bk-table-column label="Status" prop="nodeStatus"></bk-table-column>
                 <bk-table-column label="Operation" width="150" class-name="handler-btn">
                     <template slot-scope="props">
                         <span class="update-btn" @click="showDelete(props.row)">Delete</span>
@@ -117,36 +59,6 @@
                 ],
                 agentList: [],
                 isLoading: false,
-                runningStatus: ['CREATING', 'STARTING', 'STOPPING', 'RESTARTING', 'DELETING', 'BUILDING_IMAGE'],
-                successStatus: ['NORMAL', 'BUILD_IMAGE_SUCCESS'],
-                failStatus: ['ABNORMAL', 'DELETED', 'LOST', 'BUILD_IMAGE_FAILED', 'UNKNOWN', 'RUNNING'],
-                nodeTypeMap: {
-                    'CC': 'CC',
-                    'CMDB': 'CMDB',
-                    'BCSVM': 'BCS virtual machine',
-                    'THIRDPARTY': 'Third-party build machine',
-                    'DEVCLOUD': 'Tencent self-developed cloud (cloud devnet resource)',
-                    'TSTACK': 'TStack virtual machine',
-                    'OTHER': 'Other',
-                    'UNKNOWN': 'Unknow'
-                },
-                nodeStatusMap: {
-                    'NORMAL': 'normal',
-                    'ABNORMAL': 'abnormal',
-                    'DELETED': 'deleted',
-                    'LOST': 'lost',
-                    'CREATING': 'creating',
-                    'RUNNING': 'Install Agent',
-                    'STARTING': 'Booting up',
-                    'STOPPING': 'Shutting down',
-                    'STOPPED': 'Shut down',
-                    'RESTARTING': 'Restarting',
-                    'DELETING': 'Being destroyed',
-                    'BUILDING_IMAGE': 'Mirroring in progress',
-                    'BUILD_IMAGE_SUCCESS': 'Successfully made the mirror',
-                    'BUILD_IMAGE_FAILED': 'Mirroring failed',
-                    'UNKNOWN': 'Unknow'
-                },
                 isShowDelete: false,
                 isDeleteing: false,
                 deleteRow: {}
@@ -168,7 +80,7 @@
         methods: {
             getNodeList () {
                 this.isLoading = true
-                setting.getNodeList(this.projectId).then((res) => {
+                setting.getNodeList(this.projectId, this.$route.params.poolId).then((res) => {
                     this.agentList = res
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

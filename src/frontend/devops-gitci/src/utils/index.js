@@ -176,7 +176,7 @@ export function preciseDiff (duration) {
     return diffTime.join(' ')
 }
 
-export function timeFormatter (time, format = 'YYYY-MM-DD hh:mm:ss') {
+export function timeFormatter (time, format = 'YYYY-MM-DD HH:mm:ss') {
     return time ? moment(time).format(format) : '--'
 }
 
@@ -188,7 +188,7 @@ export function getbuildTypeIcon (buildType) {
     const buildTypeIconMap = {
         manual: 'manual',
         push: 'commit',
-        tag_push: 'commit',
+        tag_push: 'tag',
         merge_request: 'merge'
     }
     return buildTypeIconMap[buildType] || 'well'
@@ -198,7 +198,7 @@ export function modifyHtmlTitle (title) {
     document.title = title
 }
 
-export function debounce (callBack, eachCallBack) {
+export function debounce (callBack) {
     window.clearTimeout(debounce.timeId)
     debounce.timeId = window.setTimeout(callBack, 200)
 }

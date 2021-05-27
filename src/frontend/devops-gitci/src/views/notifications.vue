@@ -11,7 +11,7 @@
                     :class="{ 'nav-item': true, active: curNav.name === nav.name }"
                 >
                     <icon :name="nav.icon" size="18"></icon>
-                    <bk-badge :val="unreadNum" theme="danger" position="right">
+                    <bk-badge :val="unreadNum" theme="danger" position="right" :visible="unreadNum">
                         <span class="mr10">{{ nav.label }}</span>
                     </bk-badge>
                 </li>
@@ -34,20 +34,21 @@
                             <span class="content-message">
                                 <span :class="{ 'message-status': true, 'unread': !request.haveRead }"></span>
                                 {{ request.messageTitle }} （{{ request.contentAttr.failedNum }} / {{ request.contentAttr.total }}）
+                                <span class="message-time">{{ request.createTime | timeFilter }}</span>
                             </span>
-                            <bk-table :data="request.content.buildRecords" :show-header="false" slot="content" class="notification-table">
+                            <bk-table :data="request.content" :show-header="false" slot="content" class="notification-table">
                                 <bk-table-column>
                                     <template slot-scope="props">
-                                        {{ props.row.displayName || '--' }}
+                                        {{ props.row.pipelineName || '--' }}
                                     </template>
                                 </bk-table-column>
                                 <bk-table-column>
                                     <template slot-scope="props">
-                                        {{ (props.row.buildHistory || {}).buildNum || '--' }}
+                                        {{ props.row.buildNum | buildNumFilter }}
                                     </template>
                                 </bk-table-column>
-                                <bk-table-column prop="reason" show-overflow-tooltip></bk-table-column>
-                                <bk-table-column prop="reasonDetail" show-overflow-tooltip></bk-table-column>
+                                <bk-table-column prop="triggerReasonName" show-overflow-tooltip></bk-table-column>
+                                <bk-table-column prop="triggerReasonDetail" show-overflow-tooltip></bk-table-column>
                             </bk-table>
                         </bk-collapse-item>
                     </bk-collapse>
@@ -71,8 +72,19 @@
 <script>
     import { notifications } from '@/http'
     import { mapState } from 'vuex'
+    import { timeFormatter } from '@/utils'
 
     export default {
+        filters: {
+            buildNumFilter (val) {
+                return val ? `# ${val}` : '--'
+            },
+
+            timeFilter (val) {
+                return timeFormatter(val)
+            }
+        },
+
         data () {
             return {
                 navList: [

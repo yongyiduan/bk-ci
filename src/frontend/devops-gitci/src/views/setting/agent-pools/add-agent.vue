@@ -14,7 +14,7 @@
 
             <section class="agent-filter">
                 <span class="filter-title">System</span>
-                <bk-select @change="getZoneList" v-model="machine.system" :loading="isLoading" behavior="simplicity" class="filter-select">
+                <bk-select @change="getThirdAgentLink" v-model="machine.system" :loading="isLoading" behavior="simplicity" class="filter-select">
                     <bk-option v-for="option in operateSystems"
                         :key="option.id"
                         :id="option.id"
@@ -27,15 +27,6 @@
                         :key="option"
                         :id="option"
                         :name="option">
-                    </bk-option>
-                </bk-select>
-                <span class="filter-title">Area</span>
-                <bk-select v-model="machine.zone" :loading="isLoading" behavior="simplicity" class="filter-select">
-                    <bk-option v-for="option in zones"
-                        :key="option.zoneName"
-                        :id="option.zoneName"
-                        :name="option.showName"
-                        @click.native="getThirdAgentLink">
                     </bk-option>
                 </bk-select>
             </section>
@@ -92,11 +83,10 @@
                     { link: '', title: 'Add Agent' }
                 ],
                 architectures: ['x64'],
-                zones: [],
                 machine: {
                     system: 'MACOS',
                     architecture: 'x64',
-                    zone: '',
+                    zone: 'shenzhen',
                     link: '',
                     agentId: ''
                 },
@@ -124,15 +114,15 @@
                         <span class="gray"># Download and install the latest agent package</span>
                         <span class="mb10">$ ${this.machine.link}</span>
                         <span class="gray"># Run it!</span>
-                        <span>$ cd landun_devops_agent && ./install.sh </span>
+                        <span>$ ./install.sh </span>
                     </p>
                 `
                 const windowHtml = `
                     <h3>Download & Install</h3>
                     <p>
                         <span class="mb10">1. Download the latest agent<a href="${this.machine.link}" target="_blank">Click here to download agent</a></span>
-                        <span class="mb10">2. Create a folder, such as C:\\data\\landun</span>
-                        <span class="mb10">3. Extract the installer to C:\\data\\landun</span>
+                        <span class="mb10">2. Create a folder, such as D:\\data\\landun</span>
+                        <span class="mb10">3. Extract the installer to D:\\data\\landun</span>
                         <span class="mb10">4. Execute install.bat by administrator</span>
                         <span class="mb10">5. In order to read user environment, please change the setup user from system to the login user, such as tencent\\zhangsan<a href="https://iwiki.woa.com/x/ZNMrAg" target="_blank">Learn more</a></span>
                     </p>
@@ -142,25 +132,12 @@
         },
 
         created () {
-            this.getZoneList()
+            this.getThirdAgentLink()
         },
 
         methods: {
             backToAgentList () {
                 this.$router.push({ name: 'agentList' })
-            },
-
-            getZoneList () {
-                this.isLoading = true
-                setting.getThirdAgentZoneList(this.projectId, this.machine.system).then((res) => {
-                    this.zones = res || []
-                    this.machine.zone = (this.zones[0] || {}).zoneName
-                    return this.getThirdAgentLink()
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoading = false
-                })
             },
 
             getThirdAgentLink () {

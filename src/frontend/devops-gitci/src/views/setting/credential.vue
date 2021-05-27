@@ -15,7 +15,7 @@
             empty-text="No credential yet"
             class="credential-table"
         >
-            <bk-table-column label="Code" prop="credentialId"></bk-table-column>
+            <bk-table-column label="Key" prop="credentialId"></bk-table-column>
             <bk-table-column label="Display Name" prop="credentialName"></bk-table-column>
             <bk-table-column label="Type" prop="credentialType"></bk-table-column>
             <bk-table-column label="Description" prop="credentialRemark"></bk-table-column>

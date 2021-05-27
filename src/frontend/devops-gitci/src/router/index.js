@@ -44,7 +44,7 @@ const routes = [
                         component: buildList
                     },
                     {
-                        path: 'pipeline/:pipelineId/detail/:buildId/:buildNum',
+                        path: 'pipeline/:pipelineId/detail/:buildId',
                         name: 'pipelineDetail',
                         component: pipelineDetail,
                         children: [

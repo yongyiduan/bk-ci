@@ -29,10 +29,11 @@
                 panels: [
                     { label: 'Build detail', name: 'buildDetail' },
                     { label: 'Artifacts', name: 'buildArtifacts' },
-                    { label: 'Report', name: 'buildReports' },
+                    { label: 'Reports', name: 'buildReports' },
                     { label: 'Configuration', name: 'buildConfig' }
                 ],
-                active: 'buildDetail'
+                active: 'buildDetail',
+                buildNum: ''
             }
         },
 
@@ -42,7 +43,7 @@
             navList () {
                 return [
                     { title: this.curPipeline.displayName, link: { name: 'buildList' } },
-                    { title: '# ' + this.$route.params.buildNum }
+                    { title: '# ' + this.buildNum }
                 ]
             }
         },
@@ -73,7 +74,9 @@
                 }
                 return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
                     const gitRequestEvent = res.gitRequestEvent || {}
-                    const title = gitRequestEvent.commitMsg + ' #' + this.$route.params.buildNum
+                    const modelDetail = res.modelDetail || {}
+                    this.buildNum = modelDetail.buildNum
+                    const title = gitRequestEvent.commitMsg + ' #' + this.buildNum
                     modifyHtmlTitle(title)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

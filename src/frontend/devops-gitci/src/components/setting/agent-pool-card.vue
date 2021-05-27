@@ -65,9 +65,9 @@
 
             cpuUsages () {
                 return [
-                    { name: 'Build machine CPU load', showVal: this.pool.averageCpuLoad, val: this.pool.averageCpuLoad / 100 },
-                    { name: 'Build machine memory load', showVal: this.pool.averageMemLoad, val: this.pool.averageMemLoad / 100 },
-                    { name: 'Build machine hard disk load', showVal: this.pool.averageDiskLoad, val: this.pool.averageDiskLoad / 100 }
+                    { name: 'CPU Usage', showVal: this.pool.averageCpuLoad, val: this.pool.averageCpuLoad / 100 },
+                    { name: 'Memory Usage', showVal: this.pool.averageMemLoad, val: this.pool.averageMemLoad / 100 },
+                    { name: 'Disk Usage', showVal: this.pool.averageDiskLoad, val: this.pool.averageDiskLoad / 100 }
                 ]
             }
         },

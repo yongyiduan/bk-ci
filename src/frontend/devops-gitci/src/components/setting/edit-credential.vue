@@ -10,7 +10,7 @@
                     </bk-option>
                 </bk-select>
             </bk-form-item>
-            <bk-form-item label="Code" :required="true" :rules="[requireRule('Code'), idRule]" property="credentialId" error-display-type="normal">
+            <bk-form-item label="Key" :required="true" :rules="[requireRule('Code'), idRule]" property="credentialId" error-display-type="normal">
                 <bk-input v-model="formData.credentialId" placeholder="It is composed of English letters, numbers or underscores (_), no more than 40 words" :disabled="isEdit"></bk-input>
             </bk-form-item>
             <bk-form-item label="Display Name" property="credentialName" :rules="[nameRule]" :desc="{ content: 'When referencing credentials through variables in the pipeline, only referencing by name is supported', width: '400px' }" error-display-type="normal">
@@ -73,7 +73,7 @@
                         name: 'AccessToken',
                         desc: 'An access token contains the security information of this login session, which is used to associate the Gitlab type code library',
                         content: [
-                            { id: 'v1', label: 'AccessToken', type: 'password', required: true, rules: [this.requireRule('AccessToken')], placeholder: 'Please enter AccessToken' }
+                            { id: 'v1', label: 'access_token', type: 'password', required: true, rules: [this.requireRule('access_token')], placeholder: 'Please enter AccessToken' }
                         ]
                     },
                     {
@@ -100,7 +100,7 @@
                         content: [
                             {
                                 id: 'v1',
-                                label: 'ssh private key',
+                                label: 'privateKey',
                                 type: 'textarea',
                                 required: true,
                                 rules: [
@@ -109,11 +109,11 @@
                                         message: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center',
                                         trigger: 'blur'
                                     },
-                                    this.requireRule('ssh private key')
+                                    this.requireRule('privateKey')
                                 ],
                                 placeholder: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center'
                             },
-                            { id: 'v2', label: 'Private key password', type: 'password', placeholder: 'Please enter the private key password' }
+                            { id: 'v2', label: 'passphrase', type: 'password', placeholder: 'Please enter the private key password' }
                         ]
                     },
                     {
@@ -121,10 +121,10 @@
                         name: 'SSH private key + private Token',
                         desc: 'Used to associate Git type code libraries using ssh',
                         content: [
-                            { id: 'v1', label: 'private token', type: 'password', required: true, rules: [this.requireRule('private token')], placeholder: 'Please enter token' },
+                            { id: 'v1', label: 'token', type: 'password', required: true, rules: [this.requireRule('token')], placeholder: 'Please enter token' },
                             {
                                 id: 'v2',
-                                label: 'ssh private key',
+                                label: 'privateKey',
                                 type: 'textarea',
                                 required: true,
                                 rules: [
@@ -133,11 +133,11 @@
                                         message: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center',
                                         trigger: 'blur'
                                     },
-                                    this.requireRule('ssh private key')
+                                    this.requireRule('privateKey')
                                 ],
                                 placeholder: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center'
                             },
-                            { id: 'v3', label: 'Private key password', type: 'password', placeholder: 'Please enter the private key password' }
+                            { id: 'v3', label: 'passphrase', type: 'password', placeholder: 'Please enter the private key password' }
                         ]
                     },
                     {
@@ -145,7 +145,7 @@
                         name: 'User password+private token',
                         desc: 'Used to associate Git type code libraries using http',
                         content: [
-                            { id: 'v1', label: 'private token', type: 'password', required: true, rules: [this.requireRule('private token')], placeholder: 'Please enter token' },
+                            { id: 'v1', label: 'token', type: 'password', required: true, rules: [this.requireRule('token')], placeholder: 'Please enter token' },
                             { id: 'v2', label: 'username', type: 'text', required: true, rules: [this.requireRule('username')], placeholder: 'please enter user name' },
                             { id: 'v3', label: 'password', type: 'password', required: true, rules: [this.requireRule('password')], placeholder: 'Please enter the password' }
                         ]

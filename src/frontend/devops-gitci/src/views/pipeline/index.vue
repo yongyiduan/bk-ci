@@ -28,11 +28,18 @@
                         <bk-input v-model="yamlData.file_name" class="yaml-name" placeholder="Please input yaml name"></bk-input>
                     </bk-compose-form-item>
                 </bk-form-item>
-                <bk-form-item label="Yaml" :rules="[requireRule('Yaml')]" :required="true" property="content" error-display-type="normal">
+                <bk-form-item label="YAML" :rules="[requireRule('Yaml')]" :required="true" property="content" error-display-type="normal">
                     <code-section :code.sync="yamlData.content" :read-only="false" :cursor-blink-rate="530"></code-section>
                 </bk-form-item>
                 <bk-form-item label="Branch" :rules="[requireRule('Branch')]" :required="true" property="branch_name" error-display-type="normal">
-                    <bk-select v-model="yamlData.branch_name" :loading="isLoadingBranches" :clearable="false" placeholder="Please select branch">
+                    <bk-select v-model="yamlData.branch_name"
+                        :remote-method="remoteGetBranchList"
+                        :loading="isLoadingBranches"
+                        :clearable="false"
+                        searchable
+                        @toggle="toggleFilterBranch"
+                        placeholder="Please select branch"
+                    >
                         <bk-option v-for="option in branchList"
                             :key="option"
                             :id="option"
@@ -40,7 +47,7 @@
                         </bk-option>
                     </bk-select>
                 </bk-form-item>
-                <bk-form-item label="commit message" :rules="[requireRule('commit message')]" :required="true" property="commit_message" error-display-type="normal">
+                <bk-form-item label="Commit Message" :rules="[requireRule('commit message')]" :required="true" property="commit_message" error-display-type="normal">
                     <bk-input v-model="yamlData.commit_message" placeholder="Please input commit message"></bk-input>
                 </bk-form-item>
                 <bk-form-item>
@@ -56,6 +63,7 @@
     import { mapState, mapActions } from 'vuex'
     import codeSection from '@/components/code-section'
     import { pipelines } from '@/http'
+    import { debounce } from '@/utils'
 
     export default {
         components: {
@@ -118,7 +126,7 @@
 
             getPipelineList () {
                 return pipelines.getPipelineList(this.projectId).then((res = {}) => {
-                    const allPipeline = { displayName: 'All pipeline', enabled: true, icon: 'all' }
+                    const allPipeline = { displayName: 'All pipelines', enabled: true, icon: 'all' }
                     const pipelines = (res.records || []).map((pipeline) => ({
                         displayName: pipeline.displayName,
                         enabled: pipeline.enabled,
@@ -158,7 +166,6 @@
 
             showAddYml () {
                 this.isShowAddYml = true
-                this.getPipelineBranches()
             },
 
             hidden () {
@@ -171,19 +178,40 @@
                 }
             },
 
-            getPipelineBranches () {
+            toggleFilterBranch (isOpen) {
+                if (isOpen) {
+                    this.isLoadingBranches = true
+                    this.getPipelineBranches().then(() => {
+                        this.isLoadingBranches = false
+                    })
+                }
+            },
+
+            remoteGetBranchList (search) {
+                return new Promise((resolve) => {
+                    debounce(() => {
+                        this.getPipelineBranches({ search }).then(() => {
+                            resolve()
+                        })
+                    })
+                })
+            },
+
+            getPipelineBranches (query = {}) {
                 const params = {
                     projectId: this.projectId,
                     page: 1,
-                    perPage: 100
+                    perPage: 100,
+                    ...query
                 }
-                this.isLoadingBranches = true
-                pipelines.getPipelineBranches(params).then((res) => {
-                    this.branchList = res || []
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoadingBranches = false
+                return new Promise((resolve) => {
+                    pipelines.getPipelineBranches(params).then((res) => {
+                        this.branchList = res || []
+                    }).catch((err) => {
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    }).finally(() => {
+                        resolve()
+                    })
                 })
             },
 
@@ -236,6 +264,7 @@
     }
     .yaml-form {
         padding: 20px 30px;
+        height: calc(100vh - 60px);
         .yaml-path {
             width: 50px;
         }

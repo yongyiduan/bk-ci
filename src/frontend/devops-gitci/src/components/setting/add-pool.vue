@@ -1,5 +1,5 @@
 <template>
-    <bk-sideslider :is-show.sync="show" :quick-close="true" @hidden="hidden" :width="622" title="add pool">
+    <bk-sideslider :is-show.sync="show" :quick-close="true" @hidden="hidden" :width="622" title="Add Self-hosted Agent Pool">
         <bk-form :model="formData" ref="poolForm" slot="content" class="pool-form" form-type="vertical">
             <bk-form-item label="Pool name" :required="true" :rules="[requireRule('Pool name'), nameRule]" property="name" error-display-type="normal">
                 <bk-input v-model="formData.name" placeholder="Composed of English letters, numbers, and underscores, no more than 64 words"></bk-input>
