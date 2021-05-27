@@ -140,10 +140,12 @@
                             <bk-checkbox
                                 class="enable-wechat-group"
                                 name="enableWechatGroups"
-                                :title="groupIdDesc"
                                 v-model="createReleaseForm.enableWechatGroups"
                             >
                                 启用企业微信群通知
+                                <span v-bk-tooltips="groupIdDesc" class="top-start">
+                                    <i class="devops-icon icon-info-circle" />
+                                </span>
                             </bk-checkbox>
                         </bk-form-item>
                         <group-id-selector class="item-groupid" v-if="createReleaseForm.enableWechatGroups"
@@ -207,7 +209,7 @@
                 hasPermission: true,
                 curPipelineId: '',
                 defaultDate: '2018-05-04',
-                groupIdDesc: '可发通知至企业微信群。群ID获取方法：将"DevOpsRobot(蓝盾机器人)" 拉进群，手动@DevOpsRobot(蓝盾机器人)并输入关键字"会话ID",发送后即可获取群ID',
+                groupIdDesc: "可发通知至企业微信群。群ID获取方法：将'CI-Notice' 拉进群，手动@CI-Notice 并输入关键字'会话ID'，发送后即可获取群ID",
                 experienceGroup: [],
                 groupIdStorage: [],
                 categoryList: [
