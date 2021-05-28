@@ -1,5 +1,5 @@
 import api from './ajax'
-import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, CHECK_ENV_URL, GITCI_PERFIX } from './perfix'
+import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX } from './perfix'
 
 export default {
     // 第一次拉取日志
@@ -34,8 +34,7 @@ export default {
     },
 
     requestDevnetGateway () {
-        const baseUrl = CHECK_ENV_URL
-        return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/checkDevnetGateway`, { baseURL: baseUrl })
+        return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/checkDevnetGateway`)
     },
 
     requestDownloadUrl ({ projectId, artifactoryType, path }) {
@@ -43,7 +42,8 @@ export default {
     },
 
     requestReportList ({ projectId, pipelineId, buildId }) {
-        return api.get(`${PROCESS_PREFIX}/user/reports/${projectId}/${pipelineId}/${buildId}`)
+        // return api.get(`${PROCESS_PREFIX}/user/reports/${projectId}/${pipelineId}/${buildId}`)
+        return api.get(`${GITCI_PERFIX}/user/current/build/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/report`)
     },
 
     getPipelineList (projectId) {
@@ -99,7 +99,16 @@ export default {
     },
 
     rebuildPipeline (projectId, pipelineId, buildId, params = {}) {
-        return api.post(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/retry`, { params })
+        const queryStr = Object.keys(params).reduce((query, key) => {
+            const value = params[key]
+            if (value !== undefined) {
+                const queryVal = `${key}=${value}`
+                query += (query === '' ? '?' : '&')
+                query += queryVal
+            }
+            return query
+        }, '')
+        return api.post(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/retry${queryStr}`)
     },
 
     cancelBuildPipeline (projectId, pipelineId, buildId) {

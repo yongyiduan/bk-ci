@@ -26,7 +26,7 @@
                     </template>
                 </bk-table-column>
             </bk-table>
-            <iframe :src="chooseReport.indexFileUrl" frameborder="0" class="report-file" v-else></iframe>
+            <iframe :src="(chooseReport.indexFileUrl).replace('https', 'http')" frameborder="0" class="report-file" v-else></iframe>
         </template>
         <span class="bk-table-empty-text" v-if="!isLoading && reportList.length <= 0">
             <i class="bk-table-empty-icon bk-icon icon-empty"></i>

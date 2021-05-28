@@ -32,8 +32,10 @@
                     <bk-collapse slot="content">
                         <bk-collapse-item :name="request.id" v-for="request in notification.records" :key="request.messageTitle" @click.native="readMessage(request)">
                             <span class="content-message">
-                                <span :class="{ 'message-status': true, 'unread': !request.haveRead }"></span>
-                                {{ request.messageTitle }} （{{ request.contentAttr.failedNum }} / {{ request.contentAttr.total }}）
+                                <span>
+                                    <span :class="{ 'message-status': true, 'unread': !request.haveRead }"></span>
+                                    {{ request.messageTitle }} （{{ request.contentAttr.failedNum }} / {{ request.contentAttr.total }}）
+                                </span>
                                 <span class="message-time">{{ request.createTime | timeFilter }}</span>
                             </span>
                             <bk-table :data="request.content" :show-header="false" slot="content" class="notification-table">
@@ -227,6 +229,8 @@
             .content-message {
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
+                padding-right: 20px;
             }
             .message-status {
                 display: inline-block;

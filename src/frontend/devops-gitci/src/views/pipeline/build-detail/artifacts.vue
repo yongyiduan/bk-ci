@@ -88,7 +88,7 @@
                     })
                 ]).then(([isDevnet, res]) => {
                     const url = isDevnet ? res.url : res.url2
-                    window.location.href = url
+                    window.open(url, '_blank')
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })

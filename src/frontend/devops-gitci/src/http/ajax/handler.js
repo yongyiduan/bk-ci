@@ -20,7 +20,7 @@ function successHandler (response) {
 }
 
 function getLoginUrl () {
-    const cUrl = location.origin + location.pathname + encodeURIComponent(location.search)
+    const cUrl = location.href
     if (/=%s/.test(LOGIN_SERVICE_URL)) {
         return LOGIN_SERVICE_URL.replace(/%s/, cUrl)
     } else {

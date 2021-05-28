@@ -301,6 +301,7 @@
             },
 
             cleanFilterData () {
+                this.compactPaging.current = 1
                 this.filterData = {
                     commitMsg: '',
                     triggerUser: [],
@@ -649,6 +650,21 @@
                 }
                 &.icon-exclamation, &.icon-exclamation-triangle, &.icon-clock {
                     font-size: 24px;
+                }
+                &.running {
+                    color: #459fff;
+                }
+                &.canceled {
+                    color: #f6b026;
+                }
+                &.danger {
+                    color: #ff5656;
+                }
+                &.success {
+                    color: #34d97b;
+                }
+                &.pause {
+                    color: #ff9801;
                 }
             }
             .message {

@@ -53,7 +53,7 @@
 
         computed: {
             jobStatusIcon () {
-                return getPipelineStatusShapeIconCls(this.job.status)
+                return getPipelineStatusShapeIconCls(this.job.status || 'WAITING')
             }
         },
 

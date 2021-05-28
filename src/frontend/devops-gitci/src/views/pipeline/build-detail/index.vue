@@ -33,16 +33,17 @@
                     { label: 'Configuration', name: 'buildConfig' }
                 ],
                 active: 'buildDetail',
-                buildNum: ''
+                buildNum: '',
+                yml: ''
             }
         },
 
         computed: {
-            ...mapState(['curPipeline', 'projectId']),
+            ...mapState(['projectId']),
 
             navList () {
                 return [
-                    { title: this.curPipeline.displayName, link: { name: 'buildList' } },
+                    { title: this.yml, link: { name: 'buildList' } },
                     { title: '# ' + this.buildNum }
                 ]
             }
@@ -75,7 +76,9 @@
                 return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
                     const gitRequestEvent = res.gitRequestEvent || {}
                     const modelDetail = res.modelDetail || {}
+                    const gitProjectPipeline = res.gitProjectPipeline || {}
                     this.buildNum = modelDetail.buildNum
+                    this.yml = gitProjectPipeline.filePath
                     const title = gitRequestEvent.commitMsg + ' #' + this.buildNum
                     modifyHtmlTitle(title)
                 }).catch((err) => {

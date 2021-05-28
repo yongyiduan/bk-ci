@@ -5,6 +5,7 @@
                 <i :class="stageStatusIcon"></i>
                 {{ stage.name }}
             </span>
+            <span v-if="['FAILED', 'CANCELED'].includes(stage.status)" class="stage-retry" @click="retry">Retry</span>
             <span class="stage-connector" v-if="stageIndex < stageNum - 1">
                 <i class="bk-icon icon-right-shape connector-angle"></i>
             </span>
@@ -17,11 +18,27 @@
             :stage-index="stageIndex"
             :stage-num="stageNum"
         ></job>
+
+        <bk-dialog v-model="showRetryStageDialog"
+            render-directive="if"
+            ext-cls="stage-retry-dialog"
+            :width="400"
+            :auto-close="false"
+            :loading="isRetrying"
+            @confirm="confirmRetry"
+        >
+            <bk-radio-group v-model="failedContainer">
+                <bk-radio :value="false">Retry all jobs</bk-radio>
+                <bk-radio :value="true">Retry failed jobs</bk-radio>
+            </bk-radio-group>
+        </bk-dialog>
     </section>
 </template>
 
 <script>
+    import { mapState } from 'vuex'
     import { getPipelineStatusClass, getPipelineStatusIconCls } from '@/components/status'
+    import { pipelines } from '@/http'
     import job from '../job/index'
 
     export default {
@@ -35,7 +52,17 @@
             stageNum: Number
         },
 
+        data () {
+            return {
+                showRetryStageDialog: false,
+                failedContainer: false,
+                isRetrying: false
+            }
+        },
+
         computed: {
+            ...mapState(['projectId']),
+
             stageStatusCls () {
                 return getPipelineStatusClass(this.stage.status)
             },
@@ -43,11 +70,36 @@
             stageStatusIcon () {
                 return getPipelineStatusIconCls(this.stage.status)
             }
+        },
+
+        methods: {
+            retry () {
+                this.showRetryStageDialog = true
+            },
+
+            confirmRetry () {
+                this.isRetrying = true
+                const routeParams = this.$route.params || {}
+                const query = {
+                    taskId: this.stage.id,
+                    failedContainer: this.failedContainer
+                }
+                pipelines.rebuildPipeline(this.projectId, routeParams.pipelineId, routeParams.buildId, query).then(() => {
+                    this.showRetryStageDialog = false
+                    this.$bkMessage({ theme: 'success', message: 'Retry successful' })
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isRetrying = false
+                })
+            }
         }
     }
 </script>
 
 <style lang="postcss" scoped>
+    @import '@/css/conf';
+
     .stage-home {
         position: relative;
         width: 280px;
@@ -106,6 +158,13 @@
                 }
             }
         }
+        .stage-retry {
+            cursor: pointer;
+            position: absolute;
+            right: 6%;
+            top: 0;
+            color: $primaryColor;
+        }
     }
     .stage-connector {
         position: absolute;
@@ -129,6 +188,15 @@
             position: absolute;
             right: -2px;
             top: -6px;
+        }
+    }
+    .stage-retry-dialog {
+        .bk-form-radio {
+            display: block;
+            margin-top: 15px;
+            .bk-radio-text {
+                font-size: 14px;
+            }
         }
     }
 </style>
