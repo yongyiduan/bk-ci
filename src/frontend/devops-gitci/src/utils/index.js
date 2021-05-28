@@ -202,3 +202,35 @@ export function debounce (callBack) {
     window.clearTimeout(debounce.timeId)
     debounce.timeId = window.setTimeout(callBack, 200)
 }
+
+export function getBuildTitle (gitRequestEvent = {}) {
+    let res = ''
+    switch (gitRequestEvent.objectKind) {
+        case 'merge_request':
+            res = gitRequestEvent.mrTitle
+            break
+        default:
+            res = gitRequestEvent.commitMsg
+            break
+    }
+    return res
+}
+
+export function getBuildSource (gitRequestEvent = {}) {
+    let res = ''
+    switch (gitRequestEvent.objectKind) {
+        case 'push':
+            res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
+            break
+        case 'tag_push':
+            res = gitRequestEvent.branch
+            break
+        case 'merge_request':
+            res = `[!${gitRequestEvent.mergeRequestId}]`
+            break
+        case 'manual':
+            res = '--'
+            break
+    }
+    return res
+}

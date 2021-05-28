@@ -4,7 +4,6 @@
             <h5 class="header-info">
                 <span class="info-title">{{ pool.name }}</span>
                 <span class="info-num" v-if="editable">Agent：{{ pool.nodeCount }}</span>
-                <span class="info-num" v-else>Agent：{{ pool.enableNode }} / {{ pool.totalNode }}</span>
             </h5>
 
             <opt-menu v-if="editable">

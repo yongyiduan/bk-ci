@@ -68,9 +68,6 @@
                 ]).then(([res, permission]) => {
                     this.artifactories = res.records || []
                     this.hasPermission = permission
-                    if (this.artifactories.length <= 0) {
-                        this.$emit('hidden')
-                    }
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

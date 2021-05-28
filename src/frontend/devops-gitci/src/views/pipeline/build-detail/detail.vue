@@ -4,7 +4,7 @@
             <i :class="[getIconClass(buildDetail.status), 'header-icon']"></i>
             <p class="detail-info">
                 <span class="info-title">
-                    {{ buildDetail.commitMsg }}
+                    {{ getBuildTitle(buildDetail) }}
                     <span class="title-item"><icon :name="buildTypeIcon" size="14" v-bk-tooltips="{ content: buildDetail.objectKind, placements: ['top'] }"></icon></span>
                     <span class="title-item"><img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}</span>
                 </span>
@@ -24,7 +24,9 @@
                     </span>
                 </span>
                 <span class="info-data">
-                    <span :class="['info-item', 'text-ellipsis', { 'text-link': buildDetail.commitId }]" @click="goToCommit(buildDetail.commitId)"><icon name="commit" size="14"></icon>{{ buildDetail.commitId | commitFilter }}</span>
+                    <span :class="['info-item', 'text-ellipsis', { 'text-link': buildDetail.objectKind !== 'manual' }]" @click="goToCode(buildDetail)">
+                        <icon :name="buildTypeIcon" size="14"></icon>{{ getBuildSource(buildDetail) }}
+                    </span>
                     <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
             </p>
@@ -39,7 +41,7 @@
 <script>
     import { mapState } from 'vuex'
     import { pipelines } from '@/http'
-    import { preciseDiff, timeFormatter, commitIdFormatter, getbuildTypeIcon, goCommit } from '@/utils'
+    import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag } from '@/utils'
     import stages from '@/components/stages'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
 
@@ -55,10 +57,6 @@
 
             timeFilter (val) {
                 return timeFormatter(val)
-            },
-
-            commitFilter (val) {
-                return commitIdFormatter(val)
             }
         },
 
@@ -89,6 +87,9 @@
         },
 
         methods: {
+            getBuildTitle,
+            getBuildSource,
+
             initData () {
                 this.isLoading = true
                 this.loopGetPipelineDetail().then(() => {
@@ -160,8 +161,18 @@
                 return [getPipelineStatusClass(status), ...getPipelineStatusCircleIconCls(status)]
             },
 
-            goToCommit (commitId) {
-                goCommit(this.projectInfo.web_url, commitId)
+            goToCode (gitRequestEvent) {
+                switch (gitRequestEvent.objectKind) {
+                    case 'push':
+                        goCommit(this.projectInfo.web_url, gitRequestEvent.commitId)
+                        break
+                    case 'tag_push':
+                        goTag(this.projectInfo.web_url, gitRequestEvent.branch)
+                        break
+                    case 'merge_request':
+                        goMR(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
+                        break
+                }
             }
         }
     }

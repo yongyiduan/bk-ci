@@ -231,6 +231,9 @@
                 align-items: center;
                 justify-content: space-between;
                 padding-right: 20px;
+                .message-time {
+                    color: #9fa2ad;
+                }
             }
             .message-status {
                 display: inline-block;

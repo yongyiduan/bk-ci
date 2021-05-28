@@ -42,12 +42,11 @@ export default {
     },
 
     requestReportList ({ projectId, pipelineId, buildId }) {
-        // return api.get(`${PROCESS_PREFIX}/user/reports/${projectId}/${pipelineId}/${buildId}`)
         return api.get(`${GITCI_PERFIX}/user/current/build/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/report`)
     },
 
     getPipelineList (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/pipelines/${projectId}/list`)
+        return api.get(`${GITCI_PERFIX}/user/pipelines/${projectId}/list?page=1&pageSize=50`)
     },
 
     getPipelineBuildList (projectId, params) {

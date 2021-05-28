@@ -25,6 +25,10 @@
             }
         }
     }
+    ul {
+        height: calc(100% - 60px);
+        overflow: auto;
+    }
     .nav-item {
         position: relative;
         line-height: 40px;
@@ -35,7 +39,10 @@
         align-items: center;
         max-width: 240px;
         &.disabled {
-            background: #F5F7FA;
+            color: #b9bcc3;
+        }
+        &:hover {
+            background: #f0f1f5;
         }
         &.active {
             background: #e0ecff;

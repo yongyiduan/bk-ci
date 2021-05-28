@@ -112,8 +112,8 @@
         }
     }
     .build-detail-main {
-        margin-top: 20px;
-        height: calc(100% - 110px);
+        margin-top: 16px;
+        height: calc(100% - 106px);
         background: #fff;
     }
 </style>

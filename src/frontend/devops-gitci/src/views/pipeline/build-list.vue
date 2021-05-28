@@ -46,7 +46,6 @@
 
             <bk-table :data="buildList"
                 :header-cell-style="{ background: '#fafbfd' }"
-                :height="tableHeight"
                 :outer-border="false"
                 :header-border="false"
                 v-bkloading="{ isLoading }"
@@ -59,7 +58,7 @@
                         <section class="commit-message">
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
                             <p>
-                                <span class="message">{{ props.row.gitRequestEvent.commitMsg }}</span>
+                                <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
                                 <span class="info">#{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
                         </section>
@@ -157,7 +156,7 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
-    import { goYaml, preciseDiff, timeFormatter, modifyHtmlTitle, debounce } from '@/utils'
+    import { goYaml, preciseDiff, timeFormatter, modifyHtmlTitle, debounce, getBuildTitle } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
@@ -235,11 +234,7 @@
         },
 
         computed: {
-            ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectInfo']),
-
-            tableHeight () {
-                return Math.min(this.appHeight - 292, 43 + (this.buildList.length || 3) * 72)
-            }
+            ...mapState(['curPipeline', 'projectId', 'projectInfo'])
         },
 
         watch: {
@@ -269,6 +264,7 @@
 
         methods: {
             ...mapActions(['setCurPipeline']),
+            getBuildTitle,
 
             setHtmlTitle () {
                 const projectPath = (this.$route.hash || '').slice(1)
@@ -359,7 +355,7 @@
                         res = `Commit ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
                         break
                     case 'tag_push':
-                        res = `Tag ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
+                        res = `Tag ${gitRequestEvent.branch} created by ${gitRequestEvent.userId}`
                         break
                     case 'merge_request':
                         const actionMap = {
@@ -564,7 +560,7 @@
 
 <style lang="postcss" scoped>
     .pipelines-main {
-        padding-left: 20px;
+        padding-left: 16px;
         .main-head {
             height: 50px;
             background: #fff;
@@ -603,8 +599,9 @@
         }
 
         .main-body {
-            margin-top: 20px;
-            height: calc(100% - 70px);
+            margin-top: 16px;
+            height: calc(100% - 66px);
+            overflow: auto;
             background: #fff;
             padding: 16px 24px 0;
             .build-filter {

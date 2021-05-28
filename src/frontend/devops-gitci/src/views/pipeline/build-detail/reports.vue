@@ -1,16 +1,13 @@
 <template>
     <article class="detail-report-home" v-bkloading="{ isLoading }">
         <template v-if="reportList.length">
-            <ul class="report-list">
-                <li v-for="(report, index) in reportList"
-                    :key="index"
-                    :class="{ 'text-overflow': true, active: reportIndex === index }"
-                    @click="reportIndex = index"
-                    v-bk-overflow-tips
-                >
-                    {{ report.name }}
-                </li>
-            </ul>
+            <bk-tab :active.sync="reportIndex">
+                <bk-tab-panel
+                    v-for="(report, index) in reportList"
+                    v-bind="report"
+                    :key="index">
+                </bk-tab-panel>
+            </bk-tab>
 
             <bk-table :data="chooseReport.thirdReports"
                 :outer-border="false"
@@ -26,7 +23,7 @@
                     </template>
                 </bk-table-column>
             </bk-table>
-            <iframe :src="(chooseReport.indexFileUrl).replace('https', 'http')" frameborder="0" class="report-file" v-else></iframe>
+            <iframe :src="chooseReport.indexFileUrl" frameborder="0" class="report-file" v-else></iframe>
         </template>
         <span class="bk-table-empty-text" v-if="!isLoading && reportList.length <= 0">
             <i class="bk-table-empty-icon bk-icon icon-empty"></i>
@@ -80,9 +77,7 @@
                     })
                     this.reportList = innerReports
                     if (thirdReports.length) this.reportList.push({ name: 'Third party report', thirdReports, type: 'THIRDPARTY' })
-                    if (this.reportList.length <= 0) {
-                        this.$emit('hidden')
-                    }
+                    this.reportList = this.reportList.map((report, index) => ({ name: index, label: report.name, indexFileUrl: report.indexFileUrl }))
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -96,40 +91,14 @@
 
 <style lang="postcss" scoped>
     .detail-report-home {
-        display: flex;
-        align-items: stretch;
-    }
-    .report-list {
-        width: 150px;
-        border-right: 1px solid #ebedf0;
-        padding: 30px 0;
-        height: 100%;
-        overflow-y: auto;
-        li {
-            position: relative;
-            line-height: 48px;
-            font-size: 14px;
-            padding-left: 16px;
-            color: #222222;
-            cursor: pointer;
-            &.active {
-                background: #f3f9ff;
-                color: #1592ff;
-                &:before {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    bottom: 0;
-                    width: 4px;
-                    background: #1a6df3;
-                }
-            }
+        /deep/ .bk-tab-section {
+            padding: 0;
+            border: none;
         }
     }
     .report-file {
-        flex: 1;
-        padding: 30px;
+        height: calc(100% - 50px);
+        width: 100%;
         .jump-icon {
             fill: #3c96ff;
             vertical-align: bottom;
@@ -137,8 +106,10 @@
         }
     }
     .bk-table-empty-text {
-        width: 100%;
+        width: 100px;
+        margin: 0 auto;
         text-align: center;
+        display: block;
     }
     /deep/ .bk-table {
         border: none;
