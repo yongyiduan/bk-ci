@@ -14,7 +14,7 @@
                     <span class="info-item text-ellipsis">
                         <icon name="message" size="14"></icon>
                         {{ buildDetail.buildHistoryRemark || '--' }}
-                        <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark" confirm-text="confirm" cancel-text="cancel">
+                        <bk-popconfirm trigger="click" @confirm="confirmUpdateRemark" placement="bottom" confirm-text="confirm" cancel-text="cancel">
                             <div slot="content">
                                 <h3 class="mb10">Edit notes</h3>
                                 <bk-input type="textarea" v-model="remark" placeholder="Please enter a note" class="mb10 w200"></bk-input>

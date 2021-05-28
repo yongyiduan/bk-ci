@@ -33,7 +33,7 @@ export default {
         return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/${pipelineId}/hasPermission?permission=${permission}`)
     },
 
-    requestDevnetGateway ({ commit }) {
+    requestDevnetGateway () {
         const baseUrl = CHECK_ENV_URL
         return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/checkDevnetGateway`, { baseURL: baseUrl })
     },

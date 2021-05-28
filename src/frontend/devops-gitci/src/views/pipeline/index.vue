@@ -25,7 +25,7 @@
                 <bk-form-item label="Name" :rules="[requireRule('Name'), nameRule]" :required="true" property="file_name" error-display-type="normal">
                     <bk-compose-form-item class="yaml-name-container">
                         <bk-input value=".ci / " disabled class="yaml-path"></bk-input>
-                        <bk-input v-model="yamlData.file_name" class="yaml-name" placeholder="Please input yaml name"></bk-input>
+                        <bk-input v-model="yamlData.file_name" class="yaml-name" placeholder="Please enter yml name，such as build.yml"></bk-input>
                     </bk-compose-form-item>
                 </bk-form-item>
                 <bk-form-item label="YAML" :rules="[requireRule('Yaml')]" :required="true" property="content" error-display-type="normal">
@@ -237,7 +237,7 @@
             requireRule (name) {
                 return {
                     required: true,
-                    message: name + 'is required',
+                    message: name + ' is required',
                     trigger: 'blur'
                 }
             }

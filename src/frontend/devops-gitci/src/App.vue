@@ -12,7 +12,7 @@
             </span>
             <section class="user-info">
                 <img :src="userInfo.img" class="avatar" />
-                <bk-dropdown-menu align="right">
+                <bk-dropdown-menu align="right" trigger="click">
                     <div class="dropdown-trigger-btn" slot="dropdown-trigger">
                         <span class="name">{{ userInfo.name }}</span>
                         <span class="unread" v-if="messageNum > 0"></span>
@@ -138,9 +138,8 @@
             },
 
             goLogin () {
-                const cUrl = location.origin + location.pathname + encodeURIComponent(location.search)
                 const loginUrl = new URL(LOGIN_SERVICE_URL)
-                loginUrl.searchParams.append('c_url', cUrl)
+                loginUrl.searchParams.append('c_url', location.href)
                 window.location.href = loginUrl.href
             },
 

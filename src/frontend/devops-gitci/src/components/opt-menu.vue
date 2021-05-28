@@ -1,5 +1,5 @@
 <template>
-    <bk-popover placement="bottom-end" theme="light" ext-cls="gitci-dropdown">
+    <bk-popover trigger="click" placement="bottom-end" theme="light" ext-cls="gitci-dropdown" @click.native.stop>
         <i class="header-opt bk-icon icon-more"></i>
         <ul slot="content">
             <slot></slot>

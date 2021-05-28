@@ -449,12 +449,12 @@
             },
 
             getPipelineBranchYaml () {
-                const params = {
-                    branchName: this.formData.branch,
-                    commitId: this.formData.useCommitId ? this.formData.commitId[0] : undefined
-                }
+                const branchName = this.formData.branch
+                const commitId = this.formData.useCommitId ? this.formData.commitId[0] : undefined
+                if (!branchName && !commitId) return
+
                 this.isLoadingYaml = true
-                return pipelines.getPipelineBranchYaml(this.projectId, this.curPipeline.pipelineId, params).then((res) => {
+                return pipelines.getPipelineBranchYaml(this.projectId, this.curPipeline.pipelineId, { branchName, commitId }).then((res) => {
                     this.formData.yaml = res || ''
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -483,6 +483,7 @@
                 button.type = 'button'
                 document.body.appendChild(button)
                 button.click()
+                document.body.removeChild(button)
             },
 
             rebuild (row) {
@@ -541,7 +542,7 @@
             requireRule (name) {
                 return {
                     required: true,
-                    message: name + 'is required',
+                    message: name + ' is required',
                     trigger: 'blur'
                 }
             },
@@ -570,7 +571,6 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 27px;
-            line-height: 50px;
             .head-text {
                 display: flex;
                 align-items: center;
