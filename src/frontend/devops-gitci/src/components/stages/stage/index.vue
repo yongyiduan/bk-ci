@@ -3,7 +3,7 @@
         <h3 class="stage-title">
             <span :class="`${stageStatusCls} title-content`">
                 <i :class="stageStatusIcon"></i>
-                {{ stage.name }}
+                <span class="stage-name text-ellipsis" v-bk-overflow-tips>{{ stage.name }}</span>
             </span>
             <span v-if="['FAILED', 'CANCELED'].includes(stage.status)" class="stage-retry" @click="retry">Re-run</span>
             <span class="stage-connector" v-if="stageIndex < stageNum - 1">
@@ -120,10 +120,17 @@
         .title-content {
             width: 100%;
             height: 100%;
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background-color: #f3f3f3;
             border: 1px solid #d0d8ea;
             color: black;
+            .stage-name {
+                max-width: 200px;
+                margin-left: 5px;
+                display: inline-block;
+            }
             .bk-icon {
                 font-size: 22px;
             }

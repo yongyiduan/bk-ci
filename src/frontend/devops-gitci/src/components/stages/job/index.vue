@@ -2,7 +2,7 @@
     <section class="job-home" ref="pipelineJob">
         <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1, [getPipelineStatusClass(job.status)]: true }" @click="toggleShowLog">
             <i :class="[jobStatusIcon, 'job-status']"></i>
-            <span class="job-name">{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
+            <span class="job-name text-ellipsis" v-bk-overflow-tips>{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
             <job-time :job="job"></job-time>
             <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
         </h3>
@@ -122,6 +122,7 @@
 
             .job-name {
                 flex: 1;
+                max-width: 152px;
             }
             .connector-angle {
                 position: absolute;

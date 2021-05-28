@@ -46,7 +46,7 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'curPipeline']),
+            ...mapState(['projectId']),
 
             chooseReport () {
                 return this.reportList.find((report, index) => (index === this.reportIndex)) || {}
@@ -61,7 +61,7 @@
             initData () {
                 const postData = {
                     projectId: this.projectId,
-                    pipelineId: this.curPipeline.pipelineId,
+                    pipelineId: this.$route.params.pipelineId,
                     buildId: this.$route.params.buildId
                 }
                 this.isLoading = true

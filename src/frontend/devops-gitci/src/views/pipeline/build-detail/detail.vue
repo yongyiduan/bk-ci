@@ -4,7 +4,7 @@
             <i :class="[getIconClass(buildDetail.status), 'header-icon']"></i>
             <p class="detail-info">
                 <span class="info-title">
-                    {{ getBuildTitle(buildDetail) }}
+                    <span class="build-title text-ellipsis" v-bk-overflow-tips>{{ getBuildTitle(buildDetail) }}</span>
                     <span class="title-item"><icon :name="buildTypeIcon" size="14" v-bk-tooltips="{ content: buildDetail.objectKind, placements: ['top'] }"></icon></span>
                     <span class="title-item"><img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}</span>
                 </span>
@@ -226,6 +226,10 @@
                 display: flex;
                 align-items: center;
                 margin: 4px 0 4px;
+                .build-title {
+                    max-width: 600px;
+                    display: inline-block;
+                }
                 .title-item {
                     position: relative;
                     display: flex;

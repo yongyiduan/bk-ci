@@ -38,7 +38,7 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'curPipeline'])
+            ...mapState(['projectId'])
         },
 
         created () {
@@ -52,13 +52,13 @@
                     params: {
                         props: {
                             buildId: this.$route.params.buildId,
-                            pipelineId: this.curPipeline.pipelineId
+                            pipelineId: this.$route.params.pipelineId
                         }
                     }
                 }
                 const permissionData = {
                     projectId: this.projectId,
-                    pipelineId: this.curPipeline.pipelineId,
+                    pipelineId: this.$route.params.pipelineId,
                     permission: 'DOWNLOAD'
                 }
                 this.isLoading = true
