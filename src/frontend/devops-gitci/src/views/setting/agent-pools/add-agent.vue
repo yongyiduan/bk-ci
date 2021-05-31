@@ -111,10 +111,8 @@
                     <p>
                         <span class="gray"># Create a folder</span>
                         <span class="mb10">$ mkdir /data/landun && cd  /data/landun</span>
-                        <span class="gray"># Download and install the latest agent package</span>
+                        <span class="gray"># Download & Install the latest agent package, and run it!</span>
                         <span class="mb10">$ ${this.machine.link}</span>
-                        <span class="gray"># Run it!</span>
-                        <span>$ ./install.sh </span>
                     </p>
                 `
                 const windowHtml = `
