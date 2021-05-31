@@ -165,7 +165,7 @@
             importNode () {
                 this.isAdding = true
                 setting.addNodeToSystem(this.projectId, this.machine.agentId).then(() => {
-                    return setting.getNodeList(this.projectId).then((res) => {
+                    return setting.getSystemNodeList(this.projectId).then((res) => {
                         const curNode = res.find((node) => (node.agentHashId === this.machine.agentId)) || {}
                         const params = [curNode.nodeHashId]
                         return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
