@@ -38,6 +38,7 @@
                 return {
                     typeMap: {
                         404: 404,
+                        500: 500,
                         520: 'login'
                     },
                     titleMap: {
@@ -46,6 +47,7 @@
                         418: 'No permission',
                         419: 'CI is not enabled',
                         499: 'No project information found',
+                        500: 'System Error',
                         520: 'Welcome to Tencent CI.'
                     },
                     messageMap: {
@@ -54,6 +56,7 @@
                         418: 'The OAUTH authorization has not been carried out yet, please authorize first!',
                         419: 'CI has not been enabled yet, please enable it first!',
                         499: `The information of the project ${this.projectPath} is not queried, please modify and try again`,
+                        500: this.exceptionInfo.message || 'System error, please try again later',
                         520: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. '
                     }
                 }

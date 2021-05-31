@@ -110,7 +110,8 @@
                             }
                             resolve()
                         }).catch((err) => {
-                            reject(err)
+                            resolve()
+                            this.setExceptionInfo({ type: 500, message: err.message || err })
                         })
                     } else {
                         this.setExceptionInfo({ type: 520 })
@@ -122,8 +123,6 @@
             getNotifications () {
                 return notifications.getUnreadNotificationNum(this.projectId).then((res) => {
                     this.messageNum = res || 0
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
 

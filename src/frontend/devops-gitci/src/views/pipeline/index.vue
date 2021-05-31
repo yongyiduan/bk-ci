@@ -29,6 +29,7 @@
                     </bk-compose-form-item>
                 </bk-form-item>
                 <bk-form-item label="YAML" :rules="[requireRule('Yaml')]" :required="true" property="content" error-display-type="normal">
+                    <bk-link theme="primary" href="https://iwiki.woa.com/x/OPBUL" target="_blank" class="yaml-examples">YAML Examples</bk-link>
                     <code-section :code.sync="yamlData.content" :read-only="false" :cursor-blink-rate="530"></code-section>
                 </bk-form-item>
                 <bk-form-item label="Branch" :rules="[requireRule('Branch')]" :required="true" property="branch_name" error-display-type="normal">
@@ -113,6 +114,8 @@
                 this.isLoading = true
                 this.loopGetPipelineList().then(() => {
                     this.setDefaultPipeline()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
                 })
@@ -135,8 +138,6 @@
                         branch: ((pipeline.latestBuildInfo || {}).gitRequestEvent || {}).branch
                     }))
                     this.pipelineList = [allPipeline, ...pipelines]
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
 
@@ -273,6 +274,11 @@
             .yaml-name {
                 width: calc(100% - 50px);
             }
+        }
+        .yaml-examples {
+            position: absolute;
+            top: -26px;
+            left: 70px;
         }
         /deep/ button {
             margin: 8px 10px 0 0;

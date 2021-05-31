@@ -3,7 +3,7 @@
         <aside class="aside-nav">
             <h3 class="nav-title">
                 <i class="bk-icon icon-arrows-left" @click="backHome"></i>
-                Setting
+                Settings
             </h3>
             <ul>
                 <li v-for="setting in settingList"

@@ -309,7 +309,9 @@
 
             initBuildData () {
                 this.isLoading = true
-                this.getBuildData().finally(() => {
+                this.getBuildData().catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
                     this.isLoading = false
                 })
             },
@@ -343,8 +345,6 @@
                         }
                     })
                     this.compactPaging.count = res.count
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
 
@@ -469,7 +469,7 @@
 
                 this.clickEmpty()
                 pipelines.cancelBuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
-                    this.getBuildData()
+                    this.initBuildData()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
@@ -488,7 +488,7 @@
 
                 this.clickEmpty()
                 pipelines.rebuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
-                    this.getBuildData()
+                    this.initBuildData()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
