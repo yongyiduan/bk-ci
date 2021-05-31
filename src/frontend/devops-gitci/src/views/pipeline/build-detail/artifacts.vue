@@ -7,9 +7,13 @@
             empty-text="No artifacts yet"
         >
             <bk-table-column label="Name" width="220" prop="name" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="Path" prop="fullName" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Path" show-overflow-tooltip>
+                <template slot-scope="props">
+                    <span v-if="props.row.artifactoryType === 'PIPELINE'">{{ props.row.name }}</span>
+                    <span v-else>{{ props.row.fullName }}</span>
+                </template>
+            </bk-table-column>
             <bk-table-column label="Size" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="Type" width="150" prop="artifactoryType" :formatter="repoTypeFormatter" show-overflow-tooltip></bk-table-column>
             <bk-table-column label="Operation" width="150">
                 <template slot-scope="props">
                     <bk-button text
@@ -89,13 +93,6 @@
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
-            },
-            repoTypeFormatter (row, column, cellValue, index) {
-                const typeMap = {
-                    CUSTOM_DIR: 'Custom Artifactory',
-                    PIPELINE: 'Pipeline Artifactory'
-                }
-                return typeMap[cellValue]
             },
             sizeFormatter (row, column, cellValue, index) {
                 return (cellValue >= 0 && convertFileSize(cellValue, 'B')) || ''

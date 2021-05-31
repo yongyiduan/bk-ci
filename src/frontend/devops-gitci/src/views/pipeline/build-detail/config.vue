@@ -37,7 +37,7 @@
             ...mapState(['projectId', 'appHeight']),
 
             height () {
-                return this.appHeight - 255
+                return this.appHeight - 267
             }
         },
 
