@@ -25,33 +25,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.log.configuration
+package com.tencent.devops.log.util
 
-import com.tencent.devops.common.log.utils.BuildLogPrinter
-import com.tencent.devops.common.log.utils.LogMQEventDispatcher
-import com.tencent.devops.common.web.mq.EXTEND_RABBIT_TEMPLATE_NAME
-import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.core.Ordered
-
-@Configuration
-@ConditionalOnWebApplication
-@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
-class LogConfiguration {
-
-    @Bean
-    fun logMQEventDispatcher(
-        @Qualifier(value = EXTEND_RABBIT_TEMPLATE_NAME)
-        rabbitTemplate: RabbitTemplate
-    ) = LogMQEventDispatcher(rabbitTemplate)
-
-    @Bean
-    fun buildLogPrinter(
-        @Qualifier(value = EXTEND_RABBIT_TEMPLATE_NAME)
-        rabbitTemplate: RabbitTemplate
-    ) = BuildLogPrinter(logMQEventDispatcher(rabbitTemplate))
+enum class LogErrorCodeEnum(
+    val errorCode: Int,
+    val formatErrorMessage: String
+) {
+    PRINT_QUEUE_LIMIT(errorCode = 2108001, formatErrorMessage = "log print queue exceeds the limit")
 }

@@ -25,32 +25,25 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.log.meta
+package com.tencent.devops.log.meta
 
-enum class AnsiColor(val value: Int) {
-    BLACK(0),
-    RED(1),
-    GREEN(2),
-    YELLOW(3),
-    BLUE(4),
-    MAGENTA(5),
-    CYAN(6),
-    WHITE(7),
-    DEFAULT(9);
-
-    fun fg(): Int {
-        return value + 30
-    }
-
-    fun bg(): Int {
-        return value + 40
-    }
-
-    fun fgBright(): Int {
-        return value + 90
-    }
-
-    fun bgBright(): Int {
-        return value + 100
-    }
+enum class AnsiAttribute(val value: Int) {
+    RESET(0),
+    INTENSITY_BOLD(1),
+    INTENSITY_FAINT(2),
+    ITALIC(3),
+    UNDERLINE(4),
+    BLINK_SLOW(5),
+    BLINK_FAST(6),
+    NEGATIVE_ON(7),
+    CONCEAL_ON(8),
+    STRIKETHROUGH_ON(9),
+    UNDERLINE_DOUBLE(21),
+    INTENSITY_BOLD_OFF(22),
+    ITALIC_OFF(23),
+    UNDERLINE_OFF(24),
+    BLINK_OFF(25),
+    NEGATIVE_OFF(27),
+    CONCEAL_OFF(28),
+    STRIKETHROUGH_OFF(29);
 }

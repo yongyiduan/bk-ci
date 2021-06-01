@@ -41,18 +41,18 @@ import com.tencent.devops.common.log.pojo.enums.LogStatus
 import com.tencent.devops.common.log.pojo.enums.LogType
 import com.tencent.devops.common.log.pojo.message.LogMessage
 import com.tencent.devops.common.log.pojo.message.LogMessageWithLineNo
-import com.tencent.devops.common.log.utils.LogMQEventDispatcher
 import com.tencent.devops.common.redis.RedisLock
 import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.log.client.LogClient
-import com.tencent.devops.log.jmx.v2.CreateIndexBeanV2
-import com.tencent.devops.log.jmx.v2.LogBeanV2
+import com.tencent.devops.log.jmx.CreateIndexBean
+import com.tencent.devops.log.jmx.LogStorageBean
 import com.tencent.devops.log.service.IndexService
 import com.tencent.devops.log.service.LogService
 import com.tencent.devops.log.service.LogStatusService
 import com.tencent.devops.log.service.LogTagService
 import com.tencent.devops.log.util.Constants
 import com.tencent.devops.log.util.ESIndexUtils
+import com.tencent.devops.log.service.BuildLogPrintService
 import org.elasticsearch.ElasticsearchStatusException
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest
 import org.elasticsearch.action.bulk.BulkRequest
@@ -87,10 +87,10 @@ class LogServiceESImpl constructor(
     private val indexService: IndexService,
     private val logStatusService: LogStatusService,
     private val logTagService: LogTagService,
-    private val createIndexBeanV2: CreateIndexBeanV2,
-    private val logBeanV2: LogBeanV2,
+    private val createIndexBean: CreateIndexBean,
+    private val logBeanV2: LogStorageBean,
     private val redisOperation: RedisOperation,
-    private val logMQEventDispatcher: LogMQEventDispatcher
+    private val buildLogPrintService: BuildLogPrintService
 ) : LogService {
 
     companion object {
@@ -104,7 +104,6 @@ class LogServiceESImpl constructor(
 
     override fun pipelineFinish(event: PipelineBuildFinishBroadCastEvent) {
         with(event) {
-            logger.info("[$projectId|$pipelineId|$buildId] build finish")
             indexService.flushLineNum2DB(buildId)
         }
     }
@@ -112,7 +111,7 @@ class LogServiceESImpl constructor(
     override fun addLogEvent(event: LogEvent) {
         val logMessage = addLineNo(event.buildId, event.logs)
         if (logMessage.isNotEmpty()) {
-            logMQEventDispatcher.dispatch(LogBatchEvent(event.buildId, logMessage))
+            buildLogPrintService.dispatchEvent(LogBatchEvent(event.buildId, logMessage))
         }
     }
 
@@ -156,7 +155,6 @@ class LogServiceESImpl constructor(
 
     override fun updateLogStatus(event: LogStatusEvent) {
         with(event) {
-            logger.info("[$buildId|$tag|$subTag|$jobId|$executeCount|$finished] Start to update log status")
             logStatusService.finish(
                 buildId = buildId,
                 tag = tag,
@@ -764,7 +762,6 @@ class LogServiceESImpl constructor(
         jobId: String? = null,
         executeCount: Int?
     ): QueryLogs {
-        logger.info("[$index|$buildId|$tag|$subTag|$jobId|$executeCount] doQueryInitLogs")
         val logStatus = if (tag == null && jobId != null) getLogStatus(
             buildId = buildId,
             tag = jobId,
@@ -803,7 +800,7 @@ class LogServiceESImpl constructor(
                 jobId = jobId,
                 executeCount = executeCount
             )
-            logger.info("Get the query builder: $boolQueryBuilder")
+            logger.info("[$index|$buildId|$tag|$subTag|$jobId|$executeCount] doQueryInitLogs get the query builder: $boolQueryBuilder")
 
             val searchRequest = SearchRequest(index)
                 .source(
@@ -865,7 +862,6 @@ class LogServiceESImpl constructor(
         jobId: String?,
         executeCount: Int?
     ): QueryLogs {
-        logger.info("[$index|$buildId|$debug|$tag|$subTag|$jobId|$executeCount] doQueryLogsAfterLine")
         val logStatus = if (tag == null && jobId != null) {
             getLogStatus(
                 buildId = buildId,
@@ -909,6 +905,7 @@ class LogServiceESImpl constructor(
                 executeCount = executeCount
             ).must(QueryBuilders.rangeQuery("lineNo").gte(start))
 
+            logger.info("[$index|$buildId|$tag|$subTag|$jobId|$executeCount] doQueryLogsAfterLine get the query builder: $boolQueryBuilder")
             val searchRequest = SearchRequest(index)
                 .source(
                     SearchSourceBuilder()
@@ -989,7 +986,6 @@ class LogServiceESImpl constructor(
         jobId: String?,
         executeCount: Int?
     ): QueryLogs {
-        logger.info("[$index|$buildId|$debug|$tag|$subTag|$jobId|$executeCount] doQueryLogsBeforeLine")
         val logStatus = if (tag == null && jobId != null) {
             getLogStatus(
                 buildId = buildId,
@@ -1045,6 +1041,7 @@ class LogServiceESImpl constructor(
             ).must(QueryBuilders.rangeQuery("lineNo").gte(start))
                 .must(QueryBuilders.rangeQuery("lineNo").lte(end))
 
+            logger.info("[$index|$buildId|$tag|$subTag|$jobId|$executeCount] doQueryLogsBeforeLine get the query builder: $boolQueryBuilder")
             val searchRequest = SearchRequest(index)
                 .source(
                     SearchSourceBuilder()
@@ -1295,7 +1292,7 @@ class LogServiceESImpl constructor(
             logger.error("[${createClient.clusterName}] Create index $index failure", e)
             return false
         } finally {
-            createIndexBeanV2.execute(System.currentTimeMillis() - startEpoch, success)
+            createIndexBean.execute(System.currentTimeMillis() - startEpoch, success)
         }
     }
 
