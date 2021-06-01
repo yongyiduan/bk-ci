@@ -4,6 +4,9 @@
             <atom-checkbox :disabled="turboDisabled" :handle-change="handleSwitch" :name="name" :text="text" :value="turboValue" :desc="desc"></atom-checkbox>
             <a href="javascript: void(0);" class="check-inline-link" target="_blank" v-if="taskId" @click.stop="goTurboLink">{{ taskName }}</a>
         </div>
+        <bk-alert type="error" class="turbo-tip" v-if="taskId && turboValue">
+            <div slot="title">当前使用的是旧版 Distcc，建议迁移到新版。<bk-link href="https://iwiki.woa.com/x/6OQMIw" target="_blank" theme="primary">了解更多</bk-link></div>
+        </bk-alert>
         <div class="build-quote" v-if="taskId && turboValue">
             <div class="quote-ident">
                 <i class="devops-icon icon-info-circle quote-ident-icon"></i>
@@ -182,6 +185,12 @@
         margin-left: 28px;
         &:link, &:visited {
             color: #3c96ff;
+        }
+    }
+    .turbo-tip {
+        margin-bottom: 5px;
+        .bk-link .bk-link-text {
+            font-size: 12px;
         }
     }
     .build-quote {
