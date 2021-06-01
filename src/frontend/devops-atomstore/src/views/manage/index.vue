@@ -50,8 +50,8 @@
                           name: 'setting',
                           children: [
                               { label: this.$t('store.成员管理'), name: 'member' },
-                              { label: this.$t('store.可见范围'), name: 'visible', hidden: VERSION_TYPE === 'ee' },
-                              { label: this.$t('store.私有配置'), name: 'private' }
+                              { label: this.$t('store.私有配置'), name: 'private' },
+                              { label: this.$t('store.apiSettingManage'), name: 'api' }
                           ],
                           showChildTab: true }
                     ],

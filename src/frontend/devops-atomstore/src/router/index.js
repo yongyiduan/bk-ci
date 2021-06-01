@@ -43,6 +43,7 @@ const setting = () => import(/* webpackChunkName: 'setting' */ '@/views/manage/s
 const visibleSetting = () => import(/* webpackChunkName: 'visibleSetting' */ '@/views/manage/setting/visible-setting.vue') // 研发商店管理页面
 const memberSetting = () => import(/* webpackChunkName: 'setting' */ '@/views/manage/setting/member-setting.vue') // 研发商店管理页面
 const privateSetting = () => import(/* webpackChunkName: 'setting' */ '@/views/manage/setting/private-setting.vue') // 研发商店管理页面
+const apiSetting = () => import(/* webpackChunkName: 'setting' */ '@/views/manage/setting/api-setting.vue') // 研发商店管理页面
 const releaseManage = () => import(/* webpackChunkName: 'releaseManage' */ '@/views/manage/release-manage/index.vue') // 研发商店管理页面
 const version = () => import(/* webpackChunkName: 'releaseManage' */ '@/views/manage/release-manage/version.vue') // 研发商店管理页面
 const environment = () => import(/* webpackChunkName: 'releaseManage' */ '@/views/manage/release-manage/environment.vue') // 研发商店管理页面
@@ -195,6 +196,11 @@ const routes = [
                                 path: 'private',
                                 name: 'private',
                                 component: privateSetting
+                            },
+                            {
+                                path: 'api',
+                                name: 'api',
+                                component: apiSetting
                             },
                             {
                                 path: 'visible',
