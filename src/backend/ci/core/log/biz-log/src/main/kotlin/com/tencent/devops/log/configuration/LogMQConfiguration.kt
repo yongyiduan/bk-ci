@@ -60,7 +60,6 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfigureOrder
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
@@ -71,18 +70,6 @@ import org.springframework.core.Ordered
 @ConditionalOnWebApplication
 @AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 class LogMQConfiguration @Autowired constructor() {
-
-    @Value("\${log.rabbitmq.preprocess.concurrency:#{null}}")
-    private val preprocessConcurrency: Int? = null
-
-    @Value("\${log.rabbitmq.preprocess.maxConcurrency:#{null}}")
-    private val preprocessMaxConcurrency: Int? = null
-
-    @Value("\${log.rabbitmq.storage.concurrency:#{null}}")
-    private val storageConcurrency: Int? = null
-
-    @Value("\${log.rabbitmq.storage.maxConcurrency:#{null}}")
-    private val storageMaxConcurrency: Int? = null
 
     @Bean
     fun rabbitAdmin(
@@ -182,8 +169,8 @@ class LogMQConfiguration @Autowired constructor() {
             adapter = messageListenerAdapter,
             startConsumerMinInterval = 5000,
             consecutiveActiveTrigger = 5,
-            concurrency = preprocessConcurrency ?: 1,
-            maxConcurrency = preprocessMaxConcurrency ?: 1
+            concurrency = 1,
+            maxConcurrency = 1
         )
     }
 
@@ -206,8 +193,8 @@ class LogMQConfiguration @Autowired constructor() {
             adapter = messageListenerAdapter,
             startConsumerMinInterval = 5000,
             consecutiveActiveTrigger = 5,
-            concurrency = storageConcurrency ?: 10,
-            maxConcurrency = storageMaxConcurrency ?: 100
+            concurrency = 10,
+            maxConcurrency = 100
         )
     }
 
