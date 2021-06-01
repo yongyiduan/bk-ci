@@ -257,6 +257,11 @@
         margin: 0 12px 10px 20px;
         padding: 10px 0;
         font-size: 16px;
+        button {
+            width: 56px;
+            min-width: 56px;
+            padding: 0;
+        }
     }
     .pipelines-main {
         width: calc(100vw - 290px);

@@ -9,10 +9,13 @@
                 </span>
                 <span class="pipeline-status" v-if="!curPipeline.enabled">Disabled</span>
             </span>
-            <opt-menu v-if="curPipeline.pipelineId">
-                <li @click="showTriggleBuild" :class="{ disabled: !curPipeline.enabled }">Trigger build</li>
-                <li @click="togglePipelineEnable">{{ curPipeline.enabled ? 'Disable pipeline' : 'Enable pipeline' }}</li>
-            </opt-menu>
+
+            <section v-if="curPipeline.pipelineId" class="head-options">
+                <bk-button @click="showTriggleBuild" :disabled="!curPipeline.enabled" size="small" class="options-btn">Trigger build</bk-button>
+                <opt-menu>
+                    <li @click="togglePipelineEnable">{{ curPipeline.enabled ? 'Disable pipeline' : 'Enable pipeline' }}</li>
+                </opt-menu>
+            </section>
         </header>
 
         <section class="main-body section-box">
@@ -571,6 +574,13 @@
             .head-text {
                 display: flex;
                 align-items: center;
+            }
+            .head-options {
+                display: flex;
+                align-items: center;
+                .options-btn {
+                    margin-right: 10px;
+                }
             }
             .pipeline-name {
                 color: #313328;
