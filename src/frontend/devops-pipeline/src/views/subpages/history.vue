@@ -1,7 +1,10 @@
 <template>
     <div class="bkdevops-pipeline-history pb20">
         <bk-tab :active.sync="currentTab" @tab-change="switchTab" :before-toggle="beforeSwitch" class="bkdevops-pipeline-tab-card" type="unborder-card">
-            <div class="bkdevops-pipeline-tab-card-setting" slot="setting">
+            <div class="bkdevops-pipeline-tab-card-setting" slot="setting" v-if="currentTab === 'trendData'">
+                <bk-date-picker :placeholder="$t('history.chooseDateRange')" :value="dateRange" :type="'daterange'" @change="changeDateRange" :shortcuts="shortcuts" :options="dateOptions"></bk-date-picker>
+            </div>
+            <div class="bkdevops-pipeline-tab-card-setting" slot="setting" v-else>
                 <i @click.stop="toggleFilterBar" class="devops-icon icon-filter-shape" :class="{ 'active': showFilterBar }"></i>
                 <i @click.stop="toggleColumnsSelectPopup(true)" class="setting-icon devops-icon icon-cog-shape" :class="{ 'active': isColumnsSelectPopupVisible }"></i>
             </div>
@@ -21,12 +24,19 @@
     import BuildHistoryTab from '@/components/BuildHistoryTab'
     import { mapGetters } from 'vuex'
     import showTooltip from '@/components/common/showTooltip'
+    import TrendData from '@/components/trendData'
+    import trendMixins from '@/components/trendData/trendMixins'
+    import customExtMixin from '@/mixins/custom-extension-mixin'
+    import { HistoryTabsHooks } from '@/components/Hooks/'
 
     export default {
         components: {
             BuildHistoryTab,
-            showTooltip
+            HistoryTabsHooks,
+            showTooltip,
+            TrendData
         },
+        mixins: [trendMixins, customExtMixin],
 
         props: {
             execHandler: Function
@@ -38,30 +48,56 @@
                 showFilterBar: false
             }
         },
-
         computed: {
             ...mapGetters('pipelines', {
                 'statusMap': 'getStatusMap',
                 'pipelineList': 'getPipelineList',
                 'hisPageStatus': 'getHisPageStatus'
             }),
+            hooks () {
+                return this.extensionTabsHooks
+            },
             projectId () {
                 return this.$route.params.projectId
             },
             pipelineId () {
                 return this.$route.params.pipelineId
             },
+            extensionTabs () {
+                return this.extensions.map(ext => ({
+                    name: ext.serviceName,
+                    label: ext.serviceName,
+                    component: HistoryTabsHooks,
+                    bindData: {
+                        tabData: {
+                            projectId: this.projectId,
+                            pipelineId: this.pipelineId,
+                            ...ext.props.data
+                        },
+                        hookIframeUrl: this.getResUrl(ext.props.entryResUrl || 'index.html', ext.baseUrl)
+                    }
+                }))
+            },
             panels () {
                 return [{
-                    name: 'history',
-                    label: this.$t('pipelinesHistory'),
-                    component: 'BuildHistoryTab',
-                    bindData: {
-                        isColumnsSelectPopupVisible: this.isColumnsSelectPopupVisible,
-                        showFilterBar: this.showFilterBar,
-                        toggleFilterBar: this.toggleFilterBar
-                    }
-                }
+                            name: 'history',
+                            label: this.$t('pipelinesHistory'),
+                            component: 'BuildHistoryTab',
+                            bindData: {
+                                isColumnsSelectPopupVisible: this.isColumnsSelectPopupVisible,
+                                showFilterBar: this.showFilterBar,
+                                toggleFilterBar: this.toggleFilterBar
+                            }
+                        },
+                        {
+                            name: 'trendData',
+                            label: this.$t('history.trendData'),
+                            component: 'TrendData',
+                            bindData: {
+                                dateRange: this.dateRange
+                            }
+                        },
+                        ...this.extensionTabs
                 ]
             },
             currentTab () {

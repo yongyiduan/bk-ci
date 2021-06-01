@@ -7,11 +7,11 @@
                 <div class="setting-expand" v-if="isFold">
                     <div v-if="isContentShow">
                         <span>{{ $t('settings.fold') }}</span>
-                        <i class="bk-icon icon-angle-up"></i>
+                        <i class="devops-icon icon-angle-up"></i>
                     </div>
                     <div v-else>
                         <span>{{ $t('settings.open') }}</span>
-                        <i class="bk-icon icon-angle-down"></i>
+                        <i class="devops-icon icon-angle-down"></i>
                     </div>
                 </div>
             </div>

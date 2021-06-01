@@ -65,7 +65,7 @@
                     v-model.trim="taskParam.machineIp">
                 </bk-input>
                 <bk-popover placement="right" :width="200" class="prompt-tips">
-                    <i class="bk-icon icon-info-circle"></i>
+                    <i class="devops-icon icon-info-circle"></i>
                     <div slot="content" style="white-space: normal;">
                         <div class="">多IP请用英文逗号分隔，蓝盾会将该IP设置为白名单</div>
                     </div>

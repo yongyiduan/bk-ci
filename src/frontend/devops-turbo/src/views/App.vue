@@ -19,27 +19,27 @@
                         {
                             id: 'turboOverview',
                             name: '总览',
-                            icon: 'icon-overview',
+                            icon: 'devops-icon icon-overview',
                             showChildren: false,
                             disable: false
                         },
                         {
                             id: 'registration',
                             name: '任务注册',
-                            icon: 'icon-task-registry',
+                            icon: 'devops-icon icon-task-registry',
                             showChildren: false
                         },
                         {
                             id: 'acceleration',
                             name: '加速任务',
-                            icon: 'icon-speed-up',
+                            icon: 'devops-icon icon-speed-up',
                             showChildren: false,
                             disable: false
                         },
                         {
                             id: 'record',
                             name: '加速记录',
-                            icon: 'icon-speed-record',
+                            icon: 'devops-icon icon-speed-record',
                             showChildren: false,
                             disable: false
                         }

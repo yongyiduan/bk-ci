@@ -37,7 +37,7 @@
                     <bk-table-column label="名称" class="name-item" width="300">
                         <template slot-scope="props">
                             <div :title="props.row.name">
-                                <i class="bk-icon icon-file"></i>
+                                <i class="devops-icon icon-file"></i>
                                 <span><span class="buildno-item" v-if="selectInfo.constructId === 'all'">{{ props.row.buildDesc }}&nbsp;</span>{{ props.row.name }}</span>
                             </div>
                         </template>
@@ -135,7 +135,7 @@
                             }
                         }
                     }, [
-                        h('i', { 'class': ['bk-icon', 'icon-question-circle'] })
+                        h('i', { 'class': ['devops-icon', 'icon-question-circle'] })
                     ])
                 ])
 
@@ -282,14 +282,18 @@
                 if (result) {
                     this.confirmScan(row, type)
                 } else {
-                    const params = {
-                        noPermissionList: [
-                            { resource: '流水线', option: '执行' }
-                        ],
+                    this.$showAskPermissionDialog({
+                        noPermissionList: [{
+                            actionId: this.$permissionActionMap.execute,
+                            resourceId: this.$permissionResourceMap.pipeline,
+                            instanceId: [{
+                                id: this.selectInfo.pipelineId,
+                                name: this.selectInfo.pipelineId
+                            }],
+                            projectId: this.projectId
+                        }],
                         applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=pipeline&role_executor=pipeline:${this.selectInfo.pipelineId}`
-                    }
-
-                    this.$showAskPermissionDialog(params)
+                    })
                 }
             },
             confirmScan (row, type) {

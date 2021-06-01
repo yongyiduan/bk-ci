@@ -38,16 +38,16 @@
         },
         computed: {
             atomVersion () {
-                return this.atom.version || '1.0.0'
+                return (this.atom.atomCode === 'CodeccCheckAtom' || this.atom.atomCode === 'CodeccCheckAtomDebug') ? '1.0.0' : this.atom.version
             },
             atomCode () {
-                return this.atom.atomCode
+                return this.atom.atomCode || 'CodeccCheckAtom'
             },
             pipelineId () {
                 return this.$route.params.pipelineId || ''
             },
             src () {
-                return `${location.origin}${API_URL_PREFIX}/artifactory/resource/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}&pipelineId=${this.pipelineId}`
+                return `${location.origin}/bk-plugin-fe/${this.atomCode}/${this.atomVersion}/index.html?projectId=${this.$route.params.projectId}&pipelineId=${this.pipelineId}`
             }
         },
         mounted () {
@@ -81,7 +81,6 @@
                 }, '*')
             },
             receiveMsgFromIframe (e) {
-                // if (location.href.indexOf(e.origin) === 0) return
                 if (!e.data) return
                 if (e.data.atomValue) {
                     this.setPipelineEditing(true)

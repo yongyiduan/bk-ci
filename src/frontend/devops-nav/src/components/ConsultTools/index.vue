@@ -9,7 +9,7 @@
             :target="entry.target"
         >
             <icon
-                class="bk-icon"
+                class="devops-icon"
                 :name="entry.icon"
                 size="13"
             />
@@ -71,7 +71,7 @@
                 sign: '37ef9b97d1210ac42416cce84db7b56b934ef302f69e6f6494d847d943e00fa4c8c24c7fbff6003642099e2260e29aeaecbfe7',
                 uid: this.user ? this.user.username : '',
                 selector: '#contactUs',
-                callback: function (type, data) {}
+                callback: function () {}
             })
         }
     }
@@ -139,7 +139,7 @@
                 opacity: 1;
             }
         }
-        .bk-icon {
+        .devops-icon {
             display: inline-block;
             margin-top: 6px;
             color: #fff;

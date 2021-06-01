@@ -21,6 +21,7 @@ import {
     regionList,
     isTGit,
     isSvn,
+    isGit,
     isGitLab,
     isGithub
 } from '../config'
@@ -61,6 +62,70 @@ export function parsePathAlias (type, path, authType, svnType) {
 
     return matchResult ? {
         alias: matchResult[3]
+    } : {
+        msg
+    }
+}
+
+export function extendParsePathAlias (type, path, authType, svnType) {
+    let reg = ''
+    let msg = ''
+    let alias = ''
+    let nameMatchIndex = 1
+    const codelibLocaleObj = window.devops.$i18n.t('codelib')
+    const preReg = /\_proj\/(branches|tags|trunk|release|document)(\/[\w\W\.\-\/\+]*)?$/i
+
+    switch (true) {
+        case isGithub(type):
+            reg = /^https\:\/\/github\.com\/([\w\W\.\-\_\/\+]+)\.git$/i
+            msg = `${codelibLocaleObj.githubRule}${type}${codelibLocaleObj.address}`
+            break
+        case (authType === 'OAUTH') || (isGit(type) && authType === 'HTTP'):
+            reg = /^https?\:\/\/git((\.code\.w?)|(\.w))oa\.com[\:|\/](.*)\.git$/
+            msg = `${codelibLocaleObj.httpsRule}${type}${codelibLocaleObj.address}`
+            nameMatchIndex = 4
+            break
+        case isSvn(type) && svnType === 'ssh':
+            if (path.match(preReg)) {
+                reg = /^svn\+ssh\:\/\/[\w\@\.\-\/\+]+\.com\/([\w\.\/\-]+\_proj)\/(branches|tags|trunk|release|document)(\/[\w\W\.\-\/\+]*)?$/i
+            } else {
+                reg = /^svn\+ssh\:\/\/[\w\@\.\-\/\+]+\.com\/([\w\.\/\-]+?\_proj)+?(\/[\w\W\.\-\/\+]*)?$/i
+            }
+            msg = `${codelibLocaleObj.svnSshRule}${type}${codelibLocaleObj.address}`
+            break
+        case isSvn(type) && svnType === 'http':
+            if (path.match(preReg)) {
+                reg = /^http\:\/\/[\w\@\.\-\/\+]+\.com\/([\w\.\/\-]+\_proj)\/(branches|tags|trunk|release|document)(\/[\w\W\.\-\/\+]*)?$/i
+            } else {
+                reg = /^http\:\/\/[\w\@\.\-\/\+]+\.com\/([\w\.\/\-]+?\_proj)+?(\/[\w\W\.\-\/\+]*)?$/i
+            }
+            msg = `${codelibLocaleObj.httpRule}${type}${codelibLocaleObj.address}`
+            break
+        case isGitLab(type):
+            reg = /^https?\:\/\/gitlab-paas\.open\.oa\.com\/([\w\W\.\-\_\/\+]+)\.git$/i
+            msg = `${codelibLocaleObj.httpsRule}${type}${codelibLocaleObj.address}`
+            break
+        case isGit(type):
+            reg = /^git@git((\.code\.w?)|(\.w))oa\.com[\:|\/](.*)\.git$/
+            msg = `${codelibLocaleObj.gitCodeInternalRule}${type}${codelibLocaleObj.address}`
+            nameMatchIndex = 4
+            break
+        case (authType === 'T_GIT_OAUTH') || (isTGit(type) && authType === 'HTTPS'):
+            reg = /^https\:\/\/git(\.code)?\.tencent\.com[\:|\/](.*)\.git$/
+            msg = `${codelibLocaleObj.tgitHttpRule}${type}${codelibLocaleObj.address}`
+            const result = path.match(reg)
+            alias = result ? result[2] : ''
+            break
+        case isTGit(type):
+            reg = /^git@git\.tencent\.com[\:|\/](.*)\.git$/
+            msg = `${codelibLocaleObj.tgitRule}${type}${codelibLocaleObj.address}`
+            break
+    }
+
+    const matchResult = path.match(reg)
+
+    return matchResult ? {
+        alias: alias || matchResult[nameMatchIndex]
     } : {
         msg
     }

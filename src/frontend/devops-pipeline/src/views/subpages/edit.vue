@@ -28,7 +28,7 @@
     import emptyTips from '@/components/devops/emptyTips'
     import MiniMap from '@/components/MiniMap'
     import { navConfirm } from '@/utils/util'
-    import { PipelineEditTab, BaseSettingTab } from '@/components/PipelineEditTabs/'
+    import { PipelineEditTab, BaseSettingTab, NotifyTab, AuthorityTab } from '@/components/PipelineEditTabs/'
     import pipelineOperateMixin from '@/mixins/pipeline-operate-mixin'
 
     export default {
@@ -36,6 +36,8 @@
             emptyTips,
             PipelineEditTab,
             BaseSettingTab,
+            NotifyTab,
+            AuthorityTab,
             MiniMap
         },
         mixins: [pipelineOperateMixin],
@@ -60,10 +62,11 @@
                             theme: 'success',
                             size: 'normal',
                             handler: () => {
-                                this.toApplyPermission(this.$permissionActionMap.edit, {
-                                    id: this.pipelineId,
-                                    name: this.pipelineId
-                                })
+                                // this.toApplyPermission(this.$permissionActionMap.edit, {
+                                //     id: this.pipelineId,
+                                //     name: this.pipelineId
+                                // })
+                                this.toApplyPermission(this.roleMap.manager)
                             },
                             text: this.$t('applyPermission')
                         }
@@ -72,6 +75,9 @@
             }
         },
         computed: {
+            ...mapState('pipelines', [
+                'projectGroupAndUsers'
+            ]),
             ...mapState([
                 'fetchError'
             ]),
@@ -80,6 +86,9 @@
             },
             pipelineId () {
                 return this.$route.params.pipelineId
+            },
+            longProjectId () {
+                return this.curProject && this.curProject.projectId ? this.curProject.projectId : ''
             },
             currentTab () {
                 return this.$route.params.tab || 'pipeline'
@@ -99,6 +108,45 @@
                             }
                         },
                         {
+                            name: 'notify',
+                            label: this.$t('settings.notify'),
+                            component: 'NotifyTab',
+                            bindData: {
+                                failSubscription: this.pipelineSetting ? this.pipelineSetting.failSubscription : null,
+                                successSubscription: this.pipelineSetting ? this.pipelineSetting.successSubscription : null,
+                                projectGroupAndUsers: this.projectGroupAndUsers,
+                                updateSubscription: (container, name, value) => {
+                                    this.setPipelineEditing(true)
+                                    this.updatePipelineSetting({
+                                        container,
+                                        param: {
+                                            [name]: value
+                                        }
+                                    })
+                                }
+                            }
+                        },
+                        ...(this.isDraftEdit ? [] : [{
+                            name: 'auth',
+                            label: this.$t('settings.auth'),
+                            component: 'AuthorityTab',
+                            bindData: {
+                                isLoading: !this.pipelineAuthority,
+                                pipelineAuthority: this.pipelineAuthority,
+                                projectGroupAndUsers: this.projectGroupAndUsers,
+                                updateAuthority: (name, value) => {
+                                    this.setPipelineEditing(true)
+                                    this.setAuthEditing(true)
+                                    this.updatePipelineAuthority({
+                                        pipelineAuthority: {
+                                            [name]: value
+                                        }
+
+                                    })
+                                }
+                            }
+                        }]),
+                        {
                             name: 'baseSetting',
                             label: this.$t('editPage.baseSetting'),
                             component: 'BaseSettingTab',
@@ -115,6 +163,9 @@
         watch: {
             '$route.params.pipelineId': function (pipelineId, oldId) {
                 this.init()
+            },
+            longProjectId () {
+                this.getRoleList()
             },
             pipeline (val) {
                 this.isLoading = false
@@ -139,6 +190,8 @@
             this.removeLeaveListenr()
             this.setPipelineEditing(false)
             this.setSaveStatus(false)
+            this.setAuthEditing(false)
+            this.authEditing = false
             this.errors.clear()
         },
         beforeRouteUpdate (to, from, next) {
@@ -163,6 +216,9 @@
             ...mapActions('pipelines', [
                 'requestPipelineSetting',
                 'updatePipelineSetting',
+                'updatePipelineAuthority',
+                'fetchRoleList',
+                'requestProjectGroupAndUsers',
                 'resetPipelineSetting'
             ]),
             ...mapActions('soda', [
@@ -170,10 +226,12 @@
                 'requestInterceptAtom'
             ]),
             init () {
-                if (!this.isDraftEdit) {
+                if (!this.isDraftEdit && this.pipelineId) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
+                    this.getRoleList()
+                    this.requestProjectGroupAndUsers(this.$route.params)
                 }
             },
             switchTab (tab) {
@@ -210,6 +268,15 @@
             leaveSure (e) {
                 e.returnValue = this.confirmMsg
                 return this.confirmMsg
+            },
+
+            getRoleList () {
+                if (this.longProjectId && this.pipelineId) {
+                    this.fetchRoleList({
+                        projectId: this.longProjectId,
+                        pipelineId: this.pipelineId
+                    })
+                }
             },
             requestQualityAtom () {
                 this.$store.dispatch('soda/requestQualityAtom', {

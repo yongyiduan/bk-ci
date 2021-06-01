@@ -9,7 +9,7 @@
             <div class="item-wrapper">
                 <span class="scheme-name">{{ scheme.name }}</span>
                 <span class="scheme-desc">{{ scheme.desc }}</span>
-                <i class="bk-icon scheme-current-icon icon-check-1" v-if="scheme.id === accelerateId"></i>
+                <i class="devops-icon scheme-current-icon icon-check-1" v-if="scheme.id === accelerateId"></i>
             </div>
         </div>
     </div>

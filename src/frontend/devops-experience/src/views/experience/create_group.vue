@@ -29,7 +29,7 @@
                 <bk-dropdown-menu style="margin-top: 4px;" @show="importMember">
                     <bk-button slot="dropdown-trigger">
                         <span>从用户组导入</span>
-                        <i :class="['bk-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
+                        <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
                     </bk-button>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
                         <li v-for="(entry, index) in userGroupList" :key="index">
@@ -41,14 +41,20 @@
                     </ul>
                 </bk-dropdown-menu>
             </bk-form-item>
-            <bk-form-item label="外部QQ" property="external_list">
-                <bk-input
-                    type="textarea"
-                    placeholder="请输入QQ号，以逗号或分号分隔"
-                    name="groupExternalList"
-                    :onkeyup="displayResult()"
+            <bk-form-item label="外部人员" property="external_list">
+                <bk-select
                     v-model="createGroupForm.external_list"
-                />
+                    ext-cls="select-custom"
+                    ext-popover-cls="select-popover-custom"
+                    :disabled="false"
+                    multiple
+                    searchable>
+                    <bk-option v-for="option in outersList"
+                        :key="option.id"
+                        :id="option.id"
+                        :name="option.name">
+                    </bk-option>
+                </bk-select>
             </bk-form-item>
             <bk-form-item label="描述" property="desc">
                 <bk-input
@@ -73,12 +79,15 @@
             errorHandler: Object,
             onChange: Function,
             cancelFn: Function,
-            displayResult: Function
+            outersList: {
+                type: Array,
+                default: () => []
+            }
         },
         data () {
             return {
                 isDropdownShow: false,
-                placeholder: '仅填写项目组内的人员有效',
+                placeholder: '全公司人员有效',
                 userGroupList: [],
                 isLoading: false
             }

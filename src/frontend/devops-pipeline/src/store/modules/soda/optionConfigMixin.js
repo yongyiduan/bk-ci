@@ -61,8 +61,18 @@ const optionConfigMixin = {
                     label: this.$t('storeMap.retryCount'),
                     placeholder: this.$t('storeMap.retryCountPlaceholder'),
                     default: '1',
-                    isHidden: (element) => {
+                    isHidden: `function (element) {
                         return !(element.additionalOptions && (element.additionalOptions.retryWhenFailed === true))
+                    }`
+                },
+                subscriptionPauseUser: {
+                    rule: {},
+                    component: 'vuex-input',
+                    label: this.$t('storeMap.pauseNotify'),
+                    desc: this.$t('storeMap.pauseNotifyTip'),
+                    default: this.$userInfo.username,
+                    isHidden: (element) => {
+                        return !(element.additionalOptions && (element.additionalOptions.pauseBeforeExec === true))
                     }
                 },
                 timeout: {
@@ -107,9 +117,9 @@ const optionConfigMixin = {
                     default: [{ key: 'param1', value: '' }],
                     allowNull: false,
                     label: this.$t('storeMap.customVar'),
-                    isHidden: (element) => {
+                    isHidden: `function (element) {
                         return !(element.additionalOptions && (element.additionalOptions.runCondition === 'CUSTOM_VARIABLE_MATCH' || element.additionalOptions.runCondition === 'CUSTOM_VARIABLE_MATCH_NOT_RUN'))
-                    }
+                    }`
                 },
                 otherTask: {
                     isHidden: true,

@@ -5,7 +5,7 @@
             <bk-dropdown-menu class="fr" :align="'center'">
                 <a type="primary" slot="dropdown-trigger">
                     <span>{{ fileterText }}</span>
-                    <i class="bk-icon icon-angle-down bk-selector-icon"></i>
+                    <i class="devops-icon icon-angle-down bk-selector-icon"></i>
                 </a>
                 <ul class="bk-dropdown-list" slot="dropdown-content">
                     <li v-for="(filiter, index) in fileters" :key="index">
@@ -16,7 +16,7 @@
             <bk-dropdown-menu v-if="task.machineType === '3'" class="fr" :align="'center'">
                 <a type="primary" slot="dropdown-trigger">
                     <span>{{ ipText }}</span>
-                    <i class="bk-icon icon-angle-down bk-selector-icon"></i>
+                    <i class="devops-icon icon-angle-down bk-selector-icon"></i>
                 </a>
                 <ul class="bk-dropdown-list" slot="dropdown-content">
                     <li><a href="javascript: void(0);" @click.stop="fileterIp()">全部IP</a></li>

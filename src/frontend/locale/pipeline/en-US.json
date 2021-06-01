@@ -43,7 +43,7 @@
     "pause": "pause",
     "uninstall": "Uninstall",
     "collect": "Star",
-    "exec": "Run", 
+    "exec": "Run",
     "uncollect": "Unstar",
     "operate": "Operation",
     "name": "Name",
@@ -72,6 +72,8 @@
     "detail": "Detail",
     "status": "Status",
     "var": "Variable",
+    "saveAs": "Save As",
+    "locate": "Locate",
     "lastExecUser": "Last executer",
     "lastExecTime": "Last run on",
     "lastUpdateTime": "Last updated on",
@@ -143,7 +145,7 @@
         "hours": "h ",
         "minutes": "m ",
         "seconds": "s ",
-        "ago" : "Ago"
+        "ago": "Ago"
     },
     "atomDebug": {
         "title": "Task.json online debugger",
@@ -263,7 +265,7 @@
         "pipelineLinkDesc": "When selected, url of the pipeline build detail will be added to the end of notification that is sent through Wechat Work, Wechat or SMS",
         "enableGroup": "Enable group notification on Wechat Work",
         "groupIdTips": "Please enter the ID of the group. If there are multiple groups, please separate IDs with semicolons",
-        "groupIdDesc": "Capable of sending notifications to groups on Wechat Work. How to obtain group ID: add 'DevOpsRobot' into the group, @ it and send '会话ID', then you will get the group ID.", 
+        "groupIdDesc": "Capable of sending notifications to groups on Wechat Work. To obtain group IDs, please invite 'CI-Notice' into your groups, @ 'CI-Notice' with keyword '会话ID' and send this message.",
         "wechatGroupMarkdownFlag": "Show group message with Markdown format",
         "buildSuc": "Build successfully",
         "buildFail": "Build failed",
@@ -322,6 +324,7 @@
         "previewDiff": "Arrange preview",
         "templateInstantiation": " Instantiate templates",
         "templateVersion": "Template version",
+        "templateVersionErrTips": "Please select Template version first",
         "applyTemplateSetting": "Apply template settings simultaneously",
         "applySettingTips": "When ticked, the template settings will be applied to instantiated pipelines",
         "newPipelineName": "Name of instantiated pipeline",
@@ -342,7 +345,9 @@
         "updateDialogContent": "The instances are being updated. An email will be notified After the update is completed"
     },
     "newlist": {
+        "exportYamlTip": "PreCI is a set of solutions provided by Blue Shield DevOps for developers' pre-CI R&D activities, which can detect problems as early as possible before submitting code and improve code quality. Including IDE plug-ins and command line tools.",
         "exportJsonTip": "Through the import function, you can quickly create a pipeline, and you can also implement cross-project and cross-blue shield platform pipeline import.",
+        "exportGitciTip": "Git CI is a collaboration between Blue Shield and Git, introducing the concept of Pipeline as Code, supporting a set of solutions that define pipelines through coding; it facilitates collaboration and version control, and is more in line with development habits.",
         "chooseExport": "Choose the export file format",
         "defaultViews": "My views",
         "copyPipeline": "Copy pipeline",
@@ -460,12 +465,12 @@
         "branch": "Branchs",
         "date": "Date",
         "tableMap": {
-            "queueTime": "Queued time", 
-            "startTime": "Start time", 
-            "endTime": "End time", 
-            "totalTime": "Duration", 
-            "appVersions": "APP version", 
-            "recommendVersion": "Recommended version", 
+            "queueTime": "Queued time",
+            "startTime": "Start time",
+            "endTime": "End time",
+            "totalTime": "Duration",
+            "appVersions": "APP version",
+            "recommendVersion": "Recommended version",
             "pipelineVersion": "Pipeline version",
             "entry": "Express entry"
         },
@@ -567,7 +572,6 @@
             "canSet": " Support using quality redlines to set quality requirement for this plugin so as to ensure the quality of this version",
             "settingNow": "Set now",
             "reflashSetting": " Click here to refresh"
-
         }
     },
     "editPage": {
@@ -652,16 +656,20 @@
         "imageType": "Image type",
         "assignResource": "Docker image url",
         "imageTicket": "Docker image  ticket",
+        "performance": "Model",
+        "cpuUnit": "C",
         "workspace": "workspace on",
         "workspaceTips": "If not filled, the it will be saved in [Agent installation directory]/workspace/[pipeline ID]/src by default",
+        "useRootText": "Execute as root(please check it if you use codecc atom in this job)",
+        "useRootDesc": "If checked, landun agent will run as root, or it will run as mqq; and if you use codecc in this job, you must check this option",
         "envDependency": "Mount dependent software over NFS",
         "envDependencyTips": "Not recommended. Given software might not be compatible with your desired build environment. It is recommended to create and use your docker image instead. After selecting the dependence on tools above, the following will be executed:  ",
         "abnormal": "Abnormal",
         "noPermToView": "No permission to view",
         "selectSlave": "Select agent",
-        "inputSlave": " Input agent alias name",
+        "inputSlave": " Input agent alias",
         "selectEnv": "Select pools",
-        "inputEnv": "Input pools alias name",
+        "inputEnv": "Input pools alias",
         "mutexGroup": "Mutex group",
         "jobOption": " Control option",
         "atomOption": "Control option",
@@ -764,12 +772,12 @@
         "seeMore": "View more",
         "docker": {
             "debugConsole": "Debug",
-            "loadingTitle": ", if the container can't be activated after one minute you did so, please contact DevOps (customer service from Blue Shield)",
+            "loadingTitle": "if the container can't be activated after one minute you did so, please contact DevOps (customer service from Blue Shield)",
             "exitDebug": "Exit debugging",
             "fromRunningTips": " Go to the current debugging through the portal of pipeline at runtime and the container for debugging is the one used for the current build",
             "failTitle": " Failed in login to debug",
             "failDesc": " Illegal name for mirroring or other errors",
-            "stopTips": " You will leave this page after stop debugging sucessfully" ,
+            "stopTips": " You will leave this page after stop debugging sucessfully",
             "confirmStop": " Confirm stopping debugging",
             "abnormalParams": " Abnormal parameters",
             "consoleEnterTips": " Linux login portal of Linux to debug is through here"
@@ -814,6 +822,8 @@
     "storeMap": {
         "textarea": "Textarea",
         "pauseAtom": "Pause before execution",
+        "pauseNotify": "Suspend notification recipient",
+        "pauseNotifyTip": "When suspended before execution, an enterprise WeChat message will be sent to the designated user to notify the user to process it as soon as possible. The default is the pipeline executor",
         "runManual": "You can manually decide to continue running or stop, and you can modify the parameters when you continue",
         "string": "String",
         "bool": "Boolean",

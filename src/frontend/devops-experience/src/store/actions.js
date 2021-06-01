@@ -27,8 +27,8 @@ const actions = {
     /**
      * 用户组列表
      */
-    requestGroupList ({ commit }, { projectId }) {
-        return vue.$ajax.get(`${prefix}/user/groups/${projectId}/list`)
+    requestGroupList ({ commit }, { projectId, params }) {
+        return vue.$ajax.get(`${prefix}/user/groups/${projectId}/list`, { params })
     },
     /**
      * 流水线列表
@@ -140,6 +140,13 @@ const actions = {
      */
     requestUserGroup ({ commit }, { projectId }) {
         return vue.$ajax.get(`${prefix}/user/groups/${projectId}/projectGroupAndUsers`)
+    },
+
+    /**
+     * 获取外部体验人员
+     */
+    fetchOutersList ({ commit }, { projectId }) {
+        return vue.$ajax.get(`${prefix}/user/experiences/outer/list?projectId=${projectId}`)
     },
     updateCurSelectedFile ({ commit }, { selectFile }) {
         commit(UPDATE_SELECTED_FILE, {

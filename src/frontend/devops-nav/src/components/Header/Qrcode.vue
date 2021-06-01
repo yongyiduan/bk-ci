@@ -8,7 +8,7 @@
             @click="toggleOrcode(show)"
         >
             <div class="qrcode-icon">
-                <i class="bk-icon icon-phone" />
+                <i class="devops-icon icon-phone" />
             </div>
             <div><span>{{ $t("DevopsMobile") }}</span></div>
         </div>

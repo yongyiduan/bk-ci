@@ -24,15 +24,20 @@ import { nodeTypeMap, nodeStatusMap } from './constants'
 const store = {
     namespaced: true,
     state: {
-        publicDockerList: [],
-        customizeDockerList: [],
         nodeDetails: {},
         nodeTypes: nodeTypeMap,
         nodeStatus: nodeStatusMap,
         devCloudVmQuta: {},
-        currentSelectedModel: {}
+        currentSelectedModel: {},
+        extensionMap: {},
+        extensions: []
     },
-    getters: {},
+    getters: {
+        asideNavBarExtIds: (_, getters, rootState, rootGetters) => {
+            const currentPageId = rootState.currentPage ? rootState.currentPage.id : ''
+            return (rootGetters.getServiceHooks(currentPageId) || []).filter(hook => hook.htmlPath === 'ENVIRONMENT.ASIDE_NAV').map(hook => hook.itemId).join(',')
+        }
+    },
     mutations,
     actions
 }

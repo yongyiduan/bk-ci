@@ -3,5 +3,4 @@ formatCommitMsg.js
 frontend/*
 svg-sprites/dist
 package-lock.json
-yarn.lock
 yarn-error.log

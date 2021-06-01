@@ -20,7 +20,7 @@
                         <template slot="extension">
                             <div class="bk-selector-create-item">
                                 <a class="bk-selector-link" target="_blank" :href="`/console/pipeline/${projectId}/list/allPipeline`">
-                                    <i class="bk-icon icon-plus-circle"></i>
+                                    <i class="devops-icon icon-plus-circle"></i>
                                     <span class="text">添加流水线</span>
                                 </a>
                             </div>
@@ -48,7 +48,7 @@
                     </vv-selector>
                 </div>
                 <bk-popover placement="right" :width="200" class="prompt-tips">
-                    <i class="bk-icon icon-info-circle"></i>
+                    <i class="devops-icon icon-info-circle"></i>
                     <div slot="content" style="white-space: normal;">
                         <div class="">目前只支持Linux环境</div>
                     </div>
@@ -71,7 +71,7 @@
                     </vv-selector>
                 </div>
                 <bk-popover placement="right" :width="200" class="prompt-tips">
-                    <i class="bk-icon icon-info-circle"></i>
+                    <i class="devops-icon icon-info-circle"></i>
                     <div slot="content" style="white-space: normal;">
                         <div class="">加速方案将为该脚本任务/代码检查原子加速，请按要求修改脚本内容</div>
                     </div>

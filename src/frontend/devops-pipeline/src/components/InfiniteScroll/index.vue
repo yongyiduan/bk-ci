@@ -69,7 +69,6 @@
             handleScroll (e) {
                 const { target } = e
                 const { hasNext, setScrollTop, scrollLoadMore, isLoadingMore } = this
-
                 setScrollTop(e.target.scrollTop)
                 const offset = e.target.scrollHeight - (e.target.offsetHeight + e.target.scrollTop)
                 if (offset <= SCROLL_THRESHOLD && hasNext && !isLoadingMore) { // scroll to end
@@ -117,6 +116,7 @@
                     })
                 } finally {
                     this.isLoadingMore = false
+                    this.animateScroll(this.scrollTop)
                 }
             },
 

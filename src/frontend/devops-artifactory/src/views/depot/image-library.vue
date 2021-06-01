@@ -6,7 +6,7 @@
             </div>
             <!-- <bk-guide></bk-guide> -->
             <div class="biz-actions">
-                <a :href="`${DOCS_URL_PREFIX}`"
+                <a :href="`${DOCS_URL_PREFIX}/x/Lozm`"
                     target="_blank" class="bk-text-button ml10">如何推镜像？</a>
             </div>
         </div>

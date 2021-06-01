@@ -68,7 +68,7 @@
                         </p>
                     </bk-checkbox>
                 </bk-checkbox-group>
-                <div v-if="formErrors.envError" class="error-tips env-error"> {{ $t('store.字段有误，请重新选择') }} </div>
+                <div v-if="formErrors.envError" class="error-tips env-error"> {{ $t('store.需要选择编译环境') }} </div>
                 <div class="bk-form-item">
                     <label class="bk-label"> {{ $t('store.功能标签') }} </label>
                     <div class="bk-form-content template-item-content">
@@ -203,7 +203,7 @@
                         </bk-popover>
                     </div>
                 </div>
-                <div class="bk-form-item release-package-form-item is-required" style="margin-top: 10px">
+                <div class="bk-form-item release-package-form-item is-required" style="margin-top: 10px" v-if="isEnterprise">
                     <label class="bk-label"> {{ $t('store.发布包') }} </label>
                     <div class="bk-form-content atom-item-content">
                         <bk-file-upload
@@ -266,7 +266,7 @@
                 initJobType: '',
                 initReleaseType: '',
                 descTemplate: '',
-                docsLink: `${DOCS_URL_PREFIX}/document/6.0/129/7515`,
+                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008942`,
                 showContent: false,
                 isUploading: false,
                 initOs: [],
@@ -330,7 +330,8 @@
                     frontendType: 'NORMAL',
                     version: '1.0.0',
                     releaseType: 'NEW',
-                    versionContent: ''
+                    versionContent: '',
+                    visibilityLevel: 'LOGIN_PUBLIC'
                 },
                 formErrors: {
                     categoryError: false,
@@ -355,6 +356,9 @@
             },
             releasePackageUrl () {
                 return `${API_URL_PREFIX}/artifactory/api/user/artifactories/projects/${this.atomForm.projectCode}/atoms/${this.atomForm.atomCode}/versions/${this.curVersion || '1.0.0'}/types/${this.atomForm.releaseType}/archive`
+            },
+            isEnterprise () {
+                return VERSION_TYPE === 'ee'
             },
             navList () {
                 const name = `${this.curTitle}（${this.atomForm.atomCode}）`
@@ -627,7 +631,7 @@
                     errorCount++
                 }
 
-                if (!this.atomForm.packageShaContent) {
+                if (this.isEnterprise && !this.atomForm.packageShaContent) {
                     this.formErrors.releasePackageError = true
                     errorCount++
                 }

@@ -159,7 +159,7 @@
             return name.replace(/^\S+?\(([\s\S]+?)\)\S*$/, '$1')
         }
 
-        gotoPage ({ link_new: linkNew }) {
+        gotoPage ({ link_new: linkNew, newWindow = false, newWindowUrl }) {
             const cAlias = this.currentPage && getServiceAliasByPath(this.currentPage['link_new'])
             const nAlias = getServiceAliasByPath(linkNew)
             const destUrl = this.addConsole(linkNew)
@@ -168,8 +168,8 @@
                 eventBus.$emit('goHome')
                 return
             }
-            this.$router.push(destUrl)
-        }
+            newWindow ? window.open(newWindowUrl, '_blank') : this.$router.push(destUrl)
+       }
 
         created () {
             if (this.curNewServices.length && this.curNewServices.some(service => {

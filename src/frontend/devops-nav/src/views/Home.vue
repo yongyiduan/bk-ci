@@ -12,17 +12,20 @@
                         class="recent-visit-service-list"
                     >
                         <template v-if="recentVisitService.length">
-                            <router-link
+                            <a
                                 v-for="service in recentVisitService"
+                                :href="service.newWindow ? service.newWindowUrl : addConsole(service.link_new)"
                                 :key="service.key"
-                                :to="addConsole(service.link_new)"
+                                :target="service.newWindow ? '_blank' : '_self'"
+                                @click.prevent="gotoPage(service)"
                             >
                                 <Logo
                                     :name="service.logoUrl"
                                     size="16"
                                 />
+
                                 {{ serviceName(service.name) }}
-                            </router-link>
+                            </a>
                         </template>
                         <p
                             v-else
@@ -64,7 +67,7 @@
                 >{{ item.label }}</span>
                 <div class="bkdevops-button">
                     <a
-                        :href="DOCS_URL_PREFIX"
+                        :href="`${DOCS_URL_PREFIX}/x/kJKj`"
                         target="_blank"
                     >
                         <bk-button
@@ -82,6 +85,11 @@
                     <p class="title">
                         {{ $t("latestNews") }}
                     </p>
+                    <a
+                        href="http://x.code.oa.com/bkdevops/devops/notice"
+                        class="more"
+                        target="_blank"
+                    >{{ $t('moreDetail') }}</a>
                 </header>
 
                 <div class="devops-news-content">
@@ -108,7 +116,7 @@
                 <p>
                     {{ $t("bkdevopsDesc") }}
                     <a
-                        :href="DOCS_URL_PREFIX"
+                        :href="`${DOCS_URL_PREFIX}/display/DevOps`"
                         class="more"
                         target="_blank"
                     >{{ $t("learnMore") }}</a>
@@ -119,7 +127,7 @@
                 <p>
                     {{ $t("bkdevopsWay") }}
                     <!-- <a
-                        :href="DOCS_URL_PREFIX"
+                        :href="`${DOCS_URL_PREFIX}/x/RY6j`"
                         target="_blank"
                         class="more"
                     >{{ $t("learnMore") }}</a> -->
@@ -139,6 +147,7 @@
                 </div>
             </article>
         </aside>
+        <consult-tools />
     </div>
 </template>
 
@@ -148,7 +157,8 @@
     import { State, Action } from 'vuex-class'
     import NavBox from '../components/NavBox/index.vue'
     import Logo from '../components/Logo/index.vue'
-    import { Accordion, AccordionItem } from '../components/Accordion/index'
+    import { Accordion, AccordionItem } from '../components/Accordion'
+    import ConsultTools from '../components/ConsultTools/index.vue'
     
     import { urlJoin } from '../utils/util'
 
@@ -157,7 +167,8 @@
             NavBox,
             Accordion,
             AccordionItem,
-            Logo
+            Logo,
+            ConsultTools
         }
     })
     export default class Home extends Vue {
@@ -177,15 +188,20 @@
         }
 
         get recentVisitService (): object[] {
-            const recentVisitService = localStorage.getItem('recentVisitService')
-            const recentVisitServiceList = recentVisitService ? JSON.parse(recentVisitService) : []
-            return recentVisitServiceList.map(service => {
-                const serviceObj = window.serviceObject.serviceMap[service.key] || {}
-                return {
-                    ...service,
-                    ...serviceObj
-                }
-            })
+            try {
+                const recentVisitService = localStorage.getItem('recentVisitService')
+                const recentVisitServiceList = recentVisitService ? JSON.parse(recentVisitService) : []
+                return recentVisitServiceList.map(service => {
+                    const serviceObj = window.serviceObject.serviceMap[service.key] || {}
+                    return {
+                        ...service,
+                        ...serviceObj
+                    }
+                })
+            } catch (error) {
+                console.error(error)
+                return []
+            }
         }
 
         get serviceCount (): number {
@@ -194,6 +210,11 @@
                 return sum
             }, 0)
         }
+        
+        gotoPage ({ link_new: linkNew, newWindow = false, newWindowUrl }) {
+           const destUrl = this.addConsole(linkNew)
+           newWindow ? window.open(newWindowUrl, '_blank') : this.$router.push(destUrl)
+       }
 
         updateShowAllService (show: boolean): void {
             this.isAllServiceListShow = show

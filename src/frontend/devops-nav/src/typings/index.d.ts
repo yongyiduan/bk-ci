@@ -24,6 +24,7 @@ interface Window {
     Pages: any
     eventBus: object
     devops: object
+    isMooc: boolean
     iframeUtil: ObjectMap
     allServices: ObjectMap[]
     projectList: ObjectMap[]
@@ -66,14 +67,14 @@ declare module '*.vue' {
     export default Vue
 }
 
-
-declare var LOGIN_SERVICE_URL: string
-declare var API_URL_PREFIX: string
-declare var DOCS_URL_PREFIX: string
-declare var DEVOPS_LS_VERSION: string
-declare var ENTERPRISE_VERSION: string
+declare const LOGIN_SERVICE_URL: string
+declare const API_URL_PREFIX: string
+declare const DOCS_URL_PREFIX: string
+declare const DEVOPS_LS_VERSION: string
+declare const ENTERPRISE_VERSION: string
+declare const VERSION_TYPE: string
+declare const PERM_URL_PREFIX: string
 
 declare module '*.png'
 
 declare const X_DEVOPS_PROJECT_ID: string
-

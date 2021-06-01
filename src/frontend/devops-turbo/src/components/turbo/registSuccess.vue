@@ -1,10 +1,10 @@
 <template>
     <section class="wrapper-container-success">
-        <h5 class="success-title"><i class="bk-icon icon-check-circle-shape"></i>恭喜，任务注册成功</h5>
+        <h5 class="success-title"><i class="devops-icon icon-check-circle-shape"></i>恭喜，任务注册成功</h5>
         <template v-if="isInstallToMachine && isToolMake">
             <p class="success-desc">编译加速任务的配置信息已经全部配置完成。还需修改目标构建机上编译命令，方能顺利使用编译加速服务。</p>
             <div class="success-info">
-                <i class="bk-icon icon-exclamation-circle-shape"></i>
+                <i class="devops-icon icon-exclamation-circle-shape"></i>
                 <p class="success-info-title">提示：修改makefile文件和编译命令</p>
                 <p class="success-info-title-level-2">1、执行./install.sh将软件包安装到目标构建机上</p>
                 <p class="success-info-title-level-2">2、修改编译命令（请将示例中$PROJECTID替换为本任务ID: <span class="warning">{{ getRegister.taskId }}</span>）</p>
@@ -30,7 +30,7 @@
         <template v-else-if="isInstallToMachine && isToolBlade">
             <p class="success-desc">编译加速任务的配置信息已经全部配置完成。还需修改目标构建机上编译命令，方能顺利使用编译加速服务。</p>
             <div class="success-info">
-                <i class="bk-icon icon-exclamation-circle-shape"></i>
+                <i class="devops-icon icon-exclamation-circle-shape"></i>
                 <p class="success-info-title">提示：修改makefile文件和编译命令</p>
                 <p class="success-info-title-level-2">1、执行./install.sh将软件包安装到目标构建机上</p>
                 <p class="success-info-title-level-2">2、打开distcc开关。在项目的 BLADE_ROOT 文件里面添加：</p>
@@ -55,7 +55,7 @@
         <template v-else-if="isInstallToMachine && isToolBazel">
             <p class="success-desc">编译加速任务的配置信息已经全部配置完成。还需修改目标构建机上编译命令，方能顺利使用编译加速服务。</p>
             <div class="success-info">
-                <i class="bk-icon icon-exclamation-circle-shape"></i>
+                <i class="devops-icon icon-exclamation-circle-shape"></i>
                 <p class="success-info-title">提示：修改makefile文件和编译命令</p>
                 <p class="success-info-title-level-2">1、执行./install.sh将软件包安装到目标构建机上</p>
                 <p class="success-info-title-level-2">2、复制和整理模板文件</p>
@@ -79,7 +79,7 @@
         <template v-else-if="isToolMake">
             <p class="success-desc">编译加速任务的配置信息已经全部配置完成。还需修改流水线中脚本内容，方能顺利使用编译加速服务。</p>
             <div class="success-info">
-                <i class="bk-icon icon-exclamation-circle-shape"></i>
+                <i class="devops-icon icon-exclamation-circle-shape"></i>
                 <p class="success-info-title">提示：修改流水线脚本内容</p>
                 <p class="success-info-title-level-2">1、若你的makefile是由cmake自动生成的，需先修改cmake并加上编译加速任务ID参数</p>
                 <p class="success-info-desc">cmake改为bk-cmake -p ${turbo.task.id} {{ extraParam() }}</p>
@@ -93,7 +93,7 @@
         <template v-else-if="isToolBlade">
             <p class="success-desc">编译加速任务的配置信息已经全部配置完成。还需修改流水线中脚本内容，方能顺利使用编译加速服务。</p>
             <div class="success-info">
-                <i class="bk-icon icon-exclamation-circle-shape"></i>
+                <i class="devops-icon icon-exclamation-circle-shape"></i>
                 <p class="success-info-title">提示：修改编译命令</p>
                 <p class="success-info-title-level-2">1、打开distcc开关。在项目的 BLADE_ROOT 文件里面添加：</p>
                 <p class="success-info-desc">distcc_config(</p>
@@ -117,7 +117,7 @@
         <template v-else-if="isToolBazel">
             <p class="success-desc">编译加速任务的配置信息已经全部配置完成。还需修改流水线中脚本内容，方能顺利使用编译加速服务。</p>
             <div class="success-info">
-                <i class="bk-icon icon-exclamation-circle-shape"></i>
+                <i class="devops-icon icon-exclamation-circle-shape"></i>
                 <p class="success-info-title">提示：修改编译命令</p>
                 <p class="success-info-title-level-2">1、复制和整理模板文件</p>
                 <p class="success-info-desc">将配置文件bk_bazelrc和文件夹bkdistcctoolchain（含里面的文件）拷贝到项目根目录下。<a href="http://devgw.devops.oa.com/turbo-client/bazel.zip" class="text-link">点击下载模板文件>></a></p>
@@ -215,7 +215,7 @@
             margin-bottom: 10px;
             font-size: 16px;
             color: #333c48;
-            >.bk-icon {
+            >.devops-icon {
                 margin-right: 8px;
                 font-size: 32px;
                 color: #00c873;
@@ -236,7 +236,7 @@
             font-size: 14px;
             color: $fontColor;
             background: #fff4e2;
-            .bk-icon {
+            .devops-icon {
                 position: absolute;
                 top: 19px;
                 left: 16px;

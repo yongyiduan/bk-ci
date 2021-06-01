@@ -188,7 +188,7 @@ const bcsMixin = {
         async getCluster () {
             try {
                 let res = await this.$store.dispatch('soda/getBcsCluster', {
-                    projectCode: this.curProject.projectCode
+                    projectCode: this.projectId || this.curProject.englishName
                 })
                 if (!res) {
                     res = []

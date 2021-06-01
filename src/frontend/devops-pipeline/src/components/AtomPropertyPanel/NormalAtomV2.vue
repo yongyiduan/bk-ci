@@ -38,7 +38,7 @@
                     <p v-for="(output, key) in outputProps" :key="key">
                         {{ namespace ? `${namespace}_` : '' }}{{ key }}
                         <bk-popover placement="right">
-                            <i class="bk-icon icon-info-circle" />
+                            <i class="devops-icon icon-info-circle" />
                             <div slot="content">
                                 {{ output.description }}
                             </div>
@@ -64,6 +64,7 @@
     import TimePicker from '@/components/AtomFormComponent/TimePicker'
     import Parameter from '@/components/AtomFormComponent/Parameter'
     import Tips from '@/components/AtomFormComponent/Tips'
+    import NameSpaceVar from '@/components/atomFormField/NameSpaceVar'
     import DynamicParameter from '@/components/AtomFormComponent/DynamicParameter'
     import { getAtomDefaultValue } from '@/store/modules/atom/atomUtil'
     import copyIcon from '@/components/copyIcon'
@@ -77,6 +78,7 @@
             TimePicker,
             Parameter,
             Tips,
+            NameSpaceVar,
             DynamicParameter,
             copyIcon
         },

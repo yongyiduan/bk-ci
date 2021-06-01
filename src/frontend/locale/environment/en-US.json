@@ -209,7 +209,7 @@
         "loginMethod": "Login method",
         "checkMails": "Check email for password",
         "idcTestMachine": "IDC test machine",
-        "devCloudApply": "If DevCloud is not available，please contact 蓝盾人工客服 to apply",
+        "devCloudApply": "If DevCloud is not available，please contact DevOps-helper to apply",
         "operatorModfied": "Owner modified, click to change",
         "currentImporter": "Current importer：",
         "currentOperator": "Current operator：",

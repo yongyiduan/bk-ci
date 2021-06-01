@@ -6,7 +6,7 @@
         </div>
         <div class="build-quote" v-if="taskId && turboValue">
             <div class="quote-ident">
-                <i class="bk-icon icon-info-circle quote-ident-icon"></i>
+                <i class="devops-icon icon-info-circle quote-ident-icon"></i>
             </div>
             <div class="quote-content">
                 <p class="quote-text quote-title">
@@ -136,7 +136,7 @@
                 !this.turboDisabled && this.$emit('handleChange', name, value)
             },
             goTurboLink () {
-                window.open(`${WEB_URL_PIRFIX}/turbo/${this.$route.params.projectId}/acceleration#${this.$route.params.pipelineId}&${this.taskId}`, '_blank')
+                window.open(`${WEB_URL_PREFIX}/turbo/${this.$route.params.projectId}/acceleration#${this.$route.params.pipelineId}&${this.taskId}`, '_blank')
             },
             projLang () {
                 if (this.task.projLang === '1') {

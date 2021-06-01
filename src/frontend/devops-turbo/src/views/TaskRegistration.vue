@@ -17,7 +17,7 @@
             :close-icon="false"
             :ext-cls="'build-dialog'">
             <div class="build-dialog-wrapper">
-                <i class="bk-dialog-close bk-icon icon-close" v-if="getDialogOpt.hasClose" @click.stop="dialogClose"></i>
+                <i class="bk-dialog-close devops-icon icon-close" v-if="getDialogOpt.hasClose" @click.stop="dialogClose"></i>
                 <div v-if="'picture' === getDialogOpt.contentType" :class="['dialog-img-container', { 'distccImg': getDialogOpt.imgType === 'distccImg', 'ccacheImg': getDialogOpt.imgType === 'ccacheImg' }]">
                     <img :src="getDialogOpt.imgSrc">
                 </div>

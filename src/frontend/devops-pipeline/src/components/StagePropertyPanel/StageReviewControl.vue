@@ -8,7 +8,7 @@
         </form-field>
         <template v-if="manualTrigger">
             <form-field :required="true" :disabled="disabled" :label="$t('stageUserTriggers')" :is-error="!hasTriggerMember" :desc="$t('stageTriggerDesc')" :error-msg="$t('editPage.stageManualTriggerUserNoEmptyTips')">
-                <user-input :clearable="true" :disabled="disabled" :value="triggerUsers" name="triggerUsers" :handle-change="handleUpdateStageControl"></user-input>
+                <staff-input :clearable="true" :disabled="disabled" name="triggerUsers" :value="triggerUsers" :handle-change="handleUpdateStageControl"></staff-input>
             </form-field>
 
             <form-field :disabled="disabled" :label="$t('stageReviewInputDesc')">
@@ -29,19 +29,18 @@
         </template>
     </div>
 </template>
-
 <script>
     import Vue from 'vue'
     import { mapActions } from 'vuex'
     import FormField from '@/components/AtomPropertyPanel/FormField'
-    import UserInput from '@/components/atomFormField/UserInput'
+    import StaffInput from '@/components/atomFormField/StaffInput'
     import VuexTextarea from '@/components/atomFormField/VuexTextarea'
     import KeyValueNormal from '@/components/atomFormField/KeyValueNormal'
     export default {
         name: 'stage-review-control',
         components: {
             FormField,
-            UserInput,
+            StaffInput,
             VuexTextarea,
             KeyValueNormal
         },
@@ -158,7 +157,6 @@
         }
     }
 </script>
-
 <style lang="scss" scoped>
     .stage-review-radio-group {
         .bk-form-radio {

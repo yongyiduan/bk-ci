@@ -18,10 +18,17 @@ import {
     TOGGLE_MODULE_LOADING,
     UPDATE_CURRENT_PAGE,
     TOGGLE_PERMISSION_DIALOG,
-    SET_CURRENT_NOTICE
+    SET_CURRENT_NOTICE,
+    SET_SERVICE_HOOKS
 } from './constants'
 
 const mutations: MutationTree<RootState> = {
+    [SET_SERVICE_HOOKS]: (state: RootState, { serviceId, extHooks }: any) => {
+        Vue.set(state, 'hookMap', {
+            ...state.hookMap,
+            [serviceId]: extHooks
+        })
+    },
     [TOGGLE_PERMISSION_DIALOG]: (state: RootState, visible: boolean) => {
         Vue.set(state, 'isPermissionDialogShow', visible)
     },

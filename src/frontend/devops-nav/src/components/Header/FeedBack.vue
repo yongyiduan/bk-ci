@@ -5,7 +5,7 @@
         :class="{ &quot;devops-feedback&quot;: true, &quot;active&quot;: show }"
     >
         <icon
-            class="bk-icon"
+            class="devops-icon"
             name="feedback"
             @click="toggleFeedBackMenu(show)"
         />
@@ -81,7 +81,7 @@
         align-items: center;
         color: $fontLigtherColor;
 
-        > .bk-icon {
+        > .devops-icon {
             margin: 0 10px;
             font-size: 20px;
             cursor: pointer;

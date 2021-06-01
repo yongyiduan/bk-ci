@@ -72,7 +72,7 @@
                         <template slot="extension">
                             <div class="bk-selector-create-item">
                                 <a class="bk-selector-link" target="_blank" :href="`/console/pipeline/${projectId}/list/allPipeline`">
-                                    <i class="bk-icon icon-plus-circle"></i>
+                                    <i class="devops-icon icon-plus-circle"></i>
                                     <span class="text">添加流水线</span>
                                 </a>
                             </div>
@@ -349,9 +349,10 @@
                             orderStr = stage.id.replace(reg, ' ')
                             stage.containers.forEach((container, index) => {
                                 const isDocker = container.dockerBuildVersion || (container.dispatchType && container.dispatchType.buildType === 'DOCKER')
+                                const isDevCloud = container.dispatchType && container.dispatchType.buildType === 'PUBLIC_DEVCLOUD'
                                 const isThirdPartyAgent = container.thirdPartyAgentId || (container.dispatchType && container.dispatchType.buildType === 'THIRD_PARTY_AGENT_ID')
                                 const dockerBuildVersion = container.dockerBuildVersion || (isDocker ? container.dispatchType.value : '')
-                                if ((machineType === '1' && isDocker) || (machineType === '2' && isThirdPartyAgent)) {
+                                if ((machineType === '1' && (isDocker || isDevCloud)) || (machineType === '2' && isThirdPartyAgent)) {
                                     index++
                                     buildArr.push({
                                         id: allIndex + '',

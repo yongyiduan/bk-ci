@@ -1,6 +1,6 @@
 {
   "name": "devops-environment",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "dependencies": {
     "brace": "^0.10.0",

@@ -64,6 +64,7 @@
     import TimePicker from '@/components/AtomFormComponent/TimePicker'
     import Parameter from '@/components/AtomFormComponent/Parameter'
     import Tips from '@/components/AtomFormComponent/Tips'
+    import NameSpaceVar from '@/components/atomFormField/NameSpaceVar'
     import DynamicParameter from '@/components/AtomFormComponent/DynamicParameter'
     import copyIcon from '@/components/copyIcon'
 
@@ -77,6 +78,7 @@
             TimePicker,
             Parameter,
             Tips,
+            NameSpaceVar,
             DynamicParameter,
             copyIcon
         },

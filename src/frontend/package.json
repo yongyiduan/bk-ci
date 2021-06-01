@@ -2,10 +2,10 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "chalk": "^4.0.0",
     "gulp": "^4.0.2",
-    "gulp-rename": "^1.4.0",
     "lerna": "3.17.0",
+    "chalk": "^4.0.0",
+    "gulp-rename": "^1.4.0",
     "node-fetch": "^2.6.0",
     "ora": "^3.4.0",
     "husky": "^3.0.7",
@@ -37,10 +37,14 @@
     "devops-codelib",
     "devops-environment",
     "devops-atomstore",
-    "devops-artifactory",
     "devops-ticket",
     "devops-pipeline",
+    "devops-experience",
+    "devops-artifactory",
+    "devops-turbo",
+    "devops-vs",
     "devops-quality",
-    "devops-nav"
+    "devops-nav",
+    "devops-gitci"
   ]
 }

@@ -6,8 +6,12 @@
     "devops-environment",
     "devops-ticket",
     "devops-atomstore",
+    "devops-experience",
     "devops-artifactory",
-    "devops-quality"
+    "devops-turbo",
+    "devops-vs",
+    "devops-quality",
+    "devops-gitci"
   ],
   "npmClient": "yarn",
   "version": "independent",

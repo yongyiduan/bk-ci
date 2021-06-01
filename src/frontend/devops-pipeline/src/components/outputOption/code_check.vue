@@ -8,7 +8,7 @@
             <!-- overview start -->
             <!-- <p class="update-time">更新时间 :
                 <span>{{checkUpdateTime || '-'}}</span>
-                <i class="bk-icon icon-refresh" @click="init"></i>
+                <i class="devops-icon icon-refresh" @click="init"></i>
             </p> -->
 
             <!-- overview start -->
@@ -29,7 +29,7 @@
                                         <span class="item-active-text">{{ codeccOptions[item.tool_name_en].activeKey }}</span>
                                         <span class="item-label-change"
                                             v-if="codeccOptions[item.tool_name_en].hasChange">
-                                            <i class="bk-icon change-direction"
+                                            <i class="devops-icon change-direction"
                                                 :class="[ item[codeccOptions[item.tool_name_en].activeVal] > 0 ? 'icon-angle-up' : 'icon-angle-down']"></i>
                                         </span>
                                     </div>
@@ -77,7 +77,7 @@
                                 <label>{{ codeccOptions[tool.tool_name_en].activeKey }}</label>
                                 <span class="legend-data">{{ tool[codeccOptions[tool.tool_name_en].activeVal] }}</span>
                                 <i v-if="![&quot;KLOCWORK&quot;, &quot;COVERITY&quot;].includes(tool.tool_name_cn)"
-                                    :class="{ &quot;bk-icon&quot;: true,
+                                    :class="{ &quot;devops-icon&quot;: true,
                                               &quot;icon-arrows-up&quot;: parseFloat(tool[codeccOptions[tool.tool_name_en].activeChange]) > 0,
                                               &quot;icon-arrows-down&quot;: parseFloat(tool[codeccOptions[tool.tool_name_en].activeChange]) < 0 }"></i>
                             </div>
@@ -86,7 +86,7 @@
                                 <label>{{ codeccOptions[tool.tool_name_en].normalKey }}</label>
                                 <span class="legend-data">{{ tool[codeccOptions[tool.tool_name_en].normalVal] }}</span>
                                 <i v-if="![&quot;KLOCWORK&quot;, &quot;COVERITY&quot;].includes(tool.tool_name_cn)"
-                                    :class="{ &quot;bk-icon&quot;: true,
+                                    :class="{ &quot;devops-icon&quot;: true,
                                               &quot;icon-arrows-up&quot;: parseFloat(tool[codeccOptions[tool.tool_name_en].normalChange]) > 0,
                                               &quot;icon-arrows-down&quot;: parseFloat(tool[codeccOptions[tool.tool_name_en].normalChange]) < 0 }"></i>
                             </div>
@@ -658,11 +658,11 @@
                 this.$toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                const url = `${PERM_URL_PIRFIX}/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
+                const url = `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_manager=pipeline:${this.pipelineId}`
                 window.open(url, '_blank')
             },
             toLinkCodecc (url) {
-                // const url = `${WEB_URL_PIRFIX}/codecc/${this.projectId}/procontrol/buglist?proj_id=${this.curTaskId}&toolName=COVERITY&projectId=${this.projectId}&buildId=${this.buildNo}`
+                // const url = `${WEB_URL_PREFIX}/codecc/${this.projectId}/procontrol/buglist?proj_id=${this.curTaskId}&toolName=COVERITY&projectId=${this.projectId}&buildId=${this.buildNo}`
                 window.open(url, '_blank')
             }
         },

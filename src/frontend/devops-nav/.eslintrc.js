@@ -21,7 +21,6 @@
  * @file eslint config
  */
 
- 
 module.exports = {
     extends: [
         '../.eslintrc.js'
@@ -48,14 +47,11 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['*.vue'],
+            files: ['*.ts', '*.vue'],
             rules: {
-                indent: 'off'
-            },
-            files: ['*.ts'],
-            rules: {
-                "no-unused-vars": "off",
-                "@typescript-eslint/no-unused-vars": "error"
+                'indent': 'off',
+                'no-unused-vars': 'off',
+                '@typescript-eslint/no-unused-vars': 'error'
             }
         }
     ]

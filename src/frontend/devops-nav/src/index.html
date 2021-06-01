@@ -27,6 +27,7 @@
     <link rel='preload' as='script' href="/console/static/vue.min.js" />
     <link rel='preload' as='script' href="/console/static/vuex.min.js" />
     <link rel='preload' as='script' href="/console/static/vue-router.min.js" />
+    <link rel="preload" as='script' href="//pingjs.qq.com/h5/stats.js?v2.0.4">
     
     <!-- devops:preload -->
     <% for (key in htmlWebpackPlugin.files.js) { %>
@@ -73,7 +74,6 @@
     <!-- end devops:assets -->
     
     <script>
-
         var API_URL_PREFIX = '/ms'     // api接口前缀
         var PERM_URL_PREFIX = '__BK_PAAS_PUBLIC_URL__/o/bk_iam_app' // EE PERM URL PREFIX
         var DOCS_URL_PREFIX = '__BK_CI_DOCS_URL__'  // 文档中心域名
@@ -147,11 +147,11 @@
         }
 
         function setCookie(cname, cvalue, domain){
-            document.cookie = cname + "=" + cvalue + "; " + 'domain=' + domain + '; path=/';
+            document.cookie = cname + "=" + cvalue + "; " + 'domain=' + domain + '; path=/;expires=Fri, 31 Dec 2030 23:59:59 GMT"';
         }
         
         window.setProjectIdCookie = function (projectId) {
-          const topDomain = document.domain.split('.').slice(-2).join('.')
+            var topDomain = document.domain.split('.').slice(-2).join('.');
             try {
                 if (projectId) {
                     setCookie(X_DEVOPS_PROJECT_ID, projectId, topDomain)
@@ -180,7 +180,7 @@
                     return ''    
                 } else {
                     var res = location.pathname.match(reg)
-                    return res ? res[1] : ''
+                    return res && res[1] !== '0' ? res[1] : ''
                 }
                 
             } catch (e) {
@@ -281,8 +281,11 @@
                         var cssUrl = assetMod ? joinUrl([ '', mod, assetMod.css ]) : children[j].css_url
                         children[j].js_url = jsUrl
                         children[j].css_url = cssUrl
+                    } else if (children[j].inject_type === 'iframe') {
+                      children[j].iframe_url = joinUrl([ location.origin, children[j].iframe_url ])
                     }
                     serviceMap[mod] = children[j]
+
                     if (children[j].inject_type === 'iframe') {
                         iframeRoutes.push({
                             path: mod + (children[j].show_project_list ? '/:projectId?' : ''),
@@ -471,6 +474,33 @@
                 }
             }
         }
+
+        // 接入mta统计
+        var _mtac = {};
+        (function() {
+            var mta = document.createElement("script");
+            mta.src = "//pingjs.qq.com/h5/stats.js?v2.0.4";
+            mta.setAttribute("name", "MTAH5");
+            mta.setAttribute("sid", "500630653");
+
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(mta, s);
+        })();
+
+        function JSONP (url, callback) {
+            console.log(url)
+            const cbId = 'jsonp_callback_' + Math.round(100000 * Math.random())
+
+            window[cbId] = function (data) {
+                delete window[cbId]
+                document.body.removeChild(scriptNode)
+                callback(data)
+            }
+
+            var scriptNode = document.createElement('script')
+            scriptNode.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + cbId
+            document.body.appendChild(scriptNode)
+        }
         
         function handleVisibilityChange () {
             if (!document.hidden && window.GLOBAL_PID) {
@@ -486,5 +516,7 @@
             document.removeEventListener('visibilitychange', handleVisibilityChange, false);
         }
     </script>
+
+    <script async src="https://yzf.qq.com/xv/web/static/chat_sdk/yzf_chat.min.js"></script>
 </body>
 </html>

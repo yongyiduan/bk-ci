@@ -311,9 +311,10 @@ const buildOption = {
                         orderStr = stage.id.replace(reg, ' ')
                         stage.containers.forEach((container, index) => {
                             const isDocker = container.dockerBuildVersion || (container.dispatchType && container.dispatchType.buildType === 'DOCKER')
+                            const isDevCloud = container.dispatchType && container.dispatchType.buildType === 'PUBLIC_DEVCLOUD'
                             const isThirdPartyAgent = container.thirdPartyAgentId || (container.dispatchType && container.dispatchType.buildType === 'THIRD_PARTY_AGENT_ID')
                             const dockerBuildVersion = container.dockerBuildVersion || (isDocker ? container.dispatchType.value : '')
-                            if ((machineType === '1' && isDocker) || (machineType === '2' && isThirdPartyAgent)) {
+                            if ((machineType === '1' && (isDocker || isDevCloud)) || (machineType === '2' && isThirdPartyAgent)) {
                                 index++
                                 buildArr.push({
                                     id: allIndex + '',
