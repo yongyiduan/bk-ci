@@ -2,8 +2,8 @@
     <article class="gitci-main" v-bkloading="{ isLoading }">
         <header class="gitci-header">
             <span class="header-info">
-                <icon name="export-ci" size="44"></icon>
-                <span class="ci-name">Tencent CI</span>
+                <icon name="devops" size="30"></icon>
+                <span class="ci-name" @click="goToHome">蓝盾 | Pipeline as Code</span>
                 <template v-if="$route.hash">
                     <icon name="git" size="18" class="gray-icon"></icon>
                     <span class="git-project-path" @click="goToCode">{{ decodeURIComponent(($route.hash || '').slice(1)) }}</span>
@@ -148,6 +148,16 @@
 
             goToCode () {
                 window.open(this.projectInfo.web_url, '_blank')
+            },
+
+            goToHome () {
+                const pipelineId = this.$route.params.pipelineId
+                this.$router.push({
+                    name: 'buildList',
+                    params: {
+                        pipelineId
+                    }
+                })
             }
         }
     }
@@ -190,9 +200,10 @@
             align-items: center;
             .ci-name {
                 display: inline-block;
-                margin: 0 40px 0 7.8px;
-                font-size: 20px;
+                margin: 0 40px 0 12px;
+                font-size: 16px;
                 color: #f5f7fa;
+                cursor: pointer;
             }
             .git-project-path {
                 display: inline-block;
