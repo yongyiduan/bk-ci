@@ -1,9 +1,10 @@
 <template>
     <article class="build-detail-home">
-        <header class="build-detail-header">
-            <bk-breadcrumb class="header-bread">
-                <bk-breadcrumb-item v-for="(item,index) in list" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
+        <section class="section-box build-detail-header">
+            <bk-breadcrumb class="build-detail-crumb" separator-class="bk-icon icon-angle-right">
+                <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
+
             <bk-tab :active.sync="active" type="unborder-card" class="header-tab" @tab-change="changeTab">
                 <bk-tab-panel
                     v-for="(panel, index) in panels"
@@ -11,26 +12,40 @@
                     :key="index">
                 </bk-tab-panel>
             </bk-tab>
-        </header>
-        <router-view class="build-detail-main"></router-view>
+        </section>
+
+        <router-view class="section-box build-detail-main"></router-view>
     </article>
 </template>
 
 <script>
+    import { mapState } from 'vuex'
+    import { modifyHtmlTitle, getBuildTitle } from '@/utils'
+    import { pipelines } from '@/http'
+
     export default {
         data () {
             return {
-                list: [
-                    { title: 'Frontent CI', link: { name: 'buildList' } },
-                    { title: '# 127' }
-                ],
                 panels: [
-                    { label: '详情', name: 'buildDetail' },
-                    { label: '构件', name: 'buildArtifacts' },
-                    { label: '报告', name: 'buildReports' },
-                    { label: '配置', name: 'buildConfig' }
+                    { label: 'Build detail', name: 'buildDetail' },
+                    { label: 'Artifacts', name: 'buildArtifacts' },
+                    { label: 'Reports', name: 'buildReports' },
+                    { label: 'Configuration', name: 'buildConfig' }
                 ],
-                active: 'buildDetail'
+                active: 'buildDetail',
+                buildNum: '',
+                yml: ''
+            }
+        },
+
+        computed: {
+            ...mapState(['projectId']),
+
+            navList () {
+                return [
+                    { title: this.yml, link: { name: 'buildList' } },
+                    { title: '# ' + this.buildNum }
+                ]
             }
         },
 
@@ -44,35 +59,61 @@
             }
         },
 
+        created () {
+            this.setHtmlTitle()
+        },
+
         methods: {
             changeTab (name) {
                 this.$router.push({ name })
+            },
+
+            setHtmlTitle () {
+                const params = {
+                    pipelineId: this.$route.params.pipelineId,
+                    buildId: this.$route.params.buildId
+                }
+                return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
+                    const gitRequestEvent = res.gitRequestEvent || {}
+                    const modelDetail = res.modelDetail || {}
+                    const gitProjectPipeline = res.gitProjectPipeline || {}
+                    this.buildNum = modelDetail.buildNum
+                    this.yml = gitProjectPipeline.filePath
+                    const title = getBuildTitle(gitRequestEvent) + ' #' + this.buildNum
+                    modifyHtmlTitle(title)
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
             }
         }
     }
 </script>
 
 <style lang="postcss" scoped>
+    .build-detail-home {
+        padding-left: 20px;
+    }
     .build-detail-header {
         background: #fff;
-        box-shadow: 0 2px 5px 0 rgba(51,60,72,0.03);
-        .header-bread {
-            line-height: 41px;
-            padding: 0 25px;
+    }
+    .build-detail-crumb {
+        height: 50px;
+        line-height: 50px;
+        padding: 0 27px;
+    }
+    .header-tab {
+        margin-top: -10px;
+        /deep/ .bk-tab-header {
+            padding: 0 14px;
+            background-image: none !important;
         }
-        .header-tab {
-            /deep/ .bk-tab-header {
-                padding: 0 14px;
-            }
-            /deep/ .bk-tab-section {
-                padding: 0;
-            }
+        /deep/ .bk-tab-section {
+            padding: 0;
         }
     }
     .build-detail-main {
-        margin: 25px;
-        height: calc(100vh - 209px);
-        overflow: auto;
+        margin-top: 16px;
+        height: calc(100% - 106px);
         background: #fff;
     }
 </style>

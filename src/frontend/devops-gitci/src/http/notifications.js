@@ -6,7 +6,15 @@ export default {
         return api.get(`${GITCI_PERFIX}/user/messages`, { params })
     },
 
-    readAllMessages () {
-        return api.put(`${GITCI_PERFIX}/user/messages/read`)
+    readAllMessages (projectId) {
+        return api.put(`${GITCI_PERFIX}/user/messages/read?projectId=${projectId}`)
+    },
+
+    readMessage (id) {
+        return api.put(`${GITCI_PERFIX}/user/messages/${id}/read`)
+    },
+
+    getUnreadNotificationNum (projectId) {
+        return api.get(`${GITCI_PERFIX}/user/messages/noread`, { params: { projectId } })
     }
 }

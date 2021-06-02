@@ -1,24 +1,31 @@
 <template>
     <article class="setting-basic-home" v-bkloading="{ isLoading }">
+        <h3 class="setting-basic-head">General</h3>
         <section class="basic-main">
             <h5 class="main-title">Config listening events</h5>
             <section class="main-checkbox">
-                <bk-checkbox v-model="form.buildPushedBranches" class="checkbox">Build pushed branches</bk-checkbox>
-                <bk-checkbox v-model="form.buildPushedPullRequest" class="checkbox">Build pushed merge request</bk-checkbox>
+                <bk-checkbox v-model="form.buildPushedBranches" class="basic-item">Build pushed branches</bk-checkbox>
+                <bk-checkbox v-model="form.buildPushedPullRequest" class="basic-item">Build pushed merge request</bk-checkbox>
             </section>
 
             <h5 class="main-title">Config merge request</h5>
             <section class="main-checkbox">
-                <bk-checkbox v-model="form.enableMrBlock" class="checkbox">Lock MR merge</bk-checkbox>
+                <bk-checkbox v-model="form.enableMrBlock" class="basic-item">Lock MR merge</bk-checkbox>
             </section>
-
-            <h5 class="main-title">Config enable</h5>
-            <section class="main-checkbox">
-                <bk-checkbox v-model="form.enableCi" class="checkbox">Enable CI</bk-checkbox>
-            </section>
+            <bk-button theme="primary" class="basic-btn" @click="saveSetting" :loading="isSaving">Save</bk-button>
         </section>
 
-        <bk-button theme="primary" class="basic-btn" @click="saveSetting" :loading="isSaving">保存</bk-button>
+        <h3 class="setting-basic-head">CI Authorization</h3>
+        <section class="basic-main">
+            <h5 class="main-title">Authorized by @{{form.enableUserId}}. When running, it will use {{form.enableUserId}}'s permission to checkout current repository.</h5>
+            <section class="main-checkbox">
+                <bk-button @click="resetAuthorization" :loading="isReseting">Reset Authorization</bk-button>
+            </section>
+            <h5 class="main-title">After disable CI, all trigger events will be ignored.</h5>
+            <section class="main-checkbox">
+                <bk-button :theme="form.enableCi ? 'danger' : 'primary'" :loading="isToggleEnable" @click="toggleEnable">{{ form.enableCi ? 'Disable CI' : 'Enable CI' }}</bk-button>
+            </section>
+        </section>
     </article>
 </template>
 
@@ -32,16 +39,17 @@
                 form: {
                     buildPushedBranches: false,
                     buildPushedPullRequest: false,
-                    enableMrBlock: false,
-                    enableCi: false
+                    enableMrBlock: false
                 },
                 isSaving: false,
-                isLoading: false
+                isLoading: false,
+                isToggleEnable: false,
+                isReseting: false
             }
         },
 
         computed: {
-            ...mapState(['projectId'])
+            ...mapState(['projectId', 'projectInfo'])
         },
 
         created () {
@@ -51,7 +59,7 @@
         methods: {
             getSetting () {
                 this.isLoading = true
-                setting.getSetting(this.projectId).then((res) => {
+                setting.getSetting(this.projectId).then((res = {}) => {
                     Object.assign(this.form, res)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -62,16 +70,34 @@
 
             saveSetting () {
                 this.isSaving = true
-                const postData = {
-                    projectId: this.projectId,
-                    ...this.form
-                }
-                setting.saveSetting(postData).then(() => {
-                    this.$bkMessage({ theme: 'success', message: '保存成功' })
+                setting.saveSetting(this.projectId, this.form).then(() => {
+                    this.$bkMessage({ theme: 'success', message: 'Saved successfully' })
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isSaving = false
+                })
+            },
+
+            toggleEnable () {
+                this.isToggleEnable = true
+                setting.toggleEnableCi(!this.form.enableCi, this.projectInfo).then(() => {
+                    this.getSetting()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isToggleEnable = false
+                })
+            },
+
+            resetAuthorization () {
+                this.isReseting = true
+                setting.resetAuthorization(this.projectId).then(() => {
+                    this.getSetting()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isReseting = false
                 })
             }
         }
@@ -80,30 +106,34 @@
 
 <style lang="postcss" scoped>
     .setting-basic-home {
-        padding: 20px 24px;
-    }
-    .basic-main {
+        margin: 16px;
+        padding: 24px;
         background: #fff;
         overflow: hidden;
-        padding: 0 24px;
+    }
+    .setting-basic-head {
+        font-size: 16px;
+        color: #313328;
+    }
+    .basic-main {
+        margin: 10px 0 30px;
+        border: 1px solid #f0f1f5;
+        padding: 20px;
         .main-title {
-            margin: 25px 0 18px;
-            font-size: 16px;
-            color: #313328;
+            margin-bottom: 20px;
         }
         .main-checkbox {
-            padding-bottom: 25px;
-            &:not(:last-child) {
-                border-bottom: 1px solid #f0f1f5;
+            display: flex;
+            margin-bottom: 20px;
+            &:last-child {
+                margin-bottom: 0;
             }
         }
-        .checkbox:not(:last-child) {
-            display: block;
-            margin-bottom: 17px;
+        .basic-item {
+            margin-right: 100px;
         }
     }
     .basic-btn {
-        margin-top: 20px;
         width: 88px;
     }
 </style>

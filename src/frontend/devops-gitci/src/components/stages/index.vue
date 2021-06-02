@@ -10,7 +10,7 @@
 </template>
 
 <script>
-    import stage from './stage'
+    import stage from './stage/index'
 
     export default {
         components: {

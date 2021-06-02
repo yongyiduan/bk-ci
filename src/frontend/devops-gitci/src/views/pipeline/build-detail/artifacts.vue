@@ -4,18 +4,23 @@
             :outer-border="false"
             :header-border="false"
             :header-cell-style="{ background: '#f1f2f3' }"
+            empty-text="No artifacts yet"
         >
-            <bk-table-column label="构件名称" width="220" prop="name" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="路径" prop="fullName" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="文件大小" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="仓库类型" width="150" prop="artifactoryType" :formatter="repoTypeFormatter" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="操作" width="150">
+            <bk-table-column label="Name" width="220" prop="name" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Path" show-overflow-tooltip>
+                <template slot-scope="props">
+                    <span v-if="props.row.artifactoryType === 'PIPELINE'">{{ props.row.name }}</span>
+                    <span v-else>{{ props.row.fullName }}</span>
+                </template>
+            </bk-table-column>
+            <bk-table-column label="Size" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Operation" width="150">
                 <template slot-scope="props">
                     <bk-button text
                         @click="downLoadFile(props.row)"
                         :disabled="!hasPermission"
-                        v-bk-tooltips="{ content: '你没有该流水线的下载构件权限，无法下载', disabled: hasPermission }"
-                    >下载</bk-button>
+                        v-bk-tooltips="{ content: 'You do not have the permission to download components of the pipeline, and you cannot download', disabled: hasPermission }"
+                    >Download</bk-button>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -37,7 +42,7 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'curPipeline'])
+            ...mapState(['projectId'])
         },
 
         created () {
@@ -51,13 +56,13 @@
                     params: {
                         props: {
                             buildId: this.$route.params.buildId,
-                            pipelineId: this.curPipeline.pipelineId
+                            pipelineId: this.$route.params.pipelineId
                         }
                     }
                 }
                 const permissionData = {
                     projectId: this.projectId,
-                    pipelineId: this.curPipeline.pipelineId,
+                    pipelineId: this.$route.params.pipelineId,
                     permission: 'DOWNLOAD'
                 }
                 this.isLoading = true
@@ -67,9 +72,6 @@
                 ]).then(([res, permission]) => {
                     this.artifactories = res.records || []
                     this.hasPermission = permission
-                    if (this.artifactories.length <= 0) {
-                        this.$emit('hidden')
-                    }
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -87,17 +89,10 @@
                     })
                 ]).then(([isDevnet, res]) => {
                     const url = isDevnet ? res.url : res.url2
-                    window.location.href = url
+                    window.open(url, '_blank')
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
-            },
-            repoTypeFormatter (row, column, cellValue, index) {
-                const typeMap = {
-                    CUSTOM_DIR: '自定义仓库',
-                    PIPELINE: '流水线仓库'
-                }
-                return typeMap[cellValue]
             },
             sizeFormatter (row, column, cellValue, index) {
                 return (cellValue >= 0 && convertFileSize(cellValue, 'B')) || ''
