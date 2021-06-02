@@ -8,6 +8,7 @@
             </span>
             <bk-button theme="primary" v-if="exceptionType === 418" @click="oauth" :loading="isSaving">OAUTH Authorization</bk-button>
             <bk-button theme="primary" v-if="exceptionType === 419" @click="enable" :loading="isSaving">Enable</bk-button>
+            <bk-button theme="primary" v-if="[500, 403].includes(exceptionType)" @click="refresh">Refresh</bk-button>
         </section>
     </bk-exception>
 </template>
@@ -80,12 +81,16 @@
             enable () {
                 this.isSaving = true
                 setting.toggleEnableCi(true, this.projectInfo).then(() => {
-                    location.reload()
+                    this.refresh()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isSaving = false
                 })
+            },
+
+            refresh () {
+                location.reload()
             }
         }
     }

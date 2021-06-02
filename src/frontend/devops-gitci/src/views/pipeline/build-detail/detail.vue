@@ -285,7 +285,7 @@
                 margin-bottom: 15px;
             }
         }
-        .detail-button {
+        .nav-button {
             margin-top: 22px;
         }
     }
