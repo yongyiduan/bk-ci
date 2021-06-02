@@ -139,49 +139,26 @@
                         }
                     }
                 } else if (this.elementId && !this.taskId) {
-                    this.isLoading = true
-                    try {
-                        const res = await this.requestTurboV2Info({
-                            bsPipelineId: this.$route.params.pipelineId,
-                            bsElementId: this.elementId
-                        })
-                        if (res) {
-                            res.data.banAllBooster === 'false' ? (this.banAllBooster = true) : (this.banAllBooster = false)
-                            this.task = Object.assign({}, res.data)
-                            this.taskId = res.data.taskId
-                            this.taskName = res.data.taskName
-                            if (!this.taskId) {
-                                this.banAllBooster = false
-                                const h = this.$createElement
-                                this.$bkInfo({
-                                    subHeader: h('div', {}, [this.$t('editPage.atomForm.turboOffline'), h('a', {
-                                        style: {
-                                            color: '#3c96ff',
-                                            marginLeft: '15px'
-                                        },
-                                        attrs: {
-                                            href: 'https://iwiki.woa.com/x/6OQMIw',
-                                            target: '_blank'
-                                        }
-                                    }, '新版编译加速')]),
-                                    closeIcon: false,
-                                    confirmFn () {
-                                        this.banAllBooster = false
-                                    },
-                                    cancelFn: () => {
-                                        this.banAllBooster = false
-                                    }
-                                })
+                    const h = this.$createElement
+                    this.$bkInfo({
+                        subHeader: h('div', {}, [this.$t('editPage.atomForm.turboOffline'), h('a', {
+                            style: {
+                                color: '#3c96ff',
+                                marginLeft: '15px'
+                            },
+                            attrs: {
+                                href: 'https://iwiki.woa.com/x/6OQMIw',
+                                target: '_blank'
                             }
+                        }, this.$t('editPage.atomForm.turboV2'))]),
+                        closeIcon: false,
+                        confirmFn () {
+                            this.banAllBooster = false
+                        },
+                        cancelFn () {
+                            this.banAllBooster = false
                         }
-                    } catch (err) {
-                        this.$bkMessage({
-                            message: err.message ? err.message : err,
-                            theme: 'error'
-                        })
-                    } finally {
-                        this.isLoading = false
-                    }
+                    })
                 } else {
                     this.isShow = true
                 }
@@ -193,10 +170,11 @@
                         bsElementId: this.elementId
                     })
                     if (res) {
-                        res.data.banAllBooster === 'false' ? (this.banAllBooster = true) : (this.banAllBooster = false)
-                        this.task = Object.assign({}, res.data)
-                        this.taskId = res.data.taskId
-                        this.taskName = res.data.taskName
+                        const data = res.data || {}
+                        this.banAllBooster = data.banAllBooster === 'false'
+                        this.task = Object.assign({}, data)
+                        this.taskId = data.taskId
+                        this.taskName = data.taskName
                     }
                 } catch (err) {
                     this.$bkMessage({
