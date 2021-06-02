@@ -124,7 +124,7 @@
         padding: 0 25.5px;
     }
     .agent-list-main {
-        padding: 20px 24px;
+        padding: 16px;
         .add-agent {
             margin-bottom: 20px;
         }

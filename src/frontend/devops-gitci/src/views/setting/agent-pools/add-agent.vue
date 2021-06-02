@@ -190,7 +190,7 @@
         padding: 0 25.5px;
     }
     .add-agent-body {
-        padding: 16px 25px;
+        padding: 16px;
         overflow-y: auto;
         max-height: calc(100vh - 176px);
         .agent-tips {
@@ -298,7 +298,7 @@
         }
     }
     .bottom-btn {
-        margin: 12px 24px 24px;
+        margin: 12px 16px 16px;
         +button {
             margin-left: 0;
         }

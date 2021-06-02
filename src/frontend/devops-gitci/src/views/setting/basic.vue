@@ -106,7 +106,7 @@
 
 <style lang="postcss" scoped>
     .setting-basic-home {
-        margin: 20px 24px;
+        margin: 16px;
         padding: 24px;
         background: #fff;
         overflow: hidden;

@@ -97,7 +97,7 @@
     .agent-pools {
         overflow-y: auto;
         height: calc(100vh - 60px);
-        padding: 0 24px 20px;
+        padding: 0 16px 16px;
         margin: 0;
         width: 100%;
     }

@@ -9,7 +9,6 @@
             :outer-border="false"
             :header-border="false"
             :header-cell-style="{ background: '#fafbfd' }"
-            :height="tableHeight"
             @page-change="pageChange"
             @page-limit-change="pageLimitChange"
             empty-text="No credential yet"
@@ -70,11 +69,7 @@
         },
 
         computed: {
-            ...mapState(['appHeight', 'projectId']),
-
-            tableHeight () {
-                return Math.min(this.appHeight - 157, 106 + (this.credentialList.length || 3) * 42)
-            }
+            ...mapState(['appHeight', 'projectId'])
         },
 
         created () {
@@ -155,7 +150,9 @@
 
 <style lang="postcss" scoped>
     .credential-home {
-        padding: 20px 24px;
+        padding: 16px;
+        height: calc(100vh - 60px);
+        overflow: auto;
     }
     .home-header {
         display: flex;
