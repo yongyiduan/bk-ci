@@ -11,9 +11,18 @@
             </span>
 
             <section v-if="curPipeline.pipelineId" class="head-options">
-                <bk-button @click="showTriggleBuild" :disabled="!curPipeline.enabled" size="small" class="options-btn">Trigger build</bk-button>
+                <div v-bk-tooltips="computedOptToolTip" class="nav-button">
+                    <bk-button @click="showTriggleBuild"
+                        :disabled="!curPipeline.enabled || !permission"
+                        size="small"
+                        class="options-btn"
+                    >Trigger build</bk-button>
+                </div>
                 <opt-menu>
-                    <li @click="togglePipelineEnable">{{ curPipeline.enabled ? 'Disable pipeline' : 'Enable pipeline' }}</li>
+                    <li @click="togglePipelineEnable"
+                        :class="{ disabled: !permission }"
+                        v-bk-tooltips="{ content: 'Permission denied', disabled: permission }"
+                    >{{ curPipeline.enabled ? 'Disable pipeline' : 'Enable pipeline' }}</li>
                 </opt-menu>
             </section>
         </header>
@@ -85,9 +94,10 @@
                         <opt-menu>
                             <li @click="cancelBuild(props.row)"
                                 v-if="['RUNNING', 'PREPARE_ENV', 'QUEUE', 'LOOP_WAITING', 'CALL_WAITING'].includes(props.row.buildHistory.status)"
-                                :class="{ disabled: !curPipeline.enabled }"
+                                v-bk-tooltips="computedOptToolTip"
+                                :class="{ disabled: !curPipeline.enabled || !permission }"
                             >Cancel build</li>
-                            <li @click="rebuild(props.row)" v-else :class="{ disabled: !curPipeline.enabled }">Re-build</li>
+                            <li @click="rebuild(props.row)" v-else :class="{ disabled: !curPipeline.enabled || !permission }" v-bk-tooltips="computedOptToolTip">Re-build</li>
                         </opt-menu>
                     </template>
                 </bk-table-column>
@@ -237,7 +247,14 @@
         },
 
         computed: {
-            ...mapState(['curPipeline', 'projectId', 'projectInfo'])
+            ...mapState(['curPipeline', 'projectId', 'projectInfo', 'permission']),
+
+            computedOptToolTip () {
+                return {
+                    content: !this.curPipeline.enabled ? 'Pipeline disabled' : 'Permission denied',
+                    disabled: this.curPipeline.enabled && this.permission
+                }
+            }
         },
 
         watch: {
@@ -376,6 +393,8 @@
             },
 
             togglePipelineEnable () {
+                if (!this.permission) return
+
                 this.clickEmpty()
                 pipelines.toggleEnablePipeline(this.projectId, this.curPipeline.pipelineId, !this.curPipeline.enabled).then(() => {
                     const pipeline = {
@@ -389,7 +408,7 @@
             },
 
             showTriggleBuild () {
-                if (!this.curPipeline.enabled) return
+                if (!this.curPipeline.enabled || !this.permission) return
 
                 this.showTriggle = true
             },
@@ -468,7 +487,7 @@
             },
 
             cancelBuild (row) {
-                if (!this.curPipeline.enabled) return
+                if (!this.curPipeline.enabled || !this.permission) return
 
                 this.clickEmpty()
                 pipelines.cancelBuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
@@ -487,7 +506,7 @@
             },
 
             rebuild (row) {
-                if (!this.curPipeline.enabled) return
+                if (!this.curPipeline.enabled || !this.permission) return
 
                 this.clickEmpty()
                 pipelines.rebuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {

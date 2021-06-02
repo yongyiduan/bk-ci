@@ -3,7 +3,9 @@
         <aside class="aside-nav section-box" v-bkloading="{ isLoading }">
             <h3 class="nav-title">
                 Pipelines
-                <bk-button size="small" theme="primary" @click="showAddYml">New</bk-button>
+                <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" class="nav-button">
+                    <bk-button size="small" theme="primary" @click="showAddYml" :disabled="!permission">New</bk-button>
+                </div>
             </h3>
 
             <ul v-if="!isLoading">
@@ -96,7 +98,7 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'curPipeline'])
+            ...mapState(['projectId', 'curPipeline', 'permission'])
         },
 
         created () {
@@ -257,10 +259,14 @@
         margin: 0 12px 10px 20px;
         padding: 10px 0;
         font-size: 16px;
+        .nav-button {
+            height: 26px;
+        }
         button {
             width: 56px;
             min-width: 56px;
             padding: 0;
+            vertical-align: top;
         }
     }
     .pipelines-main {

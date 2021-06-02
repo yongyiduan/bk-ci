@@ -33,6 +33,10 @@ export default {
         return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/${pipelineId}/hasPermission?permission=${permission}`)
     },
 
+    requestPermission (projectId) {
+        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/hasCreatePermission`)
+    },
+
     requestDevnetGateway () {
         return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/checkDevnetGateway`)
     },

@@ -31,8 +31,12 @@
                 </span>
             </p>
 
-            <bk-button class="detail-button" @click="cancleBuild" :loading="isOperating" v-if="buildDetail.status === 'RUNNING'">Cancel Build</bk-button>
-            <bk-button class="detail-button" @click="rebuild" :loading="isOperating" v-else>Re-build</bk-button>
+            <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" class="nav-button" v-if="buildDetail.status === 'RUNNING'">
+                <bk-button class="detail-button" @click="cancleBuild" :loading="isOperating" :disabled="!permission">Cancel Build</bk-button>
+            </div>
+            <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" class="nav-button" v-else>
+                <bk-button class="detail-button" @click="rebuild" :loading="isOperating" :disabled="!permission">Re-build</bk-button>
+            </div>
         </section>
         <stages :stages="stageList" class="detail-stages"></stages>
     </article>
@@ -71,7 +75,7 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'projectInfo']),
+            ...mapState(['projectId', 'projectInfo', 'permission']),
 
             buildTypeIcon () {
                 return getbuildTypeIcon(this.buildDetail.objectKind)
@@ -282,7 +286,7 @@
             }
         }
         .detail-button {
-            margin-top: 16px;
+            margin-top: 22px;
         }
     }
     .detail-stages {

@@ -13,6 +13,7 @@ const store = new Vuex.Store({
     state: {
         user: {},
         appHeight: window.innerHeight,
+        permission: false,
         projectId: '',
         projectInfo: {},
         curPipeline: {},
@@ -36,6 +37,9 @@ const store = new Vuex.Store({
         },
         setExceptionInfo (state, exceptionInfo) {
             state.exceptionInfo = exceptionInfo
+        },
+        setPermission (state, permission) {
+            state.permission = permission
         }
     },
     actions: {
@@ -47,6 +51,9 @@ const store = new Vuex.Store({
         },
         setExceptionInfo ({ commit }, exceptionInfo) {
             commit('setExceptionInfo', exceptionInfo)
+        },
+        setPermission ({ commit }, permission) {
+            commit('setPermission', permission)
         }
     }
 })

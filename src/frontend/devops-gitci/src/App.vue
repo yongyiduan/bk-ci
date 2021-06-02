@@ -32,7 +32,7 @@
 </template>
 
 <script>
-    import { common, notifications } from '@/http'
+    import { common, notifications, pipelines } from '@/http'
     import { mapActions, mapState } from 'vuex'
 
     export default {
@@ -78,7 +78,7 @@
         },
 
         methods: {
-            ...mapActions(['setProjectInfo', 'setExceptionInfo']),
+            ...mapActions(['setProjectInfo', 'setExceptionInfo', 'setPermission']),
 
             initData () {
                 this.isLoading = true
@@ -104,6 +104,7 @@
                             if (projectInfo.id) {
                                 this.setProjectInfo(projectInfo)
                                 this.loopGetNotifications()
+                                this.getPermission()
                                 this.setExceptionInfo({ type: 200 })
                             } else {
                                 this.setExceptionInfo({ type: 499 })
@@ -117,6 +118,14 @@
                         this.setExceptionInfo({ type: 520 })
                         resolve()
                     }
+                })
+            },
+
+            getPermission () {
+                return pipelines.requestPermission(this.projectId).then((res) => {
+                    this.setPermission(res)
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
 

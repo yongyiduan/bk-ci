@@ -5,7 +5,11 @@
                 <i :class="stageStatusIcon"></i>
                 <span class="stage-name text-ellipsis" v-bk-overflow-tips>{{ stage.name }}</span>
             </span>
-            <span v-if="['FAILED', 'CANCELED'].includes(stage.status)" class="stage-retry" @click="retry">Re-run</span>
+            <span v-if="['FAILED', 'CANCELED'].includes(stage.status)"
+                v-bk-tooltips="{ content: 'Permission denied', disabled: permission }"
+                :class="['stage-retry', { disabled: !permission }]"
+                @click="retry"
+            >Re-run</span>
             <span class="stage-connector" v-if="stageIndex < stageNum - 1">
                 <i class="bk-icon icon-right-shape connector-angle"></i>
             </span>
@@ -63,7 +67,7 @@
         },
 
         computed: {
-            ...mapState(['projectId']),
+            ...mapState(['projectId', 'permission']),
 
             stageStatusCls () {
                 return getPipelineStatusClass(this.stage.status)
@@ -76,6 +80,8 @@
 
         methods: {
             retry () {
+                if (!this.permission) return
+
                 this.showRetryStageDialog = true
             },
 
@@ -171,8 +177,13 @@
             cursor: pointer;
             position: absolute;
             right: 6%;
-            top: 0;
+            top: 18px;
+            line-height: 14px;
             color: $primaryColor;
+            &.disabled {
+                cursor: not-allowed;
+                color: #c4c6cc;
+            }
         }
     }
     .stage-connector {
