@@ -29,6 +29,7 @@ import {
     SET_DEFAULT_STAGE_TAG,
     UPDATE_STAGE,
     SET_PIPELINE_STAGE,
+    SET_COMMON_SETTING,
     SET_PIPELINE_CONTAINER,
     SET_TEMPLATE,
     SET_CONTAINER_DETAIL,
@@ -104,6 +105,14 @@ export default {
             const defaultStageTag = res.data.filter(item => item.defaultFlag).map(item => item.id)
             commit(SET_STAGE_TAG_LIST, res.data)
             commit(SET_DEFAULT_STAGE_TAG, defaultStageTag)
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    async fetchCommonSetting ({ commit }) {
+        try {
+            const res = await request.get(`/${PROCESS_API_URL_PREFIX}/user/setting/common/get`)
+            commit(SET_COMMON_SETTING, res.data)
         } catch (error) {
             console.log(error)
         }

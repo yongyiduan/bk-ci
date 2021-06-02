@@ -4,7 +4,7 @@
             <template v-for="(obj, key) in atomPropsModel">
                 <form-field v-if="!isHidden(obj, element)" :key="key" :desc="obj.desc" :desc-link="obj.descLink" :desc-link-text="obj.descLinkText" :required="obj.required" :label="obj.label" :is-error="errors.has(key)" :error-msg="errors.first(key)">
                     <component :is="obj.component" v-if="key === 'scriptTurbo' && baseOSType === 'LINUX'"
-                        v-validate.initial="Object.assign(obj.rule, { required: !!obj.required })"
+                        v-validate.initial="Object.assign({}, { max: getMaxLengthByType(obj.component) }, obj.rule, { required: !!obj.required })"
                         :lang="lang"
                         :name="key"
                         :task="task"
@@ -17,7 +17,7 @@
                         @handleChange="handleUpdateTurbo"
                         v-bind="obj">
                     </component>
-                    <component :is="obj.component" v-else-if="key !== 'scriptTurbo'" :disabled="disabled" v-validate.initial="Object.assign(obj.rule, { required: !!obj.required })" :lang="lang" :name="key" :handle-change="handleUpdateElement" :value="element[key]" v-bind="obj"></component>
+                    <component :is="obj.component" v-else-if="key !== 'scriptTurbo'" :disabled="disabled" v-validate.initial="Object.assign({}, { max: getMaxLengthByType(obj.component) }, obj.rule, { required: !!obj.required })" :lang="lang" :name="key" :handle-change="handleUpdateElement" :value="element[key]" v-bind="obj"></component>
                 </form-field>
             </template>
         </div>
