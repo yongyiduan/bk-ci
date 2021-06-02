@@ -1,9 +1,9 @@
 /*
- * Tencent is pleased to support the open source community by making BK-CODECC 蓝鲸代码检查平台 available.
+ * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
  *
  * Copyright (C) 2019 THL A29 Limited, a Tencent company.  All rights reserved.
  *
- * BK-CODECC 蓝鲸代码检查平台 is licensed under the MIT license.
+ * BK-CI 蓝鲸持续集成平台 is licensed under the MIT license.
  *
  * A copy of the MIT License is included in this file.
  *
@@ -24,10 +24,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+<<<<<<< HEAD:src/backend/ci/ext/blueking/common/common-auth/common-auth-blueking/src/main/kotlin/com/tencent/devops/common/auth/api/pojo/BkAuthGroupUser.kt
+package com.tencent.devops.common.auth.api.pojo
+=======
 package com.tencent.bk.codecc.defect.service;
+>>>>>>> github/master:src/backend/codecc/core/defect/biz-defect/src/main/java/com/tencent/bk/codecc/defect/service/ICheckerIntegratedBizService.java
 
 import com.tencent.devops.common.constant.ComConstants;
 
+<<<<<<< HEAD:src/backend/ci/ext/blueking/common/common-auth/common-auth-blueking/src/main/kotlin/com/tencent/devops/common/auth/api/pojo/BkAuthGroupUser.kt
+data class BkAuthGroupUser(
+    @JsonProperty("display_name")
+    val displayName: String,
+    @JsonProperty("role_id")
+    val roleId: Int,
+    @JsonProperty("role_name")
+    val roleName: String,
+    @JsonProperty("user_id")
+    val userId: String,
+    @JsonProperty("user_type")
+    val userType: String
+)
+=======
 import java.util.List;
 
 public interface ICheckerIntegratedBizService {
@@ -41,3 +59,4 @@ public interface ICheckerIntegratedBizService {
                         String toolName,
                         ComConstants.ToolIntegratedStatus status);
 }
+>>>>>>> github/master:src/backend/codecc/core/defect/biz-defect/src/main/java/com/tencent/bk/codecc/defect/service/ICheckerIntegratedBizService.java

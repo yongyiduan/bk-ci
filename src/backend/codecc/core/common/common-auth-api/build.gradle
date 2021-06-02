@@ -24,6 +24,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+<<<<<<< HEAD:src/backend/ci/ext/tencent/common/common-auth/common-auth-tencent/src/main/kotlin/com/tencent/devops/common/auth/api/pojo/BkAuthResourceCreateRequest.kt
+package com.tencent.devops.common.auth.api.pojo
+
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class BkAuthResourceCreateRequest(
+    @JsonProperty("project_code")
+    val projectCode: String,
+    @JsonProperty("service_code")
+    val serviceCode: String,
+    @JsonProperty("resource_code")
+    val resourceCode: String,
+    @JsonProperty("resource_name")
+    val resourceName: String,
+    @JsonProperty("resource_type")
+    val resourceType: String,
+    @JsonProperty("creator")
+    val creator: String,
+    @JsonProperty("authorized_groups")
+    val authorizedGroups: String?
+)
+=======
 dependencies {
     compile fileTree(dir: 'lib/iam-sdk-1.0.0.jar', includes: ['*.jar'])
     compile project(":core:common:common-service")
@@ -43,3 +65,4 @@ dependencies {
     compile "io.swagger:swagger-jersey2-jaxrs"
 
 }
+>>>>>>> github/master:src/backend/codecc/core/common/common-auth-api/build.gradle

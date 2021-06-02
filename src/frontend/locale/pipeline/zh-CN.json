@@ -811,7 +811,7 @@
             "jobSettingTips": "当前业务不存在Job作业，请前往Job作业平台配置",
             "gcloudSettingTips": "当前业务不存在持续集成模板，请前往标准运维系统配置",
             "slaveAbsPath": "源服务器操作系统上的绝对路径",
-            "createTurbo": "暂无编译加速任务，点击去新建任务",
+            "turboOffline": "此版本编译加速已下线，请使用 TBS 编译加速插件",
             "ticketId": "凭证ID",
             "tclsId": "tcls业务ID",
             "serviceId": "业务ID",

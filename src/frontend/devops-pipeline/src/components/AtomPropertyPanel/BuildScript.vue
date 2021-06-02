@@ -80,7 +80,7 @@
         },
         methods: {
             ...mapActions('pipelines', [
-                'requestTurboIofo',
+                'requestTurboV2Info',
                 'setTurboSwitch',
                 'updateToTurbo'
             ]),
@@ -141,7 +141,7 @@
                 } else if (this.elementId && !this.taskId) {
                     this.isLoading = true
                     try {
-                        const res = await this.requestTurboIofo({
+                        const res = await this.requestTurboV2Info({
                             bsPipelineId: this.$route.params.pipelineId,
                             bsElementId: this.elementId
                         })
@@ -151,11 +151,23 @@
                             this.taskId = res.data.taskId
                             this.taskName = res.data.taskName
                             if (!this.taskId) {
-                                this.banAllBooster = value
+                                this.banAllBooster = false
+                                const h = this.$createElement
                                 this.$bkInfo({
-                                    subTitle: this.$t('editPage.atomForm.createTurbo'),
+                                    subHeader: h('div', {}, [this.$t('editPage.atomForm.turboOffline'), h('a', {
+                                        style: {
+                                            color: '#3c96ff',
+                                            marginLeft: '15px'
+                                        },
+                                        attrs: {
+                                            href: 'https://iwiki.woa.com/x/6OQMIw',
+                                            target: '_blank'
+                                        }
+                                    }, '新版编译加速')]),
                                     closeIcon: false,
-                                    confirmFn: this.goRegist,
+                                    confirmFn () {
+                                        this.banAllBooster = false
+                                    },
                                     cancelFn: () => {
                                         this.banAllBooster = false
                                     }
@@ -176,7 +188,7 @@
             },
             async initData () {
                 try {
-                    const res = await this.requestTurboIofo({
+                    const res = await this.requestTurboV2Info({
                         bsPipelineId: this.$route.params.pipelineId,
                         bsElementId: this.elementId
                     })
