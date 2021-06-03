@@ -1,7 +1,7 @@
 <template>
     <article class="add-agent-home">
         <header class="add-agent-head">
-            <bk-breadcrumb>
+            <bk-breadcrumb separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
         </header>
@@ -14,7 +14,7 @@
 
             <section class="agent-filter">
                 <span class="filter-title">System</span>
-                <bk-select @change="getZoneList" v-model="machine.system" :loading="isLoading" behavior="simplicity" class="filter-select">
+                <bk-select @change="getThirdAgentLink" v-model="machine.system" :loading="isLoading" behavior="simplicity" class="filter-select">
                     <bk-option v-for="option in operateSystems"
                         :key="option.id"
                         :id="option.id"
@@ -29,29 +29,20 @@
                         :name="option">
                     </bk-option>
                 </bk-select>
-                <span class="filter-title">地区</span>
-                <bk-select v-model="machine.zone" :loading="isLoading" behavior="simplicity" class="filter-select">
-                    <bk-option v-for="option in zones"
-                        :key="option.zoneName"
-                        :id="option.zoneName"
-                        :name="option.showName"
-                        @click.native="getThirdAgentLink">
-                    </bk-option>
-                </bk-select>
             </section>
 
             <section class="agent-info use-tip">
                 <section v-html="computedHtml"></section>
 
-                <h3>Refresh to confirm</h3>
+                <h3>Connected Agents</h3>
                 <p v-bkloading="{ isLoading: isRefresh }" class="agent-status">
-                    <bk-button text @click="getAgentStatus" v-if="agentStatus.status === 'UN_IMPORT'" class="agent-refresh">Click to show the agent</bk-button>
+                    <span class="agent-refresh" v-if="agentStatus.status === 'UN_IMPORT'">No connected Agents，<bk-button text @click="getAgentStatus">Refresh</bk-button></span>
                     <section v-else class="agent-status-info">
                         <span class="agent-title">{{ agentStatus.hostname }}</span>
                         <span class="agent-os">
-                            <span class="title">Agent状态 :</span>
-                            <span>{{ agentStatus.status === 'UN_IMPORT_OK' ? '正常' : '异常' }}</span>
-                            <span class="title">操作系统 :</span>
+                            <span class="title">Agent Status :</span>
+                            <span>{{ agentStatus.status === 'UN_IMPORT_OK' ? 'normal' : 'abnormal' }}</span>
+                            <span class="title">Operating System :</span>
                             <span>{{ agentStatus.os }}</span>
                         </span>
                     </section>
@@ -60,18 +51,17 @@
 
             <h3 class="self-hosted-agent">Using your self-hosted agent</h3>
             <section class="agent-info">
-                <h3>Using by pool</h3>
                 <p>
                     <span class="gray"># Use this YAML in your piepline file for each job</span>
                     <span class="block">runs-on:</span>
                     <span class="block">&nbsp;&nbsp;self-hosted: true</span>
-                    <span class="block">&nbsp;&nbsp;pool-name: my_pool_name</span>
+                    <span class="block">&nbsp;&nbsp;pool-name: {{$route.params.poolName}}</span>
                 </p>
             </section>
-
-            <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">导入</bk-button>
-            <bk-button class="bottom-btn" @click="backToPoolList">Back to self-hosted agents listing</bk-button>
         </main>
+
+        <bk-button class="bottom-btn" theme="primary" @click="importNode" :loading="isAdding" :disabled="agentStatus.status === 'UN_IMPORT'">Import</bk-button>
+        <bk-button class="bottom-btn" @click="backToAgentList">Back to self-hosted agents listing</bk-button>
     </article>
 </template>
 
@@ -89,15 +79,14 @@
                 ],
                 navList: [
                     { link: { name: 'agentPools' }, title: 'Agent Pools' },
-                    { link: { name: 'agentList' }, title: 'Agent List' },
+                    { link: { name: 'agentList' }, title: this.$route.params.poolName },
                     { link: '', title: 'Add Agent' }
                 ],
                 architectures: ['x64'],
-                zones: [],
                 machine: {
                     system: 'MACOS',
                     architecture: 'x64',
-                    zone: '',
+                    zone: 'shenzhen',
                     link: '',
                     agentId: ''
                 },
@@ -122,18 +111,16 @@
                     <p>
                         <span class="gray"># Create a folder</span>
                         <span class="mb10">$ mkdir /data/landun && cd  /data/landun</span>
-                        <span class="gray"># Download and install the latest agent package</span>
-                        <span class="mb10">${this.machine.link}</span>
-                        <span class="gray"># Run it!</span>
-                        <span>$ cd landun_devops_agent && ./install.sh </span>
+                        <span class="gray"># Download & Install the latest agent package, and run it!</span>
+                        <span class="mb10">$ ${this.machine.link}</span>
                     </p>
                 `
                 const windowHtml = `
                     <h3>Download & Install</h3>
                     <p>
                         <span class="mb10">1. Download the latest agent<a href="${this.machine.link}" target="_blank">Click here to download agent</a></span>
-                        <span class="mb10">2. Create a folder, such as C:\\data\\landun</span>
-                        <span class="mb10">3. Extract the installer to C:\\data\\landun</span>
+                        <span class="mb10">2. Create a folder, such as D:\\data\\landun</span>
+                        <span class="mb10">3. Extract the installer to D:\\data\\landun</span>
                         <span class="mb10">4. Execute install.bat by administrator</span>
                         <span class="mb10">5. In order to read user environment, please change the setup user from system to the login user, such as tencent\\zhangsan<a href="https://iwiki.woa.com/x/ZNMrAg" target="_blank">Learn more</a></span>
                     </p>
@@ -143,25 +130,12 @@
         },
 
         created () {
-            this.getZoneList()
+            this.getThirdAgentLink()
         },
 
         methods: {
-            backToPoolList () {
-                this.$router.back()
-            },
-
-            getZoneList () {
-                this.isLoading = true
-                setting.getThirdAgentZoneList(this.projectId, this.machine.system).then((res) => {
-                    this.zones = res || []
-                    this.machine.zone = (this.zones[0] || {}).zoneName
-                    return this.getThirdAgentLink()
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoading = false
-                })
+            backToAgentList () {
+                this.$router.push({ name: 'agentList' })
             },
 
             getThirdAgentLink () {
@@ -189,11 +163,12 @@
             importNode () {
                 this.isAdding = true
                 setting.addNodeToSystem(this.projectId, this.machine.agentId).then(() => {
-                    return setting.getNodeList(this.projectId).then((res) => {
+                    return setting.getSystemNodeList(this.projectId).then((res) => {
                         const curNode = res.find((node) => (node.agentHashId === this.machine.agentId)) || {}
                         const params = [curNode.nodeHashId]
                         return setting.addNodeToPool(this.projectId, this.$route.params.poolId, params).then(() => {
-                            this.$bkMessage({ theme: 'success', message: '导入成功' })
+                            this.backToAgentList()
+                            this.$bkMessage({ theme: 'success', message: 'Imported successfully' })
                         })
                     })
                 }).catch((err) => {
@@ -215,9 +190,9 @@
         padding: 0 25.5px;
     }
     .add-agent-body {
-        padding: 16px 25px;
+        padding: 16px;
         overflow-y: auto;
-        max-height: calc(100vh - 108px);
+        max-height: calc(100vh - 176px);
         .agent-tips {
             line-height: 20px;
             font-size: 14px;
@@ -257,9 +232,10 @@
         .agent-info {
             background: #fff;
             overflow: hidden;
+            padding-top: 12px;
             /deep/ h3 {
                 color: #313328;
-                margin: 17px 0 0 20px;
+                margin: 5px 0 0 20px;
             }
             /deep/ p {
                 margin: 8.6px 20px 24px;
@@ -291,6 +267,10 @@
                 .agent-refresh {
                     width: 100%;
                     height: 100%;
+                    display: inline-block;
+                    line-height: 36px;
+                    font-size: 14px;
+                    text-align: center;
                 }
                 .agent-status-info {
                     color: #63656e;
@@ -316,11 +296,11 @@
                 }
             }
         }
-        .bottom-btn {
-            margin: 24px 0;
-            +button {
-                margin-left: 15px;
-            }
+    }
+    .bottom-btn {
+        margin: 12px 16px 16px;
+        +button {
+            margin-left: 0;
         }
     }
     /deep/ .bk-link-text {

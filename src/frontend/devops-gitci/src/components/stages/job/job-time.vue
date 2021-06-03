@@ -62,7 +62,7 @@
 </script>
 
 <style lang="postcss" scoped>
-    @import '../../css/conf';
+    @import '@/css/conf';
 
     .job-type {
         font-size: 12px;

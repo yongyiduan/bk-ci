@@ -25,10 +25,10 @@
         data () {
             return {
                 panels: [
-                    { label: 'Parsed YAML', name: 'parsedYaml' },
-                    { label: 'Original YAML', name: 'originYaml' }
+                    { label: 'Original YAML', name: 'originYaml' },
+                    { label: 'Parsed YAML', name: 'parsedYaml' }
                 ],
-                active: 'parsedYaml',
+                active: 'originYaml',
                 ymlObj: {}
             }
         },
@@ -37,7 +37,7 @@
             ...mapState(['projectId', 'appHeight']),
 
             height () {
-                return this.appHeight - 255
+                return this.appHeight - 267
             }
         },
 

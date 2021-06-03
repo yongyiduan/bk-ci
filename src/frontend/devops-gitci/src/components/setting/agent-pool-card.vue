@@ -1,15 +1,14 @@
 <template>
-    <section class="agent-pool-card" v-bkloading="{ isLoading: isDeleteing }">
+    <section class="agent-pool-card">
         <header class="card-header">
             <h5 class="header-info">
                 <span class="info-title">{{ pool.name }}</span>
                 <span class="info-num" v-if="editable">Agent：{{ pool.nodeCount }}</span>
-                <span class="info-num" v-else>Agent：{{ pool.enableNode }} / {{ pool.totalNode }}</span>
             </h5>
 
             <opt-menu v-if="editable">
-                <li @click="goToAgentList">节点列表</li>
-                <li @click="deletePool">删除</li>
+                <li @click="goToAgentList">Self-hosted Agents</li>
+                <li @click="showDelete = true">Delete Agent Pool</li>
             </opt-menu>
         </header>
 
@@ -22,8 +21,16 @@
                 <bk-progress :theme="getTheme(usage.val)" :percent="usage.val" :show-text="false"></bk-progress>
             </li>
         </ul>
-        <bk-exception class="exception-wrap-item exception-part card-useages" type="empty" scene="part" v-else> </bk-exception>
+        <bk-exception class="exception-wrap-item exception-part card-useages" type="empty" scene="part" v-else>No Data</bk-exception>
         <bk-button @click="addAgent" class="card-button" v-if="editable">Add agent</bk-button>
+        <bk-dialog v-model="showDelete"
+            theme="danger"
+            :mask-close="false"
+            :loading="isDeleteing"
+            @confirm="deletePool"
+            title="Delete">
+            Are you sure to delete【{{pool.name}}】?
+        </bk-dialog>
     </section>
 </template>
 
@@ -47,6 +54,7 @@
 
         data () {
             return {
+                showDelete: false,
                 isDeleteing: false
             }
         },
@@ -56,9 +64,9 @@
 
             cpuUsages () {
                 return [
-                    { name: '构建机CPU负载', showVal: this.pool.averageCpuLoad, val: this.pool.averageCpuLoad / 100 },
-                    { name: '构建机内存负载', showVal: this.pool.averageMemLoad, val: this.pool.averageMemLoad / 100 },
-                    { name: '构建机硬盘负载', showVal: this.pool.averageDiskLoad, val: this.pool.averageDiskLoad / 100 }
+                    { name: 'CPU Usage', showVal: this.pool.averageCpuLoad, val: this.pool.averageCpuLoad / 100 },
+                    { name: 'Memory Usage', showVal: this.pool.averageMemLoad, val: this.pool.averageMemLoad / 100 },
+                    { name: 'Disk Usage', showVal: this.pool.averageDiskLoad, val: this.pool.averageDiskLoad / 100 }
                 ]
             }
         },
@@ -67,6 +75,7 @@
             deletePool () {
                 this.isDeleteing = true
                 setting.deleteEnvironment(this.projectId, this.pool.envHashId).then(() => {
+                    this.showDelete = false
                     this.$emit('refresh')
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -79,7 +88,8 @@
                 this.$router.push({
                     name: 'addAgent',
                     params: {
-                        poolId: this.pool.envHashId
+                        poolId: this.pool.envHashId,
+                        poolName: this.pool.name
                     }
                 })
             },
@@ -96,7 +106,7 @@
             },
 
             goToAgentList () {
-                this.$router.push({ name: 'agentList', params: { poolId: this.pool.envHashId } })
+                this.$router.push({ name: 'agentList', params: { poolId: this.pool.envHashId, poolName: this.pool.name } })
             }
         }
     }

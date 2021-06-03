@@ -118,8 +118,6 @@
 
                 logMethod(postData).then((res) => {
                     if (this.closeIds.includes(hashId)) return
-
-                    res = res.data || {}
                     if (res.status !== 0) {
                         let errMessage
                         switch (res.status) {
