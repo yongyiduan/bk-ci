@@ -6,8 +6,10 @@
                 {{ infoMap.messageMap[exceptionType] || exceptionInfo.message || 'System error, please try again later!' }}
                 <bk-link theme="primary" target="blank" href="https://iwiki.woa.com/x/r3IyKQ" v-if="exceptionType === 520">Learn more</bk-link>
             </span>
+            <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" v-if="exceptionType === 419">
+                <bk-button theme="primary" @click="enable" :loading="isSaving" :disabled="!permission">Enable</bk-button>
+            </div>
             <bk-button theme="primary" v-if="exceptionType === 418" @click="oauth" :loading="isSaving">OAUTH Authorization</bk-button>
-            <bk-button theme="primary" v-if="exceptionType === 419" @click="enable" :loading="isSaving">Enable</bk-button>
             <bk-button theme="primary" v-if="[500, 403].includes(exceptionType)" @click="refresh">Refresh</bk-button>
         </section>
     </bk-exception>
@@ -25,7 +27,7 @@
         },
 
         computed: {
-            ...mapState(['exceptionInfo', 'projectId', 'projectInfo']),
+            ...mapState(['exceptionInfo', 'projectId', 'projectInfo', 'permission']),
 
             projectPath () {
                 return (this.$route.hash || '').slice(1)
