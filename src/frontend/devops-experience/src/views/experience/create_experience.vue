@@ -112,7 +112,7 @@
                             </span>
                         </bk-form-item>
                         <bk-form-item
-                            label="附加内部体验人员"
+                            label="临时体验人员（内部）"
                             desc-type="icon"
                             desc-icon="icon-info-circle"
                             desc="全公司人员有效"
@@ -120,7 +120,7 @@
                             property="internal_list">
                             <bk-member-selector placeholder="请输入英文名，多个体验人员以英文逗号分隔" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
                         </bk-form-item>
-                        <bk-form-item label="附加外部体验人员" label-width="160" property="external_list">
+                        <bk-form-item label="临时体验人员（外部）" label-width="160" property="external_list">
                             <bk-select :disabled="false" v-model="createReleaseForm.external_list"
                                 ext-cls="select-custom"
                                 ext-popover-cls="select-popover-custom"
