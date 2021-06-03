@@ -1,8 +1,8 @@
 <template>
     <section class="job-home" ref="pipelineJob">
-        <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1 }" @click="toggleShowLog">
-            <status-icon :status="job.status" type="job"></status-icon>
-            <span class="job-name">{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
+        <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1, [getPipelineStatusClass(job.status)]: true }" @click="toggleShowLog">
+            <i :class="[jobStatusIcon, 'job-status']"></i>
+            <span class="job-name text-ellipsis" v-bk-overflow-tips>{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
             <job-time :job="job"></job-time>
             <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
         </h3>
@@ -23,15 +23,14 @@
 </template>
 
 <script>
-    import statusIcon from './status-icon'
+    import { getPipelineStatusClass, getPipelineStatusShapeIconCls } from '@/components/status'
     import cruveLine from './cruve-line'
-    import plugin from './plugin'
+    import plugin from '../plugin/index'
     import jobTime from './job-time'
-    import jobLog from '../exec-detail/job'
+    import jobLog from '@/components/exec-detail/job'
 
     export default {
         components: {
-            statusIcon,
             cruveLine,
             plugin,
             jobTime,
@@ -52,11 +51,19 @@
             }
         },
 
+        computed: {
+            jobStatusIcon () {
+                return getPipelineStatusShapeIconCls(this.job.status || 'WAITING')
+            }
+        },
+
         mounted () {
             this.initStatus()
         },
 
         methods: {
+            getPipelineStatusClass,
+
             initStatus () {
                 const siblingOffsetHeight = this.$refs.pipelineJob.previousElementSibling.offsetHeight + 15
                 const height = this.jobIndex === 0 ? 59 : siblingOffsetHeight
@@ -74,6 +81,8 @@
 </script>
 
 <style lang="postcss" scoped>
+    @import '@/css/conf';
+
     .job-home {
         position: relative;
         margin: 16px 20px 0 20px;
@@ -82,15 +91,38 @@
             margin: 0 0 16px 0;
             width: 240px;
             z-index: 3;
-            background-color: #34d97b;
             color: #fff;
             height: 42px;
             display: flex;
             align-items: center;
             font-weight: 600;
+            background-color: #63656e;
             cursor: pointer;
+            .job-status {
+                width: 42px;
+                height: 42px;
+                line-height: 42px;
+                color: #fff;
+            }
+            &.running {
+                background-color: #459fff;
+            }
+            &.canceled {
+                background-color: #f6b026;
+            }
+            &.danger {
+                background-color: #ff5656;
+            }
+            &.success {
+                background-color: #34d97b;
+            }
+            &.pause {
+                background-color: #ff9801;
+            }
+
             .job-name {
                 flex: 1;
+                max-width: 152px;
             }
             .connector-angle {
                 position: absolute;

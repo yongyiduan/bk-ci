@@ -1,36 +1,65 @@
 <template>
     <article class="pipelines-main">
-        <header class="main-head">
+        <header class="main-head section-box">
             <span class="head-text">
                 <span class="pipeline-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.displayName }}</span>
-                <template v-if="curPipeline.filePath">
-                    <span class="yml-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.filePath }}</span>
-                    <icon name="cc-jump-link" size="16" @click.native="goToGit"></icon>
-                </template>
-                <span class="pipeline-status" v-if="!curPipeline.enabled">已禁用</span>
+                <span class="yml-name text-ellipsis" @click="goToGit" v-if="curPipeline.filePath">
+                    <span v-bk-overflow-tips>{{ curPipeline.filePath }}</span>
+                    <icon name="cc-jump-link" size="16"></icon>
+                </span>
+                <span class="pipeline-status" v-if="!curPipeline.enabled">Disabled</span>
             </span>
-            <opt-menu v-if="curPipeline.pipelineId !== 'all'">
-                <li @click="showTriggleBuild">触发构建</li>
-                <li @click="togglePipelineEnable">{{ curPipeline.enabled ? '禁用流水线' : '启用流水线' }}</li>
-            </opt-menu>
+
+            <section v-if="curPipeline.pipelineId" class="head-options">
+                <div v-bk-tooltips="computedOptToolTip" class="nav-button">
+                    <bk-button @click="showTriggleBuild"
+                        :disabled="!curPipeline.enabled || !permission"
+                        size="small"
+                        class="options-btn"
+                    >Trigger build</bk-button>
+                </div>
+                <opt-menu>
+                    <li @click="togglePipelineEnable"
+                        :class="{ disabled: !permission }"
+                        v-bk-tooltips="{ content: 'Permission denied', disabled: permission }"
+                    >{{ curPipeline.enabled ? 'Disable pipeline' : 'Enable pipeline' }}</li>
+                </opt-menu>
+            </section>
         </header>
 
-        <section class="main-body">
-            <section class="build-filter" v-bkloading="{ isLoading: isLoadingFilter }">
-                <bk-input v-model="filterData.commitMsg" class="filter-item" placeholder="Commit Message"></bk-input>
-                <bk-select v-model="filterData[key]" v-for="(list, key) in filterList" :key="key" class="filter-item" :placeholder="key" multiple>
-                    <bk-option v-for="option in list"
+        <section class="main-body section-box">
+            <section class="build-filter">
+                <bk-input v-model="filterData.commitMsg" class="filter-item w300" placeholder="Commit message"></bk-input>
+                <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="http://open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
+                <bk-select v-model="filterData.branch"
+                    class="filter-item"
+                    placeholder="Branch"
+                    multiple
+                    searchable
+                    :loading="isLoadingBranch"
+                    :remote-method="remoteGetBranchList"
+                    @toggle="toggleFilterBranch"
+                >
+                    <bk-option v-for="option in branchList"
+                        :key="option"
+                        :id="option"
+                        :name="option">
+                    </bk-option>
+                </bk-select>
+                <bk-select v-model="filterData[filter.id]" v-for="filter in filterList" :key="filter.id" class="filter-item" :placeholder="filter.placeholder" multiple>
+                    <bk-option v-for="option in filter.data"
                         :key="option.id"
                         :id="option.id"
                         :name="option.name">
                     </bk-option>
                 </bk-select>
-                <bk-button @click="resetFilter">重置</bk-button>
+                <bk-button @click="resetFilter">Reset</bk-button>
             </section>
 
             <bk-table :data="buildList"
                 :header-cell-style="{ background: '#fafbfd' }"
-                :height="Math.min(appHeight - 331, 43 + buildList.length * 72)"
+                :outer-border="false"
+                :header-border="false"
                 v-bkloading="{ isLoading }"
                 @row-click="goToBuildDetail"
                 class="build-table"
@@ -39,10 +68,10 @@
                 <bk-table-column label="Commit message">
                     <template slot-scope="props">
                         <section class="commit-message">
-                            <i class="bk-icon icon-check-1"></i>
+                            <i :class="getIconClass(props.row.buildHistory.status)"></i>
                             <p>
-                                <span class="message">{{ props.row.gitRequestEvent.commitMsg }}</span>
-                                <span class="info">#{{ props.row.buildHistory.buildNum }}：<a @click.stop.prevent="goToDetail(props.row)">{{ getCommitDesc(props.row) }}</a></span>
+                                <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
+                                <span class="info">#{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
                         </section>
                     </template>
@@ -55,16 +84,20 @@
                 <bk-table-column label="Consume" width="200">
                     <template slot-scope="props">
                         <p class="consume">
-                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.currentTimestamp }}</span>
-                            <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{ props.row.buildHistory.endTime }}</span>
+                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.totalTime | totalFliter }}</span>
+                            <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{ props.row.buildHistory.startTime | timeFilter }}</span>
                         </p>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="操作" width="150" class-name="handler-btn">
+                <bk-table-column width="150" class-name="handler-btn">
                     <template slot-scope="props">
                         <opt-menu>
-                            <li @click="goToAgentDetail(props.row)">Agent Detail</li>
-                            <li>删除</li>
+                            <li @click="cancelBuild(props.row)"
+                                v-if="['RUNNING', 'PREPARE_ENV', 'QUEUE', 'LOOP_WAITING', 'CALL_WAITING'].includes(props.row.buildHistory.status)"
+                                v-bk-tooltips="computedOptToolTip"
+                                :class="{ disabled: !curPipeline.enabled || !permission }"
+                            >Cancel build</li>
+                            <li @click="rebuild(props.row)" v-else :class="{ disabled: !curPipeline.enabled || !permission }" v-bk-tooltips="computedOptToolTip">Re-build</li>
                         </opt-menu>
                     </template>
                 </bk-table-column>
@@ -81,9 +114,17 @@
 
         <bk-sideslider @hidden="hidden" :is-show.sync="showTriggle" :width="622" :quick-close="true" title="Trigger a custom build">
             <bk-form :model="formData" ref="triggleForm" :label-width="500" slot="content" class="triggle-form" form-type="vertical">
-                <bk-form-item label="Select a Branch" :required="true" :rules="[requireRule('分支')]" property="branch" error-display-type="normal">
-                    <bk-select v-model="formData.branch" :clearable="false" :loading="isLoadingBranch" @selected="selectBranch">
-                        <bk-option v-for="option in triggerBranches"
+                <bk-form-item label="Branch" :required="true" :rules="[requireRule('Branch')]" property="branch" error-display-type="normal">
+                    <bk-select v-model="formData.branch"
+                        :clearable="false"
+                        :loading="isLoadingBranch"
+                        :remote-method="remoteGetBranchList"
+                        searchable
+                        @toggle="toggleFilterBranch"
+                        @selected="selectBranch"
+                        placeholder="Select a Branch"
+                    >
+                        <bk-option v-for="option in branchList"
                             :key="option"
                             :id="option"
                             :name="option">
@@ -93,24 +134,32 @@
                 <bk-form-item class="mt15">
                     <bk-checkbox v-model="formData.useCommitId" @change="getPipelineBranchYaml">Use a specified historical commit to trigger the build</bk-checkbox>
                 </bk-form-item>
-                <bk-form-item label="Select historical commit" :required="true" :rules="[requireRule('commit')]" property="commitId" error-display-type="normal" v-if="formData.useCommitId">
-                    <bk-select v-model="formData.commitId" :clearable="false" :loading="isLoadingCommit" @selected="getPipelineBranchYaml">
-                        <bk-option v-for="option in triggerCommits"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.message">
-                        </bk-option>
-                    </bk-select>
+                <bk-form-item label="Commit" :required="true" :rules="[requireRule('Commit')]" property="commitId" error-display-type="normal" v-if="formData.useCommitId">
+                    <bk-tag-input placeholder="Select a Commit"
+                        v-model="formData.commitId"
+                        @change="getPipelineBranchYaml"
+                        :max-data="1"
+                        :loading="isLoadingCommit"
+                        :list="triggerCommits"
+                        :tpl="renderCommitList"
+                        tooltip-key="message"
+                        allow-create
+                        save-key="id"
+                        display-key="message"
+                        search-key="message"
+                        trigger="focus"
+                    >
+                    </bk-tag-input>
                 </bk-form-item>
                 <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom builds exist only on build history and will not appear in your commit history." error-display-type="normal">
                     <bk-input v-model="formData.customCommitMsg" placeholder="Please enter build message"></bk-input>
                 </bk-form-item>
-                <bk-form-item label="yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal" v-bkloading="{ isLoading: isLoadingYaml }">
+                <bk-form-item label="Yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal" v-bkloading="{ isLoading: isLoadingYaml }">
                     <code-section :code.sync="formData.yaml" :cursor-blink-rate="530" :read-only="false" ref="codeEditor" />
                 </bk-form-item>
                 <bk-form-item>
-                    <bk-button ext-cls="mr5" theme="primary" title="提交" @click.stop.prevent="submitData" :loading="isTriggering">提交</bk-button>
-                    <bk-button ext-cls="mr5" title="取消" @click="hidden" :disabled="isTriggering">取消</bk-button>
+                    <bk-button ext-cls="mr5" theme="primary" title="Submit" @click.stop.prevent="submitData" :loading="isTriggering">Submit</bk-button>
+                    <bk-button ext-cls="mr5" title="Cancel" @click="hidden" :disabled="isTriggering">Cancel</bk-button>
                 </bk-form-item>
             </bk-form>
         </bk-sideslider>
@@ -120,14 +169,27 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
-    import { goYaml } from '@/utils'
+    import { goYaml, preciseDiff, timeFormatter, modifyHtmlTitle, debounce, getBuildTitle } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
+    import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
+    import BkUserSelector from '@blueking/user-selector'
 
     export default {
         components: {
             optMenu,
-            codeSection
+            codeSection,
+            BkUserSelector
+        },
+
+        filters: {
+            timeFilter (val) {
+                return timeFormatter(val)
+            },
+
+            totalFliter (val) {
+                return preciseDiff(val)
+            }
         },
 
         data () {
@@ -145,13 +207,28 @@
                     event: [],
                     status: []
                 },
-                filterList: {
-                    triggerUser: [],
-                    branch: [],
-                    event: [],
-                    status: []
-                },
-                isLoadingFilter: false,
+                branchList: [],
+                filterList: [
+                    {
+                        id: 'event',
+                        placeholder: 'Event',
+                        data: [
+                            { name: 'Push', id: 'PUSH' },
+                            { name: 'Tag push', id: 'TAG' },
+                            { name: 'Merge request', id: 'MERGE' },
+                            { name: 'Manual trigger', id: 'MANUAL' }
+                        ]
+                    },
+                    {
+                        id: 'status',
+                        placeholder: 'Status',
+                        data: [
+                            { name: 'Succeed', id: 'SUCCEED' },
+                            { name: 'Failed', id: 'FAILED' },
+                            { name: 'Cancelled', id: 'CANCELED' }
+                        ]
+                    }
+                ],
                 isLoading: false,
                 isLoadingBranch: false,
                 isLoadingCommit: false,
@@ -161,23 +238,28 @@
                 formData: {
                     branch: '',
                     useCommitId: false,
-                    commitId: '',
+                    commitId: [],
                     customCommitMsg: '',
                     yaml: ''
                 },
-                triggerBranches: [],
                 triggerCommits: []
             }
         },
 
         computed: {
-            ...mapState(['appHeight', 'curPipeline', 'projectId', 'projectInfo'])
+            ...mapState(['curPipeline', 'projectId', 'projectInfo', 'permission']),
+
+            computedOptToolTip () {
+                return {
+                    content: !this.curPipeline.enabled ? 'Pipeline disabled' : 'Permission denied',
+                    disabled: this.curPipeline.enabled && this.permission
+                }
+            }
         },
 
         watch: {
             curPipeline: {
                 handler () {
-                    this.getFilterData()
                     this.cleanFilterData()
                     this.initBuildData()
                 },
@@ -193,6 +275,7 @@
 
         created () {
             this.loopGetList()
+            this.setHtmlTitle()
         },
 
         beforeDestroy () {
@@ -201,34 +284,40 @@
 
         methods: {
             ...mapActions(['setCurPipeline']),
+            getBuildTitle,
 
-            getFilterData () {
-                this.isLoadingFilter = true
-                Promise.all([
-                    pipelines.getPipelineBuildBranchList(this.projectId),
-                    pipelines.getPipelineBuildMemberList(this.projectId)
-                ]).then(([branchInfo, memberInfo]) => {
-                    this.filterList.branch = (branchInfo.records || []).map((branch) => ({ name: branch.branchName, id: branch.branchName }))
-                    this.filterList.triggerUser = (memberInfo || []).map((member) => ({ name: member.username, id: member.username }))
-                    this.filterList.event = [
-                        { name: 'PUSH', id: 'PUSH' },
-                        { name: 'TAG', id: 'TAG' },
-                        { name: 'MERGE', id: 'MERGE' },
-                        { name: 'MANUAL', id: 'MANUAL' }
-                    ]
-                    this.filterList.status = [
-                        { name: '成功', id: 'SUCCEED' },
-                        { name: '失败', id: 'FAILED' },
-                        { name: '取消', id: 'CANCELED' }
-                    ]
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoadingFilter = false
+            setHtmlTitle () {
+                const projectPath = (this.$route.hash || '').slice(1)
+                modifyHtmlTitle(decodeURIComponent(projectPath))
+            },
+
+            getIconClass (status) {
+                return [getPipelineStatusClass(status), ...getPipelineStatusCircleIconCls(status)]
+            },
+
+            toggleFilterBranch (isOpen) {
+                if (isOpen) {
+                    this.isLoadingBranch = true
+                    this.getPipelineBranchApi().then((branchList) => {
+                        this.branchList = branchList
+                        this.isLoadingBranch = false
+                    })
+                }
+            },
+
+            remoteGetBranchList (search) {
+                return new Promise((resolve) => {
+                    debounce(() => {
+                        this.getPipelineBranchApi({ search }).then((branchList) => {
+                            this.branchList = branchList
+                            resolve()
+                        })
+                    })
                 })
             },
 
             cleanFilterData () {
+                this.compactPaging.current = 1
                 this.filterData = {
                     commitMsg: '',
                     triggerUser: [],
@@ -240,7 +329,9 @@
 
             initBuildData () {
                 this.isLoading = true
-                this.getBuildData().finally(() => {
+                this.getBuildData().catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
                     this.isLoading = false
                 })
             },
@@ -253,9 +344,8 @@
             loopGetList () {
                 clearTimeout(this.loopGetList.loopId)
                 this.loopGetList.loopId = setTimeout(() => {
-                    this.getBuildData().then(() => {
-                        this.loopGetList()
-                    })
+                    this.getBuildData()
+                    this.loopGetList()
                 }, 5000)
             },
 
@@ -263,16 +353,18 @@
                 const params = {
                     page: this.compactPaging.current,
                     pageSize: this.compactPaging.limit,
+                    pipelineId: this.curPipeline.pipelineId,
                     ...this.filterData
                 }
-                if (this.curPipeline.pipelineId !== 'all') {
-                    params.pipelineId = this.curPipeline.pipelineId
-                }
-                return pipelines.getPipelineBuildList(this.projectId, params).then((res) => {
-                    this.buildList = res.records || []
+                return pipelines.getPipelineBuildList(this.projectId, params).then((res = {}) => {
+                    this.buildList = (res.records || []).map((build) => {
+                        return {
+                            ...build,
+                            buildHistory: build.buildHistory || {},
+                            gitRequestEvent: build.gitRequestEvent || {}
+                        }
+                    })
                     this.compactPaging.count = res.count
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
 
@@ -280,8 +372,10 @@
                 let res = ''
                 switch (gitRequestEvent.objectKind) {
                     case 'push':
+                        res = `Commit ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
+                        break
                     case 'tag_push':
-                        res = `Commit ${gitRequestEvent.commitId} pushed by ${gitRequestEvent.userId}`
+                        res = `Tag ${gitRequestEvent.branch} created by ${gitRequestEvent.userId}`
                         break
                     case 'merge_request':
                         const actionMap = {
@@ -299,6 +393,9 @@
             },
 
             togglePipelineEnable () {
+                if (!this.permission) return
+
+                this.clickEmpty()
                 pipelines.toggleEnablePipeline(this.projectId, this.curPipeline.pipelineId, !this.curPipeline.enabled).then(() => {
                     const pipeline = {
                         ...this.curPipeline,
@@ -311,24 +408,25 @@
             },
 
             showTriggleBuild () {
+                if (!this.curPipeline.enabled || !this.permission) return
+
                 this.showTriggle = true
-                this.getPipelineBranches()
             },
 
-            getPipelineBranches (query = {}) {
+            getPipelineBranchApi (query = {}) {
                 const params = {
                     page: 1,
                     perPage: 100,
                     projectId: this.projectId,
                     ...query
                 }
-                this.isLoadingBranch = true
-                return pipelines.getPipelineBranches(params).then((res) => {
-                    this.triggerBranches = res || []
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
-                    this.isLoadingBranch = false
+                return new Promise((resolve, reject) => {
+                    pipelines.getPipelineBranches(params).then((res) => {
+                        resolve(res || [])
+                    }).catch((err) => {
+                        resolve()
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    })
                 })
             },
 
@@ -339,7 +437,7 @@
                 this.formData = {
                     branch: '',
                     useCommitId: false,
-                    commitId: '',
+                    commitId: [],
                     customCommitMsg: '',
                     yaml: ''
                 }
@@ -358,6 +456,7 @@
                     branch: this.formData.branch,
                     ...query
                 }
+                this.formData.commitId = []
                 this.isLoadingCommit = true
                 return pipelines.getPipelineCommits(params).then((res) => {
                     this.triggerCommits = res || []
@@ -369,13 +468,13 @@
             },
 
             getPipelineBranchYaml () {
-                const params = {
-                    branchName: this.formData.branch,
-                    commitId: this.formData.useCommitId ? this.formData.commitId : undefined
-                }
+                const branchName = this.formData.branch
+                const commitId = this.formData.useCommitId ? this.formData.commitId[0] : undefined
+                if (!branchName && !commitId) return
+
                 this.isLoadingYaml = true
-                return pipelines.getPipelineBranchYaml(this.projectId, this.curPipeline.pipelineId, params).then((res) => {
-                    this.formData.yaml = res
+                return pipelines.getPipelineBranchYaml(this.projectId, this.curPipeline.pipelineId, { branchName, commitId }).then((res) => {
+                    this.formData.yaml = res || ''
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -387,12 +486,34 @@
                 goYaml(this.projectInfo.web_url, this.curPipeline.branch, this.curPipeline.filePath)
             },
 
-            goToDetail (row) {
-                console.log(row)
+            cancelBuild (row) {
+                if (!this.curPipeline.enabled || !this.permission) return
+
+                this.clickEmpty()
+                pipelines.cancelBuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
+                    this.initBuildData()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
             },
 
-            goToAgentDetail (row) {
-                console.log(row)
+            clickEmpty () {
+                const button = document.createElement('input')
+                button.type = 'button'
+                document.body.appendChild(button)
+                button.click()
+                document.body.removeChild(button)
+            },
+
+            rebuild (row) {
+                if (!this.curPipeline.enabled || !this.permission) return
+
+                this.clickEmpty()
+                pipelines.rebuildPipeline(this.projectId, row.pipelineId, row.buildHistory.id).then(() => {
+                    this.initBuildData()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
             },
 
             submitData () {
@@ -400,11 +521,11 @@
                     const postData = {
                         ...this.formData,
                         projectId: this.projectId,
-                        commitId: this.formData.useCommitId ? this.formData.commitId : undefined
+                        commitId: this.formData.useCommitId ? this.formData.commitId[0] : undefined
                     }
                     this.isTriggering = true
                     pipelines.trigglePipeline(this.curPipeline.pipelineId, postData).then(() => {
-                        this.$bkMessage({ theme: 'success', message: '触发成功' })
+                        this.$bkMessage({ theme: 'success', message: 'Submitted successfully' })
                         this.hidden()
                         this.initBuildData()
                     }).catch((err) => {
@@ -440,9 +561,20 @@
             requireRule (name) {
                 return {
                     required: true,
-                    message: name + '是必填项',
+                    message: name + ' is required',
                     trigger: 'blur'
                 }
+            },
+
+            renderCommitList (node) {
+                const parentClass = 'bk-selector-node bk-selector-member'
+                const textClass = 'text'
+                const innerHtml = `[${node.id.slice(0, 9)}]: ${node.message}`
+                return (
+                    <div class={parentClass}>
+                        <span class={textClass} domPropsInnerHTML={innerHtml}></span>
+                    </div>
+                )
             }
         }
     }
@@ -450,18 +582,24 @@
 
 <style lang="postcss" scoped>
     .pipelines-main {
-        padding: 20px 25px 36px;
+        padding-left: 16px;
         .main-head {
-            height: 64px;
+            height: 50px;
             background: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 27px;
-            line-height: 20px;
             .head-text {
                 display: flex;
                 align-items: center;
+            }
+            .head-options {
+                display: flex;
+                align-items: center;
+                .options-btn {
+                    margin-right: 10px;
+                }
             }
             .pipeline-name {
                 color: #313328;
@@ -472,10 +610,10 @@
                 display: inline-block;
                 margin: 0 3px 0 16px;
                 max-width: 300px;
+                cursor: pointer;
             }
             svg {
                 vertical-align: sub;
-                cursor: pointer;
             }
             .pipeline-status {
                 background: #fafbfd;
@@ -490,21 +628,28 @@
         }
 
         .main-body {
-            margin-top: 18px;
-            height: calc(100% - 138px);
+            margin-top: 16px;
+            height: calc(100% - 66px);
+            overflow: auto;
             background: #fff;
-            padding: 16px 24px 22px;
+            padding: 16px 24px 0;
             .build-filter {
                 display: flex;
                 align-items: center;
                 margin-bottom: 17px;
                 .filter-item {
-                    width: 160px;
+                    width: 200px;
                     margin-right: 8px;
+                }
+                .w300 {
+                    width: 300px;
+                }
+                /deep/ .user-selector-container {
+                    z-index: 5;
                 }
             }
             .build-paging {
-                margin: 12px 0 0;
+                margin: 6px 0 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -521,9 +666,32 @@
             align-items: top;
             font-size: 12px;
             .bk-icon {
+                width: 32px;
+                height: 32px;
                 font-size: 32px;
-                color: #2dcb56;
                 margin-right: 8px;
+                line-height: 32px;
+                &.executing {
+                    font-size: 14px;
+                }
+                &.icon-exclamation, &.icon-exclamation-triangle, &.icon-clock {
+                    font-size: 24px;
+                }
+                &.running {
+                    color: #459fff;
+                }
+                &.canceled {
+                    color: #f6b026;
+                }
+                &.danger {
+                    color: #ff5656;
+                }
+                &.success {
+                    color: #34d97b;
+                }
+                &.pause {
+                    color: #ff9801;
+                }
             }
             .message {
                 display: block;
@@ -564,6 +732,9 @@
         padding: 20px 30px;
         /deep/ button {
             margin: 8px 10px 0 0;
+        }
+        /deep/ .bk-tag-selector .bk-tag-input .tag {
+            max-width: 500px;
         }
     }
 </style>

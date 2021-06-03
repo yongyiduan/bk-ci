@@ -5,6 +5,7 @@
     >
         <plugin-log :job-index="jobIndex"
             :stage-index="stageIndex"
+            :plugin-index="pluginIndex"
             :plugin="plugin"
             ref="log"
         />
@@ -24,6 +25,7 @@
         props: {
             plugin: Object,
             jobIndex: Number,
+            pluginIndex: Number,
             stageIndex: Number
         },
 

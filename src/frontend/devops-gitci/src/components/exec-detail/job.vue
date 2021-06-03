@@ -3,18 +3,17 @@
         :title="job.name"
         :status="job.status"
     >
-        <template v-slot:content>
-            <job-log :plugin-list="pluginList"
-                :build-id="$route.params.buildId"
-                :down-load-link="downLoadJobLink"
-                :execute-count="executeCount"
-                ref="jobLog"
-            />
-        </template>
+        <job-log :plugin-list="pluginList"
+            :build-id="$route.params.buildId"
+            :down-load-link="downLoadJobLink"
+            :execute-count="executeCount"
+            ref="jobLog"
+        />
     </detail-container>
 </template>
 
 <script>
+    import { mapState } from 'vuex'
     import jobLog from './log/jobLog'
     import detailContainer from './detailContainer'
 
@@ -31,11 +30,13 @@
         },
 
         computed: {
+            ...mapState(['projectId']),
+
             downLoadJobLink () {
                 const fileName = encodeURI(encodeURI(`${this.stageIndex + 1}-${this.jobIndex + 1}-${this.job.name}`))
                 const jobId = this.job.containerId
-                const { projectId, pipelineId, buildId } = this.$route.params
-                return `/log/api/user/logs/${projectId}/${pipelineId}/${buildId}/download?jobId=${jobId}&fileName=${fileName}`
+                const { pipelineId, buildId } = this.$route.params
+                return `/log/api/user/logs/${this.projectId}/${pipelineId}/${buildId}/download?jobId=${jobId}&fileName=${fileName}`
             },
 
             pluginList () {

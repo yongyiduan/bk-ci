@@ -1,5 +1,5 @@
 <template>
-    <bk-popover placement="bottom-end" theme="light" ext-cls="gitci-dropdown">
+    <bk-popover trigger="click" placement="bottom-end" theme="light" ext-cls="gitci-dropdown" @click.native.stop>
         <i class="header-opt bk-icon icon-more"></i>
         <ul slot="content">
             <slot></slot>
@@ -39,6 +39,14 @@
                 &:hover {
                     background: #e1ecff;
                     color: #3a84ff;
+                }
+                &.disabled {
+                    cursor: not-allowed;
+                    background: #f5f7fa;
+                    &:hover {
+                        color: #7b7d8a;
+                        background: #f5f7fa;
+                    }
                 }
             }
         }

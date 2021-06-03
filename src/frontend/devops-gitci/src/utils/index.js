@@ -1,3 +1,5 @@
+const moment = require('moment')
+
 /**
  *  将毫秒值转换成xx:xx(分:秒)的形式
  *  @param {Number} time - 时间的毫秒形式
@@ -150,4 +152,85 @@ export function goYaml (projectUrl, branch, yamlName) {
     if (yamlName) {
         window.open(`${projectUrl}/blob/${branch}/${yamlName}`, '_blank')
     }
+}
+
+export function preciseDiff (duration) {
+    if (!duration) return '--'
+    const durationDate = moment.duration(Math.abs(duration))
+    const timeMap = {
+        y: durationDate.years(),
+        mon: durationDate.months(),
+        d: durationDate.days(),
+        h: durationDate.hours(),
+        m: durationDate.minutes(),
+        s: durationDate.seconds()
+    }
+    const diffTime = []
+    let hasFirstNum = false
+    for (const key in timeMap) {
+        const val = timeMap[key]
+        if (val <= 0 && !hasFirstNum) continue
+        hasFirstNum = true
+        diffTime.push(`${val}${key}`)
+    }
+    return diffTime.join(' ')
+}
+
+export function timeFormatter (time, format = 'YYYY-MM-DD HH:mm:ss') {
+    return time ? moment(time).format(format) : '--'
+}
+
+export function commitIdFormatter (commitId) {
+    return commitId ? commitId.slice(0, 9) : '--'
+}
+
+export function getbuildTypeIcon (buildType) {
+    const buildTypeIconMap = {
+        manual: 'manual',
+        push: 'commit',
+        tag_push: 'tag',
+        merge_request: 'merge'
+    }
+    return buildTypeIconMap[buildType] || 'well'
+}
+
+export function modifyHtmlTitle (title) {
+    document.title = title
+}
+
+export function debounce (callBack) {
+    window.clearTimeout(debounce.timeId)
+    debounce.timeId = window.setTimeout(callBack, 200)
+}
+
+export function getBuildTitle (gitRequestEvent = {}) {
+    let res = ''
+    switch (gitRequestEvent.objectKind) {
+        case 'merge_request':
+            res = gitRequestEvent.mrTitle
+            break
+        default:
+            res = gitRequestEvent.commitMsg
+            break
+    }
+    return res
+}
+
+export function getBuildSource (gitRequestEvent = {}) {
+    let res = ''
+    switch (gitRequestEvent.objectKind) {
+        case 'push':
+            res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
+            break
+        case 'tag_push':
+            res = gitRequestEvent.branch
+            break
+        case 'merge_request':
+            res = `[!${gitRequestEvent.mergeRequestId}]`
+            break
+        case 'manual':
+            res = '--'
+            break
+    }
+    return res
 }

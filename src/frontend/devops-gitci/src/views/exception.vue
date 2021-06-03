@@ -1,73 +1,75 @@
 <template>
-    <bk-exception :type="type" class="exception-home">
+    <bk-exception :type="infoMap.typeMap[exceptionType] || '403'" class="exception-home">
         <section class="exception-content">
-            <span>{{ title }}</span>
+            <span>{{ infoMap.titleMap[exceptionType] }}</span>
             <span class="exception-title">
-                {{ message }}
-                <bk-link theme="primary" href="https://iwiki.woa.com/x/r3IyKQ" v-if="+$route.params.type === 499">Learn more</bk-link>
+                {{ infoMap.messageMap[exceptionType] || exceptionInfo.message || 'System error, please try again later!' }}
+                <bk-link theme="primary" target="blank" href="https://iwiki.woa.com/x/r3IyKQ" v-if="exceptionType === 520">Learn more</bk-link>
             </span>
-            <bk-button theme="primary" v-if="+$route.params.type === 418" @click="oauth" :loading="isSaving">OAUTH 授权</bk-button>
+            <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" v-if="exceptionType === 419">
+                <bk-button theme="primary" @click="enable" :loading="isSaving" :disabled="!permission">Enable</bk-button>
+            </div>
+            <bk-button theme="primary" v-if="exceptionType === 418" @click="oauth" :loading="isSaving">OAUTH Authorization</bk-button>
+            <bk-button theme="primary" v-if="[500, 403].includes(exceptionType)" @click="refresh">Refresh</bk-button>
         </section>
     </bk-exception>
 </template>
 
 <script>
-    import { common } from '@/http'
+    import { common, setting } from '@/http'
+    import { mapState } from 'vuex'
 
     export default {
         data () {
             return {
-                isSaving: false,
-                typeMap: {
-                    404: 404,
-                    499: 'login',
-                    500: 500
-                },
-                titleMap: {
-                    403: '无业务权限',
-                    404: '页面不存在',
-                    418: '无权限',
-                    499: 'Welcome to Tencent CI.',
-                    500: '系统异常'
-                }
+                isSaving: false
             }
         },
 
         computed: {
+            ...mapState(['exceptionInfo', 'projectId', 'projectInfo', 'permission']),
+
             projectPath () {
-                return this.$route.params.workspace + '/' + this.$route.params.projectPath
+                return (this.$route.hash || '').slice(1)
             },
 
-            type () {
-                const type = +this.$route.params.type || 404
-                return this.typeMap[type] || '403'
+            exceptionType () {
+                return +this.exceptionInfo.type || 404
             },
 
-            message () {
-                const type = +this.$route.params.type || 404
-                return this.messageMap[type]
-            },
-
-            title () {
-                const type = +this.$route.params.type || 404
-                return this.titleMap[type]
-            },
-
-            messageMap () {
+            infoMap () {
                 return {
-                    418: '尚未进行工蜂 OAUTH 授权，请先授权，在进行操作！',
-                    403: `没有工蜂项目 ${this.projectPath} 的访问权限，请先加入项目!`,
-                    499: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. ',
-                    500: '系统异常，请稍后重试'
+                    typeMap: {
+                        404: 404,
+                        500: 500,
+                        520: 'login'
+                    },
+                    titleMap: {
+                        403: 'Not a project member',
+                        404: 'Not found',
+                        418: 'No permission',
+                        419: 'CI is not enabled',
+                        499: 'No project information found',
+                        500: 'System Error',
+                        520: 'Welcome to Tencent CI.'
+                    },
+                    messageMap: {
+                        403: `There is no access permission for the project ${this.projectPath}, please join the project first!`,
+                        404: 'Page not found',
+                        418: 'The OAUTH authorization has not been carried out yet, please authorize first!',
+                        419: 'CI has not been enabled yet, please enable it first!',
+                        499: `The information of the project ${this.projectPath} is not queried, please modify and try again`,
+                        500: this.exceptionInfo.message || 'System error, please try again later',
+                        520: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. '
+                    }
                 }
             }
         },
 
         methods: {
             oauth () {
-                const redirectUrl = location.protocol + '//' + location.host + '/' + this.projectPath
                 this.isSaving = true
-                common.oauth(redirectUrl).then((res) => {
+                common.oauth(location.href).then((res) => {
                     if (res.url) {
                         location.href = res.url
                     }
@@ -76,6 +78,21 @@
                 }).finally(() => {
                     this.isSaving = false
                 })
+            },
+
+            enable () {
+                this.isSaving = true
+                setting.toggleEnableCi(true, this.projectInfo).then(() => {
+                    this.refresh()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isSaving = false
+                })
+            },
+
+            refresh () {
+                location.reload()
             }
         }
     }
