@@ -267,22 +267,23 @@
                 })
 
                 try {
-                    const encodePath = encodeURIComponent(row.path)
                     if (key === 'url') {
                         const res = await this.$store.dispatch('soda/requestExternalUrl', {
                             projectId: this.projectId,
                             artifactoryType: row.artifactoryType,
-                            path: encodePath
+                            path: row.path
                         })
 
                         this.curIndexItemUrl = res.url
                     } else {
-                        const isDevnet = await this.$store.dispatch('soda/requestDevnetGateway')
-                        const res = await this.$store.dispatch('soda/requestDownloadUrl', {
-                            projectId: this.projectId,
-                            artifactoryType: row.artifactoryType,
-                            path: encodePath
-                        })
+                        const [isDevnet, res] = await Promise.all([
+                            this.$store.dispatch('soda/requestDevnetGateway'),
+                            this.$store.dispatch('soda/requestDownloadUrl', {
+                                projectId: this.projectId,
+                                artifactoryType: row.artifactoryType,
+                                path: row.path
+                            })
+                        ])
                         const url = isDevnet ? res.url : res.url2
                         window.location.href = type ? `${API_URL_PREFIX}/pc/download/devops_pc_forward.html?downloadUrl=${url}` : url
                     }
