@@ -20,9 +20,9 @@
         data () {
             return {
                 panels: [
-                    { name: 'overview', label: '总览', count: 10 },
-                    { name: 'task', label: '加速方案', count: 20 },
-                    { name: 'history', label: '加速历史', count: 30 }
+                    { name: 'overview', label: this.$t('accelerate.总览'), count: 10 },
+                    { name: 'task', label: this.$t('accelerate.加速方案'), count: 20 },
+                    { name: 'history', label: this.$t('accelerate.加速历史'), count: 30 }
                 ],
                 active: 'overview',
                 isloading: false
@@ -103,7 +103,7 @@
                 const doc = window.document
                 const docEl = doc.documentElement
                 const designWidth = 1310 // 默认设计图宽度
-                const maxRate = 1920 / designWidth
+                const maxRate = 2560 / designWidth
                 const minRate = 1280 / designWidth
                 const clientWidth = docEl.getBoundingClientRect().width || window.innerWidth
                 const flexibleRem = Math.max(Math.min(clientWidth / designWidth, maxRate), minRate) * 100
@@ -128,14 +128,14 @@
         }
         /deep/ .bk-tab-header {
             background-color: #fff;
-            height: 5.96vh;
-            line-height: 5.96vh;
-            background-image: none;
+            height: 5.96vh !important;
+            line-height: 5.96vh !important;
+            background-image: none !important;
             .bk-tab-label-wrapper .bk-tab-label-list {
-                height: 5.96vh;
+                height: 5.96vh !important;
                 .bk-tab-label-item {
-                    line-height: 5.96vh;
-                    height: 5.96vh;
+                    line-height: 5.96vh !important;
+                    height: 5.96vh !important;
                     color: #63656e;
                     padding: 0;
                     &::after {
@@ -151,8 +151,8 @@
                 }
             }
             .bk-tab-header-setting {
-                height: 5.96vh;
-                line-height: 5.96vh;
+                height: 5.96vh !important;
+                line-height: 5.96vh !important;
             }
         }
         /deep/ .bk-tab-section {

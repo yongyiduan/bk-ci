@@ -2,17 +2,17 @@
     <article class="list-init-home" v-bkloading="{ isloading }">
         <main class="g-accelerate-box init-main">
             <section class="init-title">
-                <h3 class="title-main g-accelerate-deep-black-font">欢迎使用 Turbo 加速方案</h3>
-                <p class="title-main-content">Turbo 基于分布式编译、缓存、容器技术，旨在为用户提供高效、稳定、便捷的加速服务，提升研发效率。已经支持 Linux 下的 C/C++ 后台服务编译，Windows 下的 UE4 代码编译等多场景下的加速。</p>
-                <h5 class="title-recommend g-accelerate-deep-black-font">为你推荐的加速模式</h5>
+                <h3 class="title-main g-accelerate-deep-black-font"> {{ $t('accelerate.欢迎使用 Turbo 加速方案') }} </h3>
+                <p class="title-main-content">{{ $t('accelerate.welcome') }}</p>
+                <h5 class="title-recommend g-accelerate-deep-black-font"> {{ $t('accelerate.为你推荐的加速模式') }} </h5>
                 <h5 class="recommend-task" v-for="(recommend, index) in recommendList" :key="index">
                     <p class="task-main">
                         <span class="task-title g-accelerate-deep-black-font">{{ recommend.engineName }}</span>
                         <span class="task-desc g-accelerate-gray-font">{{ recommend.recommendReason }}</span>
                     </p>
                     <p class="task-buttons">
-                        <bk-button text class="task-doc" @click="goToDoc(recommend.docUrl)">查看文档</bk-button>
-                        <bk-button class="task-use" @click="goToCreate(recommend.engineCode)">立即使用</bk-button>
+                        <bk-button text class="task-doc" @click="goToDoc(recommend.docUrl)"> {{ $t('accelerate.查看文档') }} </bk-button>
+                        <bk-button class="task-use" @click="goToCreate(recommend.engineCode)"> {{ $t('accelerate.立即使用') }} </bk-button>
                     </p>
                 </h5>
             </section>

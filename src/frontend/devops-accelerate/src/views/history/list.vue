@@ -19,8 +19,8 @@
                         :name="value">
                     </bk-option>
                 </bk-select>
-                <bk-date-picker class="single-width" :placeholder="'选择日期范围'" type="daterange" :value="timeRange" @change="(options) => chooseFilter('timeRange', options)"></bk-date-picker>
-                <bk-button @click="clearFilter" class="clear-btn">重置</bk-button>
+                <bk-date-picker class="single-width" :placeholder="$t('accelerate.选择日期范围')" type="daterange" :value="timeRange" @change="(options) => chooseFilter('timeRange', options)"></bk-date-picker>
+                <bk-button @click="clearFilter" class="clear-btn"> {{ $t('accelerate.重置') }} </bk-button>
             </header>
 
             <bk-table class="history-records g-accelerate-scroll-table"
@@ -35,8 +35,8 @@
                 @row-click="goToDetail"
                 @sort-change="sortChange"
             >
-                <bk-table-column label="编号" type="index" width="60"></bk-table-column>
-                <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
+                <bk-table-column :label="$t('accelerate.编号')" type="index" width="60"></bk-table-column>
+                <bk-table-column :label="$t('accelerate.流水线/构建机')" prop="pipeline_name" sortable>
                     <template slot-scope="props">
                         <span v-if="props.row.pipelineName">
                             {{ props.row.pipelineName }}
@@ -45,15 +45,15 @@
                         <span v-else>{{ props.row.clientIp }}</span>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="状态" prop="status" sortable>
+                <bk-table-column :label="$t('accelerate.状态')" prop="status" sortable>
                     <template slot-scope="props">
                         <task-status :status="props.row.status" :message="props.row.message"></task-status>
                     </template>
                 </bk-table-column>
-                <bk-table-column label="开始时间" prop="startTime" sortable></bk-table-column>
-                <bk-table-column label="未加速耗时" prop="estimateTimeValue" sortable></bk-table-column>
-                <bk-table-column label="实际耗时" prop="executeTimeValue" sortable></bk-table-column>
-                <bk-table-column label="节省率" prop="turboRatio" sortable></bk-table-column>
+                <bk-table-column :label="$t('accelerate.开始时间')" prop="startTime" sortable></bk-table-column>
+                <bk-table-column :label="$t('accelerate.未加速耗时')" prop="estimateTimeValue" sortable></bk-table-column>
+                <bk-table-column :label="$t('accelerate.实际耗时')" prop="executeTimeValue" sortable></bk-table-column>
+                <bk-table-column :label="$t('accelerate.节省率')" prop="turboRatio" sortable></bk-table-column>
             </bk-table>
         </main>
     </article>
@@ -103,10 +103,10 @@
                     clientIpList[clientIp] = clientIp
                 })
                 return [
-                    { key: 'turboPlanId', list: this.planInfo, value: this.turboPlanId, placeholder: '请选择加速方案' },
-                    { key: 'pipelineId', list: this.pipelineInfo, value: this.pipelineId, placeholder: '请选择流水线' },
-                    { key: 'clientIp', list: clientIpList, value: this.clientIp, placeholder: '请选择构建机' },
-                    { key: 'status', list: this.statusInfo, value: this.status, placeholder: '请选择状态' }
+                    { key: 'turboPlanId', list: this.planInfo, value: this.turboPlanId, placeholder: this.$t('accelerate.请选择加速方案') },
+                    { key: 'pipelineId', list: this.pipelineInfo, value: this.pipelineId, placeholder: this.$t('accelerate.请选择流水线') },
+                    { key: 'clientIp', list: clientIpList, value: this.clientIp, placeholder: this.$t('accelerate.请选择构建机') },
+                    { key: 'status', list: this.statusInfo, value: this.status, placeholder: this.$t('accelerate.请选择状态') }
                 ]
             },
 

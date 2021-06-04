@@ -1,11 +1,9 @@
 <template>
     <section class="g-accelerate-box task-setting">
         <h3 class="create-title g-accelerate-deep-black-font" @click="showIPSetting = !showIPSetting">
-            <logo name="right-shape" size="16" :class="showIPSetting ? 'right-down right-shape' : 'right-shape'"></logo>
-            设置
-        </h3>
+            <logo name="right-shape" size="16" :class="showIPSetting ? 'right-down right-shape' : 'right-shape'"></logo> {{ $t('accelerate.设置') }} </h3>
         <bk-form :label-width="120" :model="copyFormData" v-if="showIPSetting">
-            <bk-form-item label="IP白名单" property="ip">
+            <bk-form-item :label="$t('accelerate.IP白名单')" property="ip">
                 <template v-if="isEdit">
                     <bk-input type="textarea"
                         class="double-width"
@@ -13,14 +11,14 @@
                         :maxlength="100"
                         v-model="copyFormData.whiteList">
                     </bk-input>
-                    <p class="ip-tip">默认为“0.0.0.0”，即不限制加速任务来源。若需限制来源，请在此填写允许的来源IP，多个以英文分号分隔。</p>
+                    <p class="ip-tip"> {{ $t('accelerate.默认为“0.0.0.0”，即不限制加速任务来源。若需限制来源，请在此填写允许的来源IP，多个以英文分号分隔。') }} </p>
                 </template>
                 <span v-else class="g-accelerate-text-break">{{ formData.whiteList }}</span>
             </bk-form-item>
         </bk-form>
-        <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save">保存</bk-button>
-        <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancel">取消</bk-button>
-        <span class="g-accelerate-edit-button" @click="(isEdit = true, showIPSetting = true)" v-if="!onlyEdit && !isEdit"><logo name="edit" size="16"></logo>编辑</span>
+        <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save"> {{ $t('accelerate.保存') }} </bk-button>
+        <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancel"> {{ $t('accelerate.取消') }} </bk-button>
+        <span class="g-accelerate-edit-button" @click="(isEdit = true, showIPSetting = true)" v-if="!onlyEdit && !isEdit"><logo name="edit" size="16"></logo> {{ $t('accelerate.编辑') }} </span>
     </section>
 </template>
 
@@ -60,7 +58,7 @@
             save () {
                 this.isLoadng = true
                 modifyTaskWhiteList(this.copyFormData).then(() => {
-                    this.$bkMessage({ theme: 'success', message: '修改成功' })
+                    this.$bkMessage({ theme: 'success', message: this.$t('accelerate.修改成功') })
                     this.$emit('update:formData', this.copyFormData)
                     this.isEdit = false
                 }).catch((err) => {
