@@ -113,29 +113,32 @@ class GitRepositoryConfService @Autowired constructor(
     }
 
     fun getGitCIConf(gitProjectId: Long): GitRepositoryConf? {
-        val repo = gitCIBasicSettingService.getGitCIConf(gitProjectId) ?: return null
-        with(repo) {
-            return GitRepositoryConf(
-                gitProjectId = gitProjectId,
-                name = name,
-                url = url,
-                homepage = homepage,
-                gitHttpUrl = gitHttpUrl,
-                gitSshUrl = gitSshUrl,
-                enableCi = enableCi,
-                buildPushedBranches = buildPushedBranches,
-                limitConcurrentJobs = null,
-                buildPushedPullRequest = buildPushedPullRequest,
-                env = null,
-                projectCode = projectCode,
-                rtxCustomProperty = null,
-                emailProperty = null,
-                rtxGroupProperty = null,
-                enableMrBlock = enableMrBlock,
-                createTime = createTime,
-                updateTime = updateTime
-            )
+        val repoV2 = gitCIBasicSettingService.getGitCIConf(gitProjectId)
+        if (repoV2 != null) {
+            with(repoV2) {
+                return GitRepositoryConf(
+                    gitProjectId = gitProjectId,
+                    name = name,
+                    url = url,
+                    homepage = homepage,
+                    gitHttpUrl = gitHttpUrl,
+                    gitSshUrl = gitSshUrl,
+                    enableCi = enableCi,
+                    buildPushedBranches = buildPushedBranches,
+                    limitConcurrentJobs = null,
+                    buildPushedPullRequest = buildPushedPullRequest,
+                    env = null,
+                    projectCode = projectCode,
+                    rtxCustomProperty = null,
+                    emailProperty = null,
+                    rtxGroupProperty = null,
+                    enableMrBlock = enableMrBlock,
+                    createTime = createTime,
+                    updateTime = updateTime
+                )
+            }
         }
+        return gitCISettingDao.getSetting(dslContext, gitProjectId)
     }
 
     fun saveGitCIConf(userId: String, repositoryConf: GitRepositoryConf): Boolean {
