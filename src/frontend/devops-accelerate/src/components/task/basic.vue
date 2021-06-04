@@ -112,7 +112,7 @@
             },
 
             copyValue (planId) {
-                copy(planId)
+                copy(planId, this.$t)
             },
 
             requireRule (name) {

@@ -125,6 +125,7 @@
         justify-content: center;
         .home-nav-tab {
             cursor: pointer;
+            padding: 0 18px;
         }
         /deep/ .bk-tab-header {
             background-color: #fff;
@@ -137,6 +138,7 @@
                     line-height: 5.96vh !important;
                     height: 5.96vh !important;
                     color: #63656e;
+                    padding: 0;
                     &::after {
                         height: 3px;
                     }

@@ -148,7 +148,7 @@
             },
 
             copy (value) {
-                copy(value)
+                copy(value, this.$t)
             },
 
             modifyTurboPlanTopStatus (row) {
