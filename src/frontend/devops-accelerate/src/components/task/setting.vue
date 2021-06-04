@@ -1,8 +1,10 @@
 <template>
     <section class="g-accelerate-box task-setting">
         <h3 class="create-title g-accelerate-deep-black-font" @click="showIPSetting = !showIPSetting">
-            <logo name="right-shape" size="16" :class="showIPSetting ? 'right-down right-shape' : 'right-shape'"></logo> {{ $t('accelerate.设置') }} </h3>
-        <bk-form :label-width="120" :model="copyFormData" v-if="showIPSetting">
+            <logo name="right-shape" size="16" :class="showIPSetting ? 'right-down right-shape' : 'right-shape'"></logo>
+            {{ $t('accelerate.设置') }}
+        </h3>
+        <bk-form :label-width="138" :model="copyFormData" v-if="showIPSetting">
             <bk-form-item :label="$t('accelerate.IP白名单')" property="ip">
                 <template v-if="isEdit">
                     <bk-input type="textarea"

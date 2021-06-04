@@ -1,5 +1,5 @@
 <template>
-    <article class="accelerate-home" v-bkloadng="{ isloading }">
+    <article class="accelerate-home">
         <bk-tab :active.sync="active" type="unborder-card" class="home-nav g-accelerate-box-without-radius">
             <bk-tab-panel v-for="(panel, index) in panels"
                 v-bind="panel"
@@ -9,7 +9,7 @@
                 </template>
             </bk-tab-panel>
         </bk-tab>
-        <router-view class="accelerate-main"></router-view>
+        <router-view class="accelerate-main" v-bkloadng="{ isloading }"></router-view>
     </article>
 </template>
 
@@ -103,7 +103,7 @@
                 const doc = window.document
                 const docEl = doc.documentElement
                 const designWidth = 1310 // 默认设计图宽度
-                const maxRate = 2560 / designWidth
+                const maxRate = 2300 / designWidth
                 const minRate = 1280 / designWidth
                 const clientWidth = docEl.getBoundingClientRect().width || window.innerWidth
                 const flexibleRem = Math.max(Math.min(clientWidth / designWidth, maxRate), minRate) * 100
@@ -137,7 +137,6 @@
                     line-height: 5.96vh !important;
                     height: 5.96vh !important;
                     color: #63656e;
-                    padding: 0;
                     &::after {
                         height: 3px;
                     }

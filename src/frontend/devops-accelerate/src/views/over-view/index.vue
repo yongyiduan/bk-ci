@@ -371,7 +371,7 @@
         margin-bottom: 10.59px;
         height: calc(50% - 56.115px);
         .canvas-wrapper {
-            height: calc(100% - 20px);
+            height: calc(100% - 25px);
             width: 100%;
         }
         &:last-child {
@@ -388,17 +388,16 @@
         padding: 0 22px;
         /deep/ .bk-tab-header {
             background-color: #fff;
-            height: 20px;
-            line-height: 20px;
-            background-image: none;
+            height: 25px !important;
+            line-height: 25px !important;
+            background-image: none !important;
             .bk-tab-label-wrapper .bk-tab-label-list {
-                height: 20px;
+                height: 25px !important;
                 .bk-tab-label-item {
-                    line-height: 20px;
+                    line-height: 25px !important;
                     color: #63656e;
                     min-width: 36px;
-                    padding: 0;
-                    margin-right: 16px;
+                    padding: 0 12px;
                     &:last-child {
                         margin: 0;
                     }
@@ -416,8 +415,8 @@
                 }
             }
             .bk-tab-header-setting {
-                height: 20px;
-                line-height: 20px;
+                height: 25px !important;
+                line-height: 25px !important;
             }
         }
         /deep/ .bk-tab-section {
