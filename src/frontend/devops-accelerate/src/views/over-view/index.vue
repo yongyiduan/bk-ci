@@ -14,7 +14,7 @@
 
         <section class="g-accelerate-chart-box chart">
             <header class="chart-head">
-                <span class="g-accelerate-black-font">耗时分布</span>
+                <span class="g-accelerate-black-font"> {{ $t('accelerate.耗时分布') }} </span>
                 <bk-tab :active.sync="takeTimeDateType" type="unborder-card">
                     <bk-tab-panel v-for="(panel, index) in timeGap" v-bind="panel" :key="index"></bk-tab-panel>
                 </bk-tab>
@@ -26,7 +26,7 @@
 
         <section class="g-accelerate-chart-box chart">
             <header class="chart-head build-trend">
-                <span class="g-accelerate-black-font">编译次数趋势</span>
+                <span class="g-accelerate-black-font"> {{ $t('accelerate.编译次数趋势') }} </span>
                 <bk-tab :active.sync="buildNumDateType" type="unborder-card">
                     <bk-tab-panel v-for="(panel, index) in timeGap" v-bind="panel" :key="index"></bk-tab-panel>
                 </bk-tab>
@@ -52,34 +52,34 @@
             return {
                 taskCards: {
                     instanceNum: {
-                        label: '加速方案数',
+                        label: this.$t('accelerate.加速方案数'),
                         num: 0,
                         icon: 'acceleration-plan',
                         digit: 0
                     },
                     executeCount: {
-                        label: '加速次数',
+                        label: this.$t('accelerate.加速次数'),
                         num: 0,
                         icon: 'accelerations-num',
                         digit: 0
                     },
                     executeTimeHour: {
-                        label: '总耗时(h)',
+                        label: this.$t('accelerate.总耗时(h)'),
                         num: 0,
                         icon: 'total-time',
                         digit: 2
                     },
                     savingRate: {
-                        label: '节省耗时(h)',
+                        label: this.$t('accelerate.节省耗时(h)'),
                         num: 0,
                         icon: 'save-time',
                         digit: 2
                     }
                 },
                 timeGap: [
-                    { name: 'week', label: '近一周', count: 10 },
-                    { name: 'month', label: '近一月', count: 20 },
-                    { name: 'year', label: '近一年', count: 30 }
+                    { name: 'week', label: this.$t('accelerate.近一周'), count: 10 },
+                    { name: 'month', label: this.$t('accelerate.近一月'), count: 20 },
+                    { name: 'year', label: this.$t('accelerate.近一年'), count: 30 }
                 ],
                 takeTimeDateType: 'week',
                 buildNumDateType: 'week',
@@ -139,7 +139,7 @@
                             labels: res.map(x => x.date),
                             datasets: [
                                 {
-                                    label: '未加速耗时',
+                                    label: this.$t('accelerate.未加速耗时'),
                                     fill: true,
                                     backgroundColor: 'rgba(43, 124, 255,0.3)',
                                     borderColor: 'rgba(43, 124, 255,1)',
@@ -151,7 +151,7 @@
                                     data: res.map(x => x.estimateTime)
                                 },
                                 {
-                                    label: '实际耗时',
+                                    label: this.$t('accelerate.实际耗时'),
                                     fill: true,
                                     backgroundColor: 'rgba(0, 204, 158, 0.3)',
                                     borderColor: 'rgba(0, 204, 158, 1)',
@@ -246,7 +246,7 @@
                             labels: res.map(x => x.date),
                             datasets: [
                                 {
-                                    label: '编译次数',
+                                    label: this.$t('accelerate.编译次数'),
                                     fill: false,
                                     backgroundColor: 'rgba(43, 124, 255,0.3)',
                                     borderColor: 'rgba(43, 124, 255,1)',

@@ -1,21 +1,21 @@
 <template>
     <article class="task-success-home">
         <bk-breadcrumb separator-class="bk-icon icon-angle-right" class="bread-crumb">
-            <bk-breadcrumb-item :to="{ name: 'taskList' }">方案列表</bk-breadcrumb-item>
-            <bk-breadcrumb-item>新增加速方案</bk-breadcrumb-item>
+            <bk-breadcrumb-item :to="{ name: 'taskList' }"> {{ $t('accelerate.方案列表') }} </bk-breadcrumb-item>
+            <bk-breadcrumb-item> {{ $t('accelerate.新增加速方案') }} </bk-breadcrumb-item>
         </bk-breadcrumb>
 
         <section class="g-accelerate-box" v-bkloading="{ isloading }">
             <p class="success-tip">
                 <logo name="check-circle" size="48" class="icon-success"></logo>
-                <span class="g-accelerate-black-font">加速方案提交成功</span>
-                <span class="success-plan-id g-accelerate-gray-font">方案Id为：{{ $route.query.planId }}<logo name="copy" class="icon-copy" size="16" @click.native="copy"></logo></span>
+                <span class="g-accelerate-black-font"> {{ $t('accelerate.加速方案提交成功') }} </span>
+                <span class="success-plan-id g-accelerate-gray-font"> {{ $t('accelerate.方案Id为：') }} {{ $route.query.planId }}<logo name="copy" class="icon-copy" size="16" @click.native="copy"></logo></span>
             </p>
 
             <section class="g-accelerate-task-tip success-tip-user" v-html="engineDetail.userManual"></section>
         </section>
 
-        <bk-button theme="primary" @click="goToList">关闭</bk-button>
+        <bk-button theme="primary" @click="goToList"> {{ $t('accelerate.关闭') }} </bk-button>
     </article>
 </template>
 
