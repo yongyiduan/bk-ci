@@ -12,7 +12,7 @@
                 <bk-form class="experience-form" ref="form" :model="createReleaseForm">
                     <template v-if="hasPermission">
                         <div class="version-name">
-                            <bk-form-item label="ipa/apk文件" label-width="160" :required="true" property="name">
+                            <bk-form-item label="ipa/apk文件" label-width="190" :required="true" property="name">
                                 <bk-input
                                     ref="releaseName"
                                     placeholder="请从版本仓库中选择一个ipa或apk文件"
@@ -26,7 +26,7 @@
                         <bk-form-item
                             style="margin-top: 20px"
                             label="应用名称"
-                            label-width="160"
+                            label-width="190"
                             desc-type="icon"
                             desc-icon="icon-info-circle"
                             desc="展示于蓝盾App上的应用名。如果为空，将自动获取ipa/apk内置的应用名"
@@ -39,7 +39,7 @@
                         <bk-form-item
                             label="版本标题"
                             :required="true"
-                            label-width="160"
+                            label-width="190"
                             desc-type="icon"
                             desc-icon="icon-info-circle"
                             desc="该体验版本的标志性说明"
@@ -50,10 +50,10 @@
                                 :rule="[{ required: true }]"
                                 maxlength="100" />
                         </bk-form-item>
-                        <bk-form-item label="版本号" label-width="160">
+                        <bk-form-item label="版本号" label-width="190">
                             <span class="version-number-info">{{ createReleaseForm.version_no || '--' }}</span>
                         </bk-form-item>
-                        <bk-form-item label="版本描述" property="desc" label-width="160" :required="true">
+                        <bk-form-item label="版本描述" property="desc" label-width="190" :required="true">
                             <bk-input
                                 type="textarea"
                                 placeholder="请填写版本描述"
@@ -64,7 +64,7 @@
                             >
                             </bk-input>
                         </bk-form-item>
-                        <bk-form-item label="产品类别" :required="true" label-width="160" property="categoryId">
+                        <bk-form-item label="产品类别" :required="true" label-width="190" property="categoryId">
                             <bk-select v-model="createReleaseForm.categoryId">
                                 <bk-option v-for="option in categoryList"
                                     :key="option.id"
@@ -73,14 +73,14 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="产品负责人" label-width="160" :required="true" property="productOwner">
+                        <bk-form-item label="产品负责人" label-width="190" :required="true" property="productOwner">
                             <bk-input
                                 v-model="createReleaseForm.productOwner"
                                 placeholder="请输入英文名，多个产品负责人以英文逗号分隔"
                                 @change="productResult"
                                 :rule="[{ required: true }]" />
                         </bk-form-item>
-                        <bk-form-item label="体验结束时间" label-width="160" :required="true" property="end_date">
+                        <bk-form-item label="体验结束时间" label-width="190" :required="true" property="end_date">
                             <bk-date-picker
                                 placeholder="请选择体验结束时间"
                                 v-model="createReleaseForm.end_date"
@@ -89,7 +89,7 @@
                             >
                             </bk-date-picker>
                         </bk-form-item>
-                        <bk-form-item label="体验组" :required="true" label-width="160" property="experienceGroups">
+                        <bk-form-item label="体验组" :required="true" label-width="190" property="experienceGroups">
                             <div class="bkdevop-checkbox-group">
                                 <bk-checkbox v-for="(col, index) in experienceGroup" :key="index" v-model="col.isChecked" @change="handleGroupChange" class="exp-group-item">
                                     {{ col.name }}
@@ -116,11 +116,11 @@
                             desc-type="icon"
                             desc-icon="icon-info-circle"
                             desc="全公司人员有效"
-                            label-width="160"
+                            label-width="190"
                             property="internal_list">
                             <bk-member-selector placeholder="请输入英文名，多个体验人员以英文逗号分隔" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
                         </bk-form-item>
-                        <bk-form-item label="临时体验人员（外部）" label-width="160" property="external_list">
+                        <bk-form-item label="临时体验人员（外部）" label-width="190" property="external_list">
                             <bk-select :disabled="false" v-model="createReleaseForm.external_list"
                                 ext-cls="select-custom"
                                 ext-popover-cls="select-popover-custom"
@@ -133,7 +133,7 @@
                                 </bk-option>
                             </bk-select>
                         </bk-form-item>
-                        <bk-form-item label="通知方式" label-width="160" desc="三种通知方式均不会对公开体验生效" desc-type="icon" desc-icon="icon-info-circle">
+                        <bk-form-item label="通知方式" label-width="190" desc="三种通知方式均不会对公开体验生效" desc-type="icon" desc-icon="icon-info-circle">
                             <div class="bkdevop-checkbox-group">
                                 <bk-checkbox v-for="(col, index) in noticeTypeList" :key="index" v-model="col.isChecked">{{ col.name }}</bk-checkbox>
                             </div>
