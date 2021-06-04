@@ -1,7 +1,7 @@
 <template>
     <section class="g-accelerate-box basic-info">
         <h3 class="create-title g-accelerate-deep-black-font"> {{ $t('accelerate.基本信息') }} </h3>
-        <bk-form class="g-accelerate-form-left" :label-width="120" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }" ref="createTask">
+        <bk-form class="g-accelerate-form-left" :label-width="138" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }" ref="createTask">
             <bk-form-item :label="$t('accelerate.方案ID')" property="openStatus">
                 <template v-if="isEdit">
                     <bk-input v-model="copyFormData.planId" class="single-width" :placeholder="$t('accelerate.系统自动生成，方案的唯一标识')" disabled></bk-input>

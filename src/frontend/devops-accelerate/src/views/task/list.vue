@@ -68,7 +68,7 @@
                         </template>
                     </bk-table-column>
                     <bk-table-column :label="$t('accelerate.加速次数')" prop="executeCount" sortable></bk-table-column>
-                    <bk-table-column :label="$t('accelerate.平均耗时')" prop="averageExecuteTimeSecond" sortable></bk-table-column>
+                    <bk-table-column :label="$t('accelerate.平均耗时')" prop="averageExecuteTimeValue" sortable></bk-table-column>
                     <bk-table-column :label="$t('accelerate.节省率')" prop="turboRatio" sortable></bk-table-column>
                     <bk-table-column :label="$t('accelerate.最新开始时间')" prop="latestStartTime" sortable></bk-table-column>
                     <bk-table-column :label="$t('accelerate.最新状态')" prop="latestStatus" sortable>
@@ -357,8 +357,8 @@
             margin-right: .52rem;
         }
         .task-rate {
-            width: 80px;
-            margin-right: .7rem;
+            width: 145px;
+            margin-right: .2rem;
             text-align: center;
             &:nth-child(7) {
                 margin-right: .36rem;
