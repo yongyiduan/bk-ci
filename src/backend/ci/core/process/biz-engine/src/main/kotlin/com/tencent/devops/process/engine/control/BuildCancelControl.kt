@@ -179,7 +179,7 @@ class BuildCancelControl @Autowired constructor(
                         containerId = container.id ?: "",
                         startTime = null,
                         endTime = LocalDateTime.now(),
-                        buildStatus = BuildStatusSwitcher.cancel(containerBuildStatus)
+                        buildStatus = BuildStatusSwitcher.jobStatusMaker.cancel(containerBuildStatus)
                     )
                     // 构建机关机
                     if (container is VMBuildContainer) {
