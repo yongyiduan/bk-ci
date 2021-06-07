@@ -1,35 +1,33 @@
 <template>
     <section class="g-accelerate-box basic-info">
-        <h3 class="create-title g-accelerate-deep-black-font">基本信息</h3>
-        <bk-form class="g-accelerate-form-left" :label-width="120" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }" ref="createTask">
-            <bk-form-item label="方案ID" property="openStatus">
+        <h3 class="create-title g-accelerate-deep-black-font"> {{ $t('accelerate.基本信息') }} </h3>
+        <bk-form class="g-accelerate-form-left" :label-width="138" :model="copyFormData" v-bkloading="{ isLoading: isLoadingEngine }" ref="createTask">
+            <bk-form-item :label="$t('accelerate.方案ID')" property="openStatus">
                 <template v-if="isEdit">
-                    <bk-input v-model="copyFormData.planId" class="single-width" placeholder="系统自动生成，方案的唯一标识" disabled></bk-input>
-                    <bk-checkbox v-model="copyFormData.openStatus" v-bk-tooltips="{ content: '若不开启，配置不生效' }">开启方案</bk-checkbox>
+                    <bk-input v-model="copyFormData.planId" class="single-width" :placeholder="$t('accelerate.系统自动生成，方案的唯一标识')" disabled></bk-input>
+                    <bk-checkbox v-model="copyFormData.openStatus" v-bk-tooltips="{ content: $t('accelerate.若不开启，配置不生效') }"> {{ $t('accelerate.开启方案') }} </bk-checkbox>
                 </template>
                 <span v-else class="g-accelerate-text-break plan-id">
                     <span>{{ copyFormData.planId }}</span>
                     <logo name="copy" @click.native="copyValue(copyFormData.planId)" size="16" class="icon-copy"></logo>
-                    <span v-if="copyFormData.openStatus" class="plan-open plan-common" @click="toggleOpen(false)" v-bk-tooltips="{ content: '点击禁用当前方案，禁用后，配置将不再生效' }">
-                        <logo name="check" class="plan-icon" size="10"></logo>已开启
-                    </span>
-                    <span v-else class="plan-close plan-common" @click="toggleOpen(true)" v-bk-tooltips="{ content: '点击开启方案，可以在构建机或流水线中使用' }">
-                        <logo name="suspend" class="plan-icon"></logo>已禁用
-                    </span>
+                    <span v-if="copyFormData.openStatus" class="plan-open plan-common" @click="toggleOpen(false)" v-bk-tooltips="{ content: $t('accelerate.点击禁用当前方案，禁用后，配置将不再生效') }">
+                        <logo name="check" class="plan-icon" size="10"></logo> {{ $t('accelerate.已开启') }} </span>
+                    <span v-else class="plan-close plan-common" @click="toggleOpen(true)" v-bk-tooltips="{ content: $t('accelerate.点击开启方案，可以在构建机或流水线中使用') }">
+                        <logo name="suspend" class="plan-icon"></logo> {{ $t('accelerate.已禁用') }} </span>
                 </span>
             </bk-form-item>
-            <bk-form-item label="方案名称" required property="planName" :rules="[requireRule('方案名称'), nameRule]" error-display-type="normal">
+            <bk-form-item :label="$t('accelerate.方案名称')" required property="planName" :rules="[requireRule($t('accelerate.方案名称')), nameRule]" error-display-type="normal">
                 <template v-if="isEdit">
-                    <bk-input v-model="copyFormData.planName" class="single-width" placeholder="以汉字、英文字母、数字、连字符(-)、符号(_+#)组成，不超过30个字"></bk-input>
+                    <bk-input v-model="copyFormData.planName" class="single-width" :placeholder="$t('accelerate.以汉字、英文字母、数字、连字符(-)、符号(_+#)组成，不超过30个字')"></bk-input>
                 </template>
                 <span v-else class="g-accelerate-text-break">{{ formData.planName }}</span>
             </bk-form-item>
-            <bk-form-item label="加速模式" required property="engineCode" :rules="[requireRule('加速模式')]" error-display-type="normal">
+            <bk-form-item :label="$t('accelerate.加速模式')" required property="engineCode" :rules="[requireRule($t('accelerate.加速模式'))]" error-display-type="normal">
                 <template v-if="isEdit && onlyEdit">
-                    <span>根据你的加速场景选择适用的模式</span>
+                    <span> {{ $t('accelerate.根据你的加速场景选择适用的模式') }} </span>
                     <ul class="accelerate-model-list">
                         <li v-for="item in engineList" :key="item" :class="['single-width', 'accelerate-model-item', 'g-accelerate-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]" @click="chooseMode(item)">
-                            <p class="item-title g-accelerate-black-font">{{ item.engineCode }}<span class="recommend" v-if="item.recommend">（荐）<span></span></span></p>
+                            <p class="item-title g-accelerate-black-font">{{ item.engineCode }}<span class="recommend" v-if="item.recommend"> {{ $t('accelerate.（荐）') }} <span></span></span></p>
                             <span class="item-desc g-accelerate-gray-font">{{ item.desc }}</span>
                             <logo name="check" :size="10" class="item-check"></logo>
                         </li>
@@ -37,16 +35,16 @@
                 </template>
                 <span v-else class="accelerate-model-engine">{{ formData.engineCode }}</span>
             </bk-form-item>
-            <bk-form-item label="方案说明" property="name">
+            <bk-form-item :label="$t('accelerate.方案说明')" property="name">
                 <template v-if="isEdit">
                     <bk-input v-model="copyFormData.desc" type="textarea" class="double-width" :maxlength="200"></bk-input>
                 </template>
                 <span v-else class="g-accelerate-text-break">{{ formData.desc || '-' }}</span>
             </bk-form-item>
         </bk-form>
-        <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save" :loading="isLoading">保存</bk-button>
-        <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancle" :disabled="isLoading">取消</bk-button>
-        <span class="g-accelerate-edit-button" @click="isEdit = true" v-if="!onlyEdit && !isEdit"><logo name="edit" size="16"></logo>编辑</span>
+        <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save" :loading="isLoading"> {{ $t('accelerate.保存') }} </bk-button>
+        <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancle" :disabled="isLoading"> {{ $t('accelerate.取消') }} </bk-button>
+        <span class="g-accelerate-edit-button" @click="isEdit = true" v-if="!onlyEdit && !isEdit"><logo name="edit" size="16"></logo> {{ $t('accelerate.编辑') }} </span>
     </section>
 </template>
 
@@ -80,7 +78,7 @@
                 isLoadingEngine: false,
                 nameRule: {
                     validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-_+#]+$/.test(val) && val.length <= 30),
-                    message: '以汉字、英文字母、数字、连字符(-)、下划线(_)组成，不超过30个字',
+                    message: this.$t('accelerate.以汉字、英文字母、数字、连字符(-)、下划线(_)组成，不超过30个字'),
                     trigger: 'blur'
                 }
             }
@@ -120,7 +118,7 @@
             requireRule (name) {
                 return {
                     required: true,
-                    message: this.$t('accelerate.validateMessage', [name, '必填项']),
+                    message: this.$t('accelerate.validateMessage', [name, this.$t('accelerate.必填项')]),
                     trigger: 'blur'
                 }
             },
@@ -133,7 +131,7 @@
                         projectId: this.projectId
                     }
                     modifyTaskBasic(postData).then(() => {
-                        this.$bkMessage({ theme: 'success', message: '修改成功' })
+                        this.$bkMessage({ theme: 'success', message: this.$t('accelerate.修改成功') })
                         this.$emit('update:formData', this.copyFormData)
                         this.isEdit = false
                     }).catch((err) => {

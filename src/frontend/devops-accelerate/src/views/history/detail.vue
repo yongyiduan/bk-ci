@@ -1,16 +1,16 @@
 <template>
     <article class="history-detail-home">
         <bk-breadcrumb separator-class="bk-icon icon-angle-right" class="bread-crumb">
-            <bk-breadcrumb-item :to="{ name: 'history' }">历史列表</bk-breadcrumb-item>
-            <bk-breadcrumb-item>{{ detail.recordName }} 详情</bk-breadcrumb-item>
+            <bk-breadcrumb-item :to="{ name: 'history' }"> {{ $t('accelerate.历史列表') }} </bk-breadcrumb-item>
+            <bk-breadcrumb-item>{{ detail.recordName }} {{ $t('accelerate.详情') }} </bk-breadcrumb-item>
         </bk-breadcrumb>
 
         <section class="g-accelerate-box hisory-detail-data" v-bkloading="{ isloading }">
             <header class="detail-header">
                 <span class="header-title">{{ detail.recordName }}</span>
                 <span class="header-time">
-                    <span><span>开始时间：</span><span>{{ detail.startTime }}</span></span>
-                    <span><span>总耗时：</span><span>{{ detail.elapsedTime }}</span></span>
+                    <span><span> {{ $t('accelerate.开始时间：') }} </span><span>{{ detail.startTime }}</span></span>
+                    <span><span> {{ $t('accelerate.总耗时：') }} </span><span>{{ detail.elapsedTime }}</span></span>
                 </span>
             </header>
             <bk-divider></bk-divider>

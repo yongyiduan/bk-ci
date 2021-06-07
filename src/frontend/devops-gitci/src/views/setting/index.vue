@@ -3,7 +3,7 @@
         <aside class="aside-nav">
             <h3 class="nav-title">
                 <i class="bk-icon icon-arrows-left" @click="backHome"></i>
-                Setting
+                Settings
             </h3>
             <ul>
                 <li v-for="setting in settingList"
@@ -22,6 +22,8 @@
 </template>
 
 <script>
+    import { modifyHtmlTitle } from '@/utils'
+
     export default {
         data () {
             return {
@@ -43,6 +45,10 @@
             }
         },
 
+        created () {
+            this.setHtmlTitle()
+        },
+
         methods: {
             initRoute (name) {
                 let settingIndex = 0
@@ -54,6 +60,7 @@
                         settingIndex = 1
                         break
                     case 'agentPools':
+                    case 'agentList':
                     case 'addAgent':
                         settingIndex = 2
                         break
@@ -61,12 +68,18 @@
                 this.curSetting = this.settingList[settingIndex]
             },
 
+            setHtmlTitle () {
+                const projectPath = decodeURIComponent((this.$route.hash || '').slice(1))
+                const title = projectPath + ' : Setting'
+                modifyHtmlTitle(title)
+            },
+
             goToPage ({ name, params }) {
                 this.$router.push({ name, params })
             },
 
             backHome () {
-                this.goToPage({ name: 'buildList', params: { pipelineId: 'all' } })
+                this.goToPage({ name: 'buildList' })
             }
         }
     }
@@ -78,7 +91,6 @@
         flex-direction: row;
         .setting-main {
             flex: 1;
-            background: #f5f6fa;
         }
     }
 </style>

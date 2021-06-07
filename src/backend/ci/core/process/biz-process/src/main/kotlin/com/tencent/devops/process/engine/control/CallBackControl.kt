@@ -116,10 +116,18 @@ class CallBackControl @Autowired constructor(
 
         val callBackEvent =
             if (event.taskId.isNullOrBlank()) {
-                if (event.actionType == ActionType.START) {
-                    CallBackEvent.BUILD_START
+                if (event.stageId.isNullOrBlank()) {
+                    if (event.actionType == ActionType.START) {
+                        CallBackEvent.BUILD_START
+                    } else {
+                        CallBackEvent.BUILD_END
+                    }
                 } else {
-                    CallBackEvent.BUILD_END
+                    if (event.actionType == ActionType.START) {
+                        CallBackEvent.BUILD_STAGE_START
+                    } else {
+                        CallBackEvent.BUILD_STAGE_END
+                    }
                 }
             } else {
                 if (event.actionType == ActionType.START) {
@@ -129,13 +137,12 @@ class CallBackControl @Autowired constructor(
                 }
             }
 
-        logger.info("$projectId|$pipelineId|$buildId|${callBackEvent.name}|callback build event")
+        logger.info("$projectId|$pipelineId|$buildId|${callBackEvent.name}|${event.stageId}|${event.taskId}|callback")
         val list = projectPipelineCallBackService.listProjectCallBack(
             projectId = projectId,
             events = callBackEvent.name
         )
         if (list.isEmpty()) {
-            logger.info("[$buildId]|[$pipelineId]|[$callBackEvent]| no callback")
             return
         }
         val modelDetail = pipelineBuildDetailService.get(buildId = buildId, refreshStatus = false) ?: return
@@ -152,7 +159,9 @@ class CallBackControl @Autowired constructor(
             endTime = modelDetail.endTime ?: 0,
             model = SimpleModel(stages),
             projectId = projectId,
-            trigger = modelDetail.trigger
+            trigger = modelDetail.trigger,
+            stageId = event.stageId,
+            taskId = event.taskId
         )
 
         sendToCallBack(CallBackData(event = callBackEvent, data = buildEvent), list)

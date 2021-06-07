@@ -1,13 +1,13 @@
 <template>
     <article class="create-task-home">
         <bk-breadcrumb separator-class="bk-icon icon-angle-right" class="bread-crumb">
-            <bk-breadcrumb-item :to="{ name: 'taskList' }">方案列表</bk-breadcrumb-item>
-            <bk-breadcrumb-item>新增加速方案</bk-breadcrumb-item>
+            <bk-breadcrumb-item :to="{ name: 'taskList' }"> {{ $t('accelerate.方案列表') }} </bk-breadcrumb-item>
+            <bk-breadcrumb-item> {{ $t('accelerate.新增加速方案') }} </bk-breadcrumb-item>
         </bk-breadcrumb>
         <task-basic :form-data.sync="formData" ref="basic" />
         <task-param :form-data.sync="formData" ref="param" />
-        <bk-button theme="primary" @click="submit">提交</bk-button>
-        <bk-button @click="cancel">取消</bk-button>
+        <bk-button theme="primary" @click="submit"> {{ $t('accelerate.提交') }} </bk-button>
+        <bk-button @click="cancel"> {{ $t('accelerate.取消') }} </bk-button>
     </article>
 </template>
 
@@ -49,7 +49,7 @@
                         projectId: this.$route.params.projectId
                     }
                     addTurboPlan(postData).then((res) => {
-                        this.$bkMessage({ theme: 'success', message: '添加成功' })
+                        this.$bkMessage({ theme: 'success', message: this.$t('accelerate.添加成功') })
                         this.$router.push({
                             name: 'taskSuccess',
                             query: {

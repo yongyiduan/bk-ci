@@ -1,8 +1,8 @@
 <template>
     <article class="task-list-home">
         <header class="task-head">
-            <bk-button theme="primary" @click="addTask">新增方案</bk-button>
-            <span class="g-accelerate-gray-font task-head-title">共 {{ turboPlanCount }} 个方案</span>
+            <bk-button theme="primary" @click="addTask"> {{ $t('accelerate.新增方案') }} </bk-button>
+            <span class="g-accelerate-gray-font task-head-title">{{ $t('accelerate.共') }} {{ turboPlanCount }} {{ $t('accelerate.个方案') }} </span>
         </header>
 
         <main v-bkloading="{ isLoading }">
@@ -25,23 +25,23 @@
                     <span class="task-line"></span>
                     <p class="task-rate">
                         <span class="rate-num g-accelerate-deep-black-font">{{ task.instanceNum }}</span>
-                        <span class="rate-title g-accelerate-gray-font">实例数</span>
+                        <span class="rate-title g-accelerate-gray-font"> {{ $t('accelerate.实例数') }} </span>
                     </p>
                     <p class="task-rate">
                         <span class="rate-num g-accelerate-deep-black-font">{{ task.executeCount }}</span>
-                        <span class="rate-title g-accelerate-gray-font">加速次数</span>
+                        <span class="rate-title g-accelerate-gray-font"> {{ $t('accelerate.加速次数') }} </span>
                     </p>
                     <p class="task-rate">
                         <span class="rate-num g-accelerate-deep-black-font">{{ task.estimateTimeHour }}</span>
-                        <span class="rate-title g-accelerate-gray-font">未加速耗时(h)</span>
+                        <span class="rate-title g-accelerate-gray-font"> {{ $t('accelerate.未加速耗时(h)') }} </span>
                     </p>
                     <p class="task-rate">
                         <span class="rate-num g-accelerate-deep-black-font">{{ task.executeTimeHour }}</span>
-                        <span class="rate-title g-accelerate-gray-font">实际耗时(h)</span>
+                        <span class="rate-title g-accelerate-gray-font"> {{ $t('accelerate.实际耗时(h)') }} </span>
                     </p>
                     <p class="task-rate">
                         <span class="rate-num g-accelerate-deep-black-font">{{ task.turboRatio }}</span>
-                        <span class="rate-title g-accelerate-gray-font">节省率</span>
+                        <span class="rate-title g-accelerate-gray-font"> {{ $t('accelerate.节省率') }} </span>
                     </p>
                     <logo name="right-shape" size="16" :class="showIds.includes(task.planId) ? 'task-right-down task-right-shape' : 'task-right-shape'"></logo>
                 </h3>
@@ -58,7 +58,7 @@
                     @sort-change="(sort) => sortChange(sort, task)"
                     @row-click="(row) => rowClick(row, task)"
                 >
-                    <bk-table-column label="流水线/构建机" prop="pipeline_name" sortable>
+                    <bk-table-column :label="$t('accelerate.流水线/构建机')" prop="pipeline_name" sortable>
                         <template slot-scope="props">
                             <span v-if="props.row.pipelineName">
                                 {{ props.row.pipelineName }}
@@ -67,11 +67,11 @@
                             <span v-else>{{ props.row.clientIp }}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column label="加速次数" prop="executeCount" sortable></bk-table-column>
-                    <bk-table-column label="平均耗时" prop="averageExecuteTimeSecond" sortable></bk-table-column>
-                    <bk-table-column label="节省率" prop="turboRatio" sortable></bk-table-column>
-                    <bk-table-column label="最新开始时间" prop="latestStartTime" sortable></bk-table-column>
-                    <bk-table-column label="最新状态" prop="latestStatus" sortable>
+                    <bk-table-column :label="$t('accelerate.加速次数')" prop="executeCount" sortable></bk-table-column>
+                    <bk-table-column :label="$t('accelerate.平均耗时')" prop="averageExecuteTimeValue" sortable></bk-table-column>
+                    <bk-table-column :label="$t('accelerate.节省率')" prop="turboRatio" sortable></bk-table-column>
+                    <bk-table-column :label="$t('accelerate.最新开始时间')" prop="latestStartTime" sortable></bk-table-column>
+                    <bk-table-column :label="$t('accelerate.最新状态')" prop="latestStatus" sortable>
                         <template slot-scope="props">
                             <task-status :status="props.row.latestStatus" :message="props.row.message"></task-status>
                         </template>
@@ -357,8 +357,8 @@
             margin-right: .52rem;
         }
         .task-rate {
-            width: 80px;
-            margin-right: .7rem;
+            width: 145px;
+            margin-right: .2rem;
             text-align: center;
             &:nth-child(7) {
                 margin-right: .36rem;

@@ -1,14 +1,15 @@
 <template>
     <section>
-        <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [pluginCls]: true }" @click="toggleShowLog">
-            <status-icon :status="plugin.status"></status-icon>
-            <span class="plugin-name">{{ plugin.name }}</span>
+        <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [getPipelineStatusClass(plugin.status)]: true }" @click="toggleShowLog">
+            <plugin-icon :plugin="plugin"></plugin-icon>
+            <span class="plugin-name text-ellipsis" v-bk-overflow-tips>{{ plugin.name }}</span>
             <span class="plugin-time" v-bk-tooltips="pluginTime">{{ pluginTime }}</span>
         </section>
 
         <plugin-log @close="toggleShowLog"
             :plugin="plugin"
             :job-index="jobIndex"
+            :plugin-index="pluginIndex"
             :stage-index="stageIndex"
             v-if="showLog"
         ></plugin-log>
@@ -17,13 +18,14 @@
 
 <script>
     import { coverTimer } from '@/utils'
-    import statusIcon from './status-icon'
-    import pluginLog from '../exec-detail/plugin'
+    import { getPipelineStatusClass } from '@/components/status'
+    import pluginLog from '@/components/exec-detail/plugin'
+    import pluginIcon from './plugin-icon'
 
     export default {
         components: {
-            statusIcon,
-            pluginLog
+            pluginLog,
+            pluginIcon
         },
 
         props: {
@@ -42,25 +44,12 @@
         computed: {
             pluginTime () {
                 return this.plugin.elapsed > 36e5 ? '1h' : coverTimer(this.plugin.elapsed)
-            },
-
-            pluginCls () {
-                const statusMap = {
-                    CANCELED: 'warning',
-                    TERMINATE: 'warning',
-                    REVIEWING: 'warning',
-                    REVIEW_ABORT: 'warning',
-                    FAILED: 'danger',
-                    HEARTBEAT_TIMEOUT: 'danger',
-                    QUEUE_TIMEOUT: 'danger',
-                    EXEC_TIMEOUT: 'danger',
-                    SUCCEED: 'success'
-                }
-                return statusMap[this.plugin.status]
             }
         },
 
         methods: {
+            getPipelineStatusClass,
+
             toggleShowLog () {
                 this.showLog = !this.showLog
             }
@@ -69,7 +58,7 @@
 </script>
 
 <style lang="postcss" scoped>
-    @import '../../css/conf';
+    @import '@/css/conf';
 
     .plugin-item {
         position: relative;
@@ -83,14 +72,15 @@
         border-radius: 2px;
         font-size: 14px;
         transition: all .4s ease-in-out;
-        border: 1px solid white;
+        border: 1px solid #c3cdd7;
         cursor: pointer;
         .plugin-name {
             flex: 1;
+            max-width: 148px;
             color: #7b7d8a;
         }
         .plugin-time {
-            margin: 0 8px 0 2px;
+            margin: 0 0px 0 2px;
         }
         &.first-plugin:before {
             top: -16px;
@@ -116,6 +106,12 @@
             top: -5px;
             left: 18.5px;
             z-index: 2;
+        }
+        &.canceled, &.waiting {
+            border-color: $warningColor;
+        }
+        &.pause {
+            border-color: $pauseColor;
         }
         &.warning {
             border-color: $warningColor;

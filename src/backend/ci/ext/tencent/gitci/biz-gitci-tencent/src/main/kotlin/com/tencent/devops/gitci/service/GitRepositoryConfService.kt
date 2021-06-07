@@ -31,6 +31,7 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.gitci.dao.GitCISettingDao
 import com.tencent.devops.gitci.pojo.GitRepositoryConf
 import com.tencent.devops.gitci.pojo.RtxCustomProperty
+import com.tencent.devops.gitci.v2.service.GitCIBasicSettingService
 import com.tencent.devops.project.api.service.service.ServiceTxProjectResource
 import com.tencent.devops.scm.api.ServiceGitResource
 import com.tencent.devops.scm.pojo.GitCIProjectInfo
@@ -43,7 +44,8 @@ import org.springframework.stereotype.Service
 class GitRepositoryConfService @Autowired constructor(
     private val dslContext: DSLContext,
     private val client: Client,
-    private val gitCISettingDao: GitCISettingDao
+    private val gitCISettingDao: GitCISettingDao,
+    private val gitCIBasicSettingService: GitCIBasicSettingService
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(GitRepositoryConfService::class.java)
@@ -111,6 +113,31 @@ class GitRepositoryConfService @Autowired constructor(
     }
 
     fun getGitCIConf(gitProjectId: Long): GitRepositoryConf? {
+        val repoV2 = gitCIBasicSettingService.getGitCIConf(gitProjectId)
+        if (repoV2 != null) {
+            with(repoV2) {
+                return GitRepositoryConf(
+                    gitProjectId = gitProjectId,
+                    name = name,
+                    url = url,
+                    homepage = homepage,
+                    gitHttpUrl = gitHttpUrl,
+                    gitSshUrl = gitSshUrl,
+                    enableCi = enableCi,
+                    buildPushedBranches = buildPushedBranches,
+                    limitConcurrentJobs = null,
+                    buildPushedPullRequest = buildPushedPullRequest,
+                    env = null,
+                    projectCode = projectCode,
+                    rtxCustomProperty = null,
+                    emailProperty = null,
+                    rtxGroupProperty = null,
+                    enableMrBlock = enableMrBlock,
+                    createTime = createTime,
+                    updateTime = updateTime
+                )
+            }
+        }
         return gitCISettingDao.getSetting(dslContext, gitProjectId)
     }
 

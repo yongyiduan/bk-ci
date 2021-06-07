@@ -1,8 +1,8 @@
 <template>
     <article class="task-detail-home" v-bkloading="{ isLoading }">
         <bk-breadcrumb separator-class="bk-icon icon-angle-right" class="bread-crumb">
-            <bk-breadcrumb-item :to="{ name: 'taskList' }">方案列表</bk-breadcrumb-item>
-            <bk-breadcrumb-item>查看加速方案</bk-breadcrumb-item>
+            <bk-breadcrumb-item :to="{ name: 'taskList' }"> {{ $t('accelerate.方案列表') }} </bk-breadcrumb-item>
+            <bk-breadcrumb-item> {{ $t('accelerate.查看加速方案') }} </bk-breadcrumb-item>
         </bk-breadcrumb>
 
         <section class="task-detail-body" v-if="!isLoading">
@@ -13,23 +13,23 @@
 
             <main class="task-detail-right g-accelerate-box">
                 <section class="g-accelerate-task-tip task-use">
-                    <h3 class="create-title g-accelerate-deep-black-font">使用方式</h3>
+                    <h3 class="create-title g-accelerate-deep-black-font"> {{ $t('accelerate.使用方式') }} </h3>
                     <section v-html="engineDetail.userManual"></section>
                 </section>
 
                 <section class="task-record">
-                    <h3 class="create-title g-accelerate-deep-black-font">更新记录</h3>
+                    <h3 class="create-title g-accelerate-deep-black-font"> {{ $t('accelerate.更新记录') }} </h3>
                     <bk-form :label-width="100" class="g-accelerate-form-left record-form">
-                        <bk-form-item label="创建人：">
+                        <bk-form-item :label="$t('accelerate.创建人：')">
                             {{ formData.createdBy }}
                         </bk-form-item>
-                        <bk-form-item label="创建时间：">
+                        <bk-form-item :label="$t('accelerate.创建时间：')">
                             {{ formData.createdDate }}
                         </bk-form-item>
-                        <bk-form-item label="最近修改人：">
+                        <bk-form-item :label="$t('accelerate.最近修改人：')">
                             {{ formData.updatedBy }}
                         </bk-form-item>
-                        <bk-form-item label="修改时间：">
+                        <bk-form-item :label="$t('accelerate.修改时间：')">
                             {{ formData.updatedDate }}
                         </bk-form-item>
                     </bk-form>

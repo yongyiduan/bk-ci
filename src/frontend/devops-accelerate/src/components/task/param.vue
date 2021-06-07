@@ -1,7 +1,7 @@
 <template>
     <section class="g-accelerate-box task-param">
-        <h3 class="create-title g-accelerate-deep-black-font">加速参数</h3>
-        <bk-form class="g-accelerate-form-left" :label-width="120" :model="copyFormData.configParam" ref="paramForm">
+        <h3 class="create-title g-accelerate-deep-black-font"> {{ $t('accelerate.加速参数') }} </h3>
+        <bk-form class="g-accelerate-form-left" :label-width="138" :model="copyFormData.configParam" ref="paramForm">
             <bk-form-item :label="config.paramName"
                 :property="config.paramKey"
                 v-for="config in paramConfig"
@@ -20,9 +20,9 @@
                 ></component>
             </bk-form-item>
         </bk-form>
-        <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save">保存</bk-button>
-        <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancel">取消</bk-button>
-        <span class="g-accelerate-edit-button" @click="isEdit = !isEdit" v-if="!onlyEdit && (paramConfig || []).length && !isEdit"><logo name="edit" size="16"></logo>编辑</span>
+        <bk-button v-if="isEdit && !onlyEdit" theme="primary" class="g-accelerate-bottom-button" @click="save"> {{ $t('accelerate.保存') }} </bk-button>
+        <bk-button v-if="isEdit && !onlyEdit" class="g-accelerate-bottom-button" @click="cancel"> {{ $t('accelerate.取消') }} </bk-button>
+        <span class="g-accelerate-edit-button" @click="isEdit = !isEdit" v-if="!onlyEdit && (paramConfig || []).length && !isEdit"><logo name="edit" size="16"></logo> {{ $t('accelerate.编辑') }} </span>
     </section>
 </template>
 
@@ -85,7 +85,7 @@
                 if (config.required) {
                     rules.push({
                         required: true,
-                        message: this.$t('accelerate.validateMessage', [config.paramName, '必填项']),
+                        message: this.$t('accelerate.validateMessage', [config.paramName, this.$t('accelerate.必填项')]),
                         trigger: 'blur'
                     })
                 }
@@ -104,7 +104,7 @@
                 this.validate().then(() => {
                     this.isLoading = true
                     modifyConfigParam(this.copyFormData).then(() => {
-                        this.$bkMessage({ theme: 'success', message: '修改成功' })
+                        this.$bkMessage({ theme: 'success', message: this.$t('accelerate.修改成功') })
                         this.$emit('update:formData', this.copyFormData)
                         this.isEdit = false
                     }).catch((err) => {

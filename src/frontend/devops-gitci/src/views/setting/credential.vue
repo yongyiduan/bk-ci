@@ -1,7 +1,7 @@
 <template>
     <article class="credential-home" v-bkloading="{ isLoading }">
         <header class="home-header">
-            <bk-button theme="primary" @click="addCredential">新增凭据</bk-button>
+            <bk-button theme="primary" @click="addCredential">Create Credential</bk-button>
         </header>
 
         <bk-table :data="credentialList"
@@ -9,19 +9,19 @@
             :outer-border="false"
             :header-border="false"
             :header-cell-style="{ background: '#fafbfd' }"
-            :height="tableHeight"
             @page-change="pageChange"
             @page-limit-change="pageLimitChange"
+            empty-text="No credential yet"
             class="credential-table"
         >
-            <bk-table-column label="凭证名称" prop="credentialId"></bk-table-column>
-            <bk-table-column label="别名" prop="credentialName"></bk-table-column>
-            <bk-table-column label="类型" prop="credentialType"></bk-table-column>
-            <bk-table-column label="描述" prop="credentialRemark"></bk-table-column>
-            <bk-table-column label="操作" width="150" class-name="handler-btn">
+            <bk-table-column label="Key" prop="credentialId"></bk-table-column>
+            <bk-table-column label="Display Name" prop="credentialName"></bk-table-column>
+            <bk-table-column label="Type" prop="credentialType"></bk-table-column>
+            <bk-table-column label="Description" prop="credentialRemark"></bk-table-column>
+            <bk-table-column label="Operation" width="150" class-name="handler-btn">
                 <template slot-scope="props">
-                    <span :class="{ 'update-btn': true, disabled: !props.row.permissions.edit }" @click="editCredential(props.row)">编辑</span>
-                    <span :class="{ 'update-btn': true, disabled: !props.row.permissions.delete }" @click="deleteCredential(props.row)">删除</span>
+                    <span :class="{ 'update-btn': true, disabled: !props.row.permissions.edit }" @click="editCredential(props.row)">Edit</span>
+                    <span :class="{ 'update-btn': true, disabled: !props.row.permissions.delete }" @click="deleteCredential(props.row)">Delete</span>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -33,9 +33,9 @@
             :loading="isDelLoading"
             theme="danger"
             header-position="left"
-            title="删除"
+            title="Delete"
             @confirm="requestDelete">
-            确定删除【{{deleteObj.id}}】？
+            Are you sure to delete【{{deleteObj.id}}】？
         </bk-dialog>
     </article>
 </template>
@@ -69,11 +69,7 @@
         },
 
         computed: {
-            ...mapState(['appHeight', 'projectId']),
-
-            tableHeight () {
-                return Math.min(this.appHeight - 152, 106 + (Math.max(this.credentialList.length, 3)) * 42)
-            }
+            ...mapState(['appHeight', 'projectId'])
         },
 
         created () {
@@ -154,7 +150,9 @@
 
 <style lang="postcss" scoped>
     .credential-home {
-        padding: 20px 24px;
+        padding: 16px;
+        height: calc(100vh - 60px);
+        overflow: auto;
     }
     .home-header {
         display: flex;

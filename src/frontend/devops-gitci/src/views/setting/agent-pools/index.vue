@@ -7,11 +7,15 @@
 
         <h3 :class="{ 'pool-title': true, 'fix-top': scrollTop > 370 }">
             Self-hosted agent pools
-            <bk-button @click="showAddPool" class="add-pool" theme="primary" size="small">Add Pool</bk-button>
+            <bk-button @click="showAddPool" class="add-pool" theme="primary" size="small" v-if="thirdPools.length">Add Self-hosted Agent Pool</bk-button>
         </h3>
         <section class="agent-pools-container" v-bkloading="{ isLoading: isLoadingThirdPools }">
             <agent-pool-card class="agent-pool" @refresh="getThirdPool" v-for="pool in thirdPools" :key="pool.envHashId" :pool="pool"></agent-pool-card>
-            <bk-exception class="exception-wrap-item" type="empty" v-if="thirdPools.length <= 0"> </bk-exception>
+            <section v-if="thirdPools.length <= 0" class="table-empty">
+                <h3>No self-hosted agent pools yet</h3>
+                <h5>Agent pools is consisted of one or more Agents</h5>
+                <bk-button theme="primary" @click="showAddPool">Add Self-hosted Agent Pool</bk-button>
+            </section>
         </section>
 
         <add-pool :show.sync="isShowAddPool" @refresh="getThirdPool"></add-pool>
@@ -93,7 +97,7 @@
     .agent-pools {
         overflow-y: auto;
         height: calc(100vh - 60px);
-        padding: 0 24px 20px;
+        padding: 0 16px 16px;
         margin: 0;
         width: 100%;
     }
@@ -127,18 +131,7 @@
         .agent-pool {
             float: left;
             margin-top: 20px;
-            &:not(:nth-child(4n + 1)) {
-                margin-left: 20px;
-            }
-        }
-        .exception-wrap-item {
-            /deep/ img {
-                width: 420px;
-            }
-            /deep/ .bk-exception-text {
-                margin-top: -50px;
-                font-size: 18px;
-            }
+            margin-left: 20px;
         }
     }
 </style>

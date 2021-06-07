@@ -24,12 +24,12 @@
 
             getStatusName () {
                 const statusMap = {
-                    init: '初始化',
-                    staging: '排队中',
-                    starting: '准备阶段',
-                    running: '正在加速',
-                    finish: '成功',
-                    failed: '失败'
+                    init: this.$t('accelerate.初始化'),
+                    staging: this.$t('accelerate.排队中'),
+                    starting: this.$t('accelerate.准备阶段'),
+                    running: this.$t('accelerate.正在加速'),
+                    finish: this.$t('accelerate.成功'),
+                    failed: this.$t('accelerate.失败')
                 }
                 return statusMap[this.status]
             }
