@@ -125,7 +125,7 @@
         data () {
             return {
                 defaultMachineCover: require('../../../scss/logo/machine.svg'),
-                installDocsLink: `${DOCS_URL_PREFIX}/x/ZNMrAg`
+                installDocsLink: `${DOCS_URL_PREFIX}/services/pools/self-hosted-agents`
             }
         },
         methods: {

@@ -68,11 +68,11 @@ declare module '*.vue' {
     export default Vue
 }
 
-declare const LOGIN_SERVICE_URL: string
-declare const API_URL_PREFIX: string
-declare const DOCS_URL_PREFIX: string
-declare const DEVOPS_LS_VERSION: string
-declare const ENTERPRISE_VERSION: string
+declare let LOGIN_SERVICE_URL: string
+declare let API_URL_PREFIX: string
+declare let DOCS_URL_PREFIX: string
+declare let DEVOPS_LS_VERSION: string
+declare let ENTERPRISE_VERSION: string
 declare const VERSION_TYPE: string
 declare const PERM_URL_PREFIX: string
 

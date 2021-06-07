@@ -269,7 +269,7 @@
                     projectCode: '',
                     category: ''
                 },
-                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=22118721`,
+                docsLink: `${DOCS_URL_PREFIX}/store/ci-images/image-build`,
                 ticketList: [],
                 classifys: [],
                 labelList: [],
