@@ -74,11 +74,10 @@
                             </bk-select>
                         </bk-form-item>
                         <bk-form-item label="产品负责人" label-width="190" :required="true" property="productOwner">
-                            <bk-input
+                            <bk-member-selector
                                 v-model="createReleaseForm.productOwner"
-                                placeholder="请输入英文名，多个产品负责人以英文逗号分隔"
-                                @change="productResult"
-                                :rule="[{ required: true }]" />
+                                :rule="[{ required: true }]"
+                                placeholder="请输入英文名，多个产品负责人以英文逗号分隔" />
                         </bk-form-item>
                         <bk-form-item label="体验结束时间" label-width="190" :required="true" property="end_date">
                             <bk-date-picker
