@@ -88,7 +88,7 @@ class LogServiceESImpl constructor(
     private val logStatusService: LogStatusService,
     private val logTagService: LogTagService,
     private val createIndexBean: CreateIndexBean,
-    private val logBeanV2: LogStorageBean,
+    private val logStorageBean: LogStorageBean,
     private val redisOperation: RedisOperation,
     private val buildLogPrintService: BuildLogPrintService
 ) : LogService {
@@ -144,7 +144,7 @@ class LogServiceESImpl constructor(
             success = true
         } finally {
             val elapse = System.currentTimeMillis() - currentEpoch
-            logBeanV2.batchWrite(elapse, success)
+            logStorageBean.batchWrite(elapse, success)
 
             // #4265 当日志消息处理时间过长时打印消息内容
             if (elapse >= 1000 && event.logs.isNotEmpty()) logger.warn(
@@ -190,7 +190,7 @@ class LogServiceESImpl constructor(
             success = logStatusSuccess(result.status)
             return result
         } finally {
-            logBeanV2.query(System.currentTimeMillis() - currentEpoch, success)
+            logStorageBean.query(System.currentTimeMillis() - currentEpoch, success)
         }
     }
 
@@ -284,7 +284,7 @@ class LogServiceESImpl constructor(
             }
             return queryLogs
         } finally {
-            logBeanV2.query(System.currentTimeMillis() - startEpoch, success)
+            logStorageBean.query(System.currentTimeMillis() - startEpoch, success)
         }
     }
 
@@ -314,7 +314,7 @@ class LogServiceESImpl constructor(
             success = logStatusSuccess(result.status)
             return result
         } finally {
-            logBeanV2.query(System.currentTimeMillis() - startEpoch, success)
+            logStorageBean.query(System.currentTimeMillis() - startEpoch, success)
         }
     }
 
@@ -347,7 +347,7 @@ class LogServiceESImpl constructor(
             success = logStatusSuccess(result.status)
             return result
         } finally {
-            logBeanV2.query(System.currentTimeMillis() - startEpoch, success)
+            logStorageBean.query(System.currentTimeMillis() - startEpoch, success)
         }
     }
 
@@ -456,7 +456,7 @@ class LogServiceESImpl constructor(
             queryLogs.logs = result.logs
             queryLogs.timeUsed = System.currentTimeMillis() - startEpoch
         } finally {
-            logBeanV2.query(System.currentTimeMillis() - startEpoch, success)
+            logStorageBean.query(System.currentTimeMillis() - startEpoch, success)
         }
         return queryLogs
     }
@@ -487,7 +487,7 @@ class LogServiceESImpl constructor(
             result.timeUsed = System.currentTimeMillis() - startEpoch
             return result
         } finally {
-            logBeanV2.query(System.currentTimeMillis() - startEpoch, success)
+            logStorageBean.query(System.currentTimeMillis() - startEpoch, success)
         }
     }
 
@@ -546,7 +546,7 @@ class LogServiceESImpl constructor(
             logger.error("Query init logs failed because of ${e.javaClass}. buildId: $buildId", e)
             queryLogs.status = LogStatus.FAIL
         } finally {
-            logBeanV2.query(System.currentTimeMillis() - startEpoch, success)
+            logStorageBean.query(System.currentTimeMillis() - startEpoch, success)
         }
 
         return PageQueryLogs(
@@ -1179,7 +1179,7 @@ class LogServiceESImpl constructor(
                 logger.warn("[$buildId] Part of bulk lines failed, lines:$lines, bulkLines:$bulkLines")
             }
             val elapse = System.currentTimeMillis() - currentEpoch
-            logBeanV2.bulkRequest(elapse, bulkLines > 0)
+            logStorageBean.bulkRequest(elapse, bulkLines > 0)
 
             // #4265 当日志消息处理时间过长时打印消息内容
             if (elapse >= 500 && logMessages.isNotEmpty()) logger.warn(
