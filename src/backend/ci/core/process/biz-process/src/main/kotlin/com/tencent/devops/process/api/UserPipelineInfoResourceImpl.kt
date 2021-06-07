@@ -34,6 +34,7 @@ import com.tencent.devops.process.api.user.UserPipelineInfoResource
 import com.tencent.devops.process.service.PipelineListFacadeService
 import com.tencent.devops.process.pojo.Pipeline
 import com.tencent.devops.process.pojo.PipelineIdAndName
+import com.tencent.devops.process.pojo.PipelineDetailInfo
 import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
@@ -50,20 +51,20 @@ class UserPipelineInfoResourceImpl @Autowired constructor(
     override fun searchByName(
         userId: String,
         projectId: String,
-        pipelineName: String
+        pipelineName: String?
     ): Result<List<PipelineIdAndName>> {
         checkParam(userId, projectId)
-        val pipelineInfos = pipelineListFacadeService.searchByPipelineName(projectId, pipelineName, null, null)
-        val pipelineIdAndName = mutableListOf<PipelineIdAndName>()
-        pipelineInfos.records.map {
-            pipelineIdAndName.add(
-                PipelineIdAndName(
-                    pipelineId = it.pipelineId,
-                    pipelineName = it.pipelineName
-                )
-            )
-        }
-        return Result(pipelineIdAndName)
+        val pipelineInfos = pipelineListFacadeService.searchIdAndName(
+            projectId = projectId,
+            pipelineName = pipelineName,
+            page = null,
+            pageSize = null
+        )
+        return Result(pipelineInfos)
+    }
+
+    override fun getPipelineInfo(userId: String, projectId: String, pipelineId: String): Result<PipelineDetailInfo?> {
+        return Result(pipelineListFacadeService.getPipelineDetail(userId, projectId, pipelineId))
     }
 
     fun checkParam(userId: String, projectId: String) {
