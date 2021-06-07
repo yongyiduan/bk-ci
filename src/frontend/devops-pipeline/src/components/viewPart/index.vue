@@ -234,7 +234,7 @@
                 }
 
                 try {
-                    const res = await this.$store.dispatch('soda/requestPartFile', {
+                    const res = await this.$store.dispatch('common/requestPartFile', {
                         projectId: this.projectId,
                         params
                     })
@@ -268,7 +268,7 @@
 
                 try {
                     if (key === 'url') {
-                        const res = await this.$store.dispatch('soda/requestExternalUrl', {
+                        const res = await this.$store.dispatch('common/requestExternalUrl', {
                             projectId: this.projectId,
                             artifactoryType: row.artifactoryType,
                             path: row.path
@@ -277,8 +277,8 @@
                         this.curIndexItemUrl = res.url
                     } else {
                         const [isDevnet, res] = await Promise.all([
-                            this.$store.dispatch('soda/requestDevnetGateway'),
-                            this.$store.dispatch('soda/requestDownloadUrl', {
+                            this.$store.dispatch('common/requestDevnetGateway'),
+                            this.$store.dispatch('common/requestDownloadUrl', {
                                 projectId: this.projectId,
                                 artifactoryType: row.artifactoryType,
                                 path: row.path
@@ -337,7 +337,7 @@
                 const permission = 'DOWNLOAD'
 
                 try {
-                    const res = await this.$store.dispatch('soda/requestExecPipPermission', {
+                    const res = await this.$store.dispatch('common/requestExecPipPermission', {
                         projectId: this.projectId,
                         pipelineId,
                         permission
@@ -367,7 +367,7 @@
                 try {
                     sideSliderConfig.isLoading = true
                     const type = row.artifactoryType === 'PIPELINE' ? 'PIPELINE' : 'CUSTOM_DIR'
-                    const res = await this.$store.dispatch('soda/requestFileInfo', {
+                    const res = await this.$store.dispatch('common/requestFileInfo', {
                         projectId: projectId,
                         type: type,
                         path: `${row.fullPath}`
@@ -428,7 +428,7 @@
                         files: [artifactory.name],
                         copyAll: false
                     }
-                    const res = await this.$store.dispatch('soda/requestCopyArtifactory', {
+                    const res = await this.$store.dispatch('common/requestCopyArtifactory', {
                         projectId,
                         pipelineId,
                         buildId: buildNo,

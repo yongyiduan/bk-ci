@@ -96,7 +96,7 @@
             this.init()
         },
         methods: {
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestWetestReport',
                 'requestReportList'
             ]),
