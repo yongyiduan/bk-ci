@@ -557,7 +557,6 @@ export default {
                     data: responses
                 }
             } catch (e) {
-
                 this.handleError(e, [{
                     actionId: this.$permissionActionMap.edit,
                     resourceId: this.$permissionResourceMap.pipeline,
