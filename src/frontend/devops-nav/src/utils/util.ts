@@ -206,11 +206,11 @@ export function toggleDialog (options) {
     eventBus.$emit('update-extension-dialog', options)
 }
 export function goToPage (options) {
-  if (!isObject(options)) {
-      console.warn('需要传入一个对象')
-      return
-  }
-  eventBus.$emit('change-extension-route', options)
+    if (!isObject(options)) {
+        console.warn('需要传入一个对象')
+        return
+    }
+    eventBus.$emit('change-extension-route', options)
 }
 export class HttpError extends Error {
     code = 500
