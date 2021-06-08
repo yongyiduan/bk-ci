@@ -323,7 +323,7 @@
             flex-direction: column;
             width: 100%;
             overflow: hidden;
-            .bk-tab-section {
+            .bk-tab-content {
                 overflow: auto;
             }
         }
