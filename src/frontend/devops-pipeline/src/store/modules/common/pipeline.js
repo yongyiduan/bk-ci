@@ -160,7 +160,6 @@ export const mutations = {
 }
 
 export const actions = {
-
     // 获取模板的所有范畴
     requestCategory: async ({ commit }) => {
         try {
@@ -187,7 +186,6 @@ export const actions = {
     requestStoreTemplate: async ({ commit }, params) => {
         return request.get(`/${STORE_API_URL_PREFIX}/user/market/template/list`, { params })
     },
-
     requestQualityAtom: async ({ commit }, { projectId }) => {
         try {
             const response = await request.get(`/${QUALITY_API_URL_PREFIX}/user/controlPoints/v2/list?projectId=${projectId}`)
@@ -232,7 +230,7 @@ export const actions = {
     requestMatchTemplateRuleList: async ({ commit }, { projectId, templateId }) => {
         try {
             const response = await request.get(`/${QUALITY_API_URL_PREFIX}/user/rules/v2/${projectId}/matchTemplateRuleList?templateId=${templateId}`)
-            console.log('get', response.data)
+
             commit(INTERCEPT_TEMPLATE_MUTATION, {
                 templateRuleList: response.data
             })
@@ -386,8 +384,22 @@ export const actions = {
             return response.data
         })
     },
-
     updateRefreshQualityLoading: ({ commit }, status) => {
         commit(REFRESH_QUALITY_LOADING_MUNTATION, status)
+    }
+}
+
+export const getters = {
+    getAppNodes: state => (os) => state.appNodes[os] || {},
+    getHasAtomCheck: state => (stages, atom) => {
+        return stages.some((stage, index) => {
+            if (index) {
+                return stage.containers.some(container => {
+                    return container.elements.find(el => {
+                        return el.atomCode === atom
+                    })
+                })
+            }
+        })
     }
 }
