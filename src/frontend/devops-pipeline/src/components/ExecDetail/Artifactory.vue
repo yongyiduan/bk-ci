@@ -62,8 +62,8 @@
                 }
                 this.isLoading = true
                 Promise.all([
-                    this.$store.dispatch('soda/requestPartFile', postData),
-                    this.$store.dispatch('soda/requestExecPipPermission', permissionData)
+                    this.$store.dispatch('common/requestPartFile', postData),
+                    this.$store.dispatch('common/requestExecPipPermission', permissionData)
                 ]).then(([res, permission]) => {
                     this.artifactories = res.records || []
                     this.hasPermission = permission

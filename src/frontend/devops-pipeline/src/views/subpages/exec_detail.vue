@@ -340,7 +340,7 @@
 
         mounted () {
             this.requestPipelineExecDetail(this.routerParams)
-            this.$store.dispatch('soda/requestInterceptAtom', {
+            this.$store.dispatch('common/requestInterceptAtom', {
                 projectId: this.routerParams.projectId,
                 pipelineId: this.routerParams.pipelineId
             })
@@ -364,7 +364,7 @@
                 'getInitLog',
                 'getAfterLog'
             ]),
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestInterceptAtom'
             ]),
             convertMStoStringByRule,

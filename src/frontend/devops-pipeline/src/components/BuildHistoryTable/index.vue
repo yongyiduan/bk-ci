@@ -467,7 +467,7 @@
                         files: [artifactory.name],
                         copyAll: false
                     }
-                    const res = await this.$store.dispatch('soda/requestCopyArtifactory', {
+                    const res = await this.$store.dispatch('common/requestCopyArtifactory', {
                         projectId,
                         pipelineId,
                         buildId: this.currentBuildId,
