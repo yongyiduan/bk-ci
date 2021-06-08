@@ -27,19 +27,20 @@
 
 package com.tencent.devops.common.log.pojo
 
-import com.tencent.devops.common.event.annotation.Event
-import com.tencent.devops.common.event.dispatcher.pipeline.mq.MQ
 import com.tencent.devops.common.log.pojo.enums.LogStorageMode
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-@Event(MQ.EXCHANGE_LOG_STATUS_BUILD_EVENT, MQ.ROUTE_LOG_STATUS_BUILD_EVENT)
-data class LogStatusEvent(
-    override val buildId: String,
-    val finished: Boolean,
-    val tag: String,
-    val subTag: String?,
-    val jobId: String,
-    val executeCount: Int?,
-    val logStorageMode: LogStorageMode? = LogStorageMode.UPLOAD,
-    override val retryTime: Int = 2,
-    override val delayMills: Int = 0
-) : ILogEvent(buildId, retryTime, delayMills)
+/**
+ *
+ * Powered By Tencent
+ */
+@ApiModel("日志状态查询模型")
+data class QueryLogStatus(
+    @ApiModelProperty("构建ID", required = true)
+    val buildId: String,
+    @ApiModelProperty("是否结束", required = true)
+    var finished: Boolean,
+    @ApiModelProperty("日志存储状态", required = false)
+    var logMode: LogStorageMode
+)
