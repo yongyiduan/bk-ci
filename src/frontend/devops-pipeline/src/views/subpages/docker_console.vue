@@ -99,7 +99,7 @@
         methods: {
             async linkDevCloud () {
                 try {
-                    const res = await this.$store.dispatch('soda/startDebugDevcloud', {
+                    const res = await this.$store.dispatch('common/startDebugDevcloud', {
                         pipelineId: this.pipelineId,
                         vmSeqId: this.vmSeqId,
                         buildId: this.buildId
@@ -115,7 +115,7 @@
             async getContainerInfo () {
                 clearTimeout(this.timer)
                 try {
-                    const res = await this.$store.dispatch('soda/getContainerInfo', {
+                    const res = await this.$store.dispatch('common/getContainerInfo', {
                         projectId: this.projectId,
                         pipelineId: this.pipelineId,
                         vmSeqId: this.vmSeqId
@@ -148,7 +148,7 @@
                     .then(async () => {
                         try {
                             if (this.consoleType === 'DOCKER') {
-                                await this.$store.dispatch('soda/stopDebugDocker', {
+                                await this.$store.dispatch('common/stopDebugDocker', {
                                     projectId: this.projectId,
                                     pipelineId: this.pipelineId,
                                     vmSeqId: this.vmSeqId
@@ -156,7 +156,7 @@
                             } else if (this.consoleType === 'DEVCLOUD') {
                                 this.isExiting = true
                                 this.url = ''
-                                this.$store.dispatch('soda/stopDebugDevcloud', {
+                                this.$store.dispatch('common/stopDebugDevcloud', {
                                     projectId: this.projectId,
                                     pipelineId: this.pipelineId,
                                     vmSeqId: this.vmSeqId,
@@ -183,7 +183,7 @@
                     if (!containerId || !targetIp) {
                         throw Error(this.$t('editPage.docker.abnormalParams'))
                     }
-                    const execId = await this.$store.dispatch('soda/getDockerExecId', {
+                    const execId = await this.$store.dispatch('common/getDockerExecId', {
                         targetIp,
                         containerId,
                         projectId: this.projectId,

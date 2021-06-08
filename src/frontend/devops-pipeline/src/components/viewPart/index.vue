@@ -277,8 +277,8 @@
                         this.curIndexItemUrl = res.url
                     } else {
                         const [isDevnet, res] = await Promise.all([
-                            this.$store.dispatch('soda/requestDevnetGateway'),
-                            this.$store.dispatch('soda/requestDownloadUrl', {
+                            this.$store.dispatch('common/requestDevnetGateway'),
+                            this.$store.dispatch('common/requestDownloadUrl', {
                                 projectId: this.projectId,
                                 artifactoryType: row.artifactoryType,
                                 path: row.path

@@ -4,12 +4,13 @@
             <label class="bk-label label">{{ $t('settings.authType') }}：</label>
             <div class="bk-form-content">
                 <label class="bk-form-radio" v-for="type in powerTypeList" :key="type.value">
-                    <input type="radio"
+                    <input
+                        type="radio"
                         :value="type.value"
                         :name="type.name"
                         :checked="powerType === type.value"
                         @change="handlePowerRadio"
-                    >
+                    />
                     <i class="bk-radio-text">{{type.label}}</i>
                 </label>
             </div>
@@ -119,6 +120,10 @@
             }
         },
         computed: {
+            ...mapState('common', [
+                'pipelineSetting',
+                'projectGroupAndUsers'
+            ]),
             projectId () {
                 return this.$route.params.projectId
             },
@@ -127,11 +132,7 @@
             },
             longProjectId () {
                 return this.$store.state.curProject.projectId || ''
-            },
-            ...mapState('soda', [
-                'pipelineSetting',
-                'projectGroupAndUsers'
-            ])
+            }
         },
         watch: {
             '$route.params.pipelineId': async function (pipelineId, oldId) {
@@ -150,7 +151,7 @@
             await this.requestRoleList()
         },
         methods: {
-            ...mapActions('soda', [
+            ...mapActions('pipelines', [
                 'requestProjectGroupAndUsers'
             ]),
             dataChange (data) {

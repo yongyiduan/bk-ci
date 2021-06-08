@@ -179,7 +179,7 @@
             this.updateCruveConnectHeight()
         },
         methods: {
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'startDebugDocker'
             ]),
             ...mapActions('atom', [

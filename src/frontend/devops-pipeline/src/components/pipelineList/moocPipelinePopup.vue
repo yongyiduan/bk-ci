@@ -138,7 +138,7 @@
         },
 
         computed: {
-            ...mapState('soda', [
+            ...mapState('common', [
                 'pipelineTemplate'
             ]),
             ...mapGetters({
@@ -211,7 +211,7 @@
         },
 
         methods: {
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestCategory',
                 'requestPipelineTemplate',
                 'requestStoreTemplate'

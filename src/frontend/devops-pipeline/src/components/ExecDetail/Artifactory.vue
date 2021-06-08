@@ -80,8 +80,8 @@
 
             downLoadFile (row) {
                 Promise.all([
-                    this.$store.dispatch('soda/requestDevnetGateway'),
-                    this.$store.dispatch('soda/requestDownloadUrl', {
+                    this.$store.dispatch('common/requestDevnetGateway'),
+                    this.$store.dispatch('common/requestDownloadUrl', {
                         projectId: this.$route.params.projectId,
                         artifactoryType: row.artifactoryType,
                         path: row.path
