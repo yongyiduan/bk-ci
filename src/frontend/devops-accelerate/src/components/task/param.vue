@@ -77,7 +77,9 @@
 
         methods: {
             valueChange (key, value) {
-                this.$set(this.copyFormData.configParam, key, value)
+                if (this.copyFormData.configParam) {
+                    this.$set(this.copyFormData.configParam, key, value)
+                }
             },
 
             requireRule (config) {
