@@ -20,7 +20,7 @@
 /**
  * @file eslint config
  */
-
+ 
 module.exports = {
     extends: [
         '../.eslintrc.js'
@@ -43,13 +43,19 @@ module.exports = {
     ],
     globals: {
         'LOGOUT_SERVICE_URL': false,
-        'DEVOPS_LS_VERSION': false
+        'DEVOPS_LS_VERSION': false,
+        'BK_CI_VERSION': false
     },
     overrides: [
         {
-            files: ['*.ts', '*.vue'],
+            files: ['*.vue'],
             rules: {
-                'indent': 'off',
+                indent: 'off'
+            }
+        },
+        {
+            files: ['*.ts'],
+            rules: {
                 'no-unused-vars': 'off',
                 '@typescript-eslint/no-unused-vars': 'error'
             }

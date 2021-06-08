@@ -1,13 +1,7 @@
-<template>
     <div class="biz-content">
         <div class="biz-top-bar">
             <div class="biz-image-library-title">
                 公共镜像
-            </div>
-            <!-- <bk-guide></bk-guide> -->
-            <div class="biz-actions">
-                <a :href="`${DOCS_URL_PREFIX}/x/Lozm`"
-                    target="_blank" class="bk-text-button ml10">如何推镜像？</a>
             </div>
         </div>
         <div class="biz-content-wrapper" style="padding: 0;">

@@ -38,9 +38,7 @@
                             <bk-popover placement="right" :max-width="250">
                                 <i class="devops-icon icon-info-circle"></i>
                                 <div slot="content" style="white-space: normal;">
-                                    <div>
-                                        {{ getTypeDesc(localConfig.credentialType) }}
-                                    </div>
+                                    <div> {{ getTypeDesc(localConfig.credentialType) }}<a style="color:#3c96ff" target="_blank" :href="`${DOCS_URL_PREFIX}/services/ticket`">{{ $t('ticket.learnMore') }}。</a> </div>
                                 </div>
                             </bk-popover>
                         </div>
@@ -149,6 +147,7 @@
         },
         data () {
             return {
+                DOCS_URL_PREFIX,
                 showContent: false,
                 hasPermission: true,
                 newModel: {},
