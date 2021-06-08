@@ -50,7 +50,7 @@
             async handleSelectTcmId (name, value) {
                 this.handleUpdateElement(name, value)
                 if (value && this.appId) {
-                    const res = await this.$store.dispatch('soda/getTcmTemplate', {
+                    const res = await this.$store.dispatch('common/getTcmTemplate', {
                         appId: this.appId,
                         tcmId: value
                     })
@@ -66,7 +66,7 @@
             async handleSelectTemplate (name, value) {
                 this.handleUpdateElement(name, value)
                 if (value && this.appId && this.element.tcmAppId) {
-                    const res = await this.$store.dispatch('soda/getTcmTemplateParam', {
+                    const res = await this.$store.dispatch('common/getTcmTemplateParam', {
                         appId: this.appId,
                         tcmId: this.element.tcmAppId,
                         templateId: value

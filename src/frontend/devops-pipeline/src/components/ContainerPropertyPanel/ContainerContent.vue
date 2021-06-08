@@ -500,7 +500,7 @@
                 'getMacSysVersion',
                 'getMacXcodeVersion'
             ]),
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'startDebugDocker',
                 'getContainerInfoByBuildId',
                 'startDebugDevcloud'

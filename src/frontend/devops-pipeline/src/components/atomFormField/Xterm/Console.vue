@@ -78,7 +78,7 @@
             },
             handleResize (size) {
                 this.$nextTick(() => {
-                    this.resizeUrl && this.$store.dispatch('soda/resizeTerm', {
+                    this.resizeUrl && this.$store.dispatch('common/resizeTerm', {
                         resizeUrl: this.resizeUrl,
                         params: {
                             exec_id: this.execId,

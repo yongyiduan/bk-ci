@@ -160,7 +160,7 @@ export const mutations = {
 }
 
 export const actions = {
-    
+
     // 获取模板的所有范畴
     requestCategory: async ({ commit }) => {
         try {
@@ -386,7 +386,7 @@ export const actions = {
             return response.data
         })
     },
-    
+
     updateRefreshQualityLoading: ({ commit }, status) => {
         commit(REFRESH_QUALITY_LOADING_MUNTATION, status)
     }

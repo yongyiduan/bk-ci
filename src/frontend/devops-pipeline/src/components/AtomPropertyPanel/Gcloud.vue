@@ -39,7 +39,7 @@
             }
         },
         computed: {
-            ...mapState('soda', [
+            ...mapState('common', [
                 'gcloudTempList'
             ]),
             projectId () {
@@ -88,7 +88,7 @@
         },
 
         methods: {
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestGcloudTempList'
             ]),
             updateTemplateList () {
