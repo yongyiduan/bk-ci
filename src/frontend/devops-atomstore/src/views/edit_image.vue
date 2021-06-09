@@ -29,6 +29,7 @@
                             :id="option.categoryCode"
                             :name="option.categoryName"
                             :placeholder="$t('store.请选择范畴')"
+                            @click.native="changeShowAgentType(option)"
                         >
                         </bk-option>
                     </bk-select>
@@ -53,6 +54,30 @@
                 </bk-form-item>
                 <bk-form-item :label="$t('store.标签')" property="labelIdList">
                     <bk-tag-input v-model="form.labelIdList" :list="labelList" display-key="labelName" search-key="labelName" trigger="focus" :placeholder="$t('store.请选择标签')"></bk-tag-input>
+                </bk-form-item>
+                <bk-form-item :label="$t('store.适用机器')"
+                    property="agentTypeScope"
+                    :required="true"
+                    :rules="[requireRule]"
+                    ref="agentTypeScope"
+                    v-if="needAgentType"
+                    error-display-type="normal"
+                >
+                    <bk-select
+                        v-model="form.agentTypeScope"
+                        searchable
+                        multiple
+                        show-select-all
+                        :loading="isLoadingAgent"
+                        @toggle="handlerFetchAgentTypes">
+                        <bk-option v-for="(option, index) in agentTypes"
+                            :key="index"
+                            :id="option.code"
+                            :name="option.name"
+                            :placeholder="$t('store.请选择适用机器')"
+                        >
+                        </bk-option>
+                    </bk-select>
                 </bk-form-item>
                 <bk-form-item :label="$t('store.简介')"
                     property="summary"
@@ -267,17 +292,21 @@
                     versionContent: '',
                     ticketId: '',
                     projectCode: '',
-                    category: ''
+                    category: '',
+                    agentTypeScope: []
                 },
                 docsLink: `${DOCS_URL_PREFIX}/store/ci-images/image-build`,
                 ticketList: [],
                 classifys: [],
                 labelList: [],
                 categoryList: [],
+                agentTypes: [],
                 imageList: [],
                 imageVersionList: [],
                 isLoading: false,
                 isLoadingTag: false,
+                isLoadingAgent: false,
+                needAgentType: false,
                 originVersion: '',
                 requireRule: {
                     required: true,
@@ -335,8 +364,34 @@
                 'requestImageList',
                 'requestImageTagList',
                 'requestTicketList',
-                'requestReleaseImage'
+                'requestReleaseImage',
+                'fetchAgentTypes'
             ]),
+
+            handlerFetchAgentTypes (v) {
+                if (v) {
+                    let message, theme
+                    this.isLoadingAgent = true
+                    this.fetchAgentTypes().then((res) => {
+                        this.agentTypes = res
+                    }).catch((err) => {
+                        message = err.message ? err.message : err
+                        theme = 'error'
+
+                        this.$bkMessage({
+                            message,
+                            theme
+                        })
+                    }).finally(() => {
+                        this.isLoadingAgent = false
+                    })
+                }
+            },
+
+            changeShowAgentType (option) {
+                const settings = option.settings || {}
+                this.needAgentType = settings.needAgentType === 'NEED_AGENT_TYPE_TRUE'
+            },
 
             submitImage () {
                 if (this.form.dockerFileType === 'INPUT') this.form.dockerFileContent = this.$refs.codeEditor.getValue()
@@ -413,6 +468,9 @@
                             this.labelList = labels
                             this.categoryList = categorys
                             this.ticketList = ticket.records || []
+                            const currentCategory = categorys.find((category) => (res.category === category.categoryCode)) || {}
+                            const settings = currentCategory.settings || {}
+                            this.needAgentType = settings.needAgentType === 'NEED_AGENT_TYPE_TRUE'
                             
                             if (this.form.imageRepoName && this.form.imageSourceType === 'BKDEVOPS') {
                                 const imageRepo = this.form.imageRepoName
