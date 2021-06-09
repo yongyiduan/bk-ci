@@ -20,6 +20,7 @@
 /**
  * @file eslint config
  */
+
 module.exports = {
     extends: [
         '../.eslintrc.js'

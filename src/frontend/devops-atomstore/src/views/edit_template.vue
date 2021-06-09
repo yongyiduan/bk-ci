@@ -167,7 +167,7 @@
             return {
                 showContent: false,
                 descTemplate: '',
-                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008944`,
+                docsLink: `${DOCS_URL_PREFIX}/store/store-home`,
                 sortList: [],
                 labelList: [],
                 categoryList: [],

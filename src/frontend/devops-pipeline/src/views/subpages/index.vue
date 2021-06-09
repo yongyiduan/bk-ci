@@ -289,7 +289,7 @@
                 })
             },
             async handleSearchPipeline (value, e) {
-                console.log('searchValue', value)
+                if (this.pipelineListSearching) return
                 this.pipelineListSearching = true
                 await this.fetchPipelineList(value)
                 this.pipelineListSearching = false

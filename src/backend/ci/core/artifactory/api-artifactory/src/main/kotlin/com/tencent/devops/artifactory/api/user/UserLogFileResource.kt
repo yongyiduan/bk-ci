@@ -25,34 +25,49 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.project.api.service
+package com.tencent.devops.artifactory.api.user
 
-import com.tencent.bk.sdk.iam.dto.callback.request.CallbackRequestDTO
-import com.tencent.bk.sdk.iam.dto.callback.response.CallbackBaseResponseDTO
-import com.tencent.devops.common.api.auth.AUTH_HEADER_IAM_TOKEN
+import com.tencent.devops.artifactory.pojo.Url
+import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
+import com.tencent.devops.common.api.pojo.Result
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import javax.ws.rs.Consumes
+import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
-import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 
-@Api(tags = ["AUTH_CALLBACK_PROJECT"], description = "iam回调project接口")
-@Path("/open/project/callback")
+@Api(tags = ["USER_ARTIFACTORY"], description = "仓库-文件管理")
+@Path("/user/artifactories/log")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-interface ServiceProjectAuthResource {
-    @POST
-    @Path("/")
-    @ApiOperation("iam项目回调接口")
-    fun projectInfo(
-        @HeaderParam(AUTH_HEADER_IAM_TOKEN)
-        @ApiParam("token")
-        token: String,
-        @ApiParam(value = "回调信息")
-        callBackInfo: CallbackRequestDTO
-    ): CallbackBaseResponseDTO?
+interface UserLogFileResource {
+
+    @ApiOperation("下载日志")
+    @GET
+    @Path("plugin/{projectId}/{pipelineId}/{buildId}/{elementId}/{executeCount}")
+    fun getPluginLogUrl(
+        @ApiParam("userId", required = true)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("项目 ID", required = true)
+        @PathParam("projectId")
+        projectId: String,
+        @ApiParam("流水线 ID", required = true)
+        @PathParam("pipelineId")
+        pipelineId: String,
+        @ApiParam("构建 ID", required = true)
+        @PathParam("buildId")
+        buildId: String,
+        @ApiParam("插件 elementId", required = true)
+        @PathParam("elementId")
+        elementId: String,
+        @ApiParam("执行序号", required = true)
+        @PathParam("executeCount")
+        executeCount: String
+    ): Result<Url>
 }

@@ -82,6 +82,7 @@ object Runner {
             } finally {
                 LoggerService.stop()
                 Heartbeat.stop()
+                LoggerService.archiveLogFiles()
                 EngineService.endBuild()
             }
         } catch (ignore: Exception) {
@@ -112,6 +113,7 @@ object Runner {
         LoggerService.executeCount = retryCount.toInt() + 1
         LoggerService.jobId = buildVariables.containerHashId
         LoggerService.elementId = VMUtils.genStartVMTaskId(buildVariables.containerId)
+        LoggerService.buildVariables = buildVariables
 
         showBuildStartupLog(buildVariables.buildId, buildVariables.vmSeqId)
         showMachineLog(buildVariables.vmName)
@@ -120,10 +122,12 @@ object Runner {
 
         Heartbeat.start(buildVariables.timeoutMills) // #2043 添加Job超时监控
 
-        return workspaceInterface.getWorkspace(
+        val workspaceAndLogPath = workspaceInterface.getWorkspaceAndLogDir(
             variables = buildVariables.variablesWithType.associate { it.key to it.value.toString() },
             pipelineId = buildVariables.pipelineId
         )
+        LoggerService.pipelineLogDir = workspaceAndLogPath.second
+        return workspaceAndLogPath.first
     }
 
     private fun loopPickup(workspacePathFile: File, buildVariables: BuildVariables): Boolean {
@@ -146,6 +150,7 @@ object Runner {
                     val taskDaemon = TaskDaemon(task, buildTask, buildVariables, workspacePathFile)
                     try {
                         LoggerService.elementId = buildTask.elementId!!
+                        LoggerService.elementName = buildTask.elementName ?: LoggerService.elementId
 
                         // 开始Task执行
                         taskDaemon.run()
@@ -162,6 +167,7 @@ object Runner {
                     } finally {
                         LoggerService.finishTask()
                         LoggerService.elementId = ""
+                        LoggerService.elementName = ""
                     }
                 }
                 BuildTaskStatus.WAIT -> Thread.sleep(5000)

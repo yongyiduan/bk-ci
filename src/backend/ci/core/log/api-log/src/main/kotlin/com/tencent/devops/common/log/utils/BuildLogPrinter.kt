@@ -180,28 +180,6 @@ class BuildLogPrinter(
         executeCount = executeCount
     )
 
-    fun updateLogStatus(
-        buildId: String,
-        finished: Boolean,
-        tag: String,
-        subTag: String? = null,
-        jobId: String? = null,
-        executeCount: Int?
-    ) {
-        try {
-            genLogPrintPrintResource().updateLogStatus(
-                buildId = buildId,
-                finished = finished,
-                tag = tag,
-                subTag = subTag,
-                jobId = jobId ?: "",
-                executeCount = executeCount
-            )
-        } catch (e: Exception) {
-            logger.error("[$buildId]|updateLogStatus error|finished=$finished", e)
-        }
-    }
-
     fun stopLog(
         buildId: String,
         tag: String,
@@ -217,6 +195,29 @@ class BuildLogPrinter(
             jobId = jobId,
             executeCount = executeCount
         )
+    }
+
+    private fun updateLogStatus(
+        buildId: String,
+        finished: Boolean,
+        tag: String,
+        subTag: String? = null,
+        jobId: String? = null,
+        executeCount: Int?
+    ) {
+        try {
+            // TODO 增加日志存储模式
+            genLogPrintPrintResource().updateLogStatus(
+                buildId = buildId,
+                finished = finished,
+                tag = tag,
+                subTag = subTag,
+                jobId = jobId ?: "",
+                executeCount = executeCount
+            )
+        } catch (e: Exception) {
+            logger.error("[$buildId]|updateLogStatus error|finished=$finished", e)
+        }
     }
 
     private fun genLogMessage(
