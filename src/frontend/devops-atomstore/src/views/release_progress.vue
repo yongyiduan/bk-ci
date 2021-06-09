@@ -258,7 +258,7 @@
                 currentBuildNo: '',
                 currentPipelineId: '',
                 timer: -1,
-                docsLink: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=15008942`,
+                docsLink: `${DOCS_URL_PREFIX}/store/plugins/create-plugin`,
                 showContent: false,
                 isOverflow: false,
                 isDropdownShow: false,
