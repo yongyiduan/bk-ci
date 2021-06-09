@@ -25,61 +25,48 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.auth.api
+package com.tencent.devops.auth.filter
 
-import org.springframework.beans.factory.annotation.Value
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_BK_TOKEN
+import com.tencent.devops.common.api.exception.TokenForbiddenException
+import com.tencent.devops.common.client.ClientTokenService
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import javax.servlet.Filter
+import javax.servlet.FilterChain
+import javax.servlet.FilterConfig
+import javax.servlet.ServletRequest
+import javax.servlet.ServletResponse
+import javax.servlet.http.HttpServletRequest
 
 @Component
-class BkAuthProperties {
-    @Value("\${auth.envName:#{null}}")
-    val envName: String? = null
+class TokenCheckFilter @Autowired constructor(
+    val clientTokenService: ClientTokenService
+) : Filter {
+    override fun destroy() = Unit
 
-    @Value("\${auth.idProvider:#{null}}")
-    val idProvider: String? = null
+    override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
+        if (request == null || chain == null) {
+            return
+        }
+        val httpServletRequest = request as HttpServletRequest
+        val token = httpServletRequest.getHeader(AUTH_HEADER_DEVOPS_BK_TOKEN)
 
-    @Value("\${auth.grantType:#{null}}")
-    val grantType: String? = null
+        if (!httpServletRequest.pathInfo.contains("/open")) {
+            return chain.doFilter(request, response)
+        }
+        if (token != clientTokenService.getSystemToken(null)) {
+            logger.warn("auth token fail: $token")
+            throw TokenForbiddenException("token check fail")
+        }
 
-    @Value("\${auth.url:#{null}}")
-    val url: String? = null
+        chain.doFilter(request, response)
+    }
 
-    @Value("\${auth.bcsSecret:#{null}}")
-    val bcsSecret: String? = null
+    override fun init(filterConfig: FilterConfig?) = Unit
 
-    @Value("\${auth.codeSecret:#{null}}")
-    val codeSecret: String? = null
-
-    @Value("\${auth.pipelineSecret:#{null}}")
-    val pipelineSecret: String? = null
-
-    @Value("\${auth.artifactorySecret:#{null}}")
-    val artifactorySecret: String? = null
-
-    @Value("\${auth.ticketSecret:#{null}}")
-    val ticketSecret: String? = null
-
-    @Value("\${auth.environmentSecret:#{null}}")
-    val environmentSecret: String? = null
-
-    @Value("\${auth.experienceSecret:#{null}}")
-    val experienceSecret: String? = null
-
-    @Value("\${auth.thirdPartyAgentSecret:#{null}}")
-    val thirdPartyAgentSecret: String? = null
-
-    @Value("\${auth.vsSecret:#{null}}")
-    val vsSecret: String? = null
-
-    @Value("\${auth.qualitySecret:#{null}}")
-    val qualitySecret: String? = null
-
-    @Value("\${auth.wetestSecret:#{null}}")
-    val wetestSecret: String? = null
-
-    @Value("\${auth.authSecret:#{null}}")
-    val authSecret: String? = null
-
-    @Value("\${auth.ignore:#{null}}")
-    val ignoreService: String? = null
+    companion object {
+        private val logger = LoggerFactory.getLogger(TokenCheckFilter::class.java)
+    }
 }

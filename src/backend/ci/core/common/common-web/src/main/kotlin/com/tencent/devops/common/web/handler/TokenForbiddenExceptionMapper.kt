@@ -25,31 +25,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.auth.code
+package com.tencent.devops.common.web.handler
 
-/**
- * 服务模块
- */
-enum class BSAuthServiceCode(val value: String) {
-    COMMON("bk_ci_auth"),
-    BCS("bcs"),
-    CODE("code"),
-    PIPELINE("pipeline"),
-    ARTIFACTORY("artifactory"),
-    TICKET("ticket"),
-    PROJECT("project"),
-    ENVIRONMENT("environment"),
-    EXPERIENCE("experience"),
-    VS("vs"),
-    QUALITY("quality_gate"),
-    WETEST("wetest");
+import com.tencent.devops.common.api.exception.PermissionForbiddenException
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.service.Profile
+import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.common.web.annotation.BkExceptionMapper
+import org.slf4j.LoggerFactory
+import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
+import javax.ws.rs.ext.ExceptionMapper
 
+@BkExceptionMapper
+class TokenForbiddenExceptionMapper : ExceptionMapper<PermissionForbiddenException> {
     companion object {
-        fun get(value: String): BSAuthServiceCode {
-            values().forEach {
-                if (value == it.value) return it
-            }
-            throw IllegalArgumentException("No enum for constant $value")
+        val logger = LoggerFactory.getLogger(TokenForbiddenExceptionMapper::class.java)!!
+    }
+
+    override fun toResponse(exception: PermissionForbiddenException): Response {
+        logger.warn("Encounter token exception(${exception.message})")
+        val status = Response.Status.FORBIDDEN
+        val message = if (SpringContextUtil.getBean(Profile::class.java).isDebug()) {
+            exception.defaultMessage
+        } else {
+            "auth token 校验失败"
         }
+        return Response.status(status).type(MediaType.APPLICATION_JSON_TYPE)
+            .entity(Result(status = status.statusCode, message = message, data = exception.message)).build()
     }
 }
