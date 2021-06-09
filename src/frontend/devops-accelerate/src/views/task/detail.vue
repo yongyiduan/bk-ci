@@ -19,7 +19,7 @@
 
                 <section class="task-record">
                     <h3 class="create-title g-accelerate-deep-black-font"> {{ $t('accelerate.更新记录') }} </h3>
-                    <bk-form :label-width="100" class="g-accelerate-form-left record-form">
+                    <bk-form :label-width="130" class="g-accelerate-form-left record-form">
                         <bk-form-item :label="$t('accelerate.创建人：')">
                             {{ formData.createdBy }}
                         </bk-form-item>

@@ -11,10 +11,10 @@
                     <logo name="thumbtack" class="icon-thumbtack"></logo>
                 </span>
 
-                <h3 class="card-head" @click="toggleShowCard(task)">
+                <h3 :class="['card-head', { 'disabled': !task.openStatus }]" @click="toggleShowCard(task)">
                     <p class="task-name">
                         <span class="g-accelerate-deep-black-font name-desc" @click.stop="$router.push({ name: 'taskDetail', params: { id: task.planId } })">
-                            <span class="g-accelerate-text-overflow">{{ task.planName }}</span>
+                            <span class="g-accelerate-text-overflow plan-name">{{ task.planName }}</span>
                             <span class="name-detail">{{ task.engineCode }}</span>
                         </span>
                         <span class="g-accelerate-gray-font name-hash g-accelerate-text-overflow">
@@ -148,7 +148,7 @@
             },
 
             copy (value) {
-                copy(value)
+                copy(value, this.$t.bind(this))
             },
 
             modifyTurboPlanTopStatus (row) {
@@ -320,6 +320,11 @@
             padding: 0 28px 0 43px;
             font-weight: normal;
             height: 110px;
+            &.disabled {
+                .plan-name, .name-detail, .rate-num, .rate-title {
+                    color: #c4c6cc;
+                }
+            }
         }
         .task-name {
             flex: 1;

@@ -7,7 +7,10 @@ export default {
         paramEnum: Object,
         paramKey: String,
         disabled: Boolean,
-        paramValue: Object,
+        paramValue: {
+            type: Object,
+            default: () => ({})
+        },
         defaultValue: [String, Array, Object]
     },
 
@@ -26,7 +29,7 @@ export default {
 
     methods: {
         handleDefaultValue () {
-            const curValue = (this.paramValue)[this.paramKey]
+            const curValue = (this.paramValue || {})[this.paramKey]
             if (isEmpty(curValue)) this.changeParamValue(this.defaultValue)
         },
 
