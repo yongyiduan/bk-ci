@@ -55,7 +55,7 @@
                     { name: 'serviceWork',
                       label: this.$t('store.微扩展'),
                       links: [
-                          { name: this.$t('store.微扩展指引'), link: `${DOCS_URL_PREFIX}/pages/viewpage.action?pageId=103523086` }
+                          { name: this.$t('store.微扩展指引'), link: `${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=103523086` }
                       ]
                     }
                 ]

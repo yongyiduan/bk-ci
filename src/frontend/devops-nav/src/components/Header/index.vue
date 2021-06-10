@@ -252,7 +252,7 @@
         }
 
         goToDocs (): void {
-            this.to(`${DOCS_URL_PREFIX}/display/DevOps`)
+            this.to(`${IWIKI_DOCS_URL}/display/DevOps`)
         }
 
         goToPm (): void {

@@ -23,7 +23,7 @@
                 <p class="success-info-desc">例1、make 改为bk-make -p $PROJECTID {{ extraParam() }}</p>
                 <p class="success-info-desc">例2、make all 改为 bk-make -p $PROJECTID -a "all" {{ extraParam() }}</p>
                 <p class="success-info-desc">
-                    <a :href="`${DOCS_URL_PREFIX}/x/sobm`"
+                    <a :href="`${IWIKI_DOCS_URL}/x/sobm`"
                         class="text-link" target="_blank">查看更多修改案例</a></p>
             </div>
         </template>
@@ -48,7 +48,7 @@
                 <br />
                 <p class="success-info-desc">-a 用于传递原始blade命令后面带的参数</p>
                 <p class="success-info-desc">
-                    <a :href="`${DOCS_URL_PREFIX}/x/sobm`"
+                    <a :href="`${IWIKI_DOCS_URL}/x/sobm`"
                         class="text-link" target="_blank">查看更多修改案例</a></p>
             </div>
         </template>
@@ -72,7 +72,7 @@
                 <br />
                 <p class="success-info-desc">-a 用于传递原始bazel命令后面带的参数</p>
                 <p class="success-info-desc">
-                    <a :href="`${DOCS_URL_PREFIX}/x/sobm`"
+                    <a :href="`${IWIKI_DOCS_URL}/x/sobm`"
                         class="text-link" target="_blank">查看更多修改案例</a></p>
             </div>
         </template>
@@ -86,7 +86,7 @@
                 <p class="success-info-title-level-2">2、使用bk-make来替代make，并加上编译加速任务ID和流水线当前构建ID参数</p>
                 <p class="success-info-desc">make改为bk-make -p ${turbo.task.id} -b ${pipeline.build.id} {{ extraParam() }}</p>
                 <p class="success-info-desc">
-                    <a :href="`${DOCS_URL_PREFIX}/x/tYbm`"
+                    <a :href="`${IWIKI_DOCS_URL}/x/tYbm`"
                         class="text-link" target="_blank">查看更多修改案例</a></p>
             </div>
         </template>
@@ -110,7 +110,7 @@
                 <br />
                 <p class="success-info-desc">-a 用于传递原始blade命令后面带的参数</p>
                 <p class="success-info-desc">
-                    <a :href="`${DOCS_URL_PREFIX}/x/tYbm`"
+                    <a :href="`${IWIKI_DOCS_URL}/x/tYbm`"
                         class="text-link" target="_blank">查看更多修改案例</a></p>
             </div>
         </template>
@@ -133,7 +133,7 @@
                 <br />
                 <p class="success-info-desc">-a 用于传递原始bazel命令后面带的参数</p>
                 <p class="success-info-desc">
-                    <a :href="`${DOCS_URL_PREFIX}/x/tYbm`"
+                    <a :href="`${IWIKI_DOCS_URL}/x/tYbm`"
                         class="text-link" target="_blank">查看更多修改案例</a></p>
             </div>
         </template>
@@ -155,7 +155,7 @@
         data () {
             return {
                 buildText: '',
-                DOCS_URL_PREFIX: DOCS_URL_PREFIX
+                IWIKI_DOCS_URL
             }
         },
         computed: {

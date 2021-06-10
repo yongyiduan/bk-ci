@@ -438,7 +438,7 @@
                 return VERSION_TYPE === 'ee'
             },
             docsPrefix () {
-                return DOCS_URL_PREFIX
+                return IWIKI_DOCS_URL
             }
         },
 

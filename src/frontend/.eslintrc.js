@@ -43,6 +43,7 @@ module.exports = {
     ],
     globals: {
         'DOCS_URL_PREFIX': true,
+        'IWIKI_DOCS_URL': true,
         'LOGIN_SERVICE_URL': true,
         'WEB_URL_PREFIX': true,
         'BUILD_ENV': true,

@@ -67,7 +67,7 @@
                 >{{ item.label }}</span>
                 <div class="bkdevops-button">
                     <a
-                        :href="`${DOCS_URL_PREFIX}/x/kJKj`"
+                        :href="`${IWIKI_DOCS_URL}/x/kJKj`"
                         target="_blank"
                     >
                         <bk-button
@@ -119,7 +119,7 @@
                 <p>
                     {{ $t("bkdevopsDesc") }}
                     <a
-                        :href="`${DOCS_URL_PREFIX}/display/DevOps`"
+                        :href="`${IWIKI_DOCS_URL}/display/DevOps`"
                         class="more"
                         target="_blank"
                     >{{ $t("learnMore") }}</a>
@@ -129,11 +129,6 @@
                 <h2>{{ $t("bkdevopsTarget") }}</h2>
                 <p>
                     {{ $t("bkdevopsWay") }}
-                    <!-- <a
-                        :href="`${DOCS_URL_PREFIX}/x/RY6j`"
-                        target="_blank"
-                        class="more"
-                    >{{ $t("learnMore") }}</a> -->
                 </p>
             </article>
             <article>
@@ -180,7 +175,7 @@
         @State related
         @Action fetchLinks
         isAllServiceListShow: boolean = false
-        DOCS_URL_PREFIX: string = DOCS_URL_PREFIX
+        IWIKI_DOCS_URL: string = IWIKI_DOCS_URL
         BK_CI_VERSION: string = window.BK_CI_VERSION
 
         get funcArray (): object[] {
