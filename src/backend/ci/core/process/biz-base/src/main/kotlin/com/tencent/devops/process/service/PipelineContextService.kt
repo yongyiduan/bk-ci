@@ -55,12 +55,10 @@ import com.tencent.devops.process.pojo.pipeline.ModelDetail
 import com.tencent.devops.process.utils.PIPELINE_BUILD_ID
 import com.tencent.devops.process.utils.PIPELINE_BUILD_NUM
 import com.tencent.devops.process.utils.PIPELINE_START_TYPE
-import com.tencent.devops.process.utils.PIPELINE_START_USER_ID
 import com.tencent.devops.process.utils.PROJECT_NAME
 import com.tencent.devops.ticket.api.ServiceCredentialResource
 import com.tencent.devops.ticket.pojo.Credential
 import com.tencent.devops.ticket.pojo.enums.CredentialType
-import com.tencent.devops.ticket.pojo.enums.Permission
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -98,17 +96,12 @@ class PipelineContextService@Autowired constructor(
         buildVar: Map<String, String>,
         varMap: MutableMap<String, String>
     ) {
-        val userId = buildVar[PIPELINE_START_USER_ID]
         val projectId = buildVar[PROJECT_NAME]
-        if (!userId.isNullOrBlank() && !projectId.isNullOrBlank()) {
-            val credentials = client.get(ServiceCredentialResource::class).hasPermissionList(
-                userId = userId,
+        if (!projectId.isNullOrBlank()) {
+            val credentials = client.get(ServiceCredentialResource::class).list(
                 projectId = projectId,
-                credentialTypesString = null,
-                permission = Permission.USE,
-                page = null,
-                pageSize = null,
-                keyword = null
+                page = 1,
+                pageSize = 1000
             ).data
             if (credentials != null && credentials.records.isNotEmpty()) {
                 credentials.records.forEach { credential ->
