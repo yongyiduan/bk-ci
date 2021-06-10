@@ -119,7 +119,7 @@
             </bk-form-item>
             <bk-form-item class="form-item-text">
                 <a :href="`http://api.devops.oa.com/turbo/api/user/turbo/task/software/${taskParam.taskId}/LD_Turbo_install.tar.gz`" class="bk-form-link" style="margin-left:0;">点击下载编译加速包</a>
-                <a :href="`${DOCS_URL_PREFIX}/x/sobm`"
+                <a :href="`${IWIKI_DOCS_URL}/x/sobm`"
                     class="bk-form-link" target="_blank"
                 >查看编译加速包使用教程</a>
             </bk-form-item>
@@ -163,7 +163,7 @@
                 showLinkElement: false, // 备选
                 pipelineDisabled: false,
                 accelerateId: '',
-                DOCS_URL_PREFIX: DOCS_URL_PREFIX,
+                IWIKI_DOCS_URL,
                 paramsMap: {
                     'osType': {
                         '1': 'tlinux'

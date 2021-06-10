@@ -696,7 +696,7 @@
                     this.constructToolConf.importText = this.$t('environment.comfirm')
                     this.switchConstruct(node)
                 } else if (['CC', 'CMDB'].includes(node.nodeType)) {
-                    const url = `${DOCS_URL_PREFIX}/x/WtMrAg`
+                    const url = `${IWIKI_DOCS_URL}/x/WtMrAg`
                     window.open(url, '_blank')
                 }
             },

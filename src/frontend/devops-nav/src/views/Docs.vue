@@ -129,8 +129,8 @@
             }
         }
 
-        goDetail (link) {
-            const path = `${DOCS_URL_PREFIX}/${link.replace(/^\//, '')}`
+        goDetail (link: string) {
+            const path = `${IWIKI_DOCS_URL}/${link.replace(/^\//, '')}`
             window.open(path, '_self')
         }
 
