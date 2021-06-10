@@ -90,7 +90,7 @@
                     list: [],
                     hasLink: true,
                     linkTitle: '了解更多编译加速',
-                    linkHref: `${DOCS_URL_PREFIX}/x/nobm`
+                    linkHref: `${IWIKI_DOCS_URL}/x/nobm`
                 },
                 emptyInfo: {
                     title: '创建第一个编译加速任务',

@@ -1079,7 +1079,7 @@
                 this.configList.unshift(newItem)
             },
             toInstall () {
-                const url = `${DOCS_URL_PREFIX}/x/WtMrAg`
+                const url = `${IWIKI_DOCS_URL}/x/WtMrAg`
                 window.open(url, '_blank')
             },
             importNewNode () {

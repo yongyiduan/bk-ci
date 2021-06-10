@@ -130,7 +130,7 @@
         },
         data () {
             return {
-                docsURL: `${DOCS_URL_PREFIX}/x/tYbm`,
+                docsURL: `${IWIKI_DOCS_URL}/x/tYbm`,
                 linkUrl: `${CHECK_ENV_URL}/turbo-client/bazel.zip`
             }
         },
