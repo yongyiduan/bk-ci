@@ -256,8 +256,8 @@ export const actions = {
     /**
      * 重新构建
      */
-    rebuild ({ commit }, { atomId, projectId, initProject }) {
-        return vue.$ajax.put(`${prefix}/user/market/desk/atom/release/rebuild/${atomId}?projectId=${projectId}`, {}, { headers: { 'X-DEVOPS-PROJECT-ID': initProject } })
+    rebuild ({ commit }, { atomId, projectId, initProject, fieldCheckConfirmFlag }) {
+        return vue.$ajax.put(`${prefix}/user/market/desk/atom/release/rebuild/${atomId}?projectId=${projectId}`, { fieldCheckConfirmFlag }, { headers: { 'X-DEVOPS-PROJECT-ID': initProject } })
     },
 
     /**
