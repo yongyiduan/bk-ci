@@ -81,6 +81,9 @@
             ...mapState([
                 'fetchError'
             ]),
+            ...mapState('atom', [
+                'editfromImport'
+            ]),
             projectId () {
                 return this.$route.params.projectId
             },
@@ -226,7 +229,7 @@
                 'requestInterceptAtom'
             ]),
             init () {
-                if (!this.isDraftEdit && this.pipelineId) {
+                if (!this.isDraftEdit && !this.editfromImport) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
