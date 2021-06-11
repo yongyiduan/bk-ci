@@ -13,9 +13,10 @@
             >
                 <component :is="'param-' + config.paramType"
                     v-bind="config"
+                    v-if="config.displayed"
                     :disabled="!isEdit"
                     :param-value="copyFormData.configParam"
-                    v-if="config.displayed"
+                    :key="copyFormData.engineCode + config.paramType"
                     @value-change="valueChange"
                 ></component>
             </bk-form-item>
@@ -68,7 +69,6 @@
             formData: {
                 handler (val) {
                     if (JSON.stringify(val) === JSON.stringify(this.copyFormData)) return
-
                     this.copyFormData = JSON.parse(JSON.stringify(this.formData))
                 },
                 immediate: true

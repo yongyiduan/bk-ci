@@ -27,13 +27,13 @@
                     <span> {{ $t('accelerate.根据你的加速场景选择适用的模式') }} </span>
                     <ul class="accelerate-model-list">
                         <li v-for="item in engineList" :key="item" :class="['single-width', 'accelerate-model-item', 'g-accelerate-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]" @click="chooseMode(item)">
-                            <p class="item-title g-accelerate-black-font">{{ item.engineCode }}<span class="recommend" v-if="item.recommend"> {{ $t('accelerate.（荐）') }} <span></span></span></p>
-                            <span class="item-desc g-accelerate-gray-font">{{ item.desc }}</span>
+                            <p class="item-title g-accelerate-black-font">{{ item.engineName }}<span class="recommend" v-if="item.recommend"> {{ $t('accelerate.（荐）') }} <span></span></span></p>
+                            <span class="item-desc g-accelerate-gray-font g-accelerate-text-overflow" v-bk-overflow-tips="{ interactive: true }">{{ item.desc }}</span>
                             <logo name="check" :size="10" class="item-check"></logo>
                         </li>
                     </ul>
                 </template>
-                <span v-else class="accelerate-model-engine">{{ formData.engineCode }}</span>
+                <span v-else class="accelerate-model-engine">{{ formData.engineName }}</span>
             </bk-form-item>
             <bk-form-item :label="$t('accelerate.方案说明')" property="name">
                 <template v-if="isEdit">
@@ -150,12 +150,16 @@
             },
 
             chooseMode (item) {
-                const enginCode = item.engineCode
-                const formData = JSON.parse(JSON.stringify(this.formData))
-                this.copyFormData.engineCode = enginCode
+                if (item.engineCode === this.copyFormData.engineCode) return
+
+                const formData = {
+                    ...JSON.parse(JSON.stringify(this.formData)),
+                    paramConfig: item.paramConfig,
+                    userManual: item.userManual,
+                    engineCode: item.engineCode
+                }
+                this.copyFormData.engineCode = item.engineCode
                 this.copyFormData.paramConfig = item.paramConfig
-                formData.paramConfig = item.paramConfig
-                formData.userManual = item.userManual
                 this.setParamConfig(item.paramConfig)
                 this.$emit('update:formData', formData)
             },
@@ -261,6 +265,7 @@
             .item-desc {
                 font-size: 12px;
                 line-height: 20px;
+                max-width: 100%;
             }
             &:hover {
                 border-color: #3a84ff;
