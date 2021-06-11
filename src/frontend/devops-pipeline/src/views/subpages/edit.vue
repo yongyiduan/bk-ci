@@ -228,10 +228,14 @@
                 'requestInterceptAtom'
             ]),
             init () {
-                if (!this.isDraftEdit && !this.editfromImport) {
+                if (!this.isDraftEdit) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
+                    this.getRoleList()
+                    this.requestProjectGroupAndUsers(this.$route.params)
+                }
+                if (this.editfromImport) {
                     this.getRoleList()
                     this.requestProjectGroupAndUsers(this.$route.params)
                 }
