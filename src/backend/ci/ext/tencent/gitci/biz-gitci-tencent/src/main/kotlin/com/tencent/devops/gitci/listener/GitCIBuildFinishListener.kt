@@ -37,7 +37,6 @@ import com.tencent.devops.common.event.pojo.pipeline.PipelineBuildFinishBroadCas
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.common.ci.OBJECT_KIND_MANUAL
 import com.tencent.devops.common.ci.v2.IfType
-import com.tencent.devops.common.ci.v2.Notices
 import com.tencent.devops.common.ci.v2.ScriptBuildYaml
 import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
 import com.tencent.devops.common.client.Client
@@ -237,13 +236,16 @@ class GitCIBuildFinishListener @Autowired constructor(
                     // 获取需要进行替换的variables
                     val variables =
                         client.get(ServiceVarResource::class).getBuildVar(buildId = build.id, varName = null).data
-                    // 将yaml直接替换，使用替换后的发送通知
-                    val newYaml = EnvUtils.parseEnv(event.normalizedYaml, variables ?: mapOf())
                     val notices = YamlUtil.getObjectMapper().readValue(
-                        newYaml, ScriptBuildYaml::class.java
+                        event.normalizedYaml, ScriptBuildYaml::class.java
                     ).notices
                     notices?.forEach { notice ->
-                        if (!checkStatus(notice, buildStatus)) {
+                        // 替换 variables
+                        if (!checkStatus(build.id, replaceVar(notice.ifField, variables), buildStatus)) {
+                            return@forEach
+                        }
+                        val newType = replaceVar(notice.type, variables)
+                        if (newType.isNullOrBlank()) {
                             return@forEach
                         }
                         sendNotifyV2(
@@ -256,12 +258,12 @@ class GitCIBuildFinishListener @Autowired constructor(
                             event = event,
                             pipeline = pipeline,
                             build = build,
-                            receivers = notice.receivers ?: setOf(),
-                            ccs = notice.ccs?.toMutableSet() ?: mutableSetOf(),
-                            chatIds = notice.chatId ?: mutableSetOf(),
-                            title = notice.title,
-                            content = notice.content,
-                            notifyType = getNoticeType(notice.type)
+                            receivers = replaceVar(notice.receivers, variables),
+                            ccs = replaceVar(notice.ccs, variables)?.toMutableSet(),
+                            chatIds = replaceVar(notice.chatId, variables)?.toMutableSet(),
+                            title = replaceVar(notice.title, variables),
+                            content = replaceVar(notice.content, variables),
+                            notifyType = getNoticeType(build.id, newType)
                         )
                     }
                 } else {
@@ -290,25 +292,26 @@ class GitCIBuildFinishListener @Autowired constructor(
     }
 
     // 校验V2通知状态
-    private fun checkStatus(notice: Notices, buildStatus: BuildStatus): Boolean {
+    private fun checkStatus(buildId: String, ifField: String?, buildStatus: BuildStatus): Boolean {
         // 未填写则所有状态都发送
-        if (notice.ifField == null) {
+        if (ifField.isNullOrBlank()) {
             return true
         }
-        return when (notice.ifField) {
-            IfType.SUCCESS -> {
+        return when (ifField) {
+            IfType.SUCCESS.name -> {
                 return buildStatus.isSuccess()
             }
-            IfType.FAILURE -> {
+            IfType.FAILURE.name -> {
                 return buildStatus.isFailure()
             }
-            IfType.CANCELLED -> {
+            IfType.CANCELLED.name -> {
                 return buildStatus.isCancel()
             }
-            IfType.ALWAYS -> {
+            IfType.ALWAYS.name -> {
                 return true
             }
             else -> {
+                logger.error("buidld: $buildId , ifField: $ifField is error!")
                 false
             }
         }
@@ -610,9 +613,9 @@ class GitCIBuildFinishListener @Autowired constructor(
         state: String,
         notifyType: GitCINotifyType?,
         conf: GitCIBasicSetting,
-        receivers: Set<String>,
-        ccs: MutableSet<String>,
-        chatIds: Set<String>,
+        receivers: Set<String>?,
+        ccs: MutableSet<String>?,
+        chatIds: Set<String>?,
         event: TGitRequestEventBuildRecord,
         pipeline: TGitPipelineResourceRecord,
         build: BuildHistory,
@@ -708,7 +711,7 @@ class GitCIBuildFinishListener @Autowired constructor(
     private fun getEmailSendRequestV2(
         state: String,
         receivers: Set<String>,
-        ccs: MutableSet<String>,
+        ccs: MutableSet<String>?,
         projectName: String,
         branchName: String,
         pipelineName: String,
@@ -720,17 +723,20 @@ class GitCIBuildFinishListener @Autowired constructor(
     ): SendNotifyMessageTemplateRequest {
         val isSuccess = state == "success"
         val titleParams = mapOf(
-            "title" to (title
-                ?: V2NotifyTemplate.getEmailTitle(
+            "title" to (if (title.isNullOrBlank()) {
+                V2NotifyTemplate.getEmailTitle(
                     isSuccess = isSuccess,
                     projectName = projectName,
                     branchName = branchName,
                     pipelineName = pipelineName, buildNum = build.buildNum.toString()
-                ))
+                )
+            } else {
+                title
+            })
         )
         val bodyParams = mapOf(
-            "content" to (content
-                ?: V2NotifyTemplate.getEmailContent(
+            "content" to (if (content.isNullOrBlank()) {
+                V2NotifyTemplate.getEmailContent(
                     isSuccess = isSuccess,
                     projectName = projectName,
                     branchName = branchName,
@@ -746,7 +752,10 @@ class GitCIBuildFinishListener @Autowired constructor(
                         pipelineId = pipelineId,
                         buildId = build.id
                     )
-                ))
+                )
+            } else {
+                content
+            })
         )
         return SendNotifyMessageTemplateRequest(
             templateCode = GitCINotifyTemplateEnum.GITCI_V2_BUILD_TEMPLATE.templateCode,
@@ -824,6 +833,29 @@ class GitCIBuildFinishListener @Autowired constructor(
             })"
     }
 
+    // 替换variables变量
+    private fun replaceVar(value: String?, variables: Map<String, String>?): String? {
+        if (value.isNullOrBlank()) {
+            return value
+        }
+        if (variables.isNullOrEmpty()) {
+            return value
+        }
+        return EnvUtils.parseEnv(value, variables)
+    }
+
+    private fun replaceVar(value: Set<String>?, variables: Map<String, String>?): Set<String>? {
+        if (value.isNullOrEmpty()) {
+            return value
+        }
+        if (variables.isNullOrEmpty()) {
+            return value
+        }
+        return value.map {
+            EnvUtils.parseEnv(it, variables)
+        }.toSet()
+    }
+
     // 使用启动参数替换接收人
     private fun replaceReceivers(receivers: Set<String>?, startParams: List<BuildParameters>?): MutableSet<String> {
         if (receivers == null || receivers.isEmpty()) {
@@ -840,7 +872,7 @@ class GitCIBuildFinishListener @Autowired constructor(
         }.toMutableSet()
     }
 
-    private fun getNoticeType(type: String): GitCINotifyType? {
+    private fun getNoticeType(buildId: String, type: String?): GitCINotifyType? {
         return when (type) {
             "email" -> {
                 GitCINotifyType.EMAIL
@@ -852,6 +884,7 @@ class GitCIBuildFinishListener @Autowired constructor(
                 GitCINotifyType.RTX_GROUP
             }
             else -> {
+                logger.error("buidld: $buildId , type: $type is error!")
                 null
             }
         }
