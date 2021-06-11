@@ -58,13 +58,15 @@ export default {
             requestToggleCollect: 'requestToggleCollect',
             removePipeline: 'deletePipeline',
             copyPipelineAction: 'copyPipeline',
-            updatePipelineSetting: 'updatePipelineSetting'
+            updatePipelineSetting: 'updatePipelineSetting',
+            setPipelineSetting: 'setPipelineSetting'
         }),
         ...mapActions('atom', [
             'setPipelineEditing',
             'setExecuteStatus',
             'setSaveStatus',
             'setAuthEditing',
+            'setPipeline',
             'updateContainer'
         ]),
         async fetchPipelineList () {
@@ -495,7 +497,6 @@ export default {
         },
         async savePipelineAndSetting () {
             const { pipelineSetting, checkPipelineInvalid, pipeline } = this
-            console.log(this, '111')
             const { inValid, message } = checkPipelineInvalid(pipeline.stages, pipelineSetting)
             const { projectId, pipelineId } = this.$route.params
             if (inValid) {
