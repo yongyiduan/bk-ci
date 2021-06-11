@@ -37,8 +37,6 @@ import {
     PIPELINE_TEMPLATE_MUTATION,
     STORE_TEMPLATE_MUTATION,
     TEMPLATE_MUTATION,
-    PROJECT_GROUP_USERS_MUTATION,
-    PIPELINE_SETTING_MUTATION,
     UPDATE_PIPELINE_SETTING_MUNTATION,
     RESET_PIPELINE_SETTING_MUNTATION,
     REFRESH_QUALITY_LOADING_MUNTATION,
@@ -99,12 +97,6 @@ export const mutations = {
         })
     },
 
-    [PIPELINE_SETTING_MUTATION]: (state, { pipelineSetting }) => {
-        return Object.assign(state, {
-            pipelineSetting
-        })
-    },
-
     [QUALITY_ATOM_MUTATION]: (state, { qualityAtom }) => {
         const atoms = []
         qualityAtom.forEach(item => atoms.push(...item.controlPoints))
@@ -149,11 +141,6 @@ export const mutations = {
         })
         return state
     },
-    [PROJECT_GROUP_USERS_MUTATION]: (state, { projectGroupAndUsers }) => {
-        return Object.assign(state, {
-            projectGroupAndUsers
-        })
-    },
     [UPDATE_PIPELINE_SETTING_MUNTATION]: (state, { container, param }) => {
         Object.assign(container, param)
         return state
@@ -173,20 +160,7 @@ export const mutations = {
 }
 
 export const actions = {
-    requestTemplate: async ({ commit }, { projectId, templateId, version }) => {
-        try {
-            const url = version ? `/${PROCESS_API_URL_PREFIX}/user/templates/projects/${projectId}/templates/${templateId}?version=${version}` : `/${PROCESS_API_URL_PREFIX}/user/templates/projects/${projectId}/templates/${templateId}`
-            const response = await request.get(url)
-            commit(TEMPLATE_MUTATION, {
-                template: response.data
-            })
-        } catch (e) {
-            if (e.code === 403) {
-                e.message = ''
-            }
-            rootCommit(commit, FETCH_ERROR, e)
-        }
-    },
+    
     // 获取模板的所有范畴
     requestCategory: async ({ commit }) => {
         try {
@@ -213,32 +187,7 @@ export const actions = {
     requestStoreTemplate: async ({ commit }, params) => {
         return request.get(`/${STORE_API_URL_PREFIX}/user/market/template/list`, { params })
     },
-    requestPipelineSetting: async ({ commit }, { projectId, pipelineId }) => {
-        try {
-            const response = await request.get(`/${PROCESS_API_URL_PREFIX}/user/setting/get?pipelineId=${pipelineId}&projectId=${projectId}`)
-            commit(PIPELINE_SETTING_MUTATION, {
-                pipelineSetting: response.data
-            })
-        } catch (e) {
-            if (e.code === 403) {
-                e.message = ''
-            }
-            rootCommit(commit, FETCH_ERROR, e)
-        }
-    },
-    requestTemplateSetting: async ({ commit }, { projectId, templateId }) => {
-        try {
-            const response = await request.get(`/${PROCESS_API_URL_PREFIX}/user/templates/projects/${projectId}/templates/${templateId}/settings`)
-            commit(PIPELINE_SETTING_MUTATION, {
-                pipelineSetting: response.data
-            })
-        } catch (e) {
-            if (e.code === 403) {
-                e.message = ''
-            }
-            rootCommit(commit, FETCH_ERROR, e)
-        }
-    },
+
     requestQualityAtom: async ({ commit }, { projectId }) => {
         try {
             const response = await request.get(`/${QUALITY_API_URL_PREFIX}/user/controlPoints/v2/list?projectId=${projectId}`)
@@ -283,23 +232,9 @@ export const actions = {
     requestMatchTemplateRuleList: async ({ commit }, { projectId, templateId }) => {
         try {
             const response = await request.get(`/${QUALITY_API_URL_PREFIX}/user/rules/v2/${projectId}/matchTemplateRuleList?templateId=${templateId}`)
-
+            console.log('get', response.data)
             commit(INTERCEPT_TEMPLATE_MUTATION, {
                 templateRuleList: response.data
-            })
-        } catch (e) {
-            if (e.code === 403) {
-                e.message = ''
-            }
-            rootCommit(commit, FETCH_ERROR, e)
-        }
-    },
-    requestProjectGroupAndUsers: async ({ commit }, { projectId }) => {
-        try {
-            const response = await request.get(`/experience/api/user/groups/${projectId}/projectGroupAndUsers`)
-
-            commit(PROJECT_GROUP_USERS_MUTATION, {
-                projectGroupAndUsers: response.data
             })
         } catch (e) {
             if (e.code === 403) {
@@ -451,28 +386,8 @@ export const actions = {
             return response.data
         })
     },
-    updatePipelineSetting: ({ commit }, payload) => {
-        commit(UPDATE_PIPELINE_SETTING_MUNTATION, payload)
-    },
-    resetPipelineSetting: ({ commit }, payload) => {
-        commit(RESET_PIPELINE_SETTING_MUNTATION, payload)
-    },
+    
     updateRefreshQualityLoading: ({ commit }, status) => {
         commit(REFRESH_QUALITY_LOADING_MUNTATION, status)
-    }
-}
-
-export const getters = {
-    getAppNodes: state => (os) => state.appNodes[os] || {},
-    getHasAtomCheck: state => (stages, atom) => {
-        return stages.some((stage, index) => {
-            if (index) {
-                return stage.containers.some(container => {
-                    return container.elements.find(el => {
-                        return el.atomCode === atom
-                    })
-                })
-            }
-        })
     }
 }

@@ -67,7 +67,7 @@
                 'setPipeline',
                 'setPipelineEditing'
             ]),
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestQualityAtom',
                 'requestInterceptAtom'
             ]),

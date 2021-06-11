@@ -203,7 +203,7 @@
             }
         },
         computed: {
-            ...mapState('soda', [
+            ...mapState('pipelines', [
                 'pipelineSetting',
                 'projectGroupAndUsers'
             ]),
@@ -272,7 +272,7 @@
             this.setGroupidStorage(this.pipelineSubscription)
         },
         methods: {
-            ...mapActions('soda', [
+            ...mapActions('pipelines', [
                 'requestTemplateSetting',
                 'updatePipelineSetting',
                 'requestProjectGroupAndUsers'
