@@ -548,11 +548,16 @@ export default {
                     message: this.$t('saveSuc'),
                     theme: 'success'
                 })
-                const { pipeline } = this
-                if (!this.isTemplatePipeline && pipeline.latestVersion && !isNaN(pipeline.latestVersion)) {
-                    ++pipeline.latestVersion
+                
+                if (!this.isTemplatePipeline && this.pipeline.latestVersion && !isNaN(this.pipeline.latestVersion)) {
+                    ++this.pipeline.latestVersion
+                    this.updateCurPipelineByKeyValue('pipelineVersion', this.pipeline.latestVersion)
                 }
-                this.fetchPipelineList()
+                
+                if (this.pipelineSetting && this.pipelineSetting.pipelineName !== this.curPipeline.pipelineName) {
+                    this.updateCurPipelineByKeyValue('pipelineName', this.pipelineSetting.pipelineName)
+                }
+                
                 return {
                     code: 0,
                     data: responses
