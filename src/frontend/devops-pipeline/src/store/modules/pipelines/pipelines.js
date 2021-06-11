@@ -278,7 +278,6 @@ const actions = {
             rootCommit(commit, FETCH_ERROR, e)
         }
     },
-                
     requestTemplateSetting: async ({ commit }, { projectId, templateId }) => {
         try {
             const response = await ajax.get(`/${PROCESS_API_URL_PREFIX}/user/templates/projects/${projectId}/templates/${templateId}/settings`)
@@ -353,7 +352,7 @@ const actions = {
     },
     searchPipelineList ({ commit, state, dispatch }, { projectId, pipelineId, searchName = '' }) {
         const url = `/${PROCESS_API_URL_PREFIX}/user/pipelineInfos/${projectId}/searchByName?pipelineName=${searchName}&pipelineId=${pipelineId}`
-        
+
         return ajax.get(url).then(response => {
             return response.data
         })

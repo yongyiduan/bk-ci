@@ -189,7 +189,7 @@
             async getCurrentTask (taskId) {
                 this.isLoading = true
                 try {
-                    const res = await this.$store.dispatch('soda/requestJobTaskParam', {
+                    const res = await this.$store.dispatch('common/requestJobTaskParam', {
                         projectId: this.projectId,
                         taskId
                     })
