@@ -20,7 +20,6 @@
 /**
  * @file eslint config
  */
-
 module.exports = {
     extends: [
         '../.eslintrc.js'
@@ -48,7 +47,7 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['*.ts', '*.vue'],
+            files: ['*.vue'],
             rules: {
                 indent: 'off'
             }

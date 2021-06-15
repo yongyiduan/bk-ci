@@ -59,6 +59,7 @@ export default {
             removePipeline: 'deletePipeline',
             copyPipelineAction: 'copyPipeline',
             updatePipelineSetting: 'updatePipelineSetting',
+            setPipelineSetting: 'setPipelineSetting',
             requestTerminatePipeline: 'requestTerminatePipeline',
             requestRetryPipeline: 'requestRetryPipeline',
             searchPipelineList: 'searchPipelineList',

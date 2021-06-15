@@ -183,8 +183,14 @@
             }
         },
         mounted () {
-            this.init()
+            if (this.editfromImport) {
+                this.getRoleList()
+                this.requestProjectGroupAndUsers(this.$route.params)
+            } else {
+                this.init()
+            }
             this.requestQualityAtom()
+            this.setEditFrom(false)
             this.addLeaveListenr()
         },
         beforeDestroy () {
@@ -213,7 +219,8 @@
                 'togglePropertyPanel',
                 'setPipeline',
                 'setPipelineEditing',
-                'setSaveStatus'
+                'setSaveStatus',
+                'setEditFrom'
             ]),
             ...mapActions('pipelines', [
                 'requestPipelineSetting',
@@ -233,12 +240,8 @@
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
                     this.getRoleList()
-                    this.requestProjectGroupAndUsers(this.$route.params)
                 }
-                if (this.editfromImport) {
-                    this.getRoleList()
-                    this.requestProjectGroupAndUsers(this.$route.params)
-                }
+                this.requestProjectGroupAndUsers(this.$route.params)
             },
             switchTab (tab) {
                 this.$router.push({

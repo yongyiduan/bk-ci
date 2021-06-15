@@ -103,7 +103,7 @@
     import showTooltip from '@/components/common/showTooltip'
     import exportDialog from '@/components/ExportDialog'
     import versionSideslider from '@/components/VersionSideslider'
-    import { debounce } from '../../utils/util'
+    import { debounce, navConfirm } from '@/utils/util'
     export default {
         components: {
             innerHeader,
@@ -220,7 +220,7 @@
                 return this.saveStatus || this.executeStatus
             },
             saveBtnDisabled () {
-                return this.saveStatus || this.executeStatus || Object.keys(this.pipelineSetting).length === 0 || Object.keys(this.pipelineAuthority).length === 0
+                return this.saveStatus || this.executeStatus || Object.keys(this.pipelineSetting).length === 0 || (this.authSettingEditing && Object.keys(this.pipelineAuthority).length === 0)
             },
             canManualStartup () {
                 return this.curPipeline ? this.curPipeline.canManualStartup : false
@@ -279,8 +279,18 @@
                 'setEditFrom'
             ]),
             handleSelected (pipelineId) {
+                if (this.isEditing) {
+                    navConfirm({ content: this.$t('editPage.confirmMsg'), type: 'warning' }).then(() => {
+                        this.doSelectPipeline(pipelineId)
+                    }).catch(() => {
+                        // prevent select
+                    })
+                } else {
+                    this.doSelectPipeline(pipelineId)
+                }
+            },
+            doSelectPipeline (pipelineId) {
                 const { projectId, $route } = this
-
                 this.updateCurPipeline({
                     pipelineId,
                     projectId

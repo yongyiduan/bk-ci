@@ -1,4 +1,3 @@
-<template>
     <div class="biz-content">
         <div class="biz-top-bar">
             <div class="biz-image-library-title">
