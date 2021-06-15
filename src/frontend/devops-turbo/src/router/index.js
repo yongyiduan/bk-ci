@@ -1,4 +1,4 @@
-const home = () => import(/* webpackChunkName: 'home' */ '../views/index')
+const home = () => import(/* webpackChunkName: 'home' */ '../views/index.vue')
 // over-view
 const overview = () => import(/* webpackChunkName: 'overview' */ '../views/over-view/index.vue')
 // task
