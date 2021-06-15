@@ -300,13 +300,15 @@
                                             </bk-checkbox-group>
                                         </bk-form-item>
                                         <bk-form-item label="附加通知人员" desc="请输入通知人员，支持输入流水线变量">
-                                            <user-input :handle-change="handleChange" name="attacher" :value="createRuleForm.notifyUserList" placeholder="请输入通知人员，支持输入流水线变量"></user-input>
+                                            <staff-input v-if="isExtendTx" :name="'attacher'" :value="createRuleForm.notifyUserList" :handle-change="handleChange"></staff-input>
+                                            <user-input v-else :handle-change="handleChange" name="attacher" :value="createRuleForm.notifyUserList" placeholder="请输入通知人员，支持输入流水线变量"></user-input>
                                         </bk-form-item>
                                     </bk-form>
 
                                     <bk-form v-else :label-width="120" :model="createRuleForm" class="user-audit-form">
-                                        <bk-form-item label="审核人" desc="请输入通知人员，支持输入流水线变量" :required="true">
-                                            <user-input :handle-change="handleChange" name="reviewer" :value="createRuleForm.auditUserList" placeholder="请输入通知人员，支持输入流水线变量"></user-input>
+                                        <bk-form-item label="审核人" :required="true" desc="请输入通知人员，支持输入流水线变量">
+                                            <staff-input v-if="isExtendTx" :name="'reviewer'" :value="createRuleForm.auditUserList" :handle-change="handleChange"></staff-input>
+                                            <user-input v-else :handle-change="handleChange" name="reviewer" :value="createRuleForm.auditUserList" placeholder="请输入通知人员，支持输入流水线变量"></user-input>
                                         </bk-form-item>
                                         <bk-form-item label="审核超时时间">
                                             <bk-input type="number"
