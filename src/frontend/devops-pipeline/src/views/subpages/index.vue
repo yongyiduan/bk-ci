@@ -103,7 +103,7 @@
     import showTooltip from '@/components/common/showTooltip'
     import exportDialog from '@/components/ExportDialog'
     import versionSideslider from '@/components/VersionSideslider'
-    import { navConfirm } from '@/utils/util'
+    import { debounce, navConfirm } from '@/utils/util'
     export default {
         components: {
             innerHeader,
@@ -122,6 +122,7 @@
                 tabMap: {
                     'trendData': this.$t('history.trendData')
                 },
+                pipelineListSearching: false,
                 breadCrumbPath: [],
                 isLoading: false,
                 hasNoPermission: false,
@@ -219,7 +220,7 @@
                 return this.saveStatus || this.executeStatus
             },
             saveBtnDisabled () {
-                return this.saveStatus || this.executeStatus || Object.keys(this.pipelineSetting).length === 0 || Object.keys(this.pipelineAuthority).length === 0
+                return this.saveStatus || this.executeStatus || Object.keys(this.pipelineSetting).length === 0 || (this.authSettingEditing && Object.keys(this.pipelineAuthority).length === 0)
             },
             canManualStartup () {
                 return this.curPipeline ? this.curPipeline.canManualStartup : false
@@ -243,7 +244,7 @@
                 }, {
                     paramId: 'pipelineId',
                     paramName: 'pipelineName',
-                    selectedValue: this.pipelineId,
+                    selectedValue: this.curPipeline.pipelineName || '--',
                     records: [
                         ...this.pipelineList
                     ],
@@ -253,30 +254,25 @@
                     to: this.$route.name === 'pipelinesHistory' ? null : {
                         name: 'pipelinesHistory'
                     },
-                    handleSelected: this.handleSelected
+                    handleSelected: this.handleSelected,
+                    searching: this.pipelineListSearching,
+                    handleSearch: debounce(this.handleSearchPipeline, 300)
                 }, {
                     selectedValue: this.$route.params.type && this.tabMap[this.$route.params.type] ? this.tabMap[this.$route.params.type] : this.$t(this.$route.name)
                 }]
             }
 
         },
-        watch: {
-            pipelineId (newVal) {
-                this.updateCurPipelineId(newVal)
-            }
-        },
+        
         created () {
             this.fetchPipelineList()
             this.$store.dispatch('requestProjectDetail', { projectId: this.projectId })
         },
         beforeDestroy () {
             this.$store.commit('pipelines/updateCurPipeline', {})
+            this.$store.commit('pipelines/updatePipelineList', [])
         },
         methods: {
-            ...mapActions('pipelines', [
-                'requestPipelinesList',
-                'requestExecPipeline'
-            ]),
             ...mapActions('atom', [
                 'requestPipelineExecDetailByBuildNum',
                 'togglePropertyPanel',
@@ -308,6 +304,12 @@
                         pipelineId
                     }
                 })
+            },
+            async handleSearchPipeline (value, e) {
+                if (this.pipelineListSearching) return
+                this.pipelineListSearching = true
+                await this.fetchPipelineList(value)
+                this.pipelineListSearching = false
             },
             async switchBuildNum (int = 0) {
                 const { execDetail } = this
@@ -400,20 +402,19 @@
             },
             
             copyPipeline () {
-                const { curPipeline } = this
                 this.isDialogShow = true
                 this.dialogConfig = {
                     title: this.$t('newlist.copyPipeline'),
                     formData: {
                         ...this.pipelineFormData,
-                        name: `${curPipeline.pipelineName}_copy`
+                        name: `${this.curPipeline.pipelineName}_copy`
                     },
                     loading: false,
                     formConfig: this.renameFormConfig,
                     handleDialogConfirm: async () => {
                         try {
                             this.dialogConfig.loading = true
-                            await this.copy(this.dialogConfig.formData, curPipeline.pipelineId)
+                            await this.copy(this.dialogConfig.formData, this.curPipeline.pipelineId)
                             this.dialogConfig.loading = false
                             this.resetDialog()
                         } catch (e) {

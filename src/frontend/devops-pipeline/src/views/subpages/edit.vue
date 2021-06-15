@@ -183,7 +183,10 @@
             }
         },
         mounted () {
-            if (!this.editfromImport) {
+            if (this.editfromImport) {
+                this.getRoleList()
+                this.requestProjectGroupAndUsers(this.$route.params)
+            } else {
                 this.init()
             }
             this.requestQualityAtom()
@@ -227,7 +230,7 @@
                 'requestProjectGroupAndUsers',
                 'resetPipelineSetting'
             ]),
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestQualityAtom',
                 'requestInterceptAtom'
             ]),
@@ -237,12 +240,8 @@
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
                     this.getRoleList()
-                    this.requestProjectGroupAndUsers(this.$route.params)
                 }
-                if (this.editfromImport) {
-                    this.getRoleList()
-                    this.requestProjectGroupAndUsers(this.$route.params)
-                }
+                this.requestProjectGroupAndUsers(this.$route.params)
             },
             switchTab (tab) {
                 this.$router.push({
@@ -289,20 +288,20 @@
                 }
             },
             requestQualityAtom () {
-                this.$store.dispatch('soda/requestQualityAtom', {
+                this.$store.dispatch('common/requestQualityAtom', {
                     projectId: this.projectId
                 })
             },
             requestInterceptAtom () {
                 if (this.projectId && this.pipelineId) {
-                    this.$store.dispatch('soda/requestInterceptAtom', {
+                    this.$store.dispatch('common/requestInterceptAtom', {
                         projectId: this.projectId,
                         pipelineId: this.pipelineId
                     })
                 }
             },
             requestMatchTemplateRules (templateId) {
-                this.$store.dispatch('soda/requestMatchTemplateRuleList', {
+                this.$store.dispatch('common/requestMatchTemplateRuleList', {
                     projectId: this.projectId,
                     templateId
                 })

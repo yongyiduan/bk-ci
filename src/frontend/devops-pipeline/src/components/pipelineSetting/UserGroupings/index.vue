@@ -120,7 +120,7 @@
             }
         },
         computed: {
-            ...mapState('soda', [
+            ...mapState('common', [
                 'pipelineSetting'
             ]),
             computeWidth () {
