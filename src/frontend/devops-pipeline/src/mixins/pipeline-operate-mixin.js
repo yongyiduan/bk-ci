@@ -62,13 +62,15 @@ export default {
             requestTerminatePipeline: 'requestTerminatePipeline',
             requestRetryPipeline: 'requestRetryPipeline',
             searchPipelineList: 'searchPipelineList',
-            requestPipelineDetail: 'requestPipelineDetail'
+            requestPipelineDetail: 'requestPipelineDetail',
+            setPipelineSetting: 'setPipelineSetting'
         }),
         ...mapActions('atom', [
             'setPipelineEditing',
             'setExecuteStatus',
             'setSaveStatus',
             'setAuthEditing',
+            'setPipeline',
             'updateContainer'
         ]),
         async fetchPipelineList (searchName) {
@@ -77,8 +79,7 @@ export default {
                 const [list, curPipeline] = await Promise.all([
                     this.searchPipelineList({
                         projectId,
-                        searchName,
-                        pipelineId
+                        searchName
                     }),
                     this.updateCurPipeline({
                         projectId,
@@ -86,13 +87,7 @@ export default {
                     })
                 ])
                 
-                this.$store.commit('pipelines/updatePipelineList', [
-                    ...list.filter(ele => ele.pipelineId !== curPipeline.pipelineId),
-                    {
-                        pipelineId: curPipeline.pipelineId,
-                        pipelineName: curPipeline.pipelineName
-                    }
-                ])
+                this.setBreadCrumbPipelineList(list, curPipeline)
             } catch (err) {
                 console.log(err)
                 this.$showTips({
@@ -100,6 +95,18 @@ export default {
                     theme: 'error'
                 })
             }
+        },
+        async setBreadCrumbPipelineList (list, pipeline) {
+            if (pipeline && list.every(ele => ele.pipelineId !== pipeline.pipelineId)) {
+                list = [
+                    {
+                        pipelineId: pipeline.pipelineId,
+                        pipelineName: pipeline.pipelineName
+                    },
+                    ...list
+                ]
+            }
+            this.$store.commit('pipelines/updatePipelineList', list)
         },
         async updateCurPipeline ({ projectId, pipelineId }) {
             const curPipeline = await this.requestPipelineDetail({
@@ -563,11 +570,13 @@ export default {
                 
                 if (!this.isTemplatePipeline && this.pipeline.latestVersion && !isNaN(this.pipeline.latestVersion)) {
                     ++this.pipeline.latestVersion
+                    this.updateCurPipelineByKeyValue('pipelineVersion', this.pipeline.latestVersion)
                 }
                 
                 if (this.pipelineSetting && this.pipelineSetting.pipelineName !== this.curPipeline.pipelineName) {
                     this.updateCurPipelineByKeyValue('pipelineName', this.pipelineSetting.pipelineName)
                 }
+                
                 return {
                     code: 0,
                     data: responses
