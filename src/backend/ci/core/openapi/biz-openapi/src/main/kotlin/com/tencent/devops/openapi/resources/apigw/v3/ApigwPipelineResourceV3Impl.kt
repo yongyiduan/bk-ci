@@ -39,6 +39,7 @@ import com.tencent.devops.process.pojo.Pipeline
 import com.tencent.devops.process.pojo.PipelineId
 import com.tencent.devops.process.pojo.PipelineIdInfo
 import com.tencent.devops.process.pojo.PipelineName
+import com.tencent.devops.process.pojo.setting.PipelineSetting
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -193,6 +194,23 @@ class ApigwPipelineResourceV3Impl @Autowired constructor(private val client: Cli
     ): Result<List<PipelineIdInfo>> {
         logger.info("getProjectPipelineIds $projectCode")
         return client.get(ServicePipelineResource::class).getProjectPipelineIds(projectCode)
+    }
+
+    override fun saveSetting(
+        appCode: String?,
+        apigwType: String?,
+        userId: String,
+        projectId: String,
+        pipelineId: String,
+        setting: PipelineSetting
+    ): Result<Boolean> {
+        logger.info("saveSetting: userId[$userId] projectId[$projectId] pipelineId[$pipelineId]")
+        return client.get(ServicePipelineResource::class).saveSetting(
+            userId = userId,
+            projectId = projectId,
+            pipelineId = pipelineId,
+            setting = setting
+        )
     }
 
     companion object {
