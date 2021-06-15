@@ -137,7 +137,7 @@
             padding: 18px 20px;
             margin-bottom: 20px;
             .task-main {
-                width: 367px;
+                width: calc(100% - 200px);
             }
             .task-title {
                 font-size: 16px;

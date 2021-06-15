@@ -15,7 +15,7 @@
                     <p class="task-name">
                         <span class="g-accelerate-deep-black-font name-desc" @click.stop="$router.push({ name: 'taskDetail', params: { id: task.planId } })">
                             <span class="g-accelerate-text-overflow plan-name">{{ task.planName }}</span>
-                            <span class="name-detail">{{ task.engineCode }}</span>
+                            <span class="name-detail">{{ task.engineName }}</span>
                         </span>
                         <span class="g-accelerate-gray-font name-hash g-accelerate-text-overflow">
                             {{ task.planId }}
