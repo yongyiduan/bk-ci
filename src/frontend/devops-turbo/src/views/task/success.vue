@@ -15,7 +15,7 @@
             <section class="g-turbo-task-tip success-tip-user" v-html="engineDetail.userManual"></section>
         </section>
 
-        <bk-button theme="primary" @click="goToList"> {{ $t('turbo.关闭') }} </bk-button>
+        <bk-button theme="primary" @click="goToDetail"> {{ $t('turbo.查看详情') }} </bk-button>
     </article>
 </template>
 
@@ -57,9 +57,12 @@
                 copy(this.$route.query.planId, this.$t.bind(this))
             },
 
-            goToList () {
+            goToDetail () {
                 this.$router.push({
-                    name: 'taskList'
+                    name: 'taskDetail',
+                    params: {
+                        id: this.$route.query.planId
+                    }
                 })
             }
         }
