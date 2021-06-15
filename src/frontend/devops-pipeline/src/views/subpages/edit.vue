@@ -81,6 +81,9 @@
             ...mapState([
                 'fetchError'
             ]),
+            ...mapState('atom', [
+                'editfromImport'
+            ]),
             projectId () {
                 return this.$route.params.projectId
             },
@@ -180,8 +183,14 @@
             }
         },
         mounted () {
-            this.init()
+            if (this.editfromImport) {
+                this.getRoleList()
+                this.requestProjectGroupAndUsers(this.$route.params)
+            } else {
+                this.init()
+            }
             this.requestQualityAtom()
+            this.setEditFrom(false)
             this.addLeaveListenr()
         },
         beforeDestroy () {
@@ -210,8 +219,8 @@
                 'togglePropertyPanel',
                 'setPipeline',
                 'setPipelineEditing',
-                'setAuthEditing',
-                'setSaveStatus'
+                'setSaveStatus',
+                'setEditFrom'
             ]),
             ...mapActions('pipelines', [
                 'requestPipelineSetting',
@@ -226,13 +235,13 @@
                 'requestInterceptAtom'
             ]),
             init () {
-                if (!this.isDraftEdit && this.pipelineId) {
+                if (!this.isDraftEdit) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
                     this.getRoleList()
-                    this.requestProjectGroupAndUsers(this.$route.params)
                 }
+                this.requestProjectGroupAndUsers(this.$route.params)
             },
             switchTab (tab) {
                 this.$router.push({

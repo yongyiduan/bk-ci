@@ -59,6 +59,7 @@ export default {
             removePipeline: 'deletePipeline',
             copyPipelineAction: 'copyPipeline',
             updatePipelineSetting: 'updatePipelineSetting',
+            setPipelineSetting: 'setPipelineSetting',
             requestTerminatePipeline: 'requestTerminatePipeline',
             requestRetryPipeline: 'requestRetryPipeline',
             searchPipelineList: 'searchPipelineList',
@@ -69,6 +70,7 @@ export default {
             'setExecuteStatus',
             'setSaveStatus',
             'setAuthEditing',
+            'setPipeline',
             'updateContainer'
         ]),
         async fetchPipelineList (searchName) {
@@ -563,11 +565,13 @@ export default {
                 
                 if (!this.isTemplatePipeline && this.pipeline.latestVersion && !isNaN(this.pipeline.latestVersion)) {
                     ++this.pipeline.latestVersion
+                    this.updateCurPipelineByKeyValue('pipelineVersion', this.pipeline.latestVersion)
                 }
                 
                 if (this.pipelineSetting && this.pipelineSetting.pipelineName !== this.curPipeline.pipelineName) {
                     this.updateCurPipelineByKeyValue('pipelineName', this.pipelineSetting.pipelineName)
                 }
+                
                 return {
                     code: 0,
                     data: responses
