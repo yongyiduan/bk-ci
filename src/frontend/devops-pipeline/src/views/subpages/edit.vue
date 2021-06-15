@@ -183,10 +183,13 @@
             }
         },
         mounted () {
-            if (!this.editfromImport) {
+            if (this.editfromImport) {
+                this.getRoleList()
+                this.requestProjectGroupAndUsers(this.$route.params)
+            } else {
                 this.init()
-                this.requestQualityAtom()
             }
+            this.requestQualityAtom()
             this.setEditFrom(false)
             this.addLeaveListenr()
         },
@@ -232,13 +235,13 @@
                 'requestInterceptAtom'
             ]),
             init () {
-                if (!this.isDraftEdit && this.pipelineId) {
+                if (!this.isDraftEdit) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
                     this.getRoleList()
-                    this.requestProjectGroupAndUsers(this.$route.params)
                 }
+                this.requestProjectGroupAndUsers(this.$route.params)
             },
             switchTab (tab) {
                 this.$router.push({
