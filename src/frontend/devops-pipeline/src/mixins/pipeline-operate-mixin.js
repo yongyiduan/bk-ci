@@ -63,8 +63,7 @@ export default {
             requestTerminatePipeline: 'requestTerminatePipeline',
             requestRetryPipeline: 'requestRetryPipeline',
             searchPipelineList: 'searchPipelineList',
-            requestPipelineDetail: 'requestPipelineDetail',
-            setPipelineSetting: 'setPipelineSetting'
+            requestPipelineDetail: 'requestPipelineDetail'
         }),
         ...mapActions('atom', [
             'setPipelineEditing',
