@@ -421,6 +421,7 @@
     import { mapGetters } from 'vuex'
     import metadataPanel from '@/components/devops/metadata-panel'
     import UserInput from '@/components/devops/UserInput/index.vue'
+    import StaffInput from '@/components/devops/StaffInput/index.vue'
     import pipelineList from '@/components/devops/pipeline-list'
     import templateList from '@/components/devops/template-list'
     import createGroup from '@/components/devops/create_group'
@@ -434,6 +435,7 @@
             templateList,
             metadataPanel,
             UserInput,
+            StaffInput,
             emptyTips
         },
         data () {
