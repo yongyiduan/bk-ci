@@ -103,6 +103,7 @@
     import showTooltip from '@/components/common/showTooltip'
     import exportDialog from '@/components/ExportDialog'
     import versionSideslider from '@/components/VersionSideslider'
+    import { navConfirm } from '@/utils/util'
     export default {
         components: {
             innerHeader,
@@ -281,10 +282,23 @@
                 'togglePropertyPanel',
                 'setEditFrom'
             ]),
-            handleSelected (pipelineId, cur) {
+            handleSelected (pipelineId) {
+                if (this.isEditing) {
+                    navConfirm({ content: this.$t('editPage.confirmMsg'), type: 'warning' }).then(() => {
+                        this.doSelectPipeline(pipelineId)
+                    }).catch(() => {
+                        // prevent select
+                    })
+                } else {
+                    this.doSelectPipeline(pipelineId)
+                }
+            },
+            doSelectPipeline (pipelineId) {
                 const { projectId, $route } = this
-
-                this.$store.commit('pipelines/updateCurPipeline', cur)
+                this.updateCurPipeline({
+                    pipelineId,
+                    projectId
+                })
 
                 const name = $route.params.buildNo ? 'pipelinesHistory' : $route.name
                 this.$router.push({

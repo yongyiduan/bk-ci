@@ -183,8 +183,11 @@
             }
         },
         mounted () {
-            this.init()
+            if (!this.editfromImport) {
+                this.init()
+            }
             this.requestQualityAtom()
+            this.setEditFrom(false)
             this.addLeaveListenr()
         },
         beforeDestroy () {
@@ -213,7 +216,8 @@
                 'togglePropertyPanel',
                 'setPipeline',
                 'setPipelineEditing',
-                'setSaveStatus'
+                'setSaveStatus',
+                'setEditFrom'
             ]),
             ...mapActions('pipelines', [
                 'requestPipelineSetting',
