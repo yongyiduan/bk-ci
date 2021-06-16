@@ -237,7 +237,6 @@ class ServicePipelineResourceImpl @Autowired constructor(
         setting: PipelineSetting
     ): Result<Boolean> {
         checkProjectId(projectId)
-        checkPipelineId(pipelineId)
         pipelineSettingFacadeService.saveSetting(userId = userId, setting = setting, checkPermission = true)
         return Result(true)
     }
