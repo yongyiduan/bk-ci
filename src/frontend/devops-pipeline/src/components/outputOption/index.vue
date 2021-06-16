@@ -37,7 +37,7 @@
         },
         computed: {
             ...mapGetters({
-                'checkHasCodecc': 'soda/getHasAtomCheck'
+                'checkHasCodecc': 'common/getHasAtomCheck'
             }),
             hasCodecc () {
                 return this.checkHasCodecc(this.curPipeline.stages, 'linuxPaasCodeCCScript')
@@ -96,7 +96,7 @@
             this.init()
         },
         methods: {
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestWetestReport',
                 'requestReportList'
             ]),

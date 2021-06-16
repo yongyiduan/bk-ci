@@ -315,6 +315,7 @@
                             this.selectList(this.list[this.focusList])
                             this.showList = false
                         }
+                        this.hideAll(e)
                         break
                     // 退出
                     case 27:

@@ -81,6 +81,9 @@
             ...mapState([
                 'fetchError'
             ]),
+            ...mapState('atom', [
+                'editfromImport'
+            ]),
             projectId () {
                 return this.$route.params.projectId
             },
@@ -180,8 +183,14 @@
             }
         },
         mounted () {
-            this.init()
+            if (this.editfromImport) {
+                this.getRoleList()
+                this.requestProjectGroupAndUsers(this.$route.params)
+            } else {
+                this.init()
+            }
             this.requestQualityAtom()
+            this.setEditFrom(false)
             this.addLeaveListenr()
         },
         beforeDestroy () {
@@ -191,7 +200,7 @@
             this.setPipelineEditing(false)
             this.setSaveStatus(false)
             this.setAuthEditing(false)
-            this.authEditing = false
+            this.setEditFrom(false)
             this.errors.clear()
         },
         beforeRouteUpdate (to, from, next) {
@@ -210,8 +219,8 @@
                 'togglePropertyPanel',
                 'setPipeline',
                 'setPipelineEditing',
-                'setAuthEditing',
-                'setSaveStatus'
+                'setSaveStatus',
+                'setEditFrom'
             ]),
             ...mapActions('pipelines', [
                 'requestPipelineSetting',
@@ -221,18 +230,18 @@
                 'requestProjectGroupAndUsers',
                 'resetPipelineSetting'
             ]),
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestQualityAtom',
                 'requestInterceptAtom'
             ]),
             init () {
-                if (!this.isDraftEdit && this.pipelineId) {
+                if (!this.isDraftEdit) {
                     this.isLoading = true
                     this.requestPipeline(this.$route.params)
                     this.requestPipelineSetting(this.$route.params)
                     this.getRoleList()
-                    this.requestProjectGroupAndUsers(this.$route.params)
                 }
+                this.requestProjectGroupAndUsers(this.$route.params)
             },
             switchTab (tab) {
                 this.$router.push({
@@ -279,20 +288,20 @@
                 }
             },
             requestQualityAtom () {
-                this.$store.dispatch('soda/requestQualityAtom', {
+                this.$store.dispatch('common/requestQualityAtom', {
                     projectId: this.projectId
                 })
             },
             requestInterceptAtom () {
                 if (this.projectId && this.pipelineId) {
-                    this.$store.dispatch('soda/requestInterceptAtom', {
+                    this.$store.dispatch('common/requestInterceptAtom', {
                         projectId: this.projectId,
                         pipelineId: this.pipelineId
                     })
                 }
             },
             requestMatchTemplateRules (templateId) {
-                this.$store.dispatch('soda/requestMatchTemplateRuleList', {
+                this.$store.dispatch('common/requestMatchTemplateRuleList', {
                     projectId: this.projectId,
                     templateId
                 })

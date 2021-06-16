@@ -67,7 +67,8 @@ import {
     SET_DEFAULT_STAGE_TAG,
     TOGGLE_REVIEW_DIALOG,
     TOGGLE_STAGE_REVIEW_PANEL,
-    SET_IMPORTED_JSON
+    SET_IMPORTED_JSON,
+    SET_EDIT_FROM
 } from './constants'
 import {
     getAtomModalKey,
@@ -146,6 +147,10 @@ export default {
     },
     [SET_PIPELINE]: (state, pipeline = null) => {
         Vue.set(state, 'pipeline', pipeline)
+        return state
+    },
+    [SET_EDIT_FROM]: (state, editfromImport = false) => {
+        Vue.set(state, 'editfromImport', editfromImport)
         return state
     },
     [SET_PIPELINE_EDITING]: (state, editing) => {

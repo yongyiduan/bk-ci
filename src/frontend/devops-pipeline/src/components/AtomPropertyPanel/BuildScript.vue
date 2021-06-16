@@ -84,7 +84,7 @@
                 'setTurboSwitch',
                 'updateToTurbo'
             ]),
-            ...mapActions('soda', [
+            ...mapActions('common', [
                 'requestInterceptAtom'
             ]),
             ...mapActions('atom', [
