@@ -1,11 +1,11 @@
 <template>
     <section>
         <div>
-            <atom-checkbox :disabled="turboDisabled" :handle-change="handleSwitch" :name="name" :text="text" :value="turboValue" :desc="desc"></atom-checkbox>
+            <atom-checkbox ref="turbo" :disabled="turboDisabled" :handle-change="handleSwitch" :name="name" :text="text" :value="turboValue" :desc="desc"></atom-checkbox>
             <a href="javascript: void(0);" class="check-inline-link" target="_blank" v-if="taskId" @click.stop="goTurboLink">{{ taskName }}</a>
         </div>
         <bk-alert type="error" class="turbo-tip" v-if="taskId && turboValue">
-            <div slot="title">当前使用的是旧版 Distcc，建议迁移到新版。<bk-link href="https://iwiki.woa.com/x/6OQMIw" target="_blank" theme="primary">了解更多</bk-link></div>
+            <div slot="title">当前使用的是旧版 distcc，建议迁移到新版。<bk-link href="https://iwiki.woa.com/x/xmKDDw" target="_blank" theme="primary">了解更多</bk-link></div>
         </bk-alert>
         <div class="build-quote" v-if="taskId && turboValue">
             <div class="quote-ident">
@@ -139,7 +139,7 @@
                 !this.turboDisabled && this.$emit('handleChange', name, value)
             },
             goTurboLink () {
-                window.open(`${WEB_URL_PREFIX}/accelerate/${this.$route.params.projectId}/history/?pipelineId=${this.$route.params.pipelineId}&planId=${this.taskId}`, '_blank')
+                window.open(`${WEB_URL_PREFIX}/turbo/${this.$route.params.projectId}/history/?pipelineId=${this.$route.params.pipelineId}&planId=${this.taskId}`, '_blank')
             },
             projLang () {
                 if (this.task.projLang === '1') {

@@ -813,7 +813,7 @@
             "jobSettingTips": " The current task doesn't exist in the Job. Please go to Job Allocation Center to set it up",
             "gcloudSettingTips": " No available template for the current task. Please go to the Standard Operation & Maintenance system to set it up.",
             "slaveAbsPath": " The absolute path on the operating system of source server",
-            "turboOffline": "This entry is the old version of the turbo entry, which has been removed. please use",
+            "turboOffline": "This entry is the old version of the turbo, which has been removed. please use",
             "turboV2": "New version turbo",
             "ticketId": "Ticket ID",
             "tclsId": "TCLS ID",

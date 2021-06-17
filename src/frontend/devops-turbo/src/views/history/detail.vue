@@ -1,13 +1,18 @@
 <template>
     <article class="history-detail-home">
         <bk-breadcrumb separator-class="bk-icon icon-angle-right" class="bread-crumb">
-            <bk-breadcrumb-item :to="{ name: 'history' }"> {{ $t('turbo.历史列表') }} </bk-breadcrumb-item>
-            <bk-breadcrumb-item>{{ detail.recordName }} {{ $t('turbo.详情') }} </bk-breadcrumb-item>
+            <bk-breadcrumb-item :to="{ name: 'history' }"> {{ $t('turbo.历史列表') }}</bk-breadcrumb-item>
+            <bk-breadcrumb-item :to="{ name: 'history', query: { pipelineId: detail.pipelineId, clientIp: detail.clientIp } }">{{ detail.pipelineName || detail.clientIp }}</bk-breadcrumb-item>
+            <bk-breadcrumb-item>#{{ detail.executeCount }}</bk-breadcrumb-item>
         </bk-breadcrumb>
 
         <section class="g-turbo-box hisory-detail-data" v-bkloading="{ isloading }">
             <header class="detail-header">
-                <span class="header-title">{{ detail.recordName }}</span>
+                <span class="header-title">
+                    【{{ detail.executeCount }}】
+                    <span class="header-name">{{ detail.pipelineName || detail.clientIp }}</span>
+                    <task-status :status="detail.status" :show-name="false"></task-status>
+                </span>
                 <span class="header-time">
                     <span><span> {{ $t('turbo.开始时间：') }} </span><span>{{ detail.startTime }}</span></span>
                     <span><span> {{ $t('turbo.总耗时：') }} </span><span>{{ detail.elapsedTime }}</span></span>
@@ -28,10 +33,12 @@
 <script>
     import { getTurboRecord } from '@/api'
     import logo from '@/components/logo'
+    import taskStatus from '@/components/task-status'
 
     export default {
         components: {
-            logo
+            logo,
+            taskStatus
         },
 
         data () {
@@ -90,6 +97,12 @@
             justify-content: space-between;
             .header-title {
                 color: #000;
+                display: flex;
+                align-items: center;
+                .header-name {
+                    display: inline-block;
+                    margin: 0 10px 0 2px;
+                }
             }
             .header-time {
                 color: #63656e;

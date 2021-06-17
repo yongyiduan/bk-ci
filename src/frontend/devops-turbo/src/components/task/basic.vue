@@ -11,9 +11,11 @@
                     <span>{{ copyFormData.planId }}</span>
                     <logo name="copy" @click.native="copyValue(copyFormData.planId)" size="16" class="icon-copy"></logo>
                     <span v-if="copyFormData.openStatus" class="plan-open plan-common" @click="toggleOpen(false)" v-bk-tooltips="{ content: $t('turbo.点击禁用当前方案，禁用后，配置将不再生效') }">
-                        <logo name="check" class="plan-icon" size="10"></logo> {{ $t('turbo.已开启') }} </span>
+                        <logo name="check" class="plan-icon" size="10"></logo> {{ $t('turbo.已开启') }}
+                    </span>
                     <span v-else class="plan-close plan-common" @click="toggleOpen(true)" v-bk-tooltips="{ content: $t('turbo.点击开启方案，可以在构建机或流水线中使用') }">
-                        <logo name="suspend" class="plan-icon"></logo> {{ $t('turbo.已禁用') }} </span>
+                        <logo name="suspend" class="plan-icon"></logo> {{ $t('turbo.已禁用') }}
+                    </span>
                 </span>
             </bk-form-item>
             <bk-form-item :label="$t('turbo.方案名称')" required property="planName" :rules="[requireRule($t('turbo.方案名称')), nameRule]" error-display-type="normal">
@@ -78,7 +80,7 @@
                 isLoadingEngine: false,
                 nameRule: {
                     validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-_+#]+$/.test(val) && val.length <= 30),
-                    message: this.$t('turbo.以汉字、英文字母、数字、连字符(-)、下划线(_)组成，不超过30个字'),
+                    message: this.$t('turbo.以汉字、英文字母、数字、连字符(-)、符号(_+#)组成，不超过30个字'),
                     trigger: 'blur'
                 }
             }
@@ -151,7 +153,7 @@
 
             chooseMode (item) {
                 const formData = {
-                    ...JSON.parse(JSON.stringify(this.formData)),
+                    ...JSON.parse(JSON.stringify(this.copyFormData)),
                     paramConfig: item.paramConfig,
                     userManual: item.userManual,
                     engineCode: item.engineCode

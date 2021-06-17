@@ -160,10 +160,10 @@
                 })
             },
 
-            getPlanList () {
+            getPlanList (isLoadMore) {
                 this.isLoadingMore = true
                 return getPlanList(this.projectId, this.pageNum).then((res) => {
-                    this.taskList = (res.turboPlanList || []).map((item) => {
+                    const taskList = (res.turboPlanList || []).map((item) => {
                         item.pagination = { current: 1, count: 1, limit: 10 }
                         item.tableList = []
                         item.loading = false
@@ -171,6 +171,8 @@
                         item.sortType = undefined
                         return item
                     })
+                    if (isLoadMore) this.taskList.push(...taskList)
+                    else this.taskList = taskList
                     this.turboPlanCount = res.turboPlanCount
                     this.loadEnd = (this.pageNum * 40) >= res.turboPlanCount
                     this.pageNum++
@@ -260,7 +262,7 @@
             scrollLoadMore (event) {
                 const target = event.target
                 const bottomDis = target.scrollHeight - target.clientHeight - target.scrollTop
-                if (bottomDis <= 500 && !this.loadEnd && !this.isLoadingMore) this.getPlanList()
+                if (bottomDis <= 500 && !this.loadEnd && !this.isLoadingMore) this.getPlanList(true)
             }
         }
     }
