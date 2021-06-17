@@ -90,7 +90,8 @@ class V2RequestTrigger @Autowired constructor(
             isMr = (event is GitMergeRequestEvent),
             originYaml = originYaml,
             filePath = filePath,
-            pipelineId = gitProjectPipeline.pipelineId
+            pipelineId = gitProjectPipeline.pipelineId,
+            pipelineName = gitProjectPipeline.displayName
         ) ?: return false
         val yamlObject = yamlObjects.normalYaml
         val normalizedYaml = YamlUtil.toYaml(yamlObject)
@@ -159,6 +160,7 @@ class V2RequestTrigger @Autowired constructor(
                 userId = gitRequestEvent.userId,
                 eventId = gitRequestEvent.id!!,
                 pipelineId = if (gitProjectPipeline.pipelineId.isBlank()) null else gitProjectPipeline.pipelineId,
+                pipelineName = gitProjectPipeline.displayName,
                 filePath = gitProjectPipeline.filePath,
                 originYaml = originYaml,
                 parsedYaml = parsedYaml,
@@ -185,7 +187,8 @@ class V2RequestTrigger @Autowired constructor(
         isMr: Boolean,
         originYaml: String?,
         filePath: String,
-        pipelineId: String?
+        pipelineId: String?,
+        pipelineName: String?
     ): YamlObjects? {
         if (originYaml.isNullOrBlank()) {
             return null
@@ -198,7 +201,8 @@ class V2RequestTrigger @Autowired constructor(
             gitRequestEvent = gitRequestEvent,
             pipelineId = pipelineId,
             filePath = filePath,
-            isMr = isMr
+            isMr = isMr,
+            pipelineName = pipelineName
         ) ?: return null
         return replaceYamlTemplate(
             isFork = isFork,
@@ -209,7 +213,8 @@ class V2RequestTrigger @Autowired constructor(
             filePath = filePath ?: GIT_CI_TEMPLATE_ROOT_FILE,
             gitRequestEvent = gitRequestEvent,
             pipelineId = pipelineId,
-            originYaml = originYaml
+            originYaml = originYaml,
+            pipelineName = pipelineName
         )
     }
 
@@ -217,6 +222,7 @@ class V2RequestTrigger @Autowired constructor(
         originYaml: String,
         gitRequestEvent: GitRequestEvent,
         pipelineId: String?,
+        pipelineName: String?,
         filePath: String,
         isMr: Boolean
     ): PreTemplateScriptBuildYaml? {
@@ -234,6 +240,7 @@ class V2RequestTrigger @Autowired constructor(
                 userId = gitRequestEvent.userId,
                 eventId = gitRequestEvent.id!!,
                 pipelineId = pipelineId,
+                pipelineName = pipelineName,
                 filePath = filePath,
                 originYaml = originYaml,
                 parsedYaml = null,
@@ -257,7 +264,8 @@ class V2RequestTrigger @Autowired constructor(
         filePath: String,
         gitRequestEvent: GitRequestEvent,
         originYaml: String?,
-        pipelineId: String?
+        pipelineId: String?,
+        pipelineName: String?
     ): YamlObjects? {
         // 替换yaml文件中的模板引用
         val preYamlObject = try {
@@ -288,6 +296,7 @@ class V2RequestTrigger @Autowired constructor(
                 userId = gitRequestEvent.userId,
                 eventId = gitRequestEvent.id!!,
                 pipelineId = pipelineId,
+                pipelineName = pipelineName,
                 filePath = filePath,
                 originYaml = originYaml,
                 parsedYaml = null,
