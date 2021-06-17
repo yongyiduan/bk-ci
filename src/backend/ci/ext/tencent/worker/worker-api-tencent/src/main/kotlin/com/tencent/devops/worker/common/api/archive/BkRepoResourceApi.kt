@@ -45,7 +45,6 @@ import com.tencent.devops.common.archive.constant.ARCHIVE_PROPS_APP_APP_TITLE
 import com.tencent.devops.common.archive.constant.ARCHIVE_PROPS_APP_BUNDLE_IDENTIFIER
 import com.tencent.devops.common.archive.constant.ARCHIVE_PROPS_APP_FULL_IMAGE
 import com.tencent.devops.common.archive.constant.ARCHIVE_PROPS_APP_IMAGE
-import com.tencent.devops.common.archive.constant.ARCHIVE_PROPS_APP_NAME
 import com.tencent.devops.common.archive.constant.ARCHIVE_PROPS_APP_SCHEME
 import com.tencent.devops.common.archive.constant.ARCHIVE_PROPS_APP_VERSION
 import com.tencent.devops.process.pojo.BuildVariables
@@ -245,7 +244,8 @@ class BkRepoResourceApi : AbstractBuildResourceApi() {
                 repoName = repoName,
                 fullPath = fullPath,
                 token = token,
-                destPath = destPath
+                destPath = destPath,
+                isVmBuildEnv = true
             )
         } else {
             directDownloadBkRepoFile(userId, projectId, repoName, fullPath, destPath)
@@ -263,10 +263,10 @@ class BkRepoResourceApi : AbstractBuildResourceApi() {
         AbstractBuildResourceApi.logger.info("upload file >>> ${file.name}")
         val url = "/bkrepo/api/build/generic/$projectId/$repoName$destFullPath"
         val request = buildPut(
-            url,
-            RequestBody.create(MediaType.parse("application/octet-stream"), file),
-            getUploadHeader(file, buildVariables, parseAppMetadata),
-            useFileGateway = true
+            path = url,
+            requestBody = RequestBody.create(MediaType.parse("application/octet-stream"), file),
+            headers = getUploadHeader(file, buildVariables, parseAppMetadata),
+            useFileDevnetGateway = true
         )
         val response = request(request, "上传文件失败")
         try {
