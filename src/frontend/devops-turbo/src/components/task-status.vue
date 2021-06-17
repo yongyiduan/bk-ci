@@ -1,6 +1,6 @@
 <template>
     <span class="status-component">
-        <logo size="14" :name="lowerCaseProp()" :class="`${status} status-logo`"></logo><span :class="{ error: message }" v-bk-tooltips="{ content: message, disabled: !message }">{{ getStatusName() }}</span>
+        <logo size="14" :name="lowerCaseProp()" :class="`${status} status-logo`"></logo><span :class="{ error: message }" v-bk-tooltips="{ content: message, disabled: !message }" v-if="showName">{{ getStatusName() }}</span>
     </span>
 </template>
 
@@ -14,7 +14,11 @@
 
         props: {
             status: String,
-            message: String
+            message: String,
+            showName: {
+                type: Boolean,
+                default: true
+            }
         },
 
         methods: {
@@ -25,11 +29,11 @@
             getStatusName () {
                 const statusMap = {
                     init: this.$t('turbo.初始化'),
-                    staging: this.$t('turbo.排队中'),
+                    staging: this.$t('turbo.准备中'),
                     starting: this.$t('turbo.准备阶段'),
-                    running: this.$t('turbo.正在加速'),
-                    finish: this.$t('turbo.成功'),
-                    failed: this.$t('turbo.失败')
+                    running: this.$t('turbo.正在构建'),
+                    finish: this.$t('turbo.构建完成'),
+                    failed: this.$t('turbo.构建失败')
                 }
                 return statusMap[this.status]
             }

@@ -104,7 +104,7 @@
             padding: 0 32px;
             .task-use {
                 margin-bottom: 20px;
-                padding: 26px 0 67px;
+                padding: 26px 0 20px;
             }
             .task-record {
                 border-top: 1px solid #DCDEE5;

@@ -118,15 +118,12 @@
         watch: {
             projectId: {
                 handler () {
+                    this.initFilter()
                     this.getHistoryList()
                     this.getHistorySearchList()
                 },
                 immediate: true
             }
-        },
-
-        created () {
-            this.initFilter()
         },
 
         methods: {
@@ -169,6 +166,7 @@
                     pipelineId: this.pipelineId,
                     status: this.status,
                     turboPlanId: this.turboPlanId,
+                    clientIp: this.clientIp,
                     projectId: this.projectId
                 }
                 const queryData = {

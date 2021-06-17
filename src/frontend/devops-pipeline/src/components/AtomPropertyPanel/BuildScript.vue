@@ -14,6 +14,7 @@
                         :project-id="projectId"
                         :element-id="elementId"
                         :turbo-disabled="inputDisabled"
+                        :ref="key"
                         @handleChange="handleUpdateTurbo"
                         v-bind="obj">
                     </component>
@@ -140,23 +141,35 @@
                     }
                 } else if (this.elementId && !this.taskId) {
                     const h = this.$createElement
+                    const cancelChoose = () => {
+                        const scriptTurbo = this.$refs.scriptTurbo[0]
+                        if (scriptTurbo) {
+                            const turbo = scriptTurbo.$refs.turbo || {}
+                            turbo.$refs.checkbox.setLocalValue(false)
+                        }
+                    }
                     this.$bkInfo({
-                        subHeader: h('div', {}, [this.$t('editPage.atomForm.turboOffline'), h('a', {
+                        subHeader: h('div', {
+                            style: {
+                                fontSize: '14px'
+                            }
+                        }, [this.$t('editPage.atomForm.turboOffline'), h('a', {
                             style: {
                                 color: '#3c96ff',
-                                marginLeft: '15px'
+                                marginLeft: '5px'
                             },
                             attrs: {
-                                href: 'https://iwiki.woa.com/x/6OQMIw',
+                                href: `${WEB_URL_PIRFIX}/turbo/${this.projectId}/task/`,
                                 target: '_blank'
                             }
                         }, this.$t('editPage.atomForm.turboV2'))]),
                         closeIcon: false,
+                        width: '460px',
                         confirmFn () {
-                            this.banAllBooster = false
+                            cancelChoose()
                         },
                         cancelFn () {
-                            this.banAllBooster = false
+                            cancelChoose()
                         }
                     })
                 } else {
