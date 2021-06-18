@@ -35,7 +35,7 @@
                 @row-click="goToDetail"
                 @sort-change="sortChange"
             >
-                <bk-table-column :label="$t('turbo.编号')" type="index" width="60"></bk-table-column>
+                <bk-table-column :label="$t('turbo.编号')" prop="executeNum" width="80" sortable></bk-table-column>
                 <bk-table-column :label="$t('turbo.流水线/构建机')" prop="pipeline_name" sortable>
                     <template slot-scope="props">
                         <span v-if="props.row.pipelineName">
