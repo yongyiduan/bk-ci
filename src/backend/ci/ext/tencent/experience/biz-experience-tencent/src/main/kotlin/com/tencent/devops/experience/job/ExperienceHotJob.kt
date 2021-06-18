@@ -30,7 +30,7 @@ class ExperienceHotJob @Autowired constructor(
     private var hotDays: Long = 7
 
     @Scheduled(cron = "0 5 0 * * ?")
-    @SuppressWarnings("MagicNumber")
+    @SuppressWarnings("MagicNumber", "NestedBlockDepth", "SwallowedException")
     fun jobHot() {
         if (profile.isProd() && !profile.isProdGray()) {
             logger.info("profile is prod , no start")
@@ -55,13 +55,17 @@ class ExperienceHotJob @Autowired constructor(
                         hotDaysAgo = hotDaysAgo
                     )
 
-                    val record = experienceDao.get(dslContext, it.get("RECORD_ID", Long::class.java))
+                    val updateTime = try {
+                        experienceDao.get(dslContext, it.get("RECORD_ID", Long::class.java)).updateTime
+                    } catch (e: Exception) {
+                        LocalDateTime.now()
+                    }
 
                     experiencePublicDao.updateById(
                         dslContext = dslContext,
                         id = it.get("ID", Long::class.java),
                         downloadTime = countForHot,
-                        updateTime = record.updateTime
+                        updateTime = updateTime
                     )
                 }
                 logger.info("Job hot finish")
