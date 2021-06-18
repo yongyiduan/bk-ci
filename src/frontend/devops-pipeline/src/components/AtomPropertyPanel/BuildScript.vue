@@ -14,6 +14,7 @@
                         :project-id="projectId"
                         :element-id="elementId"
                         :turbo-disabled="inputDisabled"
+                        :ref="key"
                         @handleChange="handleUpdateTurbo"
                         v-bind="obj">
                     </component>
@@ -80,7 +81,7 @@
         },
         methods: {
             ...mapActions('pipelines', [
-                'requestTurboIofo',
+                'requestTurboV2Info',
                 'setTurboSwitch',
                 'updateToTurbo'
             ]),
@@ -139,52 +140,54 @@
                         }
                     }
                 } else if (this.elementId && !this.taskId) {
-                    this.isLoading = true
-                    try {
-                        const res = await this.requestTurboIofo({
-                            bsPipelineId: this.$route.params.pipelineId,
-                            bsElementId: this.elementId
-                        })
-                        if (res) {
-                            res.data.banAllBooster === 'false' ? (this.banAllBooster = true) : (this.banAllBooster = false)
-                            this.task = Object.assign({}, res.data)
-                            this.taskId = res.data.taskId
-                            this.taskName = res.data.taskName
-                            if (!this.taskId) {
-                                this.banAllBooster = value
-                                this.$bkInfo({
-                                    subTitle: this.$t('editPage.atomForm.createTurbo'),
-                                    closeIcon: false,
-                                    confirmFn: this.goRegist,
-                                    cancelFn: () => {
-                                        this.banAllBooster = false
-                                    }
-                                })
-                            }
+                    const h = this.$createElement
+                    const cancelChoose = () => {
+                        const scriptTurbo = this.$refs.scriptTurbo[0]
+                        if (scriptTurbo) {
+                            const turbo = scriptTurbo.$refs.turbo || {}
+                            turbo.$refs.checkbox.setLocalValue(false)
                         }
-                    } catch (err) {
-                        this.$bkMessage({
-                            message: err.message ? err.message : err,
-                            theme: 'error'
-                        })
-                    } finally {
-                        this.isLoading = false
                     }
+                    this.$bkInfo({
+                        subHeader: h('div', {
+                            style: {
+                                fontSize: '14px'
+                            }
+                        }, [this.$t('editPage.atomForm.turboOffline'), h('a', {
+                            style: {
+                                color: '#3c96ff',
+                                marginLeft: '5px'
+                            },
+                            attrs: {
+                                href: `${WEB_URL_PREFIX}/turbo/${this.projectId}/task/`,
+                                target: '_blank'
+                            }
+                        }, this.$t('editPage.atomForm.turboV2'))]),
+                        closeIcon: false,
+                        width: '460px',
+                        confirmFn () {
+                            cancelChoose()
+                        },
+                        cancelFn () {
+                            cancelChoose()
+                        }
+                    })
                 } else {
                     this.isShow = true
                 }
             },
             async initData () {
                 try {
-                    const res = await this.requestTurboIofo({
+                    const res = await this.requestTurboV2Info({
                         bsPipelineId: this.$route.params.pipelineId,
                         bsElementId: this.elementId
                     })
                     if (res) {
-                        res.data.banAllBooster === 'false' ? (this.banAllBooster = true) : (this.banAllBooster = false)
-                        this.task = Object.assign({}, res.data)
-                        this.taskId = res.data.taskId
-                        this.taskName = res.data.taskName
+                        const data = res.data || {}
+                        this.banAllBooster = data.banAllBooster === 'false'
+                        this.task = Object.assign({}, data)
+                        this.taskId = data.taskId
+                        this.taskName = data.taskName
                     }
                 } catch (err) {
                     this.$bkMessage({

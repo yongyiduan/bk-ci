@@ -125,7 +125,7 @@
         data () {
             return {
                 defaultMachineCover: require('../../../scss/logo/machine.svg'),
-                installDocsLink: `${IWIKI_DOCS_URL}/services/pools/self-hosted-agents`
+                installDocsLink: `${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=36426596`
             }
         },
         methods: {
