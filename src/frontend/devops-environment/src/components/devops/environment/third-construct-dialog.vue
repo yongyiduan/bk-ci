@@ -125,7 +125,7 @@
         data () {
             return {
                 defaultMachineCover: require('../../../scss/logo/machine.svg'),
-                installDocsLink: 'https://iwiki.woa.com/pages/viewpage.action?pageId=36426596'
+                installDocsLink: `${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=36426596`
             }
         },
         methods: {
