@@ -37,7 +37,6 @@ import com.tencent.devops.process.api.service.ServicePipelineResource
 import com.tencent.devops.process.pojo.PipelineWithModel
 import com.tencent.devops.process.pojo.Pipeline
 import com.tencent.devops.process.pojo.PipelineId
-import com.tencent.devops.process.pojo.PipelineIdInfo
 import com.tencent.devops.process.pojo.PipelineName
 import com.tencent.devops.process.pojo.pipeline.DeployPipelineResult
 import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
@@ -48,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired
 @RestResource
 class ApigwPipelineResourceV3Impl @Autowired constructor(private val client: Client) :
     ApigwPipelineResourceV3 {
-
     override fun status(
         appCode: String?,
         apigwType: String?,
@@ -221,15 +219,6 @@ class ApigwPipelineResourceV3Impl @Autowired constructor(private val client: Cli
     ): Result<Boolean> {
         logger.info("restore: userId[$userId] projectId[$projectId] pipelineId[$pipelineId]")
         return client.get(ServicePipelineResource::class).restore(userId, projectId, pipelineId)
-    }
-
-    override fun getProjectPipelineIds(
-        appCode: String?,
-        apigwType: String?,
-        projectCode: String
-    ): Result<List<PipelineIdInfo>> {
-        logger.info("getProjectPipelineIds $projectCode")
-        return client.get(ServicePipelineResource::class).getProjectPipelineIds(projectCode)
     }
 
     override fun saveSetting(
