@@ -139,7 +139,7 @@
                 !this.turboDisabled && this.$emit('handleChange', name, value)
             },
             goTurboLink () {
-                window.open(`${WEB_URL_PIRFIX}/turbo/${this.$route.params.projectId}/history/?pipelineId=${this.$route.params.pipelineId}&planId=${this.taskId}`, '_blank')
+                window.open(`${WEB_URL_PREFIX}/turbo/${this.$route.params.projectId}/history/?pipelineId=${this.$route.params.pipelineId}&planId=${this.taskId}`, '_blank')
             },
             projLang () {
                 if (this.task.projLang === '1') {

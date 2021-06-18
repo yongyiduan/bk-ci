@@ -159,7 +159,7 @@
                                 marginLeft: '5px'
                             },
                             attrs: {
-                                href: `${WEB_URL_PIRFIX}/turbo/${this.projectId}/task/`,
+                                href: `${WEB_URL_PREFIX}/turbo/${this.projectId}/task/`,
                                 target: '_blank'
                             }
                         }, this.$t('editPage.atomForm.turboV2'))]),
