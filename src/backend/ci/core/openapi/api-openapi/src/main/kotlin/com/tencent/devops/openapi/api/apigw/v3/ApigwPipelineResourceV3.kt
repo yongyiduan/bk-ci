@@ -38,10 +38,10 @@ import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.process.pojo.Pipeline
 import com.tencent.devops.process.pojo.PipelineId
 import com.tencent.devops.process.pojo.PipelineName
+import com.tencent.devops.process.pojo.setting.PipelineSetting
 import com.tencent.devops.process.pojo.PipelineWithModel
 import com.tencent.devops.process.pojo.pipeline.DeployPipelineResult
 import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
-import com.tencent.devops.process.pojo.setting.PipelineSetting
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -306,10 +306,9 @@ interface ApigwPipelineResourceV3 {
         pipelineId: String
     ): Result<Boolean>
 
-    @ApiOperation("保存流水线设置")
+    @ApiOperation("更新流水线设置")
     @POST
-    // @Path("/projects/{projectId}/pipelines/{pipelineId}/saveSetting")
-    @Path("/{projectId}/{pipelineId}/saveSetting")
+    @Path("/{projectId}/{pipelineId}/setting_update")
     fun saveSetting(
         @ApiParam(value = "appCode", required = true, defaultValue = AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_DEVOPS_APP_CODE)

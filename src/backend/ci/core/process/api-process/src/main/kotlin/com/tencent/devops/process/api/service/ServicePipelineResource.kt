@@ -41,8 +41,8 @@ import com.tencent.devops.process.pojo.PipelineIdInfo
 import com.tencent.devops.process.pojo.PipelineName
 import com.tencent.devops.process.pojo.pipeline.DeployPipelineResult
 import com.tencent.devops.process.pojo.pipeline.SimplePipeline
-import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
 import com.tencent.devops.process.pojo.setting.PipelineSetting
+import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -209,7 +209,6 @@ interface ServicePipelineResource {
 
     @ApiOperation("保存流水线设置")
     @POST
-    // @Path("/projects/{projectId}/pipelines/{pipelineId}/saveSetting")
     @Path("/{projectId}/{pipelineId}/saveSetting")
     fun saveSetting(
         @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)

@@ -38,9 +38,9 @@ import com.tencent.devops.process.pojo.PipelineWithModel
 import com.tencent.devops.process.pojo.Pipeline
 import com.tencent.devops.process.pojo.PipelineId
 import com.tencent.devops.process.pojo.PipelineName
+import com.tencent.devops.process.pojo.setting.PipelineSetting
 import com.tencent.devops.process.pojo.pipeline.DeployPipelineResult
 import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
-import com.tencent.devops.process.pojo.setting.PipelineSetting
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
