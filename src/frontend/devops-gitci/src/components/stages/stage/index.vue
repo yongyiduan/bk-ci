@@ -144,7 +144,6 @@
                 color: #c3cdd7;
                 fill: #c3cdd7;
             }
-
             &.running {
                 background-color: #eff5ff;
                 border-color: #d4e8ff;

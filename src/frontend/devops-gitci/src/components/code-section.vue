@@ -1,5 +1,8 @@
 <template>
-    <section :class="[{ 'max-height': limitHeight }, 'ci-yml']" :style="styleVar"></section>
+    <section class="code-section-home">
+        <section :class="[{ 'max-height': limitHeight && !isFullScreen, 'un-full-screen': !isFullScreen }, 'ci-yml']" :style="styleVar"></section>
+        <i :class="['bk-icon', isFullScreen ? 'icon-un-full-screen' : 'icon-full-screen']" @click="toggleFullScreen(!isFullScreen)"></i>
+    </section>
 </template>
 
 <script>
@@ -8,6 +11,8 @@
     import 'codemirror/mode/yaml/yaml'
     import 'codemirror/lib/codemirror.css'
     import 'codemirror/theme/3024-night.css'
+    import 'codemirror/addon/display/fullscreen'
+    import 'codemirror/addon/display/fullscreen.css'
 
     export default {
         props: {
@@ -34,6 +39,7 @@
         },
 
         data () {
+            const vm = this
             return {
                 codeMirrorCon: {
                     lineNumbers: true,
@@ -44,9 +50,15 @@
                     cursorBlinkRate: this.cursorBlinkRate,
                     readOnly: this.readOnly,
                     autoRefresh: true,
-                    autofocus: false
+                    autofocus: false,
+                    extraKeys: {
+                        Esc () {
+                            vm.toggleFullScreen(false)
+                        }
+                    }
                 },
-                codeEditor: undefined
+                codeEditor: undefined,
+                isFullScreen: false
             }
         },
 
@@ -75,7 +87,7 @@
 
         methods: {
             initCodeMirror () {
-                const ele = document.querySelector('.ci-yml')
+                const ele = this.$el.querySelector('.ci-yml')
                 if (this.codeEditor) ele.innerHTML = ''
                 this.codeEditor = CodeMirror(ele, this.codeMirrorCon)
                 this.codeEditor.setValue(this.code || '')
@@ -89,14 +101,38 @@
 
             getValue () {
                 return this.codeEditor.getValue()
+            },
+
+            toggleFullScreen (val) {
+                this.isFullScreen = val
+                this.codeEditor.setOption('fullScreen', val)
+                this.$nextTick(() => {
+                    this.codeEditor.refresh()
+                })
             }
         }
     }
 </script>
 
 <style lang="postcss" scoped>
+    .code-section-home {
+        position: relative;
+    }
+
     .ci-yml {
         background: black;
+    }
+
+    .bk-icon {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        color: #fff;
+        cursor: pointer;
+        z-index: 999;
+        &.icon-un-full-screen {
+            position: fixed;
+        }
     }
 
     .max-height {
@@ -113,12 +149,11 @@
     /deep/ .CodeMirror {
         font-family: Consolas, "Courier New", monospace;
         line-height: 1.5;
+    }
+    .un-full-screen /deep/ .CodeMirror {
+        min-height: 300px;
         margin-bottom: 20px;
         padding: 10px;
-        height: auto;
-    }
-    /deep/ .CodeMirror {
-        min-height: 300px;
         height: auto;
         .CodeMirror-scroll {
             min-height: 300px;

@@ -116,5 +116,9 @@ export default {
 
     cancelBuildPipeline (projectId, pipelineId, buildId) {
         return api.delete(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}`)
+    },
+
+    getBuildInfoByBuildNum (projectId, pipelineId, buildNum) {
+        return api.get(`${PROCESS_PREFIX}/user/builds/${projectId}/${pipelineId}/detail/${buildNum}`)
     }
 }
