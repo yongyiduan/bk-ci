@@ -132,7 +132,7 @@
                     </bk-select>
                 </bk-form-item>
                 <bk-form-item class="mt15">
-                    <bk-checkbox v-model="formData.useCommitId" @change="getPipelineBranchYaml">Use a specified historical commit to trigger the build</bk-checkbox>
+                    <bk-checkbox v-model="formData.useCommitId" @change="getPipelineBranchYaml">Use a commit history to trigger this build</bk-checkbox>
                 </bk-form-item>
                 <bk-form-item label="Commit" :required="true" :rules="[requireRule('Commit')]" property="commitId" error-display-type="normal" v-if="formData.useCommitId">
                     <bk-tag-input placeholder="Select a Commit"
@@ -151,7 +151,7 @@
                     >
                     </bk-tag-input>
                 </bk-form-item>
-                <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom builds exist only on build history and will not appear in your commit history." error-display-type="normal">
+                <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom build message will not affect your commit history." error-display-type="normal">
                     <bk-input v-model="formData.customCommitMsg" placeholder="Please enter build message"></bk-input>
                 </bk-form-item>
                 <bk-form-item label="Yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal" v-bkloading="{ isLoading: isLoadingYaml }">

@@ -82,6 +82,12 @@
             }
         },
 
+        watch: {
+            '$route.params.buildId' () {
+                this.initData()
+            }
+        },
+
         created () {
             this.initData()
         },

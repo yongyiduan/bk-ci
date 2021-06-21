@@ -34,7 +34,7 @@ export default {
     },
 
     requestPermission (projectId) {
-        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/hasCreatePermission`)
+        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/hasCreatePermission`, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
     },
 
     requestDevnetGateway () {
@@ -116,5 +116,9 @@ export default {
 
     cancelBuildPipeline (projectId, pipelineId, buildId) {
         return api.delete(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}`)
+    },
+
+    getBuildInfoByBuildNum (projectId, pipelineId, buildNum) {
+        return api.get(`${PROCESS_PREFIX}/user/builds/${projectId}/${pipelineId}/detail/${buildNum}`)
     }
 }
