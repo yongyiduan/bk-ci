@@ -48,12 +48,13 @@
   "dependencies": {
     "@blueking/log": "1.1.9",
     "@blueking/user-selector": "^1.0.6",
-    "@icon-cool/bk-icon-gitci": "0.0.11",
+    "@icon-cool/bk-icon-gitci": "0.0.14",
     "axios": "~0.18.0",
     "bk-magic-vue": "^2.3.0",
     "codemirror": "^5.61.0",
     "cookie": "~0.4.0",
     "jsonp": "~0.2.1",
+    "vue-echarts": "^3.0.9",
     "vue": "~2.5.22",
     "vue-router": "~3.0.6",
     "vuex": "~3.1.1"

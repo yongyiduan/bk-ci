@@ -54,8 +54,8 @@ export default {
         return api.post(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${poolHash}/listNodes`)
     },
 
-    deleteNode (projectId, params) {
-        return api.post(`${ENVIRNMENT_PERFIX}/user/envnode/${projectId}/deleteNodes`, params).then(response => {
+    deleteEnvNode (projectId, envHashId, params) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${envHashId}/deleteNodes`, params).then(response => {
             return response
         })
     },
@@ -82,5 +82,21 @@ export default {
 
     resetAuthorization (projectId) {
         return api.post(`${GITCI_PERFIX}/user/basic/setting/${projectId}/user`)
+    },
+
+    requestNodeList (projectId) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/envnode/${projectId}`)
+    },
+
+    importEnvNode (projectId, envHashId, params) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${envHashId}/addNodes`, params).then(response => {
+            return response
+        })
+    },
+
+    requestNodeDetail (projectId, nodeHashId) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/thirdPartyAgentDetail`).then(response => {
+            return response
+        })
     }
 }

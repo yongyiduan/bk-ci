@@ -20,6 +20,11 @@
                 v-if="agentList.length"
             >
                 <bk-table-column label="Display Name" prop="displayName"></bk-table-column>
+                <!-- <bk-table-column label="Display Name" prop="displayName">
+                    <template slot-scope="props">
+                        <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.name}}</span>
+                    </template>
+                </bk-table-column> -->
                 <bk-table-column label="OS" prop="osName"></bk-table-column>
                 <bk-table-column label="Status" prop="nodeStatus"></bk-table-column>
                 <bk-table-column label="Operation" width="150" class-name="handler-btn">
@@ -96,7 +101,7 @@
 
             deleteAgent () {
                 this.isDeleteing = true
-                setting.deleteNode(this.projectId, [this.deleteRow.nodeHashId]).then(() => {
+                setting.deleteEnvNode(this.projectId, this.$route.params.poolId, [this.deleteRow.nodeHashId]).then(() => {
                     this.isShowDelete = false
                     this.getNodeList()
                 }).catch((err) => {
@@ -109,6 +114,15 @@
             goToAddAgent () {
                 this.$router.push({
                     name: 'addAgent'
+                })
+            },
+
+            goToAgentDetail (id) {
+                this.$router.push({
+                    name: 'agentDetail',
+                    params: {
+                        agentId: id
+                    }
                 })
             }
         }
