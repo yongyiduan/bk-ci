@@ -1,5 +1,5 @@
 <template>
-    <bk-select :value="paramValue[paramKey]" @change="changeParamValue" v-bind="$props" class="g-turbo-single-width">
+    <bk-select :value="paramValue[paramKey]" @change="changeParamValue" v-bind="{ ...$props, ...paramProps }" class="g-turbo-single-width">
         <bk-option v-for="(param, index) in paramEnum"
             :key="index"
             :id="param.paramValue"
