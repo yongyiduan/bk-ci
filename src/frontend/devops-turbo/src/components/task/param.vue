@@ -12,7 +12,7 @@
                 error-display-type="normal"
             >
                 <component :is="'param-' + config.paramType"
-                    v-bind="config"
+                    v-bind="{ ...config, ...(config.paramProps || {}) }"
                     v-if="config.displayed"
                     :disabled="!isEdit"
                     :param-value="copyFormData.configParam"
