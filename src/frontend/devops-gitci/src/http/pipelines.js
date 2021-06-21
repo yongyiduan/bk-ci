@@ -34,7 +34,7 @@ export default {
     },
 
     requestPermission (projectId) {
-        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/hasCreatePermission`)
+        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/hasCreatePermission`, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
     },
 
     requestDevnetGateway () {
