@@ -1,34 +1,39 @@
 <template>
     <article class="detail-report-home" v-bkloading="{ isLoading }">
-        <template v-if="reportList.length">
-            <bk-tab :active.sync="reportIndex">
-                <bk-tab-panel
-                    v-for="(report, index) in reportList"
-                    v-bind="report"
-                    :key="index">
-                </bk-tab-panel>
-            </bk-tab>
+        <bk-exception class="exception-wrap-item" type="403" scene="part" v-if="noPermission">
+            <span>No permission</span>
+        </bk-exception>
+        <template v-else>
+            <template v-if="reportList.length">
+                <bk-tab :active.sync="reportIndex">
+                    <bk-tab-panel
+                        v-for="(report, index) in reportList"
+                        v-bind="report"
+                        :key="index">
+                    </bk-tab-panel>
+                </bk-tab>
 
-            <bk-table :data="chooseReport.thirdReports"
-                :outer-border="false"
-                :header-border="false"
-                :header-cell-style="{ background: '#FAFBFD' }"
-                v-if="chooseReport.type === 'THIRDPARTY'"
-                class="report-file"
-            >
-                <bk-table-column label="Name" show-overflow-tooltip>
-                    <template slot-scope="props">
-                        <icon name="tiaozhuan" size="18" class="jump-icon" />
-                        <a :href="props.row.indexFileUrl" target="_blank" class="text-link">{{ props.row.name }}</a>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-            <iframe :src="chooseReport.indexFileUrl" frameborder="0" class="report-file" v-else></iframe>
+                <bk-table :data="chooseReport.thirdReports"
+                    :outer-border="false"
+                    :header-border="false"
+                    :header-cell-style="{ background: '#FAFBFD' }"
+                    v-if="chooseReport.type === 'THIRDPARTY'"
+                    class="report-file"
+                >
+                    <bk-table-column label="Name" show-overflow-tooltip>
+                        <template slot-scope="props">
+                            <icon name="tiaozhuan" size="18" class="jump-icon" />
+                            <a :href="props.row.indexFileUrl" target="_blank" class="text-link">{{ props.row.name }}</a>
+                        </template>
+                    </bk-table-column>
+                </bk-table>
+                <iframe :src="chooseReport.indexFileUrl" frameborder="0" class="report-file" v-else></iframe>
+            </template>
+            <span class="bk-table-empty-text" v-if="!isLoading && reportList.length <= 0">
+                <i class="bk-table-empty-icon bk-icon icon-empty"></i>
+                <div>No reports yet</div>
+            </span>
         </template>
-        <span class="bk-table-empty-text" v-if="!isLoading && reportList.length <= 0">
-            <i class="bk-table-empty-icon bk-icon icon-empty"></i>
-            <div>No reports yet</div>
-        </span>
     </article>
 </template>
 
@@ -41,7 +46,8 @@
             return {
                 isLoading: false,
                 reportList: [],
-                reportIndex: 0
+                reportIndex: 0,
+                noPermission: false
             }
         },
 
@@ -50,6 +56,12 @@
 
             chooseReport () {
                 return this.reportList.find((report, index) => (index === this.reportIndex)) || {}
+            }
+        },
+
+        watch: {
+            '$route.params.buildId' () {
+                this.initData()
             }
         },
 
@@ -79,6 +91,7 @@
                     if (thirdReports.length) this.reportList.push({ name: 'Third party report', thirdReports, type: 'THIRDPARTY' })
                     this.reportList = this.reportList.map((report, index) => ({ name: index, label: report.name, indexFileUrl: report.indexFileUrl }))
                 }).catch((err) => {
+                    this.noPermission = err.code === 2129002
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
@@ -110,6 +123,9 @@
         margin: 0 auto;
         text-align: center;
         display: block;
+    }
+    .exception-wrap-item {
+        padding-top: 45px;
     }
     /deep/ .bk-table {
         border: none;

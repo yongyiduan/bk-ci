@@ -1,9 +1,10 @@
 <template>
     <section>
-        <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [getPipelineStatusClass(plugin.status)]: true }" @click="toggleShowLog">
-            <plugin-icon :plugin="plugin"></plugin-icon>
+        <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [statusClass]: true }" @click="toggleShowLog">
+            <plugin-icon :plugin="plugin" v-if="!isSkip"></plugin-icon>
+            <span v-else class="plugin-index">{{ jobIndex + 1 }}-{{ pluginIndex + 1 }}</span>
             <span class="plugin-name text-ellipsis" v-bk-overflow-tips>{{ plugin.name }}</span>
-            <span class="plugin-time" v-bk-tooltips="pluginTime">{{ pluginTime }}</span>
+            <span class="plugin-time" v-bk-tooltips="pluginTime" v-if="!isSkip">{{ pluginTime }}</span>
         </section>
 
         <plugin-log @close="toggleShowLog"
@@ -44,12 +45,18 @@
         computed: {
             pluginTime () {
                 return this.plugin.elapsed > 36e5 ? '1h' : coverTimer(this.plugin.elapsed)
+            },
+
+            statusClass () {
+                return getPipelineStatusClass(this.plugin.status)
+            },
+
+            isSkip () {
+                return this.statusClass === 'skip'
             }
         },
 
         methods: {
-            getPipelineStatusClass,
-
             toggleShowLog () {
                 this.showLog = !this.showLog
             }
@@ -81,6 +88,11 @@
         }
         .plugin-time {
             margin: 0 0px 0 2px;
+        }
+        .plugin-index {
+            display: inline-block;
+            width: 42px;
+            text-align: center;
         }
         &.first-plugin:before {
             top: -16px;
@@ -138,6 +150,13 @@
             }
             &:after {
                 border-color: $successColor;
+            }
+        }
+        &.skip {
+            color: #c3cdd7;
+            .plugin-name {
+                color: #c3cdd7;
+                text-decoration: line-through;
             }
         }
     }

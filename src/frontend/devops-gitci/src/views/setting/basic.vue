@@ -21,7 +21,7 @@
             <section class="main-checkbox">
                 <bk-button @click="resetAuthorization" :loading="isReseting">Reset Authorization</bk-button>
             </section>
-            <h5 class="main-title">After disable CI, all trigger events will be ignored.</h5>
+            <h5 class="main-title">{{ form.enableCi ? 'After disable CI, all trigger events will be ignored.' : 'Build, test and deploy your code. Continuous delivery of your product faster, easier, with fewer bugs.' }}</h5>
             <section class="main-checkbox">
                 <bk-button :theme="form.enableCi ? 'danger' : 'primary'" :loading="isToggleEnable" @click="toggleEnable">{{ form.enableCi ? 'Disable CI' : 'Enable CI' }}</bk-button>
             </section>
