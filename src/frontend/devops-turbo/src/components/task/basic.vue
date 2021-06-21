@@ -28,7 +28,12 @@
                 <template v-if="isEdit && onlyEdit">
                     <span> {{ $t('turbo.根据你的加速场景选择适用的模式') }} </span>
                     <ul class="turbo-model-list">
-                        <li v-for="item in engineList" :key="item" :class="['single-width', 'turbo-model-item', 'g-turbo-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]" @click="chooseMode(item)">
+                        <li v-for="item in engineList"
+                            v-show="item.recommend"
+                            :key="item"
+                            :class="['single-width', 'turbo-model-item', 'g-turbo-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]"
+                            @click="chooseMode(item)"
+                        >
                             <p class="item-title g-turbo-black-font">{{ item.engineName }}<span class="recommend" v-if="item.recommend"> {{ $t('turbo.（荐）') }} <span></span></span></p>
                             <span class="item-desc g-turbo-gray-font g-turbo-text-overflow" v-bk-overflow-tips="{ interactive: true }">{{ item.desc }}</span>
                             <logo name="check" :size="10" class="item-check"></logo>
