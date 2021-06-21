@@ -11,7 +11,11 @@ export default {
             type: Object,
             default: () => ({})
         },
-        defaultValue: [String, Array, Object]
+        defaultValue: [String, Array, Object],
+        paramProps: {
+            type: Object,
+            default: () => ({})
+        }
     },
 
     computed: {
