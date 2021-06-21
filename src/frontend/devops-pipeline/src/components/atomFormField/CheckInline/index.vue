@@ -5,7 +5,7 @@
             <a href="javascript: void(0);" class="check-inline-link" target="_blank" v-if="taskId" @click.stop="goTurboLink">{{ taskName }}</a>
         </div>
         <bk-alert type="error" class="turbo-tip" v-if="taskId && turboValue">
-            <div slot="title">当前使用的是旧版 distcc，建议迁移到新版。<bk-link href="https://iwiki.woa.com/x/xmKDDw" target="_blank" theme="primary">了解更多</bk-link></div>
+            <div slot="title">当前使用的是旧版 distcc，建议迁移到新版。<bk-link href="https://iwiki.woa.com/x/dj67Lw" target="_blank" theme="primary">了解更多</bk-link></div>
         </bk-alert>
         <div class="build-quote" v-if="taskId && turboValue">
             <div class="quote-ident">
