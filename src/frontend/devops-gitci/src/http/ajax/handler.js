@@ -1,5 +1,9 @@
 import store from '@/store'
 
+function requestHandler (config) {
+    return config
+}
+
 function errorHandler (error) {
     console.log('error catch', error)
     return Promise.reject(Error(error.message || '网络出现问题，请检查你的网络是否正常'))
@@ -34,4 +38,4 @@ function getLoginUrl () {
     }
 }
 
-export { errorHandler, successHandler }
+export { errorHandler, successHandler, requestHandler }

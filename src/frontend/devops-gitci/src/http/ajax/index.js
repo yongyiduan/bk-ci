@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { errorHandler, successHandler } from './handler'
+import { errorHandler, successHandler, requestHandler } from './handler'
 
 const request = axios.create({
     baseURL: AJAX_URL_PREFIX,
@@ -11,10 +11,11 @@ const request = axios.create({
     },
     withCredentials: true,
     xsrfCookieName: 'paas_perm_csrftoken',
-    xsrfHeaderName: 'X-CSRFToken'
+    xsrfHeaderName: 'X-CSRFToken',
+    headers: { Cookie: 'X-DEVOPS-PROJECT-ID=gitciproject;' }
 })
 
-request.interceptors.request.use(config => config, error => Promise.reject(error))
+request.interceptors.request.use(requestHandler, error => Promise.reject(error))
 
 request.interceptors.response.use(successHandler, errorHandler)
 
