@@ -125,7 +125,7 @@
             },
 
             loopGetPipelineList () {
-                register.installWsMessage(this.getPipelineList, 'status')
+                register.installWsMessage(this.getPipelineList, 'STATUSgitci')
                 return this.getPipelineList()
             },
 

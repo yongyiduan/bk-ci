@@ -138,9 +138,7 @@
 
             loopGetNotifications () {
                 this.getNotifications()
-                register.installWsMessage((res) => {
-                    this.messageNum = res || 0
-                }, 'notify')
+                register.installWsMessage(this.getNotifications, 'NOTIFYgitci')
             },
 
             goToSetting () {

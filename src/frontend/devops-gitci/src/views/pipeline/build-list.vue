@@ -343,15 +343,7 @@
             },
 
             loopGetList () {
-                register.installWsMessage((res = {}) => {
-                    this.buildList = (res.records || []).map((build) => {
-                        return {
-                            ...build,
-                            buildHistory: build.buildHistory || {},
-                            gitRequestEvent: build.gitRequestEvent || {}
-                        }
-                    })
-                }, 'history')
+                register.installWsMessage(this.getBuildData, 'IFRAMEprocess')
             },
 
             getBuildData () {

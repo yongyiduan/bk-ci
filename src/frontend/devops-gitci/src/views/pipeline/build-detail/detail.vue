@@ -121,7 +121,7 @@
             },
 
             loopGetPipelineDetail () {
-                register.installWsMessage(this.handleData, 'detail')
+                register.installWsMessage(this.getPipelineBuildDetail, 'IFRAMEprocess')
                 return this.getPipelineBuildDetail()
             },
 
