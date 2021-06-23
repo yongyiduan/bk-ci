@@ -54,6 +54,9 @@ const store = new Vuex.Store({
         },
         setPermission ({ commit }, permission) {
             commit('setPermission', permission)
+        },
+        setUser ({ commit }, user) {
+            commit('updateUser', user)
         }
     }
 })

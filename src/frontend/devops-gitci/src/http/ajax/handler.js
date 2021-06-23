@@ -1,5 +1,9 @@
 import store from '@/store'
 
+function setCookie (cname, cvalue, domain) {
+    document.cookie = `${cname}=${cvalue};domain=${domain}; path=/;expires=Fri, 31 Dec 2030 23:59:59 GMT`
+}
+
 function requestHandler (config) {
     return config
 }
@@ -38,4 +42,4 @@ function getLoginUrl () {
     }
 }
 
-export { errorHandler, successHandler, requestHandler }
+export { errorHandler, successHandler, requestHandler, setCookie }

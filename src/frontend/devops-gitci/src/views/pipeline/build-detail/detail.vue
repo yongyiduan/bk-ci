@@ -48,6 +48,7 @@
     import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag } from '@/utils'
     import stages from '@/components/stages'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
+    import register from '@/utils/websocket-register'
 
     export default {
         components: {
@@ -93,7 +94,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetPipelineDetail.loopId)
+            register.unInstallWsMessage()
         },
 
         methods: {
@@ -114,21 +115,28 @@
                     pipelineId: this.$route.params.pipelineId,
                     buildId: this.$route.params.buildId
                 }
-                return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
-                    const modelDetail = res.modelDetail || {}
-                    const model = modelDetail.model || {}
-                    this.stageList = (model.stages || []).slice(1)
-                    this.buildDetail = {
-                        ...res.gitProjectPipeline,
-                        ...res.gitRequestEvent,
-                        buildHistoryRemark: res.buildHistoryRemark,
-                        spendTime: modelDetail.endTime - modelDetail.startTime,
-                        startTime: modelDetail.startTime,
-                        status: modelDetail.status
-                    }
-                }).catch((err) => {
+                return pipelines.getPipelineBuildDetail(this.projectId, params).then(this.handleData).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
+            },
+
+            loopGetPipelineDetail () {
+                register.installWsMessage(this.handleData, 'detail')
+                return this.getPipelineBuildDetail()
+            },
+
+            handleData (res) {
+                const modelDetail = res.modelDetail || {}
+                const model = modelDetail.model || {}
+                this.stageList = (model.stages || []).slice(1)
+                this.buildDetail = {
+                    ...res.gitProjectPipeline,
+                    ...res.gitRequestEvent,
+                    buildHistoryRemark: res.buildHistoryRemark,
+                    spendTime: modelDetail.endTime - modelDetail.startTime,
+                    startTime: modelDetail.startTime,
+                    status: modelDetail.status
+                }
             },
 
             rebuild () {
@@ -159,12 +167,6 @@
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
-            },
-
-            loopGetPipelineDetail () {
-                clearTimeout(this.loopGetPipelineDetail.loopId)
-                this.loopGetPipelineDetail.loopId = setTimeout(this.loopGetPipelineDetail, 2000)
-                return this.getPipelineBuildDetail()
             },
 
             getIconClass (status) {

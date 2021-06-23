@@ -11,10 +11,10 @@
                 </template>
             </span>
             <section class="user-info">
-                <img :src="userInfo.img" class="avatar" />
+                <img :src="user.avatarUrl" class="avatar" />
                 <bk-dropdown-menu align="right" trigger="click">
                     <div class="dropdown-trigger-btn" slot="dropdown-trigger">
-                        <span class="name">{{ userInfo.name }}</span>
+                        <span class="name">{{ user.username }}</span>
                         <span class="unread" v-if="messageNum > 0"></span>
                         <i class="bk-icon icon-down-shape"></i>
                     </div>
@@ -34,23 +34,21 @@
 <script>
     import { common, notifications, pipelines } from '@/http'
     import { mapActions, mapState } from 'vuex'
+    import gitCiWebSocket from '@/utils/websocket'
+    import register from '@/utils/websocket-register'
 
     export default {
         name: 'app',
 
         data () {
             return {
-                userInfo: {
-                    name: '',
-                    img: ''
-                },
                 messageNum: 0,
                 isLoading: false
             }
         },
 
         computed: {
-            ...mapState(['exceptionInfo', 'projectInfo', 'projectId']),
+            ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'user']),
 
             computedIconClass () {
                 const name = this.$route.name
@@ -66,19 +64,21 @@
 
         watch: {
             '$route.hash': {
-                handler () {
-                    this.initData()
+                handler (val) {
+                    if (val) {
+                        this.initData()
+                    }
                 },
                 immediate: true
             }
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetNotifications.loopId)
+            register.unInstallWsMessage()
         },
 
         methods: {
-            ...mapActions(['setProjectInfo', 'setExceptionInfo', 'setPermission']),
+            ...mapActions(['setProjectInfo', 'setExceptionInfo', 'setPermission', 'setUser']),
 
             initData () {
                 this.isLoading = true
@@ -91,7 +91,7 @@
 
             getUserInfo () {
                 return common.getUserInfo().then((userInfo = {}) => {
-                    this.userInfo = { name: userInfo.username, img: userInfo.avatarUrl }
+                    this.setUser(userInfo)
                 })
             },
 
@@ -106,6 +106,7 @@
                                 this.loopGetNotifications()
                                 this.getPermission()
                                 this.setExceptionInfo({ type: 200 })
+                                gitCiWebSocket.changeRoute(this.$route)
                             } else {
                                 this.setExceptionInfo({ type: 499 })
                             }
@@ -136,9 +137,10 @@
             },
 
             loopGetNotifications () {
-                clearTimeout(this.loopGetNotifications.loopId)
                 this.getNotifications()
-                this.loopGetNotifications.loopId = setTimeout(this.loopGetNotifications, 5000)
+                register.installWsMessage((res) => {
+                    this.messageNum = res || 0
+                }, 'notify')
             },
 
             goToSetting () {

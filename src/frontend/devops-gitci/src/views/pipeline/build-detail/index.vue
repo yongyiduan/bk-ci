@@ -56,7 +56,6 @@
             '$route.name': {
                 handler (name) {
                     this.active = name
-                    this.changeTab(name)
                 },
                 immediate: true
             }

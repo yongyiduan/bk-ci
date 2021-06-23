@@ -174,6 +174,7 @@
     import codeSection from '@/components/code-section'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import BkUserSelector from '@blueking/user-selector'
+    import register from '@/utils/websocket-register'
 
     export default {
         components: {
@@ -279,7 +280,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetList.loopId)
+            register.unInstallWsMessage()
         },
 
         methods: {
@@ -342,11 +343,15 @@
             },
 
             loopGetList () {
-                clearTimeout(this.loopGetList.loopId)
-                this.loopGetList.loopId = setTimeout(() => {
-                    this.getBuildData()
-                    this.loopGetList()
-                }, 5000)
+                register.installWsMessage((res = {}) => {
+                    this.buildList = (res.records || []).map((build) => {
+                        return {
+                            ...build,
+                            buildHistory: build.buildHistory || {},
+                            gitRequestEvent: build.gitRequestEvent || {}
+                        }
+                    })
+                }, 'history')
             },
 
             getBuildData () {
