@@ -16,7 +16,7 @@ function successHandler (response) {
     } else if ((typeof code !== 'undefined' && code !== 0) || (typeof status !== 'undefined' && status !== 0)) {
         return Promise.reject(errorMsg)
     }
-    return data
+    return data || response.data
 }
 
 function getLoginUrl () {

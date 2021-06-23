@@ -1,6 +1,7 @@
 <template>
     <section class="stages-home">
         <stage v-for="(stage, index) in stages"
+            :stages="stages"
             :stage-index="index"
             :stage-num="stages.length"
             :stage="stage"

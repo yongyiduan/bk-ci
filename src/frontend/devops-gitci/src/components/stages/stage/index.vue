@@ -21,6 +21,7 @@
             :job-index="jobIndex"
             :stage-index="stageIndex"
             :stage-num="stageNum"
+            :stages="stages"
         ></job>
 
         <bk-dialog v-model="showRetryStageDialog"
@@ -53,6 +54,7 @@
         },
 
         props: {
+            stages: Object,
             stage: Object,
             stageIndex: Number,
             stageNum: Number

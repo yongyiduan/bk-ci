@@ -17,6 +17,7 @@ const buildDetail = () => import(/* webpackChunkName: 'buildDetail' */'@/views/p
 const buildArtifacts = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/artifacts')
 const buildReports = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/reports')
 const buildConfig = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/config')
+const webConsole = () => import(/* webpackChunkName: "webConsole" */'@/views/pipeline/web-console.vue')
 const setting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/index')
 const basicSetting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/basic')
 const credentialList = () => import(/* webpackChunkName: 'setting' */'@/views/setting/credential')
@@ -33,6 +34,11 @@ const routes = [
             exception: exception
         },
         children: [
+            {
+                path: 'webConsole',
+                name: 'webConsole',
+                component: webConsole
+            },
             {
                 path: '',
                 component: pipeline,

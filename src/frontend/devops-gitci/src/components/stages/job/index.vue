@@ -18,7 +18,7 @@
             :stage-index="stageIndex"
         ></plugin>
 
-        <job-log :job="job" v-if="showJobLog" :job-index="jobIndex" :stage-index="stageIndex" @close="toggleShowLog"></job-log>
+        <job-log :job="job" v-if="showJobLog" :job-index="jobIndex" :stages="stages" :stage-index="stageIndex" @close="toggleShowLog"></job-log>
     </section>
 </template>
 
@@ -40,6 +40,7 @@
         props: {
             job: Object,
             jobIndex: Number,
+            stages: Object,
             stageIndex: Number,
             stageNum: Number
         },
