@@ -1,5 +1,6 @@
 import store from '../store'
 import SockJS from 'sockjs-client'
+import { getWSpath } from './index'
 const Stomp = require('stompjs/lib/stomp.js').Stomp
 
 function uuid () {
@@ -65,7 +66,7 @@ class GitCiWebSocket {
         const data = {
             sessionId: this.uuid,
             userId: (state.user || {}).username,
-            page: router.path,
+            page: getWSpath(router.path),
             showProjectList: false,
             projectId: state.projectId
         }
@@ -81,7 +82,11 @@ class GitCiWebSocket {
     }
 
     loginOut (from) {
-        const data = { sessionId: this.uuid, userId: (store.state.user || {}).username, page: from.path }
+        const data = {
+            sessionId: this.uuid,
+            userId: (store.state.user || {}).username,
+            page: getWSpath(from.path)
+        }
         if (this.hasConnect) {
             this.ensureSendMessage(() => {
                 this.stompClient.send('/app/loginOut', {}, JSON.stringify(data))

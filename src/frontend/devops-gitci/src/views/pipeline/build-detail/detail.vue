@@ -10,7 +10,7 @@
                 </span>
                 <span class="info-data">
                     <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
-                    <span class="info-item text-ellipsis"><icon name="clock" size="14"></icon>{{ buildDetail.spendTime | spendTimeFilter }}</span>
+                    <span class="info-item text-ellipsis"><icon name="clock" size="14"></icon>{{ buildDetail.executeTime | spendTimeFilter }}</span>
                     <span class="info-item text-ellipsis">
                         <icon name="message" size="14"></icon>
                         {{ buildDetail.buildHistoryRemark || '--' }}
@@ -115,28 +115,33 @@
                     pipelineId: this.$route.params.pipelineId,
                     buildId: this.$route.params.buildId
                 }
-                return pipelines.getPipelineBuildDetail(this.projectId, params).then(this.handleData).catch((err) => {
+                return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
+                    const modelDetail = res.modelDetail || {}
+                    const model = modelDetail.model || {}
+                    this.stageList = (model.stages || []).slice(1)
+                    this.buildDetail = {
+                        ...res.gitProjectPipeline,
+                        ...res.gitRequestEvent,
+                        buildHistoryRemark: res.buildHistoryRemark,
+                        executeTime: modelDetail.executeTime,
+                        startTime: modelDetail.startTime,
+                        status: modelDetail.status
+                    }
+                }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
 
             loopGetPipelineDetail () {
-                register.installWsMessage(this.getPipelineBuildDetail, 'IFRAMEprocess')
+                register.installWsMessage((res) => {
+                    console.log(res)
+                    const model = res.model || {}
+                    this.stageList = (model.stages || []).slice(1)
+                    this.buildDetail.status = res.status
+                    this.buildDetail.startTime = res.startTime
+                    this.buildDetail.executeTime = res.executeTime
+                }, 'IFRAMEprocess')
                 return this.getPipelineBuildDetail()
-            },
-
-            handleData (res) {
-                const modelDetail = res.modelDetail || {}
-                const model = modelDetail.model || {}
-                this.stageList = (model.stages || []).slice(1)
-                this.buildDetail = {
-                    ...res.gitProjectPipeline,
-                    ...res.gitRequestEvent,
-                    buildHistoryRemark: res.buildHistoryRemark,
-                    spendTime: modelDetail.endTime - modelDetail.startTime,
-                    startTime: modelDetail.startTime,
-                    status: modelDetail.status
-                }
             },
 
             rebuild () {

@@ -1,3 +1,5 @@
+import { getWSpath } from './index'
+
 export default {
     callBack: () => {},
 
@@ -5,7 +7,8 @@ export default {
         this.callBack = (res = {}) => {
             const { webSocketType, module, page, message } = res.data || {}
             const wsKey = webSocketType + module
-            if (wsKey === key && location.href.includes(page)) {
+            const wsPath = getWSpath(location.href)
+            if (wsKey === key && wsPath.includes(page)) {
                 const parseMessage = JSON.parse(message)
                 callBack(parseMessage)
             }
