@@ -33,6 +33,7 @@ import com.tencent.devops.artifactory.api.ServiceArchiveAtomResource
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.constant.DEFAULT
 import com.tencent.devops.common.api.constant.REQUIRED
+import com.tencent.devops.common.api.constant.VALUE
 import com.tencent.devops.common.api.enums.FrontendTypeEnum
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Page
@@ -1007,15 +1008,16 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
                 val desc = paramValueMap["desc"]
                 val description = if (label?.toString().isNullOrBlank()) {
                     if (text?.toString().isNullOrBlank()) {
-                        desc
+                        desc.toString()
                     } else {
-                        text
+                        text.toString()
                     }
                 } else {
-                    label
+                    label.toString()
                 }
                 val type = paramValueMap["type"]
-                val required = paramValueMap["required"]
+                val required = null != paramValueMap["required"] &&
+                    "true".equals(paramValueMap["required"].toString(), true)
                 val defaultValue = paramValueMap["default"]
                 val multipleMap = paramValueMap["optionsConf"]
                 val multiple = if (null != multipleMap && null != (multipleMap as Map<String, String>)["multiple"]) {
@@ -1025,32 +1027,42 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
                 }
                 val requiredName = MessageCodeUtil.getCodeLanMessage(REQUIRED)
                 val defaultName = MessageCodeUtil.getCodeLanMessage(DEFAULT)
+                val valueName = MessageCodeUtil.getCodeLanMessage(VALUE)
                 if ((type == "selector" && multiple) ||
                     type in listOf("atom-checkbox-list", "staff-input", "company-staff-input", "parameter")) {
-                    sb.append("      $paramKey: ")
-                    sb.append("\t\t# $description")
-                    if (null != required && "true".equals(required.toString(), true)) {
-                        sb.append(", $requiredName")
-                    }
-                    if (null != defaultValue && (defaultValue.toString()).isNotBlank()) {
-                        sb.append(", $defaultName: ${defaultValue.toString().replace("\n", "")}")
-                    }
+                    addParamComment(
+                        builder = sb,
+                        description = description,
+                        paramKey = paramKey,
+                        required = required,
+                        valueName = valueName,
+                        paramValueMap = paramValueMap,
+                        requiredName = requiredName,
+                        defaultValue = defaultValue,
+                        defaultName = defaultName
+                    )
                     sb.append("\r\n")
-                    sb.append("      - string\r\n")
-                    sb.append("      - string\r\n")
+                    sb.append("      $paramKey: ")
+                    sb.append("        - string\r\n")
+                    sb.append("        - string\r\n")
                 } else {
+                    addParamComment(
+                        builder = sb,
+                        description = description,
+                        paramKey = paramKey,
+                        required = required,
+                        valueName = valueName,
+                        paramValueMap = paramValueMap,
+                        requiredName = requiredName,
+                        defaultValue = defaultValue,
+                        defaultName = defaultName
+                    )
+                    sb.append("\r\n")
                     sb.append("    $paramKey: ")
                     if (type == "atom-checkbox") {
                         sb.append("boolean")
                     } else {
                         sb.append("string")
-                    }
-                    sb.append("\t\t# ${description.toString().replace("\n", "")}")
-                    if (null != required && "true".equals(required.toString(), true)) {
-                        sb.append(", $requiredName")
-                    }
-                    if (null != defaultValue && (defaultValue.toString()).isNotBlank()) {
-                        sb.append(", $defaultName: ${defaultValue.toString().replace("\n", "")}")
                     }
                     sb.append("\r\n")
                 }
@@ -1098,4 +1110,36 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
         repositoryHashId: String,
         tokenType: TokenTypeEnum
     ): Result<Boolean>
+
+    private fun addParamComment(
+        builder: StringBuffer,
+        description: String,
+        paramKey: String,
+        required: Boolean,
+        valueName: String,
+        paramValueMap: Map<String, Any>,
+        requiredName: Any?,
+        defaultValue: Any?,
+        defaultName: Any?
+    ) {
+        builder.append("    # ${description.replace("\n", "")}")
+        if (required) {
+            builder.append(", $requiredName")
+        }
+        if (null != defaultValue && (defaultValue.toString()).isNotBlank()) {
+            builder.append(", $defaultName: ${defaultValue.toString().replace("\n", "")}")
+        }
+        val options = paramValueMap["options"] ?: return
+        try {
+            options as List<Map<String, String>>
+            builder.append(", $valueName:")
+            options.forEachIndexed { index, map ->
+                if (index == options.size - 1) builder.append(" ${map["id"]}[${map["name"]}]")
+                else builder.append(" ${map["id"]}[${map["name"]}] |")
+            }
+            builder.removeSuffix("|")
+        } catch (e: Exception) {
+            println("load atom input[$paramKey] with error: ${e.message}")
+        }
+    }
 }
