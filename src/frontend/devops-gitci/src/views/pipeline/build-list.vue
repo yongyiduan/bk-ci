@@ -280,7 +280,7 @@
         },
 
         beforeDestroy () {
-            register.unInstallWsMessage()
+            register.unInstallWsMessage('history')
         },
 
         methods: {
@@ -343,7 +343,7 @@
             },
 
             loopGetList () {
-                register.installWsMessage(this.getBuildData, 'IFRAMEprocess')
+                register.installWsMessage(this.getBuildData, 'IFRAMEprocess', 'history')
             },
 
             getBuildData () {

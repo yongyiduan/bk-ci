@@ -1,23 +1,36 @@
 import { getWSpath } from './index'
 
-export default {
-    callBack: () => {},
+const register = {
+    callBacks: {},
 
-    installWsMessage (callBack, key) {
-        this.callBack = (res = {}) => {
+    execCallBacks (res) {
+        const keys = Object.keys(register.callBacks)
+        keys.forEach((key) => {
+            const cb = register.callBacks[key]
+            cb(res)
+        })
+    },
+
+    installWsMessage (callBack, key, id) {
+        register.callBacks[id] = (res = {}) => {
+            console.log(key, id)
             const { webSocketType, module, page, message } = res.data || {}
             const wsKey = webSocketType + module
-            const wsPath = getWSpath(location.href)
+            const wsPath = getWSpath(location.href.replace(/#.+$/, ''))
             if (wsKey === key && wsPath.includes(page)) {
                 const parseMessage = JSON.parse(message)
                 callBack(parseMessage)
             }
         }
-        window.addEventListener('message', this.callBack)
     },
 
-    unInstallWsMessage () {
-        window.removeEventListener('message', this.callBack)
-        this.callBack = () => {}
+    unInstallWsMessage (id) {
+        if (register.callBacks[id]) {
+            delete register.callBacks[id]
+        }
     }
 }
+
+window.addEventListener('message', register.execCallBacks)
+
+export default register

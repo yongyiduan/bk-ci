@@ -74,7 +74,7 @@
         },
 
         beforeDestroy () {
-            register.unInstallWsMessage()
+            register.unInstallWsMessage('notify')
         },
 
         methods: {
@@ -138,7 +138,7 @@
 
             loopGetNotifications () {
                 this.getNotifications()
-                register.installWsMessage(this.getNotifications, 'NOTIFYgitci')
+                register.installWsMessage(this.getNotifications, 'NOTIFYgitci', 'notify')
             },
 
             goToSetting () {

@@ -94,7 +94,7 @@
         },
 
         beforeDestroy () {
-            register.unInstallWsMessage()
+            register.unInstallWsMessage('detail')
         },
 
         methods: {
@@ -134,13 +134,12 @@
 
             loopGetPipelineDetail () {
                 register.installWsMessage((res) => {
-                    console.log(res)
                     const model = res.model || {}
                     this.stageList = (model.stages || []).slice(1)
                     this.buildDetail.status = res.status
                     this.buildDetail.startTime = res.startTime
                     this.buildDetail.executeTime = res.executeTime
-                }, 'IFRAMEprocess')
+                }, 'IFRAMEprocess', 'detail')
                 return this.getPipelineBuildDetail()
             },
 

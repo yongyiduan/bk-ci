@@ -107,7 +107,7 @@
         },
 
         beforeDestroy () {
-            register.unInstallWsMessage()
+            register.unInstallWsMessage('pipelineList')
         },
 
         methods: {
@@ -125,7 +125,7 @@
             },
 
             loopGetPipelineList () {
-                register.installWsMessage(this.getPipelineList, 'STATUSgitci')
+                register.installWsMessage(this.getPipelineList, 'STATUSgitci', 'pipelineList')
                 return this.getPipelineList()
             },
 
