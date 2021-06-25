@@ -13,7 +13,6 @@ const register = {
 
     installWsMessage (callBack, key, id) {
         register.callBacks[id] = (res = {}) => {
-            console.log(key, id)
             const { webSocketType, module, page, message } = res.data || {}
             const wsKey = webSocketType + module
             const wsPath = getWSpath(location.href.replace(/#.+$/, ''))
