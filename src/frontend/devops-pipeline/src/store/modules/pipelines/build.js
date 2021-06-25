@@ -284,8 +284,8 @@ const actions = {
         })
     },
 
-    requestTurboV2Info ({ commit, state, dispatch }, { bsPipelineId, bsContainerId, bsElementId }) {
-        return ajax.get(`turbo-new/api/user/turboPlan/pipelineId/${bsPipelineId}/pipelineElementId/${bsElementId}`).then(response => {
+    requestTurboV2Info ({ commit, state, dispatch }, { bsPipelineId, bsProjectId, bsElementId }) {
+        return ajax.get(`turbo-new/api/user/turboPlan/projectId/${bsProjectId}/pipelineId/${bsPipelineId}/pipelineElementId/${bsElementId}`).then(response => {
             return response
         })
     },
