@@ -8,7 +8,7 @@
             </bk-tab-panel>
         </bk-tab>
 
-        <code-section :code="ymlObj[active]" limit-height :height="`${height}px`"></code-section>
+        <code-section :code="ymlObj[active]" limit-height :height="`${height}px`" v-bkloading="{ isLoading, opacity: 0, color: '#090300' }"></code-section>
     </article>
 </template>
 
@@ -29,7 +29,8 @@
                     { label: 'Parsed YAML', name: 'parsedYaml' }
                 ],
                 active: 'originYaml',
-                ymlObj: {}
+                ymlObj: {},
+                isLoading: true
             }
         },
 
@@ -41,14 +42,25 @@
             }
         },
 
+        watch: {
+            '$route.params.buildId' () {
+                this.getYaml()
+            }
+        },
+
         created () {
             this.getYaml()
         },
 
         methods: {
             getYaml () {
+                this.isLoading = true
                 pipelines.getPipelineBuildYaml(this.projectId, this.$route.params.buildId).then((res) => {
                     this.ymlObj = res
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
                 })
             }
         }

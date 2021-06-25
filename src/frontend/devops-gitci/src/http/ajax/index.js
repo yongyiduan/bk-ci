@@ -1,5 +1,8 @@
 import axios from 'axios'
-import { errorHandler, successHandler } from './handler'
+import { errorHandler, successHandler, requestHandler, setCookie } from './handler'
+
+// 设置cookie，路由到git-ci独立集群
+setCookie('X-DEVOPS-PROJECT-ID', 'gitciproject', document.domain.split('.').slice(-2).join('.'))
 
 const request = axios.create({
     baseURL: AJAX_URL_PREFIX,
@@ -14,7 +17,7 @@ const request = axios.create({
     xsrfHeaderName: 'X-CSRFToken'
 })
 
-request.interceptors.request.use(config => config, error => Promise.reject(error))
+request.interceptors.request.use(requestHandler, error => Promise.reject(error))
 
 request.interceptors.response.use(successHandler, errorHandler)
 
