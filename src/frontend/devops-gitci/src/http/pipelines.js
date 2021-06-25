@@ -1,5 +1,5 @@
 import api from './ajax'
-import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX } from './perfix'
+import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX } from './perfix'
 
 export default {
     // 第一次拉取日志
@@ -118,6 +118,41 @@ export default {
         return api.delete(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}`)
     },
 
+    getContainerInfoByBuildId (projectId, pipelineId, buildId, vmSeqId) {
+        return api.get(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/getContainerInfo/${projectId}/${pipelineId}/${buildId}/${vmSeqId}`)
+    },
+
+    startDebugDocker (params) {
+        return api.post(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/startDebug/`, params)
+    },
+
+    stopDebugDocker (projectId, pipelineId, vmSeqId) {
+        return api.post(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/stopDebug/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
+            return res
+        })
+    },
+
+    getDebugStatus (projectId, pipelineId, vmSeqId) {
+        return api.get(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/getDebugStatus/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
+            return res
+        }).catch((err) => {
+            throw err
+        })
+    },
+
+    getDockerExecId (containerId, projectId, pipelineId, cmd, targetIp) {
+        return api.post(`http://${PROXY_URL_PREFIX}/docker-console-create?pipelineId=${pipelineId}&projectId=${projectId}&targetIp=${targetIp}`, { container_id: containerId, cmd }).then(res => {
+            return res && res.Id
+        }).catch((err) => {
+            throw err
+        })
+    },
+
+    resizeTerm (resizeUrl, params) {
+        return api.post(`http://${PROXY_URL_PREFIX}/${resizeUrl}`, params).then(res => {
+            return res && res.Id
+        })
+    },
     getBuildInfoByBuildNum (projectId, pipelineId, buildNum) {
         return api.get(`${PROCESS_PREFIX}/user/builds/${projectId}/${pipelineId}/detail/${buildNum}`)
     }
