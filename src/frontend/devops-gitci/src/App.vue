@@ -35,7 +35,7 @@
     import { common, notifications, pipelines } from '@/http'
     import { mapActions, mapState } from 'vuex'
     import gitCiWebSocket from '@/utils/websocket'
-    import register from '@/utils/websocket-register'
+    // import register from '@/utils/websocket-register'
 
     export default {
         name: 'app',
@@ -77,7 +77,8 @@
         },
 
         beforeDestroy () {
-            register.unInstallWsMessage('notify')
+            clearTimeout(this.loopGetNotifications.loopId)
+            // register.unInstallWsMessage('notify')
         },
 
         methods: {
@@ -140,8 +141,12 @@
             },
 
             loopGetNotifications () {
+                clearTimeout(this.loopGetNotifications.loopId)
                 this.getNotifications()
-                register.installWsMessage(this.getNotifications, 'NOTIFYgitci', 'notify')
+                this.loopGetNotifications.loopId = setTimeout(this.loopGetNotifications, 5000)
+
+                // this.getNotifications()
+                // register.installWsMessage(this.getNotifications, 'NOTIFYgitci', 'notify')
             },
 
             goToSetting () {
