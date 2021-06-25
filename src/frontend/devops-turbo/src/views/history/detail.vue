@@ -26,7 +26,7 @@
                     <logo name="cc-jump-link" class="task-link" @click.native="openLink(task.linkAddress)" v-if="task.linkAddress"></logo>
                 </li>
             </ul>
-            <bk-link theme="primary" :url="detail.recordViewUrl" target="_blank" class="detail-link">
+            <bk-link theme="primary" :href="detail.recordViewUrl" target="_blank" class="detail-link" v-if="detail.recordViewUrl">
                 {{ $t('turbo.查看编译过程数据') }}
                 <logo name="cc-jump-link" size="14"></logo>
             </bk-link>
