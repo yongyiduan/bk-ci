@@ -29,7 +29,6 @@
                     <span> {{ $t('turbo.根据你的加速场景选择适用的模式') }} </span>
                     <ul class="turbo-model-list">
                         <li v-for="item in engineList"
-                            v-show="item.recommend"
                             :key="item"
                             :class="['single-width', 'turbo-model-item', 'g-turbo-text-overflow', { choose: copyFormData.engineCode === item.engineCode }]"
                             @click="chooseMode(item)"
