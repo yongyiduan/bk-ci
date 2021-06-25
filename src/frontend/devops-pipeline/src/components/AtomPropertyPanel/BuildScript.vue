@@ -179,8 +179,9 @@
             async initData () {
                 try {
                     const res = await this.requestTurboV2Info({
-                        bsPipelineId: this.$route.params.pipelineId,
-                        bsElementId: this.elementId
+                        bsPipelineId: this.pipelineId,
+                        bsElementId: this.elementId,
+                        bsProjectId: this.projectId
                     })
                     if (res) {
                         const data = res.data || {}
