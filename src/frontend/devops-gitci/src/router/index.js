@@ -5,6 +5,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import websocket from '@/utils/websocket'
 Vue.use(VueRouter)
 
 const main = () => import(/* webpackChunkName: 'entry' */'@/views/index')
@@ -47,7 +48,10 @@ const routes = [
                     {
                         path: 'pipeline/:pipelineId?',
                         name: 'buildList',
-                        component: buildList
+                        component: buildList,
+                        meta: {
+                            websocket: true
+                        }
                     },
                     {
                         path: 'pipeline/:pipelineId/detail/:buildId',
@@ -57,7 +61,10 @@ const routes = [
                             {
                                 path: '',
                                 name: 'buildDetail',
-                                component: buildDetail
+                                component: buildDetail,
+                                meta: {
+                                    websocket: true
+                                }
                             },
                             {
                                 path: 'artifacts',
@@ -134,8 +141,13 @@ const router = new VueRouter({
     routes: routes
 })
 
+router.afterEach(route => {
+    websocket.changeRoute(route)
+})
+
 // 自动携带项目信息
 router.beforeEach((to, from, next) => {
+    websocket.loginOut(from)
     const params = {
         ...to,
         hash: to.hash || from.hash

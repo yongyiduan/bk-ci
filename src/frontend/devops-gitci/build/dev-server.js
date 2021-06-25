@@ -79,7 +79,7 @@ app.use(bodyParser.urlencoded({
 const staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-let localDevUrl = 'http://localhost.oa.com/'
+let localDevUrl = 'http://localhost.woa.com/'
 if (localDevUrl.slice(-1) === '/') {
     localDevUrl = localDevUrl.slice(0, -1)
 }

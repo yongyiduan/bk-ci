@@ -2,7 +2,16 @@
     <article class="build-detail-home">
         <section class="section-box build-detail-header">
             <bk-breadcrumb class="build-detail-crumb" separator-class="bk-icon icon-angle-right">
-                <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
+                <bk-breadcrumb-item :to="{ name: 'buildList', params: { pipelineId: curPipeline.pipelineId } }">{{yml}}</bk-breadcrumb-item>
+                <bk-breadcrumb-item>
+                    <span class="build-num">
+                        # {{buildNum}}
+                        <span class="toggle-build-icon">
+                            <icon name="angle-up-line" size="10" :class="{ click: latestBuildNum > buildNum }" @click.native="toggleBuild(1)"></icon>
+                            <icon name="angle-down-line" size="10" :class="{ click: buildNum > 1 }" @click.native="toggleBuild(-1)"></icon>
+                        </span>
+                    </span>
+                </bk-breadcrumb-item>
             </bk-breadcrumb>
 
             <bk-tab :active.sync="active" type="unborder-card" class="header-tab" @tab-change="changeTab">
@@ -34,33 +43,26 @@
                 ],
                 active: 'buildDetail',
                 buildNum: '',
+                latestBuildNum: '',
                 yml: ''
             }
         },
 
         computed: {
-            ...mapState(['projectId']),
-
-            navList () {
-                return [
-                    { title: this.yml, link: { name: 'buildList' } },
-                    { title: '# ' + this.buildNum }
-                ]
-            }
+            ...mapState(['projectId', 'curPipeline'])
         },
 
         watch: {
             '$route.name': {
                 handler (name) {
                     this.active = name
-                    this.changeTab(name)
                 },
                 immediate: true
             }
         },
 
         created () {
-            this.setHtmlTitle()
+            this.initData()
         },
 
         methods: {
@@ -68,22 +70,43 @@
                 this.$router.push({ name })
             },
 
-            setHtmlTitle () {
+            initData () {
                 const params = {
                     pipelineId: this.$route.params.pipelineId,
                     buildId: this.$route.params.buildId
                 }
-                return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
-                    const gitRequestEvent = res.gitRequestEvent || {}
-                    const modelDetail = res.modelDetail || {}
-                    const gitProjectPipeline = res.gitProjectPipeline || {}
+                return pipelines.getPipelineBuildDetail(this.projectId, params).then((res = {}) => {
+                    const { gitRequestEvent = {}, modelDetail = {}, gitProjectPipeline = {} } = res || {}
                     this.buildNum = modelDetail.buildNum
+                    this.latestBuildNum = modelDetail.latestBuildNum
                     this.yml = gitProjectPipeline.filePath
-                    const title = getBuildTitle(gitRequestEvent) + ' #' + this.buildNum
-                    modifyHtmlTitle(title)
+                    const message = getBuildTitle(gitRequestEvent)
+                    this.setHtmlTitle(message)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
+            },
+
+            toggleBuild (num) {
+                const buildNum = this.buildNum + num
+                if (buildNum <= 0 || buildNum > this.latestBuildNum) return
+
+                const pipelineId = this.$route.params.pipelineId
+                pipelines.getBuildInfoByBuildNum(this.projectId, pipelineId, buildNum).then((res) => {
+                    const buildId = res.id
+                    this.$router.push({
+                        name: this.$route.name,
+                        params: { buildId, pipelineId }
+                    })
+                    this.initData()
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
+            },
+
+            setHtmlTitle (message) {
+                const title = message + ' #' + this.buildNum
+                modifyHtmlTitle(title)
             }
         }
     }
@@ -100,6 +123,21 @@
         height: 50px;
         line-height: 50px;
         padding: 0 27px;
+        .build-num {
+            display: flex;
+            align-items: center;
+        }
+        .toggle-build-icon {
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+            font-size: 12px;
+            color: #c3cdd7;
+            .click {
+                color: #3a84ff;
+                cursor: pointer;
+            }
+        }
     }
     .header-tab {
         margin-top: -10px;

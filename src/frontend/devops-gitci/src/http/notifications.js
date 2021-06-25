@@ -10,8 +10,8 @@ export default {
         return api.put(`${GITCI_PERFIX}/user/messages/read?projectId=${projectId}`)
     },
 
-    readMessage (id) {
-        return api.put(`${GITCI_PERFIX}/user/messages/${id}/read`)
+    readMessage (id, projectId) {
+        return api.put(`${GITCI_PERFIX}/user/messages/${id}/read?projectId=${projectId}`)
     },
 
     getUnreadNotificationNum (projectId) {

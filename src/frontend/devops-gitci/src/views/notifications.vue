@@ -153,7 +153,7 @@
 
             readMessage (message) {
                 if (!message.haveRead) {
-                    notifications.readMessage(message.id).then(() => {
+                    notifications.readMessage(message.id, this.projectId).then(() => {
                         message.haveRead = true
                         this.getUnreadNum()
                     }).catch((err) => {
@@ -163,8 +163,8 @@
             },
 
             getUnreadNum () {
-                return notifications.getUnreadNotificationNum(this.projectId).then((res) => {
-                    this.unreadNum = res || 0
+                return notifications.getUnreadNotificationNum(this.projectId).then((res = {}) => {
+                    this.unreadNum = res.data || 0
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })

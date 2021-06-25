@@ -28,7 +28,8 @@ module.exports = {
         LOGIN_URL: false,
         USER_INFO_URL: false,
         LOGIN_SERVICE_URL: false,
-        PROXY_URL_PREFIX: false
+        PROXY_URL_PREFIX: false,
+        WEBSOCKET_URL_PREFIX: false
     },
     // add your custom rules hered
     rules: {

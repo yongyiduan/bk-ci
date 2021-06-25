@@ -34,7 +34,7 @@ export default {
     },
 
     requestPermission (projectId) {
-        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/hasCreatePermission`)
+        return api.get(`${PROCESS_PREFIX}/user/pipelines/${projectId}/hasCreatePermission`, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
     },
 
     requestDevnetGateway () {
@@ -152,5 +152,8 @@ export default {
         return api.post(`http://${PROXY_URL_PREFIX}/${resizeUrl}`, params).then(res => {
             return res && res.Id
         })
+    },
+    getBuildInfoByBuildNum (projectId, pipelineId, buildNum) {
+        return api.get(`${PROCESS_PREFIX}/user/builds/${projectId}/${pipelineId}/detail/${buildNum}`)
     }
 }

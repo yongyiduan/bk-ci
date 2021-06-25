@@ -30,7 +30,7 @@
         <section class="main-body section-box">
             <section class="build-filter">
                 <bk-input v-model="filterData.commitMsg" class="filter-item w300" placeholder="Commit message"></bk-input>
-                <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="http://open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
+                <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="https://api.open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
                 <bk-select v-model="filterData.branch"
                     class="filter-item"
                     placeholder="Branch"
@@ -84,7 +84,7 @@
                 <bk-table-column label="Consume" width="200">
                     <template slot-scope="props">
                         <p class="consume">
-                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.totalTime | totalFliter }}</span>
+                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.executeTime | totalFliter }}</span>
                             <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{ props.row.buildHistory.startTime | timeFilter }}</span>
                         </p>
                     </template>
@@ -132,7 +132,7 @@
                     </bk-select>
                 </bk-form-item>
                 <bk-form-item class="mt15">
-                    <bk-checkbox v-model="formData.useCommitId" @change="getPipelineBranchYaml">Use a specified historical commit to trigger the build</bk-checkbox>
+                    <bk-checkbox v-model="formData.useCommitId" @change="getPipelineBranchYaml">Use a commit history to trigger this build</bk-checkbox>
                 </bk-form-item>
                 <bk-form-item label="Commit" :required="true" :rules="[requireRule('Commit')]" property="commitId" error-display-type="normal" v-if="formData.useCommitId">
                     <bk-tag-input placeholder="Select a Commit"
@@ -151,7 +151,7 @@
                     >
                     </bk-tag-input>
                 </bk-form-item>
-                <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom builds exist only on build history and will not appear in your commit history." error-display-type="normal">
+                <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom build message will not affect your commit history." error-display-type="normal">
                     <bk-input v-model="formData.customCommitMsg" placeholder="Please enter build message"></bk-input>
                 </bk-form-item>
                 <bk-form-item label="Yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal" v-bkloading="{ isLoading: isLoadingYaml }">
@@ -174,6 +174,7 @@
     import codeSection from '@/components/code-section'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import BkUserSelector from '@blueking/user-selector'
+    import register from '@/utils/websocket-register'
 
     export default {
         components: {
@@ -279,7 +280,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetList.loopId)
+            register.unInstallWsMessage('history')
         },
 
         methods: {
@@ -342,11 +343,7 @@
             },
 
             loopGetList () {
-                clearTimeout(this.loopGetList.loopId)
-                this.loopGetList.loopId = setTimeout(() => {
-                    this.getBuildData()
-                    this.loopGetList()
-                }, 5000)
+                register.installWsMessage(this.getBuildData, 'IFRAMEprocess', 'history')
             },
 
             getBuildData () {

@@ -283,6 +283,12 @@ const actions = {
             return response
         })
     },
+
+    requestTurboV2Info ({ commit, state, dispatch }, { bsPipelineId, bsContainerId, bsElementId }) {
+        return ajax.get(`turbo-new/api/user/turboPlan/pipelineId/${bsPipelineId}/pipelineElementId/${bsElementId}`).then(response => {
+            return response
+        })
+    },
     /**
      * 编译加速开关
      *

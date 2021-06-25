@@ -14,7 +14,7 @@
 
             <section class="agent-filter">
                 <span class="filter-title">System</span>
-                <bk-select @change="getThirdAgentLink" v-model="machine.system" :loading="isLoading" behavior="simplicity" class="filter-select">
+                <bk-select @change="getThirdAgentLink" v-model="machine.system" :loading="isLoading" :clearable="false" behavior="simplicity" class="filter-select">
                     <bk-option v-for="option in operateSystems"
                         :key="option.id"
                         :id="option.id"
@@ -22,7 +22,7 @@
                     </bk-option>
                 </bk-select>
                 <span class="filter-title">Architecture</span>
-                <bk-select v-model="machine.architecture" behavior="simplicity" class="filter-select">
+                <bk-select v-model="machine.architecture" :clearable="false" behavior="simplicity" class="filter-select">
                     <bk-option v-for="option in architectures"
                         :key="option"
                         :id="option"
