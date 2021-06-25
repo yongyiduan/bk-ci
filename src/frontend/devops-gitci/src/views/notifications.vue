@@ -163,8 +163,8 @@
             },
 
             getUnreadNum () {
-                return notifications.getUnreadNotificationNum(this.projectId).then((res) => {
-                    this.unreadNum = res || 0
+                return notifications.getUnreadNotificationNum(this.projectId).then((res = {}) => {
+                    this.unreadNum = res.data || 0
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
