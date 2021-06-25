@@ -18,7 +18,7 @@ const register = {
             const wsKey = webSocketType + module
             const wsPath = getWSpath(location.href.replace(/#.+$/, ''))
             if (wsKey === key && wsPath.includes(page)) {
-                const parseMessage = JSON.parse(message)
+                const parseMessage = JSON.parse(message || '{}')
                 callBack(parseMessage)
             }
         }
