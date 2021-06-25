@@ -153,7 +153,7 @@
 
             readMessage (message) {
                 if (!message.haveRead) {
-                    notifications.readMessage(message.id).then(() => {
+                    notifications.readMessage(message.id, this.projectId).then(() => {
                         message.haveRead = true
                         this.getUnreadNum()
                     }).catch((err) => {
