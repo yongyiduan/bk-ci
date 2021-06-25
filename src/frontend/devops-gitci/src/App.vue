@@ -34,7 +34,7 @@
 <script>
     import { common, notifications, pipelines } from '@/http'
     import { mapActions, mapState } from 'vuex'
-    import gitCiWebSocket from '@/utils/websocket'
+    // import gitCiWebSocket from '@/utils/websocket'
     // import register from '@/utils/websocket-register'
 
     export default {
@@ -110,7 +110,7 @@
                                 this.loopGetNotifications()
                                 this.getPermission()
                                 this.setExceptionInfo({ type: 200 })
-                                gitCiWebSocket.changeRoute(this.$route)
+                                // gitCiWebSocket.changeRoute(this.$route)
                             } else {
                                 this.setExceptionInfo({ type: 499 })
                             }
