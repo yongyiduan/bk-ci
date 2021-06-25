@@ -1,5 +1,13 @@
 import store from '@/store'
 
+function setCookie (cname, cvalue, domain) {
+    document.cookie = `${cname}=${cvalue};domain=${domain}; path=/;expires=Fri, 31 Dec 2030 23:59:59 GMT`
+}
+
+function requestHandler (config) {
+    return config
+}
+
 function errorHandler (error) {
     console.log('error catch', error)
     return Promise.reject(Error(error.message || '网络出现问题，请检查你的网络是否正常'))
@@ -34,4 +42,4 @@ function getLoginUrl () {
     }
 }
 
-export { errorHandler, successHandler }
+export { errorHandler, successHandler, requestHandler, setCookie }

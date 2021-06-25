@@ -30,7 +30,7 @@
         <section class="main-body section-box">
             <section class="build-filter">
                 <bk-input v-model="filterData.commitMsg" class="filter-item w300" placeholder="Commit message"></bk-input>
-                <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="http://open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
+                <bk-user-selector v-model="filterData.triggerUser" class="filter-item" placeholder="Actor" api="https://api.open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/"></bk-user-selector>
                 <bk-select v-model="filterData.branch"
                     class="filter-item"
                     placeholder="Branch"
@@ -84,7 +84,7 @@
                 <bk-table-column label="Consume" width="200">
                     <template slot-scope="props">
                         <p class="consume">
-                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.totalTime | totalFliter }}</span>
+                            <span class="consume-item"><i class="bk-icon icon-clock"></i>{{ props.row.buildHistory.executeTime | totalFliter }}</span>
                             <span class="consume-item"><i class="bk-icon icon-calendar"></i>{{ props.row.buildHistory.startTime | timeFilter }}</span>
                         </p>
                     </template>
@@ -174,6 +174,7 @@
     import codeSection from '@/components/code-section'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import BkUserSelector from '@blueking/user-selector'
+    import register from '@/utils/websocket-register'
 
     export default {
         components: {
@@ -279,7 +280,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetList.loopId)
+            register.unInstallWsMessage('history')
         },
 
         methods: {
@@ -342,11 +343,7 @@
             },
 
             loopGetList () {
-                clearTimeout(this.loopGetList.loopId)
-                this.loopGetList.loopId = setTimeout(() => {
-                    this.getBuildData()
-                    this.loopGetList()
-                }, 5000)
+                register.installWsMessage(this.getBuildData, 'IFRAMEprocess', 'history')
             },
 
             getBuildData () {

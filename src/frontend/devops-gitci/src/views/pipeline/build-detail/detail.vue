@@ -10,7 +10,7 @@
                 </span>
                 <span class="info-data">
                     <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
-                    <span class="info-item text-ellipsis"><icon name="clock" size="14"></icon>{{ buildDetail.spendTime | spendTimeFilter }}</span>
+                    <span class="info-item text-ellipsis"><icon name="clock" size="14"></icon>{{ buildDetail.executeTime | spendTimeFilter }}</span>
                     <span class="info-item text-ellipsis">
                         <icon name="message" size="14"></icon>
                         {{ buildDetail.buildHistoryRemark || '--' }}
@@ -48,6 +48,7 @@
     import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag } from '@/utils'
     import stages from '@/components/stages'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
+    import register from '@/utils/websocket-register'
 
     export default {
         components: {
@@ -93,7 +94,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetPipelineDetail.loopId)
+            register.unInstallWsMessage('detail')
         },
 
         methods: {
@@ -122,13 +123,24 @@
                         ...res.gitProjectPipeline,
                         ...res.gitRequestEvent,
                         buildHistoryRemark: res.buildHistoryRemark,
-                        spendTime: modelDetail.endTime - modelDetail.startTime,
+                        executeTime: modelDetail.executeTime,
                         startTime: modelDetail.startTime,
                         status: modelDetail.status
                     }
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
+            },
+
+            loopGetPipelineDetail () {
+                register.installWsMessage((res) => {
+                    const model = res.model || {}
+                    this.stageList = (model.stages || []).slice(1)
+                    this.buildDetail.status = res.status
+                    this.buildDetail.startTime = res.startTime
+                    this.buildDetail.executeTime = res.executeTime
+                }, 'IFRAMEprocess', 'detail')
+                return this.getPipelineBuildDetail()
             },
 
             rebuild () {
@@ -159,12 +171,6 @@
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
-            },
-
-            loopGetPipelineDetail () {
-                clearTimeout(this.loopGetPipelineDetail.loopId)
-                this.loopGetPipelineDetail.loopId = setTimeout(this.loopGetPipelineDetail, 2000)
-                return this.getPipelineBuildDetail()
             },
 
             getIconClass (status) {

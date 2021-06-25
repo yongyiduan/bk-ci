@@ -1,3 +1,4 @@
+import store from '../store'
 const moment = require('moment')
 
 /**
@@ -156,7 +157,7 @@ export function goYaml (projectUrl, branch, yamlName) {
 
 export function preciseDiff (duration) {
     if (!duration) return '--'
-    const durationDate = moment.duration(Math.abs(duration))
+    const durationDate = moment.duration(Math.abs(duration), 's')
     const timeMap = {
         y: durationDate.years(),
         mon: durationDate.months(),
@@ -233,4 +234,9 @@ export function getBuildSource (gitRequestEvent = {}) {
             break
     }
     return res
+}
+
+export function getWSpath (path = '') {
+    const state = store.state || {}
+    return path + (path.endsWith('/') ? '' : '/') + state.projectId
 }
