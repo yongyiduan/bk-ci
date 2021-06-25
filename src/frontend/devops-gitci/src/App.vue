@@ -68,9 +68,12 @@
                     if (val) {
                         this.initData()
                     }
-                },
-                immediate: true
+                }
             }
+        },
+
+        created () {
+            this.initData()
         },
 
         beforeDestroy () {
