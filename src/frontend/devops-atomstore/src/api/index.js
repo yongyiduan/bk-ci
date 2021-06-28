@@ -68,7 +68,6 @@ export default {
     requestCancelSensitiveApi (storeType, storeCode, id) {
         return vue.$ajax.put(`${prefix}/user/sdk/${storeType}/${storeCode}/sensitiveApi/cancel/${id}`)
     },
-
     requestStatisticPipeline (code, params) {
         return vue.$ajax.get(`${processPerfix}/user/pipeline/atoms/${code}/rel/list`, { params })
     },
