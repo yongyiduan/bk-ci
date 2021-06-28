@@ -4,29 +4,20 @@
             isLoading: loading.isLoading,
             title: loading.title
         }">
-        <content-header class="info-header">
+        <div class="info-header">
             <div slot="left">
-                <i class="devops-icon icon-arrows-left" @click="toNodeList"></i>
-                <input type="text" class="bk-form-input display-name-input"
-                    ref="nodeName"
-                    v-if="editable"
-                    maxlength="30"
-                    name="nodeName"
-                    v-validate="'required'"
-                    v-model="nodeDetails.displayName"
-                    @blur="saveName"
-                    :class="{ 'is-danger': errors.has('nodeName') }" />
-                <span class="header-text" v-if="!editable">{{ nodeDetails.displayName }}</span>
-                <i class="devops-icon icon-edit" v-if="!editable && nodeDetails.canEdit" @click="editNodeName"></i>
+                <bk-breadcrumb separator-class="bk-icon icon-angle-right">
+                    <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
+                </bk-breadcrumb>
             </div>
             <div slot="right" class="node-handle">
                 <span class="copy-btn" @click="copyHandle">
                     {{ nodeDetails.os === 'WINDOWS' ? 'Copy download link' : 'Copy install command'}}
                 </span>
                 <span class="download-btn" v-if="nodeDetails.os === 'WINDOWS'" @click="downloadHandle">Download installation package</span>
-                <i class="devops-icon icon-refresh" @click="refresh"></i>
+                <i class="bk-icon icon-refresh" @click="refresh"></i>
             </div>
-        </content-header>
+        </div>
         <div class="sub-view-port" v-show="showContent">
             <ul class="base-prototype-list">
                 <li v-for="(entry, index) in basePrototypeList" :key="index">
@@ -35,7 +26,7 @@
                 </li>
             </ul>
             <node-overview-chart></node-overview-chart>
-            <!-- <node-detail-tab></node-detail-tab> -->
+            <node-detail-tab></node-detail-tab>
         </div>
     </div>
 </template>
@@ -45,19 +36,18 @@
     import { bus } from '@/utils/bus'
     import { copyText } from '@/utils/util'
     import { setting } from '@/http'
-    // import nodeDetailTab from '@/components/setting/node-detail-tab'
-    import nodeOverviewChart from '@/components/setting/node-overview-chart'
+    import nodeDetailTab from '@/components/setting/agent-detail/node-detail-tab'
+    import nodeOverviewChart from '@/components/setting/agent-detail/node-overview-chart'
 
     export default {
         components: {
-            // nodeDetailTab,
+            nodeDetailTab,
             nodeOverviewChart
         },
         data () {
             return {
                 nodeDetails: {},
                 showContent: false,
-                editable: false,
                 basePrototypeList: [
                     { id: 'hostname', name: 'cpuName', value: '' },
                     { id: 'ip', name: 'IP', value: '' },
@@ -79,6 +69,13 @@
             },
             agentLink () {
                 return this.nodeDetails.os === 'WINDOWS' ? this.nodeDetails.agentUrl : this.nodeDetails.agentScript
+            },
+            navList () {
+                return [
+                    { link: { name: 'agentPools' }, title: 'Agent Pools' },
+                    { link: { name: 'agentList' }, title: 'Agent list' },
+                    { link: '', title: this.nodeDetails.displayName }
+                ]
             }
         },
         watch: {
@@ -113,7 +110,6 @@
                         theme
                     })
                 }).finally(() => {
-                    console.log(this.nodeDetails, 2342111)
                     this.loading.isLoading = false
                     this.showContent = true
                 })
@@ -128,37 +124,6 @@
             },
             downloadHandle () {
                 window.location.href = this.nodeDetails.agentUrl
-            },
-            async saveName () {
-                if (!this.nodeDetails.displayName) {
-                    this.$bkMessage({
-                        theme: 'error',
-                        message: 'Please enter displayName'
-                    })
-                } else {
-                    const params = {
-                        displayName: this.nodeDetails.displayName.trim()
-                    }
-                    try {
-                        await this.$store.dispatch('environment/updateDisplayName', {
-                            projectId: this.projectId,
-                            nodeHashId: this.nodeHashId,
-                            params
-                        })
-                        this.editable = false
-                    } catch (err) {
-                        this.$bkMessage({
-                            theme: 'error',
-                            message: err.message ? err.message : err
-                        })
-                    }
-                }
-            },
-            editNodeName () {
-                this.editable = true
-                this.$nextTick(() => {
-                    this.$refs.nodeName.focus()
-                })
             },
             refresh () {
                 this.requestNodeDetail()
@@ -175,22 +140,17 @@
     @import '@/css/conf';
     .node-detail-wrapper {
         height: 100%;
-        overflow: hidden;
+        overflow-y: auto;
         .info-header {
-            .icon-edit {
-                margin-left: 6px;
-                cursor: pointer;
-            }
-            .icon-arrows-left {
-                margin-right: 4px;
-                cursor: pointer;
-                color: $primaryColor;
-                font-size: 16px;
-                font-weight: 600;
-            }
-            .display-name-input {
-                width: 300px;
-            }
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 60px;
+            padding: 0 20px;
+            border-bottom: 1px solid #dde4eb;
+            background-color: #fff;
+            box-shadow: 0px 2px 5px 0px rgb(51 60 72 / 3%);
             .node-handle {
                 color: $primaryColor;
                 span {

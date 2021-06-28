@@ -19,12 +19,11 @@
                 v-bkloading="{ isLoading }"
                 v-if="agentList.length"
             >
-                <bk-table-column label="Display Name" prop="displayName"></bk-table-column>
-                <!-- <bk-table-column label="Display Name" prop="displayName">
+                <bk-table-column label="Display Name" prop="displayName">
                     <template slot-scope="props">
-                        <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.name}}</span>
+                        <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.displayName}}</span>
                     </template>
-                </bk-table-column> -->
+                </bk-table-column>
                 <bk-table-column label="OS" prop="osName"></bk-table-column>
                 <bk-table-column label="Status" prop="nodeStatus"></bk-table-column>
                 <bk-table-column label="Operation" width="150" class-name="handler-btn">

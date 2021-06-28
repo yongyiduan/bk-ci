@@ -98,5 +98,68 @@ export default {
         return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/thirdPartyAgentDetail`).then(response => {
             return response
         })
+    },
+
+    /**
+    * 获取 CPU 使用率图表数据
+    */
+    getNodeCpuMetrics (params) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${params.projectId}/nodes/${params.nodeHashId}/queryCpuUsageMetrix?timeRange=${params.timeRange}`).then(response => {
+            return response
+        })
+    },
+
+    /**
+    * 获取内存使用率图表数据
+    */
+    getNodeMemoryMetrics (params) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${params.projectId}/nodes/${params.nodeHashId}/queryMemoryUsageMetrix?timeRange=${params.timeRange}`).then(response => {
+            return response
+        })
+    },
+
+    /**
+    * 获取网络图表数据
+    */
+    getNodeNetworkMetrics (params) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${params.projectId}/nodes/${params.nodeHashId}/queryNetMetrix?timeRange=${params.timeRange}`).then(response => {
+            return response
+        })
+    },
+
+    /**
+    * 获取磁盘IO图表数据
+    */
+    getNodeDiskioMetrics (params) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${params.projectId}/nodes/${params.nodeHashId}/queryDiskioMetrix?timeRange=${params.timeRange}`).then(response => {
+            return response
+        })
+    },
+
+    /**
+    * 获取第三方构建机任务
+    */
+    requestBuildList ({ projectId, nodeHashId, page, pageSize }) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/listAgentBuilds?page=${page}&pageSize=${pageSize}`).then(response => {
+            return response
+        })
+    },
+
+    /**
+    * 获取第三方构建机活动
+    */
+    requestActionList ({ projectId, nodeHashId, page, pageSize }) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/listAgentActions?page=${page}&pageSize=${pageSize}`).then(response => {
+            return response
+        })
+    },
+
+    /**
+    * 设置agent构建并发数
+    */
+    saveParallelTaskCount (projectId, nodeHashId, parallelTaskCount) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/parallelTaskCount?parallelTaskCount=${parallelTaskCount}`).then(response => {
+            return response
+        })
     }
 }

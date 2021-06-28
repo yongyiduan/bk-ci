@@ -270,7 +270,6 @@ function prezero (num) {
 
 export function convertTime (ms) {
     const time = new Date(ms)
-    console.log(ms, time, 23423525)
     return `${time.getFullYear()}-${prezero(time.getMonth() + 1)}-${prezero(time.getDate())} ${prezero(time.getHours())}:${prezero(time.getMinutes())}:${prezero(time.getSeconds())}`
 }
 

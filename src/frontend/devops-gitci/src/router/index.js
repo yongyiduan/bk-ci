@@ -103,7 +103,7 @@ const routes = [
                         component: agentList
                     },
                     {
-                        path: 'agent-detail/:agentId',
+                        path: 'agent-detail/:poolId/:poolName/:agentId',
                         name: 'agentDetail',
                         component: agentDetail
                     }

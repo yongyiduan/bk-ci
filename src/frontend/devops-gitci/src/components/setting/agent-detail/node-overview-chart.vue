@@ -9,7 +9,7 @@
                             <div style="cursor: pointer;" slot="dropdown-trigger">
                                 <span>{{cpuToggleRangeStr}}</span>
                                 <button class="dropdown-button">
-                                    <i class="devops-icon icon-angle-down"></i>
+                                    <i class="bk-icon icon-angle-down"></i>
                                 </button>
                             </div>
                             <ul class="bk-dropdown-list" slot="dropdown-content">
@@ -39,7 +39,7 @@
                             <div style="cursor: pointer;" slot="dropdown-trigger">
                                 <span>{{memToggleRangeStr}}</span>
                                 <button class="dropdown-button">
-                                    <i class="devops-icon icon-angle-down"></i>
+                                    <i class="bk-icon icon-angle-down"></i>
                                 </button>
                             </div>
                             <ul class="bk-dropdown-list" slot="dropdown-content">
@@ -71,7 +71,7 @@
                             <div style="cursor: pointer;" slot="dropdown-trigger">
                                 <span>{{networkToggleRangeStr}}</span>
                                 <button class="dropdown-button">
-                                    <i class="devops-icon icon-angle-down"></i>
+                                    <i class="bk-icon icon-angle-down"></i>
                                 </button>
                             </div>
                             <ul class="bk-dropdown-list" slot="dropdown-content">
@@ -101,7 +101,7 @@
                             <div style="cursor: pointer;" slot="dropdown-trigger">
                                 <span>{{storageToggleRangeStr}}</span>
                                 <button class="dropdown-button">
-                                    <i class="devops-icon icon-angle-down"></i>
+                                    <i class="bk-icon icon-angle-down"></i>
                                 </button>
                             </div>
                             <ul class="bk-dropdown-list" slot="dropdown-content">
@@ -135,6 +135,7 @@
     import 'echarts/lib/component/legend'
     import { nodeOverview } from '@/utils/chart-option'
     import { bus } from '@/utils/bus'
+    import { setting } from '@/http'
 
     export default {
         components: {
@@ -234,7 +235,7 @@
                 const emptyData = []
 
                 try {
-                    const res = await this.$store.dispatch('environment/getNodeCpuMetrics', { params })
+                    const res = await setting.getNodeCpuMetrics(params)
                     if (res.usage_user.length) {
                         this.isEmptyCpu = false
                         res.usage_user.forEach(item => {
@@ -268,7 +269,7 @@
                 const emptyData = []
 
                 try {
-                    const res = await this.$store.dispatch('environment/getNodeMemoryMetrics', { params })
+                    const res = await setting.getNodeMemoryMetrics(params)
                     if (res.used_percent.length) {
                         this.isEmptyMemory = false
                         res.used_percent.forEach(item => {
@@ -298,7 +299,7 @@
                 }
 
                 try {
-                    const res = await this.$store.dispatch('environment/getNodeNetworkMetrics', { params })
+                    const res = await setting.getNodeNetworkMetrics(params)
                     if (JSON.stringify(res) === '{}') {
                         this.isEmptyNetwork = true
                     } else {
@@ -345,8 +346,7 @@
                     return
                 }
                 try {
-                    const res = await this.$store.dispatch('environment/getNodeDiskioMetrics', { params })
-
+                    const res = await setting.getNodeDiskioMetrics(params)
                     if (JSON.stringify(res) === '{}') {
                         this.isEmptyDiskio = true
                     } else {
@@ -390,7 +390,8 @@
             },
             
             $t (message) {
-                return message
+                const arr = message.split('.')
+                return arr[arr.length - 1] || message
             }
         }
     }

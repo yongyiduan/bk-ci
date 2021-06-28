@@ -6,7 +6,6 @@
                 v-bind="panel"
                 :key="index">
                 <basic-information v-if="panel.name === 'base'"></basic-information>
-                <env-variable v-if="panel.name === 'envVariable'"></env-variable>
                 <pipeline-list v-if="panel.name === 'pipeline'"></pipeline-list>
                 <machine-record v-if="panel.name === 'activity'"></machine-record>
             </bk-tab-panel>
@@ -15,15 +14,13 @@
 </template>
 
 <script>
-    import BasicInformation from '@/components/devops/environment/basic-information'
-    import EnvVariable from '@/components/devops/environment/env-variable'
-    import PipelineList from '@/components/devops/environment/pipeline-list'
-    import MachineRecord from '@/components/devops/environment/machine-record'
+    import BasicInformation from '@/components/setting/agent-detail/basic-information'
+    import PipelineList from '@/components/setting/agent-detail/pipeline-list'
+    import MachineRecord from '@/components/setting/agent-detail/machine-record'
 
     export default {
         components: {
             BasicInformation,
-            EnvVariable,
             PipelineList,
             MachineRecord
         },
@@ -35,7 +32,6 @@
                 activeName: 'base',
                 menuList: [
                     { name: 'base', label: this.$t('environment.basicInfo') },
-                    { name: 'envVariable', label: this.$t('environment.environmentVariable') },
                     { name: 'pipeline', label: this.$t('environment.nodeInfo.buildTask') },
                     { name: 'activity', label: this.$t('environment.nodeInfo.machineActivityRecord') }
                 ]
@@ -46,13 +42,18 @@
         methods: {
             tabChanged (tab) {
                 this.activeName = tab
+            },
+
+            $t (message) {
+                const arr = message.split('.')
+                return arr[arr.length - 1] || message
             }
         }
     }
 </script>
 
-<style lang="scss">
-    @import './../../scss/conf';
+<style lang="postcss">
+    @import '@/css/conf';
     .node-details-tab {
         margin-top: 20px;
         .bk-tab-label-wrapper .bk-tab-label-list .active {
