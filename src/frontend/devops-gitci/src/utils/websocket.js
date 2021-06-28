@@ -1,5 +1,6 @@
 import store from '../store'
 import SockJS from 'sockjs-client'
+import { getCookie } from '@/utils'
 import { getWSpath } from './index'
 const Stomp = require('stompjs/lib/stomp.js').Stomp
 
@@ -51,6 +52,8 @@ class GitCiWebSocket {
                 this.isConnecting = false
                 window.mainComponent.$bkMessage({ message: err.message || 'websocket connection failed, please try again later', theme: 'error' })
             }
+        }, (err) => {
+            console.error(`websocket关闭事件:${err.message || err}`)
         })
     }
 
@@ -113,7 +116,7 @@ class GitCiWebSocket {
             const tagName = activeElement.tagName || ''
             // a标签也会触发这个事件，需要屏蔽
             if (tagName === 'A') return
-            navigator.sendBeacon(`/websocket/api/user/websocket/sessions/${this.uuid}/userIds/${(store.state.user || {}).username}/clear`)
+            navigator.sendBeacon(`/websocket/api/user/websocket/sessions/${this.uuid}/userIds/${getCookie('bk_uid')}/clear`)
             this.stompClient.disconnect()
             this.hasConnect = false
         })
