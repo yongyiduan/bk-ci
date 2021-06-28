@@ -54,6 +54,7 @@ import com.tencent.devops.common.pipeline.type.DispatchType
 import com.tencent.devops.common.pipeline.type.agent.AgentType
 import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentEnvDispatchType
 import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentIDDispatchType
+import com.tencent.devops.common.pipeline.type.devcloud.PublicDevCloudDispathcType
 import com.tencent.devops.common.pipeline.type.docker.DockerDispatchType
 import com.tencent.devops.common.pipeline.type.exsi.ESXiDispatchType
 import com.tencent.devops.process.engine.service.PipelineRepositoryService
@@ -218,17 +219,32 @@ class TXPipelineExportService @Autowired constructor(
                                 selfHosted = null,
                                 poolName = JobRunsOnType.DOCKER.type,
                                 container = com.tencent.devops.common.ci.v2.Container(
-                                    image = "# 请直接填入镜像(${dispatchType.imageName})的URL地址，若存在鉴权请增加 credentials 字段",
+                                    image = "###请直接填入镜像(${dispatchType.imageName})的URL地址，若存在鉴权请增加 credentials 字段###",
                                     credentials = null
                                 ),
-                                agentSelector = listOf(job.baseOS.name.toLowerCase())
+                                agentSelector = null
+                            )
+                        }
+                        is PublicDevCloudDispathcType -> {
+                            RunsOn(
+                                selfHosted = null,
+                                poolName = JobRunsOnType.DOCKER.type,
+                                container = com.tencent.devops.common.ci.v2.Container(
+                                    image = "http://mirrors.tencent.com/ci/tlinux3_ci:0.1.1.0",
+                                    credentials = null
+                                ),
+                                agentSelector = null
                             )
                         }
                         else -> {
                             RunsOn(
                                 selfHosted = null,
-                                poolName = "# 该环境不支持转换，请重新填写",
-                                agentSelector = listOf(job.baseOS.name.toLowerCase())
+                                poolName = "###该环境不支持转换，请重新填写###",
+                                container = com.tencent.devops.common.ci.v2.Container(
+                                    image = "###该环境不支持转换，请重新填写###",
+                                    credentials = null
+                                ),
+                                agentSelector = null
                             )
                         }
                     }
@@ -277,7 +293,7 @@ class TXPipelineExportService @Autowired constructor(
             val continueOnError = if (element.additionalOptions?.continueWhenFailed == true) true else null
             when (element.getClassType()) {
                 // Bash脚本插件直接转为run
-                LinuxScriptElement.classType, WindowsScriptElement.classType -> {
+                LinuxScriptElement.classType -> {
                     val step = element as LinuxScriptElement
                     stepList.add(
                         V2Step(
@@ -295,7 +311,30 @@ class TXPipelineExportService @Autowired constructor(
                             continueOnError = continueOnError,
                             retryTimes = retryTimes,
                             env = null,
-                            run = " |\r\n ${step.script}",
+                            run = step.script,
+                            checkout = null
+                        )
+                    )
+                }
+                WindowsScriptElement.classType -> {
+                    val step = element as WindowsScriptElement
+                    stepList.add(
+                        V2Step(
+                            name = step.name,
+                            id = null,
+                            ifFiled = if (step.additionalOptions?.runCondition ==
+                                RunCondition.CUSTOM_CONDITION_MATCH) {
+                                step.additionalOptions?.customCondition
+                            } else {
+                                null
+                            },
+                            uses = null,
+                            with = null,
+                            timeoutMinutes = timeoutMinutes,
+                            continueOnError = continueOnError,
+                            retryTimes = retryTimes,
+                            env = null,
+                            run = step.script,
                             checkout = null
                         )
                     )
@@ -357,8 +396,6 @@ class TXPipelineExportService @Autowired constructor(
         yamlSb.append("# 注意：不支持系统凭证(用户名、密码)的导出，请检查系统凭证的完整性！ \n")
         yamlSb.append("# 注意：[插件]内参数可能存在敏感信息，请仔细检查，谨慎分享！！！ \n")
         if (isGitCI) {
-            yamlSb.append("# 注意：[插件]工蜂CI不支持依赖蓝盾项目的服务（如凭证、节点等），" +
-                "请联系插件开发者改造插件，改造指引：https://iwiki.woa.com/x/CqARHg \n")
             yamlSb.append("# 注意：[插件]工蜂CI不支持蓝盾老版本的插件，请在研发商店搜索新插件替换 \n")
         }
         yamlSb.append("########################################################" +
