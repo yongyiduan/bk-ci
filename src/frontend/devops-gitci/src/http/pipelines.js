@@ -141,7 +141,8 @@ export default {
     },
 
     getDockerExecId (containerId, projectId, pipelineId, cmd, targetIp) {
-        return api.post(`http://${PROXY_URL_PREFIX}/docker-console-create?pipelineId=${pipelineId}&projectId=${projectId}&targetIp=${targetIp}`, { container_id: containerId, cmd }).then(res => {
+        const protocol = document.location.protocol || 'http:'
+        return api.post(`${protocol}//${PROXY_URL_PREFIX}/docker-console-create?pipelineId=${pipelineId}&projectId=${projectId}&targetIp=${targetIp}`, { container_id: containerId, cmd }).then(res => {
             return res && res.Id
         }).catch((err) => {
             throw err
@@ -149,7 +150,8 @@ export default {
     },
 
     resizeTerm (resizeUrl, params) {
-        return api.post(`http://${PROXY_URL_PREFIX}/${resizeUrl}`, params).then(res => {
+        const protocol = document.location.protocol || 'http:'
+        return api.post(`${protocol}//${PROXY_URL_PREFIX}/${resizeUrl}`, params).then(res => {
             return res && res.Id
         })
     },
