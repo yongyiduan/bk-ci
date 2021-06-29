@@ -304,7 +304,7 @@
             <bk-form ref="deleteForm" class="delete-form" :label-width="0" :model="deleteObj.formData">
                 <p class="dialog-tip">{{$t('store.1、插件能获取到的所有内容（包括但不限于：代码、节点、凭证、项目信息）均属于项目资产，仅用于实现流水线编排设定好的功能。')}}</p>
                 <p class="dialog-tip">
-                    <font style="color: red;">{{$t('store.2、未经授权私自使用插件获取到的内容（包括但不限于：拉取或转移代码、泄露或滥用凭证等）属于违规行为。')}}</font>
+                    <font style="color: red;">{{$t('store.2、未经授权私自使用插件获取内容（包括但不限于：拉取或转移代码、泄露或滥用凭证等）属于违规行为。')}}</font>
                     {{$t('store.无论当事人是否在职，公司将按照')}}
                     <a href="http://policy.woa.com/document/preview?documentId=D2728D77-4F56-485E-8175-EFD78E6639DA" class="text-link" target="_blank">{{$t('store.《阳光行为准则》')}}</a>
                     {{$t('store.对违规行为进行处理，并对情节严重者保留追究法律责任的权利。')}}
