@@ -57,8 +57,8 @@ export default {
         return vue.$ajax.get(`${prefix}/user/sdk/${storeType}/${storeCode}/sensitiveApi/list`, { params })
     },
 
-    requestUnApprovalApiList (storeType, storeCode) {
-        return vue.$ajax.get(`${prefix}/user/sdk/${storeType}/${storeCode}/sensitiveApi/unApprovalApiList`)
+    requestUnApprovalApiList (storeType, storeCode, params) {
+        return vue.$ajax.get(`${prefix}/user/sdk/${storeType}/${storeCode}/sensitiveApi/unApprovalApiList`, { params })
     },
 
     requestApplySensitiveApi (storeType, storeCode, postData) {
@@ -68,6 +68,7 @@ export default {
     requestCancelSensitiveApi (storeType, storeCode, id) {
         return vue.$ajax.put(`${prefix}/user/sdk/${storeType}/${storeCode}/sensitiveApi/cancel/${id}`)
     },
+
     requestStatisticPipeline (code, params) {
         return vue.$ajax.get(`${processPerfix}/user/pipeline/atoms/${code}/rel/list`, { params })
     },
