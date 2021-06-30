@@ -34,10 +34,14 @@ class ReplacementUtilsTest {
     class Replacement(
         private val data: Map<String, String>
     ) : ReplacementUtils.KeyReplacement {
-        override fun getReplacement(key: String): String? = if (data[key] != null) {
+        override fun getReplacement(key: String, doubleCurlyBraces: Boolean): String? = if (data[key] != null) {
             data[key]!!
         } else {
-            "\${$key}"
+            if (doubleCurlyBraces) {
+                "\${{$key}}"
+            } else {
+                "\${$key}"
+            }
         }
     }
 
