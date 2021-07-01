@@ -1616,7 +1616,7 @@ class PipelineRuntimeService @Autowired constructor(
      * 完成认领构建的任务[completeTask]
      * [endBuild]表示最后一步，当前容器要结束
      */
-    fun completeClaimBuildTask(completeTask: CompleteTask, endBuild: Boolean = false) {
+    fun completeClaimBuildTask(completeTask: CompleteTask, endBuild: Boolean = false): PipelineBuildTask? {
         val buildTask = getBuildTask(buildId = completeTask.buildId, taskId = completeTask.taskId)
         if (buildTask != null) {
             updateTaskStatus(
@@ -1642,6 +1642,7 @@ class PipelineRuntimeService @Autowired constructor(
                 )
             )
         }
+        return buildTask
     }
 
     fun updateBuildNo(pipelineId: String, buildNo: Int) {
