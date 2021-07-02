@@ -82,7 +82,6 @@ class ProjectLocalService @Autowired constructor(
     private val bkAuthProjectApi: BSAuthProjectApi,
     private val bkAuthProperties: BkAuthProperties,
     private val bsPipelineAuthServiceCode: BSPipelineAuthServiceCode,
-    private val projectPermissionService: ProjectPermissionService,
     private val gray: Gray,
     private val jmxApi: ProjectJmxApi,
     private val projectService: ProjectService,
@@ -674,6 +673,10 @@ class ProjectLocalService @Autowired constructor(
             resourceTypeCode = resourceTypeCode,
             userList = createUserList
         )
+    }
+
+    fun updateRelationId(projectCode: String, relationId: String) {
+        projectDao.updateRelationByCode(dslContext, projectCode, relationId)
     }
 
     private fun getProjectListByOrg(

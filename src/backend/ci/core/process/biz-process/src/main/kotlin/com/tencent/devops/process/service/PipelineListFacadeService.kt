@@ -1046,7 +1046,8 @@ class PipelineListFacadeService @Autowired constructor(
                     pipelineDesc = it.pipelineDesc,
                     taskCount = it.taskCount,
                     isDelete = it.delete,
-                    instanceFromTemplate = templatePipelineIds.contains(it.pipelineId)
+                    instanceFromTemplate = templatePipelineIds.contains(it.pipelineId),
+                    id = it.id
                 )
             }
         } finally {
@@ -1422,7 +1423,7 @@ class PipelineListFacadeService @Autowired constructor(
         return pipelineRepositoryService.listPipelineIdByName(projectId, pipelineNames, filterDelete)
     }
 
-    fun getPipelineId(
+    fun getProjectPipelineId(
         projectCode: String
     ): List<PipelineIdInfo> {
         val pipelineIdInfos = pipelineInfoDao.listByProject(dslContext, projectCode)
@@ -1431,5 +1432,16 @@ class PipelineListFacadeService @Autowired constructor(
             idInfos.add(PipelineIdInfo(it.get("pipelineId") as String, it.get("id") as Long))
         }
         return idInfos
+    }
+
+    fun getPipelineId(
+        projectId: String,
+        pipelineId: String
+    ): PipelineIdInfo? {
+        val pipelineInfo = pipelineInfoDao.getPipelineId(dslContext, projectId, pipelineId) ?: return null
+        return PipelineIdInfo(
+            id = pipelineInfo.id,
+            pipelineId = pipelineId
+        )
     }
 }
