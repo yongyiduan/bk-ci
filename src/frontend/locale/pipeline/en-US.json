@@ -863,6 +863,7 @@
         "automaticRetry": "Auto Retry",
         "manualRetry": "Manual Retry",
         "skipType": "Skip Type",
+        "customEnv": "Custom environment variables",
         "continueWhenFailedDesc": "If you open the option 'Continue on error' at the same time, we will continue only when all retry failed",
         "retryWhenFailed": "Retry on error",
         "retryCount": "Retry count",
