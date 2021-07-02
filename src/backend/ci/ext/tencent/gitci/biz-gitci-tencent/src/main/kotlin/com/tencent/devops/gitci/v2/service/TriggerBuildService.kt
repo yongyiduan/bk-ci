@@ -529,7 +529,7 @@ class TriggerBuildService @Autowired constructor(
         }
 
         if (job.runsOn.agentSelector.isNullOrEmpty()) {
-            return VMBaseOS.LINUX
+            return VMBaseOS.ALL
         }
         return when (job.runsOn.agentSelector!![0]) {
             "linux" -> VMBaseOS.LINUX
@@ -563,7 +563,7 @@ class TriggerBuildService @Autowired constructor(
             val containerPool = Pool(
                 container = job.runsOn.container?.image,
                 credential = Credential(
-                    user = job.runsOn.container?.credentials?.username,
+                    user = job.runsOn.container?.credentials?.username ?: "",
                     password = job.runsOn.container?.credentials?.password ?: ""
                 ),
                 macOS = null,
