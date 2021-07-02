@@ -159,7 +159,14 @@ class ServiceTxProjectResourceImpl @Autowired constructor(
         ))
     }
 
-    override fun getProjectByName(userId: String, organizationType: String, organizationId: Long, name: String, nameType: ProjectValidateType, showSecrecy: Boolean?): Result<ProjectVO?> {
+    override fun getProjectByName(
+        userId: String,
+        organizationType: String,
+        organizationId: Long,
+        name: String,
+        nameType: ProjectValidateType,
+        showSecrecy: Boolean?
+    ): Result<ProjectVO?> {
         return Result(projectLocalService.getByName(
             name = name,
             nameType = nameType,
@@ -343,6 +350,11 @@ class ServiceTxProjectResourceImpl @Autowired constructor(
             organizationId = organizationId,
             projectId = projectCode
         ))
+    }
+
+    override fun bindRelationSystem(projectCode: String, relationId: String): Result<Boolean> {
+        projectLocalService.updateRelationId(projectCode, relationId)
+        return Result(true)
     }
 
     companion object {
