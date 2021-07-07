@@ -5,7 +5,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import websocket from '@/utils/websocket'
+// import websocket from '@/utils/websocket'
 Vue.use(VueRouter)
 
 const main = () => import(/* webpackChunkName: 'entry' */'@/views/index')
@@ -116,7 +116,7 @@ const routes = [
                         component: agentList
                     },
                     {
-                        path: 'agent-detail',
+                        path: 'agent-detail/:poolId/:poolName/:agentId',
                         name: 'agentDetail',
                         component: agentDetail
                     }
@@ -141,13 +141,13 @@ const router = new VueRouter({
     routes: routes
 })
 
-router.afterEach(route => {
-    websocket.changeRoute(route)
-})
+// router.afterEach(route => {
+//     websocket.changeRoute(route)
+// })
 
 // 自动携带项目信息
 router.beforeEach((to, from, next) => {
-    websocket.loginOut(from)
+    // websocket.loginOut(from)
     const params = {
         ...to,
         hash: to.hash || from.hash

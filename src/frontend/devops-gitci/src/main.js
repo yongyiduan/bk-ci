@@ -14,9 +14,11 @@ import '@/common/bkmagic'
 import '@icon-cool/bk-icon-gitci/src/index'
 import icon from '@/components/icon'
 import log from '@blueking/log'
+import VeeValidate from 'vee-validate'
 
 Vue.component('icon', icon)
 Vue.use(log)
+Vue.use(VeeValidate)
 
 window.mainComponent = new Vue({
     el: '#app',
