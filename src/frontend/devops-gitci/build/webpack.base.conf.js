@@ -45,7 +45,7 @@ export default {
             },
             {
                 test: /\.vue$/,
-                include: [resolve('src'), resolve('../node_modules/vue-echarts'), resolve('node_modules/@blueking/log'), resolve('../node_modules/@blueking/log')],
+                include: [resolve('src'), resolve('node_modules/vue-echarts'), resolve('../node_modules/vue-echarts'), resolve('node_modules/@blueking/log'), resolve('../node_modules/@blueking/log')],
                 use: {
                     loader: 'vue-loader',
                     options: {
@@ -60,7 +60,7 @@ export default {
             },
             {
                 test: /\.js$/,
-                include: [resolve('src'), resolve('../node_modules/vue-echarts'), resolve('node_modules/@blueking/log'), resolve('../node_modules/@blueking/log')],
+                include: [resolve('src'), resolve('node_modules/vue-echarts'), resolve('../node_modules/vue-echarts'), resolve('node_modules/@blueking/log'), resolve('../node_modules/@blueking/log')],
                 use: {
                     loader: 'babel-loader',
                     options: {

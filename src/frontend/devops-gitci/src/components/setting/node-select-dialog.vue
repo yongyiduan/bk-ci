@@ -116,7 +116,6 @@
             confirmFn: Function,
             toggleAllSelect: Function,
             cancelFn: Function,
-            changeCreatedUser: Function,
             query: Function
         },
         data () {
