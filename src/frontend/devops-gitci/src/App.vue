@@ -3,7 +3,7 @@
         <header class="gitci-header">
             <span class="header-info">
                 <icon name="devops" size="30"></icon>
-                <span class="ci-name" @click="goToHome">蓝盾 | Pipeline as Code</span>
+                <span class="ci-name" @click="goToHome">蓝盾 | Stream</span>
                 <template v-if="$route.hash">
                     <icon name="git" size="18" class="gray-icon"></icon>
                     <span class="git-project-path" @click="goToCode">{{ decodeURIComponent(($route.hash || '').slice(1)) }}</span>
@@ -34,8 +34,8 @@
 <script>
     import { common, notifications, pipelines } from '@/http'
     import { mapActions, mapState } from 'vuex'
-    // import gitCiWebSocket from '@/utils/websocket'
-    // import register from '@/utils/websocket-register'
+    import gitCiWebSocket from '@/utils/websocket'
+    import register from '@/utils/websocket-register'
 
     export default {
         name: 'app',
@@ -77,8 +77,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetNotifications.loopId)
-            // register.unInstallWsMessage('notify')
+            register.unInstallWsMessage('notify')
         },
 
         methods: {
@@ -110,7 +109,7 @@
                                 this.loopGetNotifications()
                                 this.getPermission()
                                 this.setExceptionInfo({ type: 200 })
-                                // gitCiWebSocket.changeRoute(this.$route)
+                                gitCiWebSocket.changeRoute(this.$route)
                             } else {
                                 this.setExceptionInfo({ type: 499 })
                             }
@@ -141,12 +140,8 @@
             },
 
             loopGetNotifications () {
-                clearTimeout(this.loopGetNotifications.loopId)
                 this.getNotifications()
-                this.loopGetNotifications.loopId = setTimeout(this.loopGetNotifications, 5000)
-
-                // this.getNotifications()
-                // register.installWsMessage(this.getNotifications, 'NOTIFYgitci', 'notify')
+                register.installWsMessage(this.getNotifications, 'NOTIFYgitci', 'notify')
             },
 
             goToSetting () {

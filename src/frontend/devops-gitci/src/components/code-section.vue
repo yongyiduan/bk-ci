@@ -142,7 +142,6 @@
         }
         /deep/ .CodeMirror {
             max-height: var(--code-editor-height);
-            padding: 0 10px;
         }
     }
 
@@ -153,7 +152,6 @@
     .un-full-screen /deep/ .CodeMirror {
         min-height: 300px;
         margin-bottom: 20px;
-        padding: 10px;
         height: auto;
         .CodeMirror-scroll {
             min-height: 300px;

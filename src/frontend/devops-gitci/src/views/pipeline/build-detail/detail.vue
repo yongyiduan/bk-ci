@@ -48,7 +48,7 @@
     import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag } from '@/utils'
     import stages from '@/components/stages'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
-    // import register from '@/utils/websocket-register'
+    import register from '@/utils/websocket-register'
 
     export default {
         components: {
@@ -94,8 +94,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetPipelineDetail.loopId)
-            // register.unInstallWsMessage('detail')
+            register.unInstallWsMessage('detail')
         },
 
         methods: {
@@ -133,22 +132,22 @@
                 })
             },
 
-            // loopGetPipelineDetail () {
-            //     register.installWsMessage((res) => {
-            //         const model = res.model || {}
-            //         this.stageList = (model.stages || []).slice(1)
-            //         this.buildDetail.status = res.status
-            //         this.buildDetail.startTime = res.startTime
-            //         this.buildDetail.executeTime = res.executeTime
-            //     }, 'IFRAMEprocess', 'detail')
-            //     return this.getPipelineBuildDetail()
-            // },
-
             loopGetPipelineDetail () {
-                clearTimeout(this.loopGetPipelineDetail.loopId)
-                this.loopGetPipelineDetail.loopId = setTimeout(this.loopGetPipelineDetail, 5000)
+                register.installWsMessage((res) => {
+                    const model = res.model || {}
+                    this.stageList = (model.stages || []).slice(1)
+                    this.buildDetail.status = res.status
+                    this.buildDetail.startTime = res.startTime
+                    this.buildDetail.executeTime = res.executeTime
+                }, 'IFRAMEprocess', 'detail')
                 return this.getPipelineBuildDetail()
             },
+
+            // loopGetPipelineDetail () {
+            //     clearTimeout(this.loopGetPipelineDetail.loopId)
+            //     this.loopGetPipelineDetail.loopId = setTimeout(this.loopGetPipelineDetail, 5000)
+            //     return this.getPipelineBuildDetail()
+            // },
 
             rebuild () {
                 this.isOperating = true
