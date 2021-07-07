@@ -47,13 +47,12 @@ class GitCiWebSocket {
             if (this.connectErrTime <= 8) {
                 this.connectErrTime++
                 const time = Math.random() * 60000
+                console.log(`websocket connection error: ${err.message}`)
                 setTimeout(() => this.connect(), time)
             } else {
                 this.isConnecting = false
                 window.mainComponent.$bkMessage({ message: err.message || 'websocket connection failed, please try again later', theme: 'error' })
             }
-        }, (err) => {
-            console.error(`websocket关闭事件:${err.message || err}`)
         })
     }
 
