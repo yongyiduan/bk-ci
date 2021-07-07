@@ -30,6 +30,8 @@ package com.tencent.devops.process.engine.service
 import com.tencent.devops.common.event.dispatcher.pipeline.PipelineEventDispatcher
 import com.tencent.devops.common.event.enums.ActionType
 import com.tencent.devops.common.pipeline.enums.BuildStatus
+import com.tencent.devops.common.pipeline.enums.ManualReviewAction
+import com.tencent.devops.common.pipeline.pojo.StageReviewRequest
 import com.tencent.devops.common.websocket.enum.RefreshType
 import com.tencent.devops.process.engine.common.BS_MANUAL_START_STAGE
 import com.tencent.devops.process.engine.common.BS_STAGE_CANCELED_END_SOURCE
@@ -160,8 +162,17 @@ class PipelineStageService @Autowired constructor(
         }
     }
 
-    fun startStage(userId: String, buildStage: PipelineBuildStage) {
-        buildStage.controlOption!!.stageControlOption.triggered = true
+    fun startStage(
+        userId: String,
+        buildStage: PipelineBuildStage,
+        reviewRequest: StageReviewRequest?
+    ) {
+        buildStage.controlOption!!.stageControlOption.reviewCurrentGroup(
+            userId = userId,
+            action = ManualReviewAction.PROCESS,
+            params = reviewRequest?.reviewParams,
+            suggest = reviewRequest?.suggest
+        )
         with(buildStage) {
             val allStageStatus = stageBuildDetailService.stageStart(
                 buildId = buildId,
@@ -204,9 +215,20 @@ class PipelineStageService @Autowired constructor(
         }
     }
 
-    fun cancelStage(userId: String, buildStage: PipelineBuildStage) {
+    fun cancelStage(
+        userId: String,
+        buildStage: PipelineBuildStage
+    ) {
 
-        stageBuildDetailService.stageCancel(buildId = buildStage.buildId, stageId = buildStage.stageId)
+        buildStage.controlOption!!.stageControlOption.reviewCurrentGroup(
+            userId = userId,
+            action = ManualReviewAction.ABORT
+        )
+        stageBuildDetailService.stageCancel(
+            buildId = buildStage.buildId,
+            stageId = buildStage.stageId,
+            controlOption = buildStage.controlOption!!
+        )
 
         dslContext.transaction { configuration ->
             val context = DSL.using(configuration)

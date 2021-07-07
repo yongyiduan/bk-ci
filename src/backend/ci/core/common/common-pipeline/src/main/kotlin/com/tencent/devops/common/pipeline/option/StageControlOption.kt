@@ -28,7 +28,9 @@
 package com.tencent.devops.common.pipeline.option
 
 import com.tencent.devops.common.pipeline.NameAndValue
+import com.tencent.devops.common.pipeline.enums.ManualReviewAction
 import com.tencent.devops.common.pipeline.enums.StageRunCondition
+import com.tencent.devops.common.pipeline.pojo.StageReviewGroup
 import com.tencent.devops.common.pipeline.pojo.element.atom.ManualReviewParam
 
 /**
@@ -40,10 +42,84 @@ data class StageControlOption(
     val runCondition: StageRunCondition = StageRunCondition.AFTER_LAST_FINISHED, // 运行条件
     val manualTrigger: Boolean? = false,
     var triggerUsers: List<String>? = null, // 可触发用户，支持引用变量
-    var triggered: Boolean? = false, // 已通过审核
+    var triggered: Boolean? = null, // 已通过审核
+    var reviewGroups: MutableList<StageReviewGroup>? = null, // 审核流配置
     val timeout: Int? = null, // 等待审核的超时时间
     val customVariables: List<NameAndValue>? = emptyList(), // 自定义变量
     val customCondition: String? = null, // 自定义条件
     var reviewParams: List<ManualReviewParam>? = null, // 审核变量
     var reviewDesc: String? = null // 审核说明
-)
+) {
+
+    /**
+     * 获取当前等待中的审核组
+     */
+    fun groupToReview(): StageReviewGroup? {
+        refreshReviewOption()
+        reviewGroups?.forEach { group ->
+            if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+                return group
+            }
+        }
+        return null
+    }
+
+    /**
+     * 判断操作用户在不在当前审核人员名单中
+     */
+    fun reviewerContains(userId: String): Boolean {
+        refreshReviewOption()
+        reviewGroups?.forEach { group ->
+            if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+                return group.reviewers.contains(userId)
+            }
+        }
+        return false
+    }
+
+    /**
+     * 审核通过当前等待中的审核组
+     */
+    fun reviewCurrentGroup(
+        userId: String,
+        action: ManualReviewAction,
+        params: List<ManualReviewParam>? = null,
+        suggest: String? = null
+    ) {
+        refreshReviewOption()
+        reviewGroups?.forEach { group ->
+            if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+                group.status = action.name
+                group.operator = userId
+                group.params = params?.toMutableList()
+                group.suggest = suggest
+            }
+        }
+    }
+
+    /**
+     * 兼容性逻辑 - 将原有的审核配置刷新到审核流中
+     */
+    fun refreshReviewOption() {
+        val newReviewGroups = mutableListOf<StageReviewGroup>()
+        if (triggerUsers?.isNotEmpty() == true) {
+            val group = if (triggered == true) StageReviewGroup(
+                reviewers = triggerUsers!!,
+                status = ManualReviewAction.PROCESS.name,
+                params = reviewParams?.toMutableList()
+            ) else StageReviewGroup(
+                reviewers = triggerUsers!!,
+                status = null
+            )
+
+            newReviewGroups.add(group)
+            triggerUsers = null
+            triggered = null
+        }
+        if (reviewGroups.isNullOrEmpty()) {
+            reviewGroups = newReviewGroups
+        } else {
+            reviewGroups!!.addAll(newReviewGroups)
+        }
+    }
+}

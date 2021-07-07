@@ -124,7 +124,7 @@ class StageBuildDetailService(
                     update = true
                     stage.status = BuildStatus.PAUSE.name
                     stage.reviewStatus = BuildStatus.REVIEWING.name
-                    stage.stageControlOption!!.triggerUsers = controlOption.stageControlOption.triggerUsers
+                    stage.stageControlOption = controlOption.stageControlOption
                     stage.startEpoch = System.currentTimeMillis()
                     allStageStatus = fetchHistoryStageStatus(model)
                     return Traverse.BREAK
@@ -139,7 +139,11 @@ class StageBuildDetailService(
         return allStageStatus ?: emptyList()
     }
 
-    fun stageCancel(buildId: String, stageId: String) {
+    fun stageCancel(
+        buildId: String,
+        stageId: String,
+        controlOption: PipelineBuildStageControlOption
+    ) {
         logger.info("[$buildId]|stage_cancel|stageId=$stageId")
         update(buildId, object : ModelInterface {
             var update = false
@@ -149,6 +153,7 @@ class StageBuildDetailService(
                     update = true
                     stage.status = ""
                     stage.reviewStatus = BuildStatus.REVIEW_ABORT.name
+                    stage.stageControlOption = controlOption.stageControlOption
                     return Traverse.BREAK
                 }
                 return Traverse.CONTINUE
@@ -175,7 +180,7 @@ class StageBuildDetailService(
                     update = true
                     stage.status = BuildStatus.QUEUE.name
                     stage.reviewStatus = BuildStatus.REVIEW_PROCESSED.name
-                    stage.stageControlOption?.triggered = controlOption.stageControlOption.triggered
+                    stage.stageControlOption?.reviewGroups = controlOption.stageControlOption.reviewGroups
                     stage.stageControlOption?.reviewParams = controlOption.stageControlOption.reviewParams
                     allStageStatus = fetchHistoryStageStatus(model)
                     return Traverse.BREAK

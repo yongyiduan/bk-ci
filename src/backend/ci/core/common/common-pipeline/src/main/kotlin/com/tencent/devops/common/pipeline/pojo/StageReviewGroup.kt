@@ -25,20 +25,25 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.pipeline.enums
+package com.tencent.devops.common.pipeline.pojo
 
-enum class ManualReviewAction {
-    PROCESS,
-    ABORT,
-    REVIEWING;
+import com.tencent.devops.common.pipeline.enums.ManualReviewAction
+import com.tencent.devops.common.pipeline.pojo.element.atom.ManualReviewParam
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-    companion object {
-        fun parse(name: String?): ManualReviewAction {
-            return try {
-                if (name == null) REVIEWING else valueOf(name)
-            } catch (ignored: Exception) {
-                REVIEWING
-            }
-        }
-    }
-}
+@ApiModel("Stage审核组信息")
+data class StageReviewGroup(
+    @ApiModelProperty("审核组名称", required = true)
+    val name: String = "default",
+    @ApiModelProperty("审核人员", required = true)
+    var reviewers: List<String> = listOf(),
+    @ApiModelProperty("审核结果（枚举）", required = false)
+    var status: String? = ManualReviewAction.REVIEWING.name,
+    @ApiModelProperty("审核操作人", required = false)
+    var operator: String? = null,
+    @ApiModelProperty("审核建议", required = false)
+    var suggest: String? = "",
+    @ApiModelProperty("审核传入变量", required = false)
+    var params: MutableList<ManualReviewParam>? = mutableListOf()
+)
