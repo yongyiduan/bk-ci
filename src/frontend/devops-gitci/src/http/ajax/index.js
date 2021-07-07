@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { errorHandler, successHandler, requestHandler, setCookie } from './handler'
+import { setCookie } from '@/utils'
+import { errorHandler, successHandler, requestHandler } from './handler'
 
 // 设置cookie，路由到git-ci独立集群
 setCookie('X-DEVOPS-PROJECT-ID', 'gitciproject', document.domain.split('.').slice(-2).join('.'))

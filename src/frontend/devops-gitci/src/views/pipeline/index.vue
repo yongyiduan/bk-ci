@@ -67,7 +67,7 @@
     import codeSection from '@/components/code-section'
     import { pipelines } from '@/http'
     import { debounce } from '@/utils'
-    // import register from '@/utils/websocket-register'
+    import register from '@/utils/websocket-register'
 
     export default {
         components: {
@@ -107,8 +107,7 @@
         },
 
         beforeDestroy () {
-            clearTimeout(this.loopGetPipelineList.loopId)
-            // register.unInstallWsMessage('pipelineList')
+            register.unInstallWsMessage('pipelineList')
         },
 
         methods: {
@@ -125,14 +124,8 @@
                 })
             },
 
-            // loopGetPipelineList () {
-            //     register.installWsMessage(this.getPipelineList, 'IFRAMEgitci', 'pipelineList')
-            //     return this.getPipelineList()
-            // },
-
             loopGetPipelineList () {
-                clearTimeout(this.loopGetPipelineList.loopId)
-                this.loopGetPipelineList.loopId = setTimeout(this.loopGetPipelineList, 5000)
+                register.installWsMessage(this.getPipelineList, 'IFRAMEgitci', 'pipelineList')
                 return this.getPipelineList()
             },
 

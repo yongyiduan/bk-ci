@@ -12,6 +12,8 @@ import webpackHotMiddleware from 'webpack-hot-middleware'
 import proxyMiddleware from 'http-proxy-middleware'
 import bodyParser from 'body-parser'
 import history from 'connect-history-api-fallback'
+import https from 'https'
+import fs from 'fs'
 
 import devConf from './webpack.dev.conf'
 import config from './config'
@@ -79,7 +81,7 @@ app.use(bodyParser.urlencoded({
 const staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-let localDevUrl = 'http://localhost.woa.com/'
+let localDevUrl = 'https://localhost.woa.com/'
 if (localDevUrl.slice(-1) === '/') {
     localDevUrl = localDevUrl.slice(0, -1)
 }
@@ -100,7 +102,12 @@ devMiddleware.waitUntilValid(() => {
     _resolve()
 })
 
-const server = app.listen(port)
+// https
+const privateKey  = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.key'), 'utf8');
+const certificate = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.crt'), 'utf8');
+const credentials  = { key: privateKey, cert: certificate }
+
+const server = https.createServer(credentials, app).listen(port)
 
 export default {
     ready: readyPromise,
