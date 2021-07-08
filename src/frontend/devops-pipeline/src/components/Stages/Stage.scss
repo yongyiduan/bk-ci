@@ -225,7 +225,8 @@ span.skip-name {
     .container-title {
         cursor: pointer;
         background-color: $fontWeightColor;
-        
+
+        &.SKIP,
         &.UNEXEC,
         &.DISABLED {
             background-color: $fontWeightColor;
@@ -243,8 +244,7 @@ span.skip-name {
         &.CANCELED,
         &.REVIEW_ABORT,
         &.TRY_FINALLY,
-        &.QUEUE_CACHE,
-        &.SKIP {
+        &.QUEUE_CACHE {
             background-color: $cancelColor;
             .container-name span.skip-name {
                 color: white;
