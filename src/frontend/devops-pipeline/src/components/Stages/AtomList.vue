@@ -807,11 +807,10 @@
                         color: #c4cdd6;
                     }
                 }
+                // &.SKIP,
                 &.CANCELED,
-                &.SKIP,
                 &.REVIEWING {
                     border-color: $warningColor;
-                    
                     .atom-icon {
                         color: $warningColor;
                     }
@@ -829,14 +828,14 @@
                 &.SUCCEED,
                 &.REVIEW_PROCESSED {
                     border-color: $successColor;
-                    
+
                     .atom-icon {
                         color: $successColor;
                     }
                 }
                 &.PAUSE {
                     border-color: $pauseColor;
-                    
+
                     .atom-icon {
                         color: $pauseColor;
                     }
