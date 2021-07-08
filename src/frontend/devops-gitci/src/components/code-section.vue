@@ -92,6 +92,16 @@
                 this.codeEditor = CodeMirror(ele, this.codeMirrorCon)
                 this.codeEditor.setValue(this.code || '')
                 this.codeEditor.on('change', this.changeValue)
+                this.codeEditor.on('blur', this.blur)
+                this.codeEditor.on('focus', this.focus)
+            },
+
+            blur () {
+                this.$emit('blur')
+            },
+
+            focus () {
+                this.$emit('focus')
             },
 
             changeValue (instance) {

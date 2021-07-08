@@ -154,8 +154,14 @@
                 <bk-form-item label="Custom Build Message" :required="true" :rules="[requireRule('Message')]" property="customCommitMsg" desc="Custom build message will not affect your commit history." error-display-type="normal">
                     <bk-input v-model="formData.customCommitMsg" placeholder="Please enter build message"></bk-input>
                 </bk-form-item>
-                <bk-form-item label="Yaml" property="yaml" :required="true" :rules="[requireRule('yaml')]" error-display-type="normal" v-bkloading="{ isLoading: isLoadingYaml }">
-                    <code-section :code.sync="formData.yaml" :cursor-blink-rate="530" :read-only="false" ref="codeEditor" />
+                <bk-form-item label="Yaml" ref="codeSection" property="yaml" :required="true" :rules="[requireRule('yaml'), checkYaml]" error-display-type="normal" v-bkloading="{ isLoading: isLoadingYaml }">
+                    <code-section @blur="$refs.codeSection.validate('blur')"
+                        @focus="$refs.codeSection.clearValidator()"
+                        :code.sync="formData.yaml"
+                        :cursor-blink-rate="530"
+                        :read-only="false"
+                        ref="codeEditor"
+                    />
                 </bk-form-item>
                 <bk-form-item>
                     <bk-button ext-cls="mr5" theme="primary" title="Submit" @click.stop.prevent="submitData" :loading="isTriggering">Submit</bk-button>
@@ -175,6 +181,7 @@
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import BkUserSelector from '@blueking/user-selector'
     import register from '@/utils/websocket-register'
+    import validateRule from '@/utils/validate-rule'
 
     export default {
         components: {
@@ -243,7 +250,8 @@
                     customCommitMsg: '',
                     yaml: ''
                 },
-                triggerCommits: []
+                triggerCommits: [],
+                checkYaml: validateRule.checkYaml
             }
         },
 
