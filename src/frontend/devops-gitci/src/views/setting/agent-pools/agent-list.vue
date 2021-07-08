@@ -24,7 +24,7 @@
                             <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.displayName}}</span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column label="hostName" prop="name"></bk-table-column>
+                    <bk-table-column label="HostName" prop="name"></bk-table-column>
                     <bk-table-column label="Ip" prop="ip"></bk-table-column>
                     <bk-table-column label="OS" prop="osName"></bk-table-column>
                     <bk-table-column label="Status" prop="nodeStatus"></bk-table-column>

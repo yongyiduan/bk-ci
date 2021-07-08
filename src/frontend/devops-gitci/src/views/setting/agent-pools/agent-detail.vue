@@ -49,7 +49,7 @@
                 nodeDetails: {},
                 showContent: false,
                 basePrototypeList: [
-                    { id: 'hostname', name: 'CpuName', value: '' },
+                    { id: 'hostname', name: 'HostName', value: '' },
                     { id: 'ip', name: 'IP', value: '' },
                     { id: 'ncpus', name: 'CPU', value: '' },
                     { id: 'memTotal', name: 'Memory', value: '' },
