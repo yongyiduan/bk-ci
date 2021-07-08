@@ -49,12 +49,12 @@
                 nodeDetails: {},
                 showContent: false,
                 basePrototypeList: [
-                    { id: 'hostname', name: 'cpuName', value: '' },
+                    { id: 'hostname', name: 'HostName', value: '' },
                     { id: 'ip', name: 'IP', value: '' },
                     { id: 'ncpus', name: 'CPU', value: '' },
-                    { id: 'memTotal', name: 'ram', value: '' },
-                    { id: 'createdUser', name: 'owner', value: '' },
-                    { id: 'osName', name: 'cpuName', value: '' }
+                    { id: 'memTotal', name: 'Memory', value: '' },
+                    { id: 'createdUser', name: 'Owner', value: '' },
+                    { id: 'osName', name: 'OS', value: '' }
                 ],
                 loading: {
                     isLoading: false,

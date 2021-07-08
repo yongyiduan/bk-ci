@@ -1,51 +1,67 @@
 <template>
-    <article class="agent-list-home">
+    <article class="agent-list-home" v-bkloading="{ isLoading }">
         <header class="agent-list-head">
             <bk-breadcrumb separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
         </header>
 
-        <main class="agent-list-main">
-            <section>
-                <bk-button theme="primary" class="add-agent" @click="goToAddAgent" v-if="agentList.length">Add Self-hosted agent</bk-button>
+        <main class="agent-list-main" v-if="!isLoading">
+            <section v-if="agentList.length">
+                <div class="operate-agent">
+                    <bk-button theme="primary" @click="goToAddAgent">Add Self-hosted agent</bk-button>
+                    <bk-button theme="primary" class="import-agent" @click="importNewNode">Import Self-hosted agent</bk-button>
+                </div>
+                <bk-table class="agent-table"
+                    :data="agentList"
+                    :outer-border="false"
+                    :header-border="false"
+                    :header-cell-style="{ background: '#fafbfd' }"
+                    :height="tableHeight"
+                >
+                    <bk-table-column label="Display Name" prop="displayName">
+                        <template slot-scope="props">
+                            <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.displayName}}</span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column label="HostName" prop="name"></bk-table-column>
+                    <bk-table-column label="Ip" prop="ip"></bk-table-column>
+                    <bk-table-column label="OS" prop="osName"></bk-table-column>
+                    <bk-table-column label="Status" prop="nodeStatus"></bk-table-column>
+                    <bk-table-column label="Operation" width="200" class-name="handler-btn">
+                        <template slot-scope="props">
+                            <span class="update-btn" @click="showDelete(props.row)">Remove from the pool</span>
+                        </template>
+                    </bk-table-column>
+                </bk-table>
             </section>
-            <bk-table class="agent-table"
-                :data="agentList"
-                :outer-border="false"
-                :header-border="false"
-                :header-cell-style="{ background: '#fafbfd' }"
-                :height="tableHeight"
-                v-bkloading="{ isLoading }"
-                v-if="agentList.length"
-            >
-                <bk-table-column label="Display Name" prop="displayName">
-                    <template slot-scope="props">
-                        <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.displayName}}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="OS" prop="osName"></bk-table-column>
-                <bk-table-column label="Status" prop="nodeStatus"></bk-table-column>
-                <bk-table-column label="Operation" width="150" class-name="handler-btn">
-                    <template slot-scope="props">
-                        <span class="update-btn" @click="showDelete(props.row)">Delete</span>
-                    </template>
-                </bk-table-column>
-            </bk-table>
             <section v-else class="table-empty">
                 <h3>Import your first agent</h3>
                 <h5>Agent can be yourself development machine, or the compile machine of your team</h5>
-                <bk-button theme="primary" @click="goToAddAgent">Add Self-hosted agent</bk-button>
+                <div>
+                    <bk-button theme="primary" @click="goToAddAgent">Add Self-hosted agent</bk-button>
+                    <bk-button theme="primary" class="import-agent" @click="importNewNode">Import Self-hosted agent</bk-button>
+                </div>
             </section>
         </main>
+
+        <node-select :node-select-conf="nodeSelectConf"
+            :row-list="importNodeList"
+            :select-handlerc-conf="selectHandlercConf"
+            :confirm-fn="confirmFn"
+            :toggle-all-select="toggleAllSelect"
+            :loading="nodeDialogLoading"
+            :cancel-fn="cancelFn"
+            :query="query">
+        </node-select>
 
         <bk-dialog v-model="isShowDelete"
             theme="danger"
             :mask-close="false"
             :loading="isDeleteing"
             @confirm="deleteAgent"
-            title="Delete">
-            Are you sure to delete【{{deleteRow.displayName}}】？
+            title="Remove from the pool">
+            Are you sure to remove 【{{deleteRow.displayName}}】？
         </bk-dialog>
     </article>
 </template>
@@ -53,8 +69,16 @@
 <script>
     import { mapState } from 'vuex'
     import { setting } from '@/http'
+    import nodeSelect from '@/components/setting/node-select-dialog'
+    import nodeSelectMixin from '@/components/setting/node-select-mixin.js'
 
     export default {
+        components: {
+            nodeSelect
+        },
+
+        mixins: [nodeSelectMixin],
+
         data () {
             return {
                 navList: [
@@ -86,6 +110,7 @@
                 this.isLoading = true
                 setting.getNodeList(this.projectId, this.$route.params.poolId).then((res) => {
                     this.agentList = res
+                    this.nodeList = res
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -138,8 +163,11 @@
     }
     .agent-list-main {
         padding: 16px;
-        .add-agent {
+        .operate-agent {
             margin-bottom: 20px;
+        }
+        .import-agent {
+            margin-left: 10px;
         }
     }
     .agent-table {

@@ -62,6 +62,7 @@
                     case 'agentPools':
                     case 'agentList':
                     case 'addAgent':
+                    case 'agentDetail':
                         settingIndex = 2
                         break
                 }

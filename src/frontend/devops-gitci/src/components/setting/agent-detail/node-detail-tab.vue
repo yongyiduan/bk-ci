@@ -46,7 +46,8 @@
 
             $t (message) {
                 const arr = message.split('.')
-                return arr[arr.length - 1] || message
+                const str = arr[arr.length - 1] || message
+                return str.replace(/^\S/, s => s.toUpperCase())
             }
         }
     }

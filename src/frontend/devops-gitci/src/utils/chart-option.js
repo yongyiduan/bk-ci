@@ -41,7 +41,7 @@ export const nodeOverview = {
                 } else {
                     ret = `
                         <div>${convertTime(Date.parse(params[0].value[0]))}</div>
-                        <div>${params[0].marker}cpuUsageRate：${params[0].value[1]}%</div>
+                        <div>${params[0].marker}cpuUsage：${params[0].value[1]}%</div>
                     `
                 }
 
@@ -175,7 +175,7 @@ export const nodeOverview = {
                 } else {
                     ret = `
                         <div>${convertTime(Date.parse(params[0].value[0]))}</div>
-                        <div>${params[0].marker}ramUsageRate：${params[0].value[1]}%</div>
+                        <div>${params[0].marker}memoryUsage：${params[0].value[1]}%</div>
                     `
                 }
 

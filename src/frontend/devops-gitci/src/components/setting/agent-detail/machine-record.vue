@@ -15,7 +15,7 @@
                     {{ localConvertTime(props.row.actionTime) }}
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('environment.nodeInfo.ownJob')" prop="action" min-width="160">
+            <bk-table-column :label="$t('environment.nodeInfo.status')" prop="action" min-width="160">
                 <template slot-scope="props">
                     <span :title="props.row.action" :class="props.row.action === 'ONLINE' ? 'online' : 'offline'">{{ props.row.action === 'ONLINE' ? $t('environment.nodeInfo.online') : $t('environment.nodeInfo.offline') }}</span>
                 </template>
@@ -95,7 +95,8 @@
             },
             $t (message) {
                 const arr = message.split('.')
-                return arr[arr.length - 1] || message
+                const str = arr[arr.length - 1] || message
+                return str.replace(/^\S/, s => s.toUpperCase())
             }
         }
     }
