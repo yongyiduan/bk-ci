@@ -25,10 +25,9 @@
 .CALL_WAITING {
     color: $loadingColor;
 }
-
-.UNEXEC,
-.SKIP {
-    background-color: $fontWeightColor;
+// .SKIP,
+.UNEXEC {
+    color: $fontWeightColor;
 }
 
 .CANCELED,
