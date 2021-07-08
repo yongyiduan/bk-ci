@@ -96,6 +96,10 @@
         computed: {
             ...mapState(['appHeight', 'projectId']),
 
+            envHashId () {
+                return this.$route.params.poolId
+            },
+
             tableHeight () {
                 return Math.min(this.appHeight - 152, 43 + (this.agentList.length || 4) * 42)
             }

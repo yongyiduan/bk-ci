@@ -123,7 +123,7 @@ const nodeSelectMixin = {
                 params.push(item)
             })
 
-            setting.importEnvNode(this.projectId, this.pool.envHashId, params).then(() => {
+            setting.importEnvNode(this.projectId, this.envHashId, params).then(() => {
                 message = 'Import successfully'
                 theme = 'success'
             }).catch((err) => {
@@ -138,8 +138,9 @@ const nodeSelectMixin = {
                 this.nodeSelectConf.isShow = false
                 this.nodeDialogLoading.isLoading = false
                 this.$emit('refresh')
-                setting.getNodeList(this.projectId, this.pool.envHashId).then((res) => {
+                setting.getNodeList(this.projectId, this.envHashId).then((res) => {
                     this.nodeList = res
+                    this.agentList = res
                 })
             })
         },

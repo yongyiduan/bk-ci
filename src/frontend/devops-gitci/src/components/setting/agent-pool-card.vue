@@ -80,6 +80,10 @@
         computed: {
             ...mapState(['projectId']),
 
+            envHashId () {
+                return this.pool.envHashId
+            },
+
             cpuUsages () {
                 return [
                     { name: 'CPU Usage', showVal: this.pool.averageCpuLoad, val: this.pool.averageCpuLoad / 100 },
