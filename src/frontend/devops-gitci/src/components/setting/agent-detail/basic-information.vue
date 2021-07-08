@@ -50,7 +50,7 @@
                 <div class="item-value">{{ nodeDetails.createdTime || '--' }}</div>
             </div>
             <div class="item-content">
-                <div class="item-label">{{ $t('environment.nodeInfo.createdUser') }}</div>
+                <div class="item-label">{{ $t('environment.nodeInfo.creator') }}</div>
                 <div class="item-value">{{ nodeDetails.createdUser || '--' }}</div>
             </div>
             <div class="item-content">
@@ -164,7 +164,8 @@
             },
             $t (message) {
                 const arr = message.split('.')
-                return arr[arr.length - 1] || message
+                const str = arr[arr.length - 1] || message
+                return str.replace(/^\S/, s => s.toUpperCase())
             }
         }
     }

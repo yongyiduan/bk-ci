@@ -1,7 +1,8 @@
 <template>
     <bk-dialog v-model="nodeSelectConf.isShow"
-        :width="'900'"
+        :width="'1000'"
         :ext-cls="'node-select-wrapper'"
+        :position="{ top: 150 }"
         :close-icon="false">
         <div
             v-bkloading="{
@@ -56,8 +57,9 @@
                             v-model="selectHandlercConf.allNodeSelected"
                             @change="toggleAllSelect"
                         ></bk-checkbox>
+                        <div class="table-node-item node-item-ip">DisplayName</div>
+                        <div class="table-node-item node-item-name">HostName</div>
                         <div class="table-node-item node-item-ip">IP</div>
-                        <div class="table-node-item node-item-name">AgentName</div>
                         <div class="table-node-item node-item-status">OS</div>
                         <div class="table-node-item node-item-status">Creator</div>
                         <div class="table-node-item node-item-status">Status</div>
@@ -74,10 +76,13 @@
                                     ></bk-checkbox>
                                 </div>
                                 <div class="table-node-item node-item-ip">
-                                    <span class="node-ip">{{ col.ip }}</span>
+                                    <span class="node-ip">{{ col.displayName }}</span>
                                 </div>
                                 <div class="table-node-item node-item-name" :class="{ 'over-content': selectHandlercConf.curDisplayCount > 6 }">
                                     <span class="node-name">{{ col.name }}</span>
+                                </div>
+                                <div class="table-node-item node-item-ip">
+                                    <span class="node-ip">{{ col.ip }}</span>
                                 </div>
                                 <div class="table-node-item node-item-status">
                                     <span class="node-name">{{ col.osName }}</span>
@@ -449,7 +454,7 @@
         }
 
         .node-item-name {
-            flex: 5;
+            flex: 3;
         }
 
         .node-item-ip,

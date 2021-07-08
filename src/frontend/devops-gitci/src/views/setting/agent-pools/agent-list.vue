@@ -1,13 +1,13 @@
 <template>
-    <article class="agent-list-home">
+    <article class="agent-list-home" v-bkloading="{ isLoading }">
         <header class="agent-list-head">
             <bk-breadcrumb separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
         </header>
 
-        <main class="agent-list-main">
-            <section v-if="agentList.length === 0">
+        <main class="agent-list-main" v-if="!isLoading">
+            <section v-if="agentList.length">
                 <div class="operate-agent">
                     <bk-button theme="primary" @click="goToAddAgent">Add Self-hosted agent</bk-button>
                     <bk-button theme="primary" class="import-agent" @click="importNewNode">Import Self-hosted agent</bk-button>
@@ -18,13 +18,14 @@
                     :header-border="false"
                     :header-cell-style="{ background: '#fafbfd' }"
                     :height="tableHeight"
-                    v-bkloading="{ isLoading }"
                 >
                     <bk-table-column label="Display Name" prop="displayName">
                         <template slot-scope="props">
                             <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.displayName}}</span>
                         </template>
                     </bk-table-column>
+                    <bk-table-column label="hostName" prop="name"></bk-table-column>
+                    <bk-table-column label="Ip" prop="ip"></bk-table-column>
                     <bk-table-column label="OS" prop="osName"></bk-table-column>
                     <bk-table-column label="Status" prop="nodeStatus"></bk-table-column>
                     <bk-table-column label="Operation" width="200" class-name="handler-btn">
@@ -60,7 +61,7 @@
             :loading="isDeleteing"
             @confirm="deleteAgent"
             title="Remove from the pool">
-            Are you sure to remove {{deleteRow.displayName}}】？
+            Are you sure to remove 【{{deleteRow.displayName}}】？
         </bk-dialog>
     </article>
 </template>

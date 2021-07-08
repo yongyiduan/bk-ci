@@ -27,7 +27,7 @@
                     <span :title="props.row.taskName">{{ props.row.taskName }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('environment.nodeInfo.buildTaskStatus')" prop="status">
+            <bk-table-column :label="$t('environment.nodeInfo.status')" prop="status">
                 <template slot-scope="props">
                     <span :class="{
                         'is-success': props.row.status === 'DONE',
@@ -36,7 +36,7 @@
                     <span v-if="props.row.agentTask && props.row.agentTask.status === 'RUNNING'">{{`（${$t('environment.nodeInfo.agentTaskRunning')}）`}}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column :label="$t('environment.envInfo.creationTime')" prop="createdTime" min-width="160">
+            <bk-table-column :label="$t('environment.envInfo.createTime')" prop="createdTime" min-width="160">
                 <template slot-scope="props">
                     {{ localConvertTime(props.row.createdTime) }}
                 </template>
@@ -157,7 +157,8 @@
             },
             $t (message) {
                 const arr = message.split('.')
-                return arr[arr.length - 1] || message
+                const str = arr[arr.length - 1] || message
+                return str.replace(/^\S/, s => s.toUpperCase())
             }
         }
     }
