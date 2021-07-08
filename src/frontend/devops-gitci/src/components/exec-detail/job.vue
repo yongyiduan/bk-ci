@@ -3,14 +3,14 @@
         :title="job.name"
         :status="job.status"
     >
-        <!-- <span
+        <span
             v-if="job.dispatchType && job.dispatchType.buildType === 'GIT_CI'"
             class="web-console"
             :style="{ right: executeCount > 1 ? '390px' : '280px' }"
             @click="startDebug"
         >
             Web Console
-        </span> -->
+        </span>
         <job-log :plugin-list="pluginList"
             :build-id="$route.params.buildId"
             :down-load-link="downLoadJobLink"
