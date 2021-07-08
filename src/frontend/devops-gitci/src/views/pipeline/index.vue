@@ -30,9 +30,14 @@
                         <bk-input v-model="yamlData.file_name" class="yaml-name" placeholder="Please enter yml name，such as build.yml"></bk-input>
                     </bk-compose-form-item>
                 </bk-form-item>
-                <bk-form-item label="YAML" :rules="[requireRule('Yaml')]" :required="true" property="content" error-display-type="normal">
+                <bk-form-item label="YAML" :rules="[requireRule('Yaml'), checkYaml]" ref="codeSection" :required="true" property="content" error-display-type="normal">
                     <bk-link theme="primary" href="https://iwiki.woa.com/x/OPBUL" target="_blank" class="yaml-examples">YAML Examples</bk-link>
-                    <code-section :code.sync="yamlData.content" :read-only="false" :cursor-blink-rate="530"></code-section>
+                    <code-section @blur="$refs.codeSection.validate('blur')"
+                        @focus="$refs.codeSection.clearValidator()"
+                        :code.sync="yamlData.content"
+                        :read-only="false"
+                        :cursor-blink-rate="530"
+                    ></code-section>
                 </bk-form-item>
                 <bk-form-item label="Branch" :rules="[requireRule('Branch')]" :required="true" property="branch_name" error-display-type="normal">
                     <bk-select v-model="yamlData.branch_name"
@@ -68,6 +73,7 @@
     import { pipelines } from '@/http'
     import { debounce } from '@/utils'
     import register from '@/utils/websocket-register'
+    import validateRule from '@/utils/validate-rule'
 
     export default {
         components: {
@@ -94,7 +100,8 @@
                     },
                     message: 'Consists of uppercase and lowercase English letters, numbers, underscores, underscores and dots',
                     trigger: 'blur'
-                }
+                },
+                checkYaml: validateRule.checkYaml
             }
         },
 
