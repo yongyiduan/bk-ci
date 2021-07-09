@@ -7,8 +7,12 @@
             </bk-radio-group>
         </form-field>
         <template v-if="manualTrigger">
-            <form-field :required="true" :disabled="disabled" :label="$t('stageUserTriggers')" :is-error="!hasTriggerMember" :desc="$t('stageTriggerDesc')" :error-msg="$t('editPage.stageManualTriggerUserNoEmptyTips')">
-                <staff-input :clearable="true" :disabled="disabled" name="triggerUsers" :value="triggerUsers" :handle-change="handleUpdateStageControl"></staff-input>
+            <form-field :label="$t('stageUserTriggers')" :is-error="!hasTriggerMember" :desc="$t('stageTriggerDesc')" :error-msg="$t('editPage.stageManualTriggerUserNoEmptyTips')">
+                <stage-review-flow
+                    :review-groups="reviewGroups"
+                    :disabled="disabled"
+                    @change="handleUpdateStageControl"
+                ></stage-review-flow>
             </form-field>
 
             <form-field :disabled="disabled" :label="$t('stageReviewInputDesc')">
@@ -16,7 +20,7 @@
             </form-field>
 
             <form-field :disabled="disabled" :label="$t('stageReviewParams')">
-                <key-value-normal :disabled="disabled" name="reviewParams" :handle-change="handleUpdateStageControl" :value="reviewParams"></key-value-normal>
+                <define-param :disabled="disabled" name="reviewParams" :handle-change="handleUpdateStageControl" :value="reviewParams"></define-param>
             </form-field>
 
             <form-field :required="true" :disabled="disabled" :label="$t('stageTimeoutLabel')" :is-error="!validTimeout" :desc="$t('stageTimeoutDesc')" :error-msg="$t('stageTimeoutError')">
@@ -33,16 +37,17 @@
     import Vue from 'vue'
     import { mapActions } from 'vuex'
     import FormField from '@/components/AtomPropertyPanel/FormField'
-    import StaffInput from '@/components/atomFormField/StaffInput'
     import VuexTextarea from '@/components/atomFormField/VuexTextarea'
-    import KeyValueNormal from '@/components/atomFormField/KeyValueNormal'
+    import DefineParam from '@/components/AtomFormComponent/DefineParam'
+    import StageReviewFlow from './StageReviewFlow'
+
     export default {
         name: 'stage-review-control',
         components: {
             FormField,
-            StaffInput,
             VuexTextarea,
-            KeyValueNormal
+            DefineParam,
+            StageReviewFlow
         },
         props: {
             stage: {
@@ -77,12 +82,12 @@
                     this.handleUpdateStageControl('timeout', timeout)
                 }
             },
-            triggerUsers () {
-                return this.stageControl && Array.isArray(this.stageControl.triggerUsers) ? this.stageControl.triggerUsers : []
+            reviewGroups () {
+                return this.stageControl && Array.isArray(this.stageControl.reviewGroups) ? this.stageControl.reviewGroups : []
             },
             hasTriggerMember () {
                 try {
-                    return this.manualTrigger && this.triggerUsers.length > 0
+                    return this.manualTrigger && this.reviewGroups.length > 0
                 } catch (e) {
                     return false
                 }
@@ -99,7 +104,7 @@
         },
         watch: {
             manualTrigger (val) {
-                !val && this.handleUpdateStageControl('triggerUsers', [])
+                !val && this.handleUpdateStageControl('reviewGroups', [])
                 this.handleUpdateStageControl('isReviewError', !this.validateStageControl())
             },
             hasTriggerMember (hasTriggerMember) {
@@ -146,7 +151,7 @@
                         runCondition: 'AFTER_LAST_FINISHED',
                         customVariables: [{ key: 'param1', value: '' }],
                         manualTrigger: false,
-                        triggerUsers: [],
+                        reviewGroups: [],
                         timeout: 24
                     })
                 }
