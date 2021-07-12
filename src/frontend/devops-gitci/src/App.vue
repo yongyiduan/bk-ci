@@ -7,7 +7,13 @@
                 <template v-if="$route.hash">
                     <icon name="git" size="18" class="gray-icon"></icon>
                     <span class="git-project-path" @click="goToCode">{{ decodeURIComponent(($route.hash || '').slice(1)) }}</span>
-                    <icon name="setting" size="18" :class="computedIconClass" @click.native="goToSetting"></icon>
+                    <icon
+                        name="setting"
+                        size="18"
+                        :class="computedIconClass"
+                        @click.native="goToSetting"
+                        v-bk-tooltips="{ content: 'Permission denied', disabled: permission }"
+                    ></icon>
                 </template>
             </span>
             <section class="user-info">
@@ -48,7 +54,7 @@
         },
 
         computed: {
-            ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'user']),
+            ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'user', 'permission']),
 
             computedIconClass () {
                 const name = this.$route.name
@@ -145,6 +151,8 @@
             },
 
             goToSetting () {
+                if (!this.permission) return
+
                 this.$router.push({ name: 'basicSetting' })
             },
 
