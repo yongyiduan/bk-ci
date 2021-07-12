@@ -279,7 +279,7 @@ const actions = {
      * @return {Promise} promise 对象
      */
     requestTurboIofo ({ commit, state, dispatch }, { bsPipelineId, bsContainerId, bsElementId }) {
-        return ajax.get(`turbo/api/user/turbo/task/pipeline/${bsPipelineId}/${bsElementId}`).then(response => {
+        return ajax.get(`turbo-new/api/user/turbo/task/pipeline/${bsPipelineId}/${bsElementId}`).then(response => {
             return response
         })
     },
@@ -301,7 +301,7 @@ const actions = {
      * @return {Promise} promise 对象
      */
     setTurboSwitch ({ commit, state, dispatch }, { taskId, banAllBooster }) {
-        return ajax.put(`turbo/api/user/turbo/task/switch/${taskId}/${banAllBooster}`).then(response => {
+        return ajax.put(`turbo-new/api/user/turbo/task/switch/${taskId}/${banAllBooster}`).then(response => {
             return response.data
         })
     },
@@ -316,7 +316,7 @@ const actions = {
      * @return {params} params 对象
      */
     updateToTurbo ({ commit, state, dispatch }, { pipelineId, params }) {
-        return ajax.post(`turbo/api/user/turbo/pipeline/synchronization/${pipelineId}`, params).then(response => {
+        return ajax.post(`turbo-new/api/user/turbo/pipeline/synchronization/${pipelineId}`, params).then(response => {
             return response.data
         })
     },
