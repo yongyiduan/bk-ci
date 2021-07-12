@@ -198,14 +198,14 @@ const routes = [
                                 component: privateSetting
                             },
                             {
-                                path: 'api',
-                                name: 'api',
-                                component: apiSetting
-                            },
-                            {
                                 path: 'visible',
                                 name: 'visible',
                                 component: visibleSetting
+                            },
+                            {
+                                path: 'api',
+                                name: 'api',
+                                component: apiSetting
                             }
                         ]
                     },

@@ -200,7 +200,7 @@
             this.setPipelineEditing(false)
             this.setSaveStatus(false)
             this.setAuthEditing(false)
-            this.authEditing = false
+            this.setEditFrom(false)
             this.errors.clear()
         },
         beforeRouteUpdate (to, from, next) {

@@ -35,7 +35,7 @@ export default {
     },
 
     getSetting (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/basic/setting/${projectId}`)
+        return api.get(`${GITCI_PERFIX}/user/basic/setting/${projectId}`, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
     },
 
     getSystemPoolDetail () {
@@ -77,7 +77,7 @@ export default {
     },
 
     toggleEnableCi (enabled, projectInfo) {
-        return api.post(`${GITCI_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo)
+        return api.post(`${GITCI_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
     },
 
     resetAuthorization (projectId) {
