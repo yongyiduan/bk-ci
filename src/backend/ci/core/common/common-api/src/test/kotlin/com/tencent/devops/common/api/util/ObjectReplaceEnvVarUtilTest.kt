@@ -293,8 +293,8 @@ class ObjectReplaceEnvVarUtilTest {
         assertEquals("12E2", toJson(convertDataObj))
         // 替换”[133]-[sid-${normalStrEnvVar}]-[sid-zhiliang-test1]“带多个[]的字符串
         convertDataObj = ObjectReplaceEnvVarUtil.replaceEnvVar(
-            obj = "[133]-[sid-\${normalStrEnvVar}]-[sid-zhiliang-test1]",
-            envMap = envMap
+            "[133]-[sid-\${normalStrEnvVar}]-[sid-zhiliang-test1]",
+            envMap
         )
         assertEquals("[133]-[sid-123]-[sid-zhiliang-test1]", toJson(convertDataObj))
     }
