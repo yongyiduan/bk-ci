@@ -20,7 +20,7 @@ function successHandler (response) {
     } else if ((typeof code !== 'undefined' && code !== 0) || (typeof status !== 'undefined' && status !== 0)) {
         return Promise.reject(errorMsg)
     }
-    return data || response.data
+    return data === undefined ? response.data : data
 }
 
 function getLoginUrl () {
