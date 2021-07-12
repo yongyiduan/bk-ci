@@ -16,6 +16,7 @@ const store = new Vuex.Store({
         permission: false,
         projectId: '',
         projectInfo: {},
+        projectSetting: {},
         curPipeline: {},
         exceptionInfo: {
             type: 200
@@ -32,6 +33,9 @@ const store = new Vuex.Store({
             state.projectInfo = projectInfo
             modifyRequestCommonHead({ 'X-DEVOPS-PROJECT-ID': projectId })
         },
+        setProjectSetting (state, projectSetting) {
+            state.projectSetting = projectSetting || {}
+        },
         setCurPipeline (state, pipeline) {
             state.curPipeline = pipeline
         },
@@ -45,6 +49,9 @@ const store = new Vuex.Store({
     actions: {
         setProjectInfo ({ commit }, projectInfo) {
             commit('setProjectInfo', projectInfo)
+        },
+        setProjectSetting ({ commit }, projectSetting) {
+            commit('setProjectSetting', projectSetting)
         },
         setCurPipeline ({ commit }, pipeline) {
             commit('setCurPipeline', pipeline)
