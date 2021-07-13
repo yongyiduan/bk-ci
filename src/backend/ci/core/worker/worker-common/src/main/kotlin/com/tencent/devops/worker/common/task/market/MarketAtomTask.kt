@@ -381,6 +381,7 @@ open class MarketAtomTask : ITask() {
         atomParams: MutableMap<String, String>,
         inputTemplate: Map<String, Map<String, Any>>
     ) {
+        LoggerService.addFoldStartLine("[Install plugin]")
         LoggerService.addNormalLine("=====================================================================")
         LoggerService.addNormalLine("Task           : ${atomData.atomName}")
         if (!atomData.summary.isNullOrBlank()) {
@@ -405,7 +406,9 @@ open class MarketAtomTask : ITask() {
                     "[WARNING]The plugin is in the transition period and may not work properly in the future."
             )
         }
-
+        LoggerService.addFoldEndLine("-----")
+        LoggerService.addNormalLine("")
+        LoggerService.addFoldStartLine("[Input]")
         atomParams.forEach { (key, value) ->
             if (inputTemplate[key] != null) {
                 val def = inputTemplate[key] as Map<String, Any>
@@ -419,6 +422,8 @@ open class MarketAtomTask : ITask() {
                 LoggerService.addYellowLine("input(except): $key=$value")
             }
         }
+        LoggerService.addFoldEndLine("-----")
+        LoggerService.addNormalLine("")
     }
 
     private fun writeSdkEnv(workspace: File, buildTask: BuildTask, buildVariables: BuildVariables) {
@@ -516,15 +521,12 @@ open class MarketAtomTask : ITask() {
         if (atomResult == null) {
             LoggerService.addYellowLine("No output")
         } else {
-            if (atomResult.status == "success") {
-                success = true
-                LoggerService.addNormalLine("success: ${atomResult.message ?: ""}")
-            } else {
-                success = false
-            }
+            success = atomResult.status == "success"
 
             val outputData = atomResult.data
             val env = mutableMapOf<String, String>()
+            LoggerService.addNormalLine("")
+            LoggerService.addFoldStartLine("[Output]")
             outputData?.forEach { (varKey, output) ->
                 val type = output[TYPE]
                 val key = if (!namespace.isNullOrBlank()) {
@@ -587,6 +589,7 @@ open class MarketAtomTask : ITask() {
                     LoggerService.addYellowLine("output(except): $key=${env[key]}")
                 }
             }
+            LoggerService.addFoldEndLine("-----")
 
             if (atomResult.type == "default") {
                 if (env.isNotEmpty()) {
