@@ -88,14 +88,13 @@
             },
 
             goToPage ({ name, params, enable }) {
-                console.log(enable, 3453)
                 if (enable) {
                     this.$router.push({ name, params })
                 }
             },
 
             backHome () {
-                this.goToPage({ name: 'buildList' })
+                this.goToPage({ name: 'buildList', enable: true })
             }
         }
     }
