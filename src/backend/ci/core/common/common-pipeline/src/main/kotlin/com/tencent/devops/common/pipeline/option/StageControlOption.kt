@@ -27,6 +27,7 @@
 
 package com.tencent.devops.common.pipeline.option
 
+import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.pipeline.NameAndValue
 import com.tencent.devops.common.pipeline.enums.ManualReviewAction
 import com.tencent.devops.common.pipeline.enums.StageRunCondition
@@ -80,21 +81,23 @@ data class StageControlOption(
     /**
      * 审核通过当前等待中的审核组
      */
-    fun reviewCurrentGroup(
+    fun reviewGroup(
         userId: String,
         action: ManualReviewAction,
+        groupId: String? = null,
         params: List<ManualReviewParam>? = null,
         suggest: String? = null
-    ) {
+    ): Boolean {
         refreshReviewOption()
-        reviewGroups?.forEach { group ->
-            if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
-                group.status = action.name
-                group.operator = userId
-                group.params = params?.toMutableList()
-                group.suggest = suggest
-            }
+        val group = getReviewGroupById(groupId) ?: return false
+        if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+            group.status = action.name
+            group.operator = userId
+            group.params = params?.toMutableList()
+            group.suggest = suggest
+            return true
         }
+        return false
     }
 
     /**
@@ -102,24 +105,42 @@ data class StageControlOption(
      */
     fun refreshReviewOption() {
         val newReviewGroups = mutableListOf<StageReviewGroup>()
-        if (triggerUsers?.isNotEmpty() == true) {
+        if (triggerUsers?.isNotEmpty() == true && reviewGroups?.isNullOrEmpty() == true) {
             val group = if (triggered == true) StageReviewGroup(
+                id = UUIDUtil.generate(),
                 reviewers = triggerUsers!!,
                 status = ManualReviewAction.PROCESS.name,
                 params = reviewParams?.toMutableList()
             ) else StageReviewGroup(
+                id = UUIDUtil.generate(),
                 reviewers = triggerUsers!!,
                 status = null
             )
-
             newReviewGroups.add(group)
+            // TODO 在下一次发布中增加抹除旧数据逻辑
+            reviewGroups = newReviewGroups
 //            triggerUsers = null
 //            triggered = null
         }
-        if (reviewGroups.isNullOrEmpty()) {
-            reviewGroups = newReviewGroups
-        } else {
-            reviewGroups!!.addAll(newReviewGroups)
+//        if (reviewGroups.isNullOrEmpty()) {
+//
+//        } else {
+//            reviewGroups!!.addAll(newReviewGroups)
+//        }
+    }
+
+    /**
+     * 获取指定ID的审核组
+     */
+    private fun getReviewGroupById(groupId: String?): StageReviewGroup? {
+        refreshReviewOption()
+        // #4531 兼容旧的前端交互，如果是不带ID审核参数则默认返回第一个审核组（旧数据）
+        if (groupId.isNullOrBlank()) return reviewGroups?.first()
+        reviewGroups?.forEach { group ->
+            if (group.id == groupId) {
+                return group
+            }
         }
+        return null
     }
 }
