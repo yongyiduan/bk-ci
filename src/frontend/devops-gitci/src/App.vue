@@ -91,7 +91,7 @@
 
             initData () {
                 this.isLoading = true
-                Promise.all([this.getUserInfo(), this.getProjectInfo()]).catch((err) => {
+                Promise.all([this.getUserInfo()]).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
@@ -187,9 +187,9 @@
     .gitci-main {
         width: 100%;
         height: 100vh;
-        overflow: hidden;
+        overflow: auto;
         font-size: 14px;
-        color: #7b7d8a;
+        /* color: #7b7d8a; */
         background: #f5f5f5;
         font-family: -apple-system,PingFang SC,BlinkMacSystemFont,Microsoft YaHei,Helvetica Neue,Arial;
         ::-webkit-scrollbar-thumb {
@@ -246,6 +246,7 @@
 
     .gitci-content {
         height: calc(100% - 61px);
+        overflow: auto;
     }
 
     .bk-dropdown-list li {

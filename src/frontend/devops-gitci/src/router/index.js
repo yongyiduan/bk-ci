@@ -8,6 +8,7 @@ import VueRouter from 'vue-router'
 import websocket from '@/utils/websocket'
 Vue.use(VueRouter)
 
+const homePage = () => import(/* webpackChunkName: 'entry' */'@/views/home')
 const main = () => import(/* webpackChunkName: 'entry' */'@/views/index')
 const exception = () => import(/* webpackChunkName: 'entry' */'@/views/exception')
 const notifications = () => import(/* webpackChunkName: 'notifications' */'@/views/notifications')
@@ -35,6 +36,11 @@ const routes = [
             exception: exception
         },
         children: [
+            {
+                path: 'home',
+                name: 'home',
+                component: homePage
+            },
             {
                 path: 'webConsole',
                 name: 'webConsole',
