@@ -25,16 +25,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.gitci.utils
+package com.tencent.devops.auth.service.gitci.entify
 
-object GitCIPipelineUtils {
-
-    fun genGitProjectCode(gitProjectId: Long) = "git_$gitProjectId"
-
-    fun genBKPipelineName(gitProjectId: Long) = "git_" + gitProjectId + "_" + System.currentTimeMillis()
-
-    fun genGitCIV2BuildUrl(homePage: String, projectName: String, pipelineId: String, buildId: String) =
-        "$homePage/pipeline/$pipelineId/detail/$buildId/#$projectName"
-
-    fun genGitCIV1RequestUrl(homePage: String) = "$homePage/ci/pipelines#/request"
+enum class GitCIPermissionLevel(val level: Int) {
+    DEVELOP_UP(1), // develop及以上
+    DEVELOP_DOWN(2), // develop以下的项目成员
+    NO_PERMISSION(0); // 非项目成员
 }
