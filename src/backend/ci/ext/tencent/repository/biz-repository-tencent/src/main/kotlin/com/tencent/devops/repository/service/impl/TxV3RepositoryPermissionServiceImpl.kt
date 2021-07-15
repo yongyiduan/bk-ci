@@ -29,7 +29,6 @@ package com.tencent.devops.repository.service.impl
 
 import com.tencent.devops.auth.api.service.ServicePermissionAuthResource
 import com.tencent.devops.common.api.exception.PermissionForbiddenException
-import com.tencent.devops.common.api.util.HashUtil
 import com.tencent.devops.common.auth.api.AuthPermission
 import com.tencent.devops.common.auth.api.AuthResourceApiStr
 import com.tencent.devops.common.auth.api.AuthResourceType
@@ -81,7 +80,7 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
             return managerIds
         }
 
-        return resourceCodeList.map { HashUtil.decodeIdToLong(it) }
+        return resourceCodeList.map { it.toLong() }
     }
 
     override fun filterRepositories(
@@ -111,8 +110,7 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
             val ids = if (value.contains("*")) {
                 projectRepositoryIds
             } else {
-                // 因存在iam内的id为加密后的id,此处需要解密
-                value.map { HashUtil.decodeIdToLong(it) }
+                value.map { it.toLong() }
             }
             resultMap[key] = ids
             if (key == AuthPermission.VIEW) {
@@ -128,11 +126,10 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
         authPermission: AuthPermission,
         repositoryId: Long?
     ): Boolean {
-        // iamV3存的代码库Id为hashId(为兼容企业版),故此处需要再次加密做校验
         var resourceCode: String
         var resourceType: String
         if (repositoryId != null) {
-            resourceCode = HashUtil.encodeLongId(repositoryId!!)
+            resourceCode = repositoryId!!.toString()
             resourceType = AuthResourceType.CODE_REPERTORY.value
         } else {
             resourceCode = projectId
@@ -156,7 +153,7 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
             serviceCode = null,
             resourceType = TActionUtils.extResourceType(AuthResourceType.CODE_REPERTORY),
             projectCode = projectId,
-            resourceCode = HashUtil.encodeLongId(repositoryId),
+            resourceCode = repositoryId.toString(),
             resourceName = repositoryName
         )
     }
