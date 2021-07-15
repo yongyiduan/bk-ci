@@ -24,22 +24,18 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package com.tencent.devops.auth.service
 
-package com.tencent.devops.auth.pojo.dto
+import com.tencent.devops.auth.service.iam.PermissionExtService
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
-
-@ApiModel
-data class GroupDTO(
-    @ApiModelProperty("用户组编号, 内置用户组编号固定, 自定义组动态生成")
-    val groupCode: String,
-    @ApiModelProperty("默认分组类型 true:默认分组, false 非默认分组")
-    val groupType: Boolean,
-    @ApiModelProperty("用户组名称")
-    val groupName: String,
-    @ApiModelProperty("用户组别名")
-    val displayName: String?,
-    @ApiModelProperty("关联系统Id")
-    val relationId: String?
-)
+class EmptyPermissionExtServiceImpl : PermissionExtService {
+    override fun resourceCreateRelation(
+        userId: String,
+        projectCode: String,
+        resourceType: String,
+        resourceCode: String,
+        resourceName: String
+    ): Boolean {
+        return true
+    }
+}

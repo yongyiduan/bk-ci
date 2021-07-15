@@ -28,8 +28,8 @@
 package com.tencent.devops.repository.service.impl
 
 import com.tencent.devops.auth.api.service.ServicePermissionAuthResource
-import com.tencent.devops.auth.service.ManagerService
 import com.tencent.devops.common.api.exception.PermissionForbiddenException
+import com.tencent.devops.common.api.util.HashUtil
 import com.tencent.devops.common.auth.api.AuthPermission
 import com.tencent.devops.common.auth.api.AuthResourceApiStr
 import com.tencent.devops.common.auth.api.AuthResourceType
@@ -42,7 +42,6 @@ import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 
 class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
-    private val managerService: ManagerService,
     private val repositoryDao: RepositoryDao,
     private val dslContext: DSLContext,
     private val client: Client,
@@ -64,17 +63,6 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
 
     override fun filterRepository(userId: String, projectId: String, authPermission: AuthPermission): List<Long> {
         val managerIds = mutableListOf<Long>()
-        if (managerService.isManagerPermission(
-                userId = userId,
-                projectId = projectId,
-                authPermission = authPermission,
-                resourceType = AuthResourceType.CODE_REPERTORY
-            )) {
-            repositoryDao.listByProject(dslContext, projectId, null)
-                .map { managerIds.add(it.repositoryId.toLong()) }
-            return managerIds
-        }
-
         val resourceCodeList = client.get(ServicePermissionAuthResource::class).getUserResourceByPermission(
             token = tokenService.getSystemToken(null)!!,
             userId = userId,
@@ -83,13 +71,17 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
             action = TActionUtils.buildAction(authPermission, AuthResourceType.CODE_REPERTORY)
         ).data ?: emptyList()
 
+        if (resourceCodeList.isNullOrEmpty()) {
+            return emptyList()
+        }
+
         if (resourceCodeList.contains("*")) {
             repositoryDao.listByProject(dslContext, projectId, null)
-                .map { managerIds.add(it.repositoryId.toLong()) }
+                ?.map { managerIds.add(it.repositoryId.toLong()) }
             return managerIds
         }
 
-        return resourceCodeList.map { it.toLong() }
+        return resourceCodeList.map { HashUtil.decodeIdToLong(it) }
     }
 
     override fun filterRepositories(
@@ -116,19 +108,15 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
         val resultMap = mutableMapOf<AuthPermission, List<Long>>()
 
         permissionResourcesMap.forEach { key, value ->
-            if (value.contains("*")) {
-                resultMap[key] = projectRepositoryIds
+            val ids = if (value.contains("*")) {
+                projectRepositoryIds
             } else {
-                if (managerService.isManagerPermission(
-                        userId = userId,
-                        resourceType = AuthResourceType.CODE_REPERTORY,
-                        projectId = projectId,
-                        authPermission = key
-                )) {
-                    resultMap[key] = projectRepositoryIds
-                } else {
-                    resultMap[key] = value.map { it.toLong() }
-                }
+                // 因存在iam内的id为加密后的id,此处需要解密
+                value.map { HashUtil.decodeIdToLong(it) }
+            }
+            resultMap[key] = ids
+            if (key == AuthPermission.VIEW) {
+                resultMap[AuthPermission.LIST] = ids
             }
         }
         return resultMap
@@ -140,22 +128,22 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
         authPermission: AuthPermission,
         repositoryId: Long?
     ): Boolean {
-        if (managerService.isManagerPermission(
-                userId = userId,
-                projectId = projectId,
-                authPermission = authPermission,
-                resourceType = AuthResourceType.CODE_REPERTORY
-            )) {
-            return true
+        // iamV3存的代码库Id为hashId(为兼容企业版),故此处需要再次加密做校验
+        var resourceCode: String
+        var resourceType: String
+        if (repositoryId != null) {
+            resourceCode = HashUtil.encodeLongId(repositoryId!!)
+            resourceType = AuthResourceType.CODE_REPERTORY.value
+        } else {
+            resourceCode = projectId
+            resourceType = AuthResourceType.PROJECT.value
         }
-
-        val resourceCode = repositoryId?.toString() ?: projectId
 
         return client.get(ServicePermissionAuthResource::class).validateUserResourcePermissionByRelation(
             token = tokenService.getSystemToken(null)!!,
             userId = userId,
             projectCode = projectId,
-            resourceType = AuthResourceType.CODE_REPERTORY.value,
+            resourceType = resourceType,
             relationResourceType = null,
             action = TActionUtils.buildAction(authPermission, AuthResourceType.CODE_REPERTORY),
             resourceCode = resourceCode
@@ -168,7 +156,7 @@ class TxV3RepositoryPermissionServiceImpl @Autowired constructor(
             serviceCode = null,
             resourceType = TActionUtils.extResourceType(AuthResourceType.CODE_REPERTORY),
             projectCode = projectId,
-            resourceCode = repositoryId.toString(),
+            resourceCode = HashUtil.encodeLongId(repositoryId),
             resourceName = repositoryName
         )
     }

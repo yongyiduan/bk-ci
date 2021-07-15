@@ -25,21 +25,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.auth.pojo.dto
+package com.tencent.devops.auth.refresh.event
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.event.annotation.Event
+import com.tencent.devops.common.event.dispatcher.pipeline.mq.MQ
 
-@ApiModel
-data class GroupDTO(
-    @ApiModelProperty("用户组编号, 内置用户组编号固定, 自定义组动态生成")
-    val groupCode: String,
-    @ApiModelProperty("默认分组类型 true:默认分组, false 非默认分组")
-    val groupType: Boolean,
-    @ApiModelProperty("用户组名称")
-    val groupName: String,
-    @ApiModelProperty("用户组别名")
-    val displayName: String?,
-    @ApiModelProperty("关联系统Id")
-    val relationId: String?
-)
+@Event(exchange = MQ.EXCHANGE_AUTH_REFRESH_FANOUT, routeKey = MQ.ROUTE_AUTH_REFRESH_FANOUT)
+data class IamCacheRefreshEvent(
+    override val refreshType: String,
+    override var retryCount: Int = 0,
+    override var delayMills: Int = 0,
+    val userId: String,
+    val resourceType: String
+) : RefreshBroadCastEvent(refreshType, retryCount, delayMills)
