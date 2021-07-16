@@ -163,15 +163,14 @@ class UserSensitiveConfServiceImpl @Autowired constructor(
             )
         }
         val fieldType = sensitiveConfReq.fieldType
-        val fieldValueEncrypted = if (fieldType == FieldTypeEnum.BACKEND.name) {
-            // 对字段值进行加密
-            if (fieldValue == aesMock) {
-                null
-            } else {
-                AESUtil.encrypt(aesKey, fieldValue)
-            }
+        val fieldValueEncrypted = if (fieldValue == aesMock) {
+            null
         } else {
-            fieldValue
+            if (fieldType == FieldTypeEnum.BACKEND.name) {
+                AESUtil.encrypt(aesKey, fieldValue)
+            } else {
+                fieldValue
+            }
         }
         sensitiveConfDao.update(
             dslContext = dslContext,
