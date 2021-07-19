@@ -31,6 +31,7 @@ import com.sun.management.OperatingSystemMXBean
 import org.slf4j.LoggerFactory
 import oshi.SystemInfo
 import oshi.hardware.GlobalMemory
+import oshi.software.os.OSFileStore
 import oshi.software.os.OperatingSystem
 import java.lang.management.ManagementFactory
 import java.nio.charset.Charset
@@ -43,11 +44,13 @@ object SystemInfoUtil {
 
     private val memory: GlobalMemory
     private val operatingSystem: OperatingSystem
+    private var fileStore: OSFileStore? = null
     private val systemMXBean = ManagementFactory.getOperatingSystemMXBean() as OperatingSystemMXBean
 
     init {
         val systemInfo = SystemInfo()
-        memory = systemInfo.hardware.memory
+        val hardware = systemInfo.hardware
+        memory = hardware.memory
         operatingSystem = systemInfo.operatingSystem
     }
 
@@ -234,14 +237,16 @@ object SystemInfoUtil {
 
     private fun file(): Int {
         var diskUsedPercent = 0
-        operatingSystem.fileSystem
-            .getFileStores(true)
-            .firstOrNull { "/data" == it.mount }
-            ?.also {
-                val freeSpace = it.freeSpace
-                val totalSpace = it.totalSpace
-                diskUsedPercent = (100 - freeSpace * 100 / totalSpace).toInt()
-            }
+        if (fileStore == null) {
+            fileStore = operatingSystem.fileSystem
+                .getFileStores(true)
+                .first { "/data" == it.mount }
+        }
+        fileStore?.also {
+            val freeSpace = it.freeSpace
+            val totalSpace = it.totalSpace
+            diskUsedPercent = (100 - freeSpace * 100 / totalSpace).toInt()
+        }
         return diskUsedPercent
     }
 

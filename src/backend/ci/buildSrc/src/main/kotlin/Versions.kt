@@ -38,10 +38,10 @@ object Versions {
     const val CronUtils = "7.0.1"
     const val AwsS3 = "1.11.461"
     const val AsyncHttpClient = "2.1.0"
-    const val Sigar = "1.7.0.0"
     const val Logback = "1.1.11"
     const val Poi = "3.17"
     const val Jolokia = "1.6.0"
     const val InfluxDB = "2.10"
     const val Caffeine = "2.8.8"
+    const val Oshi = "5.8.0"
 }
