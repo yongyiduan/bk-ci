@@ -58,7 +58,7 @@ data class StageControlOption(
     fun groupToReview(): StageReviewGroup? {
         refreshReviewOption()
         reviewGroups?.forEach { group ->
-            if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+            if (group.status == null) {
                 return group
             }
         }
@@ -71,7 +71,7 @@ data class StageControlOption(
     fun reviewerContains(userId: String): Boolean {
         refreshReviewOption()
         reviewGroups?.forEach { group ->
-            if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+            if (group.status == null) {
                 return group.reviewers.contains(userId)
             }
         }
@@ -90,7 +90,7 @@ data class StageControlOption(
     ): Boolean {
         refreshReviewOption()
         val group = getReviewGroupById(groupId) ?: return false
-        if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+        if (group.status == null) {
             group.status = action.name
             group.operator = userId
             group.params = params?.toMutableList()
@@ -105,28 +105,31 @@ data class StageControlOption(
      */
     fun refreshReviewOption() {
         val newReviewGroups = mutableListOf<StageReviewGroup>()
-        if (triggerUsers?.isNotEmpty() == true && reviewGroups?.isNullOrEmpty() == true) {
+        if (reviewGroups?.isNotEmpty() == true) {
+            newReviewGroups.addAll(reviewGroups!!)
+        } else if (triggerUsers?.isNotEmpty() == true) {
+            // 将原有审核参数填充到第一个审核组
             val group = if (triggered == true) StageReviewGroup(
                 id = UUIDUtil.generate(),
                 reviewers = triggerUsers!!,
                 status = ManualReviewAction.PROCESS.name,
-                params = reviewParams?.toMutableList()
+                params = reviewParams?.toMutableList(),
+                suggest = reviewDesc
             ) else StageReviewGroup(
                 id = UUIDUtil.generate(),
-                reviewers = triggerUsers!!,
-                status = null
+                reviewers = triggerUsers!!
             )
             newReviewGroups.add(group)
             // TODO 在下一次发布中增加抹除旧数据逻辑
-            reviewGroups = newReviewGroups
 //            triggerUsers = null
 //            triggered = null
+//            reviewParams = null
+//            reviewDesc = null
         }
-//        if (reviewGroups.isNullOrEmpty()) {
-//
-//        } else {
-//            reviewGroups!!.addAll(newReviewGroups)
-//        }
+        newReviewGroups.forEach { group ->
+            if (group.id.isNullOrBlank()) group.id = UUIDUtil.generate()
+        }
+        reviewGroups = newReviewGroups
     }
 
     /**

@@ -31,7 +31,6 @@ import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.event.dispatcher.pipeline.PipelineEventDispatcher
 import com.tencent.devops.common.pipeline.enums.BuildStatus
-import com.tencent.devops.common.pipeline.enums.ManualReviewAction
 import com.tencent.devops.common.pipeline.option.StageControlOption
 import com.tencent.devops.process.engine.common.BS_MANUAL_START_STAGE
 import com.tencent.devops.process.engine.control.command.CmdFlowState
@@ -96,15 +95,19 @@ class CheckPauseReviewStageCmd(
     }
 
     private fun saveStageReviewParams(stage: PipelineBuildStage, stageControlOption: StageControlOption?) {
+        val reviewVariables = mutableMapOf<String, String>()
+        // # 4531 遍历全部审核组的参数，后序覆盖前序的同名变量
+        stageControlOption?.reviewGroups?.forEach { group ->
+            group.params?.forEach {
+                reviewVariables[it.key] = it.value.toString()
+            }
+        }
         if (stageControlOption?.reviewParams?.isNotEmpty() == true) {
             buildVariableService.batchUpdateVariable(
                 projectId = stage.projectId,
                 pipelineId = stage.pipelineId,
                 buildId = stage.buildId,
-                variables = stageControlOption.reviewParams!!
-                    .filter { it.key.isNotBlank() }
-                    .map { it.key to it.value.toString() }
-                    .toMap()
+                variables = reviewVariables
             )
         }
     }
@@ -114,7 +117,8 @@ class CheckPauseReviewStageCmd(
         if (event.source == BS_MANUAL_START_STAGE || option?.manualTrigger != true) {
             return false
         }
-        return option.groupToReview() != null
+        // TODO 下次发布去掉对triggered的判断
+        return option.groupToReview() != null || option.triggered == null
     }
 
     /**
@@ -126,7 +130,7 @@ class CheckPauseReviewStageCmd(
         val group = option.groupToReview() ?: return
         val notifyUsers = mutableListOf<String>()
 
-        if (group.status == null || group.status == ManualReviewAction.REVIEWING.name) {
+        if (group.status == null) {
             val reviewers = group.reviewers.joinToString(",")
             val realReviewers = EnvUtils.parseEnv(reviewers, commandContext.variables)
                 .split(",").toList()
