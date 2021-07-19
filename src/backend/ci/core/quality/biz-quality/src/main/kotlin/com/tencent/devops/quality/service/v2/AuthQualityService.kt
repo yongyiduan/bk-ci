@@ -31,7 +31,6 @@ package com.tencent.devops.quality.service.v2
 import com.tencent.bk.sdk.iam.dto.callback.response.FetchInstanceInfoResponseDTO
 import com.tencent.bk.sdk.iam.dto.callback.response.InstanceInfoDTO
 import com.tencent.bk.sdk.iam.dto.callback.response.ListInstanceResponseDTO
-import com.tencent.devops.common.api.util.HashUtil
 import com.tencent.devops.common.auth.api.AuthTokenApi
 import com.tencent.devops.common.auth.callback.FetchInstanceInfo
 import com.tencent.devops.common.auth.callback.ListInstanceInfo
@@ -66,7 +65,7 @@ class AuthQualityService @Autowired constructor(
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         qualityRuleInfos?.map {
             val entity = InstanceInfoDTO()
-            entity.id = HashUtil.encodeLongId(it.id)
+            entity.id = it.id.toString()
             entity.displayName = it.name
             entityInfo.add(entity)
         }
@@ -88,7 +87,7 @@ class AuthQualityService @Autowired constructor(
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         certInfos?.map {
             val entity = InstanceInfoDTO()
-            entity.id = HashUtil.encodeLongId(it.id)
+            entity.id = it.id.toString()
             entity.displayName = it.name
             entityInfo.add(entity)
         }
@@ -118,7 +117,7 @@ class AuthQualityService @Autowired constructor(
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         qualityRuleInfos?.map {
             val entity = InstanceInfoDTO()
-            entity.id = HashUtil.encodeLongId(it.id)
+            entity.id = it.id.toString()
             entity.displayName = it.name
             entityInfo.add(entity)
         }
@@ -146,7 +145,7 @@ class AuthQualityService @Autowired constructor(
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         qualityGroupInfos?.map {
             val entity = InstanceInfoDTO()
-            entity.id = HashUtil.encodeLongId(it.id)
+            entity.id = it.id.toString()
             entity.displayName = it.name
             entityInfo.add(entity)
         }
@@ -169,7 +168,7 @@ class AuthQualityService @Autowired constructor(
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         qualityGroupInfos?.map {
             val entity = InstanceInfoDTO()
-            entity.id = HashUtil.encodeLongId(it.id)
+            entity.id = it.id.toString()
             entity.displayName = it.name
             entityInfo.add(entity)
         }
@@ -199,7 +198,7 @@ class AuthQualityService @Autowired constructor(
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         qualityGroupInfos?.map {
             val entity = InstanceInfoDTO()
-            entity.id = HashUtil.encodeLongId(it.id)
+            entity.id = it.id.toString()
             entity.displayName = it.name
             entityInfo.add(entity)
         }
