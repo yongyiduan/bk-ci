@@ -94,9 +94,9 @@ subprojects {
     tasks.getByName("install") {
         onlyIf {
             sourceSets.main.get().allSource.files.isNotEmpty() &&
-                    !name.startsWith("model-") &&
-                    !name.startsWith("boot-") &&
-                    !name.startsWith("biz-")
+                !name.startsWith("model-") &&
+                !name.startsWith("boot-") &&
+                !name.startsWith("biz-")
         }
     }
 
@@ -107,6 +107,7 @@ subprojects {
         it.exclude("org.slf4j", "log4j-over-slf4j")
         it.exclude("org.slf4j", "slf4j-log4j12")
         it.exclude("org.slf4j", "slf4j-nop")
+        it.exclude("javax.ws.rs", "jsr311-api")
     }
 
     dependencies {
@@ -152,9 +153,9 @@ subprojects {
             dependency("com.cronutils:cron-utils:${Versions.CronUtils}")
             dependency("com.amazonaws:aws-java-sdk-s3:${Versions.AwsS3}")
             dependency("org.asynchttpclient:async-http-client:${Versions.AsyncHttpClient}")
-            dependency("com.tencent.devops.ci-plugins:sigar:${Versions.Sigar}")
             dependency("org.influxdb:influxdb-java:${Versions.InfluxDB}")
             dependency("com.github.ben-manes.caffeine:caffeine:${Versions.Caffeine}")
+            dependency("com.github.oshi:oshi-core:${Versions.Oshi}")
 
             dependencySet("org.springframework.cloud:${Versions.SpringConsul}") {
                 entry("spring-cloud-starter-consul-discovery")

@@ -166,14 +166,25 @@ class PipelineStageService @Autowired constructor(
         userId: String,
         buildStage: PipelineBuildStage,
         reviewRequest: StageReviewRequest?
-    ) {
-        buildStage.controlOption!!.stageControlOption.reviewCurrentGroup(
-            userId = userId,
-            action = ManualReviewAction.PROCESS,
-            params = reviewRequest?.reviewParams,
-            suggest = reviewRequest?.suggest
-        )
+    ): Boolean {
         with(buildStage) {
+            val option = this.controlOption!!.stageControlOption
+            val success = option.reviewGroup(
+                userId = userId,
+                groupId = reviewRequest?.id,
+                action = ManualReviewAction.PROCESS,
+                params = reviewRequest?.reviewParams,
+                suggest = reviewRequest?.suggest
+            )
+            if (!success) return false
+            stageBuildDetailService.stageReview(
+                buildId = buildId,
+                stageId = stageId,
+                controlOption = buildStage.controlOption!!
+            )
+            // #4531 如果没有其他需要审核的审核组则可以启动stage，否则直接返回
+            if (option.groupToReview() != null) return true
+
             val allStageStatus = stageBuildDetailService.stageStart(
                 buildId = buildId,
                 stageId = stageId,
@@ -212,16 +223,18 @@ class PipelineStageService @Autowired constructor(
                 )
                 // #3400 点Stage启动时处于DETAIL界面，以操作人视角，没有刷历史列表的必要
             )
+            return true
         }
     }
 
     fun cancelStage(
         userId: String,
-        buildStage: PipelineBuildStage
-    ) {
-
-        buildStage.controlOption!!.stageControlOption.reviewCurrentGroup(
+        buildStage: PipelineBuildStage,
+        groupId: String?
+    ): Boolean {
+        buildStage.controlOption!!.stageControlOption.reviewGroup(
             userId = userId,
+            groupId = groupId,
             action = ManualReviewAction.ABORT
         )
         stageBuildDetailService.stageCancel(
@@ -265,6 +278,7 @@ class PipelineStageService @Autowired constructor(
             )
             // #3400 FinishEvent会刷新HISTORY列表的Stage状态
         )
+        return true
     }
 
     fun getLastStage(buildId: String): PipelineBuildStage? {

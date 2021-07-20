@@ -452,12 +452,13 @@ class ExperienceDao {
     ): Result<TExperienceRecord> {
         return with(TExperience.T_EXPERIENCE) {
             dslContext.selectFrom(this)
-                .where(PROJECT_ID.equals(projectId))
+                .where(PROJECT_ID.eq(projectId))
                 .let {
                     if (null == name) it else it.and(NAME.eq(name))
                 }
                 .orderBy(CREATE_TIME.desc())
-                .limit(offset, limit)
+                .offset(offset)
+                .limit(limit)
                 .fetch()
         }
     }

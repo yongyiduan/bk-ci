@@ -606,17 +606,27 @@ class PipelineBuildFacadeService(
              */
             val triggerContainer = model.stages[0].containers[0] as TriggerContainer
 
-            val startParams = mutableMapOf<String, Any>()
-            startParams.putAll(parameters)
+            val startParams = mutableListOf<BuildParameters>()
+            for (it in parameters) {
+                startParams.add(BuildParameters(it.key, it.value))
+            }
+            val paramsKeyList = startParams.map { it.key }
             triggerContainer.params.forEach {
-                if (startParams.containsKey(it.id)) {
+                if (paramsKeyList.contains(it.id)) {
                     return@forEach
                 }
-                startParams[it.id] = it.defaultValue
+                startParams.add(BuildParameters(key = it.id, value = it.defaultValue, readOnly = it.readOnly))
             }
             // 子流水线的调用不受频率限制
             val startParamsWithType = mutableListOf<BuildParameters>()
-            startParams.forEach { (key, value) -> startParamsWithType.add(BuildParameters(key, value)) }
+            startParams.forEach { (key, value, valueType, readOnly) ->
+                startParamsWithType.add(BuildParameters(
+                    key,
+                    value,
+                    valueType,
+                    readOnly
+                ))
+            }
 
             return pipelineBuildService.startPipeline(
                 userId = userId,
@@ -778,8 +788,18 @@ class PipelineBuildFacadeService(
             defaultMessage = "Stage($stageId)未处于暂停状态",
             params = arrayOf(stageId)
         )
+        val option = buildStage.controlOption?.stageControlOption
+        val group = option?.getReviewGroupById(reviewRequest?.id)
+        if (group?.id != option?.groupToReview()?.id) {
+            throw ErrorCodeException(
+                statusCode = Response.Status.FORBIDDEN.statusCode,
+                errorCode = ProcessMessageCode.ERROR_PIPELINE_STAGE_REVIEW_GROUP_NOT_FOUND,
+                defaultMessage = "(${reviewRequest?.id ?: "default"})非Stage($stageId)当前待审核组",
+                params = arrayOf(stageId, reviewRequest?.id ?: "default")
+            )
+        }
 
-        if (buildStage.controlOption?.stageControlOption?.reviewerContains(userId) != true) {
+        if (option?.reviewerContains(userId) != true) {
             throw ErrorCodeException(
                 statusCode = Response.Status.FORBIDDEN.statusCode,
                 errorCode = ProcessMessageCode.USER_NEED_PIPELINE_X_PERMISSION,
@@ -804,10 +824,11 @@ class PipelineBuildFacadeService(
                     defaultMessage = "Stage启动失败![${interceptResult.message}]"
                 )
             }
-            if (isCancel) {
+            val success = if (isCancel) {
                 pipelineStageService.cancelStage(
                     userId = userId,
-                    buildStage = buildStage
+                    buildStage = buildStage,
+                    groupId = reviewRequest?.id
                 )
             } else {
                 buildStage.controlOption!!.stageControlOption.reviewParams = reviewRequest?.reviewParams
@@ -817,6 +838,12 @@ class PipelineBuildFacadeService(
                     reviewRequest = reviewRequest
                 )
             }
+            if (!success) throw ErrorCodeException(
+                statusCode = Response.Status.BAD_REQUEST.statusCode,
+                errorCode = ProcessMessageCode.ERROR_PIPLEINE_INPUT,
+                defaultMessage = "审核Stage($stageId)数据异常",
+                params = arrayOf(stageId)
+            )
         } finally {
             runLock.unlock()
         }
@@ -1705,7 +1732,7 @@ class PipelineBuildFacadeService(
                 logger.info("build($buildId) shutdown by $userId, taskId: $taskId, status: $status")
                 buildLogPrinter.addYellowLine(
                     buildId = buildId,
-                    message = "流水线被用户终止，操作人:$userId",
+                    message = "Run cancelled by $userId",
                     tag = taskId.toString(),
                     jobId = containerId.toString(),
                     executeCount = executeCount as Int
@@ -1715,7 +1742,7 @@ class PipelineBuildFacadeService(
             if (tasks.isEmpty()) {
                 buildLogPrinter.addYellowLine(
                     buildId = buildId,
-                    message = "流水线被用户终止，操作人:$userId",
+                    message = "Run cancelled by $userId",
                     tag = "",
                     jobId = "",
                     executeCount = 1
