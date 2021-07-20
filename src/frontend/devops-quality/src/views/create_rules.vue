@@ -583,7 +583,6 @@
             noticeTypeList () {
                 const list = [
                     { name: 'work-wechat', value: 'RTX', isChecked: false },
-                    { name: 'wechat', value: 'WECHAT', isChecked: false },
                     { name: 'email', value: 'EMAIL', isChecked: false }
                 ]
                 if (!this.isExtendTx) {
