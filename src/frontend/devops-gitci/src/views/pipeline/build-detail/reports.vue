@@ -12,17 +12,16 @@
                         :key="index">
                     </bk-tab-panel>
                 </bk-tab>
-
                 <bk-table :data="chooseReport.thirdReports"
                     :outer-border="false"
                     :header-border="false"
                     :header-cell-style="{ background: '#FAFBFD' }"
                     v-if="chooseReport.type === 'THIRDPARTY'"
-                    class="report-file"
+                    class="report-file report-table"
                 >
                     <bk-table-column label="Name" show-overflow-tooltip>
                         <template slot-scope="props">
-                            <icon name="tiaozhuan" size="18" class="jump-icon" />
+                            <icon name="cc-jump-link" size="14" class="jump-icon" />
                             <a :href="props.row.indexFileUrl" target="_blank" class="text-link">{{ props.row.name }}</a>
                         </template>
                     </bk-table-column>
@@ -89,7 +88,13 @@
                     })
                     this.reportList = innerReports
                     if (thirdReports.length) this.reportList.push({ name: 'Third party report', thirdReports, type: 'THIRDPARTY' })
-                    this.reportList = this.reportList.map((report, index) => ({ name: index, label: report.name, indexFileUrl: report.indexFileUrl }))
+                    this.reportList = this.reportList.map((report, index) => ({
+                        name: index,
+                        label: report.name,
+                        indexFileUrl: report.indexFileUrl,
+                        type: report.type,
+                        thirdReports: report.thirdReports
+                    }))
                 }).catch((err) => {
                     this.noPermission = err.code === 2129002
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -108,6 +113,9 @@
             padding: 0;
             border: none;
         }
+    }
+    .report-table {
+        padding: 20px;
     }
     .report-file {
         height: calc(100% - 50px);
