@@ -2,8 +2,9 @@
     <article class="gitci-main" v-bkloading="{ isLoading }">
         <header class="gitci-header">
             <span class="header-info">
-                <icon name="devops" size="30"></icon>
-                <span class="ci-name" @click="goToHome">蓝盾 | Stream</span>
+                <!-- <icon name="devops" size="30"></icon>
+                <span class="ci-name" @click="goToHome">蓝盾 | Stream</span> -->
+                <img class="ci-name" src="./images/logo.svg" height="48" />
                 <template v-if="$route.hash">
                     <icon name="git" size="18" class="gray-icon"></icon>
                     <span class="git-project-path" @click="goToCode">{{ decodeURIComponent(($route.hash || '').slice(1)) }}</span>
@@ -91,7 +92,7 @@
 
             initData () {
                 this.isLoading = true
-                Promise.all([this.getUserInfo()]).catch((err) => {
+                Promise.all([this.getUserInfo(), this.getProjectInfo()]).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
@@ -105,6 +106,7 @@
             },
 
             getProjectInfo () {
+                if (window.location.pathname && window.location.pathname.startsWith('/home')) return
                 return new Promise((resolve, reject) => {
                     const projectPath = (location.hash || '').slice(1)
 
@@ -207,9 +209,9 @@
 
     .gitci-header {
         height: 61px;
-        padding: 0 20px;
+        padding: 0 20px 0 10px;
         background: #182132;
-        border-bottom: 1px solid #dde4eb;
+        /* border-bottom: 1px solid #dde4eb; */
         display: flex;
         align-items: center;
         justify-content: space-between;

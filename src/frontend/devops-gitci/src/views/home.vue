@@ -5,44 +5,19 @@
             <div class="hero--content">
                 <div class="container">
                     <div class="hero--text-block">
-                        <h1 class="hero--title">Headless CMS that <strong>commits</strong></h1>
-                        <div class="hero--sub">Give your editors the power of Git.<br>
-                            Create, edit, and instant preview Markdown-based sites.
+                        <h1 class="hero--title">Stream： 一个更容易<strong> 治理 </strong>的 CI 服务</h1>
+                        <div>蓝盾 Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的服务。<br>
+                            让你聚焦于编码本身，而非权限申请、构建机准备、发布沟通等琐事。
                         </div>
                         <div class="hero-cta">
-                            <a href="https://app.forestry.io/signup" class="button big black" data-proofer-ignore="">
-                                Import Your Site Now
+                            <a href="" class="button big black" data-proofer-ignore="">
+                                在 Stream 上运行一个 "Hello World"
                             </a>
-                            <a href="https://forestry.io/starters/" class="button big " data-proofer-ignore="">
-                                Select a Starter Template
+                            <a href="https://iwiki.woa.com/x/pZMdK" target="_blank" class="button big " data-proofer-ignore="">
+                                了解更多特性
                             </a>
                         </div>
                     </div>
-                </div>
-                <!-- <video playsinline="" autoplay="" muted="" loop="" poster="/video/fmt-cms-comparison-generic-1.jpg" class="factory-video desktop-only ">
-                    <source src="/video/fmt-cms-comparison-generic-1.webm" type="video/webm">
-                    <source src="/video/fmt-cms-comparison-generic-1.mp4" type="video/mp4">
-                </video>
-                <video playsinline="" autoplay="" muted="" loop="" poster="/video/fmt-cms-comparison-generic-1.jpg" class="factory-video mobile-only ">
-                    <source src="/video/fmt-cms-comparison-generic-1-sm.webm" type="video/webm">
-                    <source src="/video/fmt-cms-comparison-generic-1-sm.mp4" type="video/mp4">
-                </video> -->
-            </div>
-        </section>
-
-        <section id="built-for-static-site-generators" class="section section-logos">
-            <div class="container">
-                <span class="logos--title">Built for static site generators</span>
-                <div class="logos--container">
-                    <img src="./../images/home/hugo.svg" class="logos--logo" width="auto" height="28" style="margin-top:0px;" alt="Hugo">
-                    <img src="./../images/home/nextjs.svg" class="logos--logo" width="auto" height="38" style="margin-top:-3px;" alt="Next.js">
-                    <img src="./../images/home/gatsby.svg" class="logos--logo" width="auto" height="28" style="margin-top:0px;" alt="Gatsby">
-                    <img src="./../images/home/jekyll.svg" class="logos--logo" width="auto" height="34" style="margin-top:-4px;" alt="Jekyll">
-                    <img src="./../images/home/nuxtjs.svg" class="logos--logo" width="auto" height="24" style="margin-top:1px;" alt="Nuxt.js">
-                    <img src="./../images/home/hexo.svg" class="logos--logo" width="auto" height="34" style="margin-top:0px;" alt="Hexo">
-                    <img src="./../images/home/vuepress.svg" class="logos--logo" width="auto" height="34" style="margin-top:-2px;" alt="Vue Press">
-                    <img src="./../images/home/11ty.svg" class="logos--logo" width="auto" height="28" style="margin-top:0px;" alt="11ty">
-                    <img src="./../images/home/gridsome.svg" class="logos--logo" width="auto" height="28" style="margin-top:0px;" alt="Gridsome">
                 </div>
             </div>
         </section>
@@ -51,19 +26,26 @@
             <div class="container">
                 <div class="feature-block ltr" style="display: flex;justify-content: space-between;">
                     <div class="feature-block--copy">
-                        <h2 class="section--title" style="">Your site, your workflow</h2>
+                        <h2 class="section--title" style="">
+                            语法对齐GitHub Actions<br>
+                            将语法优雅进行到底！
+                        </h2>
                         <div class="section--sub">
                             <p>
-                                Write front-end code with Next.js, Hugo, Gatsby or your favorite static site generator and push to your Git repo. Forestry will pull in your commits and update the CMS.
+                                在蓝盾 Stream 服务中，最直接与开发者打交道的就是 YAML 语法，我们在调研了 Azure Pipelines / Gitlab CI / Travis CI / Circle CI 等行业主流 CI YAML语法后最终决定：蓝盾 Stream 语法将100%兼容 GitHub Actions ！
                             </p>
                             <p>
-                                Invite your team to create content in a friendly user interface. Their updates get committed back without merge conflicts.
+                                如果你已经对 GitHub Actions 有过一定了解，那么不要犹豫了，来运行你的第一个Hello World吧！
                             </p>
+                            <div class="hero-cta" style="margin-top: 20px;">
+                                <a href="https://iwiki.woa.com/x/4FPpK" target="_blank" class="button big black" data-proofer-ignore="">
+                                    点击查阅完整 YAML 语法
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="feature-block--illu illu-shadow--right">
-                        <!-- <img loading="lazy" src="./../images/home/dev-illustration-02.png" data-src="https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_640/https://forestry.io/img/dev-illustration-02.png" data-srcset="https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_320/https://forestry.io/img/dev-illustration-02.png 320w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_497/https://forestry.io/img/dev-illustration-02.png 497w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_674/https://forestry.io/img/dev-illustration-02.png 674w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_851/https://forestry.io/img/dev-illustration-02.png 851w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1028/https://forestry.io/img/dev-illustration-02.png 1028w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1205/https://forestry.io/img/dev-illustration-02.png 1205w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1382/https://forestry.io/img/dev-illustration-02.png 1382w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1559/https://forestry.io/img/dev-illustration-02.png 1559w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1736/https://forestry.io/img/dev-illustration-02.png 1736w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1913/https://forestry.io/img/dev-illustration-02.png 1913w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1920/https://forestry.io/img/dev-illustration-02.png 1920w" data-sizes="(max-width: 76px) 100%, 800px" alt="Dev workflow" title="https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_640/https://forestry.io/img/dev-illustration-02.png" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px" srcset="https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_320/https://forestry.io/img/dev-illustration-02.png 320w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_497/https://forestry.io/img/dev-illustration-02.png 497w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_674/https://forestry.io/img/dev-illustration-02.png 674w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_851/https://forestry.io/img/dev-illustration-02.png 851w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1028/https://forestry.io/img/dev-illustration-02.png 1028w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1205/https://forestry.io/img/dev-illustration-02.png 1205w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1382/https://forestry.io/img/dev-illustration-02.png 1382w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1559/https://forestry.io/img/dev-illustration-02.png 1559w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1736/https://forestry.io/img/dev-illustration-02.png 1736w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1913/https://forestry.io/img/dev-illustration-02.png 1913w, https://res.cloudinary.com/forestry-io/image/fetch/c_limit,dpr_auto,f_auto,q_80,w_1920/https://forestry.io/img/dev-illustration-02.png 1920w"> -->
-                        <img loading="lazy" src="./../images/home/dev-illustration-02.png" data-sizes="(max-width: 76px) 100%, 800px" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px">
+                        <img loading="lazy" src="./../images/home/yaml.png" style="width:410px;height:554px;">
                     </div>
                 </div>
             </div>
@@ -71,15 +53,12 @@
 
         <section id="trusted-by" class="section section-logos">
             <div class="container">
-                <span class="logos--title">Trusted By</span>
+                <span class="logos--title">联合出品方</span>
                 <div class="logos--container">
-                    <img src="./../images/home/sketch.png" class="logos--logo" width="auto" height="60" style="margin-top:-1px;" alt="Sketch">
-                    <img src="./../images/home/spotify_partner.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="Spotify">
-                    <img src="./../images/home/mastercard.svg" class="logos--logo" width="auto" height="50" style="margin-top:0px;" alt="Mastercard">
-                    <img src="./../images/home/uga.png" class="logos--logo" width="auto" height="50" style="margin-top:0px;" alt="University of Georgia">
-                </div>
-                <div class="center">
-                    <a href="https://forestry.io/showcase" class="button big black">View Showcase</a>
+                    <img src="./../images/home/EP.png" class="logos--logo" width="auto" height="60" style="margin-top:-1px;" alt="EP度量">
+                    <img src="./../images/home/tgit-with.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="工蜂">
+                    <img src="./../images/home/bk-ci.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="蓝盾">
+                    <img src="./../images/home/tencent_ci.png" class="logos--logo" width="auto" height="50" style="margin-top:0px;" alt="腾讯CI">
                 </div>
             </div>
         </section>
@@ -88,16 +67,16 @@
             <div class="container">
                 <div class="feature-block rtl">
                     <div class="feature-block--illu illu-shadow--left">
-                        <img loading="lazy" src="./../images/home/editor-illustration-02.png" data-sizes="(max-width: 76px) 100%, 800px" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px">
+                        <img loading="lazy" src="./../images/home/home.png" data-sizes="(max-width: 76px) 100%, 800px" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px">
                     </div>
                     <div class="feature-block--copy">
-                        <h2 class="section--title" style="">Empower your editors</h2>
+                        <h2 class="section--title" style="">代码与UI，二者皆可得</h2>
                         <div class="section--sub">
                             <p>
-                                Your editing team deserves a modern yet simple to use CMS. Customize each page with Forestry’s rich editing fields.
+                                在 Stream 里，你可以用 YAML 代码的方式描述出你的 CI 流水线，这样可以将流水线的配置变更也纳入日常的Git工作流中。
                             </p>
                             <p>
-                                Login from your <strong>yoursite.com/admin</strong>. With Forestry Remote, your site will transcend static.
+                                同时，因为与蓝盾复用了相同的 CI 引擎，所以依然可以保持与蓝盾图形化 UI 相同的体验，在出问题时可快速定位。
                             </p>
                         </div>
                     </div>
@@ -109,14 +88,14 @@
             <div class="container">
                 <div class="feature-block ltr">
                     <div class="feature-block--copy">
-                        <h2 class="section--title" style="">Own Your Content</h2>
+                        <h2 class="section--title" style="">丰富的腾讯 CI 插件生态</h2>
                         <div class="section--sub">
-                            <p>Don’t lock your content in a CMS database, just commit it to <em>your</em> Git repository.</p>
-                            <p>We support public and private repositories on GitHub, GitLab and BitBucket.</p>
+                            <p>蓝盾研发商店自发布以来，共上架<strong>1250</strong>个流水线插件</p>
+                            <p>在 Stream 中，你可以通过<em>uses</em>关键字方便引入这些插件，让插件生态得以最大化利用</p>
                         </div>
                     </div>
                     <div class="feature-block--illu illu-shadow--right">
-                        <img loading="lazy" src="./../images/home/deploy-illustration-03.png" data-sizes="(max-width: 76px) 100%, 800px" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px">
+                        <img loading="lazy" src="./../images/home/store.jpg" data-sizes="(max-width: 76px) 100%, 800px" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px">
                     </div>
                 </div>
             </div>
@@ -124,14 +103,14 @@
 
         <section class="section section-cta center">
             <div class="container">
-                <h2 class="section--title">Build amazing sites</h2>
-                <p class="section--sub is-center">Import your Git repository and edit within seconds.</p>
+                <h2 class="section--title">快速高质量地交付代码</h2>
+                <p class="section--sub is-center">用最好的 CI 工具，交付更好的代码</p>
                 <br><br>
-                <a href="https://forestry.io/starters" class="button primary">Get started for free</a>
+                <a href="" class="button black">为你的工程开启 CI</a>
             </div>
         </section>
 
-        <footer class="footer">
+        <footer class="footer center">
             <div class="lower-footer">
                 <div class="container">
                     <div>Copyright © 2012-2021 Tencent BlueKing. All Rights Reserved</div>

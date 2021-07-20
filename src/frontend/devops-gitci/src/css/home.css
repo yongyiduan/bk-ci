@@ -206,8 +206,8 @@ body.in-transition {
 }
 .feature-block.ltr div:last-child {
 	-webkit-box-flex:0;
-	-ms-flex:0 0 55%;
-	flex:0 0 55%
+	-ms-flex:0 0 45%;
+	flex:0 0 45%
 }
 .feature-block.rtl {
 	-webkit-box-align:start;
@@ -243,8 +243,8 @@ body.in-transition {
 }
 .feature-block.rtl div:last-child {
 	-webkit-box-flex:0;
-	-ms-flex:0 0 45%;
-	flex:0 0 45%
+	-ms-flex:0 0 40%;
+	flex:0 0 40%
 }
 .feature-block.vertical {
 	-webkit-box-orient:vertical;
