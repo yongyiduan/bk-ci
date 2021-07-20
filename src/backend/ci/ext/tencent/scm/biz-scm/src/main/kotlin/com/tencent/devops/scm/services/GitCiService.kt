@@ -239,6 +239,37 @@ class GitCiService {
         }
     }
 
+    fun getProjectList(
+        accessToken: String,
+        userId: String,
+        page: Int?,
+        pageSize: Int?,
+        search: String?
+    ): List<GitCodeProjectInfo> {
+        val pageNotNull = page ?: 1
+        val pageSizeNotNull = pageSize ?: 20
+        val url = "$gitCIUrl/api/v3/projects?access_token=$accessToken&page=$pageNotNull&per_page=$pageSizeNotNull" +
+            if (search != null) {
+                "&search=$search"
+            } else {
+                ""
+            }
+        val res = mutableListOf<GitCodeProjectInfo>()
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        OkhttpUtils.doHttp(request).use { response ->
+            val data = response.body()?.string() ?: return@use
+            val repoList = JsonParser().parse(data).asJsonArray
+            if (!repoList.isJsonNull) {
+                return JsonUtil.to(data, object : TypeReference<List<GitCodeProjectInfo>>() {})
+            }
+        }
+        return res
+    }
+
     fun getGitCIAllMembers(
         token: String,
         gitProjectId: String,
@@ -246,6 +277,8 @@ class GitCiService {
         pageSize: Int,
         query: String?
     ): List<GitMember> {
+        val newPage = if (page == 0) 1 else page
+        val newPageSize = if (pageSize > 1000) 1000 else pageSize
         val url = "$gitCIUrl/api/v3/projects/${URLEncoder.encode(gitProjectId, "UTF8")}/members/all" +
             "?access_token=$token" +
             if (query != null) {
@@ -253,7 +286,7 @@ class GitCiService {
             } else {
                 ""
             } +
-            "&page=$page" + "&per_page=$pageSize"
+            "&page=$newPage" + "&per_page=$newPageSize"
         logger.info("getGitCIAllMembers request url: $url")
         val request = Request.Builder()
             .url(url)

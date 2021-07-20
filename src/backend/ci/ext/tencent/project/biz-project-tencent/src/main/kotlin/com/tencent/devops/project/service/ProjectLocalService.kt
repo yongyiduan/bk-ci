@@ -37,14 +37,18 @@ import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.api.pojo.Pagination
 import com.tencent.devops.common.api.util.OkhttpUtils
+import com.tencent.devops.common.api.util.PageUtil
 import com.tencent.devops.common.auth.api.AuthProjectApi
 import com.tencent.devops.common.auth.api.BkAuthProperties
 import com.tencent.devops.common.auth.api.pojo.BKAuthProjectRolesResources
 import com.tencent.devops.common.auth.code.AuthServiceCode
 import com.tencent.devops.common.auth.code.BSPipelineAuthServiceCode
+import com.tencent.devops.common.client.Client
+import com.tencent.devops.common.client.consul.ConsulContent
 import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.common.service.gray.Gray
 import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.gitci.api.service.ServiceGitForAppResource
 import com.tencent.devops.project.constant.ProjectMessageCode
 import com.tencent.devops.project.dao.ProjectDao
 import com.tencent.devops.project.jmx.api.ProjectJmxApi
@@ -55,6 +59,7 @@ import com.tencent.devops.project.pojo.Result
 import com.tencent.devops.project.pojo.UserRole
 import com.tencent.devops.project.pojo.app.AppProjectVO
 import com.tencent.devops.project.pojo.enums.ProjectChannelCode
+import com.tencent.devops.project.pojo.enums.ProjectSourceEnum
 import com.tencent.devops.project.pojo.enums.ProjectTypeEnum
 import com.tencent.devops.project.pojo.enums.ProjectValidateType
 import com.tencent.devops.project.pojo.tof.Response
@@ -75,6 +80,7 @@ import java.io.InputStream
 import java.nio.file.Files
 
 @Service
+@SuppressWarnings("LongParameterList", "TooManyFunctions", "LongMethod", "MagicNumber", "TooGenericExceptionCaught")
 class ProjectLocalService @Autowired constructor(
     private val dslContext: DSLContext,
     private val projectDao: ProjectDao,
@@ -89,7 +95,9 @@ class ProjectLocalService @Autowired constructor(
     private val projectIamV0Service: ProjectIamV0Service,
     private val projectTagService: ProjectTagService,
     private val projectPermissionService: ProjectPermissionService,
-    private val txProjectServiceImpl: TxProjectServiceImpl
+    private val txProjectServiceImpl: TxProjectServiceImpl,
+    private val client: Client,
+    bkAuthProperties: BkAuthProperties
 ) {
     private var authUrl: String = "${bkAuthProperties.url}/projects"
 
@@ -98,12 +106,33 @@ class ProjectLocalService @Autowired constructor(
 
     fun listForApp(
         userId: String,
-        offset: Int,
-        limit: Int,
+        page: Int,
+        pageSize: Int,
         searchName: String?
     ): Pagination<AppProjectVO> {
-//        val projectIds = authProjectApi.getUserProjects(bsPipelineAuthServiceCode, userId, null)
-        val projectIds = txProjectServiceImpl.getProjectFromAuth(userId, null)
+
+        val finalRecords = mutableListOf<AppProjectVO>()
+
+        // 先查询GITCI的项目
+        if (page == 1) {
+            val gitCIProjectList = ConsulContent.invokeByTag(gitCI) {
+                try {
+                    client.get(ServiceGitForAppResource::class).getGitCIProjectList(userId, 1, 100, searchName)
+                } catch (e: Exception) {
+                    logger.warn("ServiceGitForAppResource is error", e)
+                    return@invokeByTag null
+                }
+            }
+            gitCIProjectList?.data?.records?.let {
+                finalRecords.addAll(it)
+            }
+        }
+
+        // 再查询蓝盾项目
+        val sqlLimit = PageUtil.convertPageSizeToSQLLimit(page, pageSize)
+        val offset = sqlLimit.offset
+        val limit = sqlLimit.limit
+        val projectIds = bkAuthProjectApi.getUserProjects(bsPipelineAuthServiceCode, userId, null)
         // 如果使用搜索 且 总数量少于1000 , 则全量获取
         if (searchName != null &&
             searchName.isNotEmpty() &&
@@ -124,11 +153,14 @@ class ProjectLocalService @Autowired constructor(
                                 it.logoAddr.removePrefix("http://radosgw.open.oa.com")
                     } else {
                         it.logoAddr
-                    }
+                    },
+                    projectSource = ProjectSourceEnum.BK_CI.id
                 )
             }.toList()
 
-            return Pagination(false, records)
+            finalRecords.addAll(records)
+
+            return Pagination(false, finalRecords)
         } else {
             val records = projectDao.listByEnglishName(
                 dslContext = dslContext,
@@ -146,7 +178,8 @@ class ProjectLocalService @Autowired constructor(
                                 it.logoAddr.removePrefix("http://radosgw.open.oa.com")
                     } else {
                         it.logoAddr
-                    }
+                    },
+                    projectSource = ProjectSourceEnum.BK_CI.id
                 )
             }
 
@@ -157,7 +190,9 @@ class ProjectLocalService @Autowired constructor(
                 countByEnglishName > offset + limit
             }
 
-            return Pagination(hasNext, records)
+            finalRecords.addAll(records)
+
+            return Pagination(hasNext, finalRecords)
         }
     }
 
