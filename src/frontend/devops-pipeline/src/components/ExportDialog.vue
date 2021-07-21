@@ -21,7 +21,7 @@
 
 <script>
     import { PROCESS_API_URL_PREFIX } from '@/store/constants'
-    import { mapActions } from 'vuex'
+    import { mapActions, mapGetters } from 'vuex'
 
     export default {
         props: {
@@ -35,6 +35,10 @@
         },
 
         computed: {
+            ...mapGetters({
+                curPipeline: 'pipelines/getCurPipeline'
+            }),
+
             projectId () {
                 return this.$route.params.projectId
             },
@@ -53,7 +57,7 @@
                     {
                         title: 'Pipeline Json',
                         icon: 'export-pipeline',
-                        name: 'export.json',
+                        name: `${this.pipelineName}.json`,
                         tips: this.$t('newlist.exportJsonTip'),
                         exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/export`
                     },
