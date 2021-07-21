@@ -87,7 +87,6 @@ class ProjectLocalService @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val redisOperation: RedisOperation,
     private val authProjectApi: AuthProjectApi,
-    private val bkAuthProperties: BkAuthProperties,
     private val bsPipelineAuthServiceCode: BSPipelineAuthServiceCode,
     private val gray: Gray,
     private val jmxApi: ProjectJmxApi,
