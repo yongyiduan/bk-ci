@@ -63,6 +63,10 @@ Vue.prototype.$permissionActionMap = actionMap
 Vue.prototype.$permissionResourceMap = resourceMap
 Vue.prototype.$permissionResourceTypeMap = resourceTypeMap
 Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
+Vue.prototype.$bkMessage = function (config) {
+    config.ellipsisLine = config.ellipsisLine || 3
+    bkMagic.bkMessage(config)
+}
 
 Vue.mixin({
     computed: {
