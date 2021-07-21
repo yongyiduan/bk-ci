@@ -64,6 +64,7 @@
                     {
                         title: 'PreCI',
                         icon: 'export-prebuild',
+                        name: `${this.pipelineName}.yml`,
                         tips: this.$t('newlist.exportYamlTip'),
                         exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
                         tipsLink: 'https://iwiki.woa.com/x/ruhACw'
@@ -72,6 +73,7 @@
                     {
                         title: '工蜂CI Yaml',
                         icon: 'export-ci',
+                        name: `${this.pipelineName}.yml`,
                         tips: this.$t('newlist.exportGitciTip'),
                         exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
                         tipsLink: 'https://iwiki.woa.com/x/QBcLAQ'
