@@ -21,7 +21,7 @@
 
 <script>
     import { PROCESS_API_URL_PREFIX } from '@/store/constants'
-    import { mapActions, mapGetters } from 'vuex'
+    import { mapActions, mapState } from 'vuex'
 
     export default {
         props: {
@@ -35,9 +35,9 @@
         },
 
         computed: {
-            ...mapGetters({
-                curPipeline: 'pipelines/getCurPipeline'
-            }),
+            ...mapState('atom', [
+                'pipeline'
+            ]),
 
             projectId () {
                 return this.$route.params.projectId
@@ -64,6 +64,7 @@
                     {
                         title: 'PreCI',
                         icon: 'export-prebuild',
+                        name: 'prebuild.json',
                         tips: this.$t('newlist.exportYamlTip'),
                         exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/prebuild`,
                         tipsLink: 'https://iwiki.woa.com/x/ruhACw'
@@ -72,6 +73,7 @@
                     {
                         title: '工蜂CI Yaml',
                         icon: 'export-ci',
+                        name: `${this.pipeline.name}.yml`,
                         tips: this.$t('newlist.exportGitciTip'),
                         exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
                         tipsLink: 'https://iwiki.woa.com/x/QBcLAQ'
