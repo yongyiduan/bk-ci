@@ -8,6 +8,7 @@ import com.tencent.devops.process.pojo.PipelineSortType
 import com.tencent.devops.project.pojo.app.AppProjectVO
 import com.tencent.devops.project.pojo.enums.ProjectSourceEnum
 import com.tencent.devops.gitci.pojo.GitProjectPipeline
+import com.tencent.devops.scm.pojo.GitCodeProjectInfo
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -29,14 +30,19 @@ class GitCIAppService @Autowired constructor(
         searchName: String?
     ): Pagination<AppProjectVO> {
         val token = oauthService.getAndCheckOauthToken(userId).accessToken
-        val projectIdMap = scmService.getProjectList(
-            accessToken = token,
-            userId = userId,
-            page = page,
-            pageSize = pageSize,
-            search = searchName
-        )?.associateBy { it.id!! }?.toMap()
-        val hasNext = projectIdMap?.values?.size == pageSize
+        val projectIdMap = mutableMapOf<Long, GitCodeProjectInfo>()
+        for (i in 1..10) {
+            projectIdMap.putAll(
+                scmService.getProjectList(
+                    accessToken = token,
+                    userId = userId,
+                    page = i,
+                    pageSize = i * 100,
+                    search = searchName
+                )?.associateBy { it.id!! }?.toMap() ?: emptyMap()
+            )
+        }
+        val hasNext = projectIdMap.values.size == pageSize
         if (projectIdMap.isNullOrEmpty()) {
             return Pagination(false, emptyList())
         }
