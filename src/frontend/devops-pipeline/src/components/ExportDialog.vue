@@ -87,9 +87,9 @@
                 this.$emit('update:isShow', false)
             },
 
-            downLoadFromApi (url, name) {
+            downLoadFromApi (url) {
                 this.isDownLoading = true
-                this.download({ url, name }).catch((err) => {
+                this.download({ url }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isDownLoading = false

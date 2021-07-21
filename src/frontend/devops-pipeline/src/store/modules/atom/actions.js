@@ -513,7 +513,7 @@ export default {
     },
 
     download (_, { url, name }) {
-        return fetch(url, { credentials: 'include' }).then((res) => {
+        return request.get(url).then((res) => {
             if (res.status >= 200 && res.status < 300) {
                 return res.blob()
             } else {
