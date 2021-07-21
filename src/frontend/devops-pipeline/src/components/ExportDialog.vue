@@ -57,7 +57,7 @@
                     {
                         title: 'Pipeline Json',
                         icon: 'export-pipeline',
-                        name: `${this.pipelineName}.json`,
+                        name: 'export.json',
                         tips: this.$t('newlist.exportJsonTip'),
                         exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/export`
                     },
@@ -87,9 +87,9 @@
                 this.$emit('update:isShow', false)
             },
 
-            downLoadFromApi (url) {
+            downLoadFromApi (url, name) {
                 this.isDownLoading = true
-                this.download({ url }).catch((err) => {
+                this.download({ url, name }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isDownLoading = false
