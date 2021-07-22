@@ -46,7 +46,7 @@
                     name: 'manage',
                     children: [
                         { label: this.$t('memberManagement'), name: 'member' },
-                        { label: this.$t('userGroupPermissions'), name: 'userGroup', link: `/console/perm/my-perm?project_code=${this.$route.params.projectId}` }
+                        { label: this.$t('userGroupPermissions'), name: 'userGroup', link: `${BK_CI_IAM_SAAS_URL}/user-group-detail/${this.$route.params.iamId}?tab=group_perm` }
                     ],
                     showChildTab: true
                 }
