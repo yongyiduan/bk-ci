@@ -36,6 +36,7 @@ import com.tencent.devops.common.pipeline.container.Container
 import com.tencent.devops.common.pipeline.container.Stage
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.common.pipeline.pojo.element.Element
+import com.tencent.devops.common.pipeline.pojo.element.RunCondition
 import com.tencent.devops.common.pipeline.pojo.element.agent.ManualReviewUserTaskElement
 import com.tencent.devops.common.pipeline.pojo.element.quality.QualityGateInElement
 import com.tencent.devops.common.pipeline.pojo.element.quality.QualityGateOutElement
@@ -382,8 +383,10 @@ class TaskBuildDetailService(
         for (i in startIndex..endIndex) {
             val element = elements[i]
             val taskId = element.id
-            // 排除构建状态为结束态的构建任务
-            if (taskId != null && !BuildStatus.parse(element.status).isFinish()) {
+            val runCondition = element.additionalOptions?.runCondition
+            // 排除构建状态为结束态的构建任务和runCondition不为PRE_TASK_FAILED_EVEN_CANCEL的任务
+            if (taskId != null && runCondition != RunCondition.PRE_TASK_FAILED_EVEN_CANCEL &&
+                !BuildStatus.parse(element.status).isFinish()) {
                 val unExecBuildStatus = BuildStatus.UNEXEC
                 element.status = unExecBuildStatus.name
                 updateTaskStatusInfos?.add(
