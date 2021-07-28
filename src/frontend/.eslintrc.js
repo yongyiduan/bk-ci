@@ -52,7 +52,6 @@ module.exports = {
         'USER_IMG_URL': true,
         'OPEN_URL': true,
         'OIED_URL': true,
-        'CODECC_SOFWARE_URL': true,
         'JOB_URL': true,
         'VERSION_TYPE': false,
         'X_DEVOPS_PROJECT_ID': false,
