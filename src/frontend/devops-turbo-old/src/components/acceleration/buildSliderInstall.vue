@@ -118,7 +118,7 @@
                 <p class="bk-form-text">{{ taskParam.bsPipelineName || '--' }}</p>
             </bk-form-item>
             <bk-form-item class="form-item-text">
-                <a :href="`http://api.devops.oa.com/turbo/api/user/turbo/task/software/${taskParam.taskId}/LD_Turbo_install.tar.gz`" class="bk-form-link" style="margin-left:0;">点击下载编译加速包</a>
+                <a :href="`/turbo/api/user/turbo/task/software/${taskParam.taskId}/LD_Turbo_install.tar.gz`" class="bk-form-link" style="margin-left:0;">点击下载编译加速包</a>
                 <a :href="`${IWIKI_DOCS_URL}/x/sobm`"
                     class="bk-form-link" target="_blank"
                 >查看编译加速包使用教程</a>
