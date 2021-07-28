@@ -5,8 +5,8 @@
             <div class="hero--content">
                 <div class="container">
                     <div class="hero--text-block">
-                        <h1 class="hero--title">Stream： 一个更容易<strong> 治理 </strong>的 CI 服务</h1>
-                        <div>蓝盾 Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的服务。<br>
+                        <h1 class="hero--title">一个更容易<strong> 治理 </strong>的 CI 服务</h1>
+                        <div>Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的服务。<br>
                             让你聚焦于编码本身，而非权限申请、构建机准备、发布沟通等琐事。
                         </div>
                         <div class="hero-cta">
@@ -55,10 +55,10 @@
             <div class="container">
                 <span class="logos--title">联合出品方</span>
                 <div class="logos--container">
-                    <img src="./../images/home/EP.png" class="logos--logo" width="auto" height="60" style="margin-top:-1px;" alt="EP度量">
-                    <img src="./../images/home/tgit-with.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="工蜂">
                     <img src="./../images/home/bk-ci.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="蓝盾">
+                    <img src="./../images/home/tgit-with.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="工蜂">
                     <img src="./../images/home/tencent_ci.png" class="logos--logo" width="auto" height="50" style="margin-top:0px;" alt="腾讯CI">
+                    <img src="./../images/home/EP.png" class="logos--logo" width="auto" height="60" style="margin-top:-1px;" alt="EP度量">
                 </div>
             </div>
         </section>
