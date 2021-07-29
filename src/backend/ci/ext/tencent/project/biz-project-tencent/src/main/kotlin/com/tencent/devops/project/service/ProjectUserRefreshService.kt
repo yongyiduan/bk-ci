@@ -27,7 +27,6 @@
 
 package com.tencent.devops.project.service
 
-import com.tencent.bkrepo.common.api.util.toJsonString
 import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.api.util.PageUtil
 import com.tencent.devops.model.project.tables.records.TUserRecord
@@ -183,7 +182,7 @@ class ProjectUserRefreshService @Autowired constructor(
         return projectFreshDao.resetProjectDeptInfo(dslContext)
     }
 
-    fun fixGitCIProjectInfo(start: Long, limitCount: Int, sleepTime: Int): Int {
+    fun fixGitCIProjectInfo(start: Long, limitCount: Int, sleepTime: Long): Int {
         var startId = start
         var count = 0
         var currProjects = projectFreshDao.getProjectAfterId(dslContext, startId, limitCount)
@@ -192,7 +191,7 @@ class ProjectUserRefreshService @Autowired constructor(
                 try {
                     val devopsUser = projectFreshDao.getDevopsUserInfo(dslContext, it.creator)
                     if (devopsUser == null) {
-                        Thread.sleep(500)
+                        Thread.sleep(sleepTime)
                         val userInfo = tofService.getUserDeptDetail(it.creator)
                         logger.info("[${it.creator}] fixGitCIProjectInfo tofService: $userInfo")
                         count += projectFreshDao.fixProjectInfo(
@@ -228,7 +227,10 @@ class ProjectUserRefreshService @Autowired constructor(
                             )
                         )
                     } else {
-                        logger.info("[${it.creator}] fixGitCIProjectInfo getDevopsUserInfo: ${devopsUser.toJsonString()}")
+                        logger.info("[${it.creator}] fixGitCIProjectInfo getDevopsUserInfo: " +
+                            "creatorBgId=${devopsUser.bgId}, creatorBgName=${devopsUser.bgName}" +
+                            "creatorDeptId=${devopsUser.deptId}, creatorDeptName=${devopsUser.deptName}" +
+                            "creatorCenterId=${devopsUser.centerId}, creatorCenterName=${devopsUser.centerName}")
                         count += projectFreshDao.fixProjectInfo(
                             dslContext = dslContext,
                             id = it.id,

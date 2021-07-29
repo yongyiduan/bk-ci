@@ -61,7 +61,7 @@ interface OpUserResource {
     @Path("/refresh/all")
     fun refreshAllUserGroup(): Result<Boolean>
 
-    @ApiOperation("同步所有用户tof组织信息")
+    @ApiOperation("重置所有用户tof组织信息")
     @GET
     @Path("/ext/gitci/reset")
     fun resetProjectInfo(): Result<Int>
@@ -78,6 +78,6 @@ interface OpUserResource {
         limit: Int?,
         @ApiParam("间隔时间", required = false)
         @QueryParam("sleep")
-        sleep: Int?
+        sleep: Long?
     ): Result<Int>
 }
