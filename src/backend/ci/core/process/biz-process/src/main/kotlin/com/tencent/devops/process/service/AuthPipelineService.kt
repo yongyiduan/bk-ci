@@ -27,6 +27,9 @@
 
 package com.tencent.devops.process.service
 
+import com.tencent.bk.sdk.iam.constants.CallbackMethodEnum
+import com.tencent.bk.sdk.iam.dto.callback.request.CallbackRequestDTO
+import com.tencent.bk.sdk.iam.dto.callback.response.CallbackBaseResponseDTO
 import com.tencent.bk.sdk.iam.dto.callback.response.FetchInstanceInfoResponseDTO
 import com.tencent.bk.sdk.iam.dto.callback.response.InstanceInfoDTO
 import com.tencent.bk.sdk.iam.dto.callback.response.ListInstanceResponseDTO
@@ -43,12 +46,49 @@ class AuthPipelineService @Autowired constructor(
     val authTokenApi: AuthTokenApi,
     val pipelineListFacadeService: PipelineListFacadeService
 ) {
-    fun searchPipeline(
+    fun pipelineInfo(
+        callBackInfo: CallbackRequestDTO,
+        token: String,
+        returnPipelineId: Boolean? = false
+    ): CallbackBaseResponseDTO? {
+        val method = callBackInfo.method
+        val page = callBackInfo.page
+        val projectId = callBackInfo.filter.parent?.id ?: "" // FETCH_INSTANCE_INFO场景下iam不会传parentId
+        when (method) {
+            CallbackMethodEnum.LIST_INSTANCE -> {
+                return getPipeline(
+                    projectId = projectId,
+                    offset = page.offset.toInt(),
+                    limit = page.limit.toInt(),
+                    token = token,
+                    returnPipelineId = returnPipelineId!!
+                )
+            }
+            CallbackMethodEnum.FETCH_INSTANCE_INFO -> {
+                val ids = callBackInfo.filter.idList.map { it.toString() }
+                return getPipelineInfo(ids, token, returnPipelineId!!)
+            }
+            CallbackMethodEnum.SEARCH_INSTANCE -> {
+                return searchPipeline(
+                    projectId = projectId,
+                    keyword = callBackInfo.filter.keyword,
+                    limit = page.offset.toInt(),
+                    offset = page.limit.toInt(),
+                    token = token,
+                    returnPipelineId = returnPipelineId!!
+                )
+            }
+        }
+        return null
+    }
+
+    private fun searchPipeline(
         projectId: String,
         keyword: String,
         limit: Int,
         offset: Int,
-        token: String
+        token: String,
+        returnPipelineId: Boolean
     ): SearchInstanceInfo {
         authTokenApi.checkToken(token)
 //        val pipelineInfos =
@@ -67,8 +107,13 @@ class AuthPipelineService @Autowired constructor(
         }
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         pipelineInfos?.records?.map {
+            val entityId = if (returnPipelineId) {
+                it.pipelineId
+            } else {
+                it.id?.toString() ?: "0"
+            }
             val entity = InstanceInfoDTO()
-            entity.id = it.id?.toString() ?: "0"
+            entity.id = entityId
             entity.displayName = it.pipelineName
             entityInfo.add(entity)
         }
@@ -76,7 +121,13 @@ class AuthPipelineService @Autowired constructor(
         return result.buildSearchInstanceResult(entityInfo, pipelineInfos.count)
     }
 
-    fun getPipeline(projectId: String, offset: Int, limit: Int, token: String): ListInstanceResponseDTO? {
+    private fun getPipeline(
+        projectId: String,
+        offset: Int,
+        limit: Int,
+        token: String,
+        returnPipelineId: Boolean
+    ): ListInstanceResponseDTO? {
         authTokenApi.checkToken(token)
 //        val pipelineInfos =
 //            client.get(ServiceAuthPipelineResource::class)
@@ -93,8 +144,13 @@ class AuthPipelineService @Autowired constructor(
         }
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         pipelineInfos?.records?.map {
+            val entityId = if (returnPipelineId) {
+                it.pipelineId
+            } else {
+                it.id?.toString() ?: "0"
+            }
             val entity = InstanceInfoDTO()
-            entity.id = it.id?.toString() ?: "0"
+            entity.id = entityId
             entity.displayName = it.pipelineName
             entityInfo.add(entity)
         }
@@ -102,12 +158,23 @@ class AuthPipelineService @Autowired constructor(
         return result.buildListInstanceResult(entityInfo, pipelineInfos.count)
     }
 
-    fun getPipelineInfo(ids: List<Any>?, token: String): FetchInstanceInfoResponseDTO? {
+    private fun getPipelineInfo(
+        ids: List<Any>?,
+        token: String,
+        returnPipelineId: Boolean
+    ): FetchInstanceInfoResponseDTO? {
         authTokenApi.checkToken(token)
-//        val pipelineInfos =
-//            client.get(ServiceAuthPipelineResource::class)
-//                .pipelineInfos(ids!!.toSet() as Set<String>).data
-        val pipelineInfos = pipelineListFacadeService.getPipelineByIds(pipelineIds = ids!!.toSet() as Set<String>)
+
+        val pipelineId = ids!!.first().toString()
+        val idNumType = pipelineId.matches("-?\\d+(\\.\\d+)?".toRegex()) // 判断是否为纯数字
+
+        val pipelineInfos = if (idNumType) {
+            // 纯数字按自增id获取
+            pipelineListFacadeService.getByAutoIds(ids.map { it.toString().toInt() })
+        } else {
+            // 非纯数字按pipelineId获取
+            pipelineListFacadeService.getByPipelineIds(pipelineIds = ids!!.toSet() as Set<String>)
+        }
         val result = FetchInstanceInfo()
 
         if (pipelineInfos == null || pipelineInfos.isEmpty()) {
@@ -116,8 +183,13 @@ class AuthPipelineService @Autowired constructor(
         }
         val entityInfo = mutableListOf<InstanceInfoDTO>()
         pipelineInfos?.map {
+            val entityId = if (returnPipelineId) {
+                it.pipelineId
+            } else {
+                it.id?.toString() ?: "0"
+            }
             val entity = InstanceInfoDTO()
-            entity.id = it.id?.toString() ?: "0"
+            entity.id = entityId
             entity.displayName = it.pipelineName
             entityInfo.add(entity)
         }

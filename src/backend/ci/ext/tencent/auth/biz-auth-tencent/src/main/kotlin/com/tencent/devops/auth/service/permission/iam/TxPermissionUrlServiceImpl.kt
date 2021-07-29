@@ -30,7 +30,6 @@ package com.tencent.devops.auth.service.permission.iam
 import com.tencent.bk.sdk.iam.config.IamConfiguration
 import com.tencent.bk.sdk.iam.dto.RelatedResourceTypes
 import com.tencent.bk.sdk.iam.dto.RelationResourceInstance
-import com.tencent.bk.sdk.iam.dto.RelationResourceInstances
 import com.tencent.bk.sdk.iam.dto.action.UrlAction
 import com.tencent.bk.sdk.iam.service.ManagerService
 import com.tencent.devops.auth.pojo.PermissionUrlDTO
@@ -138,12 +137,11 @@ class TxPermissionUrlServiceImpl @Autowired constructor(
                     )
                     relatedInstanceInfos.add(relatedInstance)
                 }
-                val relatedInstanceList = RelationResourceInstances(relatedInstanceInfos)
 
                 relatedResourceTypes.add(RelatedResourceTypes(
                     iamConfiguration.systemId,
                     relatedResourceType,
-                    arrayListOf(relatedInstanceList),
+                    arrayListOf(relatedInstanceInfos),
                     emptyList()
                 ))
             }
@@ -175,7 +173,11 @@ class TxPermissionUrlServiceImpl @Autowired constructor(
 
     override fun getRolePermissionUrl(projectId: String, groupId: String?): String? {
         val projectRelationId = permissionProjectService.getProjectId(projectId)
-        val rolePermissionUrl = "user-group-detail/$groupId?current_role_id=$projectRelationId&tab=group_perm"
+        val rolePermissionUrl = if (!groupId.isNullOrEmpty()) {
+            "user-group-detail/$groupId?current_role_id=$projectRelationId&tab=group_perm"
+        } else {
+            "user-group?current_role_id=$projectRelationId"
+        }
         return if (permissionCenterHost.isNullOrEmpty()) {
             null
         } else if (permissionCenterHost!!.endsWith("/")) {

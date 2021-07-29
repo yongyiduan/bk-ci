@@ -107,11 +107,7 @@ class ArtifactoryTencentServiceConfig {
         authProjectApi: BSAuthProjectApi,
         artifactoryAuthServiceCode: BSRepoAuthServiceCode
     ) = DefaultPipelineServiceImpl(
-        client = client,
-        pipelineAuthServiceCode = pipelineAuthServiceCode,
-        bkAuthPermissionApi = bkAuthPermissionApi,
-        authProjectApi = authProjectApi,
-        artifactoryAuthServiceCode = artifactoryAuthServiceCode
+        client, pipelineAuthServiceCode, bkAuthPermissionApi, authProjectApi, artifactoryAuthServiceCode
     )
 
     @Bean

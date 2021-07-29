@@ -87,16 +87,16 @@ class ProjectLocalService @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val redisOperation: RedisOperation,
     private val authProjectApi: AuthProjectApi,
+    private val bkAuthProperties: BkAuthProperties,
     private val bsPipelineAuthServiceCode: BSPipelineAuthServiceCode,
     private val gray: Gray,
     private val jmxApi: ProjectJmxApi,
     private val projectService: ProjectService,
     private val projectIamV0Service: ProjectIamV0Service,
     private val projectTagService: ProjectTagService,
-    private val projectPermissionService: ProjectPermissionService,
-    private val txProjectServiceImpl: TxProjectServiceImpl,
     private val client: Client,
-    bkAuthProperties: BkAuthProperties
+    private val projectPermissionService: ProjectPermissionService,
+    private val txProjectServiceImpl: TxProjectServiceImpl
 ) {
     private var authUrl: String = "${bkAuthProperties.url}/projects"
 
@@ -131,7 +131,7 @@ class ProjectLocalService @Autowired constructor(
         val sqlLimit = PageUtil.convertPageSizeToSQLLimit(page, pageSize)
         val offset = sqlLimit.offset
         val limit = sqlLimit.limit
-        val projectIds = authProjectApi.getUserProjects(bsPipelineAuthServiceCode, userId, null)
+        val projectIds = txProjectServiceImpl.getProjectFromAuth(userId, null)
         // 如果使用搜索 且 总数量少于1000 , 则全量获取
         if (searchName != null &&
             searchName.isNotEmpty() &&

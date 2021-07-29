@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.bk.sdk.iam.config.IamConfiguration
 import com.tencent.bk.sdk.iam.helper.AuthHelper
 import com.tencent.bk.sdk.iam.service.impl.ApigwHttpClientServiceImpl
-import com.tencent.bk.sdk.iam.service.impl.DefaultHttpClientServiceImpl
 import com.tencent.bk.sdk.iam.service.impl.ManagerServiceImpl
 import com.tencent.bk.sdk.iam.service.impl.PolicyServiceImpl
 import com.tencent.bk.sdk.iam.service.impl.TokenServiceImpl
@@ -75,14 +74,14 @@ class TxAuthConfiguration {
     @Bean
     fun iamManagerService() = ManagerServiceImpl(apigwHttpClientServiceImpl(), iamConfiguration())
 
-    @Bean
-    fun httpService() = DefaultHttpClientServiceImpl(iamConfiguration())
+//    @Bean
+//    fun httpService() = DefaultHttpClientServiceImpl(iamConfiguration())
 
     @Bean
-    fun tokenService() = TokenServiceImpl(iamConfiguration(), httpService())
+    fun tokenService() = TokenServiceImpl(iamConfiguration(), apigwHttpClientServiceImpl())
 
     @Bean
-    fun policyService() = PolicyServiceImpl(iamConfiguration(), httpService())
+    fun policyService() = PolicyServiceImpl(iamConfiguration(), apigwHttpClientServiceImpl())
 
     @Bean
     @ConditionalOnMissingBean
