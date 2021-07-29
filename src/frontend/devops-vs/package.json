@@ -4,10 +4,11 @@
   "description": "",
   "dependencies": {
     "vue-property-decorator": "^6.0.0",
-    "vue-template-compiler": "^2.5.16",
+    
     "vuex-class": "^0.3.0"
   },
   "devDependencies": {
+    "vue-template-compiler": "2.6.12",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-istanbul": "^4.1.6",

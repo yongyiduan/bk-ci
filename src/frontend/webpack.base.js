@@ -87,7 +87,8 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             new webpack.HashedModuleIdsPlugin(),
             new MiniCssExtractPlugin({
                 filename: '[name].[chunkHash].css',
-                chunkName: '[id].css'
+                chunkName: '[id].css',
+                ignoreOrder: true
             }),
             new webpack.DefinePlugin({
                 VERSION_TYPE: JSON.stringify(version)
@@ -102,7 +103,6 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             extensions: ['.js', '.vue', '.json', '.ts', '.scss', '.css'],
             alias: {
                 '@': path.resolve('src'),
-                'vue$': 'vue/dist/vue.esm.js',
                 '@locale': path.resolve(__dirname, 'locale')
             }
         },
