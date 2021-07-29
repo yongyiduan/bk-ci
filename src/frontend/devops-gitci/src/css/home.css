@@ -360,8 +360,6 @@ body.in-transition {
 }
 .feature-block.tab .feature-block--data-features {
 	display:grid;
-	grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-	grid-auto-rows:50px
 }
 .feature-block.tab .feature-block--data-features p {
 	font-weight:500
