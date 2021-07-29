@@ -47,8 +47,6 @@ function setLsLocale (locale) {
 export default (r) => {
     Vue.use(VueI18n)
     const { messages, localeList } = importAll(r)
-    // remove old language cookie
-    // cookies.remove(LS_KEY, { domain: '.devops.oa.com', path: '/' })
     
     const initLocale = getLsLocale()
     // export localeList

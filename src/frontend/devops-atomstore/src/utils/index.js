@@ -106,3 +106,6 @@ export function throttle (callBack) {
         callBack()
     }
 }
+export const BK_CI_STATIC_URL = '//staticfile.woa.com'
+export const DEFAULT_LOGO_URL = `${BK_CI_STATIC_URL}/bkci/static/defaultImg.png`
+export const VSCODE_GUIDE_IMAGE_URL = `${BK_CI_STATIC_URL}/bkci/static/vscode-plugin-guide.png`
