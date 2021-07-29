@@ -27,6 +27,7 @@
 
 package com.tencent.devops.project.service
 
+import com.tencent.bkrepo.common.api.util.toJsonString
 import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.api.util.PageUtil
 import com.tencent.devops.model.project.tables.records.TUserRecord
@@ -182,17 +183,18 @@ class ProjectUserRefreshService @Autowired constructor(
         return projectFreshDao.resetProjectDeptInfo(dslContext)
     }
 
-    fun fixGitCIProjectInfo(): Int {
-        val limitCount = 5
+    fun fixGitCIProjectInfo(start: Long, limitCount: Int, sleepTime: Int): Int {
+        var startId = start
         var count = 0
-        var startId = 0L
         var currProjects = projectFreshDao.getProjectAfterId(dslContext, startId, limitCount)
         while (currProjects.isNotEmpty()) {
             currProjects.forEach {
                 try {
                     val devopsUser = projectFreshDao.getDevopsUserInfo(dslContext, it.creator)
                     if (devopsUser == null) {
+                        Thread.sleep(500)
                         val userInfo = tofService.getUserDeptDetail(it.creator)
+                        logger.info("[${it.creator}] fixGitCIProjectInfo tofService: $userInfo")
                         count += projectFreshDao.fixProjectInfo(
                             dslContext = dslContext,
                             id = it.id,
@@ -226,6 +228,7 @@ class ProjectUserRefreshService @Autowired constructor(
                             )
                         )
                     } else {
+                        logger.info("[${it.creator}] fixGitCIProjectInfo getDevopsUserInfo: ${devopsUser.toJsonString()}")
                         count += projectFreshDao.fixProjectInfo(
                             dslContext = dslContext,
                             id = it.id,
@@ -267,7 +270,6 @@ class ProjectUserRefreshService @Autowired constructor(
                 }
             }
             logger.info("fixGitCIProjectInfo project ${currProjects.map { it.id }.toList()}, fixed count: $count")
-            Thread.sleep(100)
             currProjects = projectFreshDao.getProjectAfterId(dslContext, startId, limitCount)
         }
         logger.info("fixGitCIProjectInfo finished count: $count")
