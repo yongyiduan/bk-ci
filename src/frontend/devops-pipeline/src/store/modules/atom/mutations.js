@@ -65,7 +65,6 @@ import {
     SET_SAVE_STATUS,
     SET_AUTH_EDITING,
     SET_DEFAULT_STAGE_TAG,
-    TOGGLE_REVIEW_DIALOG,
     TOGGLE_STAGE_REVIEW_PANEL,
     SET_IMPORTED_JSON,
     SET_EDIT_FROM
@@ -90,10 +89,6 @@ export default {
             showStageReviewPanel: isShow,
             editingElementPos
         })
-    },
-    [TOGGLE_REVIEW_DIALOG]: (state, { isShow: showReviewDialog, reviewInfo }) => {
-        Vue.set(state, 'showReviewDialog', showReviewDialog)
-        Vue.set(state, 'reviewInfo', reviewInfo)
     },
     [SET_DEFAULT_STAGE_TAG]: (state, defaultStageTags) => {
         Vue.set(state, 'defaultStageTags', defaultStageTags)
