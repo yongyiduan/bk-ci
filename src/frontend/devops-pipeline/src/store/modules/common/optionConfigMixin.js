@@ -140,6 +140,10 @@ const optionConfigMixin = {
                             name: this.$t('storeMap.atomEvenFail')
                         },
                         {
+                            id: 'PRE_TASK_FAILED_EVEN_CANCEL',
+                            name: this.$t('storeMap.atomEvenCancel')
+                        },
+                        {
                             id: 'PRE_TASK_FAILED_ONLY',
                             name: this.$t('storeMap.atomOnlyFail')
                         },
@@ -154,6 +158,10 @@ const optionConfigMixin = {
                         {
                             id: 'CUSTOM_CONDITION_MATCH',
                             name: this.$t('storeMap.customCondition')
+                        },
+                        {
+                            id: 'PARENT_TASK_CANCELED_OR_TIMEOUT',
+                            name: this.$t('storeMap.userCancelExec')
                         }
                     ]
                 },
