@@ -84,9 +84,9 @@ export default {
             authSettingEditing: editing
         })
     },
-    [TOGGLE_STAGE_REVIEW_PANEL]: (state, { isShow, editingElementPos = null }) => {
+    [TOGGLE_STAGE_REVIEW_PANEL]: (state, { showStageReviewPanel, editingElementPos = null }) => {
         Object.assign(state, {
-            showStageReviewPanel: isShow,
+            showStageReviewPanel,
             editingElementPos
         })
     },
