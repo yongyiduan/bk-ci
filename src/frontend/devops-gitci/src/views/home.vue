@@ -11,7 +11,7 @@
                                 <li class="anima-item"> CD</li>
                                 <li class="anima-item"> Build</li>
                             </ul>
-                            <span style="margin-left: 130px;">服务</span>
+                            <span style="margin-left: 135px;">服务</span>
                         </h1>
                         <div>Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的服务。<br>
                             让你聚焦于编码本身，而非权限申请、构建机准备、发布沟通等琐事。
