@@ -65,7 +65,6 @@
         mixins: [atomMixin, validMixins],
         data () {
             return {
-                CODECC_SOFWARE_URL: CODECC_SOFWARE_URL,
                 newModel: {},
                 task: {},
                 elementId: '',

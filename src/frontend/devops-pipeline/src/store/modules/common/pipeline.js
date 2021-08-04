@@ -273,12 +273,12 @@ export const actions = {
         })
     },
     getDockerExecId: async ({ commit }, { containerId, projectId, pipelineId, cmd, targetIp }) => {
-        return request.post(`http://${PROXY_URL_PREFIX}/docker-console-create?pipelineId=${pipelineId}&projectId=${projectId}&targetIp=${targetIp}`, { container_id: containerId, cmd }).then(response => {
+        return request.post(`${PROXY_URL_PREFIX}/docker-console-create?pipelineId=${pipelineId}&projectId=${projectId}&targetIp=${targetIp}`, { container_id: containerId, cmd }).then(response => {
             return response && response.Id
         })
     },
     resizeTerm: async ({ commit }, { resizeUrl, params }) => {
-        return request.post(`http://${PROXY_URL_PREFIX}/${resizeUrl}`, params).then(response => {
+        return request.post(`${PROXY_URL_PREFIX}/${resizeUrl}`, params).then(response => {
             return response && response.Id
         })
     },
@@ -293,8 +293,7 @@ export const actions = {
         })
     },
     requestDevnetGateway: async ({ commit }) => {
-        const baseUrl = CHECK_ENV_URL
-        return request.get(`${ARTIFACTORY_API_URL_PREFIX}/user/artifactories/checkDevnetGateway`, { baseURL: baseUrl }).then(response => {
+        return request.get(`${ARTIFACTORY_API_URL_PREFIX}/user/artifactories/checkDevnetGateway`).then(response => {
             return response.data
         }).catch(e => {
             return false
