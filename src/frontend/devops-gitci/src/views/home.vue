@@ -217,11 +217,7 @@
         width: 120px;
         text-align: center;
     }
-    .moving {
-        -webkit-animation: moving 3s forwards;
-        animation: moving 3s forwards;
-    }
-
+    
     .gif-item {
         .leftImg {
             border-radius: 15px;
@@ -237,6 +233,11 @@
                         0 5px 12px -5px #ccc,
                         0px 0 0px 0px #ccc;
         }
+    }
+
+    .moving {
+        -webkit-animation: moving 3s forwards;
+        animation: moving 3s forwards;
     }
 
     @keyframes moving {
