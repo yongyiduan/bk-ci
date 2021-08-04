@@ -227,14 +227,14 @@
             border-radius: 15px;
             box-shadow: -15px 0 20px -6px #ccc,
                         0 -5px 20px -4px #ccc,
-                        0 5px 5px -5px #ccc,
+                        0 5px 20px -5px #ccc,
                         0px 0 0px 0px #ccc;
         }
         .rightImg {
             border-radius: 15px;
             box-shadow: 0px 0 0px 0px #ccc,
                         0 -5px 20px -4px #ccc,
-                        0 5px 5px -5px #ccc,
+                        0 5px 12px -5px #ccc,
                         0px 0 0px 0px #ccc;
         }
     }
