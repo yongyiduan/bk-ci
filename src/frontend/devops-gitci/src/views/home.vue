@@ -5,7 +5,14 @@
             <div class="hero--content">
                 <div class="container" style="display: flex">
                     <div class="hero--text-block" style="padding: 0 100px 80px 0">
-                        <h1 class="hero--title">一个更容易<strong> 治理 </strong>的 CI 服务</h1>
+                        <h1 class="hero--title">一个更容易<strong> 治理 </strong>的
+                            <ul class="anima-title">
+                                <li class="anima-item"> CI</li>
+                                <li class="anima-item"> CD</li>
+                                <li class="anima-item"> Build</li>
+                            </ul>
+                            <span style="margin-left: 130px;">服务</span>
+                        </h1>
                         <div>Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的服务。<br>
                             让你聚焦于编码本身，而非权限申请、构建机准备、发布沟通等琐事。
                         </div>
@@ -19,14 +26,17 @@
                         </div>
                     </div>
 
-                    <div style="float:right;width:500px;">
-                        <img src="./../images/home/code.gif" />
+                    <div class="gif-item" style="width:320px; position: absolute; right: 250px; top: -150px; z-index: 100;">
+                        <img ref="leftImg" :src="require('./../images/home/video_7_.gif')" />
+                    </div>
+                    <div class="gif-item" style="width:500px; position: absolute; right: -150px; top: -75px;">
+                        <img ref="rightImg" :src="require('./../images/home/home.png')" />
                     </div>
                 </div>
 
                 <!-- <video playsinline="" autoplay="" muted="" loop="" class="factory-video desktop-only "><source src="./../images/home/code.mp4" type="video/mp4"></video> -->
-                <!-- <video src="./../images/home/code.mp4" controls="controls" autoplay="" muted="" loop="" class="factory-video desktop-only"> -->
-                <!-- </video> -->
+                <!-- <video src="./../images/home/code.mp4" controls="controls" autoplay="" muted="" loop="" class="factory-video desktop-only">
+                </video> -->
             </div>
         </section>
 
@@ -128,6 +138,137 @@
     </section>
 </template>
 
+<script>
+    export default {
+        mounted () {
+            this.initAnimaShow()
+            this.initGifAnimaShow()
+            this.$once('hook:beforeDestroy', () => {
+                clearTimeout(this.timer)
+                clearTimeout(this.gifTimer)
+            })
+        },
+        methods: {
+            initAnimaShow () {
+                clearTimeout(this.timer)
+                this.timer = null
+                let time = 0
+                const animaItems = document.querySelectorAll('.anima-item')
+                for (let i = 0; i < animaItems.length; i++) {
+                    this.timer = setTimeout(() => {
+                        animaItems[i].className += ' moving'
+                        animaItems[i].style.top = 0
+                        if (!i) return
+                        animaItems[i - 1].className = 'anima-item'
+                        animaItems[i - 1].style.top = '-200px'
+                    }, time)
+                    time += 3000
+                }
+
+                this.timer = setTimeout(() => {
+                    for (let i = 0; i < animaItems.length; i++) {
+                        animaItems[i].className = 'anima-item'
+                        animaItems[i].style.top = '-200px'
+                    }
+                    this.initAnimaShow()
+                }, 9000)
+            },
+
+            initGifAnimaShow () {
+                clearTimeout(this.gifTimer)
+                this.gifTimer = null
+                this.$refs.leftImg.src = require('./../images/home/video_7_.gif')
+                this.$refs.rightImg.src = require('./../images/home/Snipaste_2021-08-04_11-05-07.png')
+                const gifItems = document.querySelectorAll('.gif-item')
+                gifItems[0].className = 'item'
+                gifItems[1].className = 'item1'
+                setTimeout(() => {
+                    this.$refs.leftImg.src = require('./../images/home/Snipaste_2021-08-04_11-03-47.png')
+                    this.$refs.rightImg.src = require('./../images/home/video_8_.gif')
+                    gifItems[1].style.zIndex = '999'
+                }, 31600)
+                this.gifTimer = setTimeout(() => {
+                    for (let i = 0; i < gifItems.length; i++) {
+                        gifItems[i].className = 'gif-item'
+                    }
+                    setTimeout(() => {
+                        gifItems[1].style.zIndex = '0'
+                        this.initGifAnimaShow()
+                    }, 200)
+                }, 45100)
+            }
+        }
+    }
+</script>
+
 <style lang="postcss">
     @import '@/css/home';
+    .anima-title {
+        display: inline-block;
+        width: 120px;
+        height: 160px;
+        line-height: 160px;
+        position: absolute;
+        top: 10px;
+        overflow: hidden;
+        p {
+            color: #000;
+        }
+    }
+    .anima-item {
+        position: absolute;
+        font-weight: 700;
+        top: -200px;
+        width: 120px;
+        text-align: center;
+    }
+    .moving {
+        -webkit-animation: moving 3s forwards;
+        animation: moving 3s forwards;
+    }
+
+    @keyframes moving {
+        5% {
+            transform: translateY(0px);
+            opacity: 1;
+        }
+        30% {
+            transform: translateY(0px);
+            opacity: 1;
+        }
+        50% {
+            transform: translateY(0px);
+            opacity: 1;
+        }
+        80% {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        from {
+            transform: translateY(-40px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+    .item{ animation: gelatine 32s}
+    @keyframes gelatine {
+        1%{transform: translateX(-200px);}
+        4%{transform: translateX(0);}
+        30%{transform: translateX(0);}
+        50%{transform: translateX(0);}
+    }
+    .item1{ animation: gelatine1 45s}
+    @keyframes gelatine1 {
+        1%{transform: translateX(0);}
+        70%{transform: translateX(0);}
+        71%{transform: translateX(50px);}
+        72%{transform: translateX(-50px);}
+        99%{transform: translateX(-50px);}
+        100%{transform: translateX(0);}
+    }
 </style>
