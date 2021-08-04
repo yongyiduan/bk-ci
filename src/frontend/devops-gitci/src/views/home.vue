@@ -27,10 +27,10 @@
                     </div>
 
                     <div class="gif-item leftAnima" style="width: 600px; position: absolute; right: 200px; top: -130px; z-index: 100;">
-                        <img class="leftImg" ref="leftImg" :src="require('./../images/home/brpge-w9usr.gif')" />
+                        <img class="leftImg" ref="leftImg" :src="require('./../images/home/ui.gif')" />
                     </div>
                     <div class="gif-item rightAnima" style="width: 350px; position: absolute; right: -75px; top: -200px;">
-                        <img class="rightImg" ref="rightImg" :src="require('./../images/home/sijgi-1hydb.gif')" />
+                        <img class="rightImg" ref="rightImg" :src="require('./../images/home/code.gif')" />
                     </div>
                 </div>
 
@@ -139,6 +139,11 @@
 </template>
 
 <script>
+    import uiGif from '@/images/home/ui.gif'
+    import uiJpg from '@/images/home/ui.jpg'
+    import codeGif from '@/images/home/code.gif'
+    import codeJpg from '@/images/home/code.jpg'
+    
     export default {
         mounted () {
             this.initAnimaShow()
@@ -175,17 +180,17 @@
             },
 
             initGifAnimaShow () {
-                this.$refs.leftImg.src = require('./../images/home/brpge-w9usr.gif')
-                this.$refs.rightImg.src = require('./../images/home/43b82044-0937-404a-9a84-6bd7990b7705.jpg')
+                this.$refs.leftImg.src = uiGif
+                this.$refs.rightImg.src = codeGif
                 const gifItems = document.querySelectorAll('.gif-item')
                 
                 setTimeout(() => {
-                    this.$refs.leftImg.src = require('./../images/home/9a707614-ee17-4be5-a99d-3733ad75035b.jpg')
-                    this.$refs.rightImg.src = require('./../images/home/sijgi-1hydb.gif')
+                    this.$refs.leftImg.src = uiJpg
+                    this.$refs.rightImg.src = codeGif
                     gifItems[1].style.zIndex = '999'
                     setTimeout(() => {
                         gifItems[1].style.zIndex = '0'
-                        this.$refs.rightImg.src = require('./../images/home/43b82044-0937-404a-9a84-6bd7990b7705.jpg')
+                        this.$refs.rightImg.src = codeJpg
                     }, 11000)
                 }, 4800)
                 this.gifTimer = setTimeout(() => {
