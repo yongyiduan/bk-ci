@@ -26,10 +26,10 @@
                         </div>
                     </div>
 
-                    <div class="gif-item" style="width:320px; position: absolute; right: 250px; top: -150px; z-index: 100;">
+                    <div class="gif-item" style="width: 350px; position: absolute; right: 450px; top: -180px; z-index: 100;">
                         <img ref="leftImg" :src="require('./../images/home/video_7_.gif')" />
                     </div>
-                    <div class="gif-item" style="width:500px; position: absolute; right: -150px; top: -75px;">
+                    <div class="gif-item" style="width: 600px; position: absolute; right: -50px; top: -100px;">
                         <img ref="rightImg" :src="require('./../images/home/home.png')" />
                     </div>
                 </div>
@@ -178,12 +178,12 @@
                 clearTimeout(this.gifTimer)
                 this.gifTimer = null
                 this.$refs.leftImg.src = require('./../images/home/video_7_.gif')
-                this.$refs.rightImg.src = require('./../images/home/Snipaste_2021-08-04_11-05-07.png')
+                this.$refs.rightImg.src = require('./../images/home/9a707614-ee17-4be5-a99d-3733ad75035b.jpg')
                 const gifItems = document.querySelectorAll('.gif-item')
                 gifItems[0].className = 'item'
                 gifItems[1].className = 'item1'
                 setTimeout(() => {
-                    this.$refs.leftImg.src = require('./../images/home/Snipaste_2021-08-04_11-03-47.png')
+                    this.$refs.leftImg.src = require('./../images/home/43b82044-0937-404a-9a84-6bd7990b7705.jpg')
                     this.$refs.rightImg.src = require('./../images/home/video_8_.gif')
                     gifItems[1].style.zIndex = '999'
                 }, 31600)
@@ -268,7 +268,8 @@
         70%{transform: translateX(0);}
         71%{transform: translateX(50px);}
         72%{transform: translateX(-50px);}
-        99%{transform: translateX(-50px);}
+        98%{transform: translateX(-50px);}
+        99%{transform: translateX(20px);}
         100%{transform: translateX(0);}
     }
 </style>
