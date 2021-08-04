@@ -5,7 +5,14 @@
             <div class="hero--content">
                 <div class="container" style="display: flex">
                     <div class="hero--text-block" style="padding: 0 100px 80px 0">
-                        <h1 class="hero--title">一个更容易<strong> 治理 </strong>的 CI 服务</h1>
+                        <h1 class="hero--title">一个更容易<strong> 治理 </strong>的
+                            <ul class="anima-title">
+                                <li class="anima-item"> CI</li>
+                                <li class="anima-item"> CD</li>
+                                <li class="anima-item"> Build</li>
+                            </ul>
+                            <span style="margin-left: 135px;">服务</span>
+                        </h1>
                         <div>Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的服务。<br>
                             让你聚焦于编码本身，而非权限申请、构建机准备、发布沟通等琐事。
                         </div>
@@ -19,14 +26,14 @@
                         </div>
                     </div>
 
-                    <div style="float:right;width:500px;">
-                        <img src="./../images/home/code.gif" />
+                    <div class="gif-item leftAnima" style="width: 600px; position: absolute; right: 200px; top: -130px; z-index: 100;">
+                        <img class="leftImg" ref="leftImg" :src="require('./../images/home/ui.gif')" />
+                    </div>
+                    <div class="gif-item rightAnima" style="width: 350px; position: absolute; right: -75px; top: -200px;">
+                        <img class="rightImg" ref="rightImg" :src="require('./../images/home/code.gif')" />
                     </div>
                 </div>
 
-                <!-- <video playsinline="" autoplay="" muted="" loop="" class="factory-video desktop-only "><source src="./../images/home/code.mp4" type="video/mp4"></video> -->
-                <!-- <video src="./../images/home/code.mp4" controls="controls" autoplay="" muted="" loop="" class="factory-video desktop-only"> -->
-                <!-- </video> -->
             </div>
         </section>
 
@@ -128,6 +135,194 @@
     </section>
 </template>
 
+<script>
+    import uiGif from '@/images/home/ui.gif'
+    import uiJpg from '@/images/home/ui.jpg'
+    import codeGif from '@/images/home/code.gif'
+    import codeJpg from '@/images/home/code.jpg'
+    
+    export default {
+        mounted () {
+            this.initAnimaShow()
+            this.initGifAnimaShow()
+            this.$once('hook:beforeDestroy', () => {
+                clearTimeout(this.timer)
+                clearTimeout(this.gifTimer)
+            })
+        },
+        methods: {
+            initAnimaShow () {
+                clearTimeout(this.timer)
+                this.timer = null
+                let time = 0
+                const animaItems = document.querySelectorAll('.anima-item')
+                for (let i = 0; i < animaItems.length; i++) {
+                    this.timer = setTimeout(() => {
+                        animaItems[i].className += ' moving'
+                        animaItems[i].style.top = 0
+                        if (!i) return
+                        animaItems[i - 1].className = 'anima-item'
+                        animaItems[i - 1].style.top = '-200px'
+                    }, time)
+                    time += 3000
+                }
+
+                this.timer = setTimeout(() => {
+                    for (let i = 0; i < animaItems.length; i++) {
+                        animaItems[i].className = 'anima-item'
+                        animaItems[i].style.top = '-200px'
+                    }
+                    this.initAnimaShow()
+                }, 9000)
+            },
+
+            initGifAnimaShow () {
+                this.$refs.leftImg.src = uiGif
+                this.$refs.rightImg.src = codeGif
+                const gifItems = document.querySelectorAll('.gif-item')
+                
+                setTimeout(() => {
+                    this.$refs.leftImg.src = uiJpg
+                    this.$refs.rightImg.src = codeGif
+                    gifItems[1].style.zIndex = '999'
+                    setTimeout(() => {
+                        gifItems[1].style.zIndex = '0'
+                        this.$refs.rightImg.src = codeJpg
+                    }, 11000)
+                }, 4800)
+                this.gifTimer = setTimeout(() => {
+                    this.initGifAnimaShow()
+                }, 18000)
+            }
+        }
+    }
+</script>
+
 <style lang="postcss" scoped>
     @import '@/css/home';
+    .anima-title {
+        display: inline-block;
+        width: 120px;
+        height: 160px;
+        line-height: 160px;
+        position: absolute;
+        top: 10px;
+        overflow: hidden;
+        p {
+            color: #000;
+        }
+    }
+    .anima-item {
+        position: absolute;
+        font-weight: 700;
+        top: -200px;
+        width: 120px;
+        text-align: center;
+    }
+    
+    .gif-item {
+        .leftImg {
+            border-radius: 15px;
+            box-shadow: -15px 0 20px -6px #ccc,
+                        0 -5px 20px -4px #ccc,
+                        0 5px 20px -5px #ccc,
+                        0px 0 0px 0px #ccc;
+        }
+        .rightImg {
+            border-radius: 15px;
+            box-shadow: 0px 0 0px 0px #ccc,
+                        0 -5px 20px -4px #ccc,
+                        0 5px 12px -5px #ccc,
+                        0px 0 0px 0px #ccc;
+        }
+    }
+
+    .moving {
+        -webkit-animation: moving 3s forwards;
+        animation: moving 3s forwards;
+    }
+
+    @keyframes moving {
+        15% {
+            transform: translateY(0px);
+            opacity: 0.8;
+        }
+        30% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(0px);
+            opacity: 1;
+        }
+        80% {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        from {
+            transform: translateY(-40px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+    .leftAnima {
+        animation: leftAnima 18s infinite;
+    }
+    @keyframes leftAnima {
+        1% {
+            transform: translateX(0);
+        }
+        9% {
+            transform: translateX(0);
+        }
+        26% {
+            transform: translateX(0);
+        }
+        28% {
+            transform: translateX(-50px);
+        }
+        34% {
+            transform: translateX(50px);
+        }
+        88% {
+            transform: translateX(50px);
+        }
+        92% {
+            transform: translateX(-50px);
+        }
+        94% {
+            transform: translateX(0);
+        }
+    }
+    .rightAnima {
+        animation: rightAnima 18s infinite;
+    }
+    @keyframes rightAnima {
+        1% {
+            transform: translateX(0);
+        }
+        26% {
+            transform: translateX(0);
+        }
+        28% {
+            transform: translateX(50px);
+        }
+        34% {
+            transform: translateX(-75px);
+        }
+        88% {
+            transform: translateX(-75px);
+        }
+        92% {
+            transform: translateX(75px);
+        }
+        94% {
+            transform: translateX(0px);
+        }
+    }
 </style>
