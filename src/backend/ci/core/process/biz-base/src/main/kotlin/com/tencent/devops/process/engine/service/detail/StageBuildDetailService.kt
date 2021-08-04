@@ -220,6 +220,8 @@ class StageBuildDetailService(
     }
 
     private fun fetchHistoryStageStatus(model: Model): List<BuildStageStatus> {
+        val stageTagMap: Map<String, String>
+            by lazy { stageTagService.getAllStageTag().data!!.associate { it.id to it.stageTagName } ?: emptyMap() }
         // 更新Stage状态至BuildHistory
         return model.stages.map {
             BuildStageStatus(
@@ -229,7 +231,7 @@ class StageBuildDetailService(
                 startEpoch = it.startEpoch,
                 elapsed = it.elapsed,
                 tag = it.tag?.map { _it ->
-                    stageTagService.getStageTag(_it!!).data!!.stageTagName
+                    stageTagMap.getOrDefault(_it, "null")
                 }
             )
         }
