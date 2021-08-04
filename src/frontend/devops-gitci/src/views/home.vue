@@ -26,11 +26,11 @@
                         </div>
                     </div>
 
-                    <div class="gif-item" style="width: 350px; position: absolute; right: 450px; top: -180px; z-index: 100;">
-                        <img ref="leftImg" :src="require('./../images/home/video_7_.gif')" />
+                    <div class="gif-item leftAnima" style="width: 600px; position: absolute; right: 200px; top: -130px; z-index: 100;">
+                        <img class="leftImg" ref="leftImg" :src="require('./../images/home/brpge-w9usr.gif')" />
                     </div>
-                    <div class="gif-item" style="width: 600px; position: absolute; right: -50px; top: -100px;">
-                        <img ref="rightImg" :src="require('./../images/home/home.png')" />
+                    <div class="gif-item rightAnima" style="width: 350px; position: absolute; right: -75px; top: -200px;">
+                        <img class="rightImg" ref="rightImg" :src="require('./../images/home/sijgi-1hydb.gif')" />
                     </div>
                 </div>
 
@@ -175,27 +175,22 @@
             },
 
             initGifAnimaShow () {
-                clearTimeout(this.gifTimer)
-                this.gifTimer = null
-                this.$refs.leftImg.src = require('./../images/home/video_7_.gif')
-                this.$refs.rightImg.src = require('./../images/home/9a707614-ee17-4be5-a99d-3733ad75035b.jpg')
+                this.$refs.leftImg.src = require('./../images/home/brpge-w9usr.gif')
+                this.$refs.rightImg.src = require('./../images/home/43b82044-0937-404a-9a84-6bd7990b7705.jpg')
                 const gifItems = document.querySelectorAll('.gif-item')
-                gifItems[0].className = 'item'
-                gifItems[1].className = 'item1'
+                
                 setTimeout(() => {
-                    this.$refs.leftImg.src = require('./../images/home/43b82044-0937-404a-9a84-6bd7990b7705.jpg')
-                    this.$refs.rightImg.src = require('./../images/home/video_8_.gif')
+                    this.$refs.leftImg.src = require('./../images/home/9a707614-ee17-4be5-a99d-3733ad75035b.jpg')
+                    this.$refs.rightImg.src = require('./../images/home/sijgi-1hydb.gif')
                     gifItems[1].style.zIndex = '999'
-                }, 31600)
-                this.gifTimer = setTimeout(() => {
-                    for (let i = 0; i < gifItems.length; i++) {
-                        gifItems[i].className = 'gif-item'
-                    }
                     setTimeout(() => {
                         gifItems[1].style.zIndex = '0'
-                        this.initGifAnimaShow()
-                    }, 200)
-                }, 45100)
+                        this.$refs.rightImg.src = require('./../images/home/43b82044-0937-404a-9a84-6bd7990b7705.jpg')
+                    }, 11000)
+                }, 4800)
+                this.gifTimer = setTimeout(() => {
+                    this.initGifAnimaShow()
+                }, 18000)
             }
         }
     }
@@ -227,14 +222,30 @@
         animation: moving 3s forwards;
     }
 
+    .gif-item {
+        .leftImg {
+            border-radius: 15px;
+            box-shadow: -15px 0 20px -6px #ccc,
+                        0 -5px 20px -4px #ccc,
+                        0 5px 5px -5px #ccc,
+                        0px 0 0px 0px #ccc;
+        }
+        .rightImg {
+            border-radius: 15px;
+            box-shadow: 0px 0 0px 0px #ccc,
+                        0 -5px 20px -4px #ccc,
+                        0 5px 5px -5px #ccc,
+                        0px 0 0px 0px #ccc;
+        }
+    }
+
     @keyframes moving {
-        5% {
+        15% {
             transform: translateY(0px);
-            opacity: 1;
+            opacity: 0.8;
         }
         30% {
             transform: translateY(0px);
-            opacity: 1;
         }
         50% {
             transform: translateY(0px);
@@ -250,26 +261,65 @@
         }
         from {
             transform: translateY(-40px);
+            opacity: 0;
         }
         to {
             transform: translateY(40px);
         }
     }
-    .item{ animation: gelatine 32s}
-    @keyframes gelatine {
-        1%{transform: translateX(-200px);}
-        4%{transform: translateX(0);}
-        30%{transform: translateX(0);}
-        50%{transform: translateX(0);}
+    .leftAnima {
+        animation: leftAnima 18s infinite;
     }
-    .item1{ animation: gelatine1 45s}
-    @keyframes gelatine1 {
-        1%{transform: translateX(0);}
-        70%{transform: translateX(0);}
-        71%{transform: translateX(50px);}
-        72%{transform: translateX(-50px);}
-        98%{transform: translateX(-50px);}
-        99%{transform: translateX(20px);}
-        100%{transform: translateX(0);}
+    @keyframes leftAnima {
+        1% {
+            transform: translateX(0);
+        }
+        9% {
+            transform: translateX(0);
+        }
+        26% {
+            transform: translateX(0);
+        }
+        28% {
+            transform: translateX(-50px);
+        }
+        34% {
+            transform: translateX(50px);
+        }
+        88% {
+            transform: translateX(50px);
+        }
+        92% {
+            transform: translateX(-50px);
+        }
+        94% {
+            transform: translateX(0);
+        }
+    }
+    .rightAnima {
+        animation: rightAnima 18s infinite;
+    }
+    @keyframes rightAnima {
+        1% {
+            transform: translateX(0);
+        }
+        26% {
+            transform: translateX(0);
+        }
+        28% {
+            transform: translateX(50px);
+        }
+        34% {
+            transform: translateX(-75px);
+        }
+        88% {
+            transform: translateX(-75px);
+        }
+        92% {
+            transform: translateX(75px);
+        }
+        94% {
+            transform: translateX(0px);
+        }
     }
 </style>
