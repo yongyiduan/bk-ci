@@ -128,6 +128,6 @@
     </section>
 </template>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
     @import '@/css/home';
 </style>

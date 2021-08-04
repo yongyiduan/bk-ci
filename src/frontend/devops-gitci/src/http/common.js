@@ -12,5 +12,9 @@ export default {
 
     oauth (redirectUrl) {
         return api.get(`${REPOSITORY_PREFIX}/user/git/isOauth?redirectUrl=${redirectUrl}`)
+    },
+
+    getGitciProjects (type = 'MY_PROJECT', page = 1, limit = 20, search = '') {
+        return api.get(`${GITCI_PERFIX}/user/projects/${type}/list?page=${page}&pageSize=${limit}`)
     }
 }

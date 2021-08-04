@@ -11,6 +11,7 @@ Vue.use(VueRouter)
 const homePage = () => import(/* webpackChunkName: 'home' */'@/views/home')
 const dashboard = () => import(/* webpackChunkName: 'dashboard' */'@/views/dashboard')
 const main = () => import(/* webpackChunkName: 'entry' */'@/views/index')
+const projectIndex = () => import(/* webpackChunkName: 'entry' */'@/views/project-index')
 const exception = () => import(/* webpackChunkName: 'entry' */'@/views/exception')
 const notifications = () => import(/* webpackChunkName: 'notifications' */'@/views/notifications')
 const pipeline = () => import(/* webpackChunkName: 'pipelines' */'@/views/pipeline')
@@ -34,6 +35,8 @@ const routes = [
         path: '',
         components: {
             default: main,
+            // home: homePage,
+            // dashboard: dashboard,
             exception: exception
         },
         children: [
@@ -48,96 +51,102 @@ const routes = [
                 component: dashboard
             },
             {
-                path: 'webConsole',
-                name: 'webConsole',
-                component: webConsole
-            },
-            {
                 path: '',
-                component: pipeline,
-                name: 'pipeline',
+                component: projectIndex,
                 children: [
                     {
-                        path: 'pipeline/:pipelineId?',
-                        name: 'buildList',
-                        component: buildList,
-                        meta: {
-                            websocket: true
-                        }
+                        path: 'webConsole',
+                        name: 'webConsole',
+                        component: webConsole
                     },
                     {
-                        path: 'pipeline/:pipelineId/detail/:buildId',
-                        name: 'pipelineDetail',
-                        component: pipelineDetail,
+                        path: 'pipeline',
+                        component: pipeline,
+                        name: 'pipeline',
                         children: [
                             {
-                                path: '',
-                                name: 'buildDetail',
-                                component: buildDetail,
+                                path: ':pipelineId?',
+                                name: 'buildList',
+                                component: buildList,
                                 meta: {
                                     websocket: true
                                 }
                             },
                             {
-                                path: 'artifacts',
-                                name: 'buildArtifacts',
-                                component: buildArtifacts
-                            },
-                            {
-                                path: 'reports',
-                                name: 'buildReports',
-                                component: buildReports
-                            },
-                            {
-                                path: 'config',
-                                name: 'buildConfig',
-                                component: buildConfig
+                                path: ':pipelineId/detail/:buildId',
+                                name: 'pipelineDetail',
+                                component: pipelineDetail,
+                                children: [
+                                    {
+                                        path: '',
+                                        name: 'buildDetail',
+                                        component: buildDetail,
+                                        meta: {
+                                            websocket: true
+                                        }
+                                    },
+                                    {
+                                        path: 'artifacts',
+                                        name: 'buildArtifacts',
+                                        component: buildArtifacts
+                                    },
+                                    {
+                                        path: 'reports',
+                                        name: 'buildReports',
+                                        component: buildReports
+                                    },
+                                    {
+                                        path: 'config',
+                                        name: 'buildConfig',
+                                        component: buildConfig
+                                    }
+                                ]
                             }
                         ]
+                    },
+                    {
+                        path: 'setting',
+                        name: 'setting',
+                        component: setting,
+                        children: [
+                            {
+                                path: '',
+                                name: 'basicSetting',
+                                component: basicSetting
+                            },
+                            {
+                                path: 'credential',
+                                name: 'credentialList',
+                                component: credentialList
+                            },
+                            {
+                                path: 'agent-pools',
+                                name: 'agentPools',
+                                component: agentPools
+                            },
+                            {
+                                path: 'add-agent/:poolId/:poolName',
+                                name: 'addAgent',
+                                component: addAgent
+                            },
+                            {
+                                path: 'agent-list/:poolId/:poolName',
+                                name: 'agentList',
+                                component: agentList
+                            },
+                            {
+                                path: 'agent-detail/:poolId/:poolName/:agentId',
+                                name: 'agentDetail',
+                                component: agentDetail
+                            }
+                        ]
+                    },
+                    {
+                        path: 'notifications',
+                        name: 'notifications',
+                        component: notifications
                     }
                 ]
-            },
-            {
-                path: 'setting',
-                name: 'setting',
-                component: setting,
-                children: [
-                    {
-                        path: '',
-                        name: 'basicSetting',
-                        component: basicSetting
-                    },
-                    {
-                        path: 'credential',
-                        name: 'credentialList',
-                        component: credentialList
-                    },
-                    {
-                        path: 'agent-pools',
-                        name: 'agentPools',
-                        component: agentPools
-                    },
-                    {
-                        path: 'add-agent/:poolId/:poolName',
-                        name: 'addAgent',
-                        component: addAgent
-                    },
-                    {
-                        path: 'agent-list/:poolId/:poolName',
-                        name: 'agentList',
-                        component: agentList
-                    },
-                    {
-                        path: 'agent-detail/:poolId/:poolName/:agentId',
-                        name: 'agentDetail',
-                        component: agentDetail
-                    }
-                ]
-            },
-            {
-                path: 'notifications',
-                name: 'notifications',
-                component: notifications
             },
             {
                 path: '*',
@@ -159,6 +168,7 @@ router.afterEach(route => {
 
 // 自动携带项目信息
 router.beforeEach((to, from, next) => {
+    console.log(to, from, 'routeInfo')
     websocket.loginOut(from)
     const params = {
         ...to,

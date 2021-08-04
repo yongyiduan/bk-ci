@@ -1,9 +1,9 @@
 <template>
     <header class="gitci-header">
         <span class="header-info">
-            <img class="ci-name" src="./../images/logo.svg" height="48" />
+            <img class="ci-name" src="./../images/logo.svg" height="48" @click="goToHome" />
 
-            <template v-if="$route.hash">
+            <template v-if="$route.hash && !showMenu">
                 <icon name="git" size="18" class="gray-icon"></icon>
                 <span class="git-project-path" @click="goToCode">{{ decodeURIComponent(($route.hash || '').slice(1)) }}</span>
                 <icon
@@ -18,7 +18,7 @@
 
         <div class="navigation-header" v-if="showMenu">
             <ol class="header-nav">
-                <li v-for="item in menuList" :key="item.name" class="header-nav-item" :class="{ 'item-active': item.active }">
+                <li v-for="item in menuList" :key="item.name" @click="clickMenu(item)" class="header-nav-item" :class="{ 'item-active': item.active }">
                     {{item.name}}
                 </li>
             </ol>
@@ -48,20 +48,10 @@
 
     export default ({
         name: 'gitci-header',
-        props: {
-            messageNum: {
-                type: Number,
-                default: 0
-            }
-        },
-        data () {
-            return {
-            }
-        },
         computed: {
-            ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'user', 'permission']),
+            ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'user', 'permission', 'messageNum']),
             showMenu () {
-                return window.location.pathname && (window.location.pathname.startsWith('/home') || window.location.pathname.startsWith('/dashboard'))
+                return this.$route.name === 'home' || this.$route.name === 'dashboard'
             },
             computedIconClass () {
                 const name = this.$route.name
@@ -73,21 +63,20 @@
                 return [
                     {
                         name: 'Dashboard',
-                        active: window.location.pathname && window.location.pathname.startsWith('/dashboard'),
-                        type: 'click',
-                        func: ''
+                        active: this.$route.name === 'dashboard',
+                        routeName: 'dashboard'
                     },
                     {
                         name: 'ChangeLog',
                         active: false,
                         type: 'url',
-                        url: ''
+                        url: 'https://iwiki.woa.com/pages/viewpage.action?pageId=481669842'
                     },
                     {
                         name: 'Documentation',
                         active: false,
                         type: 'url',
-                        url: ''
+                        url: 'https://iwiki.woa.com/pages/viewpage.action?pageId=481669842'
                     }
                 ]
             }
@@ -102,6 +91,15 @@
                 return common.getUserInfo().then((userInfo = {}) => {
                     this.setUser(userInfo)
                 })
+            },
+            clickMenu (item) {
+                if (item.routeName) {
+                    this.$router.push({
+                        name: item.routeName
+                    })
+                } else if (item.url) {
+                    window.open(item.url, '_blank')
+                }
             },
             goToSetting () {
                 if (!this.permission) return
@@ -123,13 +121,7 @@
             },
 
             goToHome () {
-                const pipelineId = this.$route.params.pipelineId
-                this.$router.push({
-                    name: 'buildList',
-                    params: {
-                        pipelineId
-                    }
-                })
+                location.href = '/'
             }
         }
     })
