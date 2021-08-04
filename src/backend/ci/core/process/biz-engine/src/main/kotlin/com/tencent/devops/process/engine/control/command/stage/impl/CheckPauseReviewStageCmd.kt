@@ -31,7 +31,6 @@ import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.event.dispatcher.pipeline.PipelineEventDispatcher
 import com.tencent.devops.common.pipeline.enums.BuildStatus
-import com.tencent.devops.common.pipeline.option.StageControlOption
 import com.tencent.devops.process.engine.common.BS_MANUAL_START_STAGE
 import com.tencent.devops.process.engine.control.command.CmdFlowState
 import com.tencent.devops.process.engine.control.command.stage.StageCmd
@@ -74,9 +73,7 @@ class CheckPauseReviewStageCmd(
             commandContext.cmdFlowState = CmdFlowState.BREAK
         } else if (commandContext.buildStatus.isReadyToRun()) {
 
-            val stageControlOption = stage.controlOption?.stageControlOption
-
-            if (needPause(event, stageControlOption)) {
+            if (needPause(event, stage)) {
                 // #3742 进入暂停状态则刷新完状态后直接返回，等待手动触发
                 LOG.info("ENGINE|${event.buildId}|${event.source}|STAGE_PAUSE|${event.stageId}")
                 pauseStageNotify(commandContext)
@@ -88,21 +85,21 @@ class CheckPauseReviewStageCmd(
 
             commandContext.cmdFlowState = CmdFlowState.CONTINUE
             // #3742 只有经过手动审核才做审核变量的保存
-            if (stageControlOption?.manualTrigger == true) {
-                saveStageReviewParams(stage = stage, stageControlOption = stageControlOption)
+            if (stage.checkIn?.manualTrigger == true) {
+                saveStageReviewParams(stage = stage)
             }
         }
     }
 
-    private fun saveStageReviewParams(stage: PipelineBuildStage, stageControlOption: StageControlOption?) {
+    private fun saveStageReviewParams(stage: PipelineBuildStage) {
         val reviewVariables = mutableMapOf<String, String>()
         // # 4531 遍历全部审核组的参数，后序覆盖前序的同名变量
-        stageControlOption?.reviewGroups?.forEach { group ->
+        stage.checkIn?.reviewGroups?.forEach { group ->
             group.params?.forEach {
                 reviewVariables[it.key] = it.value.toString()
             }
         }
-        if (stageControlOption?.reviewParams?.isNotEmpty() == true) {
+        if (stage.checkIn?.reviewParams?.isNotEmpty() == true) {
             buildVariableService.batchUpdateVariable(
                 projectId = stage.projectId,
                 pipelineId = stage.pipelineId,
@@ -112,13 +109,14 @@ class CheckPauseReviewStageCmd(
         }
     }
 
-    private fun needPause(event: PipelineBuildStageEvent, option: StageControlOption?): Boolean {
+    private fun needPause(event: PipelineBuildStageEvent, stage: PipelineBuildStage): Boolean {
         // #115 只有在非手动触发该Stage的首次运行做审核暂停
-        if (event.source == BS_MANUAL_START_STAGE || option?.manualTrigger != true) {
+        if (event.source == BS_MANUAL_START_STAGE || stage.checkIn?.manualTrigger != true) {
             return false
         }
         // TODO 下次发布去掉对triggered的判断
-        return option.groupToReview() != null || option.triggered == null
+        return stage.checkIn?.groupToReview() != null ||
+            stage.controlOption?.stageControlOption?.triggered != true
     }
 
     /**
@@ -126,8 +124,8 @@ class CheckPauseReviewStageCmd(
      */
     private fun pauseStageNotify(commandContext: StageContext) {
         val stage = commandContext.stage
-        val option = stage.controlOption!!.stageControlOption
-        val group = option.groupToReview() ?: return
+        val checkIn = stage.checkIn ?: return
+        val group = stage.checkIn?.groupToReview() ?: return
         val notifyUsers = mutableListOf<String>()
 
         if (group.status == null) {
@@ -140,9 +138,9 @@ class CheckPauseReviewStageCmd(
 
         val pipelineName = commandContext.variables[PIPELINE_NAME] ?: stage.pipelineId
         val buildNum = commandContext.variables[PIPELINE_BUILD_NUM] ?: "1"
-        var reviewDesc = option.reviewDesc
+        var reviewDesc = checkIn.reviewDesc
         reviewDesc = EnvUtils.parseEnv(reviewDesc, commandContext.variables)
-        option.reviewDesc = reviewDesc // 替换变量 #3395
+        checkIn.reviewDesc = reviewDesc // 替换变量 #3395
 
         pipelineEventDispatcher.dispatch(
             PipelineBuildNotifyEvent(

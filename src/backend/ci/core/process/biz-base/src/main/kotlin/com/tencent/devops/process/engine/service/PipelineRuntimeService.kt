@@ -1064,9 +1064,10 @@ class PipelineRuntimeService @Autowired constructor(
             }
 
             // 只在第一次启动时刷新为QUEUE，若重试则保持原审核状态
-            if (stageOption?.stageControlOption?.manualTrigger == true &&
-                stageOption.stageControlOption.groupToReview() != null) {
-                stage.reviewStatus = BuildStatus.QUEUE.name
+            stage.refreshReviewOption()
+            if (stage.checkIn?.manualTrigger == true &&
+                stage.checkIn?.groupToReview() != null) {
+                stage.checkIn?.reviewStatus = BuildStatus.QUEUE.name
             }
 
             if (lastTimeBuildStageRecords.isNotEmpty()) {
@@ -1093,7 +1094,9 @@ class PipelineRuntimeService @Autowired constructor(
                         stageId = stage.id!!,
                         seq = index,
                         status = BuildStatus.QUEUE,
-                        controlOption = stageOption
+                        controlOption = stageOption,
+                        checkIn = stage.checkIn,
+                        checkOut = stage.checkOut
                     )
                 )
             }

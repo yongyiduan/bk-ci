@@ -802,18 +802,17 @@ class PipelineBuildFacadeService(
             defaultMessage = "Stage($stageId)未处于暂停状态",
             params = arrayOf(stageId)
         )
-        val option = buildStage.controlOption?.stageControlOption
-        val group = option?.getReviewGroupById(reviewRequest?.id)
-        if (group?.id != option?.groupToReview()?.id) {
+        val group = buildStage.checkIn?.getReviewGroupById(reviewRequest?.id)
+        if (group?.id != buildStage.checkIn?.groupToReview()?.id) {
             throw ErrorCodeException(
                 statusCode = Response.Status.FORBIDDEN.statusCode,
                 errorCode = ProcessMessageCode.ERROR_PIPELINE_STAGE_REVIEW_GROUP_NOT_FOUND,
-                defaultMessage = "(${reviewRequest?.id ?: "default"})非Stage($stageId)当前待审核组",
+                defaultMessage = "(${group?.name ?: "default"})非Stage($stageId)当前待审核组",
                 params = arrayOf(stageId, reviewRequest?.id ?: "default")
             )
         }
 
-        if (option?.reviewerContains(userId) != true) {
+        if (buildStage.checkIn?.reviewerContains(userId) != true) {
             throw ErrorCodeException(
                 statusCode = Response.Status.FORBIDDEN.statusCode,
                 errorCode = ProcessMessageCode.USER_NEED_PIPELINE_X_PERMISSION,
@@ -845,7 +844,9 @@ class PipelineBuildFacadeService(
                     groupId = reviewRequest?.id
                 )
             } else {
+                // TODO 暂时兼容前端显示的变量刷新，下次发版去掉
                 buildStage.controlOption!!.stageControlOption.reviewParams = reviewRequest?.reviewParams
+                buildStage.controlOption!!.stageControlOption.triggered = true
                 pipelineStageService.startStage(
                     userId = userId,
                     buildStage = buildStage,

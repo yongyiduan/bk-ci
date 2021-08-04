@@ -47,6 +47,7 @@ import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildLessAto
 import com.tencent.devops.common.pipeline.type.BuildType
 import com.tencent.devops.process.constant.ProcessMessageCode
 import com.tencent.devops.process.engine.atom.AtomUtils
+import com.tencent.devops.process.engine.common.Timeout
 import com.tencent.devops.process.engine.control.DependOnUtils
 import com.tencent.devops.process.engine.utils.PipelineUtils
 import com.tencent.devops.process.plugin.load.ContainerBizRegistrar
@@ -140,7 +141,9 @@ open class DefaultModelCheckPlugin constructor(
             }
 
             // #4531 检查stage审核组配置是否符合要求
-            if (s.stageControlOption?.manualTrigger == true) checkStageReviewers(s)
+            if (s.stageControlOption?.manualTrigger == true || s.checkIn?.manualTrigger == true) {
+                checkStageReviewers(s)
+            }
 
             val atomVersions = mutableSetOf<StoreVersion>()
             val atomInputParamList = mutableListOf<StoreParam>()
@@ -165,18 +168,24 @@ open class DefaultModelCheckPlugin constructor(
     }
 
     private fun checkStageReviewers(stage: Stage) {
-        stage.stageControlOption?.refreshReviewOption()
-        if (stage.stageControlOption?.reviewGroups?.isNullOrEmpty() == true) {
+        stage.refreshReviewOption()
+        if (stage.checkIn?.reviewGroups?.isNullOrEmpty() == true) {
             throw ErrorCodeException(
                 defaultMessage = "手动触发的Stage未配置审核组",
                 errorCode = ProcessMessageCode.ERROR_PIPELINE_STAGE_NO_REVIEW_GROUP
             )
         }
-        stage.stageControlOption?.reviewGroups?.forEach { group ->
+        stage.checkIn?.reviewGroups?.forEach { group ->
             if (group.reviewers.isNullOrEmpty()) throw ErrorCodeException(
+                defaultMessage = "手动触发的Stage未配置审核组",
                 errorCode = ProcessMessageCode.ERROR_PIPELINE_STAGE_REVIEW_GROUP_NO_USER,
                 params = arrayOf(stage.name!!, group.name)
             )
+        }
+        stage.checkIn?.timeout = if (stage.checkIn?.timeout in 1..720) {
+            stage.checkIn?.timeout
+        } else {
+            Timeout.DEFAULT_STAGE_TIMEOUT_HOURS
         }
     }
 
