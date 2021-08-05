@@ -25,7 +25,8 @@ const localeAliasMap = {
     'us': 'en-US'
 }
 
-const BK_CI_DOMAIN = document.domain.split('.').slice(-2).join('.')
+const domainMatch = location.hostname.match(/([^.]+\.)?([^\.]+\..+)/)
+const BK_CI_DOMAIN = domainMatch.length > 2 ? domainMatch[2] : location.hostname
 
 function getLsLocale () {
     try {
@@ -39,7 +40,7 @@ function getLsLocale () {
 function setLsLocale (locale) {
     const formateLocale = localeAliasMap[locale] === 'zh-CN' ? 'zh-cn' : 'en'
     if (typeof cookies.set === 'function') {
-        cookies.remove(LS_KEY, { domain: BK_CI_DOMAIN, path: '/' }) // remove oa language cookie
+        cookies.remove(LS_KEY) // remove oa language cookie
         cookies.set(LS_KEY, formateLocale, { domain: BK_CI_DOMAIN, path: '/', expires: 365 })
     }
 }
