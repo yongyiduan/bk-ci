@@ -188,7 +188,7 @@
                     setTimeout(() => {
                         gifItems[1].style.zIndex = '0'
                         this.$refs.rightImg.src = codeJpg
-                    }, 11500)
+                    }, 11300)
                 }, 4800)
                 this.gifTimer = setTimeout(() => {
                     this.initGifAnimaShow()
@@ -306,7 +306,7 @@
             transform: translateX(50px);
         }
         92% {
-            transform: translateX(-50px);
+            transform: translateX(-70px);
         }
         94% {
             transform: translateX(0);
