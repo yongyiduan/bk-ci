@@ -679,7 +679,11 @@ textarea {
 }
 @media screen and (min-width:48em) {
 	.hero {
-        min-height:100vh
+		min-height:100vh;
+		-webkit-box-orient: horizontal;
+		-webkit-box-direction: normal;
+		-ms-flex-direction:row;
+		flex-direction: row;
     }
 }
 .hero .hero--text-block {
