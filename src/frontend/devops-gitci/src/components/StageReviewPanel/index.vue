@@ -9,6 +9,7 @@
             :is="reviewComponent"
             :stage-control="stageControl"
             :stage-review-type="stageReviewType"
+            :stage="stage"
             :disabled="stageReviewDisabled"
             slot="content"
             class="stage-review-content"

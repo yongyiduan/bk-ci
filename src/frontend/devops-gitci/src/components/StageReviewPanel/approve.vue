@@ -28,6 +28,7 @@
 </template>
 
 <script>
+    import { pipelines } from '@/http'
     import { mapActions, mapState } from 'vuex'
     import ParamsApprove from './components/params/approve'
     import ReviewFlowApprove from './components/reviewFlow/approve'
@@ -55,7 +56,7 @@
         },
 
         computed: {
-            ...mapState(['user']),
+            ...mapState(['user', 'projectId']),
 
             execReviewGroup () {
                 return this.getCurReviewGroup()
@@ -77,10 +78,7 @@
         },
 
         methods: {
-            ...mapActions('atom', [
-                'triggerStage',
-                'toggleStageReviewPanel'
-            ]),
+            ...mapActions(['toggleStageReviewPanel']),
 
             getCurReviewGroup () {
                 const reviewGroups = this.stageControl.reviewGroups || []
@@ -92,8 +90,9 @@
                 const { flowApprove, paramsApprove } = this.$refs
                 this.isApproving = true
                 Promise.all([flowApprove.getApproveData(), paramsApprove.getApproveData()]).then(([flowData, reviewParams]) => {
-                    return this.triggerStage({
+                    return pipelines.triggerStage({
                         ...this.$route.params,
+                        projectId: this.projectId,
                         stageId: this.stage.id,
                         cancel: flowData.isCancel,
                         suggest: flowData.suggest,
@@ -109,9 +108,7 @@
 
             cancelApprove () {
                 this.toggleStageReviewPanel({
-                    showStageReviewPanel: {
-                        isShow: false
-                    }
+                    isShow: false
                 })
             }
         }
