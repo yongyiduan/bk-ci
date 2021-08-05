@@ -339,16 +339,12 @@
 
     @media screen and (max-width: 1680px) {
         .leftAnima {
-            animation: leftAnima 18s infinite;
-            position: absolute;
             width: 500px;
             right: 180px;
             top: -100px;
             z-index: 50;
         }
         .rightAnima {
-            animation: rightAnima 18s infinite;
-            position: absolute;
             width: 300px;
             right: -75px;
             top: -170px;
@@ -357,16 +353,12 @@
 
     @media screen and (max-width: 1400px) {
         .leftAnima {
-            animation: leftAnima 18s infinite;
-            position: absolute;
             width: 400px;
             right: 130px;
             top: -50px;
             z-index: 50;
         }
         .rightAnima {
-            animation: rightAnima 18s infinite;
-            position: absolute;
             width: 250px;
             right: -75px;
             top: -120px;
