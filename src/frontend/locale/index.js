@@ -40,7 +40,7 @@ function getLsLocale () {
 function setLsLocale (locale) {
     const formateLocale = localeAliasMap[locale] === 'zh-CN' ? 'zh-cn' : 'en'
     if (typeof cookies.set === 'function') {
-        cookies.remove(LS_KEY) // remove oa language cookie
+        cookies.remove(LS_KEY, { domain: 'oa.com' }) // remove oa language cookie
         cookies.set(LS_KEY, formateLocale, { domain: BK_CI_DOMAIN, path: '/', expires: 365 })
     }
 }
