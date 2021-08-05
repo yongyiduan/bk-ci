@@ -22,7 +22,8 @@ const store = new Vuex.Store({
             type: 200
         },
         showStageReviewPanel: {
-            isShow: false
+            isShow: false,
+            stage: {}
         }
     },
     getters: {},

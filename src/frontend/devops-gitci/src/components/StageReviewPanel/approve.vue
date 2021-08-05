@@ -28,7 +28,7 @@
 </template>
 
 <script>
-    import { mapActions } from 'vuex'
+    import { mapActions, mapState } from 'vuex'
     import ParamsApprove from './components/params/approve'
     import ReviewFlowApprove from './components/reviewFlow/approve'
     import ReviewDescribe from './components/describe'
@@ -55,6 +55,8 @@
         },
 
         computed: {
+            ...mapState(['user']),
+
             execReviewGroup () {
                 return this.getCurReviewGroup()
             },
@@ -66,7 +68,7 @@
             canTriggerStage () {
                 const reviewGroups = this.stageControl.reviewGroups || []
                 const curReviewGroup = reviewGroups.find((review) => (review.status === undefined))
-                return curReviewGroup.reviewers.includes(this.$userInfo.username)
+                return curReviewGroup.reviewers.includes(this.user.username)
             },
 
             disabled () {

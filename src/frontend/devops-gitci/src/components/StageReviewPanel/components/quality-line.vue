@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section v-if="(stageControl.ruleIds || []).length">
         <span class="review-title">质量红线</span>
         <section class="review-quality">
             <bk-collapse v-model="activeName">
@@ -34,7 +34,6 @@
     import { pipelines } from '@/http'
 
     export default {
-
         filters: {
             interceptFilter (val) {
                 const resultMap = {
@@ -70,6 +69,8 @@
 
         methods: {
             requestQualityLineFromApi () {
+                if ((this.stageControl.ruleIds || []).length <= 0) return
+
                 const params = [
                     this.projectId,
                     this.$route.params.pipelineId,

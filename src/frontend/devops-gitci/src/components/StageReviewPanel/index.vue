@@ -20,12 +20,14 @@
     import { mapState, mapActions } from 'vuex'
     import reviewShow from './show'
     import reviewApprove from './approve'
+    import reviewEnable from './enable-review'
 
     export default {
         name: 'stage-review-panel',
         components: {
             reviewShow,
-            reviewApprove
+            reviewApprove,
+            reviewEnable
         },
         computed: {
             ...mapState([
@@ -35,7 +37,7 @@
                 return this.showStageReviewPanel.stage || {}
             },
             stageTitle () {
-                return `CheckIn ${typeof this.stage !== 'undefined' ? this.stage.name : 'stage'}`
+                return `CheckIn ${this.stage.name}`
             },
             stageReviewType () {
                 return this.showStageReviewPanel.type
@@ -53,6 +55,7 @@
             reviewComponent () {
                 let reviewComponent = 'reviewShow'
                 if (this.isStagePause) reviewComponent = 'reviewApprove'
+                if (!this.stageControl.manualTrigger) reviewComponent = 'reviewEnable'
                 return reviewComponent
             },
             stageReviewDisabled () {

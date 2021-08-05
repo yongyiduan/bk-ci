@@ -1,5 +1,5 @@
 import api from './ajax'
-import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX } from './perfix'
+import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX, QUALITY_PREFIX } from './perfix'
 
 export default {
     // 第一次拉取日志
@@ -165,6 +165,6 @@ export default {
     },
 
     requestQualityLine (projectId, pipelineId, buildId, ids) {
-        return api.post(`${GITCI_PERFIX}/user/intercepts/v2/pipeline/list?projectId=${projectId}&pipelineId=${pipelineId}&buildId=${buildId}`, ids)
+        return api.post(`${QUALITY_PREFIX}/user/intercepts/v2/pipeline/list?projectId=${projectId}&pipelineId=${pipelineId}&buildId=${buildId}`, ids)
     }
 }
