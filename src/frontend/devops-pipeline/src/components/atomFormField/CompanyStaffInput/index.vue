@@ -86,10 +86,8 @@
                 }
 
                 const host = location.host
-                const prefix = host.indexOf('o.ied.com') > -1
-                    ? `http://${OIED_URL}/component/compapi/tof3/`
-                    : `${OPEN_URL}/component/compapi/tof3/`
-
+                const prefix = `${host.indexOf('o.ied.com') > -1 ? OIED_URL : OPEN_URL}/component/compapi/tof3`
+                
                 const config = {
                     url: '',
                     data: {}
@@ -97,21 +95,21 @@
 
                 switch (this.inputType) {
                     case 'rtx':
-                        config.url = `${prefix}get_all_staff_info/`
+                        config.url = `${prefix}/get_all_staff_info/`
                         config.data = {
                             'query_type': 'simple_data',
                             'app_code': 'workbench'
                         }
                         break
                     case 'email':
-                        config.url = `${prefix}get_all_ad_groups/`
+                        config.url = `${prefix}/get_all_ad_groups/`
                         config.data['query_type'] = undefined
                         config.data = {
                             'app_code': 'workbench'
                         }
                         break
                     case 'all':
-                        config.url = `${prefix}get_all_rtx_and_mail_group/`
+                        config.url = `${prefix}/get_all_rtx_and_mail_group/`
                         config.data = {
                             'app_code': 'workbench'
                         }

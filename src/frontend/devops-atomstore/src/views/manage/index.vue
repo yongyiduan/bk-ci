@@ -76,7 +76,7 @@
                           showChildTab: true }
                     ],
                     service: [
-                        { label: this.$t('store.概览'), name: 'overView' },
+                        { label: this.$t('store.概览'), name: 'statisticData' },
                         { label: this.$t('store.发布管理'),
                           name: 'release',
                           children: [

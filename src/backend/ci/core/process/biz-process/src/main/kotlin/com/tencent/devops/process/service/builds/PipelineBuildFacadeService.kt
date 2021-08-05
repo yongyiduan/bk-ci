@@ -928,18 +928,6 @@ class PipelineBuildFacadeService(
             }
 
             try {
-                val lastStage = pipelineStageService.getLastStage(buildId)
-                if (lastStage?.status?.isRunning() == true && lastStage.controlOption?.finally == true) {
-                    val message = MessageCodeUtil.getCodeLanMessage(ProcessMessageCode.ERROR_FINAL_STAGE_CANNOT_CANCEL)
-                    buildLogPrinter.addRedLine(
-                        buildId = buildId,
-                        message = message,
-                        tag = "startVM-0",
-                        jobId = "0",
-                        executeCount = lastStage.executeCount
-                    )
-                    return
-                }
                 pipelineRuntimeService.cancelBuild(
                     projectId = projectId,
                     pipelineId = pipelineId,
@@ -1697,24 +1685,6 @@ class PipelineBuildFacadeService(
                     params = arrayOf(buildId)
                 )
             }
-            val lastStage = pipelineStageService.getLastStage(buildId)
-            if (lastStage?.status?.isRunning() == true && lastStage.controlOption?.finally == true) {
-                val message = MessageCodeUtil.getCodeLanMessage(ProcessMessageCode.ERROR_FINAL_STAGE_CANNOT_CANCEL)
-                buildLogPrinter.addRedLine(
-                    buildId = buildId,
-                    message = "$message userId:$userId",
-                    tag = "startVM-0",
-                    jobId = "0",
-                    executeCount = lastStage.executeCount
-                )
-
-                throw ErrorCodeException(
-                    statusCode = Response.Status.NOT_FOUND.statusCode,
-                    errorCode = ProcessMessageCode.ERROR_FINAL_STAGE_CANNOT_CANCEL,
-                    defaultMessage = "Cannot cancel the running [final stage]",
-                    params = arrayOf(buildId)
-                )
-            }
 
             val tasks = getRunningTask(projectId, buildId)
 
@@ -1726,7 +1696,7 @@ class PipelineBuildFacadeService(
                 logger.info("build($buildId) shutdown by $userId, taskId: $taskId, status: $status")
                 buildLogPrinter.addYellowLine(
                     buildId = buildId,
-                    message = "流水线被用户终止，操作人:$userId",
+                    message = "Run cancelled by $userId",
                     tag = taskId.toString(),
                     jobId = containerId.toString(),
                     executeCount = executeCount as Int
@@ -1736,7 +1706,7 @@ class PipelineBuildFacadeService(
             if (tasks.isEmpty()) {
                 buildLogPrinter.addYellowLine(
                     buildId = buildId,
-                    message = "流水线被用户终止，操作人:$userId",
+                    message = "Run cancelled by $userId",
                     tag = "",
                     jobId = "",
                     executeCount = 1

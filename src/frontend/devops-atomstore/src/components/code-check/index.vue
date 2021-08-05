@@ -16,7 +16,7 @@
             <template v-if="['success', 'unqualified'].includes(status)">
                 <section class="code-check-detail">
                     <h3 class="detail-title score">
-                        {{ $t('store.评分') }}<a class="score-rule"><a class="g-title-work" href="https://iwiki.woa.com/x/kvMMBw" target="_blank">{{ $t('store.计算公式') }}</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
+                        {{ $t('store.评分') }}<a class="score-rule"><a class="g-title-work" :href="rateCalcDocUrl" target="_blank">{{ $t('store.计算公式') }}</a><icon name="tiaozhuan" :size="12" class="score-icon"></icon></a>
                     </h3>
                     <ul class="score-list float-left">
                         <li v-for="scoreItem in scoreList" :key="scoreItem.name" class="score-detail">
@@ -118,7 +118,9 @@
             ...mapGetters('store', {
                 'detail': 'getDetail'
             }),
-
+            rateCalcDocUrl () {
+                return `${IWIKI_DOCS_URL}/x/kvMMBw`
+            },
             storeType () {
                 const typeMap = {
                     atom: 'ATOM',

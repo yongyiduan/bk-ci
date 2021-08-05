@@ -67,7 +67,7 @@
             <locale-switcher v-if="!isMooc || !isInIframe"></locale-switcher>
             <qrcode v-if="!isMooc" class="feed-back-icon" />
             <span v-if="!isMooc" class="seperate-line">|</span>
-            <!-- <feed-back class='feed-back-icon'></feed-back> -->
+            
             <i
                 v-if="!isMooc"
                 class="devops-icon icon-helper"
@@ -94,7 +94,6 @@
     import { State, Action, Getter } from 'vuex-class'
     import User from '../User/index.vue'
     import NavMenu from './NavMenu.vue'
-    import FeedBack from './FeedBack.vue'
     import Qrcode from './Qrcode.vue'
     import Logo from '../Logo/index.vue'
     import LocaleSwitcher from '../LocaleSwitcher/index.vue'
@@ -107,7 +106,6 @@
         components: {
             User,
             NavMenu,
-            FeedBack,
             Qrcode,
             ProjectDialog,
             Logo,

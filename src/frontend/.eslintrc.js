@@ -42,6 +42,7 @@ module.exports = {
         'vue'
     ],
     globals: {
+        'BADGE_URL_PREFIX': true,
         'DOCS_URL_PREFIX': true,
         'IWIKI_DOCS_URL': true,
         'LOGIN_SERVICE_URL': true,
@@ -49,16 +50,10 @@ module.exports = {
         'BUILD_ENV': true,
         'PROXY_URL_PREFIX': true,
         'API_URL_PREFIX': true,
-        'BADGE_URL_PREFIX': true,
-        'CHECK_ENV_URL': true,
         'USER_IMG_URL': true,
         'OPEN_URL': true,
         'OIED_URL': true,
-        'ZHIYUN_URL': true,
-        'CODECC_SOFWARE_URL': true,
         'JOB_URL': true,
-        'CODEGIT_URL_PREFIX': true,
-        'GITLAB_URL_PREFIX': true,
         'VERSION_TYPE': false,
         'X_DEVOPS_PROJECT_ID': false,
         'PERM_URL_PREFIX': false

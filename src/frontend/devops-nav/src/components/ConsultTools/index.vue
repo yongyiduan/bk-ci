@@ -52,7 +52,7 @@
                     icon: 'feedback',
                     id: 'feedback',
                     label: this.$t('feedback'),
-                    href: 'http://tapd.oa.com/PaaS/prong/stories/stories_list',
+                    href: '//tapd.oa.com/PaaS/prong/stories/stories_list',
                     target: '_blank'
                 }
             ]
