@@ -309,8 +309,7 @@
     }
     .detail-stages {
         height: calc(100% - 96px);
-        padding: 30px 0;
-        margin: 0 30px;
+        padding: 30px;
         overflow: auto;
     }
 </style>

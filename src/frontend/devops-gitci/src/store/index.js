@@ -20,6 +20,9 @@ const store = new Vuex.Store({
         curPipeline: {},
         exceptionInfo: {
             type: 200
+        },
+        showStageReviewPanel: {
+            isShow: false
         }
     },
     getters: {},
@@ -44,6 +47,9 @@ const store = new Vuex.Store({
         },
         setPermission (state, permission) {
             state.permission = permission
+        },
+        toggleStageReviewPanel (state, showStageReviewPanel) {
+            Object.assign(state.showStageReviewPanel, showStageReviewPanel)
         }
     },
     actions: {
@@ -64,6 +70,9 @@ const store = new Vuex.Store({
         },
         setUser ({ commit }, user) {
             commit('updateUser', user)
+        },
+        toggleStageReviewPanel ({ commit }, showStageReviewPanel) {
+            commit('toggleStageReviewPanel', showStageReviewPanel)
         }
     }
 })

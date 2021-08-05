@@ -162,5 +162,9 @@ export default {
 
     checkYaml (yaml) {
         return api.post(`${GITCI_PERFIX}/user/trigger/build/checkYaml`, { yaml })
+    },
+
+    requestQualityLine (projectId, pipelineId, buildId, ids) {
+        return api.post(`${GITCI_PERFIX}/user/intercepts/v2/pipeline/list?projectId=${projectId}&pipelineId=${pipelineId}&buildId=${buildId}`, ids)
     }
 }
