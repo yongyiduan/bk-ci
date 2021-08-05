@@ -4,16 +4,16 @@
         <section class="hero">
             <div class="hero--content">
                 <div class="container" style="display: flex">
-                    <div class="hero--text-block" style="padding: 0 100px 80px 0; z-index: 1000;">
-                        <h1 class="hero--title">一个更容易<strong> 治理 </strong>的
+                    <div class="hero--text-block" style="padding: 0 100px 80px 0; z-index: 100">
+                        <h1 class="hero--title">用 Stream 来
                             <ul class="anima-title">
-                                <li class="anima-item"> CI</li>
-                                <li class="anima-item"> CD</li>
-                                <li class="anima-item"> Build</li>
+                                <li class="anima-item"> 编译</li>
+                                <li class="anima-item"> 测试</li>
+                                <li class="anima-item"> 部署</li>
                             </ul>
-                            <span style="margin-left: 135px;">服务</span>
+                            <span style="margin-left: 135px;">你的工程</span>
                         </h1>
-                        <div>Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的服务。<br>
+                        <div>Stream 服务可以在主流的操作系统上持续快速地编译、测试、部署你的工程。<br>
                             让你聚焦于编码本身，而非权限申请、构建机准备、发布沟通等琐事。
                         </div>
                         <div class="hero-cta">
@@ -47,10 +47,7 @@
                         </h2>
                         <div class="section--sub">
                             <p>
-                                在蓝盾 Stream 服务中，最直接与开发者打交道的就是 YAML 语法，我们在调研了 Azure Pipelines / Gitlab CI / Travis CI / Circle CI 等行业主流 CI YAML语法后最终决定：蓝盾 Stream 语法将100%兼容 GitHub Actions ！
-                            </p>
-                            <p>
-                                如果你已经对 GitHub Actions 有过一定了解，那么不要犹豫了，来运行你的第一个Hello World吧！
+                                最直接与开发者打交道的就是 YAML 语法，我们在调研了 Azure Pipelines / Gitlab CI / Travis CI / Circle CI 等行业主流 CI YAML语法后最终决定：Stream 语法将100%兼容 GitHub Actions ！
                             </p>
                             <div class="hero-cta" style="margin-top: 20px;">
                                 <a href="https://iwiki.woa.com/x/4FPpK" target="_blank" class="button big black" data-proofer-ignore="">
@@ -62,18 +59,6 @@
                     <div class="feature-block--illu illu-shadow--right">
                         <img loading="lazy" src="./../images/home/yaml.png" style="width:410px;height:554px;">
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="trusted-by" class="section section-logos">
-            <div class="container">
-                <span class="logos--title">联合出品方</span>
-                <div class="logos--container">
-                    <img src="./../images/home/bk-ci.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="蓝盾">
-                    <img src="./../images/home/tgit-with.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="工蜂">
-                    <img src="./../images/home/tencent_ci.png" class="logos--logo" width="auto" height="50" style="margin-top:0px;" alt="腾讯CI">
-                    <img src="./../images/home/EP.png" class="logos--logo" width="auto" height="60" style="margin-top:-1px;" alt="EP度量">
                 </div>
             </div>
         </section>
@@ -115,6 +100,18 @@
                 </div>
             </div>
         </section>
+        <!--
+        <section id="trusted-by" class="section section-logos">
+            <div class="container">
+                <span class="logos--title">他们都在用</span>
+                <div class="logos--container">
+                    <img src="./../images/home/bk-ci.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="蓝盾">
+                    <img src="./../images/home/tgit-with.png" class="logos--logo" width="auto" height="60" style="margin-top:0px;" alt="工蜂">
+                    <img src="./../images/home/tencent_ci.png" class="logos--logo" width="auto" height="50" style="margin-top:0px;" alt="腾讯CI">
+                    <img src="./../images/home/EP.png" class="logos--logo" width="auto" height="60" style="margin-top:-1px;" alt="EP度量">
+                </div>
+            </div>
+        </section> -->
 
         <section class="section section-cta center">
             <div class="container">
