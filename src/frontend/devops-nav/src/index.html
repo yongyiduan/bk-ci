@@ -153,7 +153,7 @@
         }
 
         function removeCookie(cname, domain) {
-          document.cookie = cname + "=; expires=-1; path=/;" + 'domain=' + domain + ';';
+          document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;" + 'domain=' + domain + ';';
         }
         
         window.setProjectIdCookie = function (projectId) {
