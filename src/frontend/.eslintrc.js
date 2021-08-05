@@ -42,6 +42,7 @@ module.exports = {
         'vue'
     ],
     globals: {
+        'BADGE_URL_PREFIX': true,
         'DOCS_URL_PREFIX': true,
         'IWIKI_DOCS_URL': true,
         'LOGIN_SERVICE_URL': true,
