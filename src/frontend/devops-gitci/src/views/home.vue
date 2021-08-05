@@ -4,7 +4,7 @@
         <section class="hero">
             <div class="hero--content">
                 <div class="container" style="display: flex">
-                    <div class="hero--text-block" style="padding: 0 100px 80px 0">
+                    <div class="hero--text-block" style="padding: 0 100px 80px 0; z-index: 100">
                         <h1 class="hero--title">用 Stream 来
                             <ul class="anima-title">
                                 <li class="anima-item"> 编译</li>
@@ -26,10 +26,10 @@
                         </div>
                     </div>
 
-                    <div class="gif-item leftAnima" style="width: 600px; position: absolute; right: 200px; top: -130px; z-index: 100;">
+                    <div class="gif-item leftAnima">
                         <img class="leftImg" ref="leftImg" :src="require('./../images/home/ui.gif')" />
                     </div>
-                    <div class="gif-item rightAnima" style="width: 350px; position: absolute; right: -75px; top: -200px;">
+                    <div class="gif-item rightAnima">
                         <img class="rightImg" ref="rightImg" :src="require('./../images/home/code.gif')" />
                     </div>
                 </div>
@@ -175,7 +175,7 @@
 
             initGifAnimaShow () {
                 this.$refs.leftImg.src = uiGif
-                this.$refs.rightImg.src = codeGif
+                this.$refs.rightImg.src = codeJpg
                 const gifItems = document.querySelectorAll('.gif-item')
                 
                 setTimeout(() => {
@@ -185,7 +185,7 @@
                     setTimeout(() => {
                         gifItems[1].style.zIndex = '0'
                         this.$refs.rightImg.src = codeJpg
-                    }, 11000)
+                    }, 11300)
                 }, 4800)
                 this.gifTimer = setTimeout(() => {
                     this.initGifAnimaShow()
@@ -269,7 +269,20 @@
     }
     .leftAnima {
         animation: leftAnima 18s infinite;
+        position: absolute;
+        width: 600px;
+        right: 220px;
+        top: -130px;
+        z-index: 50;
     }
+    .rightAnima {
+        animation: rightAnima 18s infinite;
+        position: absolute;
+        width: 350px;
+        right: -75px;
+        top: -200px;
+    }
+    
     @keyframes leftAnima {
         1% {
             transform: translateX(0);
@@ -290,15 +303,13 @@
             transform: translateX(50px);
         }
         92% {
-            transform: translateX(-50px);
+            transform: translateX(-70px);
         }
         94% {
             transform: translateX(0);
         }
     }
-    .rightAnima {
-        animation: rightAnima 18s infinite;
-    }
+
     @keyframes rightAnima {
         1% {
             transform: translateX(0);
@@ -320,6 +331,34 @@
         }
         94% {
             transform: translateX(0px);
+        }
+    }
+
+    @media screen and (max-width: 1680px) {
+        .leftAnima {
+            width: 500px;
+            right: 180px;
+            top: -100px;
+            z-index: 50;
+        }
+        .rightAnima {
+            width: 300px;
+            right: -75px;
+            top: -170px;
+        }
+    }
+
+    @media screen and (max-width: 1400px) {
+        .leftAnima {
+            width: 400px;
+            right: 130px;
+            top: -50px;
+            z-index: 50;
+        }
+        .rightAnima {
+            width: 250px;
+            right: -75px;
+            top: -120px;
         }
     }
 </style>
