@@ -1124,6 +1124,7 @@ class PipelineRuntimeService @Autowired constructor(
                 )
                 if (buildHistoryRecord != null) {
                     buildHistoryRecord.endTime = null
+                    buildHistoryRecord.queueTime = LocalDateTime.now() // for EPC
                     buildHistoryRecord.status = startBuildStatus.ordinal
                     transactionContext.batchStore(buildHistoryRecord).execute()
                     // 重置状态和人
