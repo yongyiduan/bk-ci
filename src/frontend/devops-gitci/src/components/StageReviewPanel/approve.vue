@@ -21,8 +21,8 @@
         ></params-approve>
 
         <section class="approve-footer">
-            <bk-button theme="primary" class="approve-button" @click="confirmApprove" :loading="isApproving" :disabled="disabled">确定</bk-button>
-            <bk-button @click="cancelApprove" :disabled="isApproving">取消</bk-button>
+            <bk-button theme="primary" class="approve-button" @click="confirmApprove" :loading="isApproving" :disabled="disabled">Confirm</bk-button>
+            <bk-button @click="cancelApprove" :disabled="isApproving">Cancel</bk-button>
         </section>
     </section>
 </template>

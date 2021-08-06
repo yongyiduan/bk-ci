@@ -1,8 +1,8 @@
 <template>
     <section>
         <span class="review-subtitle">
-            审核流
-            <span class="review-clock" v-bk-tooltips="{ content: '请在本时间之前完成审核操作，逾期将取消执行，自动标记流水线为Stage成功状态' }">
+            Audit Flow
+            <span class="review-clock" v-bk-tooltips="{ width: 500, content: 'Please complete the review operation before this time, the execution will be cancelled if the time expires, and the pipeline will be automatically marked as Stage successful.' }">
                 <i class="bk-icon icon-clock"></i>
                 {{ computedTime }}
             </span>
@@ -18,20 +18,20 @@
         <bk-divider></bk-divider>
 
         <span class="review-subtitle mt12">
-            当前状态<span class="gray-color ml20">{{ computedStatusTxt }}</span>
+            Current State<span class="gray-color ml20">{{ computedStatusTxt }}</span>
         </span>
         <bk-radio-group v-model="isCancel" class="review-result">
             <bk-radio :value="false" :disabled="disabled">
-                同意 <span class="gray-color">（继续执行流水线）</span>
+                Agree <span class="gray-color">（Continue to execute the pipeline）</span>
             </bk-radio>
-            <bk-radio :value="true" :disabled="disabled" class="ml135">
-                驳回 <span class="gray-color">（取消执行，立即标记为Stage成功状态）</span>
+            <bk-radio :value="true" :disabled="disabled" class="ml40">
+                Reject <span class="gray-color">（Cancel the execution and mark it as a successful stage）</span>
             </bk-radio>
         </bk-radio-group>
 
-        <span class="review-subtitle">审核意见</span>
+        <span class="review-subtitle">Audit opinion</span>
         <bk-input
-            placeholder="请输入审核意见，驳回时必填"
+            placeholder="Please enter review comments, required when rejected"
             type="textarea"
             :rows="3"
             :maxlength="200"
@@ -76,7 +76,7 @@
                     if (curExecIndex === index) status = 'loading'
 
                     let icon = index + 1
-                    if (!status) icon = `${index + 1} bk-devops-icon`
+                    if (!status) icon = ` gitci-${index + 1} gitci-icon`
 
                     return { status, title: item.name, icon }
                 }
@@ -97,9 +97,9 @@
                 const curExecIndex = this.reviewGroups.findIndex(x => x.status === undefined) + 1
                 const { reviewers, operator } = this.showReviewGroup
 
-                let statusTxt = `已审批，处理人：${operator}`
-                if (curExecIndex < this.curStep) statusTxt = `待审批，处理人：${reviewers.join(', ')}`
-                if (curExecIndex === this.curStep) statusTxt = `审批中，处理人：${reviewers.join(', ')}`
+                let statusTxt = `Approved，processor：${operator}`
+                if (curExecIndex < this.curStep) statusTxt = `Pending approval，processor：${reviewers.join(', ')}`
+                if (curExecIndex === this.curStep) statusTxt = `Approval，processor：${reviewers.join(', ')}`
 
                 return statusTxt
             }
@@ -125,7 +125,7 @@
             getApproveData () {
                 return new Promise((resolve, reject) => {
                     if (this.isCancel && this.suggest === '') {
-                        this.errMessage = '驳回时，审核意见必填'
+                        this.errMessage = 'When rejected, the review opinion is required'
                         reject(new Error(this.errMessage))
                     } else {
                         this.errMessage = ''
@@ -156,9 +156,6 @@
     }
     .gray-color {
         color: #979BA5;
-    }
-    .ml135 {
-        margin-left: 135px;
     }
     .mt12 {
         margin-top: 12px !important;

@@ -1,6 +1,6 @@
 <template>
     <section>
-        <span class="review-subtitle">审核流</span>
+        <span class="review-subtitle">Audit Flow</span>
         <bk-timeline :list="computedReviewGroups"></bk-timeline>
     </section>
 </template>
@@ -42,12 +42,12 @@
                             <section class="stage-review-content">
                                 <p class="review-title">
                                     {item.name}
-                                    <span class="review-normal"> 由 {item.operator} 审批：</span>
-                                    <span class="review-process"> 同意（继续执行流水线） </span>
+                                    <span class="review-normal"> Approved by {item.operator}：</span>
+                                    <span class="review-process"> Agree (continue to execute the pipeline) </span>
                                 </p>
-                                <p v-show={paramStr}>变更参数：{paramStr}</p>
-                                <p>审批意见：{item.suggest || '无'}</p>
-                                <p>审批时间：{convertTime(item.reviewTime)}</p>
+                                <p v-show={paramStr}>Change parameters：{paramStr}</p>
+                                <p>Approval comments：{item.suggest || 'None'}</p>
+                                <p>Approval time：{convertTime(item.reviewTime)}</p>
                             </section>
                         )
                         break
@@ -56,11 +56,11 @@
                             <section class="stage-review-content">
                                 <p class="review-title">
                                     {item.name}
-                                    <span class="review-normal"> 由 {item.operator} 审批：</span>
-                                    <span class="review-abort"> 驳回（取消执行，立即标记为Stage成功状态） </span>
+                                    <span class="review-normal"> Approved by {item.operator}：</span>
+                                    <span class="review-abort"> Reject (cancel execution, immediately mark as Stage success status) </span>
                                 </p>
-                                <p>审批意见：{item.suggest || '无'}</p>
-                                <p>审批时间：{convertTime(item.reviewTime)}</p>
+                                <p>Approval comments：{item.suggest || 'None'}</p>
+                                <p>Approval time：{convertTime(item.reviewTime)}</p>
                             </section>
                         )
                         break
@@ -69,7 +69,7 @@
                             <section class="stage-review-content">
                                 <p class="review-title">
                                     {item.name}
-                                    <span class="review-normal"> 处理人：{item.reviewers.join(',')}</span>
+                                    <span class="review-normal"> Handler：{item.reviewers.join(',')}</span>
                                 </p>
                             </section>
                         )

@@ -1,6 +1,6 @@
 <template>
     <section v-if="(stageControl.ruleIds || []).length">
-        <span class="review-title">质量红线</span>
+        <span class="review-title">Quality Red Line</span>
         <section class="review-quality">
             <bk-collapse v-model="activeName">
                 <bk-collapse-item :name="index" v-for="(qualityItem, index) in qualityList" :key="index">
@@ -12,7 +12,7 @@
                         <span>{{ qualityItem.interceptResult | interceptFilter }}（{{ qualityItem.interceptList.length }}）</span>
                     </span>
                     <section slot="content">
-                        <h5 class="quality-title">规则</h5>
+                        <h5 class="quality-title">Rules</h5>
                         <ul>
                             <li class="quality-content" v-for="(intercept, interceptIndex) in qualityItem.interceptList" :key="interceptIndex">
                                 <span :class="{ 'quality-icon': true, 'success': intercept.pass }">
@@ -37,8 +37,8 @@
         filters: {
             interceptFilter (val) {
                 const resultMap = {
-                    PASS: '已通过',
-                    FAIL: '已拦截'
+                    PASS: 'Passed',
+                    FAIL: 'Blocked'
                 }
                 return resultMap[val]
             }

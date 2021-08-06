@@ -1,10 +1,10 @@
 <template>
     <section>
-        <span class="review-subtitle">自定义参数</span>
+        <span class="review-subtitle">Custom Parameters</span>
 
         <bk-table :data="params">
-            <bk-table-column label="参数名称" prop="key" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="参数值" prop="value" :formatter="valFormatter" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Parameter Name" prop="key" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Parameter value" prop="value" :formatter="valFormatter" show-overflow-tooltip></bk-table-column>
         </bk-table>
     </section>
 </template>
