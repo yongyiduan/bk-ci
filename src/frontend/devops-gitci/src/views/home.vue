@@ -95,7 +95,7 @@
                         </div>
                     </div>
                     <div class="feature-block--illu illu-shadow--right">
-                        <img loading="lazy" src="./../images/home/store.jpg" data-sizes="(max-width: 76px) 100%, 800px" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px">
+                        <img loading="lazy" src="./../images/home/plugins.png" data-sizes="(max-width: 76px) 100%, 800px" class=" lazyloaded" sizes="(max-width: 76px) 100%, 800px">
                     </div>
                 </div>
             </div>
