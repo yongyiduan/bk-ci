@@ -20,24 +20,18 @@
             <ol class="header-nav">
                 <li v-for="item in menuList" :key="item.name" @click="clickMenu(item)" class="header-nav-item" :class="{ 'item-active': item.active }">
                     {{item.name}}
+                    <icon v-if="item.url" name="cc-jump-link" size="16" class="gray-icon" style="margin-left: 2px;margin-top: 3px;"></icon>
                 </li>
             </ol>
         </div>
 
         <section class="user-info">
-            <img :src="user.avatarUrl" class="avatar" />
-            <bk-dropdown-menu align="right" trigger="click">
-                <div class="dropdown-trigger-btn" slot="dropdown-trigger">
-                    <span class="name">{{ user.username }}</span>
-                    <span class="unread" v-if="messageNum > 0"></span>
-                    <i class="bk-icon icon-down-shape"></i>
-                </div>
-                <ul class="bk-dropdown-list" slot="dropdown-content">
-                    <li :class="{ unread: messageNum > 0 }"><a href="javascript:;" @click="goToNotifications">Notifications</a></li>
-                    <li><a href="javascript:;" @click="goLogin">Login Out</a></li>
-                </ul>
-            </bk-dropdown-menu>
-            <a href="https://iwiki.woa.com/x/klPpK" target="_blank"><i class="bk-icon icon-question-circle-shape"></i></a>
+            <a class="docs-link" href="https://iwiki.woa.com/x/klPpK" target="_blank"><icon name="helper" class="gray-icon" size="20"></icon></a>
+            <user
+                class="user-info"
+                :user="user"
+                :message-num="messageNum"
+            />
         </section>
     </header>
 </template>
@@ -45,9 +39,13 @@
 <script>
     import { mapActions, mapState } from 'vuex'
     import { common } from '@/http'
+    import user from './user'
 
     export default ({
         name: 'gitci-header',
+        components: {
+            user
+        },
         computed: {
             ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'user', 'permission', 'messageNum']),
             showMenu () {
@@ -105,15 +103,6 @@
                 if (!this.permission) return
 
                 this.$router.push({ name: 'basicSetting' })
-            },
-            goLogin () {
-                const loginUrl = new URL(LOGIN_SERVICE_URL)
-                loginUrl.searchParams.append('c_url', location.href)
-                window.location.href = loginUrl.href
-            },
-
-            goToNotifications () {
-                this.$router.push({ name: 'notifications' })
             },
 
             goToCode () {
@@ -194,18 +183,13 @@
     .user-info {
         display: flex;
         align-items: center;
-        .avatar {
-            width: 25px;
-            height: 25px;
-            border-radius: 100px;
-            margin-right: 5px;
-        }
         a {
-            color: #fff;
+            color: #c3cdd7;
+            margin-top: 3px;
+            margin-right: 8px;
         }
-        .icon-question-circle-shape {
-            cursor: pointer;
-            margin-left: 12px;
+        a:hover {
+            color: #fff;
         }
     }
 

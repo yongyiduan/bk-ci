@@ -10,7 +10,10 @@
                     </ol>
                 </div>
             </div>
-            <div class="content-container">
+            <div class="content-container" v-bkloading="{ isLoading }">
+                <div style="margin-bottom: 15px;">
+                    <bk-input :left-icon="'bk-icon icon-search'" placeholder="Filter by name" v-model="searchStr" @enter="getRepoList(1)"></bk-input>
+                </div>
                 <div class="empty-repo" v-if="!repoList.length">
                     <empty-tips title="暂无项目"></empty-tips>
                 </div>
@@ -24,8 +27,8 @@
                         </div>
                         <div class="repo-desc">
                             <div v-if="repo.ciInfo && repo.ciInfo.enableCI">
-                                <i :class="getIconClass(repo.ciInfo.status)"></i>
-                                <span class="lastest-build-info" @click="toProjectDetail('buildList', repo.nameWithNamespace)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
+                                <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
+                                <span class="lastest-build-info" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
                             </div>
                             <div v-else>{{ repo.description || 'Empty project description' }}</div>
                         </div>
@@ -64,7 +67,7 @@
         },
         data () {
             return {
-                isLoading: false,
+                isLoading: true,
                 hasNext: true,
                 type: 'MY_PROJECT',
                 limit: 100,
@@ -87,7 +90,6 @@
             }
         },
         created () {
-            console.log('dashCreated')
             this.getRepoList()
         },
         methods: {
@@ -99,18 +101,35 @@
                         avatarUrl: (item.avatarUrl.endsWith('.jpg') || item.avatarUrl.endsWith('.jpeg') || item.avatarUrl.endsWith('.png')) ? item.avatarUrl : gitcode
                     }))
                     this.hasNext = res.hasNext
+                    this.isLoading = false
                 }).catch((err) => {
                     this.$bkMessage({
                         theme: 'error',
                         message: err.message || err
                     })
+                    this.isLoading = false
                 })
-                this.isLoading = false
             },
             
             changeType (type) {
                 this.type = type
+                this.searchStr = ''
                 this.getRepoList(1)
+            },
+
+            toLastBuildDetail (repo) {
+                if (repo.ciInfo.lastBuildPipelineId && repo.ciInfo.lastBuildId) {
+                    this.$router.push({
+                        name: 'buildDetail',
+                        params: {
+                            pipelineId: repo.ciInfo.lastBuildPipelineId,
+                            buildId: repo.ciInfo.lastBuildId
+                        },
+                        hash: `#${repo.nameWithNamespace}`
+                    })
+                } else {
+                    this.toProjectDetail('buildList', repo.nameWithNamespace)
+                }
             },
 
             toProjectDetail (routeName, projectId) {
@@ -174,7 +193,6 @@
                 align-items: center;
                 font-size: 14px;
                 color: rgba(0,0,0,0.60);
-                /* font-weight: 600; */
                 margin-left: 30px;
             }
             .navigation-header .header-nav {

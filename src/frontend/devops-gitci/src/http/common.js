@@ -15,6 +15,7 @@ export default {
     },
 
     getGitciProjects (type = 'MY_PROJECT', page = 1, limit = 20, search = '') {
-        return api.get(`${GITCI_PERFIX}/user/projects/${type}/list?page=${page}&pageSize=${limit}`)
+        const querySearch = (search && search.trim()) ? `&search=${search.trim()}` : ''
+        return api.get(`${GITCI_PERFIX}/user/projects/${type}/list?page=${page}&pageSize=${limit}${querySearch}`)
     }
 }
