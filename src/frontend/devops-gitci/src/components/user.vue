@@ -115,6 +115,7 @@
 
         .icon-down-shape {
             vertical-align: -2px;
+            margin-left: 2px;
         }
 
         .user-info-dropmenu {

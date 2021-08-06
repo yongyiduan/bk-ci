@@ -168,13 +168,12 @@ router.afterEach(route => {
 
 // 自动携带项目信息
 router.beforeEach((to, from, next) => {
-    console.log(to, from, 'routeInfo')
     websocket.loginOut(from)
     const params = {
         ...to,
         hash: to.hash || from.hash
     }
-    if (to.hash || (!to.hash && !from.hash)) {
+    if (to.hash || (!to.hash && !from.hash) || (to.name === 'home' || to.name === 'dashboard')) {
         next()
     } else {
         next(params)

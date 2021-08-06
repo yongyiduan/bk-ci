@@ -26,7 +26,7 @@
         </div>
 
         <section class="user-info">
-            <a class="docs-link" href="https://iwiki.woa.com/x/klPpK" target="_blank"><icon name="helper" class="gray-icon" size="20"></icon></a>
+            <a v-if="!showMenu" class="docs-link" href="https://iwiki.woa.com/x/pZMdK" target="_blank"><icon name="helper" class="gray-icon" size="20"></icon></a>
             <user
                 class="user-info"
                 :user="user"
@@ -74,7 +74,7 @@
                         name: 'Documentation',
                         active: false,
                         type: 'url',
-                        url: 'https://iwiki.woa.com/pages/viewpage.action?pageId=481669842'
+                        url: 'https://iwiki.woa.com/x/pZMdK'
                     }
                 ]
             }
@@ -110,7 +110,9 @@
             },
 
             goToHome () {
-                location.href = '/'
+                this.$router.push({
+                    name: this.$route.name === 'dashboard' ? 'home' : 'dashboard'
+                })
             }
         }
     })

@@ -17,7 +17,7 @@
                             让你聚焦于编码本身，而非权限申请、构建机准备、发布沟通等琐事。
                         </div>
                         <div class="hero-cta">
-                            <a href="" class="button big black" data-proofer-ignore="">
+                            <a href="/dashboard" class="button big black" data-proofer-ignore="">
                                 在 Stream 上运行一个 "Hello World"
                             </a>
                             <a href="https://iwiki.woa.com/x/pZMdK" target="_blank" class="button big " data-proofer-ignore="">
@@ -118,7 +118,7 @@
                 <h2 class="section--title">快速高质量地交付代码</h2>
                 <p class="section--sub is-center">用最好的 CI 工具，交付更好的代码</p>
                 <br><br>
-                <a href="" class="button black">为你的工程开启 CI</a>
+                <a href="/dashboard" class="button black">为你的工程开启 CI</a>
             </div>
         </section>
 
