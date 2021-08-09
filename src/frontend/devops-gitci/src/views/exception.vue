@@ -3,7 +3,7 @@
         <section class="exception-content">
             <span>{{ infoMap.titleMap[exceptionType] }}</span>
             <span class="exception-title">
-                {{ infoMap.messageMap[exceptionType] || exceptionInfo.message || 'System error, please try again later!' }}
+                {{ exceptionInfo.message || infoMap.messageMap[exceptionType] || 'System error, please try again later!' }}
                 <bk-link theme="primary" target="blank" href="https://iwiki.woa.com/x/r3IyKQ" v-if="exceptionType === 520">Learn more</bk-link>
             </span>
             <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" v-if="exceptionType === 419">
@@ -45,7 +45,7 @@
                         520: 'login'
                     },
                     titleMap: {
-                        403: 'Not a project member',
+                        403: 'No permission',
                         404: 'Not found',
                         418: 'No permission',
                         419: 'CI is not enabled',
@@ -59,7 +59,7 @@
                         418: 'The OAUTH authorization has not been carried out yet, please authorize first!',
                         419: 'CI has not been enabled yet, please enable it first!',
                         499: `The information of the project ${this.projectPath} is not queried, please modify and try again`,
-                        500: this.exceptionInfo.message || 'System error, please try again later',
+                        500: 'System error, please try again later',
                         520: 'Build, test, and deploy your code. continuous delivery of your product faster, easier, with fewer bugs. '
                     }
                 }

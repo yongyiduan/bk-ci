@@ -5,7 +5,15 @@
             :name="reviewStatausIcon(stage.checkIn)"
             size="28"
             class="review-icon"
-            @click.native="handleIconClick"
+            @click.native="handleIconClick('checkIn')"
+        />
+
+        <icon
+            v-if="!isFinallyStage"
+            :name="reviewStatausIcon(stage.checkOut)"
+            size="28"
+            class="review-icon check-out"
+            @click.native="handleIconClick('checkOut')"
         />
 
         <h3 class="stage-title">
@@ -97,10 +105,10 @@
                 'toggleStageReviewPanel'
             ]),
 
-            handleIconClick () {
+            handleIconClick (type) {
                 this.toggleStageReviewPanel({
                     isShow: true,
-                    type: 'checkIn',
+                    type,
                     stage: this.stage
                 })
             },
@@ -120,7 +128,7 @@
                         case stageControl.status === 'REVIEW_ABORT':
                             return 'review-abort'
                         case this.stageStatusCls === 'SKIP':
-                        case !this.stageStatusCls && this.isExecDetail:
+                        case !this.stageStatusCls:
                             return stageControl.manualTrigger ? 'review-waiting' : 'review-auto-gray'
                         case !!this.stageStatusCls:
                             return 'review-auto-pass'
@@ -175,6 +183,10 @@
             top: 11px;
             left: -14px;
             z-index: 3;
+            &.check-out {
+                right: -14px;
+                left: auto;
+            }
         }
     }
     .stage-title {

@@ -38,7 +38,8 @@
                 return this.showStageReviewPanel.stage || {}
             },
             stageTitle () {
-                return `CheckIn ${this.stage.name}`
+                const stageType = this.stageReviewType === 'checkIn' ? 'CheckIn' : 'CheckOut'
+                return `${stageType} ${this.stage.name}`
             },
             stageReviewType () {
                 return this.showStageReviewPanel.type
@@ -56,7 +57,7 @@
             reviewComponent () {
                 let reviewComponent = 'reviewShow'
                 if (this.isStagePause) reviewComponent = 'reviewApprove'
-                if (!this.stageControl.manualTrigger) reviewComponent = 'reviewEnable'
+                if (!this.stageControl.manualTrigger && !this.stageControl.ruleIds) reviewComponent = 'reviewEnable'
                 return reviewComponent
             },
             stageReviewDisabled () {

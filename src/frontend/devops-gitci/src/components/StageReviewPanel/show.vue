@@ -1,9 +1,12 @@
 <template>
     <section class="review-show">
         <quality-line :stage-control="stageControl"></quality-line>
-        <review-describe :desc="stageControl.reviewDesc"></review-describe>
-        <review-flow-show :review-groups="stageControl.reviewGroups"></review-flow-show>
-        <params-show :params="stageControl.reviewParams"></params-show>
+
+        <template v-if="stageControl.manualTrigger">
+            <review-describe :desc="stageControl.reviewDesc"></review-describe>
+            <review-flow-show :review-groups="stageControl.reviewGroups"></review-flow-show>
+            <params-show :params="stageControl.reviewParams"></params-show>
+        </template>
     </section>
 </template>
 

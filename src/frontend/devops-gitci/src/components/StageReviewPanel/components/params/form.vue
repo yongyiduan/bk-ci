@@ -34,10 +34,10 @@
             <bk-form-item label="Required">
                 <bk-radio-group v-model="copyForm.required">
                     <bk-radio :value="true">
-                        True
+                        true
                     </bk-radio>
                     <bk-radio :value="false" style="marginLeft:55px">
-                        False
+                        false
                     </bk-radio>
                 </bk-radio-group>
             </bk-form-item>

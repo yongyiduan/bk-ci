@@ -2,28 +2,30 @@
     <section class="review-approve-home">
         <quality-line :stage-control="stageControl"></quality-line>
 
-        <review-describe :desc="stageControl.reviewDesc"></review-describe>
+        <template v-if="stageControl.manualTrigger">
+            <review-describe :desc="stageControl.reviewDesc"></review-describe>
 
-        <review-flow-approve
-            ref="flowApprove"
-            :show-review-group.sync="showReviewGroup"
-            :disabled="disabled"
-            :review-groups="stageControl.reviewGroups"
-            :timeout="stageControl.timeout"
-            :stage="stage"
-        ></review-flow-approve>
+            <review-flow-approve
+                ref="flowApprove"
+                :show-review-group.sync="showReviewGroup"
+                :disabled="disabled"
+                :review-groups="stageControl.reviewGroups"
+                :timeout="stageControl.timeout"
+                :stage="stage"
+            ></review-flow-approve>
 
-        <params-approve
-            ref="paramsApprove"
-            :show-review-group.sync="showReviewGroup"
-            :disabled="disabled"
-            :review-params="stageControl.reviewParams"
-        ></params-approve>
+            <params-approve
+                ref="paramsApprove"
+                :show-review-group.sync="showReviewGroup"
+                :disabled="disabled"
+                :review-params="stageControl.reviewParams"
+            ></params-approve>
 
-        <section class="approve-footer">
-            <bk-button theme="primary" class="approve-button" @click="confirmApprove" :loading="isApproving" :disabled="disabled">Confirm</bk-button>
-            <bk-button @click="cancelApprove" :disabled="isApproving">Cancel</bk-button>
-        </section>
+            <section class="approve-footer">
+                <bk-button theme="primary" class="approve-button" @click="confirmApprove" :loading="isApproving" :disabled="disabled">Confirm</bk-button>
+                <bk-button @click="cancelApprove" :disabled="isApproving">Cancel</bk-button>
+            </section>
+        </template>
     </section>
 </template>
 
