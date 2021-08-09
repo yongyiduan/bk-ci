@@ -168,7 +168,7 @@ export default {
         return api.post(`${QUALITY_PREFIX}/user/intercepts/v2/pipeline/list?projectId=${projectId}&pipelineId=${pipelineId}&buildId=${buildId}`, ids)
     },
 
-    triggerStage ({ projectId, pipelineId, buildNo, stageId, cancel, reviewParams, id, suggest }) {
-        return api.post(`${PROCESS_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildNo}/stages/${stageId}/manualStart?cancel=${cancel}`, { reviewParams, id, suggest })
+    triggerStage ({ projectId, pipelineId, buildId, stageId, cancel, reviewParams, id, suggest }) {
+        return api.post(`${PROCESS_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/stages/${stageId}/manualStart?cancel=${cancel}`, { reviewParams, id, suggest })
     }
 }
