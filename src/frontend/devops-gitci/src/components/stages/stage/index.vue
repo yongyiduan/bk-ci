@@ -128,9 +128,9 @@
                         case stageControl.status === 'REVIEW_ABORT':
                             return 'review-abort'
                         case this.stageStatusCls === 'SKIP':
-                        case !this.stageStatusCls:
+                        case stageControl.status === undefined:
                             return stageControl.manualTrigger ? 'review-waiting' : 'review-auto-gray'
-                        case !!this.stageStatusCls:
+                        case stageControl.status:
                             return 'review-auto-pass'
                         default:
                             return stageControl.manualTrigger ? 'review-enable' : 'review-auto'
