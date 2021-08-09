@@ -115,6 +115,8 @@
                             return 'review-waiting'
                         case stageControl.status === 'REVIEW_PROCESSED':
                             return 'reviewed'
+                        case stageControl.status === 'QUALITY_CHECK_FAIL':
+                            return 'quality_check_fail'
                         case stageControl.status === 'REVIEW_ABORT':
                             return 'review-abort'
                         case this.stageStatusCls === 'SKIP':
