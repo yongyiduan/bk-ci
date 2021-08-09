@@ -766,7 +766,7 @@ class PipelineBuildFacadeService(
         isCancel: Boolean,
         reviewRequest: StageReviewRequest?
     ) {
-        val pipelineInfo = pipelineRepositoryService.getPipelineInfo(projectId, pipelineId, ChannelCode.BS)
+        val pipelineInfo = pipelineRepositoryService.getPipelineInfo(projectId, pipelineId)
             ?: throw ErrorCodeException(
                 statusCode = Response.Status.NOT_FOUND.statusCode,
                 errorCode = ProcessMessageCode.ERROR_PIPELINE_NOT_EXISTS,
@@ -841,7 +841,7 @@ class PipelineBuildFacadeService(
                 pipelineStageService.cancelStage(
                     userId = userId,
                     buildStage = buildStage,
-                    groupId = reviewRequest?.id
+                    reviewRequest = reviewRequest
                 )
             } else {
                 // TODO 暂时兼容前端显示的变量刷新，下次发版去掉
