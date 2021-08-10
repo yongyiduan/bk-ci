@@ -1,7 +1,7 @@
 <template>
     <section class="stage-home">
         <icon
-            v-if="!isFinallyStage"
+            v-if="showStageCheck(stage.checkIn)"
             :name="reviewStatausIcon(stage.checkIn)"
             size="28"
             class="review-icon"
@@ -9,7 +9,7 @@
         />
 
         <icon
-            v-if="!isFinallyStage"
+            v-if="showStageCheck(stage.checkOut)"
             :name="reviewStatausIcon(stage.checkOut)"
             size="28"
             class="review-icon check-out"
@@ -111,6 +111,12 @@
                     type,
                     stage: this.stage
                 })
+            },
+
+            showStageCheck (stageControl = {}) {
+                const hasReviewFlow = stageControl.manualTrigger
+                const hasReviewQuality = stageControl.ruleIds && stageControl.ruleIds.length > 0
+                return !this.isFinallyStage && (hasReviewFlow || hasReviewQuality)
             },
 
             reviewStatausIcon (stageControl = {}) {

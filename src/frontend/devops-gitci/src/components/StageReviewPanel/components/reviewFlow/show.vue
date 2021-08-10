@@ -46,7 +46,7 @@
                                     <span class="review-process"> Agree (continue to execute the pipeline) </span>
                                 </p>
                                 <p v-show={paramStr}>Change parameters：{paramStr}</p>
-                                <p>Approval comments：{item.suggest || 'None'}</p>
+                                <p>Approval comments：{item.suggest}</p>
                                 <p>Approval time：{convertTime(item.reviewTime)}</p>
                             </section>
                         )
@@ -59,7 +59,7 @@
                                     <span class="review-normal"> Approved by {item.operator}：</span>
                                     <span class="review-abort"> Reject (cancel execution, immediately mark as Stage success status) </span>
                                 </p>
-                                <p>Approval comments：{item.suggest || 'None'}</p>
+                                <p>Approval comments：{item.suggest}</p>
                                 <p>Approval time：{convertTime(item.reviewTime)}</p>
                             </section>
                         )

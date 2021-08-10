@@ -100,7 +100,11 @@
                         suggest: flowData.suggest,
                         id: flowData.id,
                         reviewParams
-                    }).then(this.cancelApprove)
+                    }).then(() => {
+                        const message = flowData.isCancel ? 'Successful Reject' : 'Successful Approve'
+                        this.$bkMessage({ theme: 'success', message })
+                        this.cancelApprove()
+                    })
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
