@@ -25,17 +25,17 @@ function successHandler (response) {
 
 function getLoginUrl () {
     const cUrl = location.href
-    if (/=%s/.test(LOGIN_SERVICE_URL)) {
-        return LOGIN_SERVICE_URL.replace(/%s/, cUrl)
-    } else {
-        const loginUrl = new URL(LOGIN_SERVICE_URL)
-        if (/=$/.test(loginUrl.search)) {
-            return LOGIN_SERVICE_URL + cUrl
-        } else {
-            loginUrl.searchParams.append('c_url', cUrl)
-            return loginUrl.href
-        }
-    }
+    const loginUrl = new URL(LOGIN_SERVICE_URL)
+    const url = new URL('http://login.o.woa.com/call_back_oa/')
+    url.searchParams.append('bk_appid', 1)
+    url.searchParams.append('bk_login', 1)
+    url.searchParams.append('c_url', cUrl)
+    
+    loginUrl.searchParams.append('url', url)
+    loginUrl.searchParams.append('appkey', '909a565c052c4379b90d3d82152d2da1')
+    loginUrl.searchParams.append('title', 'bklogin')
+    
+    return loginUrl.href
 }
 
-export { errorHandler, successHandler, requestHandler }
+export { errorHandler, successHandler, requestHandler, getLoginUrl }

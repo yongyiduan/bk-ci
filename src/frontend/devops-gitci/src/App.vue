@@ -26,7 +26,7 @@
                     </div>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
                         <li :class="{ unread: messageNum > 0 }"><a href="javascript:;" @click="goToNotifications">Notifications</a></li>
-                        <li><a href="javascript:;" @click="goLogin">Login Out</a></li>
+                        <li><a href="javascript:;" @click="logout">Login Out</a></li>
                     </ul>
                 </bk-dropdown-menu>
                 <a href="https://iwiki.woa.com/x/klPpK" target="_blank"><i class="bk-icon icon-question-circle-shape"></i></a>
@@ -156,10 +156,9 @@
                 this.$router.push({ name: 'basicSetting' })
             },
 
-            goLogin () {
-                const loginUrl = new URL(LOGIN_SERVICE_URL)
-                loginUrl.searchParams.append('c_url', location.href)
-                window.location.href = loginUrl.href
+            logout () {
+                const currentHref = location.href
+                window.location.href = `http://${location.hostname}/_logout/?url=${currentHref}`
             },
 
             goToNotifications () {
