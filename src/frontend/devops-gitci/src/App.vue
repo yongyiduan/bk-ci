@@ -39,6 +39,7 @@
 
 <script>
     import { common, notifications, pipelines } from '@/http'
+    import { getLoginUrl } from '@/http/ajax'
     import { mapActions, mapState } from 'vuex'
     import gitCiWebSocket from '@/utils/websocket'
     import register from '@/utils/websocket-register'
@@ -157,8 +158,7 @@
             },
 
             logout () {
-                const currentHref = location.href
-                window.location.href = `http://${location.hostname}/_logout/?url=${currentHref}`
+                location.href = getLoginUrl(`http://${location.hostname}/_logout/`)
             },
 
             goToNotifications () {

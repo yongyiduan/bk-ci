@@ -23,17 +23,17 @@ function successHandler (response) {
     return data === undefined ? response.data : data
 }
 
-function getLoginUrl () {
+function getLoginUrl (domain = LOGIN_SERVICE_URL) {
     const cUrl = location.href
-    const loginUrl = new URL(LOGIN_SERVICE_URL)
+    const loginUrl = new URL(domain)
     const url = new URL('http://login.o.woa.com/call_back_oa/')
     url.searchParams.append('bk_appid', 1)
     url.searchParams.append('bk_login', 1)
     url.searchParams.append('c_url', cUrl)
     
-    loginUrl.searchParams.append('url', url)
-    loginUrl.searchParams.append('appkey', '909a565c052c4379b90d3d82152d2da1')
     loginUrl.searchParams.append('title', 'bklogin')
+    loginUrl.searchParams.append('appkey', '909a565c052c4379b90d3d82152d2da1')
+    loginUrl.searchParams.append('url', url)
     
     return loginUrl.href
 }
