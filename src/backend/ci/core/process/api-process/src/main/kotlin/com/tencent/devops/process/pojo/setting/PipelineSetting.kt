@@ -61,6 +61,8 @@ data class PipelineSetting(
 
     @Suppress("ALL")
     fun checkParam() {
+        successSubscription.content.replace("\"", "\\\"")
+        failSubscription.content.replace("\"", "\\\"")
         if (maxPipelineResNum < 1) {
             throw InvalidParamException(message = "流水线编排数量非法", params = arrayOf("maxPipelineResNum"))
         }
