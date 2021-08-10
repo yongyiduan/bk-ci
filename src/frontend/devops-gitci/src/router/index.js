@@ -21,11 +21,12 @@ const buildConfig = () => import(/* webpackChunkName: 'buildDetail' */'@/views/p
 const webConsole = () => import(/* webpackChunkName: "webConsole" */'@/views/pipeline/web-console.vue')
 const setting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/index')
 const basicSetting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/basic')
-const credentialList = () => import(/* webpackChunkName: 'setting' */'@/views/setting/credential')
-const agentPools = () => import(/* webpackChunkName: 'setting' */'@/views/setting/agent-pools/index')
-const addAgent = () => import(/* webpackChunkName: 'setting' */'@/views/setting/agent-pools/add-agent')
-const agentList = () => import(/* webpackChunkName: 'setting' */'@/views/setting/agent-pools/agent-list')
-const agentDetail = () => import(/* webpackChunkName: 'setting' */'@/views/setting/agent-pools/agent-detail')
+const credentialList = () => import(/* webpackChunkName: 'credential' */'@/views/setting/credential')
+const agentPools = () => import(/* webpackChunkName: 'pool' */'@/views/setting/agent-pools/index')
+const poolSettings = () => import(/* webpackChunkName: 'pool' */'@/views/setting/agent-pools/pool-settings')
+const addAgent = () => import(/* webpackChunkName: 'agent' */'@/views/setting/agent-pools/add-agent')
+const agentList = () => import(/* webpackChunkName: 'agent' */'@/views/setting/agent-pools/agent-list')
+const agentDetail = () => import(/* webpackChunkName: 'agent' */'@/views/setting/agent-pools/agent-detail')
 
 const routes = [
     {
@@ -104,6 +105,11 @@ const routes = [
                         path: 'agent-pools',
                         name: 'agentPools',
                         component: agentPools
+                    },
+                    {
+                        path: 'pool-settings/:poolId/:poolName',
+                        name: 'poolSettings',
+                        component: poolSettings
                     },
                     {
                         path: 'add-agent/:poolId/:poolName',
