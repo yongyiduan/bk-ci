@@ -45,7 +45,7 @@
 
         <share-env :share-select-conf="shareSelectConf"
             :row-list="curPageList"
-            :show-page="totalList.count"
+            :total-list="totalList"
             :share-handler-conf="shareHandlerConf"
             :confirm-fn="confirmFn"
             :toggle-all-select="toggleAllSelect"

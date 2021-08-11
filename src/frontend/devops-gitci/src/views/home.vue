@@ -178,17 +178,17 @@
             },
 
             initGifAnimaShow () {
-                this.$refs.leftImg.src = uiGif
-                this.$refs.rightImg.src = codeJpg
+                this.$refs.leftImg && (this.$refs.leftImg.src = uiGif)
+                this.$refs.rightImg && (this.$refs.rightImg.src = codeJpg)
                 const gifItems = document.querySelectorAll('.gif-item')
                 
                 setTimeout(() => {
-                    this.$refs.leftImg.src = uiJpg
-                    this.$refs.rightImg.src = codeGif
+                    this.$refs.leftImg && (this.$refs.leftImg.src = uiJpg)
+                    this.$refs.rightImg && (this.$refs.rightImg.src = codeGif)
                     gifItems[1].style.zIndex = '999'
                     setTimeout(() => {
                         gifItems[1].style.zIndex = '0'
-                        this.$refs.rightImg.src = codeJpg
+                        this.$refs.rightImg && (this.$refs.rightImg.src = codeJpg)
                     }, 11300)
                 }, 4800)
                 this.gifTimer = setTimeout(() => {
