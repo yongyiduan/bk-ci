@@ -1,56 +1,58 @@
 <template>
     <section>
         <section class="dashboard-container">
-            <div class="type-container">
-                <div class="navigation-header">
-                    <ol class="header-nav">
-                        <li v-for="item in typeList" :key="item.name" @click="changeType(item.type)" class="header-nav-item" :class="{ 'item-active': type === item.type }">
-                            {{ item.name }}
-                        </li>
-                    </ol>
-                </div>
-            </div>
-            <div class="content-container" v-bkloading="{ isLoading }">
-                <div style="margin-bottom: 15px;">
-                    <bk-input :left-icon="'bk-icon icon-search'" placeholder="Filter by name" v-model="searchStr" @enter="getRepoList(1)"></bk-input>
-                </div>
-                <div class="empty-repo" v-if="!repoList.length">
-                    <empty-tips title="暂无项目"></empty-tips>
-                </div>
-                <div v-for="repo in repoList" :key="repo.id" class="repo-item">
-                    <div class="repo-img">
-                        <img class="img" :src="repo.avatarUrl">
+            <infinite-scroll class="repo-container-wrapper" ref="infiniteScroll" :data-fetcher="getRepoList" :page-size="limit" scroll-box-class-name="dashboard-container" v-slot="slotProps">
+                <div class="type-container">
+                    <div class="navigation-header">
+                        <ol class="header-nav">
+                            <li v-for="item in typeList" :key="item.name" @click="changeType(item.type)" class="header-nav-item" :class="{ 'item-active': type === item.type }">
+                                {{ item.name }}
+                            </li>
+                        </ol>
                     </div>
-                    <div class="repo-data">
-                        <div class="repo-name">
-                            {{ repo.nameWithNamespace }}
+                </div>
+                <div class="content-container" v-bkloading="{ isLoading: slotProps.isLoading }">
+                    <div style="margin-bottom: 15px;">
+                        <bk-input :left-icon="'bk-icon icon-search'" placeholder="Filter by name" v-model="searchStr" @enter="updateList"></bk-input>
+                    </div>
+                    <div class="empty-repo" v-if="!slotProps.list.length">
+                        <empty-tips title="暂无项目"></empty-tips>
+                    </div>
+                    <div v-for="repo in slotProps.list" :key="repo.id" class="repo-item">
+                        <div class="repo-img">
+                            <img class="img" :src="repo.avatarUrl">
                         </div>
-                        <div class="repo-desc">
-                            <div v-if="repo.ciInfo && repo.ciInfo.enableCI">
-                                <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
-                                <span class="lastest-build-info" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
+                        <div class="repo-data">
+                            <div class="repo-name">
+                                {{ repo.nameWithNamespace }}
                             </div>
-                            <div v-else>{{ repo.description || 'Empty project description' }}</div>
-                        </div>
-                    </div>
-                    <div class="operation">
-                        <bk-popover v-if="repo.ciInfo && repo.ciInfo.enableCI" class="dot-menu" ext-cls="dot-menu-wrapper" placement="right" ref="dotMenuRef" theme="dot-menu light" :arrow="false" offset="15" :distance="0">
-                            <div class="dot-menu-trigger">
-                                <div class="footer-ext-dots">
-                                    <div class="ext-dot"></div>
-                                    <div class="ext-dot"></div>
-                                    <div class="ext-dot"></div>
+                            <div class="repo-desc">
+                                <div v-if="repo.ciInfo && repo.ciInfo.enableCI">
+                                    <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
+                                    <span class="lastest-build-info" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
                                 </div>
+                                <div v-else>{{ repo.description || 'Empty project description' }}</div>
                             </div>
-                            <ul class="dot-menu-list" slot="content">
-                                <li @click="toProjectDetail('buildList', repo.nameWithNamespace)">pipeline</li>
-                                <li @click="toProjectDetail('basicSetting', repo.nameWithNamespace)">setting</li>
-                            </ul>
-                        </bk-popover>
-                        <bk-button v-else theme="primary" @click="enableCi(repo)">Enable CI</bk-button>
+                        </div>
+                        <div class="operation">
+                            <bk-popover v-if="repo.ciInfo && repo.ciInfo.enableCI" class="dot-menu" ext-cls="dot-menu-wrapper" placement="right" ref="dotMenuRef" theme="dot-menu light" :arrow="false" offset="15" :distance="0">
+                                <div class="dot-menu-trigger">
+                                    <div class="footer-ext-dots">
+                                        <div class="ext-dot"></div>
+                                        <div class="ext-dot"></div>
+                                        <div class="ext-dot"></div>
+                                    </div>
+                                </div>
+                                <ul class="dot-menu-list" slot="content">
+                                    <li @click="toProjectDetail('buildList', repo.nameWithNamespace)">pipeline</li>
+                                    <li @click="toProjectDetail('basicSetting', repo.nameWithNamespace)">setting</li>
+                                </ul>
+                            </bk-popover>
+                            <bk-button v-else theme="primary" @click="enableCi(repo)">Enable CI</bk-button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </infinite-scroll>
         </section>
     </section>
 </template>
@@ -60,17 +62,18 @@
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import emptyTips from '@/components/empty-tips'
     import gitcode from './../images/home/gitcode.png'
+    import infiniteScroll from '@/components/InfiniteScroll'
 
     export default {
         components: {
-            emptyTips
+            emptyTips,
+            infiniteScroll
         },
         data () {
             return {
-                isLoading: true,
                 hasNext: true,
                 type: 'MY_PROJECT',
-                limit: 100,
+                limit: 30,
                 searchStr: '',
                 repoList: [],
                 typeList: [
@@ -89,32 +92,36 @@
                 ]
             }
         },
-        created () {
-            this.getRepoList()
-        },
         methods: {
-            getRepoList (page = 1) {
-                this.isLoading = true
-                common.getGitciProjects(this.type, page, this.limit, this.searchStr).then((res) => {
+            async updateList () {
+                if (this.$refs.infiniteScroll) {
+                    this.$nextTick(async () => {
+                        await this.$refs.infiniteScroll.updateList()
+                    })
+                }
+            },
+            async getRepoList (page = 1, pageSize = this.limit) {
+                await common.getGitciProjects(this.type, page, pageSize, this.searchStr).then((res) => {
                     this.repoList = (res.records || []).map(item => ({
                         ...item,
                         avatarUrl: (item.avatarUrl.endsWith('.jpg') || item.avatarUrl.endsWith('.jpeg') || item.avatarUrl.endsWith('.png')) ? item.avatarUrl : gitcode
                     }))
-                    this.hasNext = res.hasNext
-                    this.isLoading = false
                 }).catch((err) => {
                     this.$bkMessage({
                         theme: 'error',
                         message: err.message || err
                     })
-                    this.isLoading = false
                 })
+                return {
+                    hasNext: this.hasNext || false,
+                    records: this.repoList || []
+                }
             },
             
             changeType (type) {
                 this.type = type
                 this.searchStr = ''
-                this.getRepoList(1)
+                this.updateList()
             },
 
             toLastBuildDetail (repo) {
@@ -148,8 +155,7 @@
                     http_url_to_repo: item.httpsUrlToRepo.replace('https://', 'http://'),
                     web_url: item.webUrl
                 }).then(res => {
-                    console.log(res)
-                    this.getRepoList(1)
+                    this.updateList()
                     this.$bkMessage({
                         theme: 'success',
                         message: 'EnableCI successfully'
@@ -173,7 +179,11 @@
     @import '@/css/conf';
 
     .dashboard-container {
-        margin: 30px;
+        overflow: auto;
+        height: calc(100vh - 75px);
+        .repo-container-wrapper {
+            margin: 30px 30px 0;
+        }
         .type-container {
             display: flex;
             align-items: center;

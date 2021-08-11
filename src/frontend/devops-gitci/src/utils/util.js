@@ -205,6 +205,27 @@ export function converStrToNum (str, indicator) {
     return ~~$str
 }
 
+export function throttle (func, interval) {
+    let lastFunc
+    let lastRan
+    return function () {
+        const context = this
+        const args = arguments
+        if (!lastRan) {
+            func.apply(context, args)
+            lastRan = Date.now()
+        } else {
+            clearTimeout(lastFunc)
+            lastFunc = setTimeout(function () {
+                if ((Date.now() - lastRan) >= interval) {
+                    func.apply(context, args)
+                    lastRan = Date.now()
+                }
+            }, interval - (Date.now() - lastRan))
+        }
+    }
+}
+
 /**
  *  将字符串根据indicator转成数组
  */

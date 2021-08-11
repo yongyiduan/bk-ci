@@ -1,7 +1,13 @@
 <template>
     <div style="height: 100%;" v-bkloading="{ isLoading }">
-        <slot v-bind="{ list, isLoading, isLoadingMore, queryList, setScrollTop, animateScroll, totals }"></slot>
-        <div v-if="isLoadingMore" class="loading-more" slot="append"><i class="devops-icon icon-circle-2-1 spin-icon"></i><span>{{ $t('loadingTips') }}</span></div>
+        <slot v-bind="{ list, isLoading, isLoadingMore, queryList, setScrollTop, animateScroll }"></slot>
+        <div v-if="isLoadingMore" class="loading-more" slot="append">
+            <icon
+                name="loading"
+                size="18"
+            ></icon>
+            <span>Loading</span>
+        </div>
     </div>
 </template>
 
@@ -31,8 +37,7 @@
                 list: [],
                 currentPage: 1,
                 scrollTop: 0,
-                hasNext: false,
-                totals: 0
+                hasNext: false
             }
         },
 
@@ -86,8 +91,7 @@
 
                     this.currentPage = Math.ceil(this.list.length / pageSize)
 
-                    this.hasNext = this.currentPage < res.totalPages
-                    this.totals = res.count
+                    this.hasNext = res.hasNext
                     return res
                 }
             },
@@ -111,7 +115,7 @@
                 } catch (e) {
                     console.log(e)
                     this.$showTips({
-                        message: this.$t('history.loadingErr'),
+                        message: 'loading error',
                         theme: 'error'
                     })
                 } finally {
@@ -133,7 +137,7 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="postcss">
     .loading-more {
         display: flex;
         height: 36px;
