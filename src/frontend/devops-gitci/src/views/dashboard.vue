@@ -23,16 +23,25 @@
                             <img class="img" :src="repo.avatarUrl">
                         </div>
                         <div class="repo-data">
-                            <div class="repo-name">
-                                {{ repo.nameWithNamespace }}
-                            </div>
-                            <div class="repo-desc">
-                                <div v-if="repo.ciInfo && repo.ciInfo.enableCI">
-                                    <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
-                                    <span class="lastest-build-info" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
+                            <section v-if="repo.ciInfo && repo.ciInfo.enableCI">
+                                <div class="repo-name">
+                                    <span class="to-page-link" @click="toProjectDetail('buildList', repo.nameWithNamespace)">{{ repo.nameWithNamespace }}</span>
                                 </div>
-                                <div v-else>{{ repo.description || 'Empty project description' }}</div>
-                            </div>
+                                <div class="repo-desc">
+                                    <div v-if="repo.ciInfo && repo.ciInfo.enableCI">
+                                        <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
+                                        <span class="to-page-link" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
+                                    </div>
+                                </div>
+                            </section>
+                            <section v-else>
+                                <div class="repo-name">
+                                    {{ repo.nameWithNamespace }}
+                                </div>
+                                <div class="repo-desc">
+                                    <div>{{ repo.description || 'Empty project description' }}</div>
+                                </div>
+                            </section>
                         </div>
                         <div class="operation">
                             <bk-popover v-if="repo.ciInfo && repo.ciInfo.enableCI" class="dot-menu" ext-cls="dot-menu-wrapper" placement="right" ref="dotMenuRef" theme="dot-menu light" :arrow="false" offset="15" :distance="0">
@@ -44,8 +53,8 @@
                                     </div>
                                 </div>
                                 <ul class="dot-menu-list" slot="content">
-                                    <li @click="toProjectDetail('buildList', repo.nameWithNamespace)">pipeline</li>
-                                    <li @click="toProjectDetail('basicSetting', repo.nameWithNamespace)">setting</li>
+                                    <li @click="toProjectDetail('buildList', repo.nameWithNamespace)">Pipelines</li>
+                                    <li @click="toProjectDetail('basicSetting', repo.nameWithNamespace)">Settings</li>
                                 </ul>
                             </bk-popover>
                             <bk-button v-else theme="primary" @click="enableCi(repo)">Enable CI</bk-button>
@@ -265,12 +274,12 @@
                         font-size: 16px;
                         color: rgba(0,0,0,0.90);
                     }
+                    .to-page-link {
+                        cursor: pointer;
+                    }
                     .repo-desc {
                         font-size: 14px;
                         color: #96A2B9;
-                        .lastest-build-info {
-                            cursor: pointer;
-                        }
                         .bk-icon {
                             font-size: 20px;
                             &.executing {
