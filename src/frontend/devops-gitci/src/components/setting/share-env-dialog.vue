@@ -45,6 +45,7 @@
                                             :false-value="false"
                                             :disabled="col.isEixt"
                                             v-model="col.isChecked"
+                                            @change="val => toggleItemSelect(val, col.id)"
                                         ></bk-checkbox>
                                     </div>
                                     <div class="table-node-item node-item-ip">
@@ -97,6 +98,7 @@
             loading: Object,
             shareHandlerConf: Object,
             rowList: Array,
+            totalList: Array,
             updatePage: Function,
             confirmFn: Function,
             toggleAllSelect: Function,
@@ -129,6 +131,10 @@
                         this.updatePage(this.pageConfig.page + 1)
                     }
                 }
+            },
+            toggleItemSelect (val, id) {
+                const selectItem = this.totalList.find(item => item.id === id)
+                selectItem.isChecked = val
             }
         }
     }
