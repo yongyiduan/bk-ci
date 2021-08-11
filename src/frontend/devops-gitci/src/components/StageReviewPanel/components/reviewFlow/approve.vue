@@ -25,7 +25,7 @@
                 Approve <span class="gray-color">（Continue pipeline execution）</span>
             </bk-radio>
             <bk-radio :value="true" :disabled="disabled" class="ml40">
-                Reject <span class="gray-color">（Set previous stage status as Stage Success）</span>
+                Reject <span class="gray-color">（Reject, and set pipeline status as Stage Success）</span>
             </bk-radio>
         </bk-radio-group>
 
