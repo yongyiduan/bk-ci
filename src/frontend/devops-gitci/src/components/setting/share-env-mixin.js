@@ -71,7 +71,7 @@ const shareEnvMixin = {
                 })
                 this.curPageList.filter(kk => {
                     this.shareList.filter(vv => {
-                        if (vv.gitProjectId === kk.projectCode) {
+                        if (vv.gitProjectId === `git_${kk.id}`) {
                             kk.isChecked = true
                             kk.isEixt = true
                         }
@@ -100,10 +100,7 @@ const shareEnvMixin = {
                 message = 'Share successfully'
                 theme = 'success'
 
-                // this.$emit('refresh')
-                setting.getShareProjectList(this.projectId, this.envHashId, 1, 100).then((res) => {
-                    this.shareList = res.records || []
-                })
+                this.getShareList()
             }).catch((err) => {
                 message = err.message ? err.message : err
                 theme = 'error'
@@ -133,7 +130,7 @@ const shareEnvMixin = {
                 }
                 selectItems = selectItems.map(item => {
                     return {
-                        gitProjectId: item.projectCode,
+                        gitProjectId: `git_${item.id}`,
                         name: item.nameWithNamespace,
                         type: 'PROJECT'
                     }

@@ -1,12 +1,12 @@
 <template>
-    <article class="agent-list-home" v-bkloading="{ isLoading }">
-        <header class="agent-list-head">
+    <article class="pool-setting-home" v-bkloading="{ isLoading }">
+        <header class="pool-setting-head">
             <bk-breadcrumb separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-for="(item,index) in navList" :key="index" :to="item.link">{{item.title}}</bk-breadcrumb-item>
             </bk-breadcrumb>
         </header>
 
-        <main class="agent-list-main" v-if="!isLoading">
+        <main class="pool-setting-main" v-if="!isLoading">
             <section v-if="shareList.length">
                 <div class="operate-agent">
                     <bk-button theme="primary" @click="toLinkShare">Link project</bk-button>
@@ -106,10 +106,6 @@
 
             envHashId () {
                 return this.$route.params.poolId
-            },
-
-            tableHeight () {
-                return Math.min(this.appHeight - 152, 43 + (this.shareList.length || 4) * 42)
             }
         },
 
@@ -165,14 +161,17 @@
 </script>
 
 <style lang="postcss" scoped>
-    .agent-list-head {
+    .pool-setting-home {
+        overflow: auto;
+    }
+    .pool-setting-head {
         height: 49px;
         line-height: 49px;
         background: #fff;
         box-shadow: 0 2px 5px 0 rgba(51,60,72,0.03);
         padding: 0 25.5px;
     }
-    .agent-list-main {
+    .pool-setting-main {
         padding: 16px;
         .operate-agent {
             margin-bottom: 20px;

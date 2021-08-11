@@ -51,7 +51,7 @@
                                         <span class="node-ip">{{ col.id }}</span>
                                     </div>
                                     <div class="table-node-item node-item-name" :class="{ 'over-content': shareHandlerConf.curDisplayCount > 6 }">
-                                        <span class="node-name">{{ col.name }}</span>
+                                        <span class="node-name">{{ col.nameWithNamespace }}</span>
                                     </div>
                                 </div>
                             </template>
@@ -254,7 +254,7 @@
         }
 
         .table-node-body {
-            height: 252px;
+            height: 317px;
             overflow: auto;
         }
 
