@@ -108,24 +108,28 @@
         }
 
         async toApplyPermission () {
-          try {
-              // const body = this.noPermissionList.map(perm => this.getPermissionBody(perm))
-              // console.log('permBody', body)
-              // const redirectUrl = await this.getPermRedirectUrl(body)
-              window.open(this.applyPermissionUrl, '_blank')
-              this.showDialog = false
-              this.$bkInfo({
-                  title: this.$t('permissionRefreshtitle'),
-                  subTitle: this.$t('permissionRefreshSubtitle'),
-                  okText: this.$t('permissionRefreshOkText'),
-                  cancelText: this.$t('close'),
-                  confirmFn: () => {
-                      location.reload()
-                  }
-              })
-          } catch (e) {
-              console.error(e)
-          }
+            try {
+                const projectList = window.getLsCacheItem('projectList') || []
+                const curProject = projectList.find((project) => (project.projectCode === this.$route.params.projectId))
+                let redirectUrl = this.applyPermissionUrl
+                if (curProject.relationId) {
+                    const body = this.noPermissionList.map(perm => this.getPermissionBody(perm))
+                    redirectUrl = await this.getPermRedirectUrl(body)
+                }
+                window.open(redirectUrl, '_blank')
+                this.showDialog = false
+                this.$bkInfo({
+                    title: this.$t('permissionRefreshtitle'),
+                    subTitle: this.$t('permissionRefreshSubtitle'),
+                    okText: this.$t('permissionRefreshOkText'),
+                    cancelText: this.$t('close'),
+                    confirmFn: () => {
+                        location.reload()
+                    }
+                })
+            } catch (e) {
+                console.error(e)
+            }
         }
     }
 </script>
