@@ -21,7 +21,27 @@
                 >
                     <bk-table-column label="Display Name" prop="displayName">
                         <template slot-scope="props">
-                            <span class="update-btn" @click="goToAgentDetail(props.row.nodeHashId)">{{ props.row.displayName}}</span>
+                            <div class="bk-form-content node-item-content" v-if="props.row.nodeHashId === curEditAgentId">
+                                <div class="edit-content">
+                                    <input type="text" class="bk-form-input env-name-input"
+                                        maxlength="30"
+                                        name="nodeName"
+                                        v-validate="'required'"
+                                        v-model="curEditDisplayName"
+                                        :class="{ 'is-danger': errors.has('nodeName') }">
+                                    <div class="handler-btn">
+                                        <span class="edit-base save" @click="saveEdit(props.row)">Save</span>
+                                        <span class="edit-base cancel" @click="cancelEdit(props.row.nodeHashId)">Cancel</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-node-item node-item-id" v-else>
+                                <span class="update-btn node-name"
+                                    :title="props.row.displayName"
+                                    @click="goToAgentDetail(props.row.nodeHashId)"
+                                >{{ props.row.displayName || '-' }}</span>
+                                <i class="bk-icon icon-edit" v-if="!isEditNodeStatus" @click="editNodeName(props.row)"></i>
+                            </div>
                         </template>
                     </bk-table-column>
                     <bk-table-column label="HostName" prop="name"></bk-table-column>
@@ -89,7 +109,10 @@
                 isLoading: false,
                 isShowDelete: false,
                 isDeleteing: false,
-                deleteRow: {}
+                deleteRow: {},
+                isEditNodeStatus: false,
+                curEditAgentId: '',
+                curEditNodeDisplayName: ''
             }
         },
 
@@ -152,6 +175,46 @@
                         agentId: id
                     }
                 })
+            },
+
+            editNodeName (node) {
+                this.curEditDisplayName = node.displayName
+                this.isEditNodeStatus = true
+                this.curEditAgentId = node.nodeHashId
+            },
+
+            async saveEdit (node) {
+                const valid = await this.$validator.validate()
+                const displayName = this.curEditDisplayName.trim()
+                if (valid) {
+                    let message, theme
+                    const params = {
+                        displayName
+                    }
+
+                    setting.updateDisplayName(this.projectId, node.nodeHashId, params).then(() => {
+                        message = 'Update successfully'
+                        theme = 'success'
+                    }).catch((err) => {
+                        message = err.message ? err.message : err
+                        theme = 'error'
+                    }).finally(() => {
+                        message && this.$bkMessage({
+                            message,
+                            theme
+                        })
+                        this.isEditNodeStatus = false
+                        this.curEditAgentId = ''
+                        this.curEditDisplayName = ''
+                        this.getNodeList()
+                    })
+                }
+            },
+
+            cancelEdit () {
+                this.isEditNodeStatus = false
+                this.curEditAgentId = ''
+                this.curEditNodeDisplayName = ''
             }
         }
     }
@@ -193,5 +256,74 @@
             border-radius: 50%;
             -webkit-border-radius: 50%;
         }
+
+        .node-item-content {
+            position: absolute;
+            top: 6px;
+            display: flex;
+            width: 90%;
+            min-width: 280px;
+            margin-right: 12px;
+            z-index: 2;
+            .edit-content {
+                display: flex;
+                width: 100%;
+            }
+            .bk-form-input {
+                height: 30px;
+                font-size: 12px;
+                min-width: 280px;
+                padding-right: 74px;
+            }
+            .error-tips {
+                font-size: 12px;
+            }
+            .handler-btn {
+                display: flex;
+                align-items: center;
+                margin-left: 10px;
+                position: absolute;
+                color: #3a84ff;
+                right: 11px;
+                top: 8px;
+                .edit-base {
+                    cursor: pointer;
+                }
+                .save {
+                    margin-right: 8px;
+                }
+            }
+            .is-danger {
+                border-color: #ff5656;
+                background-color: #fff4f4;
+            }
+        }
+
+        .node-item-id {
+            display: flex;
+        }
+
+        td:first-child {
+            .node-name {
+                line-height: 14px;
+                display: inline-block;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .icon-edit {
+                position: relative;
+                left: 4px;
+                /* color: $fontColor; */
+                cursor: pointer;
+                display: none;
+            }
+            &:hover {
+                .icon-edit {
+                    display: inline-block;
+                }
+            }
+        }
+        
     }
 </style>

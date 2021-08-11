@@ -94,6 +94,13 @@ export default {
         })
     },
 
+    /**
+     * 修改节点名称
+     */
+    updateDisplayName (projectId, nodeHashId, params) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/envnode/${projectId}/${nodeHashId}/updateDisplayName`, params)
+    },
+
     requestNodeDetail (projectId, nodeHashId) {
         return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/thirdPartyAgentDetail`).then(response => {
             return response

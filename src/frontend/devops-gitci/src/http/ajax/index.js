@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { setCookie } from '@/utils'
-import { errorHandler, successHandler, requestHandler } from './handler'
+import { errorHandler, successHandler, requestHandler, getLoginUrl } from './handler'
 
 // 设置cookie，路由到git-ci独立集群
 setCookie('X-DEVOPS-PROJECT-ID', 'gitciproject', document.domain.split('.').slice(-2).join('.'))
@@ -24,9 +24,13 @@ request.interceptors.response.use(successHandler, errorHandler)
 
 export default request
 
-export function modifyRequestCommonHead (options) {
+function modifyRequestCommonHead (options) {
     request.defaults.headers.common = {
         ...request.defaults.headers.common,
         ...options
     }
+}
+export {
+    getLoginUrl,
+    modifyRequestCommonHead
 }

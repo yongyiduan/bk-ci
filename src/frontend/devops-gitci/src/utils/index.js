@@ -157,7 +157,7 @@ export function goYaml (projectUrl, branch, yamlName) {
 
 export function preciseDiff (duration) {
     if (!duration) return '--'
-    const durationDate = moment.duration(Math.abs(duration), 's')
+    const durationDate = moment.duration(Math.abs(duration))
     const timeMap = {
         y: durationDate.years(),
         mon: durationDate.months(),

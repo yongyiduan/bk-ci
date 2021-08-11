@@ -31,7 +31,7 @@
 
 <script>
     import { setting } from '@/http'
-    import { mapState } from 'vuex'
+    import { mapState, mapActions } from 'vuex'
 
     export default {
         data () {
@@ -57,10 +57,12 @@
         },
 
         methods: {
+            ...mapActions(['setProjectSetting']),
             getSetting () {
                 this.isLoading = true
                 setting.getSetting(this.projectId).then((res = {}) => {
                     Object.assign(this.form, res)
+                    this.setProjectSetting(res)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {

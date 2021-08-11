@@ -9,7 +9,7 @@
                 <li v-for="setting in settingList"
                     :key="setting.name"
                     @click="goToPage(setting)"
-                    :class="{ 'nav-item text-ellipsis': true, active: curSetting.name === setting.name }"
+                    :class="{ 'nav-item text-ellipsis': true, active: curSetting.name === setting.name, disabled: !setting.enable }"
                 >
                     <icon :name="setting.icon" size="18"></icon>
                     <span class="text-ellipsis item-text" v-bk-overflow-tips>{{ setting.label }}</span>
@@ -23,16 +23,29 @@
 
 <script>
     import { modifyHtmlTitle } from '@/utils'
+    import { mapState } from 'vuex'
 
     export default {
         data () {
             return {
-                settingList: [
-                    { label: 'Basic Settings', name: 'basicSetting', icon: 'edit' },
-                    { label: 'Credential Settings', name: 'credentialList', icon: 'lock' },
-                    { label: 'Agent Pools', name: 'agentPools', icon: 'cc-cabinet' }
-                ],
                 curSetting: {}
+            }
+        },
+
+        computed: {
+            ...mapState(['projectId', 'projectSetting']),
+
+            // 基础设置页时才判断是否enableCi
+            enableCi () {
+                return this.$route.name !== 'basicSetting' || (this.projectSetting && this.projectSetting.enableCi)
+            },
+
+            settingList () {
+                return [
+                    { label: 'Basic Settings', name: 'basicSetting', icon: 'edit', enable: true },
+                    { label: 'Credential Settings', name: 'credentialList', icon: 'lock', enable: this.enableCi },
+                    { label: 'Agent Pools', name: 'agentPools', icon: 'cc-cabinet', enable: this.enableCi }
+                ]
             }
         },
 
@@ -75,12 +88,14 @@
                 modifyHtmlTitle(title)
             },
 
-            goToPage ({ name, params }) {
-                this.$router.push({ name, params })
+            goToPage ({ name, params, enable }) {
+                if (enable) {
+                    this.$router.push({ name, params })
+                }
             },
 
             backHome () {
-                this.goToPage({ name: 'buildList' })
+                this.goToPage({ name: 'buildList', enable: true })
             }
         }
     }

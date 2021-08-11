@@ -12,7 +12,7 @@
             <bk-icon type="down-shape" />
         </div>
         <div
-            v-if="show && !disabled"
+            v-if="show"
             class="user-info-dropmenu"
         >
             <p class="user-avatar">
@@ -31,8 +31,8 @@
                         </span>
                     </li>
                     <li>
-                        <span class="user-menu-item" @click.stop="goLogin">
-                            Login Out
+                        <span class="user-menu-item" @click.stop="logout">
+                            Logout
                         </span>
                     </li>
                 </ul>
@@ -41,7 +41,7 @@
     </div>
 </template>
 <script>
-    
+    import { getLoginUrl } from '@/http/ajax'
     export default ({
         props: {
             user: {
@@ -74,10 +74,8 @@
                 this.hideUserInfo()
             },
 
-            goLogin () {
-                const loginUrl = new URL(LOGIN_SERVICE_URL)
-                loginUrl.searchParams.append('c_url', location.href)
-                window.location.href = loginUrl.href
+            logout () {
+                location.href = getLoginUrl(`http://${location.hostname}/_logout/`)
             }
         }
     })

@@ -99,7 +99,6 @@
                 this.loading.isLoading = true
 
                 setting.requestNodeDetail(this.projectId, this.nodeHashId).then((res) => {
-                    console.log(res, 3242)
                     this.nodeDetails = res
                 }).catch((err) => {
                     const message = err.message ? err.message : err
