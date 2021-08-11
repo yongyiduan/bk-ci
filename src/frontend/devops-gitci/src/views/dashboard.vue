@@ -11,7 +11,7 @@
                         </ol>
                     </div>
                 </div>
-                <div class="content-container" v-bkloading="{ isLoading: slotProps.isLoading }">
+                <div class="content-container">
                     <div style="margin-bottom: 15px;">
                         <bk-input :left-icon="'bk-icon icon-search'" placeholder="Filter by name" v-model="searchStr" @enter="updateList"></bk-input>
                     </div>
@@ -71,7 +71,7 @@
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import emptyTips from '@/components/empty-tips'
     import gitcode from './../images/home/gitcode.png'
-    import infiniteScroll from '@/components/InfiniteScroll'
+    import infiniteScroll from '@/components/infinite-scroll'
 
     export default {
         components: {

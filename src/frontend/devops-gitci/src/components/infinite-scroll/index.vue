@@ -4,7 +4,7 @@
         <div v-if="isLoadingMore" class="loading-more" slot="append">
             <icon
                 name="loading"
-                size="18"
+                :size="18"
             ></icon>
             <span>Loading</span>
         </div>

@@ -1,5 +1,5 @@
 <template>
-    <article class="gitci-main" v-bkloading="{ isLoading }">
+    <article class="gitci-main">
         <gitci-header></gitci-header>
         <router-view class="gitci-content" :name="childRouteName"></router-view>
     </article>
