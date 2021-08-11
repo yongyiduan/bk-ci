@@ -13,7 +13,7 @@
                 </div>
                 <div class="content-container">
                     <div style="margin-bottom: 15px;">
-                        <bk-input :left-icon="'bk-icon icon-search'" placeholder="Filter by name" v-model="searchStr" @enter="updateList"></bk-input>
+                        <bk-input :left-icon="'bk-icon icon-search'" placeholder="Filter by name" :clearable="true" v-model="searchStr" @enter="search" @clear="search"></bk-input>
                     </div>
                     <div class="empty-repo" v-if="!slotProps.list.length">
                         <empty-tips title="暂无项目"></empty-tips>
@@ -101,7 +101,18 @@
                 ]
             }
         },
+        created () {
+            this.searchStr = this.$route.query.searchKey || ''
+        },
         methods: {
+            search () {
+                this.$router.push({
+                    query: {
+                        searchKey: this.searchStr
+                    }
+                })
+                this.updateList()
+            },
             async updateList () {
                 if (this.$refs.infiniteScroll) {
                     this.$nextTick(async () => {
@@ -113,7 +124,7 @@
                 await common.getGitciProjects(this.type, page, pageSize, this.searchStr).then((res) => {
                     this.repoList = (res.records || []).map(item => ({
                         ...item,
-                        avatarUrl: (item.avatarUrl.endsWith('.jpg') || item.avatarUrl.endsWith('.jpeg') || item.avatarUrl.endsWith('.png')) ? item.avatarUrl : gitcode
+                        avatarUrl: (item.avatarUrl.endsWith('.jpg') || item.avatarUrl.endsWith('.jpeg') || item.avatarUrl.endsWith('.png')) ? (item.avatarUrl.replace('http:', '').replace('https:', '')) : gitcode
                     }))
                 }).catch((err) => {
                     this.$bkMessage({
