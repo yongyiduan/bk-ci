@@ -86,7 +86,7 @@ if (localDevUrl.slice(-1) === '/') {
     localDevUrl = localDevUrl.slice(0, -1)
 }
 
-const url = localDevUrl + ':8080'
+const url = `${localDevUrl}:${port}`
 
 let _resolve
 const readyPromise = new Promise(resolve => {
@@ -103,9 +103,9 @@ devMiddleware.waitUntilValid(() => {
 })
 
 // https
-const privateKey  = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.key'), 'utf8');
-const certificate = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.crt'), 'utf8');
-const credentials  = { key: privateKey, cert: certificate }
+const privateKey = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.key'), 'utf8')
+const certificate = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.crt'), 'utf8')
+const credentials = { key: privateKey, cert: certificate }
 
 const server = https.createServer(credentials, app).listen(port)
 
