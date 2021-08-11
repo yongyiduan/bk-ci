@@ -26,7 +26,7 @@
                     </div>
                     <ul class="bk-dropdown-list" slot="dropdown-content">
                         <li :class="{ unread: messageNum > 0 }"><a href="javascript:;" @click="goToNotifications">Notifications</a></li>
-                        <li><a href="javascript:;" @click="goLogin">Login Out</a></li>
+                        <li><a href="javascript:;" @click="logout">Login Out</a></li>
                     </ul>
                 </bk-dropdown-menu>
                 <a href="https://iwiki.woa.com/x/klPpK" target="_blank"><i class="bk-icon icon-question-circle-shape"></i></a>
@@ -39,6 +39,7 @@
 
 <script>
     import { common, notifications, pipelines } from '@/http'
+    import { getLoginUrl } from '@/http/ajax'
     import { mapActions, mapState } from 'vuex'
     import gitCiWebSocket from '@/utils/websocket'
     import register from '@/utils/websocket-register'
@@ -156,10 +157,8 @@
                 this.$router.push({ name: 'basicSetting' })
             },
 
-            goLogin () {
-                const loginUrl = new URL(LOGIN_SERVICE_URL)
-                loginUrl.searchParams.append('c_url', location.href)
-                window.location.href = loginUrl.href
+            logout () {
+                location.href = getLoginUrl(`http://${location.hostname}/_logout/`)
             },
 
             goToNotifications () {
