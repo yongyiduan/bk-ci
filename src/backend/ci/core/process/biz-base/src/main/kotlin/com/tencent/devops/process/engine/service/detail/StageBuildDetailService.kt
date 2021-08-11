@@ -57,7 +57,14 @@ class StageBuildDetailService(
     pipelineEventDispatcher,
     redisOperation
 ) {
-    fun updateStageStatus(buildId: String, stageId: String, buildStatus: BuildStatus): List<BuildStageStatus> {
+
+    fun updateStageStatus(
+        buildId: String,
+        stageId: String,
+        buildStatus: BuildStatus,
+        checkIn: StagePauseCheck?,
+        checkOut: StagePauseCheck?
+    ): List<BuildStageStatus> {
         logger.info("[$buildId]|update_stage_status|stageId=$stageId|status=$buildStatus")
         var allStageStatus: List<BuildStageStatus>? = null
         update(buildId, object : ModelInterface {
@@ -72,6 +79,8 @@ class StageBuildDetailService(
                     } else if (buildStatus.isFinish() && stage.startEpoch != null) {
                         stage.elapsed = System.currentTimeMillis() - stage.startEpoch!!
                     }
+                    stage.checkIn = checkIn
+                    stage.checkOut = checkOut
                     allStageStatus = fetchHistoryStageStatus(model)
                     return Traverse.BREAK
                 }
@@ -173,6 +182,39 @@ class StageBuildDetailService(
                 return update
             }
         }, BuildStatus.STAGE_SUCCESS)
+    }
+
+    fun stageCheckQualityFail(
+        buildId: String,
+        stageId: String,
+        controlOption: PipelineBuildStageControlOption,
+        checkIn: StagePauseCheck?,
+        checkOut: StagePauseCheck?
+    ): List<BuildStageStatus> {
+        logger.info("[$buildId]|stage_cancel|stageId=$stageId")
+        var allStageStatus: List<BuildStageStatus>? = null
+        update(buildId, object : ModelInterface {
+            var update = false
+
+            override fun onFindStage(stage: Stage, model: Model): Traverse {
+                if (stage.id == stageId) {
+                    update = true
+                    stage.status = null
+                    stage.reviewStatus = BuildStatus.QUALITY_CHECK_FAIL.name
+                    stage.stageControlOption = controlOption.stageControlOption
+                    stage.checkIn = checkIn
+                    stage.checkOut = checkOut
+                    allStageStatus = fetchHistoryStageStatus(model)
+                    return Traverse.BREAK
+                }
+                return Traverse.CONTINUE
+            }
+
+            override fun needUpdate(): Boolean {
+                return update
+            }
+        }, BuildStatus.FAILED)
+        return allStageStatus ?: emptyList()
     }
 
     fun stageReview(
