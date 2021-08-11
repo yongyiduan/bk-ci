@@ -2,8 +2,8 @@
     <section v-if="(stageControl.ruleIds || []).length">
         <span class="review-title">Quality Red Line</span>
         <section class="review-quality">
-            <bk-collapse>
-                <bk-collapse-item v-for="(qualityItem, index) in qualityList" :key="index">
+            <bk-collapse v-model="activeName">
+                <bk-collapse-item v-for="(qualityItem, index) in qualityList" :key="index" :name="qualityItem.hashId">
                     <span class="quality-summary">
                         <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
                         <span :class="{ 'quality-icon': true, 'success': qualityItem.interceptResult === 'PASS' }">
@@ -14,13 +14,13 @@
                         </span>
                     </span>
                     <section slot="content">
-                        <h5 class="quality-title">Rules</h5>
+                        <!-- <h5 class="quality-title">Rules</h5> -->
                         <ul>
                             <li class="quality-content text-ellipsis" v-for="(intercept, interceptIndex) in qualityItem.interceptList" :key="interceptIndex">
                                 <span :class="{ 'quality-icon': true, 'success': intercept.pass }">
                                     <i :class="`bk-icon ${ intercept.pass ? 'icon-check-1' : 'icon-close' }`"></i>
                                 </span>
-                                <span class="text-ellipsis" v-bk-overflow-tips>{{ intercept.detail }}</span>
+                                <span class="text-ellipsis" v-bk-overflow-tips>{{ intercept | nameFilter }}</span>
                             </li>
                         </ul>
                     </section>
@@ -43,6 +43,18 @@
                     FAIL: 'Blocked'
                 }
                 return resultMap[val]
+            },
+
+            nameFilter (intercept) {
+                const { indicatorName, operation, actualValue, value } = intercept
+                const operationMap = {
+                    GT: '>',
+                    GE: '>=',
+                    LT: '<',
+                    LE: '<=',
+                    EQ: '='
+                }
+                return `${indicatorName}当前值(${value})，期望${operationMap[operation]}${actualValue || 'null'}`
             }
         },
         props: {
@@ -117,13 +129,14 @@
         /deep/ .bk-collapse {
             display: flex;
             flex-wrap: wrap;
-            font-size: 14px;
+            font-size: 12px;
             .bk-collapse-item {
                 width: 50%;
                 margin-bottom: 12px;
                 .bk-collapse-item-header {
                     line-height: 20px;
                     height: 20px;
+                    font-size: 12px;
                 }
             }
             .quality-title {
@@ -131,7 +144,7 @@
                 color: #666770;
             }
             .quality-content {
-                margin-top: 4px;
+                margin-top: 6px;
                 color: #666770;
                 display: flex;
                 align-items: center;
@@ -156,7 +169,7 @@
             display: inline-block;
             line-height: 12px;
             text-align: center;
-            margin-right: 4px;
+            margin-right: 6px;
             &.success {
                 background: #e5f6ea;
             }
