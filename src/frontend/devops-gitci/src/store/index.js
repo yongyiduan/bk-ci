@@ -20,7 +20,8 @@ const store = new Vuex.Store({
         curPipeline: {},
         exceptionInfo: {
             type: 200
-        }
+        },
+        messageNum: 0
     },
     getters: {},
     mutations: {
@@ -44,6 +45,9 @@ const store = new Vuex.Store({
         },
         setPermission (state, permission) {
             state.permission = permission
+        },
+        updateMessageNum (state, num) {
+            state.messageNum = num
         }
     },
     actions: {
@@ -64,6 +68,9 @@ const store = new Vuex.Store({
         },
         setUser ({ commit }, user) {
             commit('updateUser', user)
+        },
+        setMessageNum ({ commit }, num) {
+            commit('updateMessage', num)
         }
     }
 })
