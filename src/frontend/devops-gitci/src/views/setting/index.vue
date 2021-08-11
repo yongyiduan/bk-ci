@@ -76,6 +76,7 @@
                     case 'agentList':
                     case 'addAgent':
                     case 'agentDetail':
+                    case 'poolSettings':
                         settingIndex = 2
                         break
                 }

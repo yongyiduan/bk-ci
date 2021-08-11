@@ -53,7 +53,7 @@
             },
             computedIconClass () {
                 const name = this.$route.name
-                const settingPages = ['setting', 'basicSetting', 'credentialList', 'agentPools', 'addAgent', 'agentList', 'agentDetail']
+                const settingPages = ['setting', 'basicSetting', 'credentialList', 'agentPools', 'addAgent', 'agentList', 'agentDetail', 'poolSettings']
                 const iconColor = settingPages.includes(name) ? 'blue-icon' : 'gray-icon'
                 return [iconColor, 'setting']
             },

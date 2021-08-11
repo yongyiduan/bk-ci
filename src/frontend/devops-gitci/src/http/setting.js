@@ -168,5 +168,17 @@ export default {
         return api.post(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/parallelTaskCount?parallelTaskCount=${parallelTaskCount}`).then(response => {
             return response
         })
+    },
+
+    getShareProjectList (projectId, envHashId, page = 1, pageSize = 100) {
+        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${envHashId}/list?offset=${page - 1}&limit=${pageSize}`)
+    },
+
+    setSharePool (projectId, envHashId, params) {
+        return api.post(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${envHashId}/share`, params)
+    },
+
+    deleteShare (projectId, envHashId, sharedProjectId) {
+        return api.delete(`${ENVIRNMENT_PERFIX}/user/environment/${projectId}/${envHashId}/${sharedProjectId}/sharedProject`)
     }
 }
