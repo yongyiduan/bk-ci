@@ -1,10 +1,10 @@
 <template>
     <section>
-        <span class="review-title">Manual Review</span>
-        <span class="review-subtitle">Review Instructions</span>
+        <span class="review-title">Manual Approvals</span>
+        <span class="review-subtitle">Approval description</span>
         <section :class="{ 'review-desc': true, 'show-more': isShowMore }">{{ desc }}</section>
         <bk-button text title="primary" @click="isShowMore = !isShowMore" v-if="isShowMoreButton">
-            <span v-if="!isShowMore" class="opt-button">Expand More<i class="bk-icon icon-angle-down"></i></span>
+            <span v-if="!isShowMore" class="opt-button">More<i class="bk-icon icon-angle-down"></i></span>
             <span v-else class="opt-button">Collapse<i class="bk-icon icon-angle-up"></i></span>
         </bk-button>
     </section>

@@ -1,8 +1,8 @@
 <template>
     <section>
         <span class="review-subtitle">
-            Audit Flow
-            <span class="review-clock" v-bk-tooltips="{ width: 500, content: 'Please complete the review operation before this time, the execution will be cancelled if the time expires, and the pipeline will be automatically marked as Stage successful.' }">
+            Approval Flow
+            <span class="review-clock" v-bk-tooltips="{ width: 500, content: 'Please approve before this time. If overdued, pipeline status will be set as Stage Success automatically.' }">
                 <i class="bk-icon icon-clock"></i>
                 {{ computedTime }}
             </span>
@@ -18,18 +18,18 @@
         <bk-divider></bk-divider>
 
         <span class="review-subtitle mt12">
-            Current State<span class="gray-color ml20">{{ computedStatusTxt }}</span>
+            Current Status<span class="gray-color ml20">{{ computedStatusTxt }}</span>
         </span>
         <bk-radio-group v-model="isCancel" class="review-result">
             <bk-radio :value="false" :disabled="disabled">
-                Agree <span class="gray-color">（Continue to execute the pipeline）</span>
+                Approve <span class="gray-color">（Continue pipeline execution）</span>
             </bk-radio>
             <bk-radio :value="true" :disabled="disabled" class="ml40">
-                Reject <span class="gray-color">（Cancel the execution and mark it as a successful stage）</span>
+                Reject <span class="gray-color">（Set previous stage status as Stage Success）</span>
             </bk-radio>
         </bk-radio-group>
 
-        <span class="review-subtitle">Audit opinion</span>
+        <span class="review-subtitle">Approval Opinion</span>
         <bk-input
             placeholder="Please enter review comments, required when rejected"
             type="textarea"
@@ -97,9 +97,9 @@
                 const curExecIndex = this.reviewGroups.findIndex(x => x.status === undefined) + 1
                 const { reviewers, operator } = this.showReviewGroup
 
-                let statusTxt = `Approved，processor：${operator}`
-                if (curExecIndex < this.curStep) statusTxt = `Pending approval，processor：${reviewers.join(', ')}`
-                if (curExecIndex === this.curStep) statusTxt = `Approval，processor：${reviewers.join(', ')}`
+                let statusTxt = `Approved. Approver: ${operator}`
+                if (curExecIndex < this.curStep) statusTxt = `Pending approval. Approver: ${reviewers.join(', ')}`
+                if (curExecIndex === this.curStep) statusTxt = `Waiting for preivous approval. Approver: ${reviewers.join(', ')}`
 
                 return statusTxt
             }
@@ -125,7 +125,7 @@
             getApproveData () {
                 return new Promise((resolve, reject) => {
                     if (this.isCancel && this.suggest === '') {
-                        this.errMessage = 'When rejected, the review opinion is required'
+                        this.errMessage = 'When reject is selected, approval opinion is required'
                         reject(new Error(this.errMessage))
                     } else {
                         this.errMessage = ''

@@ -1,10 +1,10 @@
 <template>
     <section>
-        <span class="review-subtitle">Custom Variable</span>
+        <span class="review-subtitle">Custom Variables</span>
 
         <bk-table :data="params">
-            <bk-table-column label="Parameter Name" prop="key" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="Parameter Value" prop="value" :formatter="valFormatter" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Name" prop="key" show-overflow-tooltip></bk-table-column>
+            <bk-table-column label="Value" prop="value" :formatter="valFormatter" show-overflow-tooltip></bk-table-column>
         </bk-table>
     </section>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <section>
-        <span class="review-subtitle">Audit Flow</span>
+        <span class="review-subtitle">Approval Flow</span>
         <bk-timeline :list="computedReviewGroups"></bk-timeline>
     </section>
 </template>
@@ -42,12 +42,12 @@
                             <section class="stage-review-content">
                                 <p class="review-title">
                                     {item.name}
-                                    <span class="review-normal"> Approved by {item.operator}：</span>
-                                    <span class="review-process"> Agree (continue to execute the pipeline) </span>
+                                    <span class="review-normal"> Approved by {item.operator}: </span>
+                                    <span class="review-process"> Approve (Continue pipeline execution) </span>
                                 </p>
-                                <p v-show={paramStr}>Change parameters：{paramStr}</p>
-                                <p>Approval comments：{item.suggest}</p>
-                                <p>Approval time：{convertTime(item.reviewTime)}</p>
+                                <p v-show={paramStr}>Edit variable: {paramStr}</p>
+                                <p>Approval opinion: {item.suggest}</p>
+                                <p>Approval time: {convertTime(item.reviewTime)}</p>
                             </section>
                         )
                         break
@@ -57,10 +57,10 @@
                                 <p class="review-title">
                                     {item.name}
                                     <span class="review-normal"> Approved by {item.operator}：</span>
-                                    <span class="review-abort"> Reject (cancel execution, immediately mark as Stage success status) </span>
+                                    <span class="review-abort"> Reject (Set previous stage status as Stage Success) </span>
                                 </p>
-                                <p>Approval comments：{item.suggest}</p>
-                                <p>Approval time：{convertTime(item.reviewTime)}</p>
+                                <p>Approval opinion: {item.suggest}</p>
+                                <p>Approval time: {convertTime(item.reviewTime)}</p>
                             </section>
                         )
                         break
@@ -69,7 +69,7 @@
                             <section class="stage-review-content">
                                 <p class="review-title">
                                     {item.name}
-                                    <span class="review-normal"> Handler：{item.reviewers.join(',')}</span>
+                                    <span class="review-normal"> Approver: {item.reviewers.join(',')}</span>
                                 </p>
                             </section>
                         )

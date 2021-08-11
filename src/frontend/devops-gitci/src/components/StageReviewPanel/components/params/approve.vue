@@ -1,6 +1,6 @@
 <template>
     <section v-if="computedShowParam">
-        <span class="review-subtitle">Custom Variable</span>
+        <span class="review-subtitle">Custom Variables</span>
         <ul>
             <li v-for="(param, index) in params" :key="index" class="review-params">
                 <bk-input disabled :value="param.key" class="review-param-item"></bk-input>

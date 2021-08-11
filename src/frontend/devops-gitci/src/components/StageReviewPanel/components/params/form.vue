@@ -10,13 +10,13 @@
         @confirm="confirm"
         @cancel="cancel">
         <bk-form form-type="vertical" :model="copyForm" ref="paramForm">
-            <bk-form-item label="Parameter Name" :rules="[requireRule('Parameter Name')]" property="key" :required="true" error-display-type="normal">
+            <bk-form-item label="Name" :rules="[requireRule('Name')]" property="key" :required="true" error-display-type="normal">
                 <bk-input v-model="copyForm.key"></bk-input>
             </bk-form-item>
-            <bk-form-item label="Chinese Name">
+            <bk-form-item label="Alias">
                 <bk-input v-model="copyForm.chineseName"></bk-input>
             </bk-form-item>
-            <bk-form-item label="Parameter Type" :rules="[requireRule('Parameter Type')]" property="valueType" :required="true" error-display-type="normal">
+            <bk-form-item label="Type" :rules="[requireRule('Type')]" property="valueType" :required="true" error-display-type="normal">
                 <bk-select v-model="copyForm.valueType" @selected="changeValueType" searchable>
                     <bk-option v-for="option in paramTypeList"
                         :key="option.id"
@@ -25,10 +25,10 @@
                     </bk-option>
                 </bk-select>
             </bk-form-item>
-            <bk-form-item label="Drop-down options" v-if="isSelectorParam(copyForm.valueType)" :desc="$t('editPage.optionsDesc')">
+            <bk-form-item label="Options" v-if="isSelectorParam(copyForm.valueType)" :desc="$t('editPage.optionsDesc')">
                 <bk-input type="textarea" :value="getTextAreaValue()" @blur="changeOption" :placeholder="$t('editPage.optionTips')"></bk-input>
             </bk-form-item>
-            <bk-form-item label="Defaults" v-if="copyForm.valueType" :key="copyForm.valueType">
+            <bk-form-item label="Default value" v-if="copyForm.valueType" :key="copyForm.valueType">
                 <param-value :form="copyForm"></param-value>
             </bk-form-item>
             <bk-form-item label="Required">
@@ -41,7 +41,7 @@
                     </bk-radio>
                 </bk-radio-group>
             </bk-form-item>
-            <bk-form-item label="Describe">
+            <bk-form-item label="Description">
                 <bk-input type="textarea" v-model="copyForm.desc"></bk-input>
             </bk-form-item>
         </bk-form>
@@ -88,7 +88,7 @@
         computed: {
             computedTitle () {
                 const keys = Object.keys(this.param)
-                return keys.length ? 'Edit parameters' : 'Add parameters'
+                return keys.length ? 'Edit variable' : 'Create variables'
             }
         },
 
