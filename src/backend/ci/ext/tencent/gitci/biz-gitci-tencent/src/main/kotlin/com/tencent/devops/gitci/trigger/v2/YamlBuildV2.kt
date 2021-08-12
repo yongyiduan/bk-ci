@@ -861,6 +861,7 @@ class YamlBuildV2 @Autowired constructor(
 
         containerList.add(
             NormalContainer(
+                jobId = job.id,
                 containerId = null,
                 id = job.id,
                 name = job.name ?: "Job-${jobIndex + 1}",
