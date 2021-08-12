@@ -58,6 +58,7 @@ import com.tencent.devops.common.ci.v2.stageCheck.ReviewVariable
 import com.tencent.devops.common.ci.v2.stageCheck.StageCheck
 import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
 import com.tencent.devops.common.client.Client
+import com.tencent.devops.common.kafka.KafkaClient
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.NameAndValue
 import com.tencent.devops.common.pipeline.container.Container
@@ -178,6 +179,7 @@ import javax.ws.rs.core.Response
 @Service
 class YamlBuildV2 @Autowired constructor(
     private val client: Client,
+    private val kafkaClient: KafkaClient,
     private val dslContext: DSLContext,
     private val objectMapper: ObjectMapper,
     private val gitCIBasicSettingDao: GitCIBasicSettingDao,
@@ -192,7 +194,7 @@ class YamlBuildV2 @Autowired constructor(
     private val gitCISettingDao: GitCISettingDao,
     private val gitPipelineBranchService: GitPipelineBranchService
 ) : YamlBaseBuildV2<ScriptBuildYaml>(
-    client, scmClient, dslContext, gitPipelineResourceDao,
+    client, kafkaClient, scmClient, dslContext, gitPipelineResourceDao,
     gitRequestEventBuildDao, gitCIEventSaveService, websocketService, gitPipelineBranchService
 ) {
 
