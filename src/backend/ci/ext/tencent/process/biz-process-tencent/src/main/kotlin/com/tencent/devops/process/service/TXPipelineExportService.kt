@@ -30,6 +30,7 @@ package com.tencent.devops.process.service
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.tencent.devops.common.api.enums.RepositoryConfig
 import com.tencent.devops.common.api.enums.RepositoryType
@@ -96,7 +97,8 @@ class TXPipelineExportService @Autowired constructor(
 
     companion object {
         private val logger = LoggerFactory.getLogger(TXPipelineExportService::class.java)
-        private val yamlObjectMapper = ObjectMapper(YAMLFactory()).apply {
+        private val yamlObjectMapper = ObjectMapper(YAMLFactory().enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE))
+            .apply {
             registerModule(KotlinModule())
         }
     }
@@ -710,7 +712,7 @@ class TXPipelineExportService @Autowired constructor(
         yamlSb.append("# 注意：不支持系统凭证(用户名、密码)的导出，请检查系统凭证的完整性！ \n")
         yamlSb.append("# 注意：[插件]输入参数可能存在敏感信息，请仔细检查，谨慎分享！！！ \n")
         if (isGitCI) {
-            yamlSb.append("# 注意：[插件]工蜂CI不支持蓝盾老版本的插件，请在研发商店搜索新插件替换 \n")
+            yamlSb.append("# 注意：[插件]Stream不支持蓝盾老版本的插件，请在研发商店搜索新插件替换 \n")
         }
         yamlSb.append("########################################################" +
             "#############################################################\n\n")
