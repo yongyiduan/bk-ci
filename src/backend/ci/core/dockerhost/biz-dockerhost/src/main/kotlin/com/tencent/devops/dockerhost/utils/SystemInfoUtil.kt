@@ -240,7 +240,7 @@ object SystemInfoUtil {
         if (fileStore == null) {
             fileStore = operatingSystem.fileSystem
                 .getFileStores(true)
-                .first { "/data" == it.mount }
+                .firstOrNull { "/data" == it.mount }
         }
         fileStore?.also {
             val freeSpace = it.freeSpace
