@@ -98,8 +98,8 @@
                 const { reviewers, operator } = this.showReviewGroup
 
                 let statusTxt = `Approved. Approver: ${operator}`
-                if (curExecIndex < this.curStep) statusTxt = `Pending approval. Approver: ${reviewers.join(', ')}`
-                if (curExecIndex === this.curStep) statusTxt = `Waiting for preivous approval. Approver: ${reviewers.join(', ')}`
+                if (curExecIndex < this.curStep) statusTxt = `Waiting for preivous approval. Approver: ${reviewers.join(', ')}`
+                if (curExecIndex === this.curStep) statusTxt = `Pending approval. Approver: ${reviewers.join(', ')}`
 
                 return statusTxt
             }
