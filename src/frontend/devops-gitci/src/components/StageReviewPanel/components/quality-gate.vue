@@ -87,7 +87,8 @@
                     this.projectId,
                     this.$route.params.pipelineId,
                     this.$route.params.buildId,
-                    this.stageControl.ruleIds
+                    this.stageControl.ruleIds,
+                    this.stageControl.checkTimes
                 ]
 
                 this.isLoading = true

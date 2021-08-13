@@ -164,8 +164,8 @@ export default {
         return api.post(`${GITCI_PERFIX}/user/trigger/build/checkYaml`, { yaml })
     },
 
-    requestQualityGate (projectId, pipelineId, buildId, ids, executeCount) {
-        return api.post(`${QUALITY_PREFIX}/user/intercepts/v2/pipeline/list?projectId=${projectId}&pipelineId=${pipelineId}&buildId=${buildId}&executeCount=${executeCount}`, ids)
+    requestQualityGate (projectId, pipelineId, buildId, ids, checkTimes) {
+        return api.post(`${QUALITY_PREFIX}/user/intercepts/v2/pipeline/list?projectId=${projectId}&pipelineId=${pipelineId}&buildId=${buildId}&checkTimes=${checkTimes}`, ids)
     },
 
     triggerStage ({ projectId, pipelineId, buildId, stageId, cancel, reviewParams, id, suggest }) {
