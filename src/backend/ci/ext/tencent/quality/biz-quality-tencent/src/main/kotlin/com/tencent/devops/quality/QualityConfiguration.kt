@@ -36,6 +36,7 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.client.ClientTokenService
 import com.tencent.devops.quality.dao.QualityNotifyGroupDao
 import com.tencent.devops.quality.dao.v2.QualityRuleDao
+import com.tencent.devops.quality.service.GitCIQualityPermissionService
 import com.tencent.devops.quality.service.TxQualityPermissionService
 import com.tencent.devops.quality.service.TxV3QualityPermissionService
 import org.jooq.DSLContext
@@ -78,5 +79,17 @@ class QualityConfiguration {
         authResourceApiStr: AuthResourceApiStr
     ) = TxV3QualityPermissionService(
         client, dslContext, ruleDao, groupDao, tokenService, authResourceApiStr
+    )
+
+    @Bean
+    @ConditionalOnProperty(prefix = "auth", name = ["idProvider"], havingValue = "gitCI")
+    fun gitCIQualityPermissionService(
+        client: Client,
+        tokenCheckService: ClientTokenService,
+        ruleDao: QualityRuleDao,
+        groupDao: QualityNotifyGroupDao,
+        dslContext: DSLContext
+    ) = GitCIQualityPermissionService(
+        client, tokenCheckService, ruleDao, groupDao, dslContext
     )
 }
