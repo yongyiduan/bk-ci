@@ -25,7 +25,8 @@ const store = new Vuex.Store({
             isShow: false,
             stage: {},
             type: ''
-        }
+        },
+        messageNum: 0
     },
     getters: {},
     mutations: {
@@ -52,6 +53,9 @@ const store = new Vuex.Store({
         },
         toggleStageReviewPanel (state, showStageReviewPanel) {
             Object.assign(state.showStageReviewPanel, showStageReviewPanel)
+        },
+        updateMessageNum (state, num) {
+            state.messageNum = num
         }
     },
     actions: {
@@ -75,6 +79,9 @@ const store = new Vuex.Store({
         },
         toggleStageReviewPanel ({ commit }, showStageReviewPanel) {
             commit('toggleStageReviewPanel', showStageReviewPanel)
+        },
+        setMessageNum ({ commit }, num) {
+            commit('updateMessage', num)
         }
     }
 })

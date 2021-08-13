@@ -7,7 +7,8 @@
             </h5>
 
             <opt-menu v-if="editable">
-                <li @click="goToAgentList">Self-hosted Agents</li>
+                <li @click="toPage('agentList')">Self-hosted Agents</li>
+                <li @click="toPage('poolSettings')">Settings</li>
                 <li @click="showDelete = true">Delete Agent Pool</li>
             </opt-menu>
         </header>
@@ -135,8 +136,8 @@
                 return theme
             },
 
-            goToAgentList () {
-                this.$router.push({ name: 'agentList', params: { poolId: this.pool.envHashId, poolName: this.pool.name } })
+            toPage (routeName) {
+                this.$router.push({ name: routeName, params: { poolId: this.pool.envHashId, poolName: this.pool.name } })
             }
         }
     }
