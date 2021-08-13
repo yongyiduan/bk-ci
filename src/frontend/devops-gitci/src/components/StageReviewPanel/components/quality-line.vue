@@ -7,7 +7,7 @@
                     <span class="quality-summary">
                         <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
                         <span :class="qualityItem.interceptResult === 'PASS' ? 'success' : 'error'">
-                            {{ qualityItem.interceptResult | interceptFilter }}（{{ qualityItem.interceptList.length }}）
+                            {{ qualityItem.interceptResult | interceptFilter }} ({{ qualityItem.interceptList.length }})
                         </span>
                     </span>
                     <section slot="content">
@@ -51,7 +51,7 @@
                     LE: '<=',
                     EQ: '='
                 }
-                return `${indicatorName}当前值(${value})，期望${operationMap[operation]}${actualValue || 'null'}`
+                return `${indicatorName}当前值(${actualValue || 'null'})，期望${operationMap[operation]}${value || 'null'}`
             }
         },
         props: {
@@ -152,6 +152,7 @@
             align-items: center;
             .quality-name {
                 margin-right: 12px;
+                max-width: 270px;
             }
         }
         .quality-icon {

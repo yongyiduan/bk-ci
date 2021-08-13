@@ -8,13 +8,13 @@
             @click.native="handleIconClick('checkIn')"
         />
 
-        <icon
+        <!-- <icon
             v-if="showStageCheck(stage.checkOut)"
             :name="reviewStatausIcon(stage.checkOut)"
             size="28"
             class="review-icon check-out"
             @click.native="handleIconClick('checkOut')"
-        />
+        /> -->
 
         <h3 class="stage-title">
             <span :class="`${stageStatusCls} title-content`">
