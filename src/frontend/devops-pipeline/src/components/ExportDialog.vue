@@ -76,7 +76,7 @@
                         name: `${this.pipelineName}.yml`,
                         tips: this.$t('newlist.exportGitciTip'),
                         exportUrl: `${API_URL_PREFIX}/${PROCESS_API_URL_PREFIX}/user/pipelines/${this.pipelineId}/projects/${this.projectId}/yaml/gitci`,
-                        tipsLink: `${IWIKI_DOCS_URL}/x/QBcLAQ`
+                        tipsLink: `${IWIKI_DOCS_URL}/x/pZMdK`
                     }
                 ]
             }
