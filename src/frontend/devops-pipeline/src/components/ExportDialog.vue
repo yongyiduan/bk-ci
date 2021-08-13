@@ -71,7 +71,7 @@
 
                     },
                     {
-                        title: '工蜂CI Yaml',
+                        title: 'Stream YAML',
                         icon: 'export-ci',
                         name: `${this.pipelineName}.yml`,
                         tips: this.$t('newlist.exportGitciTip'),
