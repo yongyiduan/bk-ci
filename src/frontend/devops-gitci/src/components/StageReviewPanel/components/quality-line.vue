@@ -6,9 +6,6 @@
                 <bk-collapse-item v-for="(qualityItem, index) in qualityList" :key="index" :name="qualityItem.hashId">
                     <span class="quality-summary">
                         <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
-                        <span :class="{ 'quality-icon': true, 'success': qualityItem.interceptResult === 'PASS' }">
-                            <i :class="`bk-icon ${ qualityItem.interceptResult === 'PASS' ? 'icon-check-1' : 'icon-close' }`"></i>
-                        </span>
                         <span :class="qualityItem.interceptResult === 'PASS' ? 'success' : 'error'">
                             {{ qualityItem.interceptResult | interceptFilter }}（{{ qualityItem.interceptList.length }}）
                         </span>
@@ -154,10 +151,7 @@
             display: flex;
             align-items: center;
             .quality-name {
-                flex: 1;
-            }
-            .quality-icon {
-                margin: 0 5.2px 0 9.3px;
+                margin-right: 12px;
             }
         }
         .quality-icon {
