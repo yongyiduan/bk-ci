@@ -1,6 +1,6 @@
 <template>
     <section class="review-show">
-        <quality-line :stage-control="stageControl"></quality-line>
+        <quality-gate :stage-control="stageControl"></quality-gate>
 
         <template v-if="stageControl.manualTrigger">
             <review-describe :desc="stageControl.reviewDesc"></review-describe>
@@ -14,14 +14,14 @@
     import ParamsShow from './components/params/show'
     import ReviewFlowShow from './components/reviewFlow/show'
     import ReviewDescribe from './components/describe'
-    import QualityLine from './components/quality-line'
+    import QualityGate from './components/quality-gate'
 
     export default {
         components: {
             ParamsShow,
             ReviewFlowShow,
             ReviewDescribe,
-            QualityLine
+            QualityGate
         },
 
         props: {

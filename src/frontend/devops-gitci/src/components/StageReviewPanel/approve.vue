@@ -1,6 +1,6 @@
 <template>
     <section class="review-approve-home">
-        <quality-line :stage-control="stageControl"></quality-line>
+        <quality-gate :stage-control="stageControl"></quality-gate>
 
         <template v-if="stageControl.manualTrigger">
             <review-describe :desc="stageControl.reviewDesc"></review-describe>
@@ -35,14 +35,14 @@
     import ParamsApprove from './components/params/approve'
     import ReviewFlowApprove from './components/reviewFlow/approve'
     import ReviewDescribe from './components/describe'
-    import QualityLine from './components/quality-line'
+    import QualityGate from './components/quality-gate'
 
     export default {
         components: {
             ParamsApprove,
             ReviewFlowApprove,
             ReviewDescribe,
-            QualityLine
+            QualityGate
         },
 
         props: {

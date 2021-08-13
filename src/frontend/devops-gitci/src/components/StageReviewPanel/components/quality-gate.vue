@@ -1,6 +1,6 @@
 <template>
     <section v-if="(stageControl.ruleIds || []).length">
-        <span class="review-title">Quality Red Line</span>
+        <span class="review-title">Quality Gate</span>
         <section class="review-quality">
             <bk-collapse v-model="activeName">
                 <bk-collapse-item v-for="(qualityItem, index) in qualityList" :key="index" :name="qualityItem.hashId">
@@ -54,6 +54,7 @@
                 return `${indicatorName}当前值(${actualValue || 'null'})，期望${operationMap[operation]}${value || 'null'}`
             }
         },
+
         props: {
             stageControl: {
                 type: Object,
@@ -90,7 +91,7 @@
                 ]
 
                 this.isLoading = true
-                pipelines.requestQualityLine(...params).then((res) => {
+                pipelines.requestQualityGate(...params).then((res) => {
                     this.qualityList = res
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
