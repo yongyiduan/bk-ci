@@ -109,10 +109,8 @@
 
         async toApplyPermission () {
             try {
-                const projectList = window.getLsCacheItem('projectList') || []
-                const curProject = projectList.find((project) => (project.projectCode === this.$route.params.projectId))
                 let redirectUrl = this.applyPermissionUrl
-                if (curProject.relationId) {
+                if (this.projectRelationId) {
                     const body = this.noPermissionList.map(perm => this.getPermissionBody(perm))
                     redirectUrl = await this.getPermRedirectUrl(body)
                 }

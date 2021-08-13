@@ -196,7 +196,14 @@
             },
 
             async toApplyPermission () {
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=code&role_creator=repertory`)
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.code, [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.CODE_REPERTORY
+                    }])
+                } else {
+                    this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=code&role_creator=repertory`)
+                }
             },
 
             goCreatePermission () {

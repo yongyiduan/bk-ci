@@ -77,6 +77,11 @@ Vue.mixin({
                 viewer: 'role_viewer',
                 creator: 'role_creator'
             }
+        },
+        projectRelationId () {
+            const projectList = JSON.parse(localStorage.getItem('_cache_projectList') || '[]')
+            const curProject = projectList.find((project) => (project.projectCode === this.$route.params.projectId))
+            return curProject.relationId
         }
     },
     methods: {
@@ -115,6 +120,30 @@ Vue.mixin({
 
         getPermUrlByRole (projectId, pipelineId, role = this.roleMap.viewer) {
             return `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&${role}=pipeline${pipelineId ? `:${pipelineId}` : ''}`
+        },
+
+        async applyPermission (actionId, resourceId, instanceId = []) {
+            try {
+                const redirectUrl = await this.$ajax.post(`/auth/api/user/auth/permissionUrl`, [{
+                    actionId,
+                    resourceId,
+                    instanceId
+                }])
+
+                console.log('redirectUrl', redirectUrl)
+                window.open(redirectUrl, '_blank')
+                this.$bkInfo({
+                    title: this.$t('permissionRefreshtitle'),
+                    subTitle: this.$t('permissionRefreshSubtitle'),
+                    okText: this.$t('permissionRefreshOkText'),
+                    cancelText: this.$t('close'),
+                    confirmFn: () => {
+                        location.reload()
+                    }
+                })
+            } catch (e) {
+                console.error(e)
+            }
         }
 
     }

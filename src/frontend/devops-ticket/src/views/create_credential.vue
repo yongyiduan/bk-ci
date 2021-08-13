@@ -254,7 +254,14 @@
                 //     id: this.projectId,
                 //     type: this.$permissionResourceTypeMap.PROJECT
                 // }])
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&role_creator=credential`)
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.credential, [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
+                    }])
+                } else {
+                    this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&role_creator=credential`)
+                }
             },
             cancel () {
                 this.$router.push({

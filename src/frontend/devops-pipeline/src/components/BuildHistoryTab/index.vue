@@ -221,7 +221,14 @@
             },
 
             async toApplyPermission () {
-                this.tencentPermission(this.getPermUrlByRole(this.$route.params.projectId, this.$route.params.pipelineId, this.roleMap.manager))
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.cert, [{
+                        id: this.$route.params.projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
+                    }])
+                } else {
+                    this.tencentPermission(this.getPermUrlByRole(this.$route.params.projectId, this.$route.params.pipelineId, this.roleMap.manager))
+                }
             },
 
             resetQueryCondition () {

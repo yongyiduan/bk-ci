@@ -269,7 +269,14 @@
                 this.iframeUtil.toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=environment&project_code=${this.projectId}&service_code=environment&role_creator=environment`)
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.envNode, [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.ENVIRONMENT_ENVIRONMENT
+                    }])
+                } else {
+                    this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=environment&project_code=${this.projectId}&service_code=environment&role_creator=environment`)
+                }
             },
             /**
              * 弹窗全选联动

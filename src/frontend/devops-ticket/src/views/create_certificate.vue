@@ -203,11 +203,14 @@
             },
 
             goToApplyPerm () {
-                // this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.cert, [{
-                //     id: this.projectId,
-                //     type: this.$permissionResourceTypeMap.PROJECT
-                // }])
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&role_creator=certificate`)
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.cert, [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
+                    }])
+                } else {
+                    this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&role_creator=certificate`)
+                }
             },
 
             async requestCertDetail (callBack) {

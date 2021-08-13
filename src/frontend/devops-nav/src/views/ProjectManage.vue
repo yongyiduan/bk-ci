@@ -400,12 +400,23 @@
 
         goProject ({ projectCode, enabled }): void {
             if (enabled) {
-                window.open(`/console/perm/my-project?project_code=${projectCode}`, '_blank')
+                if (this.projectRelationId) {
+                    window.open(`/console/ps/${projectCode}/${this.projectRelationId}/basic`, '_blank')
+                } else {
+                    window.open(`/console/perm/my-project?project_code=${projectCode}`, '_blank')
+                }
             }
         }
         
         toApplyPermission () {
-            this.tencentPermission('/console/perm/apply-join-project')
+            if (this.projectRelationId) {
+                this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.project, [{
+                    id: this.projectId,
+                    type: this.$permissionResourceTypeMap.PROJECT
+                }])
+            } else {
+                this.tencentPermission('/console/perm/apply-join-project')
+            }
         }
 
         applyCreatePermission () {
