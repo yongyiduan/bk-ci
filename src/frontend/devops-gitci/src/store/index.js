@@ -70,7 +70,7 @@ const store = new Vuex.Store({
             commit('updateUser', user)
         },
         setMessageNum ({ commit }, num) {
-            commit('updateMessage', num)
+            commit('updateMessageNum', num)
         }
     }
 })

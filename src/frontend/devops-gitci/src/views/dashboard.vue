@@ -195,7 +195,7 @@
     }
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
     @import '@/css/conf';
 
     .dashboard-container {
