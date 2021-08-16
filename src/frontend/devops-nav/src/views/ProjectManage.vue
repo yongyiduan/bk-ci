@@ -400,8 +400,10 @@
 
         goProject ({ projectCode, enabled }): void {
             if (enabled) {
-                if (this.projectRelationId) {
-                    window.open(`/console/ps/${projectCode}/${this.projectRelationId}/basic`, '_blank')
+                const projectList = window.getLsCacheItem('projectList') || []
+                const curProject = projectList.find((project) => (project.projectCode === projectCode)) || {}
+                if (curProject.relationId) {
+                    window.open(`/console/ps/${projectCode}/${curProject.relationId}/basic`, '_blank')
                 } else {
                     window.open(`/console/perm/my-project?project_code=${projectCode}`, '_blank')
                 }
