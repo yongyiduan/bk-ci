@@ -108,7 +108,7 @@ Vue.mixin({
     computed: {
         projectRelationId () {
             const projectList = window.getLsCacheItem('projectList') || []
-            const curProject = projectList.find((project) => (project.projectCode === this.$route.params.projectId))
+            const curProject = projectList.find((project) => (project.projectCode === this.$route['params'].projectId))
             return curProject.relationId
         }
     },
