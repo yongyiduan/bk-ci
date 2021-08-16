@@ -27,6 +27,7 @@
 
 package com.tencent.devops.worker.common.task.script.bat
 
+import com.tencent.devops.common.pipeline.enums.CharSetType
 import com.tencent.devops.store.pojo.app.BuildEnv
 import com.tencent.devops.worker.common.task.script.ICommand
 import com.tencent.devops.worker.common.utils.BatScriptUtil
@@ -44,7 +45,8 @@ class CommandBatImpl : ICommand {
         buildEnvs: List<BuildEnv>,
         continueNoneZero: Boolean,
         errorMessage: String?,
-        elementId: String?
+        elementId: String?,
+        charSetType: String?
     ) {
         val realCommand = parseTemplate(buildId, script, taskParam.plus(runtimeVariables), dir)
         BatScriptUtil.execute(
@@ -53,7 +55,8 @@ class CommandBatImpl : ICommand {
             runtimeVariables = runtimeVariables,
             dir = dir,
             errorMessage = errorMessage,
-            elementId = elementId
+            elementId = elementId,
+            charSetType = charSetType
         )
     }
 }
