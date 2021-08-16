@@ -47,7 +47,7 @@
         height: 100vh;
         overflow: auto;
         font-size: 14px;
-        /* color: #7b7d8a; */
+        color: #7b7d8a;
         background: #f5f5f5;
         font-family: -apple-system,PingFang SC,BlinkMacSystemFont,Microsoft YaHei,Helvetica Neue,Arial;
         ::-webkit-scrollbar-thumb {
