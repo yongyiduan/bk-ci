@@ -272,7 +272,7 @@
                 if (this.projectRelationId) {
                     this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.envNode, [{
                         id: this.projectId,
-                        type: this.$permissionResourceTypeMap.ENVIRONMENT_ENVIRONMENT
+                        type: this.$permissionResourceTypeMap.PROJECT
                     }])
                 } else {
                     this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=environment&project_code=${this.projectId}&service_code=environment&role_creator=environment`)
