@@ -25,13 +25,31 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:auth:biz-auth"))
-    api(project(":core:project:api-project"))
-    api(project(":core:repository:api-repository"))
-    api(project(":core:process:api-process"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:auth:api-auth-tencent"))
-    api(project(":ext:tencent:common:common-auth:common-auth-tencent"))
-    api(project(":ext:tencent:auth:sdk-auth-tencent"))
+package com.tencent.devops.auth.api.service
+
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID
+import com.tencent.devops.common.api.pojo.Result
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import javax.ws.rs.Consumes
+import javax.ws.rs.GET
+import javax.ws.rs.HeaderParam
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
+
+@Api(tags = ["SERVICE_DEPT"], description = "权限校验--组织相关")
+@Path("/service/dept")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface ServiceDeptResource {
+    @GET
+    @Path("/parents")
+    @ApiOperation("校验用户是否有action的权限")
+    fun getParentDept(
+        @HeaderParam(AUTH_HEADER_DEVOPS_USER_ID)
+        @ApiParam("用户ID", required = true)
+        userId: String
+    ): Result<Int>
 }

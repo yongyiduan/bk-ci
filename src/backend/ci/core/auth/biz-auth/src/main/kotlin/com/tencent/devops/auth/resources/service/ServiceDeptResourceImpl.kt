@@ -25,13 +25,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:auth:biz-auth"))
-    api(project(":core:project:api-project"))
-    api(project(":core:repository:api-repository"))
-    api(project(":core:process:api-process"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:auth:api-auth-tencent"))
-    api(project(":ext:tencent:common:common-auth:common-auth-tencent"))
-    api(project(":ext:tencent:auth:sdk-auth-tencent"))
+package com.tencent.devops.auth.resources.service
+
+import com.tencent.devops.auth.api.service.ServiceDeptResource
+import com.tencent.devops.auth.service.DeptService
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import org.springframework.beans.factory.annotation.Autowired
+
+@RestResource
+class ServiceDeptResourceImpl @Autowired constructor(
+    val deptService: DeptService
+) : ServiceDeptResource {
+    override fun getParentDept(userId: String): Result<Int> {
+        return Result("", deptService.getUserParentDept(userId))
+    }
 }

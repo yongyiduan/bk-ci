@@ -51,6 +51,7 @@ import com.tencent.devops.common.auth.utils.IamGroupUtils
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.service.utils.LogUtils
 import com.tencent.devops.project.dao.ProjectDao
+import com.tencent.devops.project.dao.UserDao
 import com.tencent.devops.project.dispatch.ProjectDispatcher
 import com.tencent.devops.project.listener.TxIamV3CreateEvent
 import org.jooq.DSLContext
@@ -64,7 +65,8 @@ class IamV3Service @Autowired constructor(
     val projectDao: ProjectDao,
     val dslContext: DSLContext,
     val projectDispatcher: ProjectDispatcher,
-    val client: Client
+    val client: Client,
+    val userDao: UserDao
 ) {
     /**
      *  V3创建项目流程 (V3创建项目未完全迁移完前，需双写V0,V3)
@@ -134,8 +136,13 @@ class IamV3Service @Autowired constructor(
         }
     }
 
+    // 分级管理员操作的用户范围,只能添加用户所在bg组织. 此处直接从project本地拿,最真实数据在用户中心
     private fun createIamProject(userId: String, resourceRegisterInfo: ResourceRegisterInfo): String {
-        val subjectScopes = ManagerScopes(ManagerScopesEnum.getType(ManagerScopesEnum.ALL), "*")
+        val bgId = userDao.get(dslContext, userId)?.bgId
+        logger.info("user $userId bg: $bgId")
+        val subjectScopes = ManagerScopes(
+            ManagerScopesEnum.getType(ManagerScopesEnum.DEPARTMENT),
+            bgId.toString())
         val authorizationScopes = AuthorizationUtils.buildManagerResources(
             projectId = resourceRegisterInfo.resourceCode,
             projectName = resourceRegisterInfo.resourceName,

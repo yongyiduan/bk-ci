@@ -25,13 +25,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:auth:biz-auth"))
-    api(project(":core:project:api-project"))
-    api(project(":core:repository:api-repository"))
-    api(project(":core:process:api-process"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:auth:api-auth-tencent"))
-    api(project(":ext:tencent:common:common-auth:common-auth-tencent"))
-    api(project(":ext:tencent:auth:sdk-auth-tencent"))
-}
+package com.tencent.devops.auth.entity
+
+import com.tencent.devops.common.auth.api.pojo.EsbBaseReq
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+
+@ApiModel
+data class SearchProfileDeptEntity(
+    @ApiModelProperty("用户 ID")
+    val id: String,
+    val with_family: Boolean,
+    override var bk_app_code: String,
+    override var bk_app_secret: String,
+    override var bk_username: String,
+    override val bk_token: String = ""
+) : EsbBaseReq(bk_app_code, bk_app_secret, bk_username, bk_token)
