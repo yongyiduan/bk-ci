@@ -1,5 +1,11 @@
 <template>
-    <vertical-tab :tabs="tabs"></vertical-tab>
+    <bk-exception class="exception-wrap-item" type="building" v-if="projectRelationId">
+        <span>权限升级中</span>
+        <div class="text-wrap">
+            权限中心功能升级中，暂不支持按流水线授权，请需要权限的同学主动申请
+        </div>
+    </bk-exception>
+    <vertical-tab :tabs="tabs" v-else></vertical-tab>
 </template>
 
 <script>
@@ -58,3 +64,12 @@
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    .exception-wrap-item {
+        margin-top: 150px;
+        /deep/ .bk-exception-text {
+            font-size: 20px;
+        }
+    }
+</style>

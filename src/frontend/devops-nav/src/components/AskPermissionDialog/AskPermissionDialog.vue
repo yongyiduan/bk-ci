@@ -108,24 +108,26 @@
         }
 
         async toApplyPermission () {
-          try {
-              // const body = this.noPermissionList.map(perm => this.getPermissionBody(perm))
-              // console.log('permBody', body)
-              // const redirectUrl = await this.getPermRedirectUrl(body)
-              window.open(this.applyPermissionUrl, '_blank')
-              this.showDialog = false
-              this.$bkInfo({
-                  title: this.$t('permissionRefreshtitle'),
-                  subTitle: this.$t('permissionRefreshSubtitle'),
-                  okText: this.$t('permissionRefreshOkText'),
-                  cancelText: this.$t('close'),
-                  confirmFn: () => {
-                      location.reload()
-                  }
-              })
-          } catch (e) {
-              console.error(e)
-          }
+            try {
+                let redirectUrl = this.applyPermissionUrl
+                if (this.projectRelationId) {
+                    const body = this.noPermissionList.map(perm => this.getPermissionBody(perm))
+                    redirectUrl = await this.getPermRedirectUrl(body)
+                }
+                window.open(redirectUrl, '_blank')
+                this.showDialog = false
+                this.$bkInfo({
+                    title: this.$t('permissionRefreshtitle'),
+                    subTitle: this.$t('permissionRefreshSubtitle'),
+                    okText: this.$t('permissionRefreshOkText'),
+                    cancelText: this.$t('close'),
+                    confirmFn: () => {
+                        location.reload()
+                    }
+                })
+            } catch (e) {
+                console.error(e)
+            }
         }
     }
 </script>

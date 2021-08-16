@@ -150,10 +150,14 @@
         function setCookie(cname, cvalue, domain){
             document.cookie = cname + "=" + cvalue + "; " + 'domain=' + domain + '; path=/;expires=Fri, 31 Dec 2030 23:59:59 GMT"';
         }
+
+        function removeCookie(cname, domain) {
+          document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;" + 'domain=' + domain + ';';
+        }
         
         window.setProjectIdCookie = function (projectId) {
             try {
-                var topDomain = document.domain.split('.').slice(-2).join('.')
+                var topDomain = document.domain.split('.').slice(-2).join('.');
                 if (projectId) {
                     setCookie(X_DEVOPS_PROJECT_ID, projectId, topDomain)
                     window.GLOBAL_PID = projectId

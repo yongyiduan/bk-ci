@@ -105,6 +105,13 @@ Vue.prototype.$bkMessage = function (config) {
 judgementLsVersion()
 
 Vue.mixin({
+    computed: {
+        projectRelationId () {
+            const projectList = window.getLsCacheItem('projectList') || []
+            const curProject = projectList.find((project) => (project.projectCode === this.$route.params.projectId))
+            return curProject.relationId
+        }
+    },
     methods: {
         tencentPermission (url) {
             const permUrl = this.isExtendTx ? url : PERM_URL_PREFIX

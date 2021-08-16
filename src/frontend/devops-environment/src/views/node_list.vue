@@ -387,21 +387,27 @@
                 this.$toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                // this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
-                //     id: this.projectId,
-                //     type: this.$permissionResourceTypeMap.PROJECT
-                // }])
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_creator=env_node`)
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
+                    }])
+                } else {
+                    this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_creator=env_node`)
+                }
             },
             toNodeApplyPerm (row) {
-                // this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
-                //     id: this.projectId,
-                //     type: this.$permissionResourceTypeMap.PROJECT
-                // }, {
-                //     id: row.nodeHashId,
-                //     type: this.$permissionResourceTypeMap.ENVIRONMENT_ENV_NODE
-                // }])
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}`)
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
+                    }, {
+                        id: row.nodeHashId,
+                        type: this.$permissionResourceTypeMap.ENVIRONMENT_ENV_NODE
+                    }])
+                } else {
+                    this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}`)
+                }
             },
             toNodeDetail (node) {
                 if (this.canShowDetail(node)) {

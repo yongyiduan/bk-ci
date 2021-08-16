@@ -637,7 +637,14 @@ export default {
         },
         async toApplyPermission (role) {
             const { projectId, pipelineId } = this.$route.params
-            this.tencentPermission(this.getPermUrlByRole(projectId, pipelineId, role))
+            if (this.projectRelationId) {
+                this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.pipeline, [{
+                    id: projectId,
+                    type: this.$permissionResourceTypeMap.PIPELINE_DEFAULT
+                }])
+            } else {
+                this.tencentPermission(this.getPermUrlByRole(projectId, pipelineId, role))
+            }
             // try {
             //     const { projectId } = this.$route.params
             //     const redirectUrl = await this.$ajax.post(`${AUTH_URL_PREFIX}/user/auth/permissionUrl`, [{
