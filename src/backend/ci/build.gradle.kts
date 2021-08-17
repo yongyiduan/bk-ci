@@ -169,6 +169,7 @@ subprojects {
 
             dependencySet("com.fasterxml.jackson.module:${Versions.Jackson}") {
                 entry("jackson-module-kotlin")
+                entry("jackson-module-jsonSchema")
             }
 
             dependencySet("com.fasterxml.jackson.core:${Versions.Jackson}") {
