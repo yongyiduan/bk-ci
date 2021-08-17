@@ -25,12 +25,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":core:dockerhost:api-dockerhost"))
-    api(project(":core:dispatch:api-dispatch"))
-}
+package com.tencent.devops.dispatch.docker.service
 
-plugins {
-    `task-deploy-to-maven`
+import com.tencent.devops.dispatch.docker.pojo.resource.UserDockerResourceOptionsVO
+
+interface ExtDockerResourceOptionsService {
+    fun getDockerResourceConfigList(userId: String, projectId: String, buildType: String): UserDockerResourceOptionsVO?
 }

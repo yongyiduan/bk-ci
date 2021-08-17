@@ -25,12 +25,30 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":core:dockerhost:api-dockerhost"))
-    api(project(":core:dispatch:api-dispatch"))
-}
+package com.tencent.devops.dispatch.docker.service
 
-plugins {
-    `task-deploy-to-maven`
+import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.kafka.KafkaClient
+import com.tencent.devops.common.kafka.KafkaTopic
+import com.tencent.devops.dispatch.docker.pojo.FormatLog
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+
+@Service
+class TXDockerHostBuildLogServiceImpl @Autowired constructor(
+    private val kafkaClient: KafkaClient
+) : DockerHostBuildLogService {
+
+    private val logger = LoggerFactory.getLogger(TXDockerHostBuildLogServiceImpl::class.java)
+
+    override fun sendFormatLog(formatLog: FormatLog): Boolean {
+        logger.info("send formatLog: $formatLog")
+        val formatLogMap = mapOf(
+            formatLog.logType to formatLog.logMessageMap,
+            "washTime" to formatLog.washTime
+        )
+        kafkaClient.send(KafkaTopic.LANDUN_LOG_FORMAT_TOPIC, JsonUtil.toJson(formatLogMap))
+        return true
+    }
 }

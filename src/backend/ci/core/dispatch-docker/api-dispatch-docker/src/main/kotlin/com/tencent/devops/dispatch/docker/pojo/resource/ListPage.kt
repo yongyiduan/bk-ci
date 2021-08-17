@@ -25,31 +25,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.dispatch.docker
+package com.tencent.devops.dispatch.docker.pojo.resource
 
-import com.tencent.devops.common.api.util.JsonUtil
-import com.tencent.devops.common.kafka.KafkaClient
-import com.tencent.devops.common.kafka.KafkaTopic
-import com.tencent.devops.dispatch.docker.pojo.FormatLog
-import com.tencent.devops.dispatch.docker.service.DockerHostBuildLogService
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-@Service
-class TXDockerHostBuildLogServiceImpl @Autowired constructor(
-    private val kafkaClient: KafkaClient
-) : DockerHostBuildLogService {
-
-    private val logger = LoggerFactory.getLogger(TXDockerHostBuildLogServiceImpl::class.java)
-
-    override fun sendFormatLog(formatLog: FormatLog): Boolean {
-        logger.info("send formatLog: $formatLog")
-        val formatLogMap = mapOf(
-            formatLog.logType to formatLog.logMessageMap,
-            "washTime" to formatLog.washTime
-        )
-        kafkaClient.send(KafkaTopic.LANDUN_LOG_FORMAT_TOPIC, JsonUtil.toJson(formatLogMap))
-        return true
-    }
+@ApiModel("分页数据包装模型")
+data class ListPage<out T>(
+    @ApiModelProperty("总记录行数", required = true)
+    val count: Long,
+    @ApiModelProperty("第几页", required = true)
+    val page: Int,
+    @ApiModelProperty("每页多少条", required = true)
+    val pageSize: Int,
+    @ApiModelProperty("总共多少页", required = true)
+    val totalPages: Int,
+    @ApiModelProperty("数据", required = true)
+    val records: List<T>
+) {
+    constructor(page: Int, pageSize: Int, count: Long, records: List<T>) :
+            this(count, page, pageSize, Math.ceil(count * 1.0 / pageSize).toInt(), records)
 }

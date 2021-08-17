@@ -25,12 +25,32 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":core:dockerhost:api-dockerhost"))
-    api(project(":core:dispatch:api-dispatch"))
-}
+package com.tencent.devops.dispatch.docker.pojo
 
-plugins {
-    `task-deploy-to-maven`
-}
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+
+/**
+ * DebugStartParam
+ */
+@ApiModel("启动webConsole调试请求参数")
+data class DebugStartParam(
+    @ApiModelProperty("项目id", required = true)
+    val projectId: String,
+    @ApiModelProperty("流水线Id", required = true)
+    val pipelineId: String,
+    @ApiModelProperty("vmSeqId", required = true)
+    val vmSeqId: String,
+    @ApiModelProperty("imageType为BKSTORE时的镜像编码", required = false)
+    val imageCode: String?,
+    @ApiModelProperty("imageType为BKSTORE时的镜像版本", required = false)
+    val imageVersion: String?,
+    @ApiModelProperty("镜像名称", required = false)
+    val imageName: String?,
+    @ApiModelProperty("环境变量", required = true)
+    val buildEnv: Map<String, String>?,
+    @ApiModelProperty("镜像类型(BKDEVOPS或THIRD或BKSTORE)", required = true)
+    val imageType: String?,
+    @ApiModelProperty("镜像仓库凭证ID", required = true)
+    val credentialId: String?
+)

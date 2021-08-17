@@ -25,38 +25,43 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.dockerhost.api
+package com.tencent.devops.dispatch.docker.api.user
 
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.dispatch.docker.pojo.ContainerInfo
+import com.tencent.devops.common.pipeline.type.BuildType
+import com.tencent.devops.dispatch.docker.pojo.resource.UserDockerResourceOptionsVO
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import javax.ws.rs.Consumes
-import javax.ws.rs.POST
+import javax.ws.rs.GET
+import javax.ws.rs.HeaderParam
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
 
-@Api(tags = ["DOCKER_DEBUG"], description = "docker debug")
-@Path("/docker")
+@Api(tags = ["USER_DOCKER_HOST"], description = "用户-获取构建容器信息")
+@Path("/user/dispatch-docker")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-interface ServiceDockerDebugResource {
+interface UserDockerResourceConfigResource {
 
-    @ApiOperation("启动流水线调试")
-    @POST
-    @Path("/debug/start")
-    fun startDebug(
-        @ApiParam("容器信息", required = true)
-        dockerStartDebugInfo: ContainerInfo
-    ): Result<String>
-
-    @ApiOperation("终止流水线调试")
-    @POST
-    @Path("/debug/end")
-    fun endDebug(
-        @ApiParam("容器信息", required = true)
-        dockerEndDebugInfo: ContainerInfo
-    ): Result<Boolean>
+    @GET
+    @Path("/resource-config/projects/{projectId}/list")
+    @ApiOperation("获取docker性能配置列表")
+    fun getDockerResourceConfigList(
+        @ApiParam("用户ID", required = true, defaultValue = AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_USER_ID)
+        userId: String,
+        @ApiParam("projectId", required = true)
+        @PathParam("projectId")
+        projectId: String,
+        @ApiParam("buildType", required = false)
+        @QueryParam("buildType")
+        buildType: String? = BuildType.DOCKER.name
+    ): Result<UserDockerResourceOptionsVO>
 }

@@ -25,38 +25,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.dockerhost.api
+package com.tencent.devops.dispatch.docker.controller
 
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.dispatch.docker.pojo.ContainerInfo
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import javax.ws.rs.Consumes
-import javax.ws.rs.POST
-import javax.ws.rs.Path
-import javax.ws.rs.Produces
-import javax.ws.rs.core.MediaType
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.dispatch.docker.api.op.OPDockerResourceOptionsResource
+import com.tencent.devops.dispatch.docker.pojo.resource.DockerResourceOptionsVO
+import com.tencent.devops.dispatch.docker.service.DockerResourceOptionsService
+import org.springframework.beans.factory.annotation.Autowired
 
-@Api(tags = ["DOCKER_DEBUG"], description = "docker debug")
-@Path("/docker")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-interface ServiceDockerDebugResource {
+@RestResource
+class OpDockerResourceOptionResourceImpl @Autowired constructor(
+    private val dockerResourceOptionsService: DockerResourceOptionsService
+) : OPDockerResourceOptionsResource {
+    override fun listResourceOptions(userId: String): Result<List<DockerResourceOptionsVO>> {
+        return Result(dockerResourceOptionsService.listDockerResourceConfig(userId))
+    }
 
-    @ApiOperation("启动流水线调试")
-    @POST
-    @Path("/debug/start")
-    fun startDebug(
-        @ApiParam("容器信息", required = true)
-        dockerStartDebugInfo: ContainerInfo
-    ): Result<String>
+    override fun createResourceOptions(
+        userId: String,
+        dockerResourceOptionsVO: DockerResourceOptionsVO
+    ): Result<Boolean> {
+        return Result(dockerResourceOptionsService.createDockerResourceOptions(userId, dockerResourceOptionsVO))
+    }
 
-    @ApiOperation("终止流水线调试")
-    @POST
-    @Path("/debug/end")
-    fun endDebug(
-        @ApiParam("容器信息", required = true)
-        dockerEndDebugInfo: ContainerInfo
-    ): Result<Boolean>
+    override fun updateResourceOptions(
+        userId: String,
+        id: Long,
+        dockerResourceOptionsVO: DockerResourceOptionsVO
+    ): Result<Boolean> {
+        return Result(dockerResourceOptionsService.updateDockerResourceOptions(userId, id, dockerResourceOptionsVO))
+    }
+
+    override fun deleteResourceOptions(userId: String, projectId: Long): Result<Boolean> {
+        return Result(dockerResourceOptionsService.deleteDockerResourceOptions(userId, projectId))
+    }
 }

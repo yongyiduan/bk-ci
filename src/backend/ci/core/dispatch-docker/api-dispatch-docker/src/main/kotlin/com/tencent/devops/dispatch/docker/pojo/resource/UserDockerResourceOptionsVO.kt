@@ -25,12 +25,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":core:dockerhost:api-dockerhost"))
-    api(project(":core:dispatch:api-dispatch"))
-}
+package com.tencent.devops.dispatch.docker.pojo.resource
 
-plugins {
-    `task-deploy-to-maven`
-}
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+
+@ApiModel("docker性能用户选项配置")
+data class UserDockerResourceOptionsVO(
+    @ApiModelProperty("默认选项")
+    val default: String,
+    @ApiModelProperty("是否展示")
+    val needShow: Boolean,
+    @ApiModelProperty("性能配置")
+    val dockerResourceOptionsMaps: List<DockerResourceOptionsMap>
+)
+
+data class DockerResourceOptionsMap(
+    val id: String,
+    val dockerResourceOptionsShow: DockerResourceOptionsShow
+)

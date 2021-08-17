@@ -25,12 +25,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":core:dockerhost:api-dockerhost"))
-    api(project(":core:dispatch:api-dispatch"))
-}
+package com.tencent.devops.dispatch.docker.pojo
 
-plugins {
-    `task-deploy-to-maven`
-}
+data class ContainerInfo(
+    val projectId: String,
+    val pipelineId: String,
+    val vmSeqId: String,
+    val poolNo: Int,
+    val status: Int,
+    val imageName: String,
+    val containerId: String,
+    val address: String,
+    val token: String,
+    val buildEnv: String?,
+    val registryUser: String?,
+    val registryPwd: String?,
+    val imageType: String?
+)

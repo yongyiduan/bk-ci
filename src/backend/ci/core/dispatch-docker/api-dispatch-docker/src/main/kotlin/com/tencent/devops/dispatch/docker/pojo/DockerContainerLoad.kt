@@ -25,12 +25,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":core:dockerhost:api-dockerhost"))
-    api(project(":core:dispatch:api-dispatch"))
-}
+package com.tencent.devops.dispatch.docker.pojo
 
-plugins {
-    `task-deploy-to-maven`
-}
+data class DockerContainerLoad(
+    val memoryLimitBytes: Long,
+    val cpuPeriod: Int,
+    val cpuQuota: Int,
+    val blkioDeviceWriteBps: Long,
+    val blkioDeviceReadBps: Long
+)
