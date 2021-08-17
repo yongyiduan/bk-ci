@@ -763,7 +763,7 @@
                                 payload
                             })
             
-                            if (!result) {
+                            if (result) {
                                 await this.$store.dispatch('experience/createExperience', {
                                     projectId: this.projectId,
                                     params
@@ -772,7 +772,7 @@
                                 message = '新增体验成功'
                                 theme = 'success'
                             } else {
-                                console.log(this.$$permissionActionMap)
+                                
                                 const params = {
                                     noPermissionList: [{
                                         actionId: this.$permissionActionMap.execute,
@@ -793,11 +793,13 @@
                         message = err.message ? err.message : err
                         theme = 'error'
                     } finally {
-                        this.$bkMessage({
-                            message,
-                            theme
-                        })
-            
+                        if (message) {
+                            this.$bkMessage({
+                                message,
+                                theme
+                            })
+                        }
+                            
                         this.loading.isLoading = false
             
                         if (theme === 'success') {
