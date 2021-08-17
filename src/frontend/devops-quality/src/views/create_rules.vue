@@ -658,7 +658,7 @@
             },
             goToApplyPerm () {
                 if (this.projectRelationId) {
-                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.rule, [{
+                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.ruleGroup, [{
                         id: this.projectId,
                         type: this.$permissionResourceTypeMap.QUALITY_RULE
                     }])
