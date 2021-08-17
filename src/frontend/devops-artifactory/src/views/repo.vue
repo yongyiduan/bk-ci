@@ -268,11 +268,8 @@
     import { mapGetters, mapState } from 'vuex'
     import {
         convertTime,
-        convertFileSize,
-        getCheckEnvPrefix
+        convertFileSize
     } from '@/utils/util'
-
-    const DEVNET_URL_PREFIX = getCheckEnvPrefix()
 
     export default {
         components: {
@@ -575,8 +572,7 @@
              */
             async getDevnetGateway () {
                 try {
-                    const url = `/artifactory/api/user/artifactories/checkDevnetGateway`
-                    const res = await this.$ajax.get(url, { baseURL: DEVNET_URL_PREFIX })
+                    const res = await this.$ajax.get(`/artifactory/api/user/artifactories/checkDevnetGateway`)
                     return res
                 } catch (err) {
                     return false

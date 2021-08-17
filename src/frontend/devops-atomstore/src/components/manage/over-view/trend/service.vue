@@ -69,7 +69,7 @@
                     if (chartData) {
                         resolve(chartData)
                     } else {
-                        const code = this.detail.atomCode
+                        const code = this.detail.serviceCode
                         const now = moment(moment().format('YYYY-MM-DD')).subtract(1, 'days')
                         const params = {
                             endTime: now.format('YYYY-MM-DD HH:mm:ss'),

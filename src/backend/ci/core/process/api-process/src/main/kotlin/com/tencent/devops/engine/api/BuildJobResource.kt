@@ -142,6 +142,21 @@ interface BuildJobResource {
     @POST
     @Path("/heartbeat")
     fun jobHeartbeat(
+        @ApiParam(value = "构建ID", required = true)
+        @HeaderParam(AUTH_HEADER_DEVOPS_BUILD_ID)
+        buildId: String,
+        @ApiParam(value = "构建环境ID", required = true)
+        @HeaderParam(AUTH_HEADER_DEVOPS_VM_SEQ_ID)
+        vmSeqId: String,
+        @ApiParam(value = "构建机名称", required = true)
+        @HeaderParam(AUTH_HEADER_DEVOPS_VM_NAME)
+        vmName: String
+    ): Result<Boolean>
+
+    @ApiOperation("Job心跳请求V1版")
+    @POST
+    @Path("/heartbeat/v1")
+    fun jobHeartbeatV1(
         @ApiParam("projectId", required = true)
         @HeaderParam(AUTH_HEADER_DEVOPS_PROJECT_ID)
         projectId: String,

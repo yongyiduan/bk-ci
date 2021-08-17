@@ -120,7 +120,7 @@
                 <i class="devops-icon icon-exclamation-circle-shape"></i>
                 <p class="success-info-title">提示：修改编译命令</p>
                 <p class="success-info-title-level-2">1、复制和整理模板文件</p>
-                <p class="success-info-desc">将配置文件bk_bazelrc和文件夹bkdistcctoolchain（含里面的文件）拷贝到项目根目录下。<a href="http://devgw.devops.oa.com/turbo-client/bazel.zip" class="text-link">点击下载模板文件>></a></p>
+                <p class="success-info-desc">将配置文件bk_bazelrc和文件夹bkdistcctoolchain（含里面的文件）拷贝到项目根目录下。<a href="/turbo-client/bazel.zip" class="text-link">点击下载模板文件>></a></p>
                 <p class="success-info-desc">如果项目有自己的toolchain配置，需要将其内容合并到上述文件里。</p>
                 <p class="success-info-title-level-2">2、修改bazel命令</p>
                 <p class="success-info-desc">例如：</p>

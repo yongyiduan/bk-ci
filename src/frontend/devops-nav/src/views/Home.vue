@@ -85,11 +85,6 @@
                     <p class="title">
                         {{ $t("latestNews") }}
                     </p>
-                    <a
-                        href="http://x.code.oa.com/bkdevops/devops/notice"
-                        class="more"
-                        target="_blank"
-                    >{{ $t('moreDetail') }}</a>
                 </header>
 
                 <div class="devops-news-content">

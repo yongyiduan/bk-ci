@@ -19,6 +19,7 @@
 
 <script>
     import commentRate from '../comment-rate'
+    import { DEFAULT_LOGO_URL } from '@/utils/'
 
     export default {
         components: {
@@ -32,7 +33,7 @@
 
         data () {
             return {
-                defaultUrl: 'http://radosgw.open.oa.com/paas_backend/ieod/dev/file/png/random_15647373141529070794466428255950.png?v=1564737314'
+                defaultUrl: DEFAULT_LOGO_URL
             }
         },
 

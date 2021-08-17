@@ -122,7 +122,6 @@
                     })
                     if (res && res.status === 2 && res.containerId && res.address) {
                         this.getLinkDetail(res.containerId, res.address)
-                        // this.url = `ws://${PROXY_URL_PREFIX}/docker-console?pipelineId=${this.pipelineId}&containerId=${res.containerId}&projectId=${this.projectId}&targetIP=${res.address}`
                     } else {
                         this.timer = setTimeout(async () => {
                             await this.getContainerInfo()
@@ -192,7 +191,7 @@
                     })
                     this.execId = execId
                     this.resizeUrl = `docker-console-resize?pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIp=${targetIp}`
-                    this.url = `ws://${PROXY_URL_PREFIX}/docker-console-new?eventId=${execId}&pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIP=${targetIp}&containerId=${containerId}`
+                    this.url = `ws:${PROXY_URL_PREFIX}/docker-console-new?eventId=${execId}&pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIP=${targetIp}&containerId=${containerId}`
                 } catch (err) {
                     this.$showTips({
                         message: err.message,

@@ -56,7 +56,7 @@
                     pipelineId: this.storeBuildInfo.pipelineId,
                     buildId: this.storeBuildInfo.buildId,
                     start: this.getLog.start > 0 ? this.getLog.start + 1 : 0,
-                    executeCount: this.getLog.executeCount || (this.getLog.executeCount = 1, 1)
+                    executeCount: (this.getLog.executeCount || (this.getLog.executeCount = 1, 1))
                 }
                 this.$store.dispatch('store/requestProgressLog', postData).then((data = {}) => {
                     if (id && this.cancelIds.includes(id)) return

@@ -122,7 +122,7 @@
         
         methods: {
             downLoad () {
-                window.open(`http://api.devops.oa.com/turbo/api/user/turbo/task/software/${this.taskParam.taskId}/LD_Turbo_install.tar.gz`)
+                window.open(`/turbo/api/user/turbo/task/software/${this.taskParam.taskId}/LD_Turbo_install.tar.gz`)
             },
             buildSave () {
                 console.log('提交')
