@@ -27,19 +27,28 @@
 
 package com.tencent.devops.common.quality.pojo
 
+import com.tencent.devops.common.quality.pojo.enums.RuleInterceptResult
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
-@ApiModel("质量红线-拦截检测结果")
-data class RuleCheckResult(
-    @ApiModelProperty("是否通过", required = true)
-    val success: Boolean,
-    @ApiModelProperty("失败后是否结束", required = true)
-    val failEnd: Boolean,
-    @ApiModelProperty("审核超时时间", required = true)
-    val auditTimeoutSeconds: Long,
-    @ApiModelProperty("第几次检查", required = true)
+@ApiModel("质量红线-规则拦截数")
+data class QualityRuleIntercept(
+    @ApiModelProperty("流水线ID", required = true)
+    val pipelineId: String,
+    @ApiModelProperty("流水线名称", required = true)
+    val pipelineName: String,
+    @ApiModelProperty("构建ID", required = true)
+    val buildId: String,
+    @ApiModelProperty("规则ID", required = true)
+    val ruleHashId: String,
+    @ApiModelProperty("规则名称", required = true)
+    val ruleName: String,
+    @ApiModelProperty("拦截时间", required = true)
+    val interceptTime: Long,
+    @ApiModelProperty("拦截结果", required = true)
+    val result: RuleInterceptResult,
+    @ApiModelProperty("拦截次数", required = true)
     val checkTimes: Int,
-    @ApiModelProperty("失败信息", required = true)
-    val resultList: List<RuleCheckSingleResult>
+    @ApiModelProperty("拦截结果信息列表", required = true)
+    val resultMsg: List<QualityRuleInterceptRecord>
 )
