@@ -41,13 +41,13 @@
                         content = (
                             <section class="stage-review-content">
                                 <p class="review-title">
-                                    {item.name}
+                                    <span class="content-subtitle">{item.name}</span>
                                     <span class="review-normal"> Approved by {item.operator}: </span>
                                     <span class="review-process"> Approve (Continue pipeline execution) </span>
                                 </p>
                                 <p v-show={paramStr}>Edit variable: {paramStr}</p>
-                                <p>Approval opinion: {item.suggest}</p>
-                                <p>Approval time: {convertTime(item.reviewTime)}</p>
+                                <p><span class="mr8 max-width">Approval opinion:</span>{item.suggest}</p>
+                                <p><span class="mr8 max-width">Approval time:</span>{convertTime(item.reviewTime)}</p>
                             </section>
                         )
                         break
@@ -55,12 +55,12 @@
                         content = (
                             <section class="stage-review-content">
                                 <p class="review-title">
-                                    {item.name}
-                                    <span class="review-normal"> Approved by {item.operator}：</span>
+                                    <span class="content-subtitle">{item.name}</span>
+                                    <span class="review-normal"> Approved by {item.operator}: </span>
                                     <span class="review-abort"> Reject (Set previous stage status as Stage Success) </span>
                                 </p>
-                                <p>Approval opinion: {item.suggest}</p>
-                                <p>Approval time: {convertTime(item.reviewTime)}</p>
+                                <p><span class="mr8 max-width">Approval opinion:</span>{item.suggest}</p>
+                                <p><span class="mr8 max-width">Approval time:</span>{convertTime(item.reviewTime)}</p>
                             </section>
                         )
                         break
@@ -68,7 +68,7 @@
                         content = (
                             <section class="stage-review-content">
                                 <p class="review-title">
-                                    {item.name}
+                                    <span class="content-subtitle">{item.name}</span>
                                     <span class="review-normal"> Approver: {item.reviewers.join(',')}</span>
                                 </p>
                             </section>
@@ -101,7 +101,7 @@
         }
     }
     .stage-review-content {
-        line-height: 20px;
+        line-height: 16px;
         font-size: 12px;
         color: #777981;
         p {
@@ -121,6 +121,16 @@
         }
         .review-abort {
             color: #ff7979;
+        }
+        .content-subtitle {
+            color: black;
+        }
+        .mr8 {
+            margin-right: 8px;
+        }
+        .max-width {
+            display: inline-block;
+            min-width: 110px;
         }
     }
 </style>

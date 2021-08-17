@@ -1,6 +1,6 @@
 <template>
     <section v-if="(stageControl.ruleIds || []).length">
-        <span class="review-title">Quality Gate</span>
+        <span class="review-title">Quality Gates</span>
         <section class="review-quality">
             <bk-collapse v-model="activeName">
                 <bk-collapse-item v-for="(qualityItem, index) in qualityList" :key="index" :name="qualityItem.hashId">
@@ -17,7 +17,8 @@
                                 <span :class="{ 'quality-icon': true, 'success': intercept.pass }">
                                     <i :class="`bk-icon ${ intercept.pass ? 'icon-check-1' : 'icon-close' }`"></i>
                                 </span>
-                                <span class="text-ellipsis" v-bk-overflow-tips>{{ intercept | nameFilter }}</span>
+                                <span class="text-ellipsis mr5" v-bk-overflow-tips>{{ intercept | nameFilter }}</span>
+                                <i class="bk-icon icon-info" v-bk-tooltips="{ content: intercept.logPrompt }" v-if="intercept.logPrompt"></i>
                             </li>
                         </ul>
                     </section>
@@ -88,7 +89,7 @@
                     this.$route.params.pipelineId,
                     this.$route.params.buildId,
                     this.stageControl.ruleIds,
-                    this.stageControl.checkTimes
+                    this.stageControl.checkTimes || 1
                 ]
 
                 this.isLoading = true
