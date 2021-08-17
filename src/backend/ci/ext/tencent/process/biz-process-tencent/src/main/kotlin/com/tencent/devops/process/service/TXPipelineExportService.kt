@@ -691,7 +691,12 @@ class TXPipelineExportService @Autowired constructor(
             }
             newValue = newValue.replace(matcher.group(), realValue)
         }
-        return newValue
+        return removeExcessIndentation(newValue)
+    }
+
+    private fun removeExcessIndentation(value: String): String {
+        val regex = Regex("\\n(\\t+|\\s+)\\n")
+        return value.replace(regex, "\n\n")
     }
 
     private fun getYamlStringBuilder(
