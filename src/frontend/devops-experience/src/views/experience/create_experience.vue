@@ -207,6 +207,7 @@
             return {
                 hasPermission: true,
                 curPipelineId: '',
+                curPipelineName: '',
                 defaultDate: '2018-05-04',
                 groupIdDesc: "可发通知至企业微信群。群ID获取方法：将'CI-Notice' 拉进群，手动@CI-Notice 并输入关键字'会话ID'，发送后即可获取群ID",
                 experienceGroup: [],
@@ -581,20 +582,23 @@
                         this.versionSelectConf.confirmText = '提交中...'
 
                         const obj = this.getSelectedFile
-                        console.log(obj, 'obj')
+                        
                         try {
                             const res = await this.$store.dispatch('experience/requestMetaList', {
                                 projectId: this.projectId,
                                 artifactoryType: obj.artifactoryType,
                                 path: obj.fullPath
                             })
-
+                            
                             this.metaList = res.map(item => {
                                 if (item.key === 'appVersion') {
                                     this.createReleaseForm.version_no = item.value
                                 }
                                 if (item.key === 'pipelineId') {
                                     this.curPipelineId = item.value
+                                }
+                                if (item.key === 'pipelineName') {
+                                    this.curPipelineName = item.value
                                 }
                                 return item
                             })
@@ -768,10 +772,17 @@
                                 message = '新增体验成功'
                                 theme = 'success'
                             } else {
+                                
                                 const params = {
-                                    noPermissionList: [
-                                        { resource: '流水线', option: '执行' }
-                                    ],
+                                    noPermissionList: [{
+                                        actionId: this.$permissionActionMap.execute,
+                                        resourceId: this.$permissionResourceMap.pipeline,
+                                        instanceId: [{
+                                            id: this.curPipelineId,
+                                            name: this.curPipelineName
+                                        }],
+                                        projectId: this.$route.params.projectId
+                                    }],
                                     applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=pipeline&role_executor=pipeline:${this.curPipelineId}`
                                 }
             
@@ -782,11 +793,13 @@
                         message = err.message ? err.message : err
                         theme = 'error'
                     } finally {
-                        this.$bkMessage({
-                            message,
-                            theme
-                        })
-            
+                        if (message) {
+                            this.$bkMessage({
+                                message,
+                                theme
+                            })
+                        }
+                            
                         this.loading.isLoading = false
             
                         if (theme === 'success') {
