@@ -657,8 +657,15 @@
                 this.iframeUtil.toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_creator=rule` : PERM_URL_PREFIX
-                window.open(url, '_blank')
+                if (this.projectRelationId) {
+                    this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.rule, [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.QUALITY_RULE
+                    }])
+                } else {
+                    const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_creator=rule` : PERM_URL_PREFIX
+                    window.open(url, '_blank')
+                }
             },
             addLeaveListenr () {
                 window.addEventListener('beforeunload', this.leaveSure)
