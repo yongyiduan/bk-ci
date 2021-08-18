@@ -426,7 +426,10 @@
                 noPermissionList: [{
                     actionId: this.$permissionActionMap.create,
                     resourceId: this.$permissionResourceMap.project,
-                    instanceId: []
+                    instanceId: [{
+                        id: this.projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
+                    }]
                 }],
                 applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project`
             })

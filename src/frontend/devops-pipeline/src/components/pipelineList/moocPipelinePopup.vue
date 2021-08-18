@@ -312,7 +312,10 @@
                             noPermissionList: [{
                                 actionId: this.$permissionActionMap.create,
                                 resourceId: this.$permissionResourceMap.pipeline,
-                                instanceId: [],
+                                instanceId: [{
+                                    id: this.$route.params.projectId,
+                                    type: this.$permissionResourceTypeMap.PROJECT
+                                }],
                                 projectId: this.$route.params.projectId
                             }],
                             applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.$route.params.projectId}&service_code=pipeline&role_creator=pipeline`

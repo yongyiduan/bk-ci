@@ -247,15 +247,19 @@ export default {
                     actionId: this.$permissionActionMap.create,
                     resourceId: this.$permissionResourceMap.pipeline,
                     instanceId: [{
-                        id: prePipeline.pipelineId,
-                        name: prePipeline.pipelineName
+                        id: projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
                     }]
                 }, {
                     actionId: this.$permissionActionMap.edit,
                     resourceId: this.$permissionResourceMap.pipeline,
                     instanceId: [{
+                        id: projectId,
+                        type: this.$permissionResourceTypeMap.PROJECT
+                    }, {
                         id: pipelineId,
-                        name: prePipeline.pipelineName
+                        name: prePipeline.pipelineName,
+                        type: this.$permissionResourceTypeMap.PIPELINE_DEFAULT
                     }],
                     projectId
                 }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.manager))
@@ -640,7 +644,7 @@ export default {
             if (this.projectRelationId) {
                 this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.pipeline, [{
                     id: projectId,
-                    type: this.$permissionResourceTypeMap.PIPELINE_DEFAULT
+                    type: this.$permissionResourceTypeMap.PROJECT
                 }])
             } else {
                 this.tencentPermission(this.getPermUrlByRole(projectId, pipelineId, role))

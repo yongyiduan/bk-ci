@@ -660,7 +660,7 @@
                 if (this.projectRelationId) {
                     this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.ruleGroup, [{
                         id: this.projectId,
-                        type: this.$permissionResourceTypeMap.QUALITY_RULE
+                        type: this.$permissionResourceTypeMap.PROJECT
                     }])
                 } else {
                     const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_creator=rule` : PERM_URL_PREFIX
