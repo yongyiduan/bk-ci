@@ -398,7 +398,10 @@
                     noPermissionList: [{
                         actionId: this.$permissionActionMap.create,
                         resourceId: this.$permissionResourceMap.pipeline,
-                        instanceId: [],
+                        instanceId: [{
+                            id: this.projectId,
+                            type: this.$permissionResourceTypeMap.PROJECT
+                        }],
                         projectId: this.projectId
                     }],
                     applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${this.projectId}&service_code=pipeline&role_creator=pipeline:`
@@ -1215,16 +1218,20 @@
                             actionId: this.$permissionActionMap.create,
                             resourceId: this.$permissionResourceMap.pipeline,
                             instanceId: [{
-                                id: prePipeline.pipelineId,
-                                name: prePipeline.pipelineName
+                                id: this.projectId,
+                                type: this.$permissionResourceTypeMap.PROJECT
                             }],
                             projectId
                         }, {
                             actionId: this.$permissionActionMap.edit,
                             resourceId: this.$permissionResourceMap.pipeline,
                             instanceId: [{
+                                id: this.projectId,
+                                type: this.$permissionResourceTypeMap.PROJECT
+                            }, {
                                 id: prePipeline.pipelineId,
-                                name: prePipeline.pipelineName
+                                name: prePipeline.pipelineName,
+                                type: this.$permissionResourceTypeMap.PIPELINE_DEFAULT
                             }],
                             projectId
                         }], this.getPermUrlByRole(projectId, prePipeline.pipelineId, this.roleMap.manager))

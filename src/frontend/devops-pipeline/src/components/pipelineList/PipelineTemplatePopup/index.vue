@@ -458,7 +458,10 @@
                     this.handleError(e, [{
                         actionId: this.$permissionActionMap.create,
                         resourceId: this.$permissionResourceMap.pipeline,
-                        instanceId: [],
+                        instanceId: [{
+                            id: this.$route.params.projectId,
+                            type: this.$permissionResourceTypeMap.PROJECT
+                        }],
                         projectId: this.$route.params.projectId
                     }], this.getPermUrlByRole(this.$route.params.projectId, null, this.roleMap.creator))
                 } finally {

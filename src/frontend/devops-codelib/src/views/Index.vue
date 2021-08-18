@@ -199,7 +199,7 @@
                 if (this.projectRelationId) {
                     this.applyPermission(this.$permissionActionMap.create, this.$permissionResourceMap.code, [{
                         id: this.projectId,
-                        type: this.$permissionResourceTypeMap.CODE_REPERTORY
+                        type: this.$permissionResourceTypeMap.PROJECT
                     }])
                 } else {
                     this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=code&role_creator=repertory`)
@@ -211,7 +211,10 @@
                     noPermissionList: [{
                         actionId: this.$permissionActionMap.create,
                         resourceId: this.$permissionResourceMap.code,
-                        instanceId: [],
+                        instanceId: [{
+                            id: this.projectId,
+                            type: this.$permissionResourceTypeMap.PROJECT
+                        }],
                         projectId: this.projectId
                     }],
                     applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${
