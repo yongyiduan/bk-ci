@@ -82,6 +82,7 @@ abstract class AtomBaseDao {
             dslContext.selectFrom(this)
                 .where(ATOM_CODE.`in`(atomCodes))
                 .and(VERSION.`in`(version))
+                .or(LATEST_FLAG.eq(true))
                 .fetch()
         }
     }
