@@ -306,7 +306,7 @@
                     this.$showAskPermissionDialog({
                         noPermissionList: [{
                             actionId: this.$permissionActionMap.edit,
-                            resourceId: this.$permissionResourceMap.notifyGroup,
+                            resourceId: this.$permissionResourceMap.ruleGroup,
                             instanceId: [{
                                 id: row.groupHashId,
                                 name: row.name
@@ -351,7 +351,7 @@
                     this.$showAskPermissionDialog({
                         noPermissionList: [{
                             actionId: this.$permissionActionMap.delete,
-                            resourceId: this.$permissionResourceMap.notifyGroup,
+                            resourceId: this.$permissionResourceMap.ruleGroup,
                             instanceId: [{
                                 id: row.groupHashId,
                                 name: row.name
