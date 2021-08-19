@@ -115,9 +115,9 @@ class QualityRuleBuildHisService constructor(
                     val indicator = qualityIndicatorMap[indicatorId]
                         ?: throw IllegalArgumentException("indicatorId not found: $indicatorId, $qualityIndicatorMap")
 
+                    val indicatorCopy = indicator.clone()
+
                     val item = ruleIndicatorIdMap[indicatorId.toLong()]
-                    indicator.operation = QualityOperation.valueOf(item?.first ?: indicator.operation.name)
-                    indicator.threshold = item?.second ?: indicator.threshold
 
                     return@INDICATOR indicator
                 },
