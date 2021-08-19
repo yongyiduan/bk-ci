@@ -239,14 +239,13 @@ object SystemInfoUtil {
         var diskUsedPercent = 0
         if (fileStore == null) {
             fileStore = operatingSystem.fileSystem
-                .getFileStores(true)
+                .fileStores
                 .firstOrNull { "/data" == it.mount }
         }
         fileStore?.also {
-            it.updateAttributes()
-            val freeSpace = it.freeSpace
+            val usableSpace = it.usableSpace
             val totalSpace = it.totalSpace
-            diskUsedPercent = (100 - freeSpace * 100 / totalSpace).toInt()
+            diskUsedPercent = (usableSpace * 100 / totalSpace).toInt()
         }
         return diskUsedPercent
     }
