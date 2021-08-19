@@ -25,6 +25,7 @@
     import serviceInfo from '../../components/common/detail-info/service'
     import detailScore from '../../components/common/detailTab/detailScore'
     import codeSection from '../../components/common/detailTab/codeSection'
+    import yamlDetail from '../../components/common/detailTab/yamlDetail'
 
     export default {
         components: {
@@ -35,7 +36,8 @@
             detailScore,
             serviceInfo,
             codeSection,
-            breadCrumbs
+            breadCrumbs,
+            yamlDetail
         },
 
         data () {
@@ -61,7 +63,7 @@
                     atom: [
                         { componentName: 'detailScore', label: this.$t('store.概述'), name: 'des' },
                         { componentName: 'codeSection', label: this.$t('store.YAMLV1'), name: 'YAML', bindData: { code: this.detail.codeSection, limitHeight: false }, hidden: (!this.detail.yamlFlag || !this.detail.recommendFlag) },
-                        { componentName: 'codeSection', label: this.$t('store.YAMLV2'), name: 'YAMLV2', bindData: { code: this.detail.codeSectionV2, limitHeight: false }, hidden: (!this.detail.yamlFlag || !this.detail.recommendFlag) }
+                        { componentName: 'yamlDetail', label: this.$t('store.YAMLV2'), name: 'YAMLV2', bindData: { code: this.detail.codeSectionV2, limitHeight: false }, hidden: (!this.detail.yamlFlag || !this.detail.recommendFlag) }
                     ],
                     template: [
                         { componentName: 'detailScore', label: this.$t('store.概述'), name: 'des' }
