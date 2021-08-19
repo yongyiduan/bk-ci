@@ -73,7 +73,11 @@ abstract class AtomBaseDao {
         }
     }
 
-    fun getAtomListByCodesAndVersion(dslContext: DSLContext, atomCodes: List<String?>, version: List<String?>): Result<TAtomRecord?> {
+    fun getAtomListByCodesAndVersion(
+        dslContext: DSLContext,
+        atomCodes: List<String?>,
+        version: List<String?>
+    ): List<TAtomRecord?> {
         return with(TAtom.T_ATOM) {
             dslContext.selectFrom(this)
                 .where(ATOM_CODE.`in`(atomCodes))

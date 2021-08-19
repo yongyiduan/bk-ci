@@ -75,6 +75,7 @@ import com.tencent.devops.process.service.label.PipelineGroupService
 import com.tencent.devops.process.service.scm.ScmProxyService
 import com.tencent.devops.store.api.atom.ServiceMarketAtomResource
 import com.tencent.devops.store.api.atom.UserMarketAtomResource
+import com.tencent.devops.store.pojo.atom.ElementThirdPartySearchParam
 import com.tencent.devops.store.pojo.atom.GetRelyAtom
 import com.tencent.devops.common.ci.v2.Step as V2Step
 import org.slf4j.LoggerFactory
@@ -453,16 +454,22 @@ class TXPipelineExportService @Autowired constructor(
         val stepList = mutableListOf<V2Step>()
 
         // 根据job里的elements统一查询数据库的store里的ATOM表prob字段
-        val thirdPartyElementList = mutableListOf<Map<String, String>>()
+        val thirdPartyElementList = mutableListOf<ElementThirdPartySearchParam>()
         job.elements.forEach { element ->
             when (element.getClassType()) {
                 MarketBuildAtomElement.classType -> {
                     val step = element as MarketBuildAtomElement
-                    thirdPartyElementList.add(mapOf("atomCode" to step.getAtomCode(), "version" to step.version))
+                    thirdPartyElementList.add(ElementThirdPartySearchParam(
+                        atomCode = step.getAtomCode(),
+                        version = step.version
+                    ))
                 }
                 MarketBuildLessAtomElement.classType -> {
                     val step = element as MarketBuildLessAtomElement
-                    thirdPartyElementList.add(mapOf("atomCode" to step.getAtomCode(), "version" to step.version))
+                    thirdPartyElementList.add(ElementThirdPartySearchParam(
+                        atomCode = step.getAtomCode(),
+                        version = step.version
+                    ))
                 }
                 else -> {
                 }

@@ -921,14 +921,16 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
 
     override fun getAtomsRely(getRelyAtom: GetRelyAtom): Map<String, Map<String, Any>> {
         logger.info("getAtomsRely getRelyAtom.thirdPartyElementList : ${getRelyAtom.thirdPartyElementList}")
-        val atomList = marketAtomDao.getAtomListByCodesAndVersion(dslContext,
-            getRelyAtom.thirdPartyElementList.map { it["atomCode"] },
-            getRelyAtom.thirdPartyElementList.map { it["version"] })
-        val getMap = getRelyAtom.thirdPartyElementList.map { it["atomCode"] to it["version"] }.toMap()
+        val atomList = marketAtomDao.getAtomListByCodesAndVersion(
+            dslContext = dslContext,
+            atomCodes = getRelyAtom.thirdPartyElementList.map { it.atomCode },
+            version = getRelyAtom.thirdPartyElementList.map { it.version}
+        )
+        val getMap = getRelyAtom.thirdPartyElementList.map { it.atomCode to it.version }.toMap()
         val result = mutableMapOf<String, Map<String, Any>>()
         logger.info("getAtomsRely atomList : $atomList")
         atomList.forEach {
-            if (it != null && it.version != getMap[it.atomCode]) {
+            if (it != null && it.version == getMap[it.atomCode]) {
                 val itemMap = mutableMapOf<String, Any>()
                 val props: Map<String, Any> = jacksonObjectMapper().readValue(it.props)
                 if (null != props["input"]) {
