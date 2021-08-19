@@ -35,4 +35,3 @@ data class GetRelyAtom(
     @ApiModelProperty("请求所需参数", required = true)
     val thirdPartyElementList: List<ElementThirdPartySearchParam>
 )
-
