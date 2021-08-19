@@ -41,7 +41,7 @@ import com.tencent.devops.quality.exception.QualityOpConfigException
 import com.tencent.devops.quality.pojo.enum.RuleOperation
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Servicea
+import org.springframework.stereotype.Service
 
 @Service
 class QualityRuleBuildHisService constructor(
