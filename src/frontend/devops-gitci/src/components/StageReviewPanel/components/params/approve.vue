@@ -65,6 +65,7 @@
                     const errorKeys = []
                     this.params.forEach(({ required, valueType, value, key }) => {
                         if (required) {
+                            key = key.replace(/^variables\./, '')
                             if (typeof value === 'undefined' || value === '') {
                                 errorKeys.push(key)
                             }
