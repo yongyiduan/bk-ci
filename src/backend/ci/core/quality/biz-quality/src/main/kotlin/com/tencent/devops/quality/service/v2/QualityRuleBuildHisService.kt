@@ -98,18 +98,20 @@ class QualityRuleBuildHisService constructor(
         val qualityIndicatorMap = qualityIndicatorService.serviceList(allIndicatorIds).map {
             HashUtil.decodeIdToLong(it.hashId).toString() to it
         }.toMap()
-        return allRule.map {
+        return allRule.sortedBy { it.id }.map {
             val thresholdList = it.indicatorThresholds.split(",")
             val opList = it.indicatorOperations.split(",")
             val ruleIndicatorIdMap = it.indicatorIds.split(",").mapIndexed { index, id ->
                 id.toLong() to Pair(opList[index], thresholdList[index])
             }.toMap()
 
+            logger.info("start to fill rule indicator: ${ruleIndicatorIdMap.entries}")
+
             val rule = QualityRule(
                 hashId = HashUtil.encodeLongId(it.id),
                 name = it.ruleName,
                 desc = it.ruleDesc,
-                indicators = it.indicatorIds.split(",").map { indicatorId ->
+                indicators = it.indicatorIds.split(",").map INDICATOR@{ indicatorId ->
                     val indicator = qualityIndicatorMap[indicatorId]
                         ?: throw IllegalArgumentException("indicatorId not found: $indicatorId, $qualityIndicatorMap")
 
@@ -117,7 +119,7 @@ class QualityRuleBuildHisService constructor(
                     indicator.operation = QualityOperation.valueOf(item?.first ?: indicator.operation.name)
                     indicator.threshold = item?.second ?: indicator.threshold
 
-                    return@map indicator
+                    return@INDICATOR indicator
                 },
                 controlPoint = QualityRule.RuleControlPoint(
                     "", "", "", ControlPointPosition(ControlPointPosition.AFTER_POSITION), listOf()
@@ -145,6 +147,9 @@ class QualityRuleBuildHisService constructor(
                     JsonUtil.to(it.operationList, object : TypeReference<List<QualityRule.RuleOp>>() {})
                 }
             )
+
+            logger.info("finish to fill rule: $rule")
+
             rule
         }
     }
