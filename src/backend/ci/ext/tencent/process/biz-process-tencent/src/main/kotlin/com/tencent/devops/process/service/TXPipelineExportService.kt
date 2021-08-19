@@ -34,6 +34,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.tencent.devops.common.api.enums.RepositoryConfig
 import com.tencent.devops.common.api.enums.RepositoryType
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.auth.api.AuthPermission
 import com.tencent.devops.common.ci.v2.Credentials
@@ -74,7 +75,6 @@ import com.tencent.devops.process.permission.PipelinePermissionService
 import com.tencent.devops.process.service.label.PipelineGroupService
 import com.tencent.devops.process.service.scm.ScmProxyService
 import com.tencent.devops.store.api.atom.ServiceMarketAtomResource
-import com.tencent.devops.store.api.atom.UserMarketAtomResource
 import com.tencent.devops.store.pojo.atom.ElementThirdPartySearchParam
 import com.tencent.devops.store.pojo.atom.GetRelyAtom
 import com.tencent.devops.common.ci.v2.Step as V2Step
@@ -475,8 +475,13 @@ class TXPipelineExportService @Autowired constructor(
                 }
             }
         }
-        val relyList = client.get(ServiceMarketAtomResource::class).getAtomRely(GetRelyAtom(thirdPartyElementList))
-        logger.info("[$projectId] getV2StepFromJob export relyList: ${relyList.data} ")
+        val relyList = try {
+            client.get(ServiceMarketAtomResource::class).getAtomRely(GetRelyAtom(thirdPartyElementList))
+        } catch (e: Exception) {
+            logger.error("get Atom Rely error.", e)
+            null
+        }
+        logger.info("[$projectId] getV2StepFromJob export relyList: ${relyList?.data} ")
         job.elements.forEach { element ->
             val originRetryTimes = element.additionalOptions?.retryCount ?: 0
             val originTimeout = element.additionalOptions?.timeout?.toInt() ?: 480
@@ -562,7 +567,8 @@ class TXPipelineExportService @Autowired constructor(
                         inputMap = inputMap,
                         timeoutMinutes = timeoutMinutes,
                         continueOnError = continueOnError,
-                        retryTimes = retryTimes
+                        retryTimes = retryTimes,
+                        relyMap = relyList?.data?.get(step.getAtomCode())
                     )
                     if (!checkoutAtom) stepList.add(
                         V2Step(
@@ -575,7 +581,12 @@ class TXPipelineExportService @Autowired constructor(
                                 null
                             },
                             uses = "${step.getAtomCode()}@${step.version}",
-                            with = replaceMapWithDoubleCurlyBraces(inputMap, output2Elements, variables),
+                            with = replaceMapWithDoubleCurlyBraces(
+                                inputMap = inputMap,
+                                output2Elements = output2Elements,
+                                variables = variables,
+                                relyMap = relyList?.data?.get(step.getAtomCode())
+                            ),
                             timeoutMinutes = timeoutMinutes,
                             continueOnError = continueOnError,
                             retryTimes = retryTimes,
@@ -602,7 +613,12 @@ class TXPipelineExportService @Autowired constructor(
                                 null
                             },
                             uses = "${step.getAtomCode()}@${step.version}",
-                            with = replaceMapWithDoubleCurlyBraces(inputMap, output2Elements, variables),
+                            with = replaceMapWithDoubleCurlyBraces(
+                                inputMap = inputMap,
+                                output2Elements = output2Elements,
+                                variables = variables,
+                                relyMap = relyList?.data?.get(step.getAtomCode())
+                            ),
                             timeoutMinutes = timeoutMinutes,
                             continueOnError = continueOnError,
                             retryTimes = retryTimes,
@@ -660,13 +676,39 @@ class TXPipelineExportService @Autowired constructor(
     fun replaceMapWithDoubleCurlyBraces(
         inputMap: MutableMap<String, Any>?,
         output2Elements: MutableMap<String, MutableList<MarketBuildAtomElement>>,
-        variables: Map<String, String>?
+        variables: Map<String, String>?,
+        relyMap: Map<String, Any>? = null
     ): Map<String, Any?>? {
         if (inputMap.isNullOrEmpty()) {
             return null
         }
         val result = mutableMapOf<String, Any>()
-        inputMap.forEach { (key, value) ->
+        inputMap.forEach lit@{ (key, value) ->
+            if (!relyMap.isNullOrEmpty()) {
+                try {
+                    val rely = relyMap[key] as Map<String, Any>
+                    if (null != rely["expression"]) {
+                        val expression = rely["expression"] as List<Map<String, Any>>
+                        if (rely["operation"] == "AND") {
+                            expression.forEach {
+                                if (inputMap[it["key"]] != it["value"]) {
+                                    return@lit
+                                }
+                            }
+                        } else if (rely["operation"] == "OR") {
+                            expression.forEach {
+                                if (inputMap[it["key"]] == it["value"]) {
+                                    result[key] = replaceValueWithDoubleCurlyBraces(value, output2Elements, variables)
+                                    return@lit
+                                }
+                            }
+                            return@lit
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.info("load atom input[rely] with error: ${e.message}")
+                }
+            }
             result[key] = replaceValueWithDoubleCurlyBraces(value, output2Elements, variables)
         }
         return result
@@ -893,7 +935,8 @@ class TXPipelineExportService @Autowired constructor(
         inputMap: MutableMap<String, Any>?,
         timeoutMinutes: Int?,
         continueOnError: Boolean?,
-        retryTimes: Int?
+        retryTimes: Int?,
+        relyMap: Map<String, Any>? = null
     ): Boolean {
         if (inputMap == null || atomCode.isBlank() || !checkoutAtomCodeSet.contains(atomCode)) return false
         logger.info("[$projectId] addCheckoutAtom export with atomCode($atomCode), inputMap=$inputMap, step=$step")
@@ -943,7 +986,12 @@ class TXPipelineExportService @Autowired constructor(
                         null
                     },
                     uses = null,
-                    with = replaceMapWithDoubleCurlyBraces(inputMap, output2Elements, variables),
+                    with = replaceMapWithDoubleCurlyBraces(
+                        inputMap = inputMap,
+                        output2Elements = output2Elements,
+                        variables = variables,
+                        relyMap = relyMap
+                    ),
                     timeoutMinutes = timeoutMinutes,
                     continueOnError = continueOnError,
                     retryTimes = retryTimes,
