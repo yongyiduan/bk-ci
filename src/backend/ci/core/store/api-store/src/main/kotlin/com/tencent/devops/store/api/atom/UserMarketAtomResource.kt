@@ -260,11 +260,4 @@ interface UserMarketAtomResource {
         defaultShowFlag: Boolean?
     ): Result<String?>
 
-    @ApiOperation("查看插件参数的依赖关系")
-    @POST
-    @Path("/atoms/rely")
-    fun getAtomRely(
-        @ApiParam("getRelyAtom", required = false)
-        getRelyAtom: GetRelyAtom
-    ): Map<String, Map<String, Any>>?
 }

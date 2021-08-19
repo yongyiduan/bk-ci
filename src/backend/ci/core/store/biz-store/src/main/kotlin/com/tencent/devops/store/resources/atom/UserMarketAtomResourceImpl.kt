@@ -146,7 +146,4 @@ class UserMarketAtomResourceImpl @Autowired constructor(
             ?: false))
     }
 
-    override fun getAtomRely(getRelyAtom: GetRelyAtom): Map<String, Map<String, Any>>? {
-        return marketAtomService.getAtomsRely(getRelyAtom = getRelyAtom)
-    }
 }

@@ -73,6 +73,7 @@ import com.tencent.devops.process.engine.service.store.StoreImageHelper
 import com.tencent.devops.process.permission.PipelinePermissionService
 import com.tencent.devops.process.service.label.PipelineGroupService
 import com.tencent.devops.process.service.scm.ScmProxyService
+import com.tencent.devops.store.api.atom.ServiceMarketAtomResource
 import com.tencent.devops.store.api.atom.UserMarketAtomResource
 import com.tencent.devops.store.pojo.atom.GetRelyAtom
 import com.tencent.devops.common.ci.v2.Step as V2Step
@@ -467,8 +468,8 @@ class TXPipelineExportService @Autowired constructor(
                 }
             }
         }
-        val relyList = client.get(UserMarketAtomResource::class).getAtomRely(GetRelyAtom(thirdPartyElementList))
-        logger.info("[$projectId] getV2StepFromJob export relyList: $relyList ")
+        val relyList = client.get(ServiceMarketAtomResource::class).getAtomRely(GetRelyAtom(thirdPartyElementList))
+        logger.info("[$projectId] getV2StepFromJob export relyList: ${relyList.data} ")
         job.elements.forEach { element ->
             val originRetryTimes = element.additionalOptions?.retryCount ?: 0
             val originTimeout = element.additionalOptions?.timeout?.toInt() ?: 480
