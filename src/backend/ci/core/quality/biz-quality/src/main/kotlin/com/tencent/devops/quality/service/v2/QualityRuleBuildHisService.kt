@@ -41,7 +41,7 @@ import com.tencent.devops.quality.exception.QualityOpConfigException
 import com.tencent.devops.quality.pojo.enum.RuleOperation
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Servicea
 
 @Service
 class QualityRuleBuildHisService constructor(
@@ -98,14 +98,12 @@ class QualityRuleBuildHisService constructor(
         val qualityIndicatorMap = qualityIndicatorService.serviceList(allIndicatorIds).map {
             HashUtil.decodeIdToLong(it.hashId).toString() to it
         }.toMap()
-        return allRule.sortedBy { it.id }.map {
+        return allRule.map {
             val thresholdList = it.indicatorThresholds.split(",")
             val opList = it.indicatorOperations.split(",")
             val ruleIndicatorIdMap = it.indicatorIds.split(",").mapIndexed { index, id ->
                 id.toLong() to Pair(opList[index], thresholdList[index])
             }.toMap()
-
-            logger.info("start to fill rule indicator: ${ruleIndicatorIdMap.entries}")
 
             val rule = QualityRule(
                 hashId = HashUtil.encodeLongId(it.id),
@@ -119,7 +117,10 @@ class QualityRuleBuildHisService constructor(
 
                     val item = ruleIndicatorIdMap[indicatorId.toLong()]
 
-                    return@INDICATOR indicator
+                    indicatorCopy.operation = QualityOperation.valueOf(item?.first ?: indicator.operation.name)
+                    indicatorCopy.threshold = item?.second ?: indicator.threshold
+
+                    return@INDICATOR indicatorCopy
                 },
                 controlPoint = QualityRule.RuleControlPoint(
                     "", "", "", ControlPointPosition(ControlPointPosition.AFTER_POSITION), listOf()
@@ -147,9 +148,6 @@ class QualityRuleBuildHisService constructor(
                     JsonUtil.to(it.operationList, object : TypeReference<List<QualityRule.RuleOp>>() {})
                 }
             )
-
-            logger.info("finish to fill rule: $rule")
-
             rule
         }
     }
