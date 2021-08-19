@@ -73,7 +73,6 @@ abstract class AtomBaseDao {
         }
     }
 
-
     fun getNewestAtomByCode(dslContext: DSLContext, atomCode: String): TAtomRecord? {
         return with(TAtom.T_ATOM) {
             dslContext.selectFrom(this)

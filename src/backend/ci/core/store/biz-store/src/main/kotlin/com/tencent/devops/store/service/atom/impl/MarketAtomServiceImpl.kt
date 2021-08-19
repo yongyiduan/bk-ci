@@ -953,7 +953,6 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
         return result
     }
 
-
     @Suppress("UNCHECKED_CAST")
     private fun generateYaml(atom: TAtomRecord, defaultShowFlag: Boolean?): String {
         val sb = StringBuilder()
