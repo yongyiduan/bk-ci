@@ -45,7 +45,7 @@
                                     <span class="review-normal"> Approved by {item.operator}: </span>
                                     <span class="review-process"> Approve (Continue pipeline execution) </span>
                                 </p>
-                                <p v-show={paramStr}>Edit variable: {paramStr}</p>
+                                <p v-show={paramStr}><span class="mr8 max-width">Edit variable:</span>{paramStr}</p>
                                 <p><span class="mr8 max-width">Approval opinion:</span>{item.suggest}</p>
                                 <p><span class="mr8 max-width">Approval time:</span>{convertTime(item.reviewTime)}</p>
                             </section>
