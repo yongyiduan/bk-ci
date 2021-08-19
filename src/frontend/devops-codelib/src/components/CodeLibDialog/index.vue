@@ -408,9 +408,16 @@
                                 actionId,
                                 resourceId: this.$permissionResourceMap.code,
                                 instanceId: repositoryHashId ? [{
+                                    id: this.projectId,
+                                    type: this.$permissionResourceTypeMap.PROJECT
+                                }, {
                                     id: repositoryHashId,
-                                    name: codelib.aliasName
-                                }] : null,
+                                    name: codelib.aliasName,
+                                    type: this.$permissionResourceTypeMap.CODE_REPERTORY
+                                }] : [{
+                                    id: this.projectId,
+                                    type: this.$permissionResourceTypeMap.PROJECT
+                                }],
                                 projectId
                             }],
                             applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${

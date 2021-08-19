@@ -403,7 +403,7 @@
                 const projectList = window.getLsCacheItem('projectList') || []
                 const curProject = projectList.find((project) => (project.projectCode === projectCode)) || {}
                 if (curProject.relationId) {
-                    window.open(`/console/ps/${projectCode}/${curProject.relationId}/basic`, '_blank')
+                    window.open(`/console/ps/${projectCode}/${curProject.relationId}/member`, '_blank')
                 } else {
                     window.open(`/console/perm/my-project?project_code=${projectCode}`, '_blank')
                 }
