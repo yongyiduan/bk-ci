@@ -261,7 +261,7 @@ interface UserMarketAtomResource {
     ): Result<String?>
 
     @ApiOperation("查看插件参数的依赖关系")
-    @GET
+    @POST
     @Path("/atoms/rely")
     fun getAtomRely(
         @ApiParam("getRelyAtom", required = false)
