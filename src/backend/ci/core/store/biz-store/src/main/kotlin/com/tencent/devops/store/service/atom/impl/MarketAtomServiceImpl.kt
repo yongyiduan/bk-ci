@@ -943,6 +943,7 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
                 result[it.atomCode] = itemMap
             }
         }
+        logger.info("getAtomsRely: $result")
         return result
     }
 
