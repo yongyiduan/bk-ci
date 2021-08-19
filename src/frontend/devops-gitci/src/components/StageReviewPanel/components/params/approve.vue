@@ -3,7 +3,7 @@
         <span class="review-subtitle">Custom Variables</span>
         <ul>
             <li v-for="(param, index) in params" :key="index" class="review-params">
-                <bk-input disabled :value="param.key" class="review-param-item"></bk-input>
+                <bk-input disabled :value="getParamKey(param)" class="review-param-item"></bk-input>
                 <span :class="{ 'review-param-gap': true, 'param-require': param.required }"></span>
                 <param-value :form="param" :disabled="disabled" class="review-param-item"></param-value>
                 <i class="bk-icon icon-info" v-bk-tooltips="param.desc" v-if="param.desc"></i>
@@ -50,6 +50,10 @@
         },
 
         methods: {
+            getParamKey (param) {
+                return param.chineseName || (param.key || '').replace(/^variables\./, '')
+            },
+
             updateParams () {
                 const params = this.showReviewGroup.params && this.showReviewGroup.params.length ? this.showReviewGroup.params : this.reviewParams
                 this.params = params || []
