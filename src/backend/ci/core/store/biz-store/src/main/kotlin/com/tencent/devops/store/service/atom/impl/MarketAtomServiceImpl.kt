@@ -920,19 +920,22 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
     }
 
     override fun getAtomsRely(getRelyAtom: GetRelyAtom): Map<String, Map<String, Any>> {
-        logger.info("getAtomsRely getRelyAtom.thirdPartyElementList : ${getRelyAtom.thirdPartyElementList}")
-        val atomList = marketAtomDao.getAtomListByCodesAndVersion(
+        val atomList = marketAtomDao.getLatestAtomListByCodes(
             dslContext = dslContext,
-            atomCodes = getRelyAtom.thirdPartyElementList.map { it.atomCode },
-            version = getRelyAtom.thirdPartyElementList.map { it.version}
+            atomCodes = getRelyAtom.thirdPartyElementList.map { it.atomCode }
         )
         val getMap = getRelyAtom.thirdPartyElementList.map { it.atomCode to it.version }.toMap()
         val result = mutableMapOf<String, Map<String, Any>>()
         logger.info("getAtomsRely atomList : $atomList")
-        atomList.forEach {
-            if (it != null && it.version == getMap[it.atomCode]) {
+        atomList.forEach lit@{
+            if (it != null) {
+                var value = it
+                if (getMap[it.atomCode]!!.contains("*") &&
+                    !it.version.startsWith(getMap[it.atomCode]!!.replace("*", ""))) {
+                    value = atomDao.getPipelineAtom(dslContext, it.atomCode, getMap[it.atomCode]) ?: return@lit
+                }
                 val itemMap = mutableMapOf<String, Any>()
-                val props: Map<String, Any> = jacksonObjectMapper().readValue(it.props)
+                val props: Map<String, Any> = jacksonObjectMapper().readValue(value.props)
                 if (null != props["input"]) {
                     val input = props["input"] as Map<String, Any>
                     input.forEach { inputIt ->
@@ -949,6 +952,7 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
         }
         return result
     }
+
 
     @Suppress("UNCHECKED_CAST")
     private fun generateYaml(atom: TAtomRecord, defaultShowFlag: Boolean?): String {
