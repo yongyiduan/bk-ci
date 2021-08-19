@@ -35,6 +35,7 @@ import com.tencent.devops.store.api.atom.UserMarketAtomResource
 import com.tencent.devops.store.pojo.atom.AtomDevLanguage
 import com.tencent.devops.store.pojo.atom.AtomVersion
 import com.tencent.devops.store.pojo.atom.AtomVersionListItem
+import com.tencent.devops.store.pojo.atom.GetRelyAtom
 import com.tencent.devops.store.pojo.atom.InstallAtomReq
 import com.tencent.devops.store.pojo.atom.MarketAtomResp
 import com.tencent.devops.store.pojo.atom.MarketMainItem
@@ -47,7 +48,8 @@ import com.tencent.devops.store.service.atom.MarketAtomService
 import com.tencent.devops.store.service.common.StoreProjectService
 import org.springframework.beans.factory.annotation.Autowired
 
-@RestResource@Suppress("ALL")
+@RestResource
+@Suppress("ALL")
 class UserMarketAtomResourceImpl @Autowired constructor(
     private val marketAtomService: MarketAtomService,
     private val storeProjectService: StoreProjectService
@@ -140,6 +142,11 @@ class UserMarketAtomResourceImpl @Autowired constructor(
     }
 
     override fun getAtomYmlV2Info(userId: String, atomCode: String, defaultShowFlag: Boolean?): Result<String?> {
-        return Result(marketAtomService.generateCiV2Yaml(atomCode = atomCode, defaultShowFlag = defaultShowFlag ?: false))
+        return Result(marketAtomService.generateCiV2Yaml(atomCode = atomCode, defaultShowFlag = defaultShowFlag
+            ?: false))
+    }
+
+    override fun getAtomRely(getRelyAtom: GetRelyAtom): Map<String, Map<String, Any>>? {
+        return marketAtomService.getAtomsRely(getRelyAtom = getRelyAtom)
     }
 }

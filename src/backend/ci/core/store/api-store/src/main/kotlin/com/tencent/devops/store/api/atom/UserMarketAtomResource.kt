@@ -35,6 +35,7 @@ import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.store.pojo.atom.AtomDevLanguage
 import com.tencent.devops.store.pojo.atom.AtomVersion
 import com.tencent.devops.store.pojo.atom.AtomVersionListItem
+import com.tencent.devops.store.pojo.atom.GetRelyAtom
 import com.tencent.devops.store.pojo.atom.InstallAtomReq
 import com.tencent.devops.store.pojo.atom.MarketAtomResp
 import com.tencent.devops.store.pojo.atom.MarketMainItem
@@ -59,7 +60,8 @@ import javax.ws.rs.core.MediaType
 @Api(tags = ["USER_MARKET_ATOM"], description = "插件市场-插件")
 @Path("/user/market/")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)@Suppress("ALL")
+@Consumes(MediaType.APPLICATION_JSON)
+@Suppress("ALL")
 interface UserMarketAtomResource {
 
     @ApiOperation("获取插件市场首页的数据")
@@ -257,4 +259,12 @@ interface UserMarketAtomResource {
         @QueryParam("defaultShowFlag")
         defaultShowFlag: Boolean?
     ): Result<String?>
+
+    @ApiOperation("查看插件参数的依赖关系")
+    @GET
+    @Path("/atoms/rely")
+    fun getAtomRely(
+        @ApiParam("getRelyAtom", required = false)
+        getRelyAtom: GetRelyAtom
+    ): Map<String, Map<String, Any>>?
 }

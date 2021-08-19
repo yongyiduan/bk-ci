@@ -42,6 +42,7 @@ import com.tencent.devops.common.ci.v2.JobRunsOnType
 import com.tencent.devops.common.ci.v2.PreJob
 import com.tencent.devops.common.ci.v2.PreStage
 import com.tencent.devops.common.ci.v2.RunsOn
+import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.container.Container
 import com.tencent.devops.common.pipeline.container.NormalContainer
@@ -72,6 +73,8 @@ import com.tencent.devops.process.engine.service.store.StoreImageHelper
 import com.tencent.devops.process.permission.PipelinePermissionService
 import com.tencent.devops.process.service.label.PipelineGroupService
 import com.tencent.devops.process.service.scm.ScmProxyService
+import com.tencent.devops.store.api.atom.UserMarketAtomResource
+import com.tencent.devops.store.pojo.atom.GetRelyAtom
 import com.tencent.devops.common.ci.v2.Step as V2Step
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -91,7 +94,8 @@ class TXPipelineExportService @Autowired constructor(
     private val pipelinePermissionService: PipelinePermissionService,
     private val pipelineRepositoryService: PipelineRepositoryService,
     private val storeImageHelper: StoreImageHelper,
-    private val scmProxyService: ScmProxyService
+    private val scmProxyService: ScmProxyService,
+    private val client: Client
 ) {
 
     companion object {
@@ -446,6 +450,25 @@ class TXPipelineExportService @Autowired constructor(
         variables: Map<String, String>?
     ): List<V2Step> {
         val stepList = mutableListOf<V2Step>()
+
+        // 根据job里的elements统一查询数据库的store里的ATOM表prob字段
+        val thirdPartyElementList = mutableListOf<Map<String, String>>()
+        job.elements.forEach { element ->
+            when (element.getClassType()) {
+                MarketBuildAtomElement.classType -> {
+                    val step = element as MarketBuildAtomElement
+                    thirdPartyElementList.add(mapOf("atomCode" to step.getAtomCode(), "version" to step.version))
+                }
+                MarketBuildLessAtomElement.classType -> {
+                    val step = element as MarketBuildLessAtomElement
+                    thirdPartyElementList.add(mapOf("atomCode" to step.getAtomCode(), "version" to step.version))
+                }
+                else -> {
+                }
+            }
+        }
+        val relyList = client.get(UserMarketAtomResource::class).getAtomRely(GetRelyAtom(thirdPartyElementList))
+        logger.info("[$projectId] getV2StepFromJob export relyList: $relyList ")
         job.elements.forEach { element ->
             val originRetryTimes = element.additionalOptions?.retryCount ?: 0
             val originTimeout = element.additionalOptions?.timeout?.toInt() ?: 480
