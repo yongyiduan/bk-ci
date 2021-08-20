@@ -32,7 +32,6 @@ allprojects {
             dependency("net.coobird:thumbnailator:${Versions.Thumbnailator}")
             dependency("com.vmware:vijava:${Versions.Vmware}")
             dependency("com.tencent.devops.ci-plugins:sigar:${Versions.SigarPlugin}")
-            dependency("net.sf.json-lib:json-lib:${Versions.JsonLib}")
             dependency("com.googlecode.plist:dd-plist:${Versions.DdPlist}")
             dependency("com.github.oshi:oshi-core:${Versions.OshiCore}")
             dependency("net.dongliu:apk-parser:${Versions.ApkParser}")
