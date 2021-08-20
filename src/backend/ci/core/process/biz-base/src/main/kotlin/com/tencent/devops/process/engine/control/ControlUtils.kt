@@ -42,7 +42,6 @@ import com.tencent.devops.process.utils.TASK_FAIL_RETRY_MAX_COUNT
 import com.tencent.devops.process.utils.TASK_FAIL_RETRY_MIN_COUNT
 import org.slf4j.LoggerFactory
 
-@Suppress("ALL")
 object ControlUtils {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -82,8 +81,14 @@ object ControlUtils {
     }
 
     // 需要暂停，且没有暂停过
-    fun pauseBeforeExec(additionalOptions: ElementAdditionalOptions?, alreadyPauseFlag: String?): Boolean {
-        return pauseFlag(additionalOptions) && alreadyPauseFlag.isNullOrEmpty()
+    fun pauseBeforeExec(
+        additionalOptions: ElementAdditionalOptions?,
+        alreadyPauseFlag: String?,
+        pauseReviewers: List<String>? = null
+    ): Boolean {
+        return alreadyPauseFlag.isNullOrEmpty() &&
+            // 有暂停审核用户，自动进入暂停
+            (pauseFlag(additionalOptions) || (pauseReviewers != null && pauseReviewers.isNotEmpty()))
     }
 
     // 暂停标识位

@@ -28,6 +28,7 @@
 package com.tencent.devops.process.engine.dao
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.tencent.devops.common.api.pojo.ErrorType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.pipeline.enums.BuildStatus
@@ -79,7 +80,8 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                     END_TIME,
                     APPROVER,
                     ADDITIONAL_OPTIONS,
-                    ATOM_CODE
+                    ATOM_CODE,
+                    PAUSE_REVIEWERS
                 )
                     .values(
                         buildTask.pipelineId,
@@ -100,7 +102,8 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                         buildTask.endTime,
                         buildTask.approver,
                         objectMapper.writeValueAsString(buildTask.additionalOptions),
-                        buildTask.atomCode
+                        buildTask.atomCode,
+                        buildTask.pauseReviewers?.let(objectMapper::writeValueAsString)
                     )
                     .execute()
             }
@@ -109,7 +112,7 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
 
     fun batchSave(dslContext: DSLContext, taskList: Collection<PipelineBuildTask>) {
         val records =
-            mutableListOf<InsertSetMoreStep<TPipelineBuildTaskRecord>>()
+            ArrayList<InsertSetMoreStep<TPipelineBuildTaskRecord>>(taskList.size)
         with(T_PIPELINE_BUILD_TASK) {
             taskList.forEach {
                 records.add(
@@ -143,6 +146,7 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                             CommonUtils.interceptStringInLength(it.errorMsg, PIPELINE_TASK_MESSAGE_STRING_LENGTH_MAX))
                         .set(CONTAINER_HASH_ID, it.containerHashId)
                         .set(ATOM_CODE, it.atomCode)
+                        .set(PAUSE_REVIEWERS, it.pauseReviewers?.let(objectMapper::writeValueAsString))
                 )
             }
             dslContext.batch(records).execute()
@@ -150,7 +154,7 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
     }
 
     fun batchUpdate(dslContext: DSLContext, taskList: List<TPipelineBuildTaskRecord>) {
-        val records = mutableListOf<Query>()
+        val records = ArrayList<Query>(taskList.size)
         with(T_PIPELINE_BUILD_TASK) {
             taskList.forEach {
                 records.add(
@@ -179,6 +183,7 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                         .set(ERROR_CODE, it.errorCode)
                         .set(CONTAINER_HASH_ID, it.containerHashId)
                         .set(ATOM_CODE, it.atomCode)
+                        .set(PAUSE_REVIEWERS, it.pauseReviewers)
                         .where(BUILD_ID.eq(it.buildId).and(TASK_ID.eq(it.taskId)))
                 )
             }
@@ -267,7 +272,8 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                 errorType = if (errorType == null) null else ErrorType.values()[errorType],
                 errorCode = errorCode,
                 errorMsg = errorMsg,
-                atomCode = atomCode
+                atomCode = atomCode,
+                pauseReviewers = pauseReviewers.let<String, List<String>>(objectMapper::readValue)
             )
         }
     }

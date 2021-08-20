@@ -113,6 +113,7 @@ import com.tencent.devops.process.engine.pojo.event.PipelineBuildStartEvent
 import com.tencent.devops.process.engine.pojo.event.PipelineBuildWebSocketPushEvent
 import com.tencent.devops.process.engine.service.rule.PipelineRuleService
 import com.tencent.devops.process.engine.utils.ContainerUtils
+import com.tencent.devops.process.engine.utils.PipelineUtils
 import com.tencent.devops.process.pojo.BuildBasicInfo
 import com.tencent.devops.process.pojo.BuildHistory
 import com.tencent.devops.process.pojo.BuildStageStatus
@@ -917,7 +918,8 @@ class PipelineRuntimeService @Autowired constructor(
                                 starter = context.userId,
                                 approver = null,
                                 subBuildId = null,
-                                atomCode = atomElement.getAtomCode()
+                                atomCode = atomElement.getAtomCode(),
+                                pauseReviewers = PipelineUtils.getPauseReviewers(atomElement)
                             )
                         )
                         needUpdateContainer = true

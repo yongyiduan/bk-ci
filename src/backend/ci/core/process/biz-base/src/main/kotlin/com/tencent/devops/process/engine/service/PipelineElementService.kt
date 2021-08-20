@@ -237,7 +237,8 @@ class PipelineElementService @Autowired constructor(
                 status = elementStatus,
                 atomCode = originAtomElement.getAtomCode(),
                 version = originAtomElement.version,
-                data = originAtomElement.data
+                data = originAtomElement.data,
+                pauseReviewers = originAtomElement.pauseReviewers
             )
             marketBuildAtomElement.additionalOptions = additionalOptions
             finalElementList.add(marketBuildAtomElement)
@@ -248,7 +249,8 @@ class PipelineElementService @Autowired constructor(
                 status = elementStatus,
                 atomCode = originAtomElement.getAtomCode(),
                 version = originAtomElement.version,
-                data = originAtomElement.data
+                data = originAtomElement.data,
+                pauseReviewers = originAtomElement.pauseReviewers
             )
             marketBuildLessAtomElement.additionalOptions = additionalOptions
             finalElementList.add(marketBuildLessAtomElement)

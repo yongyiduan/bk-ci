@@ -98,7 +98,8 @@ class PipelineTaskService @Autowired constructor(
                 } else {
                     objectMapper.readValue(it.additionalOptions, ElementAdditionalOptions::class.java)
                 },
-                os = it.os
+                os = it.os,
+                pauseReviewers = it.pauseReviewers.let<String, List<String>>(objectMapper::readValue)
             )
         }?.groupBy { it.pipelineId } ?: mapOf()
     }
@@ -200,7 +201,7 @@ class PipelineTaskService @Autowired constructor(
 
     fun isNeedPause(taskId: String, buildId: String, taskRecord: PipelineBuildTask): Boolean {
         val alreadyPause = redisOperation.get(PauseRedisUtils.getPauseRedisKey(buildId = buildId, taskId = taskId))
-        return ControlUtils.pauseBeforeExec(taskRecord.additionalOptions, alreadyPause)
+        return ControlUtils.pauseBeforeExec(taskRecord.additionalOptions, alreadyPause, taskRecord.pauseReviewers)
     }
 
     fun executePause(taskId: String, buildId: String, taskRecord: PipelineBuildTask) {
