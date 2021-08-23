@@ -73,4 +73,5 @@ test/unit/coverage
 *.ntvs*
 *.njsproj
 *.sln
-./webpack_cache
+/webpack_cache
+/src/conf/*
