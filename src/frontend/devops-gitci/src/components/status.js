@@ -69,7 +69,9 @@ export function getPipelineStatusCircleIconCls (status) {
         HEARTBEAT_TIMEOUT: 'icon-close',
         QUEUE_TIMEOUT: 'icon-close',
         EXEC_TIMEOUT: 'icon-close',
-        SUCCEED: 'icon-check-1'
+        SUCCEED: 'icon-check-1',
+        REVIEW_PROCESSED: 'gitci-icon gitci-flag',
+        STAGE_SUCCESS: 'gitci-icon gitci-flag'
     }
     return [iconName, iconMap[status]]
 }

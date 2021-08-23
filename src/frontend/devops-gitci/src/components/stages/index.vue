@@ -7,15 +7,19 @@
             :stage="stage"
             :key="stage.id"
         ></stage>
+
+        <stage-review-panel></stage-review-panel>
     </section>
 </template>
 
 <script>
     import stage from './stage/index'
+    import stageReviewPanel from '@/components/StageReviewPanel'
 
     export default {
         components: {
-            stage
+            stage,
+            stageReviewPanel
         },
 
         props: {

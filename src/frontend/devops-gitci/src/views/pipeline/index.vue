@@ -90,7 +90,7 @@
                     branch_name: '',
                     commit_message: ''
                 },
-                isShowAddYml: false,
+                isShowAddYml: this.$route.query.isNew,
                 isLoading: false,
                 isLoadingBranches: false,
                 isSaving: false,

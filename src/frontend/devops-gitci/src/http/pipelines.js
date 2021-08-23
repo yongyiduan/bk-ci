@@ -1,5 +1,5 @@
 import api from './ajax'
-import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX } from './perfix'
+import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX, QUALITY_PREFIX } from './perfix'
 
 export default {
     // 第一次拉取日志
@@ -162,5 +162,13 @@ export default {
 
     checkYaml (yaml) {
         return api.post(`${GITCI_PERFIX}/user/trigger/build/checkYaml`, { yaml })
+    },
+
+    requestQualityGate (projectId, pipelineId, buildId, ids, checkTimes) {
+        return api.post(`${QUALITY_PREFIX}/user/intercepts/v2/pipeline/list?projectId=${projectId}&pipelineId=${pipelineId}&buildId=${buildId}&checkTimes=${checkTimes}`, ids)
+    },
+
+    triggerStage ({ projectId, pipelineId, buildId, stageId, cancel, reviewParams, id, suggest }) {
+        return api.post(`${PROCESS_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/stages/${stageId}/manualStart?cancel=${cancel}`, { reviewParams, id, suggest })
     }
 }

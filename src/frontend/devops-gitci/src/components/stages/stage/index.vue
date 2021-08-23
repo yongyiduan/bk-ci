@@ -1,5 +1,21 @@
 <template>
     <section class="stage-home">
+        <icon
+            v-if="showStageCheck(stage.checkIn)"
+            :name="reviewStatausIcon(stage.checkIn)"
+            size="28"
+            class="review-icon"
+            @click.native="handleIconClick('checkIn')"
+        />
+
+        <!-- <icon
+            v-if="showStageCheck(stage.checkOut)"
+            :name="reviewStatausIcon(stage.checkOut)"
+            size="28"
+            class="review-icon check-out"
+            @click.native="handleIconClick('checkOut')"
+        /> -->
+
         <h3 class="stage-title">
             <span :class="`${stageStatusCls} title-content`">
                 <i :class="stageStatusIcon"></i>
@@ -43,7 +59,7 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+    import { mapState, mapActions } from 'vuex'
     import { getPipelineStatusClass, getPipelineStatusIconCls } from '@/components/status'
     import { pipelines } from '@/http'
     import job from '../job/index'
@@ -69,7 +85,7 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'permission']),
+            ...mapState(['projectId', 'permission', 'showStageReviewPanel']),
 
             stageStatusCls () {
                 return getPipelineStatusClass(this.stage.status)
@@ -77,10 +93,60 @@
 
             stageStatusIcon () {
                 return getPipelineStatusIconCls(this.stage.status)
+            },
+
+            isFinallyStage () {
+                return this.stage.finally === true
             }
         },
 
         methods: {
+            ...mapActions([
+                'toggleStageReviewPanel'
+            ]),
+
+            handleIconClick (type) {
+                this.toggleStageReviewPanel({
+                    isShow: true,
+                    type,
+                    stage: this.stage
+                })
+            },
+
+            showStageCheck (stageControl = {}) {
+                const hasReviewFlow = stageControl.manualTrigger
+                const hasReviewQuality = stageControl.ruleIds && stageControl.ruleIds.length > 0
+                return !this.isFinallyStage && (hasReviewFlow || hasReviewQuality)
+            },
+
+            reviewStatausIcon (stageControl = {}) {
+                try {
+                    if (stageControl.isReviewError) return 'review-error'
+                    switch (true) {
+                        case stageControl.status === 'REVIEWING':
+                            return 'reviewing'
+                        case stageControl.status === 'QUEUE':
+                            return 'review-waiting'
+                        case stageControl.status === 'REVIEW_PROCESSED':
+                            return 'reviewed'
+                        case stageControl.status === 'QUALITY_CHECK_FAIL':
+                            return 'quality-check-fail'
+                        case stageControl.status === 'REVIEW_ABORT':
+                            return 'review-abort'
+                        case this.stageStatusCls === 'SKIP':
+                        case stageControl.status === undefined:
+                            return stageControl.manualTrigger ? 'review-waiting' : 'review-auto-gray'
+                        case stageControl.status:
+                            return 'review-auto-pass'
+                        default:
+                            return stageControl.manualTrigger ? 'review-enable' : 'review-auto'
+                    }
+                } catch (e) {
+                    console.warn('get review icon error: ', e)
+                    return 'review-auto'
+                }
+            },
+
             retry () {
                 if (!this.permission) return
 
@@ -117,6 +183,17 @@
         padding: 0 0 24px 0;
         background: #f5f5f5;
         margin: 0 80px 0 0;
+        .review-icon {
+            position: absolute;
+            cursor: pointer;
+            top: 11px;
+            left: -14px;
+            z-index: 3;
+            &.check-out {
+                right: -14px;
+                left: auto;
+            }
+        }
     }
     .stage-title {
         position: relative;
