@@ -34,10 +34,10 @@
             <bk-form-item :label="$t('stageReview.required')">
                 <bk-radio-group v-model="copyForm.required">
                     <bk-radio :value="true">
-                        {{ $t('true') }}
+                        {{ $t('stageReview.true') }}
                     </bk-radio>
                     <bk-radio :value="false" style="marginLeft:55px">
-                        {{ $t('false') }}
+                        {{ $t('stageReview.false') }}
                     </bk-radio>
                 </bk-radio-group>
             </bk-form-item>
