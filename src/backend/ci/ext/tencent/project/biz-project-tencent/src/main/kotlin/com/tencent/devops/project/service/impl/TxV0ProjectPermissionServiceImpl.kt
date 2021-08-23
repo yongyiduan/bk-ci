@@ -168,6 +168,6 @@ class TxV0ProjectPermissionServiceImpl @Autowired constructor(
     }
 
     companion object {
-        val logger = LoggerFactory.getLogger(V0ProjectPermissionServiceImpl::class.java)
+        val logger = LoggerFactory.getLogger(TxV0ProjectPermissionServiceImpl::class.java)
     }
 }

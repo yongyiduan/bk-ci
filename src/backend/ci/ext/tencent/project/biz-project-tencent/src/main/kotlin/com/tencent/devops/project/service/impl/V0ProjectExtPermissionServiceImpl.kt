@@ -102,6 +102,6 @@ class V0ProjectExtPermissionServiceImpl @Autowired constructor(
     }
 
     companion object {
-        val logger = LoggerFactory.getLogger(TxProjectPermissionServiceImpl::class.java)
+        val logger = LoggerFactory.getLogger(V0ProjectExtPermissionServiceImpl::class.java)
     }
 }
