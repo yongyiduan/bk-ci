@@ -98,7 +98,8 @@ object ScriptYmlUtils {
     @Throws(JsonProcessingException::class)
     fun formatYaml(yamlStr: String): String {
         // replace custom tag
-        val yamlNormal = formatYamlCustom(yamlStr)
+        val yamlNormal =
+            formatYamlCustom(yamlStr)
         // replace anchor tag
         val yaml = Yaml()
         val obj = yaml.load(yamlNormal) as Any
@@ -374,17 +375,13 @@ object ScriptYmlUtils {
         }
 
         try {
-            val runsOn =
-                YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(preRunsOn), RunsOn::class.java)
-
+            val runsOn = YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(preRunsOn), RunsOn::class.java)
             return if (runsOn.container != null) {
                 try {
-                    val container = YamlUtil.getObjectMapper()
-                        .readValue(JsonUtil.toJson(runsOn.container), Container::class.java)
+                    val container = YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(runsOn.container), Container::class.java)
                     runsOn.copy(container = container)
                 } catch (e: Exception) {
-                    val container = YamlUtil.getObjectMapper()
-                        .readValue(JsonUtil.toJson(runsOn.container), Container2::class.java)
+                    val container = YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(runsOn.container), Container2::class.java)
                     runsOn.copy(container = container)
                 }
             } else {
@@ -506,25 +503,6 @@ object ScriptYmlUtils {
         }
 
         return null
-    }
-
-    fun normalizePreCiYaml(preScriptBuildYaml: PreScriptBuildYaml): ScriptBuildYaml {
-        val stages = formatStage(
-            preScriptBuildYaml
-        )
-
-        return ScriptBuildYaml(
-            name = preScriptBuildYaml.name,
-            version = preScriptBuildYaml.version,
-            triggerOn = null,
-            variables = preScriptBuildYaml.variables,
-            extends = preScriptBuildYaml.extends,
-            resource = preScriptBuildYaml.resources,
-            notices = preScriptBuildYaml.notices,
-            stages = stages,
-            finally = preJobs2Jobs(preScriptBuildYaml.finally),
-            label = preScriptBuildYaml.label ?: emptyList()
-        )
     }
 
     /**
@@ -768,5 +746,24 @@ object ScriptYmlUtils {
             logger.error("Format label  failed.", e)
             listOf<String>()
         }
+    }
+
+    fun normalizePreCiYaml(preScriptBuildYaml: PreScriptBuildYaml): ScriptBuildYaml {
+        val stages = formatStage(
+            preScriptBuildYaml
+        )
+
+        return ScriptBuildYaml(
+            name = preScriptBuildYaml.name,
+            version = preScriptBuildYaml.version,
+            triggerOn = null,
+            variables = preScriptBuildYaml.variables,
+            extends = preScriptBuildYaml.extends,
+            resource = preScriptBuildYaml.resources,
+            notices = preScriptBuildYaml.notices,
+            stages = stages,
+            finally = preJobs2Jobs(preScriptBuildYaml.finally),
+            label = preScriptBuildYaml.label ?: emptyList()
+        )
     }
 }
