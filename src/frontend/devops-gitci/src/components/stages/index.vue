@@ -8,7 +8,7 @@
             :key="stage.id"
         ></stage>
 
-        <stage-review-panel></stage-review-panel>
+        <stage-review-panel @approve="$emit('refresh-stages')"></stage-review-panel>
     </section>
 </template>
 

@@ -13,7 +13,7 @@ function successHandler (response) {
     const { data: { code, data, message, status }, status: httpStatus } = response
     const errorMsg = { httpStatus, message, code: code || status }
     if (httpStatus === 401) {
-        location.href = getLoginUrl()
+        location.href = window.getLoginUrl()
     } else if ([503, 403, 418, 419].includes(httpStatus)) {
         store.dispatch('setExceptionInfo', { type: httpStatus, message })
         return
@@ -23,19 +23,4 @@ function successHandler (response) {
     return data === undefined ? response.data : data
 }
 
-function getLoginUrl (domain = LOGIN_SERVICE_URL) {
-    const cUrl = location.href
-    const loginUrl = new URL(domain)
-    const url = new URL('http://login.o.woa.com/call_back_oa/')
-    url.searchParams.append('bk_appid', 1)
-    url.searchParams.append('bk_login', 1)
-    url.searchParams.append('c_url', cUrl)
-    
-    loginUrl.searchParams.append('title', 'bklogin')
-    loginUrl.searchParams.append('appkey', '909a565c052c4379b90d3d82152d2da1')
-    loginUrl.searchParams.append('url', url)
-    
-    return loginUrl.href
-}
-
-export { errorHandler, successHandler, requestHandler, getLoginUrl }
+export { errorHandler, successHandler, requestHandler }

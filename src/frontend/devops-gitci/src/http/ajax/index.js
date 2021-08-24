@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { setCookie } from '@/utils'
-import { errorHandler, successHandler, requestHandler, getLoginUrl } from './handler'
+import { errorHandler, successHandler, requestHandler } from './handler'
 
 // 设置cookie，路由到git-ci独立集群
 setCookie('X-DEVOPS-PROJECT-ID', 'gitciproject', document.domain.split('.').slice(-2).join('.'))
@@ -31,6 +31,5 @@ function modifyRequestCommonHead (options) {
     }
 }
 export {
-    getLoginUrl,
     modifyRequestCommonHead
 }
