@@ -49,8 +49,6 @@
                                 this.getPermission()
                                 this.setExceptionInfo({ type: 200 })
                                 gitCiWebSocket.changeRoute(this.$route)
-                            } else {
-                                this.setExceptionInfo({ type: 499 })
                             }
                             resolve()
                         }).catch((err) => {

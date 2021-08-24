@@ -38,7 +38,7 @@
                 <bk-button class="detail-button" @click="rebuild" :loading="isOperating" :disabled="!permission">Re-build</bk-button>
             </div>
         </section>
-        <stages :stages="stageList" class="detail-stages"></stages>
+        <stages :stages="stageList" class="detail-stages" @refresh-stages="getPipelineBuildDetail"></stages>
     </article>
 </template>
 

@@ -41,7 +41,6 @@
     </div>
 </template>
 <script>
-    import { getLoginUrl } from '@/http/ajax'
     export default ({
         props: {
             user: {
@@ -75,7 +74,7 @@
             },
 
             logout () {
-                location.href = getLoginUrl(`http://${location.hostname}/_logout/`)
+                location.href = window.getLoginUrl(`http://${location.hostname}/_logout/`)
             }
         }
     })

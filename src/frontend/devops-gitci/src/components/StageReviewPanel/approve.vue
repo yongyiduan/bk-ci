@@ -104,6 +104,7 @@
                         const message = flowData.isCancel ? 'Successful Reject' : 'Successful Approve'
                         this.$bkMessage({ theme: 'success', message })
                         this.cancelApprove()
+                        this.$emit('approve')
                     })
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })

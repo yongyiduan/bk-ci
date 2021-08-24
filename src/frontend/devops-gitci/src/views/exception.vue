@@ -5,6 +5,7 @@
             <span class="exception-title">
                 {{ exceptionInfo.message || infoMap.messageMap[exceptionType] || 'System error, please try again later!' }}
                 <bk-link theme="primary" target="_blank" href="https://iwiki.woa.com/x/pZMdK" v-if="exceptionType === 520">了解更多</bk-link>
+                <bk-link theme="primary" target="_blank" href="https://iwiki.woa.com/x/EkgKKw" v-if="exceptionType === 403">Learn more</bk-link>
             </span>
             <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" v-if="exceptionType === 419">
                 <bk-button theme="primary" @click="enable" :loading="isSaving" :disabled="!permission">Enable</bk-button>
