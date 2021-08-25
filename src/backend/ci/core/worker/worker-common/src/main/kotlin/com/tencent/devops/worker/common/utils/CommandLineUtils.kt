@@ -39,6 +39,7 @@ import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
 import org.slf4j.LoggerFactory
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.regex.Pattern
 
@@ -81,7 +82,7 @@ object CommandLineUtils {
         val outputStream = object : LogOutputStream() {
             override fun processBuffer() {
                 val privateStringField = LogOutputStream::class.java.getDeclaredField("buffer")
-                privateStringField.isAccessible = true;
+                privateStringField.isAccessible = true
                 val buffer = privateStringField.get(this) as ByteArrayOutputStream
                 processLine(buffer.toString(charset))
                 buffer.reset()
@@ -108,7 +109,7 @@ object CommandLineUtils {
         val errorStream = object : LogOutputStream() {
             override fun processBuffer() {
                 val privateStringField = LogOutputStream::class.java.getDeclaredField("buffer")
-                privateStringField.isAccessible = true;
+                privateStringField.isAccessible = true
                 val buffer = privateStringField.get(this) as ByteArrayOutputStream
                 processLine(buffer.toString(charset))
                 buffer.reset()
