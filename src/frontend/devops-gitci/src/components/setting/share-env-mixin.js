@@ -63,10 +63,12 @@ const shareEnvMixin = {
                 this.curPageList = []
                 res.map(item => {
                     // 在这里判断一下totalList里面能不能找到这一项，是否isCheck
-                    item.isChecked = false
-                    this.curPageList.push(item)
-                    if (!this.totalList.find(totalListItem => totalListItem.id === item.id)) {
-                        this.totalList.push(item)
+                    if (item.projectCode !== this.projectId) {
+                        item.isChecked = false
+                        this.curPageList.push(item)
+                        if (!this.totalList.find(totalListItem => totalListItem.id === item.id)) {
+                            this.totalList.push(item)
+                        }
                     }
                 })
                 this.curPageList.filter(kk => {

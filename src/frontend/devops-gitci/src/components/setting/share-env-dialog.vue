@@ -10,7 +10,7 @@
                 title: loading.title
             }">
             <div class="node-list-header">
-                <div class="title">Select projects to import
+                <div class="title">Select projects to link
                 </div>
                 <div class="search-input-row">
                     <div class="biz-search-input">
