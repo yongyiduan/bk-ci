@@ -3,14 +3,17 @@
         :title="job.name"
         :status="job.status"
     >
-        <span
-            v-if="job.dispatchType && job.dispatchType.buildType === 'GIT_CI'"
-            class="web-console"
-            :style="{ right: executeCount > 1 ? '390px' : '280px' }"
-            @click="startDebug"
-        >
-            Web Console
-        </span>
+        <section class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
+            <bk-popover placement="bottom" ref="consoleRef" ext-cls="console-menu-wrapper">
+                <span>
+                    Web Console
+                </span>
+                <ul class="console-ul-list" slot="content">
+                    <li @click="startDebug('/bin/sh')"><span>Login via /bin/sh</span></li>
+                    <li @click="startDebug('/bin/bash')"><span>Login via /bin/bash</span></li>
+                </ul>
+            </bk-popover>
+        </section>
         <job-log :plugin-list="pluginList"
             :build-id="$route.params.buildId"
             :down-load-link="downLoadJobLink"
@@ -34,7 +37,7 @@
 
         props: {
             job: Object,
-            stages: Object,
+            stages: Array,
             stageIndex: Number,
             jobIndex: Number
         },
@@ -72,12 +75,12 @@
             }
         },
         methods: {
-            startDebug () {
+            startDebug (cmd = '/bin/sh') {
                 const vmSeqId = this.getRealSeqId()
                 if (this.job.status === 'RUNNING') {
                     this.getContainerInfoById(vmSeqId)
                 } else {
-                    this.startNewDocker(vmSeqId)
+                    this.startNewDocker(vmSeqId, cmd)
                 }
             },
 
@@ -101,7 +104,7 @@
                 })
             },
 
-            startNewDocker (vmSeqId) {
+            startNewDocker (vmSeqId, cmd) {
                 let url = ''
                 const tab = window.open('about:blank')
                 pipelines.startDebugDocker(
@@ -109,6 +112,7 @@
                         projectId: this.projectId,
                         pipelineId: this.pipelineId,
                         vmSeqId,
+                        cmd,
                         containerPool: this.job.dispatchType.value
                     }).then((res) => {
                     if (res === true) {
@@ -138,12 +142,46 @@
     }
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
     .web-console {
         position: absolute;
         right: 280px;
         top: 20px;
-        color: #3c96ff;
-        cursor: pointer;
+        span {
+            color: #3c96ff;
+            cursor: pointer;
+        }
+    }
+    .console-menu-wrapper {
+        .tippy-tooltip {
+            padding: 0px;
+            background: #2f363d;
+            .tippy-arrow {
+                border-bottom: 8px solid #2f363d;
+            }
+        }
+    }
+    .console-ul-list {
+        border: 1px solid #444d56;
+        border-radius: 4px;
+        li {
+            display: flex;
+            align-items: center;
+            width: 180px;
+            height: 36px;
+            font-size: 12px;
+            cursor: pointer;
+            background: #2f363d;
+            &:not(:last-child) {
+                border-bottom: 1px solid #444D56;
+            }
+            &:hover {
+                background: #3a84ff;
+            }
+            span {
+                margin-left: 25px;
+            }
+        }
+        
     }
 </style>

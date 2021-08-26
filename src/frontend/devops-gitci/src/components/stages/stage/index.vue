@@ -70,7 +70,7 @@
         },
 
         props: {
-            stages: Object,
+            stages: Array,
             stage: Object,
             stageIndex: Number,
             stageNum: Number

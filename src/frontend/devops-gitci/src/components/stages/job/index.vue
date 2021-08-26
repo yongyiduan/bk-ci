@@ -41,7 +41,7 @@
         props: {
             job: Object,
             jobIndex: Number,
-            stages: Object,
+            stages: Array,
             stageIndex: Number,
             stageNum: Number
         },
