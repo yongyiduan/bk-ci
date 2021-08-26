@@ -31,7 +31,7 @@ const state = {
         // 'KNOWNED_FAILURE': 'known_error'
         'SUCCEED': 'success',
         'FAILED': 'error',
-        'CANCELED': 'cancel',
+        'CANCELED': 'error',
         'RUNNING': 'running',
         'REVIEWING': 'reviewing',
         'HEARTBEAT_TIMEOUT': 'timeout',

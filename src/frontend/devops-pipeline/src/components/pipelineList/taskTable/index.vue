@@ -31,7 +31,7 @@
                 <div v-if="row.hasPermission">
                     <progress-bar
                         class="table-list-progress mr15"
-                        v-if="row.feConfig && row.feConfig.status !== 'success' && row.feConfig.status !== 'not_built' && row.feConfig.status !== 'known_error' && row.feConfig.status !== 'known_cancel'"
+                        v-if="row.feConfig && row.feConfig.status !== 'success' && row.feConfig.status !== 'not_built' && row.feConfig.status !== 'known_error'"
                         :percentage="row.feConfig && row.feConfig.runningInfo.percentage"
                         :status="row.feConfig && row.feConfig.status"
                         :has-icon="true">
@@ -58,7 +58,7 @@
                     <a
                         href="javascript:;"
                         class="text-link item-text-btn noticed"
-                        v-if="(row.feConfig && row.feConfig.status === 'error') || (row.feConfig && row.feConfig.status === 'cancel')"
+                        v-if="row.feConfig && row.feConfig.status === 'error'"
                         @click.stop.prevent="emitEventHandler('error-noticed', row.pipelineId)">
                         {{ $t('newlist.known') }}
                         <i class="devops-icon icon-check-1"></i>
