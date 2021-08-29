@@ -25,27 +25,27 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.openapi.config
+package com.tencent.devops.openapi.resources.apigw.v3
+
+import com.tencent.devops.auth.api.service.ServiceTokenResource
+import com.tencent.devops.auth.api.user.UserTokenResource
+import com.tencent.devops.auth.pojo.TokenInfo
+import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.openapi.filter.impl.SampleApiFilter
-import com.tencent.devops.openapi.service.op.DefaultOpAppUserService
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.openapi.api.apigw.v3.ApigwTokenResourceV3
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.core.Ordered
 
-/**
- * 流水线构建核心配置
- */
-@Configuration
-@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
-class OpenAPiConfiguration {
-    @Bean
-    @ConditionalOnMissingBean(name = ["opAppUserService"])
-    fun opAppUserService() = DefaultOpAppUserService()
+@RestResource
+class ApigwTokenResourceV3Impl @Autowired constructor(
+    private val client: Client
+) : ApigwTokenResourceV3 {
 
-    @Bean
-    fun apiFilter(@Autowired client: Client) = SampleApiFilter(client)
+    override fun getJWToken(userId: String): Result<TokenInfo> {
+        return client.get(UserTokenResource::class).getAccessToken(userId)
+    }
+
+    override fun validateToken(token: String): Result<TokenInfo> {
+        return client.get(ServiceTokenResource::class).validateToken(token)
+    }
 }

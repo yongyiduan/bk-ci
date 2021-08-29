@@ -25,27 +25,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.openapi.config
-import com.tencent.devops.common.client.Client
-import com.tencent.devops.openapi.filter.impl.SampleApiFilter
-import com.tencent.devops.openapi.service.op.DefaultOpAppUserService
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.core.Ordered
+package com.tencent.devops.auth.pojo
 
-/**
- * 流水线构建核心配置
- */
-@Configuration
-@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
-class OpenAPiConfiguration {
-    @Bean
-    @ConditionalOnMissingBean(name = ["opAppUserService"])
-    fun opAppUserService() = DefaultOpAppUserService()
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-    @Bean
-    fun apiFilter(@Autowired client: Client) = SampleApiFilter(client)
-}
+@ApiModel
+data class TokenInfo(
+    @ApiModelProperty("用户id")
+    val userId: String?,
+    @ApiModelProperty("过期时间戳")
+    val expirationTime: Long,
+    @ApiModelProperty("用户token")
+    var accessToken: String?
+)

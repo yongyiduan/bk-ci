@@ -25,27 +25,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.openapi.config
-import com.tencent.devops.common.client.Client
-import com.tencent.devops.openapi.filter.impl.SampleApiFilter
-import com.tencent.devops.openapi.service.op.DefaultOpAppUserService
+package com.tencent.devops.auth.resources
+
+import com.tencent.devops.auth.api.user.UserTokenResource
+import com.tencent.devops.auth.pojo.TokenInfo
+import com.tencent.devops.auth.service.ApiAccessTokenService
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.core.Ordered
 
-/**
- * 流水线构建核心配置
- */
-@Configuration
-@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
-class OpenAPiConfiguration {
-    @Bean
-    @ConditionalOnMissingBean(name = ["opAppUserService"])
-    fun opAppUserService() = DefaultOpAppUserService()
-
-    @Bean
-    fun apiFilter(@Autowired client: Client) = SampleApiFilter(client)
+@RestResource
+class UserTokenResourceImpl @Autowired constructor(
+    val apiAccessTokenService: ApiAccessTokenService
+) : UserTokenResource {
+    override fun getAccessToken(userId: String): Result<TokenInfo> {
+        return Result(apiAccessTokenService.generateUserToken(userId))
+    }
 }
