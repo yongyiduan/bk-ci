@@ -48,7 +48,7 @@
             <div class="base-detail-item version-desc-item">
                 <label class="item-label">版本描述：</label>
                 <div class="item-content">
-                    <div class="version-desc">{{ curReleaseDetail.desc }}</div>
+                    <p class="version-desc" v-html="curReleaseDetail.desc"></p>
                 </div>
             </div>
         </div>
@@ -176,6 +176,8 @@
         .list-item,
         .version-desc-item {
             width: 90%;
+            white-space: pre-line;
+            line-height: 20px;
         }
 
         .list-item {
