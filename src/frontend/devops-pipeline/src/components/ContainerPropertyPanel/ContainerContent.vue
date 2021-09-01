@@ -111,11 +111,12 @@
                 <select-input v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></select-input>
             </form-field>
 
-            <section v-if="buildResourceType === 'PUBLIC_DEVCLOUD'">
+            <section v-if="['DOCKER', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)">
                 <form-field :label="$t('editPage.performance')" v-show="isShowPerformance">
                     <devcloud-option
                         :disabled="!editable"
                         :value="container.dispatchType.performanceConfigId"
+                        :build-type="buildResourceType"
                         :handle-change="changeBuildResourceWithoutEnv"
                         :change-show-performance="changeShowPerformance"
                     >
@@ -252,6 +253,7 @@
             ContainerAppSelector,
             BuildParams,
             VersionConfig,
+            DevcloudOption,
             ContainerEnvNode,
             DevcloudOption,
             JobOption,
@@ -632,7 +634,6 @@
                 }, emptyValueObj))
                 this.handleContainerChange('buildEnv', {}) // 清空依赖编译环境
             },
-
             changeBuildResourceWithoutEnv (name, value) {
                 this.handleContainerChange('dispatchType', Object.assign({
                     ...this.container.dispatchType,
