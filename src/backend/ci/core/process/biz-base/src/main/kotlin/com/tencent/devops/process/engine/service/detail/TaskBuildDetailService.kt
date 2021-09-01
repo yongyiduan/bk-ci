@@ -46,6 +46,7 @@ import com.tencent.devops.process.dao.BuildDetailDao
 import com.tencent.devops.process.engine.dao.PipelineBuildDao
 import com.tencent.devops.process.engine.dao.PipelineBuildTaskDao
 import com.tencent.devops.process.engine.pojo.PipelineTaskStatusInfo
+import com.tencent.devops.process.engine.utils.PipelineUtils
 import com.tencent.devops.process.service.BuildVariableService
 import com.tencent.devops.store.api.atom.ServiceMarketAtomEnvResource
 import org.jooq.DSLContext
@@ -79,6 +80,8 @@ class TaskBuildDetailService(
             override fun onFindElement(index: Int, e: Element, c: Container): Traverse {
                 if (c.id.equals(containerId)) {
                     if (e.id.equals(taskId)) {
+                        // 替换暂停审核人变量
+                        PipelineUtils.parsePauseReviewersWithTemplate(buildId, e, buildVariableService)
                         logger.info("ENGINE|$buildId|pauseTask|$stageId|j($containerId)|t($taskId)|${buildStatus.name}")
                         update = true
                         e.status = buildStatus.name
