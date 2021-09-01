@@ -273,7 +273,7 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                 errorCode = errorCode,
                 errorMsg = errorMsg,
                 atomCode = atomCode,
-                pauseReviewers = pauseReviewers.let<String, List<String>>(objectMapper::readValue)
+                pauseReviewers = pauseReviewers?.let<String, List<String>>(objectMapper::readValue)
             )
         }
     }
