@@ -1,15 +1,18 @@
 package com.tencent.devops.openapi.api.apigw.v3
 
-import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_APP_CODE
 import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_APP_CODE
 import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE
 import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID
 import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.gitci.pojo.GitCIBuildHistory
-import com.tencent.devops.gitci.pojo.GitCIModelDetail
-import com.tencent.devops.gitci.pojo.GitProjectPipeline
-import com.tencent.devops.gitci.pojo.StreamTriggerBuildReq
+import com.tencent.devops.stream.pojo.GitCIBuildHistory
+import com.tencent.devops.stream.pojo.GitCIModelDetail
+import com.tencent.devops.stream.pojo.GitProjectPipeline
+import com.tencent.devops.stream.pojo.StreamTriggerBuildReq
+import com.tencent.devops.stream.pojo.v2.GitCIBasicSetting
+import com.tencent.devops.stream.pojo.v2.GitCIUpdateSetting
+import com.tencent.devops.scm.pojo.GitCIProjectInfo
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -115,7 +118,10 @@ interface ApigwStreamResourceV3 {
         gitProjectId: Long,
         @ApiParam("流水线ID", required = true)
         @PathParam("pipelineId")
-        pipelineId: String
+        pipelineId: String,
+        @ApiParam(value = "是否带有最新一次构建历史", required = false)
+        @QueryParam("withHistory")
+        withHistory: Boolean? = false
     ): Result<GitProjectPipeline?>
 
     @ApiOperation("开启或关闭Stream流水线")
@@ -219,4 +225,62 @@ interface ApigwStreamResourceV3 {
         @QueryParam("pipelineId")
         pipelineId: String?
     ): Result<Page<GitCIBuildHistory>>
+
+    @ApiOperation("开启，关闭，初始化呢工蜂CI")
+    @POST
+    @Path("/enable")
+    fun enableGitCI(
+        @ApiParam(value = "appCode", required = true, defaultValue = AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_APP_CODE)
+        appCode: String?,
+        @ApiParam(value = "apigw Type", required = true)
+        @PathParam("apigwType")
+        apigwType: String?,
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_USER_ID)
+        userId: String,
+        @ApiParam("开启或关闭", required = true)
+        @QueryParam("enabled")
+        enabled: Boolean,
+        @ApiParam("工蜂项目信息(初始化时用)", required = false)
+        projectInfo: GitCIProjectInfo
+    ): Result<Boolean>
+
+    @ApiOperation("查询工蜂CI项目配置")
+    @GET
+    @Path("/settings/get")
+    fun getGitCIConf(
+        @ApiParam(value = "appCode", required = true, defaultValue = AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_APP_CODE)
+        appCode: String?,
+        @ApiParam(value = "apigw Type", required = true)
+        @PathParam("apigwType")
+        apigwType: String?,
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_USER_ID)
+        userId: String,
+        @ApiParam(value = "蓝盾项目ID", required = true)
+        @PathParam("gitProjectId")
+        gitProjectId: String
+    ): Result<GitCIBasicSetting?>
+
+    @ApiOperation("保存工蜂CI配置")
+    @POST
+    @Path("/settings/save")
+    fun saveGitCIConf(
+        @ApiParam(value = "appCode", required = true, defaultValue = AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_APP_CODE)
+        appCode: String?,
+        @ApiParam(value = "apigw Type", required = true)
+        @PathParam("apigwType")
+        apigwType: String?,
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_USER_ID)
+        userId: String,
+        @ApiParam(value = "蓝盾项目ID", required = true)
+        @PathParam("gitProjectId")
+        gitProjectId: String,
+        @ApiParam("工蜂项目配置", required = true)
+        gitCIUpdateSetting: GitCIUpdateSetting
+    ): Result<Boolean>
 }

@@ -1,6 +1,7 @@
 package com.tencent.devops.gitci.trigger.exception
 
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.exception.OauthForbiddenException
 import com.tencent.devops.gitci.client.ScmClient
 import com.tencent.devops.gitci.common.exception.CommitCheck
 import com.tencent.devops.gitci.common.exception.ErrorCodeEnum
@@ -17,7 +18,6 @@ import com.tencent.devops.gitci.pojo.git.GitMergeRequestEvent
 import com.tencent.devops.gitci.pojo.v2.GitCIBasicSetting
 import com.tencent.devops.gitci.trigger.GitCIEventService
 import com.tencent.devops.gitci.trigger.GitCITriggerService
-import com.tencent.devops.gitci.v2.service.ScmService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service
 @Service
 class TriggerExceptionService @Autowired constructor(
     private val scmClient: ScmClient,
-    private val scmService: ScmService,
     private val gitCIEventService: GitCIEventService
 ) {
     companion object {
@@ -144,6 +143,36 @@ class TriggerExceptionService @Autowired constructor(
                 message = codeE.defaultMessage,
                 messageParams = messageParams,
                 filePath = filePath
+            )
+        }
+    }
+
+    fun handleManualTrigger(action: () -> Unit) {
+        try {
+            action()
+        } catch (e: Throwable) {
+            val (errorCode, message) = when (e) {
+                is OauthForbiddenException -> {
+                    throw e
+                }
+                is ErrorCodeException -> {
+                    Pair(ErrorCodeEnum.MANUAL_TRIGGER_THIRD_PARTY_ERROR, e.defaultMessage)
+                }
+                is TriggerBaseException -> {
+                    val (reason, realReasonDetail) = getReason(e)
+                    if (reason == TriggerReason.UNKNOWN_ERROR.name) {
+                        Pair(ErrorCodeEnum.MANUAL_TRIGGER_SYSTEM_ERROR, realReasonDetail)
+                    } else {
+                        Pair(ErrorCodeEnum.MANUAL_TRIGGER_USER_ERROR, realReasonDetail)
+                    }
+                }
+                else -> {
+                    Pair(ErrorCodeEnum.MANUAL_TRIGGER_SYSTEM_ERROR, e.message)
+                }
+            }
+            throw ErrorCodeException(
+                errorCode = errorCode.errorCode.toString(),
+                defaultMessage = message
             )
         }
     }

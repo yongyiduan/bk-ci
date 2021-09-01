@@ -53,13 +53,15 @@ class IamAuthConfiguration {
         policyService: PolicyService,
         iamConfiguration: IamConfiguration,
         managerService: ManagerService,
-        iamCacheService: IamCacheService
+        iamCacheService: IamCacheService,
+        client: Client
     ) = TxPermissionServiceImpl(
         authHelper = authHelper,
         policyService = policyService,
         iamConfiguration = iamConfiguration,
         managerService = managerService,
-        iamCacheService = iamCacheService
+        iamCacheService = iamCacheService,
+        client = client
     )
 
     @Bean
@@ -80,12 +82,14 @@ class IamAuthConfiguration {
         iamConfiguration: IamConfiguration,
         managerService: com.tencent.bk.sdk.iam.service.ManagerService,
         permissionProjectService: TxPermissionProjectServiceImpl,
-        client: Client
+        client: Client,
+        authGroupService: AuthGroupService
     ) = TxPermissionUrlServiceImpl(
         iamConfiguration = iamConfiguration,
         managerService = managerService,
         permissionProjectService = permissionProjectService,
-        client = client
+        client = client,
+        authGroupService = authGroupService
     )
 
     @Bean

@@ -168,11 +168,14 @@ class YamlTriggerV2 @Autowired constructor(
         logger.info("normalize yaml: $normalizedYaml")
 
         // 若是Yaml格式没问题，则取Yaml中的流水线名称，并修改当前流水线名称
-        gitProjectPipeline.displayName =
-            if (!yamlObject.name.isNullOrBlank()) yamlObject.name!! else filePath.removeSuffix(".yml")
+        gitProjectPipeline.displayName = if (!yamlObject.name.isNullOrBlank()) {
+            yamlObject.name!!
+        } else {
+            filePath.removeSuffix(".yml")
+        }
 
         // 拼接插件时会需要传入GIT仓库信息需要提前刷新下状态
-            gitBasicSettingService.refreshSetting(gitRequestEvent.gitProjectId)
+        gitBasicSettingService.refreshSetting(gitRequestEvent.gitProjectId)
 
         if (isTrigger) {
             // 正常匹配仓库操作触发
@@ -256,6 +259,7 @@ class YamlTriggerV2 @Autowired constructor(
         )
     }
 
+    @Throws(TriggerBaseException::class, ErrorCodeException::class)
     override fun prepareCIBuildYaml(
         gitToken: GitToken,
         forkGitToken: GitToken?,
@@ -338,6 +342,7 @@ class YamlTriggerV2 @Autowired constructor(
         return preTemplateYamlObject
     }
 
+    @Throws(TriggerBaseException::class, ErrorCodeException::class)
     private fun formatAndCheckYaml(
         originYaml: String,
         gitRequestEvent: GitRequestEvent,
@@ -381,6 +386,7 @@ class YamlTriggerV2 @Autowired constructor(
         }
     }
 
+    @Throws(TriggerBaseException::class, ErrorCodeException::class)
     private fun replaceYamlTemplate(
         isFork: Boolean,
         isMr: Boolean,

@@ -98,7 +98,8 @@ object ScriptYmlUtils {
     @Throws(JsonProcessingException::class)
     fun formatYaml(yamlStr: String): String {
         // replace custom tag
-        val yamlNormal = formatYamlCustom(yamlStr)
+        val yamlNormal =
+            formatYamlCustom(yamlStr)
         // replace anchor tag
         val yaml = Yaml()
         val obj = yaml.load(yamlNormal) as Any
@@ -374,17 +375,13 @@ object ScriptYmlUtils {
         }
 
         try {
-            val runsOn =
-                YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(preRunsOn), RunsOn::class.java)
-
+            val runsOn = YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(preRunsOn), RunsOn::class.java)
             return if (runsOn.container != null) {
                 try {
-                    val container = YamlUtil.getObjectMapper()
-                        .readValue(JsonUtil.toJson(runsOn.container), Container::class.java)
+                    val container = YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(runsOn.container), Container::class.java)
                     runsOn.copy(container = container)
                 } catch (e: Exception) {
-                    val container = YamlUtil.getObjectMapper()
-                        .readValue(JsonUtil.toJson(runsOn.container), Container2::class.java)
+                    val container = YamlUtil.getObjectMapper().readValue(JsonUtil.toJson(runsOn.container), Container2::class.java)
                     runsOn.copy(container = container)
                 }
             } else {
@@ -403,10 +400,19 @@ object ScriptYmlUtils {
         }
 
         val stepList = mutableListOf<Step>()
+        val stepIdSet = mutableSetOf<String>()
         oldSteps.forEach {
             if (it.uses == null && it.run == null && it.checkout == null) {
                 throw YamlFormatException("step必须包含uses或run或checkout!")
             }
+
+            // 校验stepId唯一性
+            if (it.id != null && stepIdSet.contains(it.id)) {
+                throw YamlFormatException("请确保step.id唯一性!(${it.id})")
+            } else if (it.id != null && !stepIdSet.contains(it.id)) {
+                stepIdSet.add(it.id)
+            }
+
             // 检测step env合法性
             GitCIEnvUtils.checkEnv(it.env)
 
@@ -436,7 +442,15 @@ object ScriptYmlUtils {
         }
 
         val stageList = mutableListOf<Stage>()
+        val stageIdSet = mutableSetOf<String>()
         preStageList.forEach {
+            // 校验stageId唯一性
+            if (it.id != null && stageIdSet.contains(it.id)) {
+                throw YamlFormatException("请确保stage.id唯一性!(${it.id})")
+            } else if (it.id != null && !stageIdSet.contains(it.id)) {
+                stageIdSet.add(it.id)
+            }
+
             stageList.add(
                 Stage(
                     id = it.id ?: randomString(stageNamespace),
@@ -506,25 +520,6 @@ object ScriptYmlUtils {
         }
 
         return null
-    }
-
-    fun normalizePreCiYaml(preScriptBuildYaml: PreScriptBuildYaml): ScriptBuildYaml {
-        val stages = formatStage(
-            preScriptBuildYaml
-        )
-
-        return ScriptBuildYaml(
-            name = preScriptBuildYaml.name,
-            version = preScriptBuildYaml.version,
-            triggerOn = null,
-            variables = preScriptBuildYaml.variables,
-            extends = preScriptBuildYaml.extends,
-            resource = preScriptBuildYaml.resources,
-            notices = preScriptBuildYaml.notices,
-            stages = stages,
-            finally = preJobs2Jobs(preScriptBuildYaml.finally),
-            label = preScriptBuildYaml.label ?: emptyList()
-        )
     }
 
     /**
@@ -768,5 +763,24 @@ object ScriptYmlUtils {
             logger.error("Format label  failed.", e)
             listOf<String>()
         }
+    }
+
+    fun normalizePreCiYaml(preScriptBuildYaml: PreScriptBuildYaml): ScriptBuildYaml {
+        val stages = formatStage(
+            preScriptBuildYaml
+        )
+
+        return ScriptBuildYaml(
+            name = preScriptBuildYaml.name,
+            version = preScriptBuildYaml.version,
+            triggerOn = null,
+            variables = preScriptBuildYaml.variables,
+            extends = preScriptBuildYaml.extends,
+            resource = preScriptBuildYaml.resources,
+            notices = preScriptBuildYaml.notices,
+            stages = stages,
+            finally = preJobs2Jobs(preScriptBuildYaml.finally),
+            label = preScriptBuildYaml.label ?: emptyList()
+        )
     }
 }

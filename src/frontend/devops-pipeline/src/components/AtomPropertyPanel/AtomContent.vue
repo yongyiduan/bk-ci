@@ -73,6 +73,7 @@
                         :atom-props-model="atom.atomModal.props"
                         :set-parent-validate="setAtomValidate"
                         :disabled="!editable"
+                        :is-pause="showPanelType === 'PAUSE' || !editable"
                         class="atom-content">
                     </div>
                     <div class="atom-option">
@@ -592,7 +593,7 @@
                 const hasVaildRule = ruleList.some(item =>
                     item.taskId === this.element.atomCode
                     && (item.ruleList.every(rule => !rule.gatewayId)
-                    || item.ruleList.some(rule => this.element.name.indexOf(rule.gatewayId) > -1))
+                        || item.ruleList.some(rule => this.element.name.indexOf(rule.gatewayId) > -1))
                 )
                 return hasVaildRule
             },
