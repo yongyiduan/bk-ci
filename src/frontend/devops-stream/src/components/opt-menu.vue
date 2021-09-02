@@ -1,5 +1,5 @@
 <template>
-    <bk-popover trigger="click" placement="bottom-end" theme="light" ext-cls="gitci-dropdown" @click.native.stop>
+    <bk-popover trigger="click" placement="bottom-end" theme="light" ext-cls="stream-dropdown" @click.native.stop>
         <i class="header-opt bk-icon icon-more"></i>
         <ul slot="content">
             <slot></slot>
@@ -18,7 +18,7 @@
             background: #f0f1f5;
         }
     }
-    .gitci-dropdown {
+    .stream-dropdown {
         .tippy-tooltip {
             padding: 6px 0;
             border-radius: 0;

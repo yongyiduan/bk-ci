@@ -2,24 +2,24 @@
     <span class="log-status readonly">
         <i v-if="status === 'RUNNING' || status === 'PREPARE_ENV' || status === 'QUEUE' || status === 'LOOP_WAITING' || status === 'CALL_WAITING'" class="bk-icon icon-circle-2-1 executing" />
         <svg aria-hidden="true" v-if="status === 'WAITING'">
-            <use xlink:href="#gitci-build-waiting"></use>
+            <use xlink:href="#stream-build-waiting"></use>
         </svg>
         <svg fill="#fff" aria-hidden="true" v-if="['SKIP', 'CANCELED', 'TERMINATE'].includes(status) || !status">
-            <use xlink:href="#gitci-build-canceled"></use>
+            <use xlink:href="#stream-build-canceled"></use>
         </svg>
         <svg aria-hidden="true" v-if="['REVIEW_ABORT', 'REVIEWING'].includes(status)">
-            <use xlink:href="#gitci-build-warning"></use>
+            <use xlink:href="#stream-build-warning"></use>
         </svg>
         <svg aria-hidden="true" v-if="['FAILED', 'HEARTBEAT_TIMEOUT', 'QUEUE_TIMEOUT', 'EXEC_TIMEOUT'].includes(status)" class="danger">
-            <use xlink:href="#gitci-build-hooks" v-if="isHook"></use>
-            <use xlink:href="#gitci-build-failed" v-else></use>
+            <use xlink:href="#stream-build-hooks" v-if="isHook"></use>
+            <use xlink:href="#stream-build-failed" v-else></use>
         </svg>
         <svg aria-hidden="true" v-if="status === 'SUCCEED'" class="success">
-            <use xlink:href="#gitci-build-hooks" v-if="isHook"></use>
-            <use xlink:href="#gitci-build-sucess" v-else></use>
+            <use xlink:href="#stream-build-hooks" v-if="isHook"></use>
+            <use xlink:href="#stream-build-sucess" v-else></use>
         </svg>
         <svg aria-hidden="true" v-if="status === 'PAUSE'" class="pause">
-            <use xlink:href="#gitci-build-pause"></use>
+            <use xlink:href="#stream-build-pause"></use>
         </svg>
     </span>
 </template>

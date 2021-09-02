@@ -11,7 +11,7 @@
     "devops-turbo",
     "devops-vs",
     "devops-quality",
-    "devops-gitci"
+    "devops-stream"
   ],
   "npmClient": "yarn",
   "version": "independent",

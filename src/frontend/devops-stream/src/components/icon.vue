@@ -4,7 +4,7 @@
         :height="size"
         style="fill: currentColor"
     >
-        <use v-bind="{ 'xlink:href': `#gitci-${name}` }" />
+        <use v-bind="{ 'xlink:href': `#stream-${name}` }" />
     </svg>
 </template>
 

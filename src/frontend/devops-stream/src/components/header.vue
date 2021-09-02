@@ -1,5 +1,5 @@
 <template>
-    <header class="gitci-header">
+    <header class="stream-header">
         <span class="header-info">
             <img class="ci-name" src="./../images/logo.svg" height="48" @click="goToHome" />
 
@@ -42,7 +42,7 @@
     import user from './user'
 
     export default ({
-        name: 'gitci-header',
+        name: 'stream-header',
         components: {
             user
         },
@@ -119,7 +119,7 @@
 </script>
 
 <style lang="postcss" scoped>
-    .gitci-header {
+    .stream-header {
         height: 61px;
         padding: 0 20px 0 10px;
         background: #182132;

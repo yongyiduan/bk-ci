@@ -70,8 +70,8 @@ export function getPipelineStatusCircleIconCls (status) {
         QUEUE_TIMEOUT: 'icon-close',
         EXEC_TIMEOUT: 'icon-close',
         SUCCEED: 'icon-check-1',
-        REVIEW_PROCESSED: 'gitci-icon gitci-flag',
-        STAGE_SUCCESS: 'gitci-icon gitci-flag'
+        REVIEW_PROCESSED: 'stream-icon stream-flag',
+        STAGE_SUCCESS: 'stream-icon stream-flag'
     }
     return [iconName, iconMap[status]]
 }

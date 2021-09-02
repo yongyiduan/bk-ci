@@ -39,7 +39,7 @@ export default {
     },
 
     getSystemPoolDetail () {
-        return api.get(`${DISPATCH_GITCI_PERFIX}/user/dispatch/gitci/dockerhost-load`)
+        return api.get(`${DISPATCH_GITCI_PERFIX}/user/dispatch/stream/dockerhost-load`)
     },
 
     getEnvironmentList (projectId) {

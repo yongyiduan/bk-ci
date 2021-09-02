@@ -10,7 +10,7 @@ import yargs from 'yargs'
 
 const argv = yargs.default({ 'dist': 'frontend' }).argv
 const envDist = argv.env && argv.env.dist ? argv.env.dist : 'frontend'
-const dist = path.resolve(__dirname, `../../${envDist}/gitci`)
+const dist = path.resolve(__dirname, `../../${envDist}/stream`)
 
 export default {
     build: {

@@ -1,19 +1,19 @@
 <template>
-    <article class="gitci-main">
-        <gitci-header></gitci-header>
-        <router-view class="gitci-content" :name="childRouteName"></router-view>
+    <article class="stream-main">
+        <stream-header></stream-header>
+        <router-view class="stream-content" :name="childRouteName"></router-view>
     </article>
 </template>
 
 <script>
-    import gitciHeader from '@/components/header'
+    import streamHeader from '@/components/header'
     import { mapState } from 'vuex'
 
     export default {
         name: 'app',
 
         components: {
-            gitciHeader
+            streamHeader
         },
 
         computed: {
@@ -29,8 +29,8 @@
         created () {
             if (this.pathName === '/') {
                 let routeName = 'dashboard'
-                if (!localStorage.getItem('visited-gitci-home')) {
-                    localStorage.setItem('visited-gitci-home', true)
+                if (!localStorage.getItem('visited-stream-home')) {
+                    localStorage.setItem('visited-stream-home', true)
                     routeName = 'home'
                 }
                 this.$router.push({
@@ -42,7 +42,7 @@
 </script>
 
 <style lang="postcss">
-    .gitci-main {
+    .stream-main {
         width: 100%;
         height: 100vh;
         overflow: auto;
@@ -63,7 +63,7 @@
         }
     }
 
-    .gitci-content {
+    .stream-content {
         height: calc(100% - 61px);
         overflow: auto;
     }

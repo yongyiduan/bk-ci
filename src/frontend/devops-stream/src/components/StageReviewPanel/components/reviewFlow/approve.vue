@@ -76,7 +76,7 @@
                     if (curExecIndex === index) status = 'loading'
 
                     let icon = index + 1
-                    if (!status) icon = ` gitci-${index + 1} gitci-icon`
+                    if (!status) icon = ` stream-${index + 1} stream-icon`
 
                     return { status, title: item.name, icon }
                 }
