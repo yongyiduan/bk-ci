@@ -13,7 +13,7 @@ function uuid () {
     return id
 }
 
-class GitCiWebSocket {
+class StreamWebSocket {
     constructor () {
         this.connectErrTime = 1
         this.connectCallBack = []
@@ -132,4 +132,4 @@ class GitCiWebSocket {
     }
 }
 
-export default new GitCiWebSocket()
+export default new StreamWebSocket()

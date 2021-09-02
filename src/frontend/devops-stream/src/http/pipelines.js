@@ -1,5 +1,5 @@
 import api from './ajax'
-import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX, QUALITY_PREFIX } from './perfix'
+import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, STREAM_PERFIX, DISPATCH_STREAM_PERFIX, QUALITY_PREFIX } from './perfix'
 
 export default {
     // 第一次拉取日志
@@ -34,7 +34,7 @@ export default {
     },
 
     requestPermission (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/permission/projects/${projectId}/resource/validate`, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
+        return api.get(`${STREAM_PERFIX}/user/permission/projects/${projectId}/resource/validate`, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
     },
 
     requestDevnetGateway () {
@@ -46,55 +46,55 @@ export default {
     },
 
     requestReportList ({ projectId, pipelineId, buildId }) {
-        return api.get(`${GITCI_PERFIX}/user/current/build/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/report`)
+        return api.get(`${STREAM_PERFIX}/user/current/build/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/report`)
     },
 
     getPipelineList (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/pipelines/${projectId}/list?page=1&pageSize=50`)
+        return api.get(`${STREAM_PERFIX}/user/pipelines/${projectId}/list?page=1&pageSize=50`)
     },
 
     getPipelineBuildList (projectId, params) {
-        return api.post(`${GITCI_PERFIX}/user/history/build/list/${projectId}`, params)
+        return api.post(`${STREAM_PERFIX}/user/history/build/list/${projectId}`, params)
     },
 
     getPipelineBuildBranchList (projectId, params = {}) {
-        return api.get(`${GITCI_PERFIX}/user/history/build/branch/list/${projectId}`, { params })
+        return api.get(`${STREAM_PERFIX}/user/history/build/branch/list/${projectId}`, { params })
     },
 
     getPipelineBuildMemberList (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/gitcode/projects/members?projectId=${projectId}`)
+        return api.get(`${STREAM_PERFIX}/user/gitcode/projects/members?projectId=${projectId}`)
     },
 
     getPipelineBuildDetail (projectId, params) {
-        return api.get(`${GITCI_PERFIX}/user/current/build/detail/${projectId}`, { params })
+        return api.get(`${STREAM_PERFIX}/user/current/build/detail/${projectId}`, { params })
     },
 
     getPipelineBuildYaml (projectId, buildId) {
-        return api.get(`${GITCI_PERFIX}/user/trigger/build/getYaml/${projectId}/${buildId}`)
+        return api.get(`${STREAM_PERFIX}/user/trigger/build/getYaml/${projectId}/${buildId}`)
     },
 
     addPipelineYamlFile (projectId, params) {
-        return api.post(`${GITCI_PERFIX}/user/gitcode/projects/repository/files?projectId=${projectId}`, params)
+        return api.post(`${STREAM_PERFIX}/user/gitcode/projects/repository/files?projectId=${projectId}`, params)
     },
 
     getPipelineBranches (params) {
-        return api.get(`${GITCI_PERFIX}/user/gitcode/projects/repository/branches`, { params })
+        return api.get(`${STREAM_PERFIX}/user/gitcode/projects/repository/branches`, { params })
     },
 
     getPipelineCommits (params) {
-        return api.get(`${GITCI_PERFIX}/user/gitcode/projects/commits`, { params })
+        return api.get(`${STREAM_PERFIX}/user/gitcode/projects/commits`, { params })
     },
 
     getPipelineBranchYaml (projectId, pipelineId, params) {
-        return api.get(`${GITCI_PERFIX}/user/trigger/build/${projectId}/${pipelineId}/yaml`, { params })
+        return api.get(`${STREAM_PERFIX}/user/trigger/build/${projectId}/${pipelineId}/yaml`, { params })
     },
 
     trigglePipeline (pipelineId, params) {
-        return api.post(`${GITCI_PERFIX}/user/trigger/build/${pipelineId}/startup`, params)
+        return api.post(`${STREAM_PERFIX}/user/trigger/build/${pipelineId}/startup`, params)
     },
 
     toggleEnablePipeline (projectId, pipelineId, enabled) {
-        return api.post(`${GITCI_PERFIX}/user/pipelines/${projectId}/${pipelineId}/enable?enabled=${enabled}`)
+        return api.post(`${STREAM_PERFIX}/user/pipelines/${projectId}/${pipelineId}/enable?enabled=${enabled}`)
     },
 
     updateRemark (projectId, pipelineId, buildId, remark) {
@@ -111,29 +111,29 @@ export default {
             }
             return query
         }, '')
-        return api.post(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/retry${queryStr}`)
+        return api.post(`${STREAM_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/retry${queryStr}`)
     },
 
     cancelBuildPipeline (projectId, pipelineId, buildId) {
-        return api.delete(`${GITCI_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}`)
+        return api.delete(`${STREAM_PERFIX}/user/builds/${projectId}/${pipelineId}/${buildId}`)
     },
 
     getContainerInfoByBuildId (projectId, pipelineId, buildId, vmSeqId) {
-        return api.get(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/getContainerInfo/${projectId}/${pipelineId}/${buildId}/${vmSeqId}`)
+        return api.get(`${DISPATCH_STREAM_PERFIX}/user/dockerhost/getContainerInfo/${projectId}/${pipelineId}/${buildId}/${vmSeqId}`)
     },
 
     startDebugDocker (params) {
-        return api.post(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/startDebug/`, params)
+        return api.post(`${DISPATCH_STREAM_PERFIX}/user/dockerhost/startDebug/`, params)
     },
 
     stopDebugDocker (projectId, pipelineId, vmSeqId) {
-        return api.post(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/stopDebug/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
+        return api.post(`${DISPATCH_STREAM_PERFIX}/user/dockerhost/stopDebug/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
             return res
         })
     },
 
     getDebugStatus (projectId, pipelineId, vmSeqId) {
-        return api.get(`${DISPATCH_GITCI_PERFIX}/user/dockerhost/getDebugStatus/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
+        return api.get(`${DISPATCH_STREAM_PERFIX}/user/dockerhost/getDebugStatus/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
             return res
         }).catch((err) => {
             throw err
@@ -161,7 +161,7 @@ export default {
     },
 
     checkYaml (yaml) {
-        return api.post(`${GITCI_PERFIX}/user/trigger/build/checkYaml`, { yaml })
+        return api.post(`${STREAM_PERFIX}/user/trigger/build/checkYaml`, { yaml })
     },
 
     requestQualityGate (projectId, pipelineId, buildId, ids, checkTimes) {

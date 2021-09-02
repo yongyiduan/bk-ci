@@ -1,5 +1,5 @@
 import api from './ajax'
-import { ENVIRNMENT_PERFIX, TICKET_PERFIX, GITCI_PERFIX, DISPATCH_GITCI_PERFIX } from './perfix'
+import { ENVIRNMENT_PERFIX, TICKET_PERFIX, STREAM_PERFIX, DISPATCH_STREAM_PERFIX } from './perfix'
 
 export default {
     getThirdAgentZoneList (projectId, os) {
@@ -31,15 +31,15 @@ export default {
     },
 
     saveSetting (projectId, params) {
-        return api.post(`${GITCI_PERFIX}/user/basic/setting/${projectId}/save`, params)
+        return api.post(`${STREAM_PERFIX}/user/basic/setting/${projectId}/save`, params)
     },
 
     getSetting (projectId) {
-        return api.get(`${GITCI_PERFIX}/user/basic/setting/${projectId}`, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
+        return api.get(`${STREAM_PERFIX}/user/basic/setting/${projectId}`, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
     },
 
     getSystemPoolDetail () {
-        return api.get(`${DISPATCH_GITCI_PERFIX}/user/dispatch/stream/dockerhost-load`)
+        return api.get(`${DISPATCH_STREAM_PERFIX}/user/dispatch/stream/dockerhost-load`)
     },
 
     getEnvironmentList (projectId) {
@@ -77,11 +77,11 @@ export default {
     },
 
     toggleEnableCi (enabled, projectInfo) {
-        return api.post(`${GITCI_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo, { headers: { 'X-DEVOPS-PROJECT-ID': 'gitciproject' } })
+        return api.post(`${STREAM_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
     },
 
     resetAuthorization (projectId) {
-        return api.post(`${GITCI_PERFIX}/user/basic/setting/${projectId}/user`)
+        return api.post(`${STREAM_PERFIX}/user/basic/setting/${projectId}/user`)
     },
 
     requestNodeList (projectId) {

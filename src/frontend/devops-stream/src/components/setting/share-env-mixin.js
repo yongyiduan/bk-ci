@@ -57,7 +57,7 @@ const shareEnvMixin = {
         requestProjectList () {
             this.shareDialogLoading.isLoading = true
 
-            common.getGitciProjects('MY_PROJECT', this.page, this.pageSize, this.searchStr).then((res) => {
+            common.getStreamProjects('MY_PROJECT', this.page, this.pageSize, this.searchStr).then((res) => {
                 this.hasNext = res.hasNext || false
                 res = res.records || []
                 this.curPageList = []

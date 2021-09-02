@@ -132,7 +132,7 @@
             },
 
             loopGetPipelineList () {
-                register.installWsMessage(this.getPipelineList, 'IFRAMEgitci', 'pipelineList')
+                register.installWsMessage(this.getPipelineList, 'IFRAMEstream', 'pipelineList')
                 return this.getPipelineList()
             },
 

@@ -5,7 +5,7 @@
 <script>
     import { common, notifications, pipelines } from '@/http'
     import { mapActions, mapState } from 'vuex'
-    import gitCiWebSocket from '@/utils/websocket'
+    import streamWebSocket from '@/utils/websocket'
     import register from '@/utils/websocket-register'
 
     export default {
@@ -48,7 +48,7 @@
                                 this.loopGetNotifications()
                                 this.getPermission()
                                 this.setExceptionInfo({ type: 200 })
-                                gitCiWebSocket.changeRoute(this.$route)
+                                streamWebSocket.changeRoute(this.$route)
                             }
                             resolve()
                         }).catch((err) => {
@@ -78,7 +78,7 @@
 
             loopGetNotifications () {
                 this.getNotifications()
-                register.installWsMessage(this.getNotifications, 'NOTIFYgitci', 'notify')
+                register.installWsMessage(this.getNotifications, 'NOTIFYstream', 'notify')
             }
         }
     }
