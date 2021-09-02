@@ -48,6 +48,7 @@ import com.tencent.devops.process.engine.dao.PipelineBuildTaskDao
 import com.tencent.devops.process.engine.pojo.PipelineTaskStatusInfo
 import com.tencent.devops.process.engine.utils.PipelineUtils
 import com.tencent.devops.process.service.BuildVariableService
+import com.tencent.devops.process.util.TaskUtils
 import com.tencent.devops.store.api.atom.ServiceMarketAtomEnvResource
 import org.jooq.DSLContext
 import org.springframework.stereotype.Service
@@ -154,9 +155,15 @@ class TaskBuildDetailService(
                             c.status = BuildStatus.RUNNING.name
                             e.status = BuildStatus.RUNNING.name
                         }
-                        e.startEpoch = System.currentTimeMillis()
-                        if (c.startEpoch == null) {
-                            c.startEpoch = e.startEpoch
+                        // 如果是自动重试则不重置task和job的时间
+                        val retryCount = redisOperation.get(
+                            TaskUtils.getFailRetryTaskRedisKey(buildId = buildId, taskId = taskId)
+                        )?.toInt() ?: 0
+                        if (retryCount < 1) {
+                            e.startEpoch = System.currentTimeMillis()
+                            if (c.startEpoch == null) {
+                                c.startEpoch = e.startEpoch
+                            }
                         }
                         e.errorType = null
                         e.errorCode = null

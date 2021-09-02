@@ -33,11 +33,13 @@ import com.tencent.devops.common.api.pojo.ErrorType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
+import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.common.service.utils.CommonUtils
 import com.tencent.devops.model.process.Tables.T_PIPELINE_BUILD_TASK
 import com.tencent.devops.model.process.tables.TPipelineBuildTask
 import com.tencent.devops.model.process.tables.records.TPipelineBuildTaskRecord
 import com.tencent.devops.process.engine.pojo.PipelineBuildTask
+import com.tencent.devops.process.util.TaskUtils
 import com.tencent.devops.process.utils.PIPELINE_TASK_MESSAGE_STRING_LENGTH_MAX
 import org.jooq.DSLContext
 import org.jooq.InsertSetMoreStep
@@ -51,7 +53,10 @@ import java.time.LocalDateTime
 
 @Suppress("ALL")
 @Repository
-class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: ObjectMapper) {
+class PipelineBuildTaskDao @Autowired constructor(
+    private val objectMapper: ObjectMapper,
+    private val redisOperation: RedisOperation
+) {
 
     fun create(
         dslContext: DSLContext,
@@ -303,7 +308,11 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                 if (buildStatus.isReview() && !userId.isNullOrBlank()) {
                     update.set(APPROVER, userId)
                 }
-            } else if (buildStatus.isRunning()) {
+            } else if (buildStatus.isRunning() &&
+                redisOperation.get(
+                    TaskUtils.getFailRetryTaskRedisKey(buildId = buildId, taskId = taskId)
+                )?.toInt() ?: 0 > 0
+            ) {
                 update.set(START_TIME, LocalDateTime.now())
                 if (!userId.isNullOrBlank()) {
                     update.set(STARTER, userId)
