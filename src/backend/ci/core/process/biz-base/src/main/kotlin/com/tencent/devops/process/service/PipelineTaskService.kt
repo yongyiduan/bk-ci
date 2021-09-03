@@ -99,7 +99,7 @@ class PipelineTaskService @Autowired constructor(
                     objectMapper.readValue(it.additionalOptions, ElementAdditionalOptions::class.java)
                 },
                 os = it.os,
-                pauseReviewers = it.pauseReviewers.let<String, List<String>>(objectMapper::readValue)
+                pauseReviewers = it.pauseReviewers?.let<String, List<String>>(objectMapper::readValue)
             )
         }?.groupBy { it.pipelineId } ?: mapOf()
     }
