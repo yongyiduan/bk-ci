@@ -255,7 +255,6 @@
             VersionConfig,
             DevcloudOption,
             ContainerEnvNode,
-            DevcloudOption,
             JobOption,
             JobMutual,
             Selector,
