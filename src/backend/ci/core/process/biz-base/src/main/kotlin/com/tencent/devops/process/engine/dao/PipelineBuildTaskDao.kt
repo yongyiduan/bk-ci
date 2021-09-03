@@ -27,6 +27,7 @@
 
 package com.tencent.devops.process.engine.dao
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.devops.common.api.pojo.ErrorType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.pipeline.enums.BuildStatus
@@ -273,7 +274,11 @@ class PipelineBuildTaskDao {
                 errorCode = errorCode,
                 errorMsg = errorMsg,
                 atomCode = atomCode,
-                pauseReviewers = pauseReviewers?.let<String, List<String>>(JsonUtil::toJson)
+                pauseReviewers = if (pauseReviewers == null) {
+                    null
+                } else {
+                    JsonUtil.to(pauseReviewers, object : TypeReference<List<String>>() {})
+                }
             )
         }
     }
