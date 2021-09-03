@@ -70,7 +70,6 @@ import {
     SET_EXECUTE_STATUS,
     SET_SAVE_STATUS,
     SET_AUTH_EDITING,
-    TOGGLE_REVIEW_DIALOG,
     TOGGLE_STAGE_REVIEW_PANEL,
     SET_IMPORTED_JSON,
     SET_EDIT_FROM
@@ -97,8 +96,8 @@ export default {
     setAuthEditing ({ commit }, editing) {
         commit(SET_AUTH_EDITING, editing)
     },
-    triggerStage ({ commit }, { projectId, pipelineId, buildNo, stageId, cancel, reviewParams }) {
-        return request.post(`/${PROCESS_API_URL_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildNo}/stages/${stageId}/manualStart?cancel=${cancel}`, { reviewParams })
+    triggerStage ({ commit }, { projectId, pipelineId, buildNo, stageId, cancel, reviewParams, id, suggest }) {
+        return request.post(`/${PROCESS_API_URL_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildNo}/stages/${stageId}/manualStart?cancel=${cancel}`, { reviewParams, id, suggest })
     },
     async fetchStageTagList ({ commit }) {
         try {
@@ -123,9 +122,6 @@ export default {
     },
     setSaveStatus ({ commit }, status) {
         commit(SET_SAVE_STATUS, status)
-    },
-    toggleReviewDialog ({ commit }, { isShow, reviewInfo }) {
-        commit(TOGGLE_REVIEW_DIALOG, { isShow, reviewInfo })
     },
     toggleStageReviewPanel: actionCreator(TOGGLE_STAGE_REVIEW_PANEL),
     addStoreAtom ({ commit, state }) {
