@@ -25,32 +25,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.dockerhost.pojo
+package com.tencent.devops.process.engine.pojo
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.pipeline.enums.BuildStatus
+import java.time.LocalDateTime
 
-@ApiModel("DockerBuild")
-data class DockerBuildParamNew(
-    @ApiModelProperty("基础镜像凭证", required = true)
-    val ticket: List<Triple<String, String, String>>,
-    @ApiModelProperty("镜像名称", required = true)
-    val imageName: String,
-    @ApiModelProperty("镜像TAG", required = true)
-    val imageTag: String,
-    @ApiModelProperty("构建目录", required = false)
-    val buildDir: String? = ".",
-    @ApiModelProperty("Dockerfile", required = false)
-    val dockerFile: String? = "Dockerfile",
-    @ApiModelProperty("repoAddr", required = true)
-    val repoAddr: String,
-    @ApiModelProperty("userName", required = true)
-    val userName: String,
-    @ApiModelProperty("password", required = true)
-    val password: String,
-    @ApiModelProperty("构建的参数", required = true)
-    val args: List<String>,
-    @ApiModelProperty("host配置", required = true)
-    val host: List<String>
-
+data class UpdateTaskInfo(
+    val taskStatus: BuildStatus? = null, // 构建状态
+    val starter: String? = null, // 启动人
+    val approver: String? = null, // 审批人
+    val startTime: LocalDateTime? = null, // 开始时间
+    val endTime: LocalDateTime? = null, // 结束时间
+    val totalTime: Long? = null // 耗费时间
 )

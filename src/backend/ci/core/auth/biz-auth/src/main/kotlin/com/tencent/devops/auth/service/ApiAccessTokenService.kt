@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 import javax.ws.rs.core.Response
@@ -50,7 +49,6 @@ import javax.ws.rs.core.Response
 class ApiAccessTokenService @Autowired constructor(
     val dslContext: DSLContext
 ) {
-
     @Value("\${auth.accessToken.expirationTime:#{null}}")
     private val expirationTime: Int? = null
 
@@ -64,7 +62,7 @@ class ApiAccessTokenService @Autowired constructor(
 
     fun verifyJWT(token: String): TokenInfo {
         val tokenInfo = getTokenInfo(token)
-        if (tokenInfo.expirationTime > System.currentTimeMillis()) {
+        if (tokenInfo.expirationTime < System.currentTimeMillis()) {
             throw ErrorCodeException(
                 errorCode = PARAMETER_EXPIRED_ERROR,
                 statusCode = Response.Status.BAD_REQUEST.statusCode,
@@ -76,7 +74,7 @@ class ApiAccessTokenService @Autowired constructor(
     }
 
     fun generateUserToken(userDetails: String): TokenInfo {
-        logger.info("AUTH|generateUserToken userId=$userDetails")
+        logger.info("AUTH|generateUserToken| userId=$userDetails")
         if (secret.isNullOrBlank()) {
             logger.error("AUTH| generateUserToken failed, " +
                 "because config[auth.accessToken.secret] is not found")
@@ -97,7 +95,7 @@ class ApiAccessTokenService @Autowired constructor(
         tokenInfo.accessToken = try {
             URLEncoder.encode(AESUtil.encrypt(
                 secret,
-                JsonUtil.toJson(tokenInfo)
+                JsonUtil.toUnformattedJson(tokenInfo)
             ), "UTF-8")
         } catch (ignore: Throwable) {
             logger.error("AUTH| generateUserToken failed because $ignore ")
@@ -116,8 +114,9 @@ class ApiAccessTokenService @Autowired constructor(
         if (cacheToken != null) return cacheToken
 
         val result = try {
-            AESUtil.decrypt(secret!!, URLDecoder.decode(token, "UTF-8"))
+            AESUtil.decrypt(secret!!, token)
         } catch (ignore: Throwable) {
+            logger.error("AUTH|getTokenInfo Access token illegal,secret=$secret,token=$token,error=$ignore")
             throw ErrorCodeException(
                 errorCode = PARAMETER_ILLEGAL_ERROR,
                 statusCode = Response.Status.BAD_REQUEST.statusCode,

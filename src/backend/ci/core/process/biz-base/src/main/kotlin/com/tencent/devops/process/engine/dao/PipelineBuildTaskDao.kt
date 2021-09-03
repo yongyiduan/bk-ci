@@ -27,8 +27,7 @@
 
 package com.tencent.devops.process.engine.dao
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.devops.common.api.pojo.ErrorType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.pipeline.enums.BuildStatus
@@ -38,20 +37,19 @@ import com.tencent.devops.model.process.Tables.T_PIPELINE_BUILD_TASK
 import com.tencent.devops.model.process.tables.TPipelineBuildTask
 import com.tencent.devops.model.process.tables.records.TPipelineBuildTaskRecord
 import com.tencent.devops.process.engine.pojo.PipelineBuildTask
+import com.tencent.devops.process.engine.pojo.UpdateTaskInfo
 import com.tencent.devops.process.utils.PIPELINE_TASK_MESSAGE_STRING_LENGTH_MAX
 import org.jooq.DSLContext
 import org.jooq.InsertSetMoreStep
 import org.jooq.Query
 import org.jooq.Result
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Repository
 import java.time.Duration
-import java.time.LocalDateTime
 
 @Suppress("ALL")
 @Repository
-class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: ObjectMapper) {
+class PipelineBuildTaskDao {
 
     fun create(
         dslContext: DSLContext,
@@ -97,13 +95,15 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                         buildTask.subBuildId,
                         buildTask.status.ordinal,
                         buildTask.starter,
-                        objectMapper.writeValueAsString(buildTask.taskParams),
+                        JsonUtil.toJson(buildTask.taskParams),
                         buildTask.startTime,
                         buildTask.endTime,
                         buildTask.approver,
-                        objectMapper.writeValueAsString(buildTask.additionalOptions),
+                        if (buildTask.additionalOptions != null) {
+                            JsonUtil.toJson(buildTask.additionalOptions!!)
+                        } else null,
                         buildTask.atomCode,
-                        buildTask.pauseReviewers?.let(objectMapper::writeValueAsString)
+                        buildTask.pauseReviewers?.let(JsonUtil::toJson)
                     )
                     .execute()
             }
@@ -124,7 +124,7 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                         .set(CONTAINER_ID, it.containerId)
                         .set(TASK_NAME, it.taskName)
                         .set(TASK_ID, it.taskId)
-                        .set(TASK_PARAMS, objectMapper.writeValueAsString(it.taskParams))
+                        .set(TASK_PARAMS, JsonUtil.toJson(it.taskParams))
                         .set(TASK_TYPE, it.taskType)
                         .set(TASK_ATOM, it.taskAtom)
                         .set(START_TIME, it.startTime)
@@ -136,7 +136,8 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                         .set(TASK_SEQ, it.taskSeq)
                         .set(SUB_BUILD_ID, it.subBuildId)
                         .set(CONTAINER_TYPE, it.containerType)
-                        .set(ADDITIONAL_OPTIONS, objectMapper.writeValueAsString(it.additionalOptions))
+                        .set(ADDITIONAL_OPTIONS,
+                            if (it.additionalOptions != null) JsonUtil.toJson(it.additionalOptions!!) else null)
                         .set(TOTAL_TIME, if (it.endTime != null && it.startTime != null) {
                             Duration.between(it.startTime, it.endTime).toMillis() / 1000
                         } else null)
@@ -146,7 +147,7 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                             CommonUtils.interceptStringInLength(it.errorMsg, PIPELINE_TASK_MESSAGE_STRING_LENGTH_MAX))
                         .set(CONTAINER_HASH_ID, it.containerHashId)
                         .set(ATOM_CODE, it.atomCode)
-                        .set(PAUSE_REVIEWERS, it.pauseReviewers?.let(objectMapper::writeValueAsString))
+                        .set(PAUSE_REVIEWERS, it.pauseReviewers?.let(JsonUtil::toJson))
                 )
             }
             dslContext.batch(records).execute()
@@ -273,7 +274,11 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
                 errorCode = errorCode,
                 errorMsg = errorMsg,
                 atomCode = atomCode,
-                pauseReviewers = pauseReviewers?.let<String, List<String>>(objectMapper::readValue)
+                pauseReviewers = if (pauseReviewers == null) {
+                    null
+                } else {
+                    JsonUtil.to(pauseReviewers, object : TypeReference<List<String>>() {})
+                }
             )
         }
     }
@@ -287,42 +292,39 @@ class PipelineBuildTaskDao @Autowired constructor(private val objectMapper: Obje
         }
     }
 
-    fun updateStatus(
+    fun updateTaskInfo(
         dslContext: DSLContext,
         buildId: String,
         taskId: String,
-        userId: String? = null,
-        buildStatus: BuildStatus
+        updateTaskInfo: UpdateTaskInfo
     ) {
         with(T_PIPELINE_BUILD_TASK) {
-            val update = dslContext.update(this).set(STATUS, buildStatus.ordinal)
-            // 根据状态来设置字段
-            if (buildStatus.isFinish()) {
-                update.set(END_TIME, LocalDateTime.now())
-
-                if (buildStatus.isReview() && !userId.isNullOrBlank()) {
-                    update.set(APPROVER, userId)
-                }
-            } else if (buildStatus.isRunning()) {
-                update.set(START_TIME, LocalDateTime.now())
-                if (!userId.isNullOrBlank()) {
-                    update.set(STARTER, userId)
-                }
+            val baseStep = dslContext.update(this).set(BUILD_ID, buildId)
+            val taskStatus = updateTaskInfo.taskStatus
+            if (null != taskStatus) {
+                baseStep.set(STATUS, taskStatus.ordinal)
             }
-            update.where(BUILD_ID.eq(buildId)).and(TASK_ID.eq(taskId)).execute()
-
-            if (buildStatus.isFinish()) {
-                val record = dslContext.selectFrom(this).where(BUILD_ID.eq(buildId)).and(TASK_ID.eq(taskId))
-                    .fetchAny() ?: return
-                val totalTime = if (record.startTime == null || record.endTime == null) {
-                    0
-                } else {
-                    Duration.between(record.startTime, record.endTime).toMillis()
-                }
-                dslContext.update(this)
-                    .set(TOTAL_TIME, totalTime)
-                    .where(BUILD_ID.eq(buildId)).and(TASK_ID.eq(taskId)).execute()
+            val starter = updateTaskInfo.starter
+            if (null != starter) {
+                baseStep.set(STARTER, starter)
             }
+            val approver = updateTaskInfo.approver
+            if (null != approver) {
+                baseStep.set(APPROVER, approver)
+            }
+            val startTime = updateTaskInfo.startTime
+            if (null != startTime) {
+                baseStep.set(START_TIME, startTime)
+            }
+            val endTime = updateTaskInfo.endTime
+            if (null != endTime) {
+                baseStep.set(END_TIME, endTime)
+            }
+            val totalTime = updateTaskInfo.totalTime
+            if (null != totalTime) {
+                baseStep.set(TOTAL_TIME, totalTime)
+            }
+            baseStep.where(BUILD_ID.eq(buildId)).and(TASK_ID.eq(taskId)).execute()
         }
     }
 

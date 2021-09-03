@@ -38,8 +38,8 @@ import com.tencent.devops.common.quality.pojo.QualityRuleInterceptRecord
 import com.tencent.devops.common.quality.pojo.RuleCheckResult
 import com.tencent.devops.common.quality.pojo.RuleCheckSingleResult
 import com.tencent.devops.common.quality.pojo.enums.RuleInterceptResult
-import com.tencent.devops.notify.PIPELINE_QUALITY_AUDIT_NOTIFY_TEMPLATE
-import com.tencent.devops.notify.PIPELINE_QUALITY_END_NOTIFY_TEMPLATE
+import com.tencent.devops.notify.PIPELINE_QUALITY_AUDIT_NOTIFY_TEMPLATE_V2
+import com.tencent.devops.notify.PIPELINE_QUALITY_END_NOTIFY_TEMPLATE_V2
 import com.tencent.devops.notify.api.service.ServiceNotifyMessageTemplateResource
 import com.tencent.devops.notify.pojo.SendNotifyMessageTemplateRequest
 import com.tencent.devops.plugin.api.ServiceCodeccElementResource
@@ -649,9 +649,11 @@ class QualityRuleCheckService @Autowired constructor(
             emailResult.append("<br>")
         }
 
+        val templateCode = PIPELINE_QUALITY_AUDIT_NOTIFY_TEMPLATE_V2
+
         // 推送消息
         val sendNotifyMessageTemplateRequest = SendNotifyMessageTemplateRequest(
-                templateCode = PIPELINE_QUALITY_AUDIT_NOTIFY_TEMPLATE,
+                templateCode = templateCode,
                 receivers = notifyUserSet,
                 cc = mutableSetOf(triggerUserId),
                 titleParams = mapOf(
@@ -720,8 +722,10 @@ class QualityRuleCheckService @Autowired constructor(
             emailResult.append("<br>")
         }
 
+        val templateCode = PIPELINE_QUALITY_END_NOTIFY_TEMPLATE_V2
+
         val sendNotifyMessageTemplateRequest = SendNotifyMessageTemplateRequest(
-                templateCode = PIPELINE_QUALITY_END_NOTIFY_TEMPLATE,
+                templateCode = templateCode,
                 receivers = notifyUserSet,
                 cc = mutableSetOf(triggerUserId),
                 notifyType = endNotifyTypeList.map { it.name }.toMutableSet(),
