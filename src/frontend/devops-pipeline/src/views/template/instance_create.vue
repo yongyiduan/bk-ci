@@ -528,6 +528,7 @@
 
 <style lang="scss">
     @import './../../scss/conf';
+    @import '@/scss/mixins/ellipsis';
 
     .pipeline-subpages {
         min-height: 100%;
@@ -729,15 +730,25 @@
                     display: flex;
                     flex-wrap: wrap;
                     justify-content: space-between;
+                    padding-top: 10px;
                 }
-                .preview-params-item {
+                .bk-form-content {
                     position: relative;
-                    width: 48%;
-                    margin-right: 29px;
+                    float: left;
+                    margin-left: 0;
+                    width: 100%;
                 }
-                .preview-params-label {
-                    font-size: 12px;
-                    margin-bottom: 5px;
+                .bk-form-item {
+                    margin-top: 0;
+                    width: 48%;
+                }
+                .bk-label {
+                    width: 100%;
+                    text-align: left;
+                    @include ellipsis();
+                }
+                .bk-form .bk-form-item:before, .bk-form:after {
+                    display: none;
                 }
             }
         }
