@@ -131,11 +131,12 @@ class UpdateStateForStageCmdFinally(
         }
 
         // #5019 在结束阶段做stage准出判断
-        if (pipelineStageService.checkQualityPassed(event, stage, commandContext.variables, false)) {
+        if (!pipelineStageService.checkQualityPassed(event, stage, commandContext.variables, false)) {
 
             commandContext.stage.checkOut?.status = BuildStatus.QUALITY_CHECK_FAIL.name
             commandContext.buildStatus = BuildStatus.QUALITY_CHECK_FAIL
             commandContext.latestSummary = "s(${stage.stageId}) failed with QUALITY_CHECK_OUT"
+            pipelineStageService.checkQualityFailStage(userId = event.userId, buildStage = commandContext.stage)
 
             return finishBuild(commandContext = commandContext)
         } else if (nextStage != null) {
