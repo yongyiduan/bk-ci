@@ -248,8 +248,6 @@ class GitCheckService @Autowired constructor(
         reportData: Pair<List<String>, MutableMap<String, MutableList<List<String>>>> = Pair(listOf(), mutableMapOf())
     ): String {
         with(event) {
-            logger.info("Project($$projectId) add git commit($commitId) commit check.")
-
             val gitProjectId = gitCIBasicSetting.gitProjectId.toString()
             val token = scmService.getToken(gitProjectId).accessToken
             val request = CommitCheckRequest(
@@ -269,6 +267,9 @@ class GitCheckService @Autowired constructor(
                 mrRequestId = mergeRequestId,
                 reportData = reportData
             )
+
+            logger.info("Project($$projectId) add git commit($commitId) commit check with request $request.")
+
             client.getScm(ServiceGitResource::class).addCommitCheck(request)
             return gitProjectId
         }
