@@ -27,20 +27,18 @@
 
 package com.tencent.devops.worker.common.task.script
 
-import com.tencent.devops.common.api.pojo.ErrorCode
-import com.tencent.devops.common.api.pojo.ErrorType
 import com.tencent.devops.common.pipeline.pojo.element.agent.LinuxScriptElement
 import com.tencent.devops.common.pipeline.pojo.element.agent.WindowsScriptElement
+import com.tencent.devops.common.api.pojo.ErrorCode
 import com.tencent.devops.process.pojo.BuildTask
 import com.tencent.devops.process.pojo.BuildVariables
-import com.tencent.devops.process.utils.PIPELINE_START_USER_ID
+import com.tencent.devops.common.api.pojo.ErrorType
 import com.tencent.devops.store.pojo.app.BuildEnv
 import com.tencent.devops.worker.common.api.ApiFactory
-import com.tencent.devops.worker.common.api.archive.pojo.TokenType
 import com.tencent.devops.worker.common.api.quality.QualityGatewaySDKApi
 import com.tencent.devops.common.api.exception.TaskExecuteException
-import com.tencent.devops.common.pipeline.enums.BuildScriptType
-import com.tencent.devops.common.pipeline.enums.CharSetType
+import com.tencent.devops.process.utils.PIPELINE_START_USER_ID
+import com.tencent.devops.worker.common.api.archive.pojo.TokenType
 import com.tencent.devops.worker.common.env.AgentEnv
 import com.tencent.devops.worker.common.logger.LoggerService
 import com.tencent.devops.worker.common.service.RepoServiceFactory
@@ -67,7 +65,7 @@ open class ScriptTask : ITask() {
             errorType = ErrorType.USER,
             errorCode = ErrorCode.USER_INPUT_INVAILD
         )
-        val charSetType = taskParams["charSetType"] ?: CharSetType.UTF_8.name
+//        val charSetType = taskParams["charSetType"] ?: CharSetType.UTF_8.name
 
         val continueNoneZero = taskParams["continueNoneZero"] ?: "false"
         // 如果脚本执行失败之后可以选择归档这个问题
@@ -107,9 +105,7 @@ open class ScriptTask : ITask() {
                 buildEnvs = takeBuildEnvs(buildTask, buildVariables),
                 continueNoneZero = continueNoneZero.toBoolean(),
                 errorMessage = "Fail to run the plugin",
-                charSetType = if (BuildScriptType.valueOf(scriptType) == BuildScriptType.BAT) {
-                    charSetType
-                } else null
+                charSetType = null
             )
         } catch (ignore: Throwable) {
             logger.warn("Fail to run the script task", ignore)
