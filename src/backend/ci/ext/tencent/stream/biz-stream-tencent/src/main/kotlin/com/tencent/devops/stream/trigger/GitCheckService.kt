@@ -224,7 +224,8 @@ class GitCheckService @Autowired constructor(
                             targetUrl = targetUrl,
                             context = record.context,
                             description = description,
-                            gitCIBasicSetting = gitCIBasicSetting
+                            gitCIBasicSetting = gitCIBasicSetting,
+                            reportData = reportData
                         )
                         gitCheckClient.updateGitCheck(
                             gitCheckId = record.gitCheckId,
