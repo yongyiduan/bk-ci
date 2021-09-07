@@ -189,6 +189,9 @@ open class GitApi {
         description: String,
         block: Boolean
     ) {
+        logger.info("start to add commit check: " +
+            "$projectName, $commitId, $state, $context, $block, ${description.length}")
+
         val params = mapOf(
             "state" to state,
             "target_url" to detailUrl,
@@ -201,10 +204,18 @@ open class GitApi {
         val request = post(host, token, "projects/${urlEncode(projectName)}/commit/$commitId/statuses", body)
         try {
             callMethod(OPERATION_ADD_COMMIT_CHECK, request, GitCommitCheck::class.java)
+            logger.info("finish to add commit check success: " +
+                "$projectName, $commitId, $state, $context, $block, ${description.length}")
         } catch (t: GitApiException) {
+            logger.error("fail to add commit check for " +
+                "$projectName, $commitId, ${request.url()}, ${t.message}")
             if (t.code == 403) {
                 throw GitApiException(t.code, "Commit Check添加失败，请确保该代码库的凭据关联的用户对代码库有Developer权限")
             }
+            throw t
+        } catch (t: Throwable) {
+            logger.error("fail to add commit check for " +
+                "$projectName, $commitId, ${request.url()}, ${t.message}")
             throw t
         }
     }

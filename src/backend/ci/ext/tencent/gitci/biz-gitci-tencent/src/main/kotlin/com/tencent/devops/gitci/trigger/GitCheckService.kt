@@ -270,6 +270,9 @@ class GitCheckService @Autowired constructor(
                 reportData = reportData
             )
             client.getScm(ServiceGitResource::class).addCommitCheck(request)
+
+            logger.info("project add git commit commit check success: $gitProjectId, $commitId")
+
             return gitProjectId
         }
     }
