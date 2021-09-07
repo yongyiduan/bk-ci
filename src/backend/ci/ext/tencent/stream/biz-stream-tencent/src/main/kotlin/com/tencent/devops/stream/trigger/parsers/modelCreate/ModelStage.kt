@@ -279,15 +279,10 @@ class ModelStage @Autowired constructor(
     }
 
     private fun getAtomCodeAndOther(rule: String): Pair<String, String> {
-        val items = rule.split(".")
-        val (first, other) = if (items.size > 2) {
-            listOf(
-                items.first(),
-                items.slice(1 until items.size).joinToString("")
-            )
-        } else {
-            rule.split(".")
-        }
-        return Pair(first, other)
+        val index = rule.indexOfFirst { it == '.' }
+        return Pair(
+            rule.substring(0 until index),
+            rule.substring((index + 1) until rule.length)
+        )
     }
 }
