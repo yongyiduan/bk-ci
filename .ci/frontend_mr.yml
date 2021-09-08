@@ -1,0 +1,34 @@
+version: "v2.0"
+name: "BK-CI前端MR代码检查"
+
+on:
+  mr: [ frontend-integration ]
+
+steps:
+- checkout: self
+- uses: CodeccCheckAtomDebug@4.*
+  id: codecc
+  with:
+    languages:
+    - "JS"           
+    languageRuleSetMap:
+      JS_RULE:
+      - "codecc_fast_js"
+      - "standard_js_preferable"
+- uses: jsParser@2.*
+  with:
+    code: |
+        const fs = require('fs')
+        fs.readFile('${{ steps.codecc.outputs.reportCallBack }}', 'utf8' , (err, data) => {
+          if (err) {
+            console.error(err)
+            return
+          }
+          dataObj = JSON.parse(data)
+          dataObj.tool_snapshot_list.forEach((item) => {
+            if(item.tool_name_en == "ESLINT" && (item.total_serious > 0 || item.total_normal > 0 )){
+              console.log(item)
+              throw new Error('eslint err')
+            }
+          });
+        })
