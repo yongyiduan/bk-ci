@@ -92,3 +92,5 @@ stages:
           account: "root"
           targetIpList: ${{ variables.ips }}
 
+notices:
+- type: wework-message

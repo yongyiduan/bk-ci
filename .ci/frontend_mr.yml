@@ -30,3 +30,6 @@ stages:
           - ".*/static/lib\\.bundle\\.js"
           - "yarn.lock"
           - "src/frontend/devops-codecc"
+
+notices:
+- type: wework-message
