@@ -13,8 +13,17 @@ steps:
     - "JS"           
     languageRuleSetMap:
       JS_RULE:
-      - "codecc_fast_js"
-      - "standard_js_preferable"
+      - "js_eslint_sec"
+    newDefectJudgeFromDate: "2021-06-03"
+    path:
+    - "src/frontend"
+    customPath:
+    - "sfisfoisifairwinsun"
+    - ".*/.*\\.svg"
+    - ".*/static/lib\\.bundle\\.js"
+    - "yarn.lock"
+    - "src/frontend/devops-codecc"
+    
 - uses: jsParser@2.*
   with:
     code: |
