@@ -35,3 +35,7 @@ out
 .codecc
 build.yml
 *.ipa
+containerization/helm-charts/values.yaml
+containerization/helm-charts/templates/configmap/tpl/
+containerization/docker-images/ci
+containerization/docker-images/*.gz

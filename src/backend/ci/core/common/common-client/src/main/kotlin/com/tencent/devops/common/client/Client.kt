@@ -47,10 +47,11 @@ import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.jaxrs.JAXRSContract
 import feign.okhttp.OkHttpClient
+import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient
+import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClient
 import org.springframework.context.annotation.DependsOn
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.stereotype.Component
@@ -71,7 +72,7 @@ import kotlin.reflect.KClass
 @Component
 @DependsOn("springContextUtil")
 class Client @Autowired constructor(
-    private val consulClient: ConsulDiscoveryClient?,
+    private val compositeDiscoveryClient: CompositeDiscoveryClient?,
     private val clientErrorDecoder: ClientErrorDecoder,
     private val commonConfig: CommonConfig,
     objectMapper: ObjectMapper
@@ -84,6 +85,7 @@ class Client @Autowired constructor(
     }
 
     private val beanCaches: LoadingCache<KClass<*>, *> = CacheBuilder.newBuilder()
+        .expireAfterWrite(1, TimeUnit.SECONDS)//TODO 测试用
         .maximumSize(1000).build(object : CacheLoader<KClass<*>, Any>() {
             override fun load(p0: KClass<*>): Any {
                 return getImpl(p0)
@@ -179,7 +181,7 @@ class Client @Autowired constructor(
                     throw e
                 }
             })
-            .target(MicroServiceTarget(findServiceName(clz), clz.java, consulClient!!, tag))
+            .target(MicroServiceTarget(findServiceName(clz), clz.java, compositeDiscoveryClient!!, tag))
     }
 
     fun <T : Any> getExternalServiceWithoutRetry(serviceName: String, clz: KClass<T>): T {
@@ -201,7 +203,7 @@ class Client @Autowired constructor(
                     throw e
                 }
             })
-            .target(MicroServiceTarget(serviceName, clz.java, consulClient!!, tag))
+            .target(MicroServiceTarget(serviceName, clz.java, compositeDiscoveryClient!!, tag))
     }
 
     /**
@@ -252,11 +254,11 @@ class Client @Autowired constructor(
             .decoder(jacksonDecoder)
             .contract(jaxRsContract)
             .requestInterceptor(requestInterceptor)
-            .target(MicroServiceTarget(findServiceName(clz), clz.java, consulClient!!, tag))
+            .target(MicroServiceTarget(findServiceName(clz), clz.java, compositeDiscoveryClient!!, tag))
     }
 
     fun getServiceUrl(clz: KClass<*>): String {
-        return MicroServiceTarget(findServiceName(clz), clz.java, consulClient!!, tag).url()
+        return MicroServiceTarget(findServiceName(clz), clz.java, compositeDiscoveryClient!!, tag).url()
     }
 
     private fun findServiceName(clz: KClass<*>): String {
@@ -276,7 +278,7 @@ class Client @Autowired constructor(
             }
         }
 
-        return if (serviceSuffix.isNullOrBlank()) {
+        return if (serviceSuffix.isNullOrBlank()||StringUtils.isNotBlank(System.getenv("NAMESPACE"))) {
             serviceName
         } else {
             "$serviceName$serviceSuffix"

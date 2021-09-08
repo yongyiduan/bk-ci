@@ -33,8 +33,9 @@ import com.tencent.devops.common.client.consul.ConsulContent
 import com.tencent.devops.common.service.utils.MessageCodeUtil
 import feign.Request
 import feign.RequestTemplate
+import org.apache.commons.lang3.StringUtils
 import org.springframework.cloud.client.ServiceInstance
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient
+import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClient
 import org.springframework.cloud.consul.discovery.ConsulServiceInstance
 import java.util.concurrent.ConcurrentHashMap
 
@@ -42,21 +43,28 @@ import java.util.concurrent.ConcurrentHashMap
 class MicroServiceTarget<T> constructor(
     private val serviceName: String,
     private val type: Class<T>,
-    private val consulClient: ConsulDiscoveryClient,
+    private val compositeDiscoveryClient: CompositeDiscoveryClient,
     private val tag: String?
 ) : FeignTarget<T> {
 
     private val errorInfo =
         MessageCodeUtil.generateResponseDataObject<String>(ERROR_SERVICE_NO_FOUND, arrayOf(serviceName))
 
+    private val namespace = System.getenv("NAMESPACE")
+
     private val usedInstance = ConcurrentHashMap<String, ServiceInstance>()
 
     private fun choose(serviceName: String): ServiceInstance {
+        val svrName = if (StringUtils.isBlank(namespace)) {
+            serviceName
+        } else {
+            "bkci-$serviceName" // TODO
+        }
 
-        val instances = consulClient.getInstances(serviceName)
-            ?: throw ClientException(errorInfo.message ?: "找不到任何有效的[$serviceName]服务提供者")
+        val instances = compositeDiscoveryClient.getInstances(svrName)
+            ?: throw ClientException(errorInfo.message ?: "找不到任何有效的[$svrName]服务提供者")
         if (instances.isEmpty()) {
-            throw ClientException(errorInfo.message ?: "找不到任何有效的[$serviceName]服务提供者")
+            throw ClientException(errorInfo.message ?: "找不到任何有效的[$svrName]服务提供者")
         }
 
         val matchTagInstances = ArrayList<ServiceInstance>()
@@ -68,8 +76,12 @@ class MicroServiceTarget<T> constructor(
         } else tag
 
         instances.forEach { serviceInstance ->
-            if (serviceInstance is ConsulServiceInstance && serviceInstance.tags.contains(useConsulTag)) {
+            if (serviceInstance is ConsulServiceInstance) {
                 // 已经用过的不选择
+                if (serviceInstance.tags.contains(useConsulTag) && !usedInstance.contains(serviceInstance.url())) {
+                    matchTagInstances.add(serviceInstance)
+                }
+            } else {
                 if (!usedInstance.contains(serviceInstance.url())) {
                     matchTagInstances.add(serviceInstance)
                 }
@@ -82,7 +94,7 @@ class MicroServiceTarget<T> constructor(
         }
 
         if (matchTagInstances.isEmpty()) {
-            throw ClientException(errorInfo.message ?: "找不到任何有效的[$serviceName]-[$useConsulTag]服务提供者")
+            throw ClientException(errorInfo.message ?: "找不到任何有效的[$svrName]-[$useConsulTag]服务提供者")
         } else if (matchTagInstances.size > 1) {
             matchTagInstances.shuffle()
         }
