@@ -29,5 +29,5 @@ dependencies {
     api(project(":core:dockerhost:biz-dockerhost"))
     api(project(":core:dockerhost:plugin-dockerhost-codecc"))
     api(project(":core:dockerhost:biz-dockerhost-sample"))
-    api(("com.squareup.okhttp3:okhttp"))
+    api("com.squareup.okhttp3:okhttp")
 }
