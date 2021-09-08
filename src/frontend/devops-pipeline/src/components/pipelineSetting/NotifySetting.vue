@@ -1,14 +1,14 @@
 <template>
     <div class="notify-setting-comp" v-if="subscription">
         <bk-form>
-            <bk-form-item :label="$t('settings.noticeType')" :required="true">
+            <bk-form-item :label="$t('settings.noticeType')">
                 <bk-checkbox-group :value="subscription.types" @change="value => updateSubscription('types', value)">
                     <bk-checkbox v-for="item in noticeList" :key="item.id" :value="item.value">
                         {{ item.name }}
                     </bk-checkbox>
                 </bk-checkbox-group>
             </bk-form-item>
-            <bk-form-item :label="$t('settings.noticeGroup')" :required="true">
+            <bk-form-item :label="$t('settings.noticeGroup')">
                 <bk-checkbox-group :value="subscription.groups" @change="value => updateSubscription('groups', value)">
                     <bk-checkbox v-for="item in projectGroupAndUsers" :key="item.groupId" :value="item.groupId">
                         {{ item.groupName }}
@@ -19,10 +19,10 @@
                     </bk-checkbox>
                 </bk-checkbox-group>
             </bk-form-item>
-            <bk-form-item :label="$t('settings.additionUser')" :required="true">
+            <bk-form-item :label="$t('settings.additionUser')">
                 <staff-input :handle-change="handleUsers" name="users" :value="pipelineSettingUser"></staff-input>
             </bk-form-item>
-            <bk-form-item :label="$t('settings.noticeContent')" :required="true">
+            <bk-form-item :label="$t('settings.noticeContent')">
                 <textarea name="desc" v-model="subscription.content" class="bk-form-textarea"></textarea>
             </bk-form-item>
             <bk-form-item>
