@@ -270,7 +270,7 @@ class GitCheckService @Autowired constructor(
                 mrRequestId = mergeRequestId,
                 reportData = reportData
             )
-            client.getScm(ServiceScmOauthResource::class).addCommitCheck(request)
+            client.get(ServiceScmOauthResource::class).addCommitCheck(request)
             return gitProjectId
         }
     }
