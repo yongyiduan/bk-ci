@@ -1,0 +1,12 @@
+parameters:
+  - name: receivers
+    type: array
+    default: [ "${{ ci.actor }}" ]
+
+gates:
+  - name: CodeCC
+    rule:
+      - CodeccCheckAtomDebug.eslint_all_defect <= 0
+    notify-on-fail:
+      - type: wework-message
+        receivers: ${{ parameters.receivers }}
