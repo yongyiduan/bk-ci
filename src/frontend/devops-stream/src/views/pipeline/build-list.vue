@@ -386,7 +386,9 @@
                         const actionMap = {
                             'push-update': 'updated',
                             'reopen': 'reopened',
-                            'open': 'opened'
+                            'open': 'opened',
+                            'close': 'closed',
+                            'merge': 'merged'
                         }
                         res = `Merge requests [!${gitRequestEvent.mergeRequestId}] ${actionMap[gitRequestEvent.extensionAction]} by ${gitRequestEvent.userId}`
                         break
