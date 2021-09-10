@@ -8,13 +8,13 @@
             @click.native="handleIconClick('checkIn')"
         />
 
-        <!-- <icon
+        <icon
             v-if="showStageCheck(stage.checkOut)"
             :name="reviewStatausIcon(stage.checkOut)"
             size="28"
             class="review-icon check-out"
             @click.native="handleIconClick('checkOut')"
-        /> -->
+        />
 
         <h3 class="stage-title">
             <span :class="`${stageStatusCls} title-content`">
@@ -131,6 +131,8 @@
                             return 'reviewed'
                         case stageControl.status === 'QUALITY_CHECK_FAIL':
                             return 'quality-check-fail'
+                        case stageControl.status === 'QUALITY_CHECK_PASS':
+                            return 'review-auto-pass'
                         case stageControl.status === 'REVIEW_ABORT':
                             return 'review-abort'
                         case this.stageStatusCls === 'SKIP':
