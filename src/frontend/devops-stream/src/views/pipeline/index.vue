@@ -8,7 +8,7 @@
                 </div>
             </h3>
 
-            <ul v-if="!isLoading">
+            <ul v-if="!isLoading" @scroll.passive="scrollLoadMore">
                 <li v-for="(pipeline, index) in pipelineList"
                     :key="index"
                     @click="choosePipeline(pipeline)"
@@ -94,6 +94,10 @@
                 isLoading: false,
                 isLoadingBranches: false,
                 isSaving: false,
+                isLoadingMore: false,
+                isLoadEnd: false,
+                page: 1,
+                pageSize: 100,
                 nameRule: {
                     validator (val) {
                         return /^[a-zA-Z0-9_\-\.]+$/.test(val)
@@ -101,7 +105,8 @@
                     message: 'Consists of uppercase and lowercase English letters, numbers, underscores, underscores and dots',
                     trigger: 'blur'
                 },
-                checkYaml: validateRule.checkYaml
+                checkYaml: validateRule.checkYaml,
+                allPipeline: { displayName: 'All pipelines', enabled: true, icon: 'all' }
             }
         },
 
@@ -122,7 +127,8 @@
 
             initList () {
                 this.isLoading = true
-                this.loopGetPipelineList().then(() => {
+                this.initPipelineList().then(() => {
+                    this.pipelineList.unshift(this.allPipeline)
                     this.setDefaultPipeline()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -131,14 +137,28 @@
                 })
             },
 
-            loopGetPipelineList () {
-                register.installWsMessage(this.getPipelineList, 'IFRAMEstream', 'pipelineList')
+            scrollLoadMore (event) {
+                const target = event.target
+                const bottomDis = target.scrollHeight - target.clientHeight - target.scrollTop
+                if (bottomDis <= 200 && !this.isLoadEnd && !this.isLoadingMore) this.getPipelineList()
+            },
+
+            initPipelineList () {
+                register.installWsMessage(this.resetPipelineList, 'IFRAMEstream', 'pipelineList')
                 return this.getPipelineList()
             },
 
+            resetPipelineList () {
+                this.page = 1
+                this.pipelineList = [this.allPipeline]
+                this.getPipelineList().catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                })
+            },
+
             getPipelineList () {
-                return pipelines.getPipelineList(this.projectId).then((res = {}) => {
-                    const allPipeline = { displayName: 'All pipelines', enabled: true, icon: 'all' }
+                this.isLoadingMore = true
+                return pipelines.getPipelineList(this.projectId, this.page, this.pageSize).then((res = {}) => {
                     const pipelines = (res.records || []).map((pipeline) => ({
                         displayName: pipeline.displayName,
                         enabled: pipeline.enabled,
@@ -146,7 +166,11 @@
                         filePath: pipeline.filePath,
                         branch: ((pipeline.latestBuildInfo || {}).gitRequestEvent || {}).branch
                     }))
-                    this.pipelineList = [allPipeline, ...pipelines]
+                    this.page++
+                    this.pipelineList = [...this.pipelineList, ...pipelines]
+                    this.isLoadEnd = this.pipelineList > res.count
+                }).finally(() => {
+                    this.isLoadingMore = false
                 })
             },
 
