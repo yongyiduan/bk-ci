@@ -99,12 +99,12 @@
                                     v-model="createAtomForm.atomCode"
                                     v-validate="{
                                         required: true,
-                                        max: 30,
-                                        regex: '^[a-zA-Z]+$'
+                                        max: 20,
+                                        regex: '^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$'
                                     }"
-                                    :class="{ 'is-danger': errors.has('atomId') }">
-                                <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
-                                    {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.只能输入英文') : errors.first("atomId") }}
+                                    :class="{ 'is-danger': errors.has('atomName') }">
+                                <p :class="errors.has('atomName') ? 'error-tips' : 'normal-tips'">
+                                    {{ errors.first("atomName") && errors.first("atomName").indexOf($t('store.正则')) > 0 ? $t('store.由汉字、英文字母、数字、连字符、下划线或点组成，不超过20个字符') : errors.first("atomName") }}
                                 </p>
                             </div>
                             <bk-popover placement="right">
@@ -145,13 +145,38 @@
                                 </bk-select>
                                 <div v-if="atomErrors.projectError" class="error-tips"> {{ $t('store.项目不能为空') }} </div>
                             </div>
-                            <bk-popover placement="right" width="400">
+                        </div>
+                    </div>
+                    <div class="bk-form-item is-required">
+                        <label class="bk-label"> {{ $t('store.标识') }} </label>
+                        <div class="bk-form-content atom-item-content is-tooltips">
+                            <div style="min-width: 100%;">
+                                <input type="text" class="bk-form-input atom-id-input" :placeholder="$t('store.请输入英文名称，不超过30个字符')"
+                                    name="atomId"
+                                    v-model="createAtomForm.atomCode"
+                                    v-validate="{
+                                        required: true,
+                                        max: 30,
+                                        regex: '^[a-zA-Z][a-zA-Z0-9_-]*$'
+                                    }"
+                                    :class="{ 'is-danger': errors.has('atomId') }">
+                                <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
+                                    {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.由英文字母、数字、连字符(-)或下划线(_)组成，以英文字母开头，不超过30个字符') : errors.first("atomId") }}
+                                </p>
+                            </div>
+                            <bk-popover placement="right">
                                 <i class="devops-icon icon-info-circle"></i>
                                 <template slot="content">
-                                    <p> {{ $t('store.debugProjectTips') }} </p>
+                                    <p> {{ $t('store.唯一标识，创建后不能修改。将作为插件代码库路径。') }} </p>
                                 </template>
                             </bk-popover>
                         </div>
+                        <bk-popover placement="right" width="400">
+                            <i class="devops-icon icon-info-circle"></i>
+                            <template slot="content">
+                                <p> {{ $t('store.debugProjectTips') }} </p>
+                            </template>
+                        </bk-popover>
                     </div>
                     <div class="bk-form-item is-required">
                         <label class="bk-label"> {{ $t('store.开发语言') }} </label>
