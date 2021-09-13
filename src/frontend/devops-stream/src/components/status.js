@@ -7,7 +7,7 @@ export function getPipelineStatusClass (status) {
         REVIEW_ABORT: 'canceled',
         TRY_FINALLY: 'canceled',
         QUEUE_CACHE: 'canceled',
-        UNEXEC: 'waiting',
+        UNEXEC: 'skip',
         SKIP: 'skip',
         FAILED: 'danger',
         HEARTBEAT_TIMEOUT: 'danger',
