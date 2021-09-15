@@ -1713,7 +1713,7 @@ class PipelineRuntimeService @Autowired constructor(
         currentBuildStatus: BuildStatus,
         errorInfoList: List<ErrorInfo>?
     ) {
-        if (currentBuildStatus.isReadyToRun()) {
+        if (currentBuildStatus.isReadyToRun() || currentBuildStatus.isNeverRun()) {
             // 减1,当作没执行过
             pipelineBuildSummaryDao.updateQueueCount(dslContext, latestRunningBuild.pipelineId, -1)
         } else {
@@ -2023,8 +2023,14 @@ class PipelineRuntimeService @Autowired constructor(
         )?.buildId
     }
 
-    fun updateBuildInfoStatus2Queue(buildId: String, oldStatus: BuildStatus) {
-        pipelineBuildDao.updateStatus(dslContext, buildId, oldStatus, BuildStatus.QUEUE)
+    fun updateBuildInfoStatus2Queue(projectId: String, buildId: String, oldStatus: BuildStatus) {
+        pipelineBuildDao.updateStatus(
+            dslContext = dslContext,
+            projectId = buildId,
+            buildId = projectId,
+            oldBuildStatus = oldStatus,
+            newBuildStatus = BuildStatus.QUEUE
+        )
     }
 
     fun updateArtifactList(
