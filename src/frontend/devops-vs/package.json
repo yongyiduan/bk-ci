@@ -4,11 +4,9 @@
   "description": "",
   "dependencies": {
     "vue-property-decorator": "^6.0.0",
-    
     "vuex-class": "^0.3.0"
   },
   "devDependencies": {
-    "vue-template-compiler": "2.6.12",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-istanbul": "^4.1.6",
@@ -28,11 +26,13 @@
     "expose-loader": "^0.7.5",
     "html-webpack-plugin": "^3.2.0",
     "husky": "^1.2.1",
-    "mini-css-extract-plugin": "^0.4.0", 
+    "mini-css-extract-plugin": "^0.4.0",
+    "sass": "^1.41.0",
     "sass-loader": "^7.0.1",
     "url-loader": "^1.0.1",
     "validate-commit-msg": "^2.14.0",
     "vue-loader": "^15.0.9",
+    "vue-template-compiler": "2.6.12",
     "webpack": "^4.8.1",
     "webpack-bundle-analyzer": "^2.11.1",
     "webpack-cli": "^3.1.1",
