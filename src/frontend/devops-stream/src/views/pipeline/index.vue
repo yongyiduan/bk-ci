@@ -168,7 +168,7 @@
                     }))
                     this.page++
                     this.pipelineList = [...this.pipelineList, ...pipelines]
-                    this.isLoadEnd = this.pipelineList > res.count
+                    this.isLoadEnd = this.pipelineList.length > res.count
                 }).finally(() => {
                     this.isLoadingMore = false
                 })
