@@ -1830,7 +1830,7 @@ class PipelineRuntimeService @Autowired constructor(
         }
     }
 
-    fun getExecuteTime(pipelineId: String, buildId: String): Long {
+    fun getExecuteTime(buildId: String): Long {
         val filter = setOf(
             EnvControlTaskType.VM.name,
             EnvControlTaskType.NORMAL.name,
