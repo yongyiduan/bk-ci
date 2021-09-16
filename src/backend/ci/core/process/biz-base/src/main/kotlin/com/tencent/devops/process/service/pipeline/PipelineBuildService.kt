@@ -255,6 +255,7 @@ class PipelineBuildService(
                     key = PIPELINE_BUILD_MSG
                 ), startType = startType, channelCode = channelCode
             )
+            // 增加对containsKey(PIPELINE_NAME)的逻辑判断,如果有传值，默认使用。
             val paramsWithType = startParamsList.asSequence().plus(
                 BuildParameters(PIPELINE_VERSION, readyToBuildPipelineInfo.version))
                 .plus(BuildParameters(PIPELINE_START_USER_ID, userId))
