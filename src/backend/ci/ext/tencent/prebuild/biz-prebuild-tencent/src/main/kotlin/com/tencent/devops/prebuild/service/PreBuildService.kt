@@ -392,6 +392,7 @@ class PreBuildService @Autowired constructor(
     ): QueryLogs {
         val projectId = getUserProjectId(userId)
         val originLog = client.get(ServiceLogResource::class).getInitLogs(
+            userId = userId,
             projectId = projectId,
             pipelineId = pipelineId,
             buildId = buildId,
@@ -425,6 +426,7 @@ class PreBuildService @Autowired constructor(
     ): QueryLogs {
         val prebuildProjRecord = getPreProjectInfo(preProjectId, userId)
         val originLog = client.get(ServiceLogResource::class).getAfterLogs(
+            userId = userId,
             projectId = prebuildProjRecord.projectId,
             pipelineId = prebuildProjRecord.pipelineId,
             buildId = buildId,
