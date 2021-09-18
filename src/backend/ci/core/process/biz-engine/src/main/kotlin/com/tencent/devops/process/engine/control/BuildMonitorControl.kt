@@ -273,7 +273,8 @@ class BuildMonitorControl @Autowired constructor(
             val exitQueue = pipelineRuntimeExtService.existQueue(
                 projectId = event.projectId,
                 pipelineId = event.pipelineId,
-                buildId = event.buildId
+                buildId = event.buildId,
+                buildStatus = buildInfo.status
             )
             LOG.info("ENGINE|${event.buildId}|BUILD_QUEUE_MONITOR_TIMEOUT|queue timeout|exitQueue=$exitQueue")
             val errorInfo = MessageCodeUtil.generateResponseDataObject<String>(
