@@ -290,11 +290,11 @@
             position: absolute;
             top: -26px;
             left: 70px;
-            /deep/ .bk-link-text {
+           ::v-deep .bk-link-text {
                 font-size: 12px;
             }
         }
-        /deep/ button {
+       ::v-deep button {
             margin: 8px 10px 0 0;
         }
     }

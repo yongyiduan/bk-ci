@@ -58,7 +58,7 @@
 <style lang="postcss" scoped>
     .detail-config {
         overflow: hidden;
-        /deep/ .bk-tab-section {
+       ::v-deep .bk-tab-section {
             padding: 0;
             border: none;
         }

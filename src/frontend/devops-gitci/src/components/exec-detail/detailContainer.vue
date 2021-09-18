@@ -51,7 +51,7 @@
 </script>
 
 <style lang="postcss" scoped>
-    /deep/ .head-tab {
+   ::v-deep .head-tab {
         font-size: 14px;
         span {
             cursor: pointer;
@@ -72,7 +72,7 @@
         }
     }
 
-    /deep/ .head-tool {
+   ::v-deep .head-tool {
         cursor: pointer;
         font-size: 14px;
         margin-right: 15px;

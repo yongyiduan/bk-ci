@@ -13,8 +13,6 @@ const Home = () => import('../views/Home.vue')
 
 const IFrame = () => import('../views/IFrame.vue')
 
-const QuickStart = () => import('../views/QuickStart.vue')
-
 const ProjectManage = () => import('../views/ProjectManage.vue')
 
 // const Docs = () => import('../views/Docs.vue')
@@ -49,15 +47,6 @@ const routes = [
                 path: '',
                 name: 'home',
                 component: Home,
-                meta: {
-                    showProjectList: false,
-                    showNav: true
-                }
-            },
-            {
-                path: 'quickstart',
-                name: 'quickstart',
-                component: QuickStart,
                 meta: {
                     showProjectList: false,
                     showNav: true

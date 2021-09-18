@@ -47,17 +47,9 @@
                     }
                 }
             })
-
-            // window.globalVue.$on('change::$userInfo', data => { // 获取人员信息
-            //     console.log('syncUserInfo', data)
-            // })
+            
             window.globalVue.$on('order::backHome', data => { // 蓝盾选择项目时切换
                 this.goHome()
-            })
-
-            window.globalVue.$on('change::$projectList', data => { // 获取项目列表
-                // this.$store.dispatch('setProjectList', this.$projectList)
-                // this.$store.dispatch('getProjectList')
             })
 
             window.globalVue.$on('order::syncLocale', locale => {

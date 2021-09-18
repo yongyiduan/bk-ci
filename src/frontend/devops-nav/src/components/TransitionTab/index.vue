@@ -93,7 +93,7 @@
                 }
             }
         }
-        /deep/ .bk-tab-header {
+       ::v-deep .bk-tab-header {
             background-color: #fff;
             height: 64px !important;
             line-height: 64px !important;
@@ -119,7 +119,7 @@
                 line-height: 64px !important;
             }
         }
-        /deep/ .bk-tab-section {
+       ::v-deep .bk-tab-section {
             padding: 0;
         }
     }

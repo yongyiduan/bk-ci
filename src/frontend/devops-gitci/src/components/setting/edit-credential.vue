@@ -263,7 +263,7 @@
 <style lang="postcss" scoped>
     .credential-form {
         padding: 20px 30px;
-        /deep/ button {
+       ::v-deep button {
             margin: 8px 10px 0 0;
         }
     }

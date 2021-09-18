@@ -67,13 +67,6 @@ module.exports = (env = {}, argv) => {
                     options: {
                         limit: 10000
                     }
-                },
-                {
-                    test: /\.svg$/,
-                    loader: 'svg-sprite-loader',
-                    options: {
-                        extract: false
-                    }
                 }
             ]
         },

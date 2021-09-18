@@ -45,7 +45,7 @@ module.exports = (env, argv) => {
                     loader: 'babel-loader'
                 },
                 {
-                    test: /\.(png|jpg|gif)$/,
+                    test: /\.(png|jpg|gif|svg)$/,
                     loader: 'url-loader',
                     options: {
                         limit: 10000,
@@ -57,13 +57,6 @@ module.exports = (env, argv) => {
                     loader: 'url-loader',
                     options: {
                         limit: 10000
-                    }
-                },
-                {
-                    test: /\.svg$/,
-                    loader: 'svg-sprite-loader',
-                    options: {
-                        extract: false
                     }
                 }
             ]

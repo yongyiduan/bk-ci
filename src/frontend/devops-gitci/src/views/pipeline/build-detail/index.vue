@@ -142,11 +142,11 @@
     }
     .header-tab {
         margin-top: -10px;
-        /deep/ .bk-tab-header {
+       ::v-deep .bk-tab-header {
             padding: 0 14px;
             background-image: none !important;
         }
-        /deep/ .bk-tab-section {
+       ::v-deep .bk-tab-section {
             padding: 0;
         }
     }

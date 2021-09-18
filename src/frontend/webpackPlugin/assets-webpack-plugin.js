@@ -22,8 +22,8 @@ function assetsPlugin (options) {
 }
   
 assetsPlugin.prototype.apply = function (compiler) {
-    compiler.plugin('compilation', (compilation) => {
-        compilation.plugin('html-webpack-plugin-before-html-processing', data => {
+    compiler.hooks.emit.tap('compilation', (compilation) => {
+        compilation.hooks.processAssets.tap('html-webpack-plugin-before-html-processing', data => {
             const assetsPos = data.html.indexOf('<!-- end devops:assets -->')
             data.html = `${data.html.slice(0, assetsPos)} <script type='text/javascript' src='${data.assets.js[0]}'></script><script type='text/javascript'>window.jsAssets = ${JSON.stringify(data.assets.js.slice(1))};</script>\n${data.html.slice(assetsPos)}`
             return data

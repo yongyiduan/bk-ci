@@ -68,7 +68,7 @@
 <style lang="scss" scoped>
     .exception-wrap-item {
         margin-top: 150px;
-        /deep/ .bk-exception-text {
+       ::v-deep .bk-exception-text {
             font-size: 20px;
         }
     }
