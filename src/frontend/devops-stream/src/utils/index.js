@@ -257,3 +257,7 @@ export function getCookie (key) {
     }, {})
     return cookieObj[key] || ''
 }
+
+export function getDisplayName (displayName = '') {
+    return displayName.replace(/^\.ci\//, '')
+}
