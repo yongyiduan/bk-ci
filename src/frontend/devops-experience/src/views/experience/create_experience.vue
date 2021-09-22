@@ -582,14 +582,14 @@
                         this.versionSelectConf.confirmText = '提交中...'
 
                         const obj = this.getSelectedFile
-                        console.log(obj, 'obj')
+                        
                         try {
                             const res = await this.$store.dispatch('experience/requestMetaList', {
                                 projectId: this.projectId,
                                 artifactoryType: obj.artifactoryType,
                                 path: obj.fullPath
                             })
-                            console.log(res)
+                            
                             this.metaList = res.map(item => {
                                 if (item.key === 'appVersion') {
                                     this.createReleaseForm.version_no = item.value

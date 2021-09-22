@@ -392,7 +392,7 @@
     "newlist": {
         "exportYamlTip": "PreCI is a set of solutions provided by Blue Shield DevOps for developers' pre-CI R&D activities, which can detect problems as early as possible before submitting code and improve code quality. Including IDE plug-ins and command line tools.",
         "exportJsonTip": "Through the import function, you can quickly create a pipeline, and you can also implement cross-project and cross-blue shield platform pipeline import.",
-        "exportGitciTip": "Git CI is a collaboration between Blue Shield and Git, introducing the concept of Pipeline as Code, supporting a set of solutions that define pipelines through coding; it facilitates collaboration and version control, and is more in line with development habits.",
+        "exportGitciTip": "Stream is a CI service jointly developed by Tencent CI and the Git team and designed with the concept of Pipeline as Code.",
         "chooseExport": "Choose the export file format",
         "defaultViews": "My views",
         "copyPipeline": "Copy pipeline",
