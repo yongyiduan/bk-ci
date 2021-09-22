@@ -186,7 +186,7 @@
             },
 
             deleteItem (name, index, item) {
-                if (!/^\$\{(.*)\}$/.test(item)) this.list.push(item)
+                if (!item.isBkVar()) this.list.push(item)
                 const updateVal = [...this.value.slice(0, index - 1), ...this.value.slice(index, this.value.length)]
                 this.handleChange(this.name, updateVal)
             },
