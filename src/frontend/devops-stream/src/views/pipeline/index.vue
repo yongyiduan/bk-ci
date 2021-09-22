@@ -170,7 +170,7 @@
                         enabled: pipeline.enabled,
                         pipelineId: pipeline.pipelineId,
                         filePath: pipeline.filePath,
-                        branch: ((pipeline.latestBuildInfo || {}).gitRequestEvent || {}).branch
+                        branch: pipeline.latestBuildBranch
                     }))
                     this.page++
                     this.pipelineList = [...this.pipelineList, ...pipelines]
