@@ -6,7 +6,10 @@ variables:
   # 9.134.78.69,10.123.135.151,9.66.32.218
 
 on:
-  push: ["test"]
+  # push: ["test"]
+  schedules:
+    cron: 0 * * * *
+    branches: [ "test" ]
 
 stages:
 - name: "Build"
