@@ -32,7 +32,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomResource
 import com.tencent.devops.common.api.constant.AND
 import com.tencent.devops.common.api.constant.CommonMessageCode
-import com.tencent.devops.common.api.constant.DANG
 import com.tencent.devops.common.api.constant.DEFAULT
 import com.tencent.devops.common.api.constant.MULTIPLE_SELECTOR
 import com.tencent.devops.common.api.constant.NO_LABEL
@@ -40,7 +39,8 @@ import com.tencent.devops.common.api.constant.OPTIONS
 import com.tencent.devops.common.api.constant.OR
 import com.tencent.devops.common.api.constant.REQUIRED
 import com.tencent.devops.common.api.constant.SINGLE_SELECTOR
-import com.tencent.devops.common.api.constant.TIMETOSELECT
+import com.tencent.devops.common.api.constant.TOBEREQUIRED
+import com.tencent.devops.common.api.constant.WHEN
 import com.tencent.devops.common.api.enums.FrontendTypeEnum
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Page
@@ -1166,27 +1166,51 @@ abstract class MarketAtomServiceImpl @Autowired constructor() : MarketAtomServic
             builder.append(", $defaultName: ${defaultValue.toString().replace("\n", "")}")
         }
         val rely = paramValueMap["rely"]
-        if (null != rely) {
-            parseRely(builder, rely as Map<String, Any>)
+        try {
+            if (null != rely) {
+                parseRely(builder, rely as Map<String, Any>)
+            }
+        } catch (e: Exception) {
+            logger.error("addParamComment parse error: [rely] in $paramValueMap")
+            throw ErrorCodeException(
+                errorCode = StoreMessageCode.USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID,
+                params = arrayOf("rely")
+            )
         }
         val options = paramValueMap["options"]
-        if (null != options) {
-            builder.append(", $selectorTypeName")
-            builder.append(", $optionsName:")
-            parseOptions(builder, options as List<Map<String, Any>>)
+        try {
+            if (null != options) {
+                builder.append(", $selectorTypeName")
+                builder.append(", $optionsName:")
+                parseOptions(builder, options as List<Map<String, Any>>)
+            }
+        } catch (e: Exception) {
+            logger.error("addParamComment parse error: [options] in $paramValueMap")
+            throw ErrorCodeException(
+                errorCode = StoreMessageCode.USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID,
+                params = arrayOf("options")
+            )
         }
         val list = paramValueMap["list"]
-        if (null != list) {
-            builder.append(", $optionsName:")
-            parseList(builder, list as List<Map<String, Any>>)
+        try {
+            if (null != list) {
+                builder.append(", $optionsName:")
+                parseList(builder, list as List<Map<String, Any>>)
+            }
+        } catch (e: Exception) {
+            logger.error("addParamComment parse error: [list] in $paramValueMap")
+            throw ErrorCodeException(
+                errorCode = StoreMessageCode.USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID,
+                params = arrayOf("list")
+            )
         }
     }
 
     private fun parseRely(builder: StringBuilder, rely: Map<String, Any>) {
-        val dang = MessageCodeUtil.getCodeLanMessage(DANG)
+        val dang = MessageCodeUtil.getCodeLanMessage(WHEN)
         val and = MessageCodeUtil.getCodeLanMessage(AND)
         val or = MessageCodeUtil.getCodeLanMessage(OR)
-        val timeToSelect = MessageCodeUtil.getCodeLanMessage(TIMETOSELECT)
+        val timeToSelect = MessageCodeUtil.getCodeLanMessage(TOBEREQUIRED)
         try {
             if (null != rely["expression"]) {
                 val expression = rely["expression"] as List<Map<String, Any>>
