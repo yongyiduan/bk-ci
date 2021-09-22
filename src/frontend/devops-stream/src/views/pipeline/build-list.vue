@@ -2,7 +2,7 @@
     <article class="pipelines-main">
         <header class="main-head section-box">
             <span class="head-text">
-                <span class="pipeline-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.displayName }}</span>
+                <span class="pipeline-name text-ellipsis" v-bk-overflow-tips>{{ getDisplayName(curPipeline.displayName) }}</span>
                 <span class="yml-name text-ellipsis" @click="goToGit" v-if="curPipeline.filePath">
                     <span v-bk-overflow-tips>{{ curPipeline.filePath }}</span>
                     <icon name="cc-jump-link" size="16"></icon>
@@ -53,6 +53,23 @@
                         :name="option.name">
                     </bk-option>
                 </bk-select>
+                <bk-select
+                    class="filter-item"
+                    placeholder="Pipeline"
+                    multiple
+                    searchable
+                    v-model="filterData.pipelineIds"
+                    v-if="!curPipeline.pipelineId"
+                    :loading="isLoadingPipeline"
+                    :remote-method="remoteGetPipelineList"
+                    @toggle="toggleFilterPipeline"
+                >
+                    <bk-option v-for="option in pipelineList"
+                        :key="option.pipelineId"
+                        :id="option.pipelineId"
+                        :name="getDisplayName(option.displayName)">
+                    </bk-option>
+                </bk-select>
                 <bk-button @click="resetFilter">Reset</bk-button>
             </section>
 
@@ -71,7 +88,7 @@
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
                             <p>
                                 <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
-                                <span class="info">#{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
+                                <span class="info">[{{ getDisplayName(props.row.displayName) }}] #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
                         </section>
                     </template>
@@ -175,7 +192,15 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
-    import { goYaml, preciseDiff, timeFormatter, modifyHtmlTitle, debounce, getBuildTitle } from '@/utils'
+    import {
+        goYaml,
+        preciseDiff,
+        timeFormatter,
+        modifyHtmlTitle,
+        debounce,
+        getBuildTitle,
+        getDisplayName
+    } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
@@ -213,7 +238,8 @@
                     triggerUser: [],
                     branch: [],
                     event: [],
-                    status: []
+                    status: [],
+                    pipelineIds: []
                 },
                 branchList: [],
                 filterList: [
@@ -251,7 +277,9 @@
                     yaml: ''
                 },
                 triggerCommits: [],
-                checkYaml: validateRule.checkYaml
+                checkYaml: validateRule.checkYaml,
+                pipelineList: [],
+                isLoadingPipeline: false
             }
         },
 
@@ -294,6 +322,7 @@
         methods: {
             ...mapActions(['setCurPipeline']),
             getBuildTitle,
+            getDisplayName,
 
             setHtmlTitle () {
                 const projectPath = (this.$route.hash || '').slice(1)
@@ -325,6 +354,44 @@
                 })
             },
 
+            toggleFilterPipeline (isOpen) {
+                if (isOpen) {
+                    this.isLoadingPipeline = true
+                    this.getPipelineList().then((pipelineList) => {
+                        this.pipelineList = pipelineList
+                        this.isLoadingPipeline = false
+                    })
+                }
+            },
+
+            remoteGetPipelineList (keyword) {
+                return new Promise((resolve) => {
+                    debounce(() => {
+                        this.getPipelineList({ keyword }).then((pipelineList) => {
+                            this.pipelineList = pipelineList
+                            resolve()
+                        })
+                    })
+                })
+            },
+
+            getPipelineList (query) {
+                const params = {
+                    page: 1,
+                    pageSize: 100,
+                    projectId: this.projectId,
+                    ...query
+                }
+                return new Promise((resolve, reject) => {
+                    pipelines.getPipelineList(params).then((res) => {
+                        resolve(res.records || [])
+                    }).catch((err) => {
+                        resolve()
+                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                    })
+                })
+            },
+
             cleanFilterData () {
                 this.compactPaging.current = 1
                 this.filterData = {
@@ -332,7 +399,8 @@
                     triggerUser: [],
                     branch: [],
                     event: [],
-                    status: []
+                    status: [],
+                    pipelineIds: []
                 }
             },
 
@@ -490,7 +558,7 @@
             },
 
             goToGit () {
-                goYaml(this.projectInfo.web_url, this.curPipeline.branch, this.curPipeline.filePath)
+                goYaml(this.projectInfo.web_url, this.curPipeline.latestBuildBranch, this.curPipeline.filePath)
             },
 
             cancelBuild (row) {
@@ -561,7 +629,8 @@
                     triggerUser: [],
                     branch: [],
                     event: [],
-                    status: []
+                    status: [],
+                    pipelineIds: []
                 }
             },
 

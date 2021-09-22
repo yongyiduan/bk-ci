@@ -49,8 +49,8 @@ export default {
         return api.get(`${STREAM_PERFIX}/user/current/build/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/report`)
     },
 
-    getPipelineList (projectId, page, pageSize) {
-        return api.get(`${STREAM_PERFIX}/user/pipelines/${projectId}/list?page=${page}&pageSize=${pageSize}`)
+    getPipelineList ({ projectId, ...params }) {
+        return api.get(`${STREAM_PERFIX}/user/pipelines/${projectId}/list`, { params })
     },
 
     getPipelineBuildList (projectId, params) {
