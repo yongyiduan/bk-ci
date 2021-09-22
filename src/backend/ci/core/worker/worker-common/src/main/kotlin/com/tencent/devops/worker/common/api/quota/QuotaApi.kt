@@ -25,10 +25,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":ext:tencent:common:common-auth:common-auth-tencent"))
-    api(project(":ext:tencent:common:common-kafka-tencent"))
-    api(project(":core:dispatch:biz-dispatch"))
-    api(project(":ext:tencent:dispatch:biz-dispatch-bcs"))
+package com.tencent.devops.worker.common.api.quota
+
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.worker.common.api.WorkerRestApiSDK
+
+interface QuotaApi : WorkerRestApiSDK {
+
+    fun removeRunningAgent(
+        projectId: String,
+        buildId: String,
+        vmSeqId: String,
+        executeCount: Int,
+        retryCount: Int
+    ): Result<Boolean>
+
+    fun addRunningAgent(
+        projectId: String,
+        buildId: String,
+        vmSeqId: String,
+        executeCount: Int,
+        retryCount: Int
+    ): Result<Boolean>
 }

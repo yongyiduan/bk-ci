@@ -25,10 +25,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":ext:tencent:common:common-auth:common-auth-tencent"))
-    api(project(":ext:tencent:common:common-kafka-tencent"))
-    api(project(":core:dispatch:biz-dispatch"))
-    api(project(":ext:tencent:dispatch:biz-dispatch-bcs"))
+package com.tencent.devops.dispatch.service
+
+import com.tencent.devops.dispatch.pojo.JobQuotaHistory
+
+interface JobQuotaInterface {
+    /**
+     * 保存Job配额相关构建记录
+     */
+    fun saveJobQuotaHistory(jobQuotaHistory: JobQuotaHistory)
 }
