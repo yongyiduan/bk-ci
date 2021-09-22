@@ -29,7 +29,7 @@ stages:
           cd src/frontend
           npm install -g lerna
           yarn start
-          yarn public -e dev -t tencent -s ${{ variables.modules }}
+          yarn public -e dev -t tencent
 
           cd ./frontend/ || exit 1
 
