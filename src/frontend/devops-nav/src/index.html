@@ -21,7 +21,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="icon" href="/console/static/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="/console/static/favicon.ico" type="image/x-icon" />
     <link rel='preload' as='script' href="/console/static/vue.min.js" />
@@ -454,7 +453,7 @@
             init(...response)
         }).catch(function (e) {
             console.log(e)
-            printError(e.status)
+            // printError(e.status)
         })
 
         function printError (status) {

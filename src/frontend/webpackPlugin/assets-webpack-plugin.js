@@ -24,7 +24,6 @@ class assetsPlugin {
     apply (compiler) {
         compiler.hooks.compilation.tap('assetsPlugin', async (compilation) => {
             console.log('The compiler is starting a new compilation...')
-            console.log(HtmlWebpackPlugin.getHooks(compilation).hooks)
             let assets
             // Static Plugin interface |compilation |HOOK NAME | register listener
             await HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync(

@@ -29,24 +29,24 @@ stages:
           cd src/frontend
           npm install -g lerna
           yarn start
-          yarn public -e dev -t tencent
+          yarn public -e test -l v2 -t tencent
 
           cd ./frontend/ || exit 1
 
-          cp -rf ${{ ci.workspace }}/devops-config/gateway_frontend/* ${{ ci.workspace }}/
-          rm -r ${{ ci.workspace }}/ci || echo "no ci director"
-          mkdir -p ${{ ci.workspace }}/ci/frontend
+          cp -rf ${WORKSPACE}/devops-config/gateway_frontend/* ${WORKSPACE}/
+          rm -r ${WORKSPACE}/ci || echo "no ci director"
+          mkdir -p ${WORKSPACE}/ci/frontend
 
-          cp -r ./* ${{ ci.workspace }}/ci/frontend/
-          cp ./console/frontend#console#index.html ${{ ci.workspace }}/support-files/templates/ || echo "no console module"
-          cp ./pipeline/frontend#pipeline#index.html ${{ ci.workspace }}/support-files/templates/ || echo "no pipeline module"
+          cp -r ./* ${WORKSPACE}/ci/frontend/
+          cp ./console/frontend#console#index.html ${WORKSPACE}/support-files/templates/ || echo "no console module"
+          cp ./pipeline/frontend#pipeline#index.html ${WORKSPACE}/support-files/templates/ || echo "no pipeline module"
 
-          cd ${{ ci.workspace }}/scripts/
-          cp -rf ci_env_dev.properties ci_env.properties
+          cd ${WORKSPACE}/scripts/
+          cp -rf ci_env_test.properties ci_env.properties
           sh ./render_ci -m ci ../support-files/templates/*
 
-          cd ${{ ci.workspace }}/ci/frontend/
-          zip -r frontend.zip ./* && cp frontend.zip ${{ ci.workspace }}
+          cd ${WORKSPACE}/ci/frontend/
+          zip -r frontend.zip ./* && cp frontend.zip ${WORKSPACE}
       - name: "Upload"
         uses: "UploadArtifactory@1.*"
         with:
