@@ -25,27 +25,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.stream.pojo
+package com.tencent.devops.stream.config
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.core.task.TaskExecutor
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
-@ApiModel("蓝盾工蜂流水线列表")
-data class GitProjectPipeline(
-    @ApiModelProperty("工蜂项目ID", required = true)
-    val gitProjectId: Long,
-    @ApiModelProperty("流水线名称", required = true)
-    var displayName: String,
-    @ApiModelProperty("蓝盾流水线ID", required = true)
-    var pipelineId: String,
-    @ApiModelProperty("文件路径", required = true)
-    val filePath: String,
-    @ApiModelProperty("是否启用", required = true)
-    val enabled: Boolean,
-    @ApiModelProperty("创建人", required = false)
-    val creator: String?,
-    @ApiModelProperty("最近一次构建详情", required = false)
-    val latestBuildInfo: GitCIBuildHistory?,
-    @ApiModelProperty("自己一次构建分支", required = false)
-    val latestBuildBranch: String?
-)
+@Configuration
+@EnableAsync
+class StreamAsyncConfig {
+
+    @Bean
+    fun pipelineBranchCheckExecutor(): TaskExecutor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 1 // 核心线程数
+        executor.maxPoolSize = 1 // 最大线程数
+        executor.setQueueCapacity(1) // 任务队列容量
+        return executor
+    }
+}

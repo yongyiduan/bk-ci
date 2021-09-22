@@ -25,27 +25,34 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.stream.pojo
+package com.tencent.devops.stream.api.op
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.pojo.Result
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import javax.ws.rs.Consumes
+import javax.ws.rs.POST
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
+import javax.ws.rs.core.MediaType
 
-@ApiModel("蓝盾工蜂流水线列表")
-data class GitProjectPipeline(
-    @ApiModelProperty("工蜂项目ID", required = true)
-    val gitProjectId: Long,
-    @ApiModelProperty("流水线名称", required = true)
-    var displayName: String,
-    @ApiModelProperty("蓝盾流水线ID", required = true)
-    var pipelineId: String,
-    @ApiModelProperty("文件路径", required = true)
-    val filePath: String,
-    @ApiModelProperty("是否启用", required = true)
-    val enabled: Boolean,
-    @ApiModelProperty("创建人", required = false)
-    val creator: String?,
-    @ApiModelProperty("最近一次构建详情", required = false)
-    val latestBuildInfo: GitCIBuildHistory?,
-    @ApiModelProperty("自己一次构建分支", required = false)
-    val latestBuildBranch: String?
-)
+@Api(tags = ["OP_STREAM_CHECK"], description = "Stream校验op系统")
+@Path("/op/stream/check")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface OpStreamCheckResource {
+
+    @ApiOperation("校验并删除在工蜂中不存在的分支")
+    @POST
+    @Path("/branches")
+    fun checkBranches(
+        @ApiParam(value = "工蜂项目ID", required = true)
+        @QueryParam("gitProjectId")
+        gitProjectId: Long?,
+        @ApiParam(value = "流水线ID", required = true)
+        @QueryParam("pipelineId")
+        pipelineId: String?
+    ): Result<Boolean>
+}
