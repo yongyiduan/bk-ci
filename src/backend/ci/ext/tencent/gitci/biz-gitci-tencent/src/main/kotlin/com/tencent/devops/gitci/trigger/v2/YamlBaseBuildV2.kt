@@ -55,6 +55,7 @@ import com.tencent.devops.gitci.v2.service.GitPipelineBranchService
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.process.api.service.ServicePipelineResource
 import com.tencent.devops.process.pojo.BuildId
+import com.tencent.devops.process.pojo.setting.PipelineSetting
 import com.tencent.devops.store.api.atom.ServiceMarketAtomResource
 import com.tencent.devops.store.pojo.atom.InstallAtomReq
 import org.jooq.DSLContext
@@ -150,6 +151,16 @@ abstract class YamlBaseBuildV2<T> @Autowired constructor(
         } else if (pipeline.pipelineId.isNotBlank()) {
             // 编辑流水线model
             processClient.edit(event.userId, gitCIBasicSetting.projectCode!!, pipeline.pipelineId, model, channelCode)
+            processClient.saveSetting(
+                userId = event.userId,
+                projectId = gitCIBasicSetting.projectCode!!,
+                pipelineId = pipeline.pipelineId,
+                setting = PipelineSetting(
+                    projectId = gitCIBasicSetting.projectCode!!,
+                    pipelineId = pipeline.pipelineId,
+                    labels = model.labels
+                )
+            )
             // 已有的流水线需要更新下工蜂CI这里的状态
             logger.info("update gitPipeline pipeline: $pipeline")
             gitPipelineResourceDao.updatePipeline(
