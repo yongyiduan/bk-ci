@@ -25,38 +25,49 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.process.api.service
+package com.tencent.devops.artifactory.api.service
 
+import com.tencent.devops.artifactory.pojo.Url
+import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.process.service.BuildVariableService
-import com.tencent.devops.process.service.PipelineContextService
-import org.springframework.beans.factory.annotation.Autowired
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import javax.ws.rs.Consumes
+import javax.ws.rs.GET
+import javax.ws.rs.HeaderParam
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
 
-@RestResource
-class ServiceVarResourceImpl @Autowired constructor(
-    private val buildVariableService: BuildVariableService,
-    private val pipelineContextService: PipelineContextService
-) : ServiceVarResource {
-    override fun getBuildVar(buildId: String, varName: String?): Result<Map<String, String>> {
-        return if (varName.isNullOrBlank()) {
-            Result(buildVariableService.getAllVariable(buildId))
-        } else {
-            Result(mapOf(varName to (buildVariableService.getVariable(buildId, varName) ?: "")))
-        }
-    }
+@Api(tags = ["SERVICE_ARTIFACTORY_LOG"], description = "仓库-日志文件管理")
+@Path("/service/artifactories/log")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface ServiceLogFileResource {
 
-    override fun getContextVar(buildId: String, contextName: String?): Result<Map<String, String>> {
-        val buildVars = buildVariableService.getAllVariable(buildId)
-        return if (contextName.isNullOrBlank()) {
-            Result(pipelineContextService.getAllBuildContext(buildVars))
-        } else {
-            val context = pipelineContextService.getBuildContext(buildVars, contextName)
-            if (context.isNullOrEmpty()) {
-                Result(emptyMap())
-            } else {
-                Result(mapOf(contextName to context))
-            }
-        }
-    }
+    @ApiOperation("下载日志")
+    @GET
+    @Path("/{projectId}/{pipelineId}/{buildId}/{elementId}/{executeCount}")
+    fun getPluginLogUrl(
+        @ApiParam("userId", required = true)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("项目 ID", required = true)
+        @PathParam("projectId")
+        projectId: String,
+        @ApiParam("流水线 ID", required = true)
+        @PathParam("pipelineId")
+        pipelineId: String,
+        @ApiParam("构建 ID", required = true)
+        @PathParam("buildId")
+        buildId: String,
+        @ApiParam("插件 elementId", required = true)
+        @PathParam("elementId")
+        elementId: String,
+        @ApiParam("执行序号", required = true)
+        @PathParam("executeCount")
+        executeCount: String
+    ): Result<Url>
 }

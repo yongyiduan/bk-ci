@@ -25,20 +25,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.project.pojo.service
+package com.tencent.devops.artifactory.resources
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.artifactory.api.service.ServiceLogFileResource
+import com.tencent.devops.artifactory.pojo.Url
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
 
-/**
- *   Date on 2018-12-05.
- */
-@ApiModel("服务-修改模型")
-data class ServiceUrlUpdateInfo(
-    @ApiModelProperty("服务名称", required = true)
-    val name: String,
-    @ApiModelProperty("cssUrl")
-    val cssUrl: String,
-    @ApiModelProperty("jsUrl")
-    val jsUrl: String
-)
+@RestResource
+class ServiceLogFileResourceImpl : ServiceLogFileResource {
+
+    override fun getPluginLogUrl(
+        userId: String,
+        projectId: String,
+        pipelineId: String,
+        buildId: String,
+        elementId: String,
+        executeCount: String
+    ): Result<Url> {
+        TODO("not implemented")
+    }
+}
