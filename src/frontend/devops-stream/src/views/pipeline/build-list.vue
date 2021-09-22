@@ -558,7 +558,7 @@
             },
 
             goToGit () {
-                goYaml(this.projectInfo.web_url, this.curPipeline.latestBuildBranch, this.curPipeline.filePath)
+                goYaml(this.projectInfo.web_url, this.curPipeline.branch, this.curPipeline.filePath)
             },
 
             cancelBuild (row) {
