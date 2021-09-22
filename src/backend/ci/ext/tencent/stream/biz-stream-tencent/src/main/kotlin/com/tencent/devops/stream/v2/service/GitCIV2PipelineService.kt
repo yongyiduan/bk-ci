@@ -36,7 +36,6 @@ import com.tencent.devops.common.redis.RedisLock
 import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.stream.constant.GitCIConstant.DEVOPS_PROJECT_PREFIX
 import com.tencent.devops.stream.dao.GitPipelineResourceDao
-import com.tencent.devops.stream.pojo.GitCIBuildHistory
 import com.tencent.devops.stream.pojo.GitProjectPipeline
 import com.tencent.devops.process.api.service.ServicePipelineResource
 import org.jooq.DSLContext
@@ -49,10 +48,10 @@ class GitCIV2PipelineService @Autowired constructor(
     private val dslContext: DSLContext,
     private val client: Client,
     private val pipelineResourceDao: GitPipelineResourceDao,
-    private val gitCIV2DetailService: GitCIV2DetailService,
     private val scmService: ScmService,
     private val redisOperation: RedisOperation,
-    private val websocketService: GitCIV2WebsocketService
+    private val websocketService: GitCIV2WebsocketService,
+    private val streamPipelineBranchService: StreamPipelineBranchService
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(GitCIV2PipelineService::class.java)
@@ -66,7 +65,6 @@ class GitCIV2PipelineService @Autowired constructor(
         page: Int?,
         pageSize: Int?
     ): Page<GitProjectPipeline> {
-        logger.info("get pipeline list, gitProjectId: $gitProjectId")
         val pageNotNull = page ?: 1
         val pageSizeNotNull = pageSize ?: 10
         val limit = PageUtil.convertPageSizeToSQLLimit(pageNotNull, pageSizeNotNull)
@@ -85,17 +83,11 @@ class GitCIV2PipelineService @Autowired constructor(
             records = emptyList()
         )
         val count = pipelineResourceDao.getPipelineCount(dslContext, gitProjectId)
-        val latestBuilds =
-            try {
-                gitCIV2DetailService.batchGetBuildDetail(
-                    userId = userId,
-                    gitProjectId = gitProjectId,
-                    buildIds = pipelines.map { it.latestBuildId }
-                )
-            } catch (e: Exception) {
-                logger.info("getPipelineList batchGetBuildDetail error gitProjectId: $gitProjectId")
-                emptyMap<String, GitCIBuildHistory>()
-            }
+        // 获取流水线最后一次构建分支
+        val pipelineBranchMap = streamPipelineBranchService.getPipelinesLastBuildBranch(
+            gitProjectId,
+            pipelineIds = pipelines.map { it.pipelineId }.toSet()
+        )
         return Page(
             count = count.toLong(),
             page = pageNotNull,
@@ -109,7 +101,8 @@ class GitCIV2PipelineService @Autowired constructor(
                     displayName = it.displayName,
                     enabled = it.enabled,
                     creator = it.creator,
-                    latestBuildInfo = latestBuilds[it.latestBuildId]
+                    latestBuildInfo = null,
+                    latestBuildBranch = pipelineBranchMap?.get(it.pipelineId) ?: "master"
                 )
             }
         )
@@ -132,7 +125,8 @@ class GitCIV2PipelineService @Autowired constructor(
                 displayName = it.displayName,
                 enabled = it.enabled,
                 creator = it.creator,
-                latestBuildInfo = null
+                latestBuildInfo = null,
+                latestBuildBranch = null
             )
         }
     }
@@ -155,7 +149,8 @@ class GitCIV2PipelineService @Autowired constructor(
             displayName = pipeline.displayName,
             enabled = pipeline.enabled,
             creator = pipeline.creator,
-            latestBuildInfo = null
+            latestBuildInfo = null,
+            latestBuildBranch = null
         )
     }
 
