@@ -27,11 +27,29 @@ stages:
           branchName: "integration"
           localPath: "devops-config"
         checkout: "http://git.code.oa.com/bkdevops/devops-config.git"
+      - uses: calculatehash@1.*
+        id: calculate
+        with:
+          file_path: src/frontend/package.json
+          calculate_func: md5
+      - uses: cache@1.*
+        id: cache
+        with:
+          cacheKey: "nodejstesa_linux_${{ steps.calculate.outputs.hash_value }}"
+          cachePaths: "src/frontend/node_modules"
+          restoreKeys: "nodejstesa_linux_"
+      - run: |
+            yarn
+        if: steps.cache.outputs.cacheHit == false
       - name: "Bash"
         run: |
           cd src/frontend
-          npm install -g lerna
-          yarn start
+          if [ ${{ steps.cache.outputs.cacheHit }} == 'false' ]
+          then
+            yarn
+          else
+            echo "package.json has not changed"
+          fi
           yarn public -e test -l v2 -t tencent
 
           cd ./frontend/ || exit 1
