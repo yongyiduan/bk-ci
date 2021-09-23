@@ -50,9 +50,9 @@ stages:
           else
             echo "package.json has not changed"
           fi
-          ls
+          
           chmod -R 777 ./node_modules
-          ls -l
+          lerna -v
           yarn public -e test -l v2 -t tencent
 
           cd ./frontend/ || exit 1
