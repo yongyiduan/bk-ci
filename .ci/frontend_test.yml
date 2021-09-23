@@ -6,6 +6,7 @@ variables:
   # 9.134.78.69,10.123.135.151,9.66.32.218
 
 on:
+  push: ["frontend-master"]
   schedules:
     cron: 0 * * * *
     branches: [ "test" ]
@@ -41,10 +42,6 @@ stages:
           cachePaths: "src/frontend/node_modules"
           restoreKeys: "nodejstesa_linux_"
       - run: |
-            yarn
-        if: steps.cache.outputs.cacheHit == false
-      - name: "Bash"
-        run: |
           cd src/frontend
           if [ ${{ steps.cache.outputs.cacheHit }} == 'false' ]
           then
