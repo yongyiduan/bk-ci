@@ -20,7 +20,10 @@ stages:
       name: "构建环境-LINUX"
       runs-on: docker
       steps:
-      - checkout: self
+      - uses: checkout@1.*
+        name: Checkout
+        with:
+          refName: test
       - name: "拉取前端占位符"
         with:
           pullType: "BRANCH"
