@@ -384,7 +384,7 @@
                 }
                 return new Promise((resolve, reject) => {
                     pipelines.getPipelineInfoList(params).then((res) => {
-                        resolve(res.records || [])
+                        resolve(res || [])
                     }).catch((err) => {
                         resolve()
                         this.$bkMessage({ theme: 'error', message: err.message || err })
