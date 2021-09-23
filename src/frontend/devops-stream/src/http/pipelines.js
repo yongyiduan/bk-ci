@@ -53,6 +53,10 @@ export default {
         return api.get(`${STREAM_PERFIX}/user/pipelines/${projectId}/list`, { params })
     },
 
+    getPipelineInfoList ({ projectId, ...params }) {
+        return api.get(`${STREAM_PERFIX}/user/pipelines/${projectId}/listInfo`, { params })
+    },
+
     getPipelineBuildList (projectId, params) {
         return api.post(`${STREAM_PERFIX}/user/history/build/list/${projectId}`, params)
     },
