@@ -88,7 +88,7 @@
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
                             <p>
                                 <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
-                                <span class="info">[{{ getDisplayName(props.row.displayName) }}] #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
+                                <span class="info">{{ getDisplayName(props.row.displayName) }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
                         </section>
                     </template>
@@ -383,7 +383,7 @@
                     ...query
                 }
                 return new Promise((resolve, reject) => {
-                    pipelines.getPipelineList(params).then((res) => {
+                    pipelines.getPipelineInfoList(params).then((res) => {
                         resolve(res.records || [])
                     }).catch((err) => {
                         resolve()
