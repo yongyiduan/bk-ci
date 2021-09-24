@@ -25,36 +25,46 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.stream.resources.user
+package com.tencent.devops.stream.v2.service
 
-import com.tencent.devops.common.api.exception.ParamBlankException
-import com.tencent.devops.common.api.pojo.Page
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.stream.api.user.UserGitCIRequestResource
-import com.tencent.devops.stream.pojo.GitRequestHistory
-import com.tencent.devops.stream.utils.GitCommonUtils
-import com.tencent.devops.stream.v2.service.StreamRequestService
+import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
+import org.slf4j.LoggerFactory
 
-@RestResource
-class UserGitCIRequestResourceImpl @Autowired constructor(
-    private val streamRequestService: StreamRequestService
-) : UserGitCIRequestResource {
-    override fun getMergeBuildList(
-        userId: String,
-        projectId: String,
-        page: Int?,
-        pageSize: Int?
-    ): Result<Page<GitRequestHistory>> {
-        val gitProjectId = GitCommonUtils.getGitProjectId(projectId)
-        checkParam(userId)
-        return Result(streamRequestService.getRequestList(userId, gitProjectId, page, pageSize))
+@Service
+class StreamGitTokenService @Autowired constructor(
+    private val streamScmService: StreamScmService
+) {
+
+    private val tokenCache = Caffeine.newBuilder()
+        .maximumSize(100000)
+        .expireAfterAccess(30, TimeUnit.MINUTES)
+        .build<Long/*gitProjectId*/, String/*api token*/>()
+
+    fun getToken(gitProjectId: Long): String {
+        val token = tokenCache.getIfPresent(gitProjectId)
+        return if (token.isNullOrBlank()) {
+            val newToken = streamScmService.getToken(gitProjectId.toString()).accessToken
+            logger.info("STREAM|getToken|gitProjectId=$gitProjectId|newToken=$newToken")
+            tokenCache.put(gitProjectId, newToken)
+            newToken
+        } else token
     }
 
-    private fun checkParam(userId: String) {
-        if (userId.isBlank()) {
-            throw ParamBlankException("Invalid userId")
+    fun clearToken(gitProjectId: Long): Boolean {
+        val token = tokenCache.getIfPresent(gitProjectId)
+        if (token.isNullOrBlank()) return true
+        val cleared = streamScmService.clearToken(gitProjectId, token)
+        logger.info("STREAM|clearToken|gitProjectId=$gitProjectId|token=$token cleared=$cleared")
+        if (cleared) {
+            tokenCache.invalidate(gitProjectId)
         }
+        return cleared
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(StreamGitTokenService::class.java)
     }
 }
