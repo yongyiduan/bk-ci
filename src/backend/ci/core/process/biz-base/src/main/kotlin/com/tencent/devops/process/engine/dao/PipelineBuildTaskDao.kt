@@ -27,7 +27,6 @@
 
 package com.tencent.devops.process.engine.dao
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.devops.common.api.pojo.ErrorType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.pipeline.enums.BuildStatus
@@ -46,8 +45,9 @@ import org.jooq.Result
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
-@Suppress("ALL")
+@Suppress("TooManyFunctions", "LongParameterList")
 @Repository
 class PipelineBuildTaskDao {
 
@@ -95,14 +95,14 @@ class PipelineBuildTaskDao {
                         buildTask.subBuildId,
                         buildTask.status.ordinal,
                         buildTask.starter,
-                        JsonUtil.toJson(buildTask.taskParams),
+                        JsonUtil.toJson(buildTask.taskParams, formatted = false),
                         buildTask.startTime,
                         buildTask.endTime,
                         buildTask.approver,
                         if (buildTask.additionalOptions != null) {
-                            JsonUtil.toJson(buildTask.additionalOptions!!)
+                            JsonUtil.toJson(buildTask.additionalOptions!!, formatted = false)
                         } else null,
-                        buildTask.atomCode,
+                        buildTask.atomCode
                         buildTask.pauseReviewers?.let(JsonUtil::toJson)
                     )
                     .execute()
@@ -124,7 +124,7 @@ class PipelineBuildTaskDao {
                         .set(CONTAINER_ID, it.containerId)
                         .set(TASK_NAME, it.taskName)
                         .set(TASK_ID, it.taskId)
-                        .set(TASK_PARAMS, JsonUtil.toJson(it.taskParams))
+                        .set(TASK_PARAMS, JsonUtil.toJson(it.taskParams, formatted = false))
                         .set(TASK_TYPE, it.taskType)
                         .set(TASK_ATOM, it.taskAtom)
                         .set(START_TIME, it.startTime)
@@ -137,10 +137,18 @@ class PipelineBuildTaskDao {
                         .set(SUB_BUILD_ID, it.subBuildId)
                         .set(CONTAINER_TYPE, it.containerType)
                         .set(ADDITIONAL_OPTIONS,
-                            if (it.additionalOptions != null) JsonUtil.toJson(it.additionalOptions!!) else null)
-                        .set(TOTAL_TIME, if (it.endTime != null && it.startTime != null) {
-                            Duration.between(it.startTime, it.endTime).toMillis() / 1000
-                        } else null)
+                            if (it.additionalOptions != null) {
+                                JsonUtil.toJson(it.additionalOptions!!, formatted = false)
+                            } else {
+                                null
+                            })
+                        .set(TOTAL_TIME,
+                            if (it.endTime != null && it.startTime != null) {
+                                TimeUnit.MILLISECONDS.toSeconds(Duration.between(it.startTime, it.endTime).toMillis())
+                            } else {
+                                null
+                            }
+                        )
                         .set(ERROR_TYPE, it.errorType?.ordinal)
                         .set(ERROR_CODE, it.errorCode)
                         .set(ERROR_MSG,

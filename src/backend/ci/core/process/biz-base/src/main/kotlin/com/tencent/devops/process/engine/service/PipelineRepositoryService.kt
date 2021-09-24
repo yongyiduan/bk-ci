@@ -497,7 +497,7 @@ class PipelineRepositoryService constructor(
                 projectId = projectId,
                 pipelineId = pipelineId,
                 userId = userId,
-                model = JsonUtil.toJson(model),
+                model = JsonUtil.toJson(model, formatted = false),
                 channelCode = channelCode.name
             )
         )
@@ -605,7 +605,7 @@ class PipelineRepositoryService constructor(
                 projectId = projectId,
                 pipelineId = pipelineId,
                 userId = userId,
-                model = JsonUtil.toJson(model),
+                model = JsonUtil.toJson(model, formatted = false),
                 channelCode = channelCode.name
             )
         )
@@ -688,7 +688,7 @@ class PipelineRepositoryService constructor(
                 templatePipelineDao.delete(transactionContext, pipelineId)
             } else {
                 // 删除前改名，防止名称占用
-                val deleteTime = LocalDateTime.now().toString("yyyyMMddHHmm")
+                val deleteTime = LocalDateTime.now().toString("yyMMddHHmmSS")
                 var deleteName = "${record.pipelineName}[$deleteTime]"
                 if (deleteName.length > MAX_LEN_FOR_NAME) { // 超过截断，且用且珍惜
                     deleteName = deleteName.substring(0, MAX_LEN_FOR_NAME)
