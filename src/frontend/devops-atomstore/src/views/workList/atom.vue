@@ -61,7 +61,6 @@
                 </bk-table-column>
             </bk-table>
         </main>
-
         <bk-sideslider
             class="create-atom-slider g-slide-radio"
             :is-show.sync="createAtomsideConfig.show"
@@ -98,6 +97,7 @@
                             </bk-popover>
                         </div>
                     </div>
+                    
                     <div class="bk-form-item is-required">
                         <label class="bk-label"> {{ $t('store.标识') }} </label>
                         <div class="bk-form-content atom-item-content is-tooltips">
@@ -108,11 +108,11 @@
                                     v-validate="{
                                         required: true,
                                         max: 30,
-                                        regex: '^[a-zA-Z]+$'
+                                        regex: '^[a-zA-Z][a-zA-Z0-9_-]*$'
                                     }"
                                     :class="{ 'is-danger': errors.has('atomId') }">
                                 <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
-                                    {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.只能输入英文') : errors.first("atomId") }}
+                                    {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.由英文字母、数字、连字符(-)或下划线(_)组成，以英文字母开头，不超过30个字符') : errors.first("atomId") }}
                                 </p>
                             </div>
                             <bk-popover placement="right">
@@ -122,6 +122,13 @@
                                 </template>
                             </bk-popover>
                         </div>
+                        <bk-popover placement="right">
+                            <i class="devops-icon icon-info-circle"></i>
+                            <template slot="content">
+                                <p> {{ $t('store.由汉字、英文字母、数字、连字符、下划线或点组成，不超过20个字符') }} </p>
+                            </template>
+                        </bk-popover>
+                    </div>
                     </div>
                     <div class="bk-form-item is-required">
                         <label class="bk-label"> {{ $t('store.调试项目') }} </label>
@@ -224,8 +231,7 @@
                         <span> {{ $t('store.新增插件时将自动初始化插件代码库，请先进行工蜂OAUTH授权') }} </span>
                     </p>
                 </div>
-            </template>
-        </bk-sideslider>
+            </template></bk-sideslider>
         <bk-sideslider
             class="offline-atom-slider"
             :is-show.sync="offlinesideConfig.show"
