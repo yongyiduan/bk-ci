@@ -123,6 +123,31 @@
                                         v-validate="{
                                             required: true,
                                             max: 30,
+                                            regex: '^[a-zA-Z]+$'
+                                        }"
+                                        :class="{ 'is-danger': errors.has('atomId') }">
+                                    <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
+                                        {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.只能输入英文') : errors.first("atomId") }}
+                                    </p>
+                                </div>
+                                <bk-popover placement="right">
+                                    <i class="devops-icon icon-info-circle"></i>
+                                    <template slot="content">
+                                        <p> {{ $t('store.唯一标识，创建后不能修改。将作为插件代码库路径。') }} </p>
+                                    </template>
+                                </bk-popover>
+                            </div>
+                        </div>
+                        <!-- <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.标识') }} </label>
+                            <div class="bk-form-content atom-item-content is-tooltips">
+                                <div style="min-width: 100%;">
+                                    <input type="text" class="bk-form-input atom-id-input" :placeholder="$t('store.请输入英文名称，不超过30个字符')"
+                                        name="atomId"
+                                        v-model="createAtomForm.atomCode"
+                                        v-validate="{
+                                            required: true,
+                                            max: 30,
                                             regex: '^[a-zA-Z][a-zA-Z0-9_-]*$'
                                         }"
                                         :class="{ 'is-danger': errors.has('atomId') }">
@@ -137,7 +162,7 @@
                                     </template>
                                 </bk-popover>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="bk-form-item is-required">
                             <label class="bk-label"> {{ $t('store.调试项目') }} </label>
                             <div class="bk-form-content atom-item-content is-tooltips">
