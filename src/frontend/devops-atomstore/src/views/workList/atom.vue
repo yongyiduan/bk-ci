@@ -81,8 +81,7 @@
                                     v-model="createAtomForm.name"
                                     v-validate="{
                                         required: true,
-                                        max: 20,
-                                        regex: '^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$'
+                                        regex: '^[\u4e00-\u9fa5a-zA-Z0-9-_.]{1,20}$'
                                     }"
                                     :class="{ 'is-danger': errors.has('atomName') }">
                                 <p :class="errors.has('atomName') ? 'error-tips' : 'normal-tips'">
@@ -129,6 +128,7 @@
                             </template>
                         </bk-popover>
                     </div>
+
                     <div class="bk-form-item is-required">
                         <label class="bk-label"> {{ $t('store.调试项目') }} </label>
                         <div class="bk-form-content atom-item-content is-tooltips">
@@ -230,7 +230,8 @@
                         <span> {{ $t('store.新增插件时将自动初始化插件代码库，请先进行工蜂OAUTH授权') }} </span>
                     </p>
                 </div>
-            </template></bk-sideslider>
+            </template>
+        </bk-sideslider>
         <bk-sideslider
             class="offline-atom-slider"
             :is-show.sync="offlinesideConfig.show"
