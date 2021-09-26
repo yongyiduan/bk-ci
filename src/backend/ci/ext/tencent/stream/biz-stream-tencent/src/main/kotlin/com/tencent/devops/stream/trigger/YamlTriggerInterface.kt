@@ -40,7 +40,7 @@ interface YamlTriggerInterface<T> {
         event: GitEvent,
         originYaml: String?,
         filePath: String,
-        changeSet: Set<String>? = null,
+        changeSet: Set<String>?,
         forkGitProjectId: Long? = null
     ): Boolean
 
@@ -52,7 +52,7 @@ interface YamlTriggerInterface<T> {
         pipelineId: String?,
         pipelineName: String?,
         event: GitEvent?,
-        changeSet: Set<String>? = null,
+        changeSet: Set<String>?,
         forkGitProjectId: Long? = null
     ): T?
 

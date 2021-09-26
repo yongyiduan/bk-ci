@@ -129,7 +129,6 @@
                             </template>
                         </bk-popover>
                     </div>
-                    </div>
                     <div class="bk-form-item is-required">
                         <label class="bk-label"> {{ $t('store.调试项目') }} </label>
                         <div class="bk-form-content atom-item-content is-tooltips">
