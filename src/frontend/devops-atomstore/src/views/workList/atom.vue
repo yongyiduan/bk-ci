@@ -113,7 +113,7 @@
                             </div>
 
                         </div>
-                        <div class="bk-form-item is-required">
+                        <!-- <div class="bk-form-item is-required">
                             <label class="bk-label"> {{ $t('store.标识') }} </label>
                             <div class="bk-form-content atom-item-content is-tooltips">
                                 <div style="min-width: 100%;">
@@ -137,8 +137,8 @@
                                     </template>
                                 </bk-popover>
                             </div>
-                        </div>
-                        <!-- <div class="bk-form-item is-required">
+                        </div> -->
+                        <div class="bk-form-item is-required">
                             <label class="bk-label"> {{ $t('store.标识') }} </label>
                             <div class="bk-form-content atom-item-content is-tooltips">
                                 <div style="min-width: 100%;">
@@ -162,7 +162,7 @@
                                     </template>
                                 </bk-popover>
                             </div>
-                        </div> -->
+                        </div>
                         <div class="bk-form-item is-required">
                             <label class="bk-label"> {{ $t('store.调试项目') }} </label>
                             <div class="bk-form-content atom-item-content is-tooltips">
