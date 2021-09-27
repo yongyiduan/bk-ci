@@ -106,8 +106,7 @@
                                     v-model="createAtomForm.atomCode"
                                     v-validate="{
                                         required: true,
-                                        max: 30,
-                                        regex: '^[a-zA-Z][a-zA-Z0-9_-]*$'
+                                        regex: '^[a-zA-Z][a-zA-Z0-9_-]{1, 30}$'
                                     }"
                                     :class="{ 'is-danger': errors.has('atomId') }">
                                 <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
@@ -121,12 +120,6 @@
                                 </template>
                             </bk-popover>
                         </div>
-                        <bk-popover placement="right">
-                            <i class="devops-icon icon-info-circle"></i>
-                            <template slot="content">
-                                <p> {{ $t('store.由汉字、英文字母、数字、连字符、下划线或点组成，不超过20个字符') }} </p>
-                            </template>
-                        </bk-popover>
                     </div>
 
                     <div class="bk-form-item is-required">
