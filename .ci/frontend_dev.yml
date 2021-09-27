@@ -33,9 +33,9 @@ stages:
       - uses: cache@1.*
         id: cache
         with:
-          cacheKey: "nodejstesa_linux_${{ steps.calculate.outputs.hash_value }}"
+          cacheKey: "bk_ci_frontend_dev_linux_${{ steps.calculate.outputs.hash_value }}"
           cachePaths: "src/frontend/node_modules"
-          restoreKeys: "nodejstesa_linux_"
+          restoreKeys: "bk_ci_frontend_dev_linux_"
       - run: |
             yarn
         if: steps.cache.outputs.cacheHit == false
