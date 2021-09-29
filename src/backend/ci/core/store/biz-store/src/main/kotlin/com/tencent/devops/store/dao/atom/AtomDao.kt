@@ -107,8 +107,7 @@ class AtomDao : AtomBaseDao() {
         atomRequest: AtomCreateRequest
     ) {
         with(TAtom.T_ATOM) {
-            dslContext.insertInto(
-                this,
+            dslContext.insertInto(this,
                 ID,
                 NAME,
                 ATOM_CODE,
@@ -131,8 +130,7 @@ class AtomDao : AtomBaseDao() {
                 CREATOR,
                 MODIFIER
             )
-                .values(
-                    id,
+                .values(id,
                     atomRequest.name,
                     atomRequest.atomCode,
                     classType,
@@ -197,10 +195,8 @@ class AtomDao : AtomBaseDao() {
      */
     fun countReleaseAtomNumByClassifyId(dslContext: DSLContext, classifyId: String): Int {
         with(TAtom.T_ATOM) {
-            return dslContext.selectCount().from(this).where(
-                ATOM_STATUS.eq(AtomStatusEnum.RELEASED.status.toByte())
-                    .and(CLASSIFY_ID.eq(classifyId))
-            ).fetchOne(0, Int::class.java)!!
+            return dslContext.selectCount().from(this).where(ATOM_STATUS.eq(AtomStatusEnum.RELEASED.status.toByte())
+                .and(CLASSIFY_ID.eq(classifyId))).fetchOne(0, Int::class.java)!!
         }
     }
 
@@ -215,10 +211,8 @@ class AtomDao : AtomBaseDao() {
             AtomStatusEnum.UNDERCARRIAGED.status.toByte()
         )
         return dslContext.selectCount().from(a).join(b).on(a.ATOM_CODE.eq(b.STORE_CODE))
-            .where(
-                a.ATOM_STATUS.`in`(atomStatusList)
-                    .and(a.CLASSIFY_ID.eq(classifyId))
-            )
+            .where(a.ATOM_STATUS.`in`(atomStatusList)
+                .and(a.CLASSIFY_ID.eq(classifyId)))
             .fetchOne(0, Int::class.java)!!
     }
 

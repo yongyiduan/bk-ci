@@ -734,8 +734,7 @@ abstract class AtomServiceImpl @Autowired constructor() : AtomService {
                             context, userId, AtomFeatureRequest(
                             atomCode = atomCode,
                             recommendFlag = recommendFlag,
-                            yamlFlag = atomUpdateRequest.yamlFlag,
-                            qualityFlag = atomUpdateRequest.qualityFlag
+                            yamlFlag = atomUpdateRequest.yamlFlag
                         )
                         )
                     } else {
@@ -743,8 +742,7 @@ abstract class AtomServiceImpl @Autowired constructor() : AtomService {
                             context, userId, AtomFeatureRequest(
                             atomCode = atomCode,
                             recommendFlag = recommendFlag,
-                            yamlFlag = atomUpdateRequest.yamlFlag,
-                            qualityFlag = atomUpdateRequest.qualityFlag
+                            yamlFlag = atomUpdateRequest.yamlFlag
                         )
                         )
                     }
