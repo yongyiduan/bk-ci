@@ -81,8 +81,7 @@
                                     v-model="createAtomForm.name"
                                     v-validate="{
                                         required: true,
-                                        max: 20,
-                                        regex: '^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$'
+                                        regex: '^[\u4e00-\u9fa5a-zA-Z0-9-_.]{1,20}$'
                                     }"
                                     :class="{ 'is-danger': errors.has('atomName') }">
                                 <p :class="errors.has('atomName') ? 'error-tips' : 'normal-tips'">
@@ -107,8 +106,7 @@
                                     v-model="createAtomForm.atomCode"
                                     v-validate="{
                                         required: true,
-                                        max: 30,
-                                        regex: '^[a-zA-Z][a-zA-Z0-9_-]*$'
+                                        regex: '^[a-zA-Z][a-zA-Z0-9_-]{1,30}$'
                                     }"
                                     :class="{ 'is-danger': errors.has('atomId') }">
                                 <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
@@ -122,140 +120,110 @@
                                 </template>
                             </bk-popover>
                         </div>
-                        <bk-popover placement="right">
-                            <i class="devops-icon icon-info-circle"></i>
-                            <template slot="content">
-                                <p> {{ $t('store.由汉字、英文字母、数字、连字符、下划线或点组成，不超过20个字符') }} </p>
-                            </template>
-                        </bk-popover>
                     </div>
-                </div>
-                <div class="bk-form-item is-required">
-                    <label class="bk-label"> {{ $t('store.标识') }} </label>
-                    <div class="bk-form-content atom-item-content is-tooltips">
-                        <div style="min-width: 100%;">
-                            <input type="text" class="bk-form-input atom-id-input" :placeholder="$t('store.请输入英文名称，不超过30个字符')"
-                                name="atomId"
-                                v-model="createAtomForm.atomCode"
-                                v-validate="{
-                                    required: true,
-                                    max: 30,
-                                    regex: '^[a-zA-Z]+$'
-                                }"
-                                :class="{ 'is-danger': errors.has('atomId') }">
-                            <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
-                                {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.只能输入英文') : errors.first("atomId") }}
-                            </p>
+
+                    <div class="bk-form-item is-required">
+                        <label class="bk-label"> {{ $t('store.调试项目') }} </label>
+                        <div class="bk-form-content atom-item-content is-tooltips">
+                            <div style="min-width: 100%">
+                                <bk-select v-model="createAtomForm.projectCode"
+                                    @selected="selectedProject"
+                                    @toggle="toggleProjectList"
+                                    searchable
+                                    :placeholder="$t('store.请选择调试项目')"
+                                    :enable-virtual-scroll="projectList && projectList.length > 3000"
+                                    :list="projectList"
+                                    id-key="projectCode"
+                                    display-key="projectName"
+                                >
+                                    <bk-option
+                                        v-for="item in projectList"
+                                        :key="item.projectCode"
+                                        :id="item.projectCode"
+                                        :name="item.projectName"
+                                    >
+                                    </bk-option>
+                                    <div slot="extension" style="cursor: pointer;">
+                                        <a :href="itemUrl" target="_blank">
+                                            <i class="devops-icon icon-plus-circle" />
+                                            {{ itemText }}
+                                        </a>
+                                    </div>
+                                </bk-select>
+                                <div v-if="atomErrors.projectError" class="error-tips"> {{ $t('store.项目不能为空') }} </div>
+                            </div>
+                            <bk-popover placement="right" width="400">
+                                <i class="devops-icon icon-info-circle"></i>
+                                <template slot="content">
+                                    <p> {{ $t('store.debugProjectTips') }} </p>
+                                </template>
+                            </bk-popover>
                         </div>
-                        <bk-popover placement="right">
-                            <i class="devops-icon icon-info-circle"></i>
-                            <template slot="content">
-                                <p> {{ $t('store.唯一标识，创建后不能修改。将作为插件代码库路径。') }} </p>
-                            </template>
-                        </bk-popover>
                     </div>
-                </div>
-                <div class="bk-form-item is-required">
-                    <label class="bk-label"> {{ $t('store.调试项目') }} </label>
-                    <div class="bk-form-content atom-item-content is-tooltips">
-                        <div style="min-width: 100%">
-                            <bk-select v-model="createAtomForm.projectCode"
-                                @selected="selectedProject"
-                                @toggle="toggleProjectList"
-                                searchable
-                                :placeholder="$t('store.请选择调试项目')"
-                                :enable-virtual-scroll="projectList && projectList.length > 3000"
-                                :list="projectList"
-                                id-key="projectCode"
-                                display-key="projectName"
-                            >
-                                <bk-option
-                                    v-for="item in projectList"
-                                    :key="item.projectCode"
-                                    :id="item.projectCode"
-                                    :name="item.projectName"
+                    <div class="bk-form-item is-required">
+                        <label class="bk-label"> {{ $t('store.开发语言') }} </label>
+                        <div class="bk-form-content atom-item-content">
+                            <bk-select v-model="createAtomForm.language" searchable>
+                                <bk-option v-for="(option, index) in languageList"
+                                    :key="index"
+                                    :id="option.language"
+                                    :name="option.name"
+                                    @click.native="selectedLanguage"
+                                    :placeholder="$t('store.请选择开发语言')"
                                 >
                                 </bk-option>
-                                <div slot="extension" style="cursor: pointer;">
-                                    <a :href="itemUrl" target="_blank">
-                                        <i class="devops-icon icon-plus-circle" />
-                                        {{ itemText }}
-                                    </a>
-                                </div>
                             </bk-select>
-                            <div v-if="atomErrors.projectError" class="error-tips"> {{ $t('store.项目不能为空') }} </div>
+                            <div v-if="atomErrors.languageError" class="error-tips"> {{ $t('store.开发语言不能为空') }} </div>
                         </div>
-                        <bk-popover placement="right" width="400">
-                            <i class="devops-icon icon-info-circle"></i>
-                            <template slot="content">
-                                <p> {{ $t('store.debugProjectTips') }} </p>
-                            </template>
-                        </bk-popover>
                     </div>
+                    <template v-if="!isEnterprise">
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.授权方式') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-radio-group v-model="createAtomForm.authType">
+                                    <bk-radio :value="entry.value" v-for="(entry, key) in authTypeList" :key="key">{{ entry.label }}</bk-radio>
+                                </bk-radio-group>
+                            </div>
+                        </div>
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.是否开源') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-radio-group v-model="createAtomForm.visibilityLevel">
+                                    <bk-radio :disabled="entry.disable" :title="entry.title" :value="entry.value" v-for="(entry, key) in isOpenSource" :key="key" @click.native="changeOpenSource">{{ entry.label }}</bk-radio>
+                                </bk-radio-group>
+                                <p v-if="atomErrors.openSourceError" class="error-tips"> {{ $t('store.是否开源不能为空') }} </p>
+                            </div>
+                        </div>
+                        <div class="bk-form-item is-required" v-if="createAtomForm.visibilityLevel === 'PRIVATE'">
+                            <label class="bk-label"> {{ $t('store.不开源原因') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-input v-model="createAtomForm.privateReason" type="textarea" :placeholder="$t('store.请输入不开源原因')" @input="atomErrors.privateReasonError = false"></bk-input>
+                                <p v-if="atomErrors.privateReasonError" class="error-tips"> {{ $t('store.不开源原因不能为空') }} </p>
+                            </div>
+                        </div>
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.自定义前端') }} </label>
+                            <div class="bk-form-content atom-item-content">
+                                <bk-radio-group v-model="createAtomForm.frontendType">
+                                    <bk-radio :title="entry.title" :value="entry.value" v-for="(entry, key) in frontendTypeList" :key="key">{{ entry.label }}</bk-radio>
+                                </bk-radio-group>
+                            </div>
+                        </div>
+                        <form-tips :tips-content="createTips" class="atom-tip"></form-tips>
+                    </template>
+                    <div class="form-footer">
+                        <button class="bk-button bk-primary" type="button" @click="submitCreateAtom()"> {{ $t('store.提交') }} </button>
+                        <button class="bk-button bk-default" type="button" @click="cancelCreateAtom()"> {{ $t('store.取消') }} </button>
+                    </div>
+                </form>
+                <div class="oauth-tips" v-else style="margin: 30px">
+                    <button class="bk-button bk-primary" type="button" @click="openValidate"> {{ $t('store.OAUTH认证') }} </button>
+                    <p class="prompt-oauth">
+                        <i class="devops-icon icon-info-circle-shape"></i>
+                        <span> {{ $t('store.新增插件时将自动初始化插件代码库，请先进行工蜂OAUTH授权') }} </span>
+                    </p>
                 </div>
-                <div class="bk-form-item is-required">
-                    <label class="bk-label"> {{ $t('store.开发语言') }} </label>
-                    <div class="bk-form-content atom-item-content">
-                        <bk-select v-model="createAtomForm.language" searchable>
-                            <bk-option v-for="(option, index) in languageList"
-                                :key="index"
-                                :id="option.language"
-                                :name="option.name"
-                                @click.native="selectedLanguage"
-                                :placeholder="$t('store.请选择开发语言')"
-                            >
-                            </bk-option>
-                        </bk-select>
-                        <div v-if="atomErrors.languageError" class="error-tips"> {{ $t('store.开发语言不能为空') }} </div>
-                    </div>
-                </div>
-                <template v-if="!isEnterprise">
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.授权方式') }} </label>
-                        <div class="bk-form-content atom-item-content">
-                            <bk-radio-group v-model="createAtomForm.authType">
-                                <bk-radio :value="entry.value" v-for="(entry, key) in authTypeList" :key="key">{{ entry.label }}</bk-radio>
-                            </bk-radio-group>
-                        </div>
-                    </div>
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.是否开源') }} </label>
-                        <div class="bk-form-content atom-item-content">
-                            <bk-radio-group v-model="createAtomForm.visibilityLevel">
-                                <bk-radio :disabled="entry.disable" :title="entry.title" :value="entry.value" v-for="(entry, key) in isOpenSource" :key="key" @click.native="changeOpenSource">{{ entry.label }}</bk-radio>
-                            </bk-radio-group>
-                            <p v-if="atomErrors.openSourceError" class="error-tips"> {{ $t('store.是否开源不能为空') }} </p>
-                        </div>
-                    </div>
-                    <div class="bk-form-item is-required" v-if="createAtomForm.visibilityLevel === 'PRIVATE'">
-                        <label class="bk-label"> {{ $t('store.不开源原因') }} </label>
-                        <div class="bk-form-content atom-item-content">
-                            <bk-input v-model="createAtomForm.privateReason" type="textarea" :placeholder="$t('store.请输入不开源原因')" @input="atomErrors.privateReasonError = false"></bk-input>
-                            <p v-if="atomErrors.privateReasonError" class="error-tips"> {{ $t('store.不开源原因不能为空') }} </p>
-                        </div>
-                    </div>
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.自定义前端') }} </label>
-                        <div class="bk-form-content atom-item-content">
-                            <bk-radio-group v-model="createAtomForm.frontendType">
-                                <bk-radio :title="entry.title" :value="entry.value" v-for="(entry, key) in frontendTypeList" :key="key">{{ entry.label }}</bk-radio>
-                            </bk-radio-group>
-                        </div>
-                    </div>
-                    <form-tips :tips-content="createTips" class="atom-tip"></form-tips>
-                </template>
-                <div class="form-footer">
-                    <button class="bk-button bk-primary" type="button" @click="submitCreateAtom()"> {{ $t('store.提交') }} </button>
-                    <button class="bk-button bk-default" type="button" @click="cancelCreateAtom()"> {{ $t('store.取消') }} </button>
-                </div>
-            </form>
-            <div class="oauth-tips" v-else style="margin: 30px">
-                <button class="bk-button bk-primary" type="button" @click="openValidate"> {{ $t('store.OAUTH认证') }} </button>
-                <p class="prompt-oauth">
-                    <i class="devops-icon icon-info-circle-shape"></i>
-                    <span> {{ $t('store.新增插件时将自动初始化插件代码库，请先进行工蜂OAUTH授权') }} </span>
-                </p>
-            </div>
+            </template>
         </bk-sideslider>
         <bk-sideslider
             class="offline-atom-slider"
