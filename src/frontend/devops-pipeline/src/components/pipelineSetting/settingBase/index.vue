@@ -546,6 +546,11 @@
                 white-space: nowrap;
             }
         }
+        .notify-setting-no-data {
+            vertical-align: top;
+            font-size: 12px;
+            color: #63656e;
+        }
     }
     .notice-user-content {
         max-width: 300px;
