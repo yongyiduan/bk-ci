@@ -286,12 +286,12 @@ export const CODE_LIB_TYPE = [
         name: 'GIT'
     },
     {
-        id: 'GITHUB',
-        name: 'GITHUB'
+        id: 'CODE_SVN',
+        name: 'SVN'
     },
     {
-        id: 'GITLAB',
-        name: 'GITLAB'
+        id: 'GITHUB',
+        name: 'GITHUB'
     }
 ]
 
