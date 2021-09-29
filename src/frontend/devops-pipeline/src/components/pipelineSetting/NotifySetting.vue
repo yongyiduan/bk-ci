@@ -118,5 +118,10 @@
             padding: 0;
             width: 180px;
         }
+        .notify-setting-no-data {
+            vertical-align: top;
+            font-size: 12px;
+            color: #63656e;
+        }
     }
 </style>

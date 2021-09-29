@@ -23,7 +23,7 @@
                 @page-limit-change="pageCountChanged"
                 v-bkloading="{ isLoading }"
             >
-                <bk-table-column :label="$t('store.镜像名称')" width="180">
+                <bk-table-column :label="$t('store.镜像名称')" width="200">
                     <template slot-scope="props">
                         <span class="atom-name" :title="props.row.imageName" @click="goToImageDetail(props.row.imageCode)">{{ props.row.imageName }}</span>
                     </template>
@@ -48,7 +48,21 @@
                 </bk-table-column>
                 <bk-table-column :label="$t('store.状态')">
                     <template slot-scope="props">
-                        <status :status="calcStatus(props.row.imageStatus)"></status>
+                        <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
+                            v-if="['AUDITING', 'COMMITTING', 'CHECKING', 'CHECK_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.imageStatus)">
+                            <div class="rotate rotate1"></div>
+                            <div class="rotate rotate2"></div>
+                            <div class="rotate rotate3"></div>
+                            <div class="rotate rotate4"></div>
+                            <div class="rotate rotate5"></div>
+                            <div class="rotate rotate6"></div>
+                            <div class="rotate rotate7"></div>
+                            <div class="rotate rotate8"></div>
+                        </div>
+                        <span class="atom-status-icon success" v-if="props.row.imageStatus === 'RELEASED'"></span>
+                        <span class="atom-status-icon fail" v-if="props.row.imageStatus === 'GROUNDING_SUSPENSION'"></span>
+                        <span class="atom-status-icon obtained" v-if="props.row.imageStatus === 'AUDIT_REJECT' || props.row.imageStatus === 'UNDERCARRIAGED'"></span>
+                        <span class="atom-status-icon devops-icon icon-initialize" v-if="props.row.imageStatus === 'INIT'"></span>
                         <span>{{ $t(imageStatusList[props.row.imageStatus]) }}</span>
                     </template>
                 </bk-table-column>
@@ -65,7 +79,7 @@
                             @click="$router.push({ name: 'editImage', params: { imageId: props.row.imageId } })"> {{ $t('store.升级') }} </span>
                         <span class="shelf-btn"
                             v-if="props.row.imageStatus === 'RELEASED' && !props.row.publicFlag"
-                            @click="$router.push({ name: 'install', query: { code: props.row.imageCode, type: 'image', from: 'serviceWork' } })"> {{ $t('store.安装') }} </span>
+                            @click="$router.push({ name: 'install', query: { code: props.row.imageCode, type: 'image', from: 'imageWork' } })"> {{ $t('store.安装') }} </span>
                         <span class="schedule-btn"
                             v-if="['AUDITING', 'COMMITTING', 'CHECKING', 'CHECK_FAIL', 'UNDERCARRIAGING', 'TESTING'].includes(props.row.imageStatus)"
                             @click="$router.push({ name: 'imageProgress', params: { imageId: props.row.imageId } })"> {{ $t('store.进度') }} </span>
@@ -89,7 +103,7 @@
                         :required="true"
                         property="imageName"
                         :desc="$t('store.镜像在研发商店中的别名')"
-                        :rules="[requireRule, nameRule, numMax]"
+                        :rules="[requireRule, nameRule]"
                         error-display-type="normal"
                     >
                         <bk-input v-model="relateImageData.form.imageName" :placeholder="$t('store.请输入镜像名称，不超过20个字符')" style="width: 96%;"></bk-input>
@@ -104,7 +118,7 @@
                         :required="true"
                         property="imageCode"
                         :desc="$t('store.镜像英文名，为当前镜像在研发商店中的唯一标识')"
-                        :rules="[requireRule, alpRule, alpNumMax]"
+                        :rules="[requireRule, alpRule]"
                         error-display-type="normal"
                     >
                         <bk-input v-model="relateImageData.form.imageCode" :placeholder="$t('store.请输入镜像标识，不超过30个字符')" style="width: 96%;"></bk-input>
@@ -116,8 +130,7 @@
                         </bk-popover>
                     </bk-form-item>
                     <bk-form-item :label="$t('store.镜像源')" :required="true" property="imageSourceType" class="h32" :rules="[requireRule]">
-                        <bk-radio-group v-model="relateImageData.form.imageSourceType">
-                            <bk-radio value="BKDEVOPS" class="mr12"> {{ $t('store.蓝盾源') }} </bk-radio>
+                        <bk-radio-group v-model="relateImageData.form.imageSourceType" class="mt6">
                             <bk-radio value="THIRD"> {{ $t('store.第三方源') }} </bk-radio>
                         </bk-radio-group>
                     </bk-form-item>
@@ -202,13 +215,8 @@
 <script>
     import { debounce } from '@/utils/index'
     import { imageStatusList } from '@/store/constants'
-    import status from './status'
 
     export default {
-        components: {
-            status
-        },
-
         data () {
             return {
                 imageStatusList,
@@ -233,7 +241,7 @@
                         imageCode: '',
                         projectCode: '',
                         imageName: '',
-                        imageSourceType: 'BKDEVOPS',
+                        imageSourceType: 'THIRD',
                         ticketId: ''
                     }
                 },
@@ -257,23 +265,13 @@
                     trigger: 'blur'
                 },
                 alpRule: {
-                    validator: (val) => (/^[a-zA-Z][a-zA-Z0-9-_]*$/.test(val)),
+                    validator: (val) => (/^[a-zA-Z][a-zA-Z0-9-_]{1,30}$/.test(val)),
                     message: this.$t('store.由英文字母、数字、连字符(-)或下划线(_)组成，以英文字母开头，不超过30个字符'),
                     trigger: 'blur'
                 },
-                alpNumMax: {
-                    validator: (val = '') => (val.length <= 30),
-                    message: this.$t('store.字段不超过30个字符'),
-                    trigger: 'blur'
-                },
                 nameRule: {
-                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-_.]+$/.test(val)),
+                    validator: (val) => (/^[\u4e00-\u9fa5a-zA-Z0-9-_.]{1,20}$/.test(val)),
                     message: this.$t('store.由汉字、英文字母、数字、连字符、下划线或点组成，不超过20个字符'),
-                    trigger: 'blur'
-                },
-                numMax: {
-                    validator: (val = '') => (val.length <= 20),
-                    message: this.$t('store.字段不超过20个字符'),
                     trigger: 'blur'
                 }
             }
@@ -291,34 +289,6 @@
         },
 
         methods: {
-            calcStatus (status) {
-                let icon = ''
-                switch (status) {
-                    case 'AUDITING':
-                    case 'COMMITTING':
-                    case 'CHECKING':
-                    case 'CHECK_FAIL':
-                    case 'UNDERCARRIAGING':
-                    case 'TESTING':
-                        icon = 'doing'
-                        break
-                    case 'RELEASED':
-                        icon = 'success'
-                        break
-                    case 'GROUNDING_SUSPENSION':
-                        icon = 'fail'
-                        break
-                    case 'AUDIT_REJECT':
-                    case 'UNDERCARRIAGED':
-                        icon = 'info'
-                        break
-                    case 'INIT':
-                        icon = 'init'
-                        break
-                }
-                return icon
-            },
-
             search () {
                 this.pagination.current = 1
                 this.requestList()
@@ -392,8 +362,6 @@
                 }
                 this.$bkInfo({
                     title: this.$t('store.确认要删除？'),
-                    type: 'warning',
-                    theme: 'warning',
                     confirmFn
                 })
             },

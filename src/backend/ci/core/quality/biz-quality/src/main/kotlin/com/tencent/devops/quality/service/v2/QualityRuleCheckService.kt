@@ -46,6 +46,7 @@ import com.tencent.devops.notify.pojo.SendNotifyMessageTemplateRequest
 import com.tencent.devops.plugin.api.ServiceCodeccElementResource
 import com.tencent.devops.plugin.codecc.CodeccUtils
 import com.tencent.devops.process.api.service.ServicePipelineResource
+import com.tencent.devops.process.utils.PIPELINE_START_USER_ID
 import com.tencent.devops.project.api.service.ServiceProjectResource
 import com.tencent.devops.quality.api.v2.pojo.QualityHisMetadata
 import com.tencent.devops.quality.api.v2.pojo.QualityIndicator
@@ -348,6 +349,7 @@ class QualityRuleCheckService @Autowired constructor(
         ruleOp: QualityRule.RuleOp
     ) {
         with(buildCheckParams) {
+            logger.info("buildCheckParams is: $buildCheckParams")
             val createTime = LocalDateTime.now()
             if (ruleOp.operation == RuleOperation.END) {
                 sendEndNotification(
