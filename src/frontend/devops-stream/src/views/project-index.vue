@@ -18,7 +18,6 @@
             ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'permission'])
         },
         created () {
-            console.log('project-index')
             this.initData()
         },
         beforeDestroy () {

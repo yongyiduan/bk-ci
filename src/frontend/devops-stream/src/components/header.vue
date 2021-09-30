@@ -5,7 +5,7 @@
 
             <template v-if="$route.hash && !showMenu">
                 <icon name="git" size="18" class="gray-icon"></icon>
-                <span class="git-project-path" @click="goToCode">{{ decodeURIComponent(($route.hash || '').slice(1)) }}</span>
+                <span class="git-project-path" @click="goToCode">{{ projectInfo.path_with_namespace }}</span>
                 <icon
                     name="setting"
                     size="18"
