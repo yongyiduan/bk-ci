@@ -8,6 +8,9 @@ variables:
 
 on:
   push: ["frontend-develop"]
+  schedules:
+    cron: 0 * * * *
+    branches: [ "frontend-develop" ]
 
 stages:
 - name: "Build"
