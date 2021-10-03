@@ -88,7 +88,7 @@ object Runner {
             } finally {
                 LoggerService.stop()
                 LoggerService.archiveLogFiles()
-                EngineService.endBuild()
+                EngineService.endBuild(buildVariables)
                 QuotaService.removeRunningAgent(buildVariables)
                 Heartbeat.stop()
             }
