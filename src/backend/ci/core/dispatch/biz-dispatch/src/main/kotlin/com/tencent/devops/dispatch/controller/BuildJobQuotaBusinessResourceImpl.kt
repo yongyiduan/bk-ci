@@ -25,10 +25,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":ext:tencent:common:common-auth:common-auth-tencent"))
-    api(project(":ext:tencent:common:common-kafka-tencent"))
-    api(project(":core:dispatch:biz-dispatch"))
-    api(project(":ext:tencent:dispatch:biz-dispatch-bcs"))
+package com.tencent.devops.dispatch.controller
+
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.dispatch.api.BuildJobQuotaBusinessResource
+import com.tencent.devops.dispatch.service.JobQuotaBusinessService
+import org.springframework.beans.factory.annotation.Autowired
+
+@RestResource@Suppress("ALL")
+class BuildJobQuotaBusinessResourceImpl @Autowired constructor(
+    private val jobQuotaBusinessService: JobQuotaBusinessService
+) : BuildJobQuotaBusinessResource {
+
+    override fun addRunningAgent(
+        projectId: String,
+        buildId: String,
+        vmSeqId: String,
+        executeCount: Int
+    ): Result<Boolean> {
+        jobQuotaBusinessService.updateAgentStartTime(projectId, buildId, vmSeqId, executeCount)
+        return Result(true)
+    }
+
+    override fun removeRunningAgent(
+        projectId: String,
+        buildId: String,
+        vmSeqId: String,
+        executeCount: Int
+    ): Result<Boolean> {
+        jobQuotaBusinessService.updateRunningTime(projectId, buildId, vmSeqId, executeCount)
+        return Result(true)
+    }
 }

@@ -25,10 +25,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":ext:tencent:common:common-digest-tencent"))
-    api(project(":ext:tencent:common:common-auth:common-auth-tencent"))
-    api(project(":ext:tencent:common:common-kafka-tencent"))
-    api(project(":core:dispatch:biz-dispatch"))
-    api(project(":ext:tencent:dispatch:biz-dispatch-bcs"))
-}
+package com.tencent.devops.dispatch.pojo
+
+data class JobQuotaHistory(
+    val projectId: String,
+    val buildId: String,
+    val vmSeqId: String,
+    val executeCount: Int,
+    val vmType: String,
+    val createTime: String,
+    val agentStartTime: String,
+    val agentFinishTime: String
+)
