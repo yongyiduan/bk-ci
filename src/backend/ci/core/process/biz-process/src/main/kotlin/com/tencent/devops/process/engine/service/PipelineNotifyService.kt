@@ -1,39 +1,39 @@
 package com.tencent.devops.process.engine.service
 
-import com.tencent.devops.common.api.pojo.Result
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
 import com.tencent.devops.common.api.util.DateTimeUtil
-import com.tencent.devops.common.api.util.EnvUtils
-import com.tencent.devops.common.client.Client
+import com.tencent.devops.common.api.util.Watcher
 import com.tencent.devops.common.pipeline.enums.BuildStatus
-import com.tencent.devops.common.pipeline.enums.ChannelCode
-import com.tencent.devops.notify.api.service.ServiceNotifyMessageTemplateResource
-import com.tencent.devops.notify.pojo.SendNotifyMessageTemplateRequest
-import com.tencent.devops.process.dao.PipelineSettingDao
-import com.tencent.devops.process.pojo.PipelineNotifyTemplateEnum
-import com.tencent.devops.process.pojo.pipeline.ModelDetail
-import com.tencent.devops.process.pojo.setting.PipelineSetting
+import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.process.notify.command.BuildNotifyContext
+import com.tencent.devops.process.notify.command.NotifyCmd
+import com.tencent.devops.process.notify.command.NotifyCmdChain
+import com.tencent.devops.process.notify.command.impl.NotifyContentCmd
+import com.tencent.devops.process.notify.command.impl.NotifyPipelineCmd
+import com.tencent.devops.process.notify.command.impl.NotifyReceiversCmd
+import com.tencent.devops.process.notify.command.impl.NotifySendCmd
+import com.tencent.devops.process.notify.command.impl.NotifyUrlBuildCmd
 import com.tencent.devops.process.service.BuildVariableService
-import com.tencent.devops.process.service.builds.PipelineBuildFacadeService
-import com.tencent.devops.process.util.NotifyTemplateUtils
 import com.tencent.devops.process.utils.PIPELINE_TIME_DURATION
-import com.tencent.devops.project.api.service.ServiceProjectResource
-import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Date
 
 abstract class PipelineNotifyService @Autowired constructor(
     open val buildVariableService: BuildVariableService,
-    open val pipelineRuntimeService: PipelineRuntimeService,
-    open val pipelineRepositoryService: PipelineRepositoryService,
-    open val pipelineSettingDao: PipelineSettingDao,
-    open val dslContext: DSLContext,
-    open val client: Client,
-    open val pipelineBuildFacadeService: PipelineBuildFacadeService
+    open val pipelineRepositoryService: PipelineRepositoryService
 ) {
+
+    private val commandCache: LoadingCache<Class<out NotifyCmd>, NotifyCmd> = CacheBuilder.newBuilder()
+        .maximumSize(CACHE_SIZE).build(
+            object : CacheLoader<Class<out NotifyCmd>, NotifyCmd>() {
+                override fun load(clazz: Class<out NotifyCmd>): NotifyCmd {
+                    return SpringContextUtil.getBean(clazz)
+                }
+            }
+        )
+
     fun onPipelineShutdown(
         pipelineId: String,
         buildId: String,
@@ -45,186 +45,40 @@ abstract class PipelineNotifyService @Autowired constructor(
         vars[PIPELINE_TIME_DURATION]?.takeIf { it.isNotBlank() }?.toLongOrNull()?.let {
             vars[PIPELINE_TIME_DURATION] = DateTimeUtil.formatMillSecond(it * 1000)
         }
+        val setting = pipelineRepositoryService.getSetting(pipelineId) ?: return
 
-        val mapData = buildNotifyMapData(projectId, pipelineId, buildId, vars)
+        val context = BuildNotifyContext(
+            buildId = buildId,
+            projectId = projectId,
+            pipelineId = pipelineId,
+            variables = vars,
+            notifyValue = mutableMapOf(),
+            buildStatus = buildStatus,
+            cmdFlowSeq = 0,
+            pipelineSetting = setting,
+            receivers = mutableSetOf(),
+            watcher = Watcher("buildNotify")
+        )
 
-        if (mapData.isEmpty()) {
-            logger.warn("onPipelineShutdown mapData is empty,$projectId|$pipelineId|$buildId|$buildStatus")
-            return
+        val commandList = mutableListOf(
+            commandCache.get(NotifyUrlBuildCmd::class.java), // 构建发送url相关信息
+            commandCache.get(NotifyContentCmd::class.java), // 构建发送内容相关信息
+            commandCache.get(NotifyReceiversCmd::class.java), // 构建发送人相关信息
+            commandCache.get(NotifyPipelineCmd::class.java), // 构建流水线相关相关信息
+            commandCache.get(NotifySendCmd::class.java) // 发送消息
+        )
+        // 添加自定义扩展
+        if (addExtCmd() != null) {
+            commandList.addAll(addExtCmd()!!)
         }
 
-        // 流水线设置订阅的用户
-        val settingInfo = pipelineRepositoryService.getSetting(pipelineId) ?: return
-
-        when {
-            buildStatus.isFailure() -> {
-                sendNotifyByTemplate(
-                    templateCode = PipelineNotifyTemplateEnum.PIPELINE_SHUTDOWN_FAILURE_NOTIFY_TEMPLATE,
-                    receivers = getReceivers(settingInfo, FAIL_TYPE, projectId),
-                    notifyType = settingInfo.failSubscription.types.map { it.name }.toMutableSet(),
-                    titleParams = mapData,
-                    bodyParams = mapData
-                )
-            }
-            buildStatus.isCancel() -> {
-                sendNotifyByTemplate(
-                    templateCode = PipelineNotifyTemplateEnum.PIPELINE_SHUTDOWN_FAILURE_NOTIFY_TEMPLATE,
-                    receivers = getReceivers(settingInfo, FAIL_TYPE, projectId),
-                    notifyType = settingInfo.failSubscription.types.map { it.name }.toMutableSet(),
-                    titleParams = mapData,
-                    bodyParams = mapData
-                )
-            }
-            buildStatus.isSuccess() -> {
-                sendNotifyByTemplate(
-                    templateCode = PipelineNotifyTemplateEnum.PIPELINE_SHUTDOWN_SUCCESS_NOTIFY_TEMPLATE,
-                    receivers = getReceivers(settingInfo, SUCCESS_TYPE, projectId),
-                    notifyType = settingInfo.successSubscription.types.map { it.name }.toMutableSet(),
-                    titleParams = mapData,
-                    bodyParams = mapData
-                )
-            }
-            else -> Result<Any>(0)
-        }
-
-        // 发送企业微信群消息
-        sendWeworkGroupMsg(settingInfo, buildStatus, mapData)
+        NotifyCmdChain(commandList).doCommand(context)
     }
 
-    abstract fun getExecutionVariables(pipelineId: String, vars: Map<String, String>): ExecutionVariables
-
-    abstract fun sendWeworkGroupMsg(setting: PipelineSetting, buildStatus: BuildStatus, vars: Map<String, String>)
-
-    abstract fun buildUrl(projectId: String, pipelineId: String, buildId: String): Map<String, String>
-
-    abstract fun getReceivers(setting: PipelineSetting, type: String, projectId: String): Set<String>
-
-    private fun buildPipelineInfo(
-        projectId: String,
-        pipelineId: String,
-        buildId: String,
-        vars: MutableMap<String, String>
-    ): Map<String, String> {
-        val pipelineInfo = pipelineRepositoryService.getPipelineInfo(pipelineId) ?: return emptyMap()
-        var pipelineName = pipelineInfo.pipelineName
-        val executionVar = getExecutionVariables(pipelineId, vars)
-        val buildInfo = pipelineRuntimeService.getBuildInfo(buildId) ?: return emptyMap()
-        val trigger = executionVar.trigger
-        val buildNum = buildInfo.buildNum
-        val user = executionVar.user
-        val detail = pipelineBuildFacadeService.getBuildDetail(buildInfo.startUser,
-            projectId,
-            pipelineId,
-            buildId,
-            ChannelCode.BS,
-            false)
-        val failTask = getFailTaskName(detail)
-        vars["failTask"] = failTask
-        val projectName =
-            client.get(ServiceProjectResource::class).get(projectId).data?.projectName.toString()
-        return mutableMapOf(
-            "pipelineName" to pipelineName,
-            "buildNum" to buildNum.toString(),
-            "projectName" to projectName,
-            "startTime" to getFormatTime(detail.startTime),
-            "trigger" to trigger,
-            "username" to user,
-            "failTask" to failTask
-        )
-    }
-
-    private fun sendNotifyByTemplate(
-        templateCode: PipelineNotifyTemplateEnum,
-        receivers: Set<String>,
-        notifyType: Set<String>,
-        titleParams: Map<String, String>,
-        bodyParams: Map<String, String>
-    ) {
-        client.get(ServiceNotifyMessageTemplateResource::class).sendNotifyMessageByTemplate(
-            SendNotifyMessageTemplateRequest(
-                templateCode = templateCode.templateCode,
-                receivers = receivers as MutableSet<String>,
-                notifyType = notifyType as MutableSet<String>,
-                titleParams = titleParams,
-                bodyParams = bodyParams,
-                cc = null,
-                bcc = null
-            )
-        )
-    }
-
-    private fun buildNotifyMapData(
-        projectId: String,
-        pipelineId: String,
-        buildId: String,
-        vars: MutableMap<String, String>
-    ): Map<String, String> {
-        val mapData = mutableMapOf<String, String>()
-        mapData.putAll(buildUrl(projectId, pipelineId, buildId))
-        mapData.putAll(buildNotifyContent(buildId, vars))
-        mapData.putAll(buildPipelineInfo(projectId, pipelineId, buildId, vars))
-
-        return mapData
-    }
-
-    private fun buildNotifyContent(pipelineId: String, vars: Map<String, String>): Map<String, String> {
-        val replaceWithEmpty = true
-        val setting = pipelineSettingDao.getSetting(dslContext, pipelineId) ?: return emptyMap()
-
-        setting.successReceiver = EnvUtils.parseEnv(setting.successReceiver, vars, replaceWithEmpty)
-        setting.failReceiver = EnvUtils.parseEnv(setting.failReceiver, vars, replaceWithEmpty)
-        // 内容为null的时候处理为空字符串
-        setting.successContent = setting.successContent ?: NotifyTemplateUtils.COMMON_SHUTDOWN_SUCCESS_CONTENT
-        setting.failContent = setting.failContent ?: NotifyTemplateUtils.COMMON_SHUTDOWN_FAILURE_CONTENT
-        // 内容
-        var emailSuccessContent = setting.successContent
-        var emailFailContent = setting.failContent
-
-        emailSuccessContent = EnvUtils.parseEnv(emailSuccessContent, vars, replaceWithEmpty)
-        emailFailContent = EnvUtils.parseEnv(emailFailContent, vars, replaceWithEmpty)
-        setting.successContent = EnvUtils.parseEnv(setting.successContent, vars, replaceWithEmpty)
-
-        setting.failContent = EnvUtils.parseEnv(setting.failContent, vars, replaceWithEmpty)
-
-        return mutableMapOf(
-            "successContent" to setting.successContent,
-            "failContent" to setting.failContent,
-            "emailSuccessContent" to emailSuccessContent,
-            "emailFailContent" to emailFailContent
-        )
-    }
-
-    private fun getFailTaskName(detail: ModelDetail): String {
-        var result = "unknown"
-        detail.model.stages.forEach { stage ->
-            stage.containers.forEach { container ->
-                container.elements.firstOrNull { "FAILED" == it.status }?.let {
-                    result = it.name
-                }
-            }
-        }
-        return result
-    }
-
-    private fun getFormatTime(time: Long): String {
-        val current = LocalDateTime.ofInstant(Date(time).toInstant(), ZoneId.systemDefault())
-
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        return current.format(formatter)
-    }
-
-    data class ExecutionVariables(
-        val pipelineVersion: Int?,
-        val buildNum: Int?,
-        val trigger: String,
-        val originTriggerType: String,
-        val user: String,
-        val isMobileStart: Boolean
-    )
+    abstract fun addExtCmd(): MutableList<NotifyCmd>?
 
     companion object {
         val logger = LoggerFactory.getLogger(PipelineNotifyService::class.java)
-        const val SUCCESS_TYPE = "success"
-        const val FAIL_TYPE = "fail"
+        private const val CACHE_SIZE = 500L
     }
 }
