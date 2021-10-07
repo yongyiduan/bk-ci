@@ -1,5 +1,6 @@
 package com.tencent.devops.process.notify.command.impl
 
+import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.process.engine.service.PipelineRepositoryService
@@ -33,6 +34,10 @@ abstract class NotifyPipelineCmd @Autowired constructor(
             pipelineId = commandContextBuild.pipelineId,
             vars = commandContextBuild.variables as MutableMap<String, String>)
         val buildInfo = pipelineRuntimeService.getBuildInfo(commandContextBuild.buildId) ?: return
+        val startTime = buildInfo.startTime
+        val endTime = System.currentTimeMillis()
+        val duration = endTime - startTime!!
+
         val trigger = executionVar.trigger
         val buildNum = buildInfo.buildNum
         val user = executionVar.user
@@ -53,7 +58,8 @@ abstract class NotifyPipelineCmd @Autowired constructor(
             "startTime" to getFormatTime(detail.startTime),
             "trigger" to trigger,
             "username" to user,
-            "failTask" to failTask
+            "failTask" to failTask,
+            "duration" to DateTimeUtil.formatMillSecond(duration).removeSuffix("秒")
         )
         commandContextBuild.notifyValue.putAll(pipelineMap)
     }
