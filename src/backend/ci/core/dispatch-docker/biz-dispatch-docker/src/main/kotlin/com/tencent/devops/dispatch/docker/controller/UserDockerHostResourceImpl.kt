@@ -53,6 +53,7 @@ import com.tencent.devops.process.constant.ProcessMessageCode
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import javax.ws.rs.core.Response
 
 @RestResource
@@ -71,6 +72,9 @@ class UserDockerHostResourceImpl @Autowired constructor(
     companion object {
         private val logger = LoggerFactory.getLogger(UserDockerHostResourceImpl::class.java)
     }
+
+    @Value("\${spring.cloud.consul.discovery.tags:prod}")
+    private val consulTag: String = "prod"
 
     override fun startDebug(userId: String, debugStartParam: DebugStartParam): Result<Boolean>? {
         checkPermission(userId, debugStartParam.projectId, debugStartParam.pipelineId, debugStartParam.vmSeqId)
@@ -244,14 +248,16 @@ class UserDockerHostResourceImpl @Autowired constructor(
     private fun checkPermission(userId: String, projectId: String, pipelineId: String, vmSeqId: String) {
         checkParam(userId, projectId, pipelineId, vmSeqId)
 
-        validPipelinePermission(
-            userId = userId,
-            authResourceType = AuthResourceType.PIPELINE_DEFAULT,
-            projectId = projectId,
-            pipelineId = pipelineId,
-            permission = AuthPermission.EDIT,
-            message = "用户($userId)无权限在工程($projectId)下编辑流水线($pipelineId)"
-        )
+        if (!consulTag.contains("stream") && !consulTag.contains("gitci")) {
+            validPipelinePermission(
+                userId = userId,
+                authResourceType = AuthResourceType.PIPELINE_DEFAULT,
+                projectId = projectId,
+                pipelineId = pipelineId,
+                permission = AuthPermission.EDIT,
+                message = "用户($userId)无权限在工程($projectId)下编辑流水线($pipelineId)"
+            )
+        }
     }
 
     private fun validPipelinePermission(
