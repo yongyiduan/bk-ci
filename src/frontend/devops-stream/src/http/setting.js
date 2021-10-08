@@ -39,7 +39,7 @@ export default {
     },
 
     getSystemPoolDetail () {
-        return api.get(`${DISPATCH_STREAM_PERFIX}/user/dispatch/stream/dockerhost-load`)
+        return api.get(`${DISPATCH_STREAM_PERFIX}/user/dispatch/dockerhost/dockerhost-load`)
     },
 
     getEnvironmentList (projectId) {

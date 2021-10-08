@@ -1,6 +1,6 @@
 export const ENVIRNMENT_PERFIX = 'ms/environment/api'
 export const TICKET_PERFIX = 'ms/ticket/api'
-export const DISPATCH_STREAM_PERFIX = 'dispatch-stream/api'
+export const DISPATCH_STREAM_PERFIX = 'dispatch-docker/api'
 export const STREAM_PERFIX = 'stream/api'
 export const PROJECT_PERFIX = 'ms/project/api'
 export const LOG_PERFIX = 'ms/log/api'
