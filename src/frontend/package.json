@@ -21,6 +21,7 @@
     "@babel/runtime-corejs2": "^7.15.4",
     "@commitlint/cli": "^9.1.1",
     "@commitlint/config-conventional": "^9.1.1",
+    "babel-plugin-transform-vue-jsx": "4.0.1",
     "chalk": "^4.0.0",
     "gulp": "^4.0.2",
     "gulp-rename": "^1.4.0",
