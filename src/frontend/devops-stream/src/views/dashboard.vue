@@ -2,6 +2,38 @@
     <section>
         <section class="dashboard-container">
             <infinite-scroll class="repo-container-wrapper" ref="infiniteScroll" :data-fetcher="getRepoList" :page-size="limit" scroll-box-class-name="dashboard-container" v-slot="slotProps">
+                <section v-if="recentProjects.length" class="recent-projects">
+                    <div class="recent-title">Recent Projects</div>
+                    <div class="recent-projects-container">
+                        <div v-for="repo in recentProjects" :key="repo.id" class="repo-item recent-item">
+                            <div class="repo-img">
+                                <img class="img" :src="repo.avatarUrl">
+                            </div>
+                            <div class="repo-data">
+                                <section v-if="repo.ciInfo && repo.ciInfo.enableCI">
+                                    <div class="repo-name">
+                                        <span class="to-page-link" @click="toProjectDetail('buildList', repo.nameWithNamespace)">{{ repo.nameWithNamespace }}</span>
+                                    </div>
+                                    <div class="repo-desc">
+                                        <div v-if="repo.ciInfo && repo.ciInfo.enableCI" class="repo-ci-info">
+                                            <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
+                                            <span class="to-page-link" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section v-else>
+                                    <div class="repo-name">
+                                        {{ repo.nameWithNamespace }}
+                                    </div>
+                                    <div class="repo-desc">
+                                        <bk-button theme="primary" @click="enableCi(repo)">Enable CI</bk-button>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="type-container">
                     <div class="navigation-header">
                         <ol class="header-nav">
@@ -28,7 +60,7 @@
                                     <span class="to-page-link" @click="toProjectDetail('buildList', repo.nameWithNamespace)">{{ repo.nameWithNamespace }}</span>
                                 </div>
                                 <div class="repo-desc">
-                                    <div v-if="repo.ciInfo && repo.ciInfo.enableCI">
+                                    <div v-if="repo.ciInfo && repo.ciInfo.enableCI" class="repo-ci-info">
                                         <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
                                         <span class="to-page-link" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
                                     </div>
@@ -84,6 +116,7 @@
                 type: 'MY_PROJECT',
                 limit: 30,
                 searchStr: '',
+                recentProjects: [],
                 repoList: [],
                 typeList: [
                     {
@@ -102,6 +135,7 @@
             }
         },
         created () {
+            this.getRecentProjects()
             this.searchStr = this.$route.query.searchKey || ''
         },
         methods: {
@@ -119,6 +153,19 @@
                         await this.$refs.infiniteScroll.updateList()
                     })
                 }
+            },
+            getRecentProjects () {
+                common.getRecentProjects().then((res) => {
+                    this.recentProjects = (res || []).map(item => ({
+                        ...item,
+                        avatarUrl: item.avatarUrl && (item.avatarUrl.endsWith('.jpg') || item.avatarUrl.endsWith('.jpeg') || item.avatarUrl.endsWith('.png')) ? (item.avatarUrl.replace('http:', '').replace('https:', '')) : gitcode
+                    }))
+                }).catch((err) => {
+                    this.$bkMessage({
+                        theme: 'error',
+                        message: err.message || err
+                    })
+                })
             },
             async getRepoList (page = 1, pageSize = this.limit) {
                 await common.getStreamProjects(this.type, page, pageSize, this.searchStr).then((res) => {
@@ -200,10 +247,32 @@
 
     .dashboard-container {
         overflow: auto;
+        min-width: 1280px;
         height: calc(100vh - 75px);
         .repo-container-wrapper {
             margin: 30px 30px 0;
         }
+        .recent-projects {
+            background: #fff;
+            margin-bottom: 20px;
+            .recent-title {
+                padding: 20px 30px 0;
+                font-size: 14px;
+                color: rgba(0,0,0,0.9);
+            }
+            .recent-projects-container {
+                display: flex;
+                justify-content: flex-start;
+                .recent-item {
+                    flex: 1;
+                    width: 25%;
+                    .repo-data {
+                        width: calc(100% - 120px);
+                    }
+                }
+            }
+        }
+        
         .type-container {
             display: flex;
             align-items: center;
@@ -261,83 +330,100 @@
                 background: #fff;
                 display: flex;
             }
-            .repo-item {
-                height: 88px;
-                width: 100%;
-                background: #fff;
-                display: flex;
-                align-items: center;
-                margin-bottom: 10px;
-                padding: 0 24px;
-                cursor: default;
-                .repo-img {
-                    .img {
-                        width: 56px;
-                        height: 56px;
-                        border-radius: 28px;
-                    }
+        }
+
+        .repo-item {
+            height: 88px;
+            width: 100%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 0 24px;
+            cursor: default;
+            .repo-img {
+                .img {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 28px;
                 }
-                .repo-data {
-                    flex: 1;
-                    margin: 0 16px;
-                    .repo-name {
-                        margin-bottom: 6px;
-                        font-size: 16px;
-                        color: rgba(0,0,0,0.90);
+            }
+            .repo-data {
+                flex: 1;
+                margin: 0 16px;
+                .repo-name {
+                    margin-bottom: 6px;
+                    font-size: 16px;
+                    color: rgba(0,0,0,0.90);
+                    display: inline-block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    width: 100%;
+                }
+                .to-page-link {
+                    cursor: pointer;
+                }
+                .repo-desc {
+                    font-size: 14px;
+                    color: #96A2B9;
+                    display: inline-block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    width: 100%;
+                    .repo-ci-info {
+                        width: 100%;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
                     }
-                    .to-page-link {
-                        cursor: pointer;
-                    }
-                    .repo-desc {
-                        font-size: 14px;
-                        color: #96A2B9;
-                        .bk-icon {
-                            font-size: 20px;
-                            &.executing {
-                                font-size: 14px;
-                            }
-                            &.icon-exclamation, &.icon-exclamation-triangle, &.icon-clock {
-                                font-size: 24px;
-                            }
-                            &.running {
-                                color: #459fff;
-                            }
-                            &.canceled {
-                                color: #f6b026;
-                            }
-                            &.danger {
-                                color: #ff5656;
-                            }
-                            &.success {
-                                color: #34d97b;
-                            }
-                            &.pause {
-                                color: #ff9801;
-                            }
+                    .bk-icon {
+                        font-size: 20px;
+                        &.executing {
+                            font-size: 14px;
+                        }
+                        &.icon-exclamation, &.icon-exclamation-triangle, &.icon-clock {
+                            font-size: 24px;
+                        }
+                        &.running {
+                            color: #459fff;
+                        }
+                        &.canceled {
+                            color: #f6b026;
+                        }
+                        &.danger {
+                            color: #ff5656;
+                        }
+                        &.success {
+                            color: #34d97b;
+                        }
+                        &.pause {
+                            color: #ff9801;
                         }
                     }
                 }
-                .operation {
-                    width: 120px;
-                    .ext-dot {
-                        width: 3px;
-                        height: 3px;
-                        border-radius: 50%;
-                        background-color: $fontWeightColor;
-                        & + .ext-dot {
-                            margin-top: 4px;
-                        }
+            }
+            .operation {
+                width: 120px;
+                .ext-dot {
+                    width: 3px;
+                    height: 3px;
+                    border-radius: 50%;
+                    background-color: $fontWeightColor;
+                    & + .ext-dot {
+                        margin-top: 4px;
                     }
-                    .dot-menu-trigger {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        width: 23px;
-                        height: 100%;
-                        text-align: center;
-                        font-size: 0;
-                        cursor: pointer;
-                    }
+                }
+                .dot-menu-trigger {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 23px;
+                    height: 100%;
+                    text-align: center;
+                    font-size: 0;
+                    cursor: pointer;
                 }
             }
         }

@@ -17,5 +17,9 @@ export default {
     getStreamProjects (type = 'MY_PROJECT', page = 1, limit = 20, search = '') {
         const querySearch = (search && search.trim()) ? `&search=${search.trim()}` : ''
         return api.get(`${STREAM_PERFIX}/user/projects/${type}/list?page=${page}&pageSize=${limit}${querySearch}`)
+    },
+    
+    getRecentProjects (size = 4) {
+        return api.get(`${STREAM_PERFIX}/user/projects/history?size=${size}`)
     }
 }
