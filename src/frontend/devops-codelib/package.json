@@ -3,6 +3,7 @@
     "version": "1.0.1",
     "description": "",
     "dependencies": {
+        "vue": "2.6.10",
         "vuex-class": "^0.3.0"
     },
     "devDependencies": {

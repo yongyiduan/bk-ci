@@ -5,6 +5,7 @@
   "dependencies": {
     "brace": "^0.10.0",
     "vee-validate": "^2.0.3",
+    "vue": "2.6.10",
     "vue-file-upload": "^0.1.12",
     "vuex-class": "^0.3.0"
   },
