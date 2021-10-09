@@ -140,6 +140,10 @@ abstract class StoreCommonServiceImpl @Autowired constructor() : StoreCommonServ
         return storeCommonDao.getStoreNameById(dslContext, storeId) ?: ""
     }
 
+    override fun getStorePublicFlagByCode(storeCode: String, storeType: StoreTypeEnum): Boolean {
+        return getStoreCommonDao(storeType.name).getStorePublicFlagByCode(dslContext, storeCode)
+    }
+
     private fun getStoreCommonDao(storeType: String): AbstractStoreCommonDao {
         return SpringContextUtil.getBean(AbstractStoreCommonDao::class.java, "${storeType}_COMMON_DAO")
     }
