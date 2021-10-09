@@ -222,7 +222,7 @@
                     width: calc(100% - 40px);
                     margin: 0 20px;
                 }
-                /deep/ .bk-collapse-item-content {
+                ::v-deep .bk-collapse-item-content {
                     margin-bottom: 20px;
                 }
             }
@@ -247,7 +247,7 @@
                 }
             }
         }
-        /deep/ .bk-badge {
+        ::v-deep .bk-badge {
             display: inline-block;
             margin-left: 15px;
             line-height: 14px;
@@ -258,7 +258,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        /deep/ span {
+        ::v-deep span {
             outline: none;
             margin-left: 0;
         }

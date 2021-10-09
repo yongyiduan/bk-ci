@@ -145,7 +145,7 @@
             cursor: pointer;
             color: $primaryColor;
         }
-        /deep/ .bk-dialog {
+        ::v-deep .bk-dialog {
             top: 100px;
         }
         img {

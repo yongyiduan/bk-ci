@@ -216,7 +216,7 @@
             .filter-select {
                 width: 160px;
                 margin-right: 32px;
-                /deep/ .bk-select-name {
+                ::v-deep .bk-select-name {
                     font-weight: bold;
                     color: #313328;
                 }
@@ -233,11 +233,11 @@
             background: #fff;
             overflow: hidden;
             padding-top: 12px;
-            /deep/ h3 {
+            ::v-deep h3 {
                 color: #313328;
                 margin: 5px 0 0 20px;
             }
-            /deep/ p {
+            ::v-deep p {
                 margin: 8.6px 20px 24px;
                 background: #fafbfd;
                 border: 1px solid #e1e3e9;
@@ -303,7 +303,7 @@
             margin-left: 0;
         }
     }
-    /deep/ .bk-link-text {
+    ::v-deep .bk-link-text {
         font-size: 12px;
     }
 </style>

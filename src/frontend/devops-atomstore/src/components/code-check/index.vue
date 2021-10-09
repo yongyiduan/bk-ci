@@ -277,7 +277,7 @@
 </script>
 
 <style lang="scss" scoped>
-    /deep/ .bk-exception-text {
+    ::v-deep .bk-exception-text {
         margin-top: -50px;
     }
     .code-check-main {
@@ -452,13 +452,13 @@
             }
         }
     }
-    /deep/ .exception-wrap-item {
+    ::v-deep .exception-wrap-item {
         margin-top: 16px;
         .exception-image {
             object-fit: none;
         }
     }
-    /deep/ .code-check-tip {
+    ::v-deep .code-check-tip {
         margin: 30px 3.2vh 0;
         background: #f0f8ff;
         border: 1px solid #c5daff;
@@ -472,7 +472,7 @@
             font-size: 14px;
         }
     }
-    /deep/ .code-ckeck-status {
+    ::v-deep .code-ckeck-status {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;

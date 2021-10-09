@@ -227,7 +227,7 @@
         }
         .visible-table {
             height: calc(100% - 32px - 3.2vh);
-            /deep/.bk-table {
+            ::v-deep.bk-table {
                 height: 100%;
                 .bk-table-body-wrapper {
                     max-height: calc(100% - 43px);

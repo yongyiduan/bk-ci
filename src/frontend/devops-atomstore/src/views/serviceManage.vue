@@ -196,7 +196,7 @@
                     }
                     .filter-select {
                         margin-left: 20px;
-                        /deep/  .bk-form-checkbox {
+                        ::v-deep  .bk-form-checkbox {
                             margin: 0 18px 20px 0;
                             .bk-checkbox-text {
                                 width: 80px;

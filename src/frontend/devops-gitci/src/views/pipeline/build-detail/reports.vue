@@ -104,7 +104,7 @@
 
 <style lang="postcss" scoped>
     .detail-report-home {
-        /deep/ .bk-tab-section {
+        ::v-deep .bk-tab-section {
             padding: 0;
             border: none;
         }
@@ -127,7 +127,7 @@
     .exception-wrap-item {
         padding-top: 45px;
     }
-    /deep/ .bk-table {
+    ::v-deep .bk-table {
         border: none;
         height: 100%;
         &::before {

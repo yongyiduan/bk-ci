@@ -110,7 +110,7 @@
 <style lang="postcss" scoped>
     .detail-artifactory-home {
         padding: 32px;
-        /deep/ .bk-table {
+        ::v-deep .bk-table {
             border: none;
             height: 100%;
             &::before {

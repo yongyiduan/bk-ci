@@ -60,6 +60,10 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                     }
                 },
                 {
+                    test: /\.cur$/,
+                    type: 'asset/resource'
+                },
+                {
                     test: /\.(png|jpe?g|gif|svg|webp|woff2?|eot|ttf|otf)(\?.*)?$/,
                     type: 'asset',
                     parser: {

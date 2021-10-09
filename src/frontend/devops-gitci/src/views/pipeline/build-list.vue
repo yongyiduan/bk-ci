@@ -644,7 +644,7 @@
                 .w300 {
                     width: 300px;
                 }
-                /deep/ .user-selector-container {
+                ::v-deep .user-selector-container {
                     z-index: 5;
                 }
             }
@@ -653,7 +653,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                /deep/ span {
+                ::v-deep span {
                     outline: none;
                     margin-left: 0;
                 }
@@ -719,10 +719,10 @@
                 font-size: 15px;
             }
         }
-        /deep/ .bk-table-row {
+        ::v-deep .bk-table-row {
             cursor: pointer;
         }
-        /deep/ .handler-btn {
+        ::v-deep .handler-btn {
             .cell {
                 overflow: visible;
             }
@@ -730,10 +730,10 @@
     }
     .triggle-form {
         padding: 20px 30px;
-        /deep/ button {
+        ::v-deep button {
             margin: 8px 10px 0 0;
         }
-        /deep/ .bk-tag-selector .bk-tag-input .tag {
+        ::v-deep .bk-tag-selector .bk-tag-input .tag {
             max-width: 500px;
         }
     }

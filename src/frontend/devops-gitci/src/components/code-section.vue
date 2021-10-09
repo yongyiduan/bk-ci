@@ -137,20 +137,20 @@
 
     .max-height {
         height: var(--code-editor-height);
-        /deep/ .CodeMirror-scroll {
+        ::v-deep .CodeMirror-scroll {
             height: var(--code-editor-height);
         }
-        /deep/ .CodeMirror {
+        ::v-deep .CodeMirror {
             max-height: var(--code-editor-height);
             padding: 0 10px;
         }
     }
 
-    /deep/ .CodeMirror {
+    ::v-deep .CodeMirror {
         font-family: Consolas, "Courier New", monospace;
         line-height: 1.5;
     }
-    .un-full-screen /deep/ .CodeMirror {
+    .un-full-screen ::v-deep .CodeMirror {
         min-height: 300px;
         margin-bottom: 20px;
         padding: 10px;
