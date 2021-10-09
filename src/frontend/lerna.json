@@ -1,18 +1,4 @@
 {
-  "packages": [
-    "devops-nav",
-    "devops-pipeline",
-    "devops-codelib",
-    "devops-environment",
-    "devops-ticket",
-    "devops-atomstore",
-    "devops-experience",
-    "devops-artifactory",
-    "devops-turbo",
-    "devops-vs",
-    "devops-quality",
-    "devops-gitci"
-  ],
   "npmClient": "yarn",
   "version": "independent",
   "useWorkspaces": true

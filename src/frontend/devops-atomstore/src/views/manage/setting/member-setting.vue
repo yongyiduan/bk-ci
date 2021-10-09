@@ -344,7 +344,7 @@
         .add-member {
             height: 100%;
             padding: 32px;
-            /deep/ .bk-form-radio:not(:last-child) {
+            ::v-deep .bk-form-radio:not(:last-child) {
                 margin-right: 32px;
             }
         }
@@ -357,7 +357,7 @@
             }
         }
         .g-scroll-table {
-            /deep/ .bk-table .bk-table-body-wrapper {
+            ::v-deep .bk-table .bk-table-body-wrapper {
                 height: calc(100% - 43px);
             }
         }

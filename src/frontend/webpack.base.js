@@ -1,26 +1,28 @@
 const path = require('path')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const BundleWebpackPlugin = require('./webpackPlugin/bundle-webpack-plugin')
-// const TerserPlugin = require('terser-webpack-plugin')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
+    console.log(env, 'sssss')
     const isDev = argv.mode === 'development'
     const envDist = env && env.dist ? env.dist : 'frontend'
     const version = env && env.version ? env.version : 'tencent'
     const buildDist = path.join(__dirname, envDist, dist)
     console.log(path.join(__dirname, 'locale', dist), version)
     return {
-        devtool: '#source-map',
+        cache: true,
+        devtool: 'source-map',
         entry,
         output: {
             publicPath: isDev ? `http://dev.static.devops.oa.com${publicPath}` : publicPath,
             chunkFilename: '[name].[chunkhash].js',
-            filename: '[name].[contentHash].min.js',
-            path: buildDist
+            filename: '[name].[contenthash].min.js',
+            path: buildDist,
+            assetModuleFilename: '[name].[ext]?[contenthash]'
         },
         module: {
             rules: [
@@ -47,14 +49,6 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                     use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
                 },
                 {
-                    test: /\.(png|jpe?g|gif|svg|webp|cur)(\?.*)?$/,
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        name: '[name].[ext]?[hash]'
-                    }
-                },
-                {
                     test: /\.(js|vue)$/,
                     loader: 'eslint-loader',
                     enforce: 'pre',
@@ -66,12 +60,15 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                     }
                 },
                 {
-                    test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000
+                    test: /\.(png|jpe?g|gif|svg|webp|woff2?|eot|ttf|otf)(\?.*)?$/,
+                    type: 'asset',
+                    parser: {
+                        dataUrlCondition: {
+                            maxSize: 8 * 1024
+                        }
                     }
                 }
+                
             ]
         },
         plugins: [
@@ -81,13 +78,10 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                 dist: envDist,
                 bundleName: 'assets_bundle'
             }),
-            new webpack.optimize.LimitChunkCountPlugin({
-                minChunkSize: 1000
-            }),
-            new webpack.HashedModuleIdsPlugin(),
             new MiniCssExtractPlugin({
-                filename: '[name].[chunkHash].css',
-                chunkName: '[id].css'
+                filename: '[name].[contenthash].css',
+                chunkFilename: '[id].css',
+                ignoreOrder: true
             }),
             new webpack.DefinePlugin({
                 VERSION_TYPE: JSON.stringify(version)
@@ -95,14 +89,17 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             new CopyWebpackPlugin([{ from: path.join(__dirname, 'locale', dist), to: buildDist }])
         ],
         optimization: {
-            namedChunks: true,
+            chunkIds: 'named',
+            moduleIds: 'deterministic',
             minimize: !isDev
         },
         resolve: {
             extensions: ['.js', '.vue', '.json', '.ts', '.scss', '.css'],
+            fallback: {
+                'path': false
+            },
             alias: {
                 '@': path.resolve('src'),
-                'vue$': 'vue/dist/vue.esm.js',
                 '@locale': path.resolve(__dirname, 'locale')
             }
         },

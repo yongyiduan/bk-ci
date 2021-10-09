@@ -76,7 +76,7 @@
             height: 100%;
             position: relative;
         }
-        /deep/ .manage-detail-edit {
+        ::v-deep .manage-detail-edit {
             margin-right: 136px;
             .remark-input {
                 min-width: 100%;
