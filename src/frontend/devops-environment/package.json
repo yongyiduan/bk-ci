@@ -5,6 +5,7 @@
   "dependencies": {
     "brace": "^0.10.0",
     "clipboard": "^1.7.1",
+    "core-js": "3.10.0",
     "vee-validate": "^2.0.3",
     "vue": "2.6.12",
     "vue-echarts": "^3.0.9",

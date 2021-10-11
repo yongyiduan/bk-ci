@@ -4,6 +4,7 @@
   "description": "",
   "dependencies": {
     "brace": "^0.10.0",
+    "core-js": "3.10.0",
     "vee-validate": "^2.0.3",
     "vue": "2.6.12",
     "vue-file-upload": "^0.1.12",
