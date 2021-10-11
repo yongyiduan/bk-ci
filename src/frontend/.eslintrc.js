@@ -26,7 +26,6 @@
 // eslint-plugin-vue 5.2.2
 module.exports = {
     root: true,
-    parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@babel/eslint-parser',
         ecmaVersion: 2020,
