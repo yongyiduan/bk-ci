@@ -81,6 +81,7 @@ import {
     SET_STORE_DATA,
     SET_UNRECOMMEND_STORE_DATA,
     SET_UNRECOMMEND_PROJECT_DATA,
+    SET_UNRECOMMEND_ATOM_COUNT,
     SET_PROJECT_DATA,
     SET_PROJECT_ATOMS,
     SET_STORE_ATOMS,
@@ -329,6 +330,18 @@ export default {
      * 获取项目下插件
      */
     fetchProjectAtoms: async ({ commit, state }, { projectCode, category, recommendFlag, os, queryProjectAtomFlag }) => {
+        // 前提：查询不适用当前job插件
+        // 在有编译环境下fitOsFlag传false就代表会把不符合当前job的插件查出来,jobType不传
+        // 无编译环境不用传fitOsFlag这个参数，jobType传AGENT
+        let jobType = ['WINDOWS', 'MACOS', 'LINUX'].includes(os) ? 'AGENT' : 'AGENT_LESS'
+        const fitOsFlag = (jobType === 'AGENT' && !recommendFlag) ? false : undefined
+        if (fitOsFlag === false) {
+            jobType = undefined
+        }
+        if (!recommendFlag && jobType === 'AGENT_LESS') {
+            jobType = 'AGENT'
+        }
+
         let projectData, unRecommendProjectData, page, pageSize, keyword
         if (recommendFlag) {
             // 适用插件
@@ -342,29 +355,14 @@ export default {
             page = unRecommendProjectData.page || 1
             pageSize = unRecommendProjectData.pageSize || 15
             keyword = unRecommendProjectData.keyword || undefined
-        }
-
-        // 前提：查询不适用当前job插件
-        // 在有编译环境下fitOsFlag传false就代表会把不符合当前job的插件查出来,jobType不传
-        // 无编译环境不用传fitOsFlag这个参数，jobType传AGENT
-        let jobType = ['WINDOWS', 'MACOS', 'LINUX'].includes(os) ? 'AGENT' : 'AGENT_LESS'
-        const fitOsFlag = (jobType === 'AGENT' && !recommendFlag) ? false : undefined
-        if (fitOsFlag === false) {
-            jobType = undefined
-        }
-        
-        if (!recommendFlag && jobType === 'AGENT_LESS') {
-            jobType = 'AGENT'
+            // 无编译不适用情况、有编译不适用情况，category不用传
+            category = undefined
+            recommendFlag = undefined
         }
 
         if (category === 'TRIGGER') {
             // 请求触发器类插件时不jobType
-            pageSize = 15
-            page = 1
             jobType = undefined
-            commit(SET_PROJECT_DATA, {
-                page: 1
-            })
         }
 
         try {
@@ -412,7 +410,7 @@ export default {
                 }
             }
             
-            if (recommendFlag && category === 'TASK') {
+            if (recommendFlag) {
                 // 保存请求页码、搜索关键字
                 const isProjectPageOver = Object.keys(state.projectRecommendAtomMap).length === atomList.count
                 const projectData = {
@@ -425,7 +423,8 @@ export default {
                 commit(SET_PROJECT_DATA, projectData)
             }
             // 不适用插件请求页码数据保存
-            if (!recommendFlag && category === 'TASK') {
+            if (!recommendFlag) {
+                const unRecommendAtomCount = atomList.count
                 const isUnRecommendProjectPageOver = Object.keys(state.projectUnRecommendAtomMap).length === atomList.count
                 const curUnRecommendProjectData = {
                     page: ++page,
@@ -434,18 +433,32 @@ export default {
                 }
                 commit(IS_UNRECOMMEND_PROJECT_PAGE_OVER, isUnRecommendProjectPageOver)
                 commit(SET_UNRECOMMEND_PROJECT_DATA, curUnRecommendProjectData)
+                commit(SET_UNRECOMMEND_ATOM_COUNT, unRecommendAtomCount)
             }
         } catch (e) {
             rootCommit(commit, FETCH_ERROR, e)
         } finally {
             commit(FETCHING_ATOM_LIST, false)
             commit(IS_RECOMMEND_MORE_LOADING, false)
+            commit(IS_UNRECOMMEND_MORE_LOADING, false)
         }
     },
     /**
      * 获取研发商店插件
      */
     fetchStoreAtoms: async ({ commit, state }, { projectCode, classifyId, recommendFlag, category, os, queryProjectAtomFlag }) => {
+        // 前提：查询不适用当前job插件
+        // 在有编译环境下fitOsFlag传false就代表会把不符合当前job的插件查出来,jobType不传
+        // 无编译环境不用传fitOsFlag这个参数，jobType传AGENT
+        let jobType = ['WINDOWS', 'MACOS', 'LINUX'].includes(os) ? 'AGENT' : 'AGENT_LESS'
+        const fitOsFlag = (jobType === 'AGENT' && !recommendFlag) ? false : undefined
+        if (fitOsFlag === false) {
+            jobType = undefined
+        }
+        if (!recommendFlag && jobType === 'AGENT_LESS') {
+            jobType = 'AGENT'
+        }
+
         let storeData, unRecommendStoreData, page, pageSize, keyword
         if (recommendFlag) {
             // 适用插件
@@ -459,6 +472,14 @@ export default {
             page = unRecommendStoreData.page || 1
             pageSize = unRecommendStoreData.pageSize || 15
             keyword = unRecommendStoreData.keyword || undefined
+            // 无编译不适用情况、有编译不适用情况，category不用传
+            category = undefined
+            recommendFlag = undefined
+        }
+        
+        if (category === 'TRIGGER') {
+            // 请求触发器类插件时不jobType1
+            jobType = undefined
         }
 
         if (state.storeData && state.storeData.classifyId !== classifyId) {
@@ -470,29 +491,6 @@ export default {
                 commit(FETCHING_ATOM_LIST, true)
             } else {
                 recommendFlag ? commit(IS_RECOMMEND_MORE_LOADING, true) : commit(IS_UNRECOMMEND_MORE_LOADING, true)
-            }
-
-            let jobType = ['WINDOWS', 'MACOS', 'LINUX'].includes(os) ? 'AGENT' : 'AGENT_LESS'
-
-            // 前提：查询不适用当前job插件
-            // 在有编译环境下fitOsFlag传false就代表会把不符合当前job的插件查出来,jobType不传
-            // 无编译环境不用传fitOsFlag这个参数，jobType传AGENT
-            const fitOsFlag = (jobType === 'AGENT' && !recommendFlag) ? false : undefined
-            if (fitOsFlag === false) {
-                jobType = undefined
-            }
-            if (!recommendFlag && jobType === 'AGENT_LESS') {
-                jobType = 'AGENT'
-            }
-            
-            if (category === 'TRIGGER') {
-                // 请求触发器类插件时不jobType
-                pageSize = 15
-                page = 1
-                jobType = undefined
-                commit(SET_STORE_DATA, {
-                    page: 1
-                })
             }
 
             const { data: atomList } = await request.get(`${STORE_API_URL_PREFIX}/user/pipeline/atom`, {
@@ -534,7 +532,7 @@ export default {
                 }
             }
             // 适用插件请求页码数据保存
-            if (recommendFlag && category === 'TASK') {
+            if (recommendFlag) {
                 const isStorePageOver = Object.keys(state.storeRecommendAtomMap).length === atomList.count
                 const storeData = {
                     page: ++page,
@@ -547,7 +545,8 @@ export default {
             }
 
             // 不适用插件请求页码数据保存
-            if (!recommendFlag && category === 'TASK') {
+            if (!recommendFlag) {
+                const unRecommendAtomCount = atomList.count
                 const isUnRecommendStorePageOver = Object.keys(state.storeUnRecommendAtomMap).length === atomList.count
                 const curUnRecommendStoreData = {
                     page: ++page,
@@ -557,6 +556,7 @@ export default {
                 }
                 commit(IS_UNRECOMMEND_STORE_PAGE_OVER, isUnRecommendStorePageOver)
                 commit(SET_UNRECOMMEND_STORE_DATA, curUnRecommendStoreData)
+                commit(SET_UNRECOMMEND_ATOM_COUNT, unRecommendAtomCount)
             }
         } catch (e) {
             rootCommit(commit, FETCH_ERROR, e)
