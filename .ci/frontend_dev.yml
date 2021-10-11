@@ -20,7 +20,10 @@ stages:
       name: "构建环境-LINUX"
       runs-on: docker
       steps:
-      - checkout: self
+      - checkout: "http://git.code.oa.com/bkdevops/bk-ci.git"
+        name: Checkout
+        with:
+          refName: frontend-develop
       - name: "拉取前端占位符"
         with:
           pullType: "BRANCH"
