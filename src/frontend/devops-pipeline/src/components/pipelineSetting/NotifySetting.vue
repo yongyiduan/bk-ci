@@ -1,7 +1,7 @@
 <template>
     <div class="notify-setting-comp" v-if="subscription">
         <bk-form>
-            <bk-form-item :label="$t('settings.noticeType')" :required="true">
+            <bk-form-item :label="$t('settings.noticeType')">
                 <bk-checkbox-group :value="subscription.types" @change="value => updateSubscription('types', value)">
                     <bk-checkbox v-for="item in noticeList" :key="item.id" :value="item.value">
                         {{ item.name }}
