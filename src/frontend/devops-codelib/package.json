@@ -3,6 +3,8 @@
     "version": "1.0.1",
     "description": "",
     "dependencies": {
+        "core-js": "^3.10.0",
+        "vue": "2.6.12",
         "vuex-class": "^0.3.0"
     },
     "devDependencies": {
