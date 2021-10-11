@@ -29,7 +29,6 @@ class assetsPlugin {
             await HtmlWebpackPlugin.getHooks(compilation).beforeAssetTagGeneration.tapAsync(
                 'assetsPlugin', // <-- Set a meaningful name here for stacktraces
                 (data, cb) => {
-                    console.log(data.assets, 'fist')
                     // Manipulate the content
                     assets = data.assets
                     

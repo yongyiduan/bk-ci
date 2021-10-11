@@ -45,18 +45,31 @@ module.exports = (env, argv) => {
                     loader: 'babel-loader'
                 },
                 {
-                    test: /\.(png|jpg|gif|svg)$/,
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        name: '[name].[ext]?[hash]'
+                    test: /\.(png|jpg|gif)$/,
+                    type: 'asset',
+                    parser: {
+                        dataUrlCondition: {
+                            maxSize: 8 * 1024 // 4kb
+                        }
+                    },
+                    generator: {
+                        filename: '[name].[ext]?[hash]'
                     }
                 },
                 {
                     test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                    loader: 'url-loader',
+                    type: 'asset',
+                    parser: {
+                        dataUrlCondition: {
+                            maxSize: 8 * 1024 // 4kb
+                        }
+                    }
+                },
+                {
+                    test: /\.svg$/,
+                    loader: 'svg-sprite-loader',
                     options: {
-                        limit: 10000
+                        extract: false
                     }
                 }
             ]
