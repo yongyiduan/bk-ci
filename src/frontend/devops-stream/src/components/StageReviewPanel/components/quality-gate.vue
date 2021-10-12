@@ -16,16 +16,28 @@
                                 text
                                 title="primary"
                                 class="mr10"
+                                :disabled="isNotGateKeeper(qualityItem.gateKeepers)"
                                 @click.stop="changeGateWayStatus(true, qualityItem.hashId)"
                             >
-                                继续
+                                <span
+                                    v-bk-tooltips="{
+                                        content: `由把关人【${qualityItem.gateKeepers.join(',')}】操作`,
+                                        disabled: !isNotGateKeeper(qualityItem.gateKeepers)
+                                    }"
+                                >继续</span>
                             </bk-button>
                             <bk-button
                                 text
                                 title="primary"
+                                :disabled="isNotGateKeeper(qualityItem.gateKeepers)"
                                 @click.stop="changeGateWayStatus(false, qualityItem.hashId)"
                             >
-                                终止
+                                <span
+                                    v-bk-tooltips="{
+                                        content: `由把关人【${qualityItem.gateKeepers.join(',')}】操作`,
+                                        disabled: !isNotGateKeeper(qualityItem.gateKeepers)
+                                    }"
+                                >终止</span>
                             </bk-button>
                         </span>
                         <span v-if="['INTERCEPT', 'INTERCEPT_PASS'].includes(qualityItem.interceptResult)" class="summary-right">
@@ -85,8 +97,7 @@
         },
 
         computed: {
-            ...mapState(['projectId'])
-
+            ...mapState(['projectId', 'user'])
         },
 
         created () {
@@ -94,6 +105,10 @@
         },
 
         methods: {
+            isNotGateKeeper (gateKeepers = []) {
+                return gateKeepers.length <= 0 || !gateKeepers.includes(this.user.username)
+            },
+
             getOptValue (qualityItem) {
                 const optNameMap = {
                     INTERCEPT: 'Stopped',
