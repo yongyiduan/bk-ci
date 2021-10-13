@@ -7,7 +7,6 @@ variables:
   ips: "11.185.144.156,9.4.20.15"
 
 on:
-  push: ["frontend-master"]
   schedules:
     cron: 0 * * * *
     branches: [ "frontend-develop" ]
