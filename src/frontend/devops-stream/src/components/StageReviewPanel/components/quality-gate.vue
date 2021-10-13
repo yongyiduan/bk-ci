@@ -16,26 +16,26 @@
                                 text
                                 title="primary"
                                 class="mr10"
-                                :disabled="isNotGateKeeper(qualityItem.gateKeepers)"
+                                :disabled="isNotGateKeeper(qualityItem)"
                                 @click.stop="changeGateWayStatus(true, qualityItem.hashId)"
                             >
                                 <span
                                     v-bk-tooltips="{
-                                        content: `由把关人【${qualityItem.gateKeepers.join(',')}】操作`,
-                                        disabled: !isNotGateKeeper(qualityItem.gateKeepers)
+                                        content: `由把关人【${qualityItem.join(',')}】操作`,
+                                        disabled: !isNotGateKeeper(qualityItem)
                                     }"
                                 >继续</span>
                             </bk-button>
                             <bk-button
                                 text
                                 title="primary"
-                                :disabled="isNotGateKeeper(qualityItem.gateKeepers)"
+                                :disabled="isNotGateKeeper(qualityItem)"
                                 @click.stop="changeGateWayStatus(false, qualityItem.hashId)"
                             >
                                 <span
                                     v-bk-tooltips="{
-                                        content: `由把关人【${qualityItem.gateKeepers.join(',')}】操作`,
-                                        disabled: !isNotGateKeeper(qualityItem.gateKeepers)
+                                        content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
+                                        disabled: !isNotGateKeeper(qualityItem)
                                     }"
                                 >终止</span>
                             </bk-button>
@@ -105,16 +105,29 @@
         },
 
         methods: {
-            isNotGateKeeper (gateKeepers = []) {
+            getGateKeeper (qualityItem) {
+                const { qualityRuleBuildHisOpt: { gateKeepers = [] } } = qualityItem
+                return gateKeepers
+            },
+
+            isNotGateKeeper (qualityItem) {
+                const gateKeepers = this.getGateKeeper(qualityItem)
                 return gateKeepers.length <= 0 || !gateKeepers.includes(this.user.username)
             },
 
             getOptValue (qualityItem) {
+                const {
+                    interceptResult,
+                    qualityRuleBuildHisOpt: {
+                        gateOptUser,
+                        gateOptTime
+                    }
+                } = qualityItem
                 const optNameMap = {
                     INTERCEPT: 'Stopped',
                     INTERCEPT_PASS: 'Passed'
                 }
-                return `${optNameMap[qualityItem.interceptResult]} by ${qualityItem.gateOptUser} as ${qualityItem.gateOptTime}`
+                return `${optNameMap[interceptResult]} by ${gateOptUser} as ${gateOptTime}`
             },
 
             getInterceptNum (interceptList = []) {
