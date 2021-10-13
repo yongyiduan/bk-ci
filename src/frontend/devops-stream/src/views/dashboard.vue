@@ -12,17 +12,17 @@
                             <div class="repo-data">
                                 <section v-if="repo.ciInfo && repo.ciInfo.enableCI">
                                     <div class="repo-name">
-                                        <span class="to-page-link" @click="toProjectDetail('buildList', repo.nameWithNamespace)">{{ repo.nameWithNamespace }}</span>
+                                        <span class="to-page-link" :title="repo.nameWithNamespace" @click="toProjectDetail('buildList', repo.nameWithNamespace)">{{ repo.nameWithNamespace }}</span>
                                     </div>
                                     <div class="repo-desc">
                                         <div v-if="repo.ciInfo && repo.ciInfo.enableCI" class="repo-ci-info">
                                             <i :class="getIconClass(repo.ciInfo.lastBuildStatus)"></i>
-                                            <span class="to-page-link" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages'}}</span>
+                                            <span class="to-page-link" :title="repo.ciInfo.lastBuildMessage || 'Empty commit messages'" @click="toLastBuildDetail(repo)">{{ repo.ciInfo.lastBuildMessage || 'Empty commit messages' }}</span>
                                         </div>
                                     </div>
                                 </section>
                                 <section v-else>
-                                    <div class="repo-name">
+                                    <div class="repo-name" :title="repo.nameWithNamespace">
                                         {{ repo.nameWithNamespace }}
                                     </div>
                                     <div class="repo-desc">
