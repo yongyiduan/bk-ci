@@ -39,7 +39,6 @@
   },
   "dependencies": {
     "@blueking/bkcharts": "^2.0.10",
-    "core-js": "^3.10.0",
     "vue": "2.6.12"
   }
 }

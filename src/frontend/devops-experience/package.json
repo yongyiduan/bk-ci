@@ -3,7 +3,6 @@
   "version": "1.0.1",
   "description": "",
   "dependencies": {
-    "core-js": "^3.10.0",
     "vue": "2.6.12",
     "vue-property-decorator": "^6.0.0",
     "vuex-class": "^0.3.0"
