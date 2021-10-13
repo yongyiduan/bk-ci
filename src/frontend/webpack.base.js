@@ -86,10 +86,16 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                 chunkFilename: '[id].css',
                 ignoreOrder: true
             }),
-            new webpack.DefinePlugin({
-                VERSION_TYPE: JSON.stringify(version)
-            }),
-            new CopyWebpackPlugin([{ from: path.join(__dirname, 'locale', dist), to: buildDist }])
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: path.join(__dirname, 'locale', dist),
+                        to: buildDist
+                    }],
+                options: {
+                    concurrency: 100
+                }
+            })
         ],
         optimization: {
             chunkIds: 'named',
@@ -112,10 +118,9 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             'vuex': 'Vuex'
         },
         devServer: {
-            contentBase: path.join(__dirname, envDist),
+            static: path.join(__dirname, envDist),
+            allowedHosts: 'all',
             historyApiFallback: true,
-            noInfo: false,
-            disableHostCheck: true,
             port
         }
     }
