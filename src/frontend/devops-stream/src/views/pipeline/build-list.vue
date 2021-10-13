@@ -463,6 +463,9 @@
                     case 'manual':
                         res = `Manual by ${gitRequestEvent.userId}`
                         break
+                    case 'schedule':
+                        res = 'Scheduled'
+                        break
                 }
                 return res
             },
