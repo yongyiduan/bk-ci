@@ -1,7 +1,7 @@
 version: "v2.0"
 name: "bk-ci前端部署【Dev】"
 variables:
-  modules: "nav,pipeline,vs,ticket,codelib,quality,turbo,atomstore,artifactory,environment,experience,stream"
+  modules: "nav,pipeline,vs,ticket,codelib,quality,turbo,atomstore,environment,experience,stream"
   branch: "frontend-develop"
   path: "default"
   ips: "11.185.144.156,9.4.20.15"
@@ -57,6 +57,7 @@ stages:
             src/frontend/devops-quality/node_modules
             src/frontend/devops-experience/node_modules
             src/frontend/devops-turbo/node_modules
+            src/frontend/devops-stream/node_modules
           restoreKeys: "bk_ci_frontend_dev_linux_"
       - name: "Bash"
         run: |
@@ -68,7 +69,7 @@ stages:
             echo "package.json has not changed"
           fi
           ls -l ./node_modules/.bin
-          chmod -R 777 ./node_modules
+          chmod -R 777 ./
           yarn public -e dev -t tencent -s ${{ variables.modules }}
 
           cd ./frontend/ || exit 1

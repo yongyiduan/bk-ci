@@ -1,7 +1,7 @@
 version: "v2.0"
 name: "前端部署Test"
 variables:
-  modules: "nav,pipeline,vs,ticket,codelib,quality,turbo,atomstore,artifactory,environment,experience,stream"
+  modules: "nav,pipeline,vs,ticket,codelib,quality,turbo,atomstore,environment,experience"
   ips: "11.185.145.49"
   # 9.134.78.69,10.123.135.151,9.66.32.218
 
@@ -66,7 +66,7 @@ stages:
             echo "package.json has not changed"
           fi
           ls -l ./node_modules/.bin
-          chmod -R 777 ./node_modules
+          chmod -R 777 ./
           yarn public -e test -l v2 -t tencent
 
           cd ./frontend/ || exit 1
