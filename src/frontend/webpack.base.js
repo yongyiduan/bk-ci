@@ -86,6 +86,9 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                 chunkFilename: '[id].css',
                 ignoreOrder: true
             }),
+            new webpack.DefinePlugin({
+                VERSION_TYPE: JSON.stringify(version)
+            }),
             new CopyWebpackPlugin({
                 patterns: [
                     {
