@@ -88,7 +88,7 @@ import com.tencent.devops.process.pojo.RedisAtomsBuild
 import com.tencent.devops.process.pojo.ReviewParam
 import com.tencent.devops.process.pojo.SecretInfo
 import com.tencent.devops.process.pojo.VmInfo
-import com.tencent.devops.process.pojo.mq.PipelineBuildContainerEvent
+import com.tencent.devops.process.engine.pojo.event.PipelineBuildContainerEvent
 import com.tencent.devops.process.pojo.pipeline.ModelDetail
 import com.tencent.devops.process.pojo.pipeline.PipelineLatestBuild
 import com.tencent.devops.process.service.BuildStartupParamService
@@ -446,6 +446,9 @@ class PipelineBuildFacadeService(
                     }
                     // #4531 重试完整构建时将所有stage的审核状态恢复
                     pipelineStageService.retryRefreshStage(model)
+
+                    // 完整重试,重置启动时间
+                    pipelineRuntimeService.updateStartTime(buildId)
                 } catch (ignored: Exception) {
                     logger.warn("ENGINE|$buildId|Fail to get the startup param: $ignored")
                 }
