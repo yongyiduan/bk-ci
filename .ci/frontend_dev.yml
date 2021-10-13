@@ -7,6 +7,7 @@ variables:
   ips: "11.185.144.156,9.4.20.15"
 
 on:
+  push: ["frontend-master"]
   schedules:
     cron: 0 * * * *
     branches: [ "frontend-develop" ]
@@ -25,11 +26,11 @@ stages:
         with:
           refName: frontend-develop
       - name: "拉取前端占位符"
+        checkout: "http://git.code.oa.com/bkdevops/devops-config.git"
         with:
           pullType: "BRANCH"
-          branchName: "integration"
+          refName: "integration"
           localPath: "devops-config"
-        checkout: "http://git.code.oa.com/bkdevops/devops-config.git"
       - uses: calculatehash@1.*
         id: calculate
         with:
