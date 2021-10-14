@@ -5,8 +5,9 @@
 
 module.exports = {
     root: true,
+    parser: 'vue-eslint-parser',
     parserOptions: {
-        parser: 'babel-eslint',
+        parser: '@babel/eslint-parser',
         sourceType: 'module'
     },
     env: {
@@ -33,6 +34,7 @@ module.exports = {
     },
     // add your custom rules hered
     rules: {
+        'vue/no-mutating-props': 'off',
         // https://eslint.org/docs/rules/brace-style
         'brace-style': ['error', '1tbs', { 'allowSingleLine': false }],
 

@@ -6,8 +6,16 @@
                 <bk-collapse-item v-for="(qualityItem, index) in qualityList" :key="index" :name="qualityItem.hashId">
                     <span class="quality-summary">
                         <span class="text-ellipsis summary-left">
+                            <i
+                                :class="[
+                                    'mr5',
+                                    'stream-icon',
+                                    qualityItem.interceptResult === 'WAIT' ? 'stream-current-status' : 'stream-not-start',
+                                    qualityItem.interceptResult
+                                ]"
+                            ></i>
                             <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
-                            <span :class="qualityItem.interceptResult === 'PASS' ? 'success' : 'error'">
+                            <span>
                                 {{ getInterceptValue(qualityItem.interceptResult) }} {{ getInterceptNum(qualityItem.interceptList) }}
                             </span>
                         </span>
@@ -21,7 +29,7 @@
                             >
                                 <span
                                     v-bk-tooltips="{
-                                        content: `由把关人【${qualityItem.join(',')}】操作`,
+                                        content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
                                         disabled: !isNotGateKeeper(qualityItem)
                                     }"
                                 >继续</span>
@@ -208,7 +216,7 @@
             font-size: 12px;
             .bk-collapse-item {
                 width: 100%;
-                margin-bottom: 15px;
+                margin-bottom: 20px;
                 .bk-collapse-item-header {
                     line-height: 20px;
                     height: 20px;
@@ -220,7 +228,7 @@
                 color: #666770;
             }
             .quality-content {
-                margin-top: 6px;
+                margin-top: 12px;
                 color: #666770;
                 display: flex;
                 align-items: center;
@@ -273,5 +281,20 @@
     .review-quality-divider {
         margin-bottom: 24px !important;
         margin-top: 12px !important;
+    }
+    .WAIT {
+        color: #3a84ff;
+    }
+    .PASS {
+        color: #3fc06d;
+    }
+    .FAIL {
+        color: #ea3636;
+    }
+    .INTERCEPT {
+        color: #ea3636;
+    }
+    .INTERCEPT_PASS {
+        color: #3fc06d;
     }
 </style>

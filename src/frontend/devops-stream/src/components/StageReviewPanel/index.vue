@@ -25,7 +25,7 @@
     import reviewEnable from './enable-review'
 
     export default {
-        name: 'stage-review-panel',
+        name: 'StageReviewPanel',
         components: {
             reviewShow,
             reviewApprove,

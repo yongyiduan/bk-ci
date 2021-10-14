@@ -42,7 +42,7 @@
     import user from './user'
 
     export default ({
-        name: 'stream-header',
+        name: 'StreamHeader',
         components: {
             user
         },

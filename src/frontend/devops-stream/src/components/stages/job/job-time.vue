@@ -1,7 +1,7 @@
 <script>
     import { coverTimer, convertMStoString } from '@/utils'
     export default {
-        name: 'job-time',
+        name: 'JobTime',
         props: {
             job: Object
         },
