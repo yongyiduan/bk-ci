@@ -5,9 +5,9 @@
 
 import webpack from 'webpack'
 import { VueLoaderPlugin } from 'vue-loader'
-import friendlyFormatter from 'eslint-friendly-formatter'
 import { resolve, assetsPath } from './util'
 import config from './config'
+const ESLintPlugin = require('eslint-webpack-plugin')
 const isProd = process.env.NODE_ENV === 'production'
 
 export default {
@@ -21,7 +21,7 @@ export default {
     resolve: {
         extensions: ['.js', '.vue', '.json'],
         alias: {
-            'vue$': 'vue/dist/vue.esm.js',
+            vue$: 'vue/dist/vue.esm.js',
             '@': resolve('src'),
             '@doc': resolve('doc')
         }
@@ -33,16 +33,6 @@ export default {
             /\/node_modules\/echarts\/dist\/echarts\.min\.js$/
         ],
         rules: [
-            {
-                test: /\.(js|vue)$/,
-                loader: 'eslint-loader',
-                enforce: 'pre',
-                include: [resolve('src'), resolve('test'), resolve('static')],
-                exclude: /node_modules/,
-                options: {
-                    formatter: friendlyFormatter
-                }
-            },
             {
                 test: /\.vue$/,
                 include: [resolve('src'), resolve('node_modules/vue-echarts'), resolve('../node_modules/vue-echarts'), resolve('node_modules/@blueking/log'), resolve('../node_modules/@blueking/log')],
@@ -108,6 +98,11 @@ export default {
     plugins: [
         new VueLoaderPlugin(),
         // moment 优化，只提取本地包
-        new webpack.ContextReplacementPlugin(/moment\/locale$/, /zh-cn/)
+        new webpack.ContextReplacementPlugin(/moment\/locale$/, /zh-cn/),
+        new ESLintPlugin({
+            context: resolve(__dirname, '..', 'src'),
+            extensions: ['js', 'ts', 'vue', 'jsx', 'tsx'],
+            lintDirtyModulesOnly: true
+        })
     ]
 }

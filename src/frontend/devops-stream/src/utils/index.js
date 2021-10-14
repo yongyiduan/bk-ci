@@ -87,7 +87,7 @@ export function convertMStoString (time) {
         }
     }
 
-    return time ? getDays(Math.floor(time / 1000)) : `0秒`
+    return time ? getDays(Math.floor(time / 1000)) : '0秒'
 }
 
 export const uuid = () => {
