@@ -38,10 +38,10 @@
         },
         computed: {
             atomVersion () {
-                return (this.atom.atomCode === 'CodeccCheckAtom' || this.atom.atomCode === 'CodeccCheckAtomDebug') ? '1.0.0' : this.atom.version
+                return this.atom.version || '1.0.0'
             },
             atomCode () {
-                return this.atom.atomCode || 'CodeccCheckAtom'
+                return this.atom.atomCode
             },
             pipelineId () {
                 return this.$route.params.pipelineId || ''
