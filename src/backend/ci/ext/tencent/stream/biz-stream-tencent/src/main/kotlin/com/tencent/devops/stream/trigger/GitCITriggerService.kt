@@ -56,8 +56,8 @@ import com.tencent.devops.repository.pojo.oauth.GitToken
 import com.tencent.devops.common.ci.v2.enums.gitEventKind.TGitMergeActionKind
 import com.tencent.devops.common.ci.v2.enums.gitEventKind.TGitObjectKind
 import com.tencent.devops.stream.trigger.parsers.CheckStreamSetting
-import com.tencent.devops.stream.pojo.isDeleteBranch
 import com.tencent.devops.stream.config.StreamStorageBean
+import com.tencent.devops.stream.pojo.isDeleteBranch
 import com.tencent.devops.stream.pojo.isFork
 import com.tencent.devops.stream.trigger.parsers.MergeConflictCheck
 import com.tencent.devops.stream.trigger.parsers.YamlVersion
