@@ -84,9 +84,9 @@
 
 <script>
     import { getPlanList, getPlanInstanceDetail, modifyTurboPlanTopStatus } from '@/api'
-    import { copy } from '../../assets/js/util'
-    import logo from '../../components/logo'
-    import taskStatus from '../../components/task-status'
+    import { copy } from '@/assets/js/util'
+    import logo from '@/components/logo'
+    import taskStatus from '@/components/task-status'
 
     export default {
         components: {
