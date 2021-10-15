@@ -251,7 +251,7 @@
                             { name: 'Tag push', id: 'TAG' },
                             { name: 'Merge request', id: 'MERGE' },
                             { name: 'Manual trigger', id: 'MANUAL' },
-                            { name: 'Scheduled', id: 'schedule' },
+                            { name: 'Scheduled', id: 'SCHEDULE' },
                         ]
                     },
                     {
