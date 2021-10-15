@@ -25,7 +25,7 @@
                                 title="primary"
                                 class="mr10"
                                 :disabled="isNotGateKeeper(qualityItem)"
-                                @click.stop="changeGateWayStatus(true, qualityItem.hashId)"
+                                @click.stop="changeGateWayStatus(true, qualityItem.ruleHashId)"
                             >
                                 <span
                                     v-bk-tooltips="{
@@ -38,7 +38,7 @@
                                 text
                                 title="primary"
                                 :disabled="isNotGateKeeper(qualityItem)"
-                                @click.stop="changeGateWayStatus(false, qualityItem.hashId)"
+                                @click.stop="changeGateWayStatus(false, qualityItem.ruleHashId)"
                             >
                                 <span
                                     v-bk-tooltips="{
