@@ -29,16 +29,15 @@ package com.tencent.devops.common.api.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 
 /**
  *
  * Powered By Tencent
  */
 object YamlUtil {
-    private val objectMapper = ObjectMapper(YAMLFactory()).apply {
-        registerModule(KotlinModule())
-    }
+    private val objectMapper = ObjectMapper(
+        YAMLFactory().disable(YAMLGenerator.Feature.SPLIT_LINES)
+    ).registerKotlinModule()
 
     fun getObjectMapper() = objectMapper
 
