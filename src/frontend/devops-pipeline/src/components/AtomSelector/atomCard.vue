@@ -46,7 +46,7 @@
             <p class="atom-name">
                 <a class="atom-link">
                     {{ atom.name }}
-                    <span @click.stop="handleGoDocs(atom.docsLink)">
+                    <span style="cursor: pointer;" @click.stop="handleGoDocs(atom.docsLink)">
                         <logo v-if="atom.docsLink" class="jump-icon" name="tiaozhuan" size="14" style="fill:#3c96ff; position:relative; top:2px;" />
                     </span>
                     <span class="fire-num">
@@ -71,14 +71,14 @@
                 </span>
                 <div v-else style="padding-bottom: 10px;"></div>
             </template>
-            <span
+            <div
                 v-if="!isRecommend && (atom.os && atom.os.length > 0)"
                 class="allow-os-list"
                 v-bk-tooltips="{ content: osTips(atom.os), zIndex: 99999 }">
                 <template>
                     <i v-for="(os, osIndex) in atom.os" :key="osIndex" style="margin-right: 3px;" :class="`os-tag devops-icon icon-${os.toLowerCase()}`" />
                 </template>
-            </span>
+            </div>
             <p class="atom-update-time" v-if="atom.publisher">{{ atom.publisher }} {{ $t('editPage.update') }} {{ formatDiff(atom.updateTime) }}</p>
             <span class="atom-active" v-if="atomCode === atom.atomCode">
                 <i class="devops-icon icon-check-1" />
@@ -176,10 +176,7 @@
             },
 
             handleGoPipelineAtomManage (name) {
-                const routeData = this.$router.resolve({
-                    path: `/pipeline/${this.projectCode}/list/atomManage/${name}`
-                })
-                window.open(routeData.href, '_blank')
+                window.open(`${WEB_URL_PREFIX}/pipeline/${this.projectCode}/list/atomManage/${name}`, '_blank')
             },
 
             /**
