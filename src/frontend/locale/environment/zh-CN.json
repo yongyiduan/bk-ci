@@ -205,6 +205,7 @@
         "executeCommandPrompt": "在目标构建机任意路径下(工作空间)执行如下命令",
         "installBuildMachineTips": "如何在Windows上安装Agent",
         "connectedNodes": "已连接的节点",
+        "unableToSpawnNodes": "无法刷出节点?",
         "noConnectedNodes": "暂无连接任何连接节点",
         "loginMethod": "目标机登录方式",
         "checkMails": "密码请查收邮件",
