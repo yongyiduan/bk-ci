@@ -60,7 +60,7 @@
                 </div>
                 <div class="handler-prompt-node">
                     <p>{{ $t('environment.nodeInfo.connectedNodes') }}</p>
-                    <a :href="spawnNodesDescLink" target="_blank" @click="aaa">
+                    <a :href="spawnNodesDescLink" target="_blank">
                         {{ $t('environment.nodeInfo.unableToSpawnNodes') }}</a>
                 </div>
                 <div class="construct-card-item connection-node-card">
