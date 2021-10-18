@@ -41,6 +41,7 @@ import com.tencent.devops.notify.PIPELINE_QUALITY_AUDIT_NOTIFY_TEMPLATE_V2
 import com.tencent.devops.notify.PIPELINE_QUALITY_END_NOTIFY_TEMPLATE_V2
 import com.tencent.devops.process.utils.PIPELINE_START_WEBHOOK_USER_ID
 import com.tencent.devops.process.utils.PIPELINE_START_USER_ID
+import com.tencent.devops.process.utils.PIPELINE_NAME
 import com.tencent.devops.notify.api.service.ServiceNotifyMessageTemplateResource
 import com.tencent.devops.notify.pojo.SendNotifyMessageTemplateRequest
 import com.tencent.devops.plugin.api.ServiceCodeccElementResource
@@ -642,7 +643,7 @@ class QualityRuleCheckService @Autowired constructor(
         runtimeVariable: Map<String, String>?
     ) {
         val projectName = getProjectName(projectId)
-        val pipelineName = getPipelineName(projectId, pipelineId)
+        val pipelineName = runtimeVariable?.get(PIPELINE_NAME) ?: getPipelineName(projectId, pipelineId)
         val url = qualityUrlBean.genBuildDetailUrl(projectId, pipelineId, buildId, runtimeVariable)
         val time = createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"))
 
@@ -709,7 +710,7 @@ class QualityRuleCheckService @Autowired constructor(
         runtimeVariable: Map<String, String>?
     ) {
         val projectName = getProjectName(projectId)
-        val pipelineName = getPipelineName(projectId, pipelineId)
+        val pipelineName = runtimeVariable?.get(PIPELINE_NAME) ?: getPipelineName(projectId, pipelineId)
         val url = qualityUrlBean.genBuildDetailUrl(projectId, pipelineId, buildId, runtimeVariable)
         val time = createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
