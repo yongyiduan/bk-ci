@@ -407,7 +407,7 @@
              *  头像格式
              */
             localCoverAvatar (data) {
-                const member = /^\$\{(.*)\}$/.test(data) ? 'un_know' : data
+                const member = data.isBkVar() ? 'un_know' : data
                 return `${USER_IMG_URL}/avatars/${member}/avatar.jpg`
             },
             // 重置input
@@ -422,7 +422,7 @@
             },
             // 检验变量
             checkVariable (val) {
-                return /^\$\{(.*)\}$/.test(val)
+                return typeof val === 'string' && val.isBkVar()
             },
             toEdit (event) {
                 this.$refs.staffInput.focus()
