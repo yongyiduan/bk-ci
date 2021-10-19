@@ -737,5 +737,7 @@
     "参数说明": "Parameter Description",
     "指标名": "Quota Name",
     "值类型": "Value Type",
-    "支持的操作": "Supported Operations"
+    "支持的操作": "Supported Operations",
+    "说明：": "Usage: ",
+    "说明文案": "reference by expression ${{ steps.<step-id>.outputs.<output-var-name> }}"
 }

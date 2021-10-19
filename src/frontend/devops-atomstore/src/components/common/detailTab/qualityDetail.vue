@@ -1,6 +1,5 @@
 <template>
-    <section>
-        <h3 class="yaml-title">{{ $t('store.质量红线指标') }}:</h3>
+    <section class="tab-content">
         <bk-table :data="qualityData" v-bkloading="{ isLoading }">
             <bk-table-column :label="$t('store.指标名')" prop="enName" show-overflow-tooltip></bk-table-column>
             <bk-table-column :label="$t('store.参数说明')" prop="desc" show-overflow-tooltip></bk-table-column>
@@ -38,6 +37,12 @@
 </script>
 
 <style lang="scss" scoped>
+    .tab-content {
+        margin-top: 20px;
+        .explain {
+            color: #828282;
+        }
+    }
     .yaml-title {
         margin: 20px 0 10px;
         line-height: 23px;

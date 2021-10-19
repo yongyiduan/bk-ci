@@ -1,6 +1,6 @@
 <template>
     <section>
-        <h3 class="yaml-title">{{ $t('store.输出参数') }}:</h3>
+        <div class="explain">{{ $t('store.说明：') }}<span class="explain-info">{{ $t('store.说明文案') }}</span></div>
         <bk-table :data="outputData" v-bkloading="{ isLoading: isLoading }">
             <bk-table-column :label="$t('store.参数名')" prop="name" show-overflow-tooltip></bk-table-column>
             <bk-table-column :label="$t('store.参数说明')" prop="desc" show-overflow-tooltip></bk-table-column>
@@ -40,6 +40,16 @@
 </script>
 
 <style lang="scss" scoped>
+    .explain {
+        margin: 20px 0 10px;
+        color: #707070;
+        font-weight: 700;
+        font-size: 12px;
+        .explain-info {
+            font-weight: 100;
+            color: #a7a7a7;
+        }
+    }
     .yaml-title {
         margin: 20px 0 10px;
         line-height: 23px;
