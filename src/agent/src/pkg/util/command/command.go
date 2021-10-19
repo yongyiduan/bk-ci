@@ -1,5 +1,3 @@
-// +build linux darwin
-
 /*
  * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
  *
@@ -12,12 +10,13 @@
  *
  * Terms of the MIT License:
  * ---------------------------------------------------
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+ * the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
  * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
@@ -29,76 +28,91 @@
 package command
 
 import (
-	"errors"
-	"fmt"
-	"github.com/astaxie/beego/logs"
-	"os"
-	"os/exec"
+    "errors"
+    "fmt"
+    "github.com/astaxie/beego/logs"
+    "os"
+    "os/exec"
 )
 
 func RunCommand(command string, args []string, workDir string, envMap map[string]string) (output []byte, err error) {
-	cmd := exec.Command(command)
+    cmd := exec.Command(command)
 
-	if len(args) > 0 {
-		cmd.Args = append(cmd.Args, args...)
-	}
+    if len(args) > 0 {
+        cmd.Args = append(cmd.Args, args...)
+    }
 
-	if workDir != "" {
-		cmd.Dir = workDir
-	}
+    if workDir != "" {
+        cmd.Dir = workDir
+    }
 
-	cmd.Env = os.Environ()
-	if envMap != nil {
-		for k, v := range envMap {
-			cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
-		}
-	}
+    cmd.Env = os.Environ()
+    if envMap != nil {
+        for k, v := range envMap {
+            cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
+        }
+    }
 
-	logs.Info("cmd.Path: ", cmd.Path)
-	logs.Info("cmd.Args: ", cmd.Args)
-	logs.Info("cmd.workDir: ", cmd.Dir)
+    logs.Info("cmd.Path: ", cmd.Path)
+    logs.Info("cmd.Args: ", cmd.Args)
+    logs.Info("cmd.workDir: ", cmd.Dir)
 
-	outPut, err := cmd.CombinedOutput()
-	logs.Info("output: ", string(outPut))
-	if err != nil {
-		return outPut, err
-	}
+    outPut, err := cmd.CombinedOutput()
+    logs.Info("output: ", string(outPut))
+    if err != nil {
+        return outPut, err
+    }
 
-	return outPut, nil
+    return outPut, nil
 }
 
 func StartProcess(command string, args []string, workDir string, envMap map[string]string, runUser string) (int, error) {
-	cmd := exec.Command(command)
+    return StartProcess2(command, args, workDir, envMap, runUser, false)
+}
 
-	if len(args) > 0 {
-		cmd.Args = append(cmd.Args, args...)
-	}
+func StartProcess2(
+    command string,
+    args []string,
+    workDir string,
+    envMap map[string]string,
+    runUser string,
+    windowsNative bool,
+) (int, error) {
+    return StartProcFacade(command, args, workDir, envMap, runUser, windowsNative)
+}
 
-	if workDir != "" {
-		cmd.Dir = workDir
-	}
+func StartProc(command string, args []string, workDir string, envMap map[string]string, runUser string) (int, error) {
+    cmd := exec.Command(command)
 
-	cmd.Env = os.Environ()
-	if envMap != nil {
-		for k, v := range envMap {
-			cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
-		}
-	}
+    if len(args) > 0 {
+        cmd.Args = append(cmd.Args, args...)
+    }
 
-	err := setUser(cmd, runUser)
-	if err != nil {
-		logs.Error("set user failed: ", err.Error())
-		return -1, errors.New("set user failed")
-	}
+    if workDir != "" {
+        cmd.Dir = workDir
+    }
 
-	logs.Info("cmd.Path: ", cmd.Path)
-	logs.Info("cmd.Args: ", cmd.Args)
-	logs.Info("cmd.workDir: ", cmd.Dir)
-	logs.Info("runUser: ", runUser)
+    cmd.Env = os.Environ()
+    if envMap != nil {
+        for k, v := range envMap {
+            cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
+        }
+    }
 
-	err = cmd.Start()
-	if err != nil {
-		return -1, err
-	}
-	return cmd.Process.Pid, nil
+    err := setUser(cmd, runUser)
+    if err != nil {
+        logs.Error("set user failed: ", err.Error())
+        return -1, errors.New("set user failed")
+    }
+
+    logs.Info("cmd.Path: ", cmd.Path)
+    logs.Info("cmd.Args: ", cmd.Args)
+    logs.Info("cmd.workDir: ", cmd.Dir)
+    logs.Info("runUser: ", runUser)
+
+    err = cmd.Start()
+    if err != nil {
+        return -1, err
+    }
+    return cmd.Process.Pid, nil
 }

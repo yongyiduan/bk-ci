@@ -1,6 +1,33 @@
 //go:build windows
 // +build windows
 
+/*
+ * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
+ *
+ * Copyright (C) 2019 THL A29 Limited, a Tencent company.  All rights reserved.
+ *
+ * BK-CI 蓝鲸持续集成平台 is licensed under the MIT license.
+ *
+ * A copy of the MIT License is included in this file.
+ *
+ *
+ * Terms of the MIT License:
+ * ---------------------------------------------------
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of
+ * the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+ * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+ * NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package command
 
 import (
@@ -8,50 +35,30 @@ import (
     "fmt"
     "github.com/astaxie/beego/logs"
     "golang.org/x/sys/windows"
-    "os"
-    "os/exec"
     "strings"
     "unicode/utf16"
     "unsafe"
+    "os"
 )
 
-func RunCommand(command string, args []string, workDir string, envMap map[string]string) (output []byte, err error) {
-    cmd := exec.Command(command)
-
-    if len(args) > 0 {
-        cmd.Args = append(cmd.Args, args...)
+func StartProcFacade(
+    command string,
+    args []string,
+    workDir string,
+    envMap map[string]string,
+    runUser string,
+    windowsNative bool,
+) (int, error) {
+    // 需要使用本地session执行
+    if windowsNative {
+        commandLine := commandArgsConcat(command, args)
+        logs.Info("windows commandLine:", commandLine)
+        logs.Info("config user(only print):", runUser)
+        logs.Info("workDir:", workDir)
+        return StartProcessAsCurrentUser(commandLine, workDir, envMap)
+    } else {
+        return StartProc(command, args, workDir, envMap, runUser)
     }
-
-    if workDir != "" {
-        cmd.Dir = workDir
-    }
-
-    cmd.Env = os.Environ()
-    if envMap != nil {
-        for k, v := range envMap {
-            cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
-        }
-    }
-
-    logs.Info("cmd.Path: ", cmd.Path)
-    logs.Info("cmd.Args: ", cmd.Args)
-    logs.Info("cmd.workDir: ", cmd.Dir)
-
-    outPut, err := cmd.CombinedOutput()
-    logs.Info("output: ", string(outPut))
-    if err != nil {
-        return outPut, err
-    }
-
-    return outPut, nil
-}
-
-func StartProcess(command string, args []string, workDir string, envMap map[string]string, runUser string) (int, error) {
-    commandLine := commandArgsConcat(command, args)
-    logs.Info("windows commandLine:", commandLine)
-    logs.Info("config user(only print):", runUser)
-    logs.Info("workDir:", workDir)
-    return StartProcessAsCurrentUser(commandLine, workDir, envMap)
 }
 
 func commandArgsConcat(command string, args []string) string {
@@ -79,6 +86,7 @@ var (
     procCreateEnvironmentBlock       *windows.LazyProc = moduserenv.NewProc("CreateEnvironmentBlock")
     procDestroyEnvironmentBlock      *windows.LazyProc = moduserenv.NewProc("DestroyEnvironmentBlock")
     procCreateProcessAsUser          *windows.LazyProc = modadvapi32.NewProc("CreateProcessAsUserW")
+    procCreateProcess                *windows.LazyProc = modadvapi32.NewProc("CreateProcessW")
 )
 
 const (
@@ -205,7 +213,7 @@ func DuplicateUserTokenFromSessionID(sessionId windows.Handle) (windows.Token, e
     if returnCode, _, err := procWTSQueryUserToken.Call(
         uintptr(sessionId),
         uintptr(unsafe.Pointer(&impersonationToken))); returnCode == 0 {
-        return 0xFFFFFFFF, fmt.Errorf("call native WTSQueryUserToken: %s", err)
+        return 0xFFFFFFFF, fmt.Errorf("call native WTSQueryUserToken: %d %s", sessionId, err)
     }
 
     if returnCode, _, err := procDuplicateTokenEx.Call(
@@ -227,6 +235,11 @@ func DuplicateUserTokenFromSessionID(sessionId windows.Handle) (windows.Token, e
 
 // fetch current process environment
 func fetchProcessEnviron(userToken windows.Token) (env []string, e error) {
+
+    if userToken == 0 {
+        logs.Info("get current process env by os.Environ()")
+        return os.Environ(), nil
+    }
 
     var envInfo windows.Handle
 
@@ -297,7 +310,7 @@ tryNext:
     return uintptr(unsafe.Pointer(&utf16.Encode([]rune(buffer.String()))[0])), nil
 }
 
-func StartProcessAsCurrentUser(cmdLine, workDir string, envMap map[string]string) (int, error) {
+func StartProcessAsActiveUser(cmdLine, workDir string, envMap map[string]string) (int, error) {
     var (
         sessionId windows.Handle
         userToken windows.Token
@@ -328,7 +341,6 @@ func StartProcessAsCurrentUser(cmdLine, workDir string, envMap map[string]string
         return -1, fmt.Errorf("append env block: %s", err)
     }
 
-
     creationFlags := CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW //  | CREATE_NEW_CONSOLE
     startupInfo.ShowWindow = SW_SHOW
     startupInfo.Desktop = windows.StringToUTF16Ptr("winsta0\\default")
@@ -342,6 +354,55 @@ func StartProcessAsCurrentUser(cmdLine, workDir string, envMap map[string]string
 
     if returnCode, _, err := procCreateProcessAsUser.Call(
         uintptr(userToken),
+        lpApplicationName, // lpApplicationName 允许为空，此处统一使用lpCommandLine
+        lpCommandLine,
+        lpProcessAttributes,
+        lpThreadAttributes,
+        bInheritHandles,
+        uintptr(creationFlags),
+        lpEnv,
+        lpWorkingDir,
+        uintptr(unsafe.Pointer(&startupInfo)),
+        uintptr(unsafe.Pointer(&processInfo)),
+    ); returnCode == 0 {
+        return -1, fmt.Errorf("create process as user: %s", err)
+    }
+
+    return int(processInfo.ProcessId), nil
+}
+
+func StartProcessAsCurrentUser(cmdLine, workDir string, envMap map[string]string) (int, error) {
+    var (
+        startupInfo windows.StartupInfo
+        processInfo windows.ProcessInformation
+
+        lpApplicationName   uintptr = 0
+        lpCommandLine       uintptr = 0
+        lpWorkingDir        uintptr = 0
+        lpEnv               uintptr = 0
+        lpProcessAttributes uintptr = 0
+        lpThreadAttributes  uintptr = 0
+        bInheritHandles     uintptr = 0
+        err                 error
+    )
+
+    lpEnv, err = appendEnvironmentBlock(0, envMap)
+    if err != nil {
+        return -1, fmt.Errorf("append env block: %s", err)
+    }
+
+    creationFlags := CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW //  | CREATE_NEW_CONSOLE
+    startupInfo.ShowWindow = SW_SHOW
+    startupInfo.Desktop = windows.StringToUTF16Ptr("winsta0\\default")
+
+    if len(cmdLine) > 0 {
+        lpCommandLine = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(cmdLine)))
+    }
+    if len(workDir) > 0 {
+        lpWorkingDir = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(workDir)))
+    }
+
+    if returnCode, _, err := procCreateProcessW.Call(
         lpApplicationName, // lpApplicationName 允许为空，此处统一使用lpCommandLine
         lpCommandLine,
         lpProcessAttributes,

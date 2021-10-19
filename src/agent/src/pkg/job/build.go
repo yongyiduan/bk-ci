@@ -152,7 +152,7 @@ func runBuild(buildInfo *api.ThirdPartyBuildInfo) error {
 
 	}
 
-	runUser := config.GAgentConfig.SlaveUser
+	runUser := config.GAgentConfig.AgentUser
 
 	goEnv := map[string]string{
 		"DEVOPS_AGENT_VERSION":  config.AgentVersion,
@@ -179,7 +179,7 @@ func runBuild(buildInfo *api.ThirdPartyBuildInfo) error {
 		workerBuildFinish(&api.ThirdPartyBuildWithStatus{*buildInfo, false, errMsg})
 		return err
 	}
-	pid, err := command.StartProcess(scriptFile, []string{}, workDir, goEnv, runUser)
+	pid, err := command.StartProcess2(scriptFile, []string{}, workDir, goEnv, runUser, config.GAgentConfig.WindowsNative)
 	if err != nil {
 		errMsg := "start worker process failed: " + err.Error()
 		logs.Error(errMsg)
