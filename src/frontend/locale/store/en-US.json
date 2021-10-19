@@ -732,10 +732,9 @@
     "搜索": "Search",
     "质量红线指标": "Quality",
     "配置片段：": "Configuration Snippet:",
-    "输出参数：": "Output Parameters:",
+    "输出参数": "Output Parameters",
     "参数名": "Parameter Name",
     "参数说明": "Parameter Description",
-    "质量红线指标：": "Quality:",
     "指标名": "Quota Name",
     "值类型": "Value Type",
     "支持的操作": "Supported Operations"
