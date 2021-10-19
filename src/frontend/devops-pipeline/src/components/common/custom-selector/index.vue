@@ -422,7 +422,7 @@
             },
             // 检验变量
             checkVariable (val) {
-                return val.isBkVar()
+                return typeof val === 'string' && val.isBkVar()
             },
             toEdit (event) {
                 this.$refs.staffInput.focus()
