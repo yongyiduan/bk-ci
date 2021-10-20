@@ -135,7 +135,7 @@
                     INTERCEPT: 'Stopped',
                     INTERCEPT_PASS: 'Passed'
                 }
-                return `${optNameMap[interceptResult]} by ${gateOptUser} as ${gateOptTime}`
+                return `${optNameMap[interceptResult]} by ${gateOptUser} at ${gateOptTime}`
             },
 
             getInterceptNum (interceptList = []) {
