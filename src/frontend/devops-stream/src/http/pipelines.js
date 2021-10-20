@@ -174,5 +174,9 @@ export default {
 
     triggerStage ({ projectId, pipelineId, buildId, stageId, cancel, reviewParams, id, suggest }) {
         return api.post(`${PROCESS_PREFIX}/user/builds/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/stages/${stageId}/manualStart?cancel=${cancel}`, { reviewParams, id, suggest })
+    },
+
+    changeGateWayStatus (val, hashId) {
+        return api.put(`${QUALITY_PREFIX}/user/rules/v3/update/${hashId}?pass=${val}`)
     }
 }

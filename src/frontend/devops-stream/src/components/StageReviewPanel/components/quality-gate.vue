@@ -1,17 +1,58 @@
 <template>
     <section v-if="(stageControl.ruleIds || []).length">
         <span class="review-title">Quality Gates</span>
-        <section class="review-quality">
+        <section class="review-quality" v-bkloading="{ isLoading }">
             <bk-collapse v-model="activeName">
                 <bk-collapse-item v-for="(qualityItem, index) in qualityList" :key="index" :name="qualityItem.hashId">
                     <span class="quality-summary">
-                        <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
-                        <span :class="qualityItem.interceptResult === 'PASS' ? 'success' : 'error'">
-                            {{ qualityItem.interceptResult | interceptFilter }} ({{ qualityItem.interceptList.length }})
+                        <span class="text-ellipsis summary-left">
+                            <i
+                                :class="[
+                                    'mr5',
+                                    'stream-icon',
+                                    qualityItem.interceptResult === 'WAIT' ? 'stream-current-status' : 'stream-not-start',
+                                    qualityItem.interceptResult
+                                ]"
+                            ></i>
+                            <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
+                            <span>
+                                {{ getInterceptValue(qualityItem.interceptResult) }} {{ getInterceptNum(qualityItem.interceptList) }}
+                            </span>
+                        </span>
+                        <span v-if="qualityItem.interceptResult === 'WAIT'" class="summary-right">
+                            <bk-button
+                                text
+                                title="primary"
+                                class="mr10"
+                                :disabled="isNotGateKeeper(qualityItem)"
+                                @click.stop="changeGateWayStatus(true, qualityItem.ruleHashId)"
+                            >
+                                <span
+                                    v-bk-tooltips="{
+                                        content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
+                                        disabled: !isNotGateKeeper(qualityItem)
+                                    }"
+                                >继续</span>
+                            </bk-button>
+                            <bk-button
+                                text
+                                title="primary"
+                                :disabled="isNotGateKeeper(qualityItem)"
+                                @click.stop="changeGateWayStatus(false, qualityItem.ruleHashId)"
+                            >
+                                <span
+                                    v-bk-tooltips="{
+                                        content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
+                                        disabled: !isNotGateKeeper(qualityItem)
+                                    }"
+                                >终止</span>
+                            </bk-button>
+                        </span>
+                        <span v-if="['INTERCEPT', 'INTERCEPT_PASS'].includes(qualityItem.interceptResult)" class="summary-right">
+                            {{ getOptValue(qualityItem) }}
                         </span>
                     </span>
                     <section slot="content">
-                        <!-- <h5 class="quality-title">Rules</h5> -->
                         <ul>
                             <li class="quality-content text-ellipsis" v-for="(intercept, interceptIndex) in qualityItem.interceptList" :key="interceptIndex">
                                 <span :class="{ 'quality-icon': true, 'success': intercept.pass }">
@@ -35,14 +76,6 @@
 
     export default {
         filters: {
-            interceptFilter (val) {
-                const resultMap = {
-                    PASS: 'Passed',
-                    FAIL: 'Blocked'
-                }
-                return resultMap[val]
-            },
-
             nameFilter (intercept) {
                 const { indicatorName, operation, actualValue, value } = intercept
                 const operationMap = {
@@ -72,8 +105,7 @@
         },
 
         computed: {
-            ...mapState(['projectId'])
-
+            ...mapState(['projectId', 'user'])
         },
 
         created () {
@@ -81,6 +113,47 @@
         },
 
         methods: {
+            getGateKeeper (qualityItem) {
+                const { qualityRuleBuildHisOpt: { gateKeepers = [] } } = qualityItem
+                return gateKeepers
+            },
+
+            isNotGateKeeper (qualityItem) {
+                const gateKeepers = this.getGateKeeper(qualityItem)
+                return gateKeepers.length <= 0 || !gateKeepers.includes(this.user.username)
+            },
+
+            getOptValue (qualityItem) {
+                const {
+                    interceptResult,
+                    qualityRuleBuildHisOpt: {
+                        gateOptUser,
+                        gateOptTime
+                    }
+                } = qualityItem
+                const optNameMap = {
+                    INTERCEPT: 'Stopped',
+                    INTERCEPT_PASS: 'Passed'
+                }
+                return `${optNameMap[interceptResult]} by ${gateOptUser} at ${gateOptTime}`
+            },
+
+            getInterceptNum (interceptList = []) {
+                const paasNum = interceptList.filter(x => x.pass)
+                return `（${paasNum.length}/${interceptList.length}）`
+            },
+
+            getInterceptValue (val) {
+                const resultMap = {
+                    PASS: 'Passed',
+                    FAIL: 'Blocked',
+                    WAIT: 'Wait',
+                    INTERCEPT: 'Blocked',
+                    INTERCEPT_PASS: 'Passed'
+                }
+                return resultMap[val]
+            },
+
             requestQualityLineFromApi () {
                 if ((this.stageControl.ruleIds || []).length <= 0) return
 
@@ -95,6 +168,17 @@
                 this.isLoading = true
                 pipelines.requestQualityGate(...params).then((res) => {
                     this.qualityList = res
+                }).catch((err) => {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                }).finally(() => {
+                    this.isLoading = false
+                })
+            },
+
+            changeGateWayStatus (val, hashId) {
+                this.isLoading = true
+                pipelines.changeGateWayStatus(val, hashId).then(() => {
+                    return this.requestQualityLineFromApi()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -131,8 +215,8 @@
             flex-wrap: wrap;
             font-size: 12px;
             .bk-collapse-item {
-                width: 50%;
-                margin-bottom: 12px;
+                width: 100%;
+                margin-bottom: 20px;
                 .bk-collapse-item-header {
                     line-height: 20px;
                     height: 20px;
@@ -144,7 +228,7 @@
                 color: #666770;
             }
             .quality-content {
-                margin-top: 6px;
+                margin-top: 12px;
                 color: #666770;
                 display: flex;
                 align-items: center;
@@ -153,9 +237,21 @@
         .quality-summary {
             display: flex;
             align-items: center;
-            .quality-name {
-                margin-right: 12px;
-                max-width: 270px;
+            justify-content: space-between;
+            .summary-left {
+                width: 60%;
+                display: flex;
+                align-items: center;
+                .quality-name {
+                    max-width: calc(100% - 120px);
+                    margin-right: 12px;
+                }
+            }
+            .summary-right {
+                width: 36%;
+                ::v-deep .bk-button-text {
+                    font-size: 12px;
+                }
             }
         }
         .quality-icon {
@@ -185,5 +281,20 @@
     .review-quality-divider {
         margin-bottom: 24px !important;
         margin-top: 12px !important;
+    }
+    .WAIT {
+        color: #3a84ff;
+    }
+    .PASS {
+        color: #3fc06d;
+    }
+    .FAIL {
+        color: #ea3636;
+    }
+    .INTERCEPT {
+        color: #ea3636;
+    }
+    .INTERCEPT_PASS {
+        color: #3fc06d;
     }
 </style>

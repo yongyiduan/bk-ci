@@ -26,7 +26,7 @@
 
 <script>
     export default {
-        name: 'log-status',
+        name: 'LogStatus',
         props: {
             status: {
                 type: String,

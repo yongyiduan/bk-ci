@@ -18,7 +18,7 @@ import log from '@blueking/log'
 import VeeValidate from 'vee-validate'
 import { bkMessage } from 'bk-magic-vue'
 
-Vue.component('icon', icon)
+Vue.component('Icon', icon)
 Vue.use(log)
 Vue.use(VeeValidate)
 

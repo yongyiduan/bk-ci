@@ -186,6 +186,7 @@
             goToCode (gitRequestEvent) {
                 switch (gitRequestEvent.objectKind) {
                     case 'push':
+                    case 'schedule':
                         goCommit(this.projectInfo.web_url, gitRequestEvent.commitId)
                         break
                     case 'tag_push':

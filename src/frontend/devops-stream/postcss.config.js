@@ -36,10 +36,8 @@ module.exports = {
             // see https://github.com/csstools/postcss-preset-env#options
             stage: 0,
             autoprefixer: {
-                browsers: ['last 2 versions'],
                 grid: true
-            },
-            browsers: ['last 2 versions']
+            }
         },
         // 这个插件可以在写 nested 样式时省略开头的 &
         // @see https://github.com/postcss/postcss-nested#postcss-nested-

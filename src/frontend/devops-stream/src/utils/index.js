@@ -87,7 +87,7 @@ export function convertMStoString (time) {
         }
     }
 
-    return time ? getDays(Math.floor(time / 1000)) : `0秒`
+    return time ? getDays(Math.floor(time / 1000)) : '0秒'
 }
 
 export const uuid = () => {
@@ -190,7 +190,8 @@ export function getbuildTypeIcon (buildType) {
         manual: 'manual',
         push: 'commit',
         tag_push: 'tag',
-        merge_request: 'merge'
+        merge_request: 'merge',
+        schedule: 'clock_fill'
     }
     return buildTypeIconMap[buildType] || 'well'
 }
@@ -231,6 +232,9 @@ export function getBuildSource (gitRequestEvent = {}) {
             break
         case 'manual':
             res = '--'
+            break
+        case 'schedule':
+            res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
             break
     }
     return res
