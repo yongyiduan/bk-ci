@@ -58,22 +58,26 @@ const (
     ConfigKeySlaveUser         = "devops.slave.user"
     ConfigKeyCollectorOn       = "devops.agent.collectorOn"
     ConfigKeyRequestTimeoutSec = "devops.agent.request.timeout.sec"
-    ConfigKeywindowsNative     = "windows.native"
+    ConfigKeyWindowsNative     = "windows.native"
+    ConfigKeyWindowsUserPwd    = "windows.user.password"
+    ConfigKeyWindowsDomain     = "windows.user.domain"
 )
 
 type AgentConfig struct {
-    Gateway              string
-    FileGateway          string
-    BuildType            string
-    ProjectId            string
-    AgentId              string
-    SecretKey            string
-    ParallelTaskCount    int
-    EnvType              string
-    AgentUser            string
-    CollectorOn          bool
-    TimeoutSec           int64
-    WindowsNative        bool
+    Gateway           string
+    FileGateway       string
+    BuildType         string
+    ProjectId         string
+    AgentId           string
+    SecretKey         string
+    ParallelTaskCount int
+    EnvType           string
+    AgentUser         string
+    CollectorOn       bool
+    TimeoutSec        int64
+    WindowsNative     bool
+    WindowsUserPwd    string
+    WindowsDomain     string
 }
 
 type AgentEnv struct {
@@ -239,9 +243,20 @@ func LoadAgentConfig() error {
         timeout = 5
     }
 
-    windowsNative, err := conf.Bool(ConfigKeywindowsNative)
+    windowsNative, err := conf.Bool(ConfigKeyWindowsNative)
     if err != nil {
         windowsNative = false
+    }
+
+    windowsUserPwd := strings.TrimSpace(conf.String(ConfigKeyWindowsUserPwd))
+    if windowsNative && err != nil {
+        return errors.New("invalid windows.user.password")
+    }
+
+    windowsDomain := strings.TrimSpace(conf.String(ConfigKeyWindowsDomain))
+    if err != nil {
+        windowsDomain = ""
+        logs.Info("windows.user.domain is empty")
     }
 
     GAgentConfig.Gateway = landunGateway
@@ -268,7 +283,10 @@ func LoadAgentConfig() error {
     GAgentConfig.TimeoutSec = timeout
     logs.Info("TimeoutSec: ", GAgentConfig.TimeoutSec)
     GAgentConfig.WindowsNative = windowsNative
-    logs.Info("WindowsNative: ", GAgentConfig.WindowsNative)
+    logs.Info("windowsNative: ", GAgentConfig.WindowsNative)
+    GAgentConfig.WindowsDomain = windowsDomain
+    logs.Info("WindowsDomain: ", GAgentConfig.WindowsDomain)
+    GAgentConfig.WindowsUserPwd = windowsUserPwd
     // 初始化 GAgentConfig 写入一次配置, 往文件中写入一次程序中新添加的 key
     return GAgentConfig.SaveConfig()
 }
@@ -287,7 +305,9 @@ func (a *AgentConfig) SaveConfig() error {
     content.WriteString(ConfigKeyAgentUser + "=" + GAgentConfig.AgentUser + "\n")
     content.WriteString(ConfigKeyRequestTimeoutSec + "=" + strconv.FormatInt(GAgentConfig.TimeoutSec, 10) + "\n")
     if systemutil.IsWindows() {
-        content.WriteString(ConfigKeywindowsNative + "=" + strconv.FormatBool(GAgentConfig.WindowsNative) + "\n")
+        content.WriteString(ConfigKeyWindowsUserPwd + "=" + GAgentConfig.WindowsUserPwd + "\n")
+        content.WriteString(ConfigKeyWindowsDomain + "=" + GAgentConfig.WindowsDomain + "\n")
+        content.WriteString(ConfigKeyWindowsNative + "=" + strconv.FormatBool(GAgentConfig.WindowsNative) + "\n")
     }
 
     err := ioutil.WriteFile(filePath, []byte(content.String()), 0666)

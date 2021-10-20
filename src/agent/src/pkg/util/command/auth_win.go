@@ -1,5 +1,5 @@
-//go:build linux || darwin
-// +build linux darwin
+//go:build windows
+// +build windows
 
 /*
  * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
@@ -30,8 +30,34 @@
 
 package command
 
-func StartProcFacade(
-    runUser, password, domain, command, workDir string, args []string, envMap map[string]string, windowsNative bool,
-) (int, error) {
-    return StartProc(runUser, command, workDir, args, envMap)
+import (
+    "fmt"
+    "golang.org/x/sys/windows"
+    "unsafe"
+)
+
+var procLogonUserW *windows.LazyProc = modadvapi32.NewProc("LogonUserW")
+
+const (
+    LOGON32_LOGON_INTERACTIVE = 2
+)
+
+const (
+    LOGON32_PROVIDER_DEFAULT = 0
+)
+
+func windowsLogon(userNameWithDomain, password string) (userToken windows.Token, err error) {
+    if returnCode, _, err2 := procLogonUserW.Call(
+        uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(userNameWithDomain))),
+        0,
+        uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(password))),
+        LOGON32_LOGON_INTERACTIVE,
+        LOGON32_PROVIDER_DEFAULT,
+        uintptr(unsafe.Pointer(&userToken)),
+    );
+        returnCode == 0 {
+        err = fmt.Errorf("user %s logon fail: %s", userNameWithDomain, err2)
+    }
+
+    return userToken, err
 }
