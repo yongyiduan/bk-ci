@@ -19,7 +19,9 @@
                                 :target="service.newWindow ? '_blank' : '_self'"
                                 @click.prevent="gotoPage(service)"
                             >
+                                <img v-if="isAbsoluteUrl(service.logoUrl)" :src="service.logoUrl" class="recent-logo-icon" />
                                 <Logo
+                                    v-else
                                     :name="service.logoUrl"
                                     size="16"
                                 />
@@ -153,7 +155,7 @@
     import { Accordion, AccordionItem } from '../components/Accordion'
     import ConsultTools from '../components/ConsultTools/index.vue'
     
-    import { urlJoin } from '../utils/util'
+    import { urlJoin, isAbsoluteUrl } from '../utils/util'
 
     @Component({
         components: {
@@ -172,6 +174,7 @@
         isAllServiceListShow: boolean = false
         IWIKI_DOCS_URL: string = IWIKI_DOCS_URL
         BK_CI_VERSION: string = window.BK_CI_VERSION
+        isAbsoluteUrl = isAbsoluteUrl
 
         get funcArray (): object[] {
             const funcArray = ['issueLabel', 'developLabel', 'testLabel', 'deployLabel', 'operationLabel']
@@ -269,8 +272,15 @@
                     display: flex;
                     align-items: center;
                     cursor: pointer;
-                    > svg {
+
+                    > svg,
+                    .recent-logo-icon {
                         margin-right: 6px;
+                    }
+
+                    .recent-logo-icon {
+                        width: 16px;
+                        height: 16px;
                     }
                 }
             }
