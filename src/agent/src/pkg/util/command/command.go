@@ -67,19 +67,21 @@ func RunCommand(command string, args []string, workDir string, envMap map[string
 }
 
 func StartProcess(command string, args []string, workDir string, envMap map[string]string, runUser string) (int, error) {
-    return StartProcess2(runUser, "", "", command, workDir, args, envMap, false)
+    return StartProcess2(command, args, workDir, envMap, runUser, false)
 }
 
 func StartProcess2(
-    runUser, password, domain, command, workDir string,
+    command string,
     args []string,
+    workDir string,
     envMap map[string]string,
+    runUser string,
     windowsNative bool,
 ) (int, error) {
-    return StartProcFacade(runUser, password, domain, command, workDir, args, envMap, windowsNative)
+    return StartProcFacade(command, args, workDir, envMap, runUser, windowsNative)
 }
 
-func StartProc(runUser, command, workDir string, args []string, envMap map[string]string) (int, error) {
+func StartProc(command string, args []string, workDir string, envMap map[string]string, runUser string) (int, error) {
     cmd := exec.Command(command)
 
     if len(args) > 0 {

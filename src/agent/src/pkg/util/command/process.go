@@ -31,7 +31,12 @@
 package command
 
 func StartProcFacade(
-    runUser, password, domain, command, workDir string, args []string, envMap map[string]string, windowsNative bool,
+    command string,
+    args []string,
+    workDir string,
+    envMap map[string]string,
+    runUser string,
+    windowsNative bool,
 ) (int, error) {
-    return StartProc(runUser, command, workDir, args, envMap)
+    return StartProc(command, args, workDir, envMap, runUser)
 }

@@ -35,25 +35,29 @@ import (
     "fmt"
     "github.com/astaxie/beego/logs"
     "golang.org/x/sys/windows"
-    "os"
     "strings"
     "unicode/utf16"
     "unsafe"
+    "os"
 )
 
 func StartProcFacade(
-    runUser, password, domain, command, workDir string, args []string, envMap map[string]string, windowsNative bool,
+    command string,
+    args []string,
+    workDir string,
+    envMap map[string]string,
+    runUser string,
+    windowsNative bool,
 ) (int, error) {
     // 需要使用本地session执行
-    if windowsNative && len(runUser) > 0 && len(password) > 0 {
+    if windowsNative {
         commandLine := commandArgsConcat(command, args)
         logs.Info("windows commandLine:", commandLine)
         logs.Info("config user(only print):", runUser)
         logs.Info("workDir:", workDir)
-        return StartProcessAsLogon(runUser, password, domain, commandLine, workDir, envMap)
-        //return StartProcessAsActiveUser(commandLine, workDir, envMap)
+        return StartProcessAsCurrentUser(commandLine, workDir, envMap)
     } else {
-        return StartProc(runUser, command, workDir, args, envMap)
+        return StartProc(command, args, workDir, envMap, runUser)
     }
 }
 
@@ -82,6 +86,7 @@ var (
     procCreateEnvironmentBlock       *windows.LazyProc = moduserenv.NewProc("CreateEnvironmentBlock")
     procDestroyEnvironmentBlock      *windows.LazyProc = moduserenv.NewProc("DestroyEnvironmentBlock")
     procCreateProcessAsUser          *windows.LazyProc = modadvapi32.NewProc("CreateProcessAsUserW")
+    procCreateProcess                *windows.LazyProc = modadvapi32.NewProc("CreateProcessW")
 )
 
 const (
@@ -366,50 +371,27 @@ func StartProcessAsActiveUser(cmdLine, workDir string, envMap map[string]string)
     return int(processInfo.ProcessId), nil
 }
 
-func StartProcessAsLogon(runUser, password, domain, cmdLine, workDir string, envMap map[string]string) (int, error) {
-
-    if len(runUser) <= 0 {
-        return -1, fmt.Errorf("runUser is nil")
-    }
-
-    if len(password) <= 0 {
-        return -1, fmt.Errorf("password is nil")
-    }
-
+func StartProcessAsCurrentUser(cmdLine, workDir string, envMap map[string]string) (int, error) {
     var (
-        userToken   windows.Token
         startupInfo windows.StartupInfo
         processInfo windows.ProcessInformation
 
-        userNameWithDomain   string
-        lpApplicationName    uintptr = 0
-        lpCommandLine        uintptr = 0
-        lpWorkingDir         uintptr = 0
-        lpEnv                uintptr = 0
-        lpProcessAttributes  uintptr = 0
-        lpThreadAttributes   uintptr = 0
-        bInheritHandles      uintptr = 0
-        err                  error
+        lpApplicationName   uintptr = 0
+        lpCommandLine       uintptr = 0
+        lpWorkingDir        uintptr = 0
+        lpEnv               uintptr = 0
+        lpProcessAttributes uintptr = 0
+        lpThreadAttributes  uintptr = 0
+        bInheritHandles     uintptr = 0
+        err                 error
     )
 
-    if strings.Contains(runUser, "@") {
-        userNameWithDomain = runUser
-    } else if len(domain) > 0 {
-        userNameWithDomain = runUser + "@" + domain
-    } else {
-        userNameWithDomain = runUser
-    }
-
-    if userToken, err = windowsLogon(userNameWithDomain, password); err != nil {
-        return -1, err
-    }
-
-    lpEnv, err = appendEnvironmentBlock(userToken, envMap)
+    lpEnv, err = appendEnvironmentBlock(0, envMap)
     if err != nil {
         return -1, fmt.Errorf("append env block: %s", err)
     }
 
-    creationFlags := CREATE_UNICODE_ENVIRONMENT  | CREATE_NEW_CONSOLE
+    creationFlags := CREATE_UNICODE_ENVIRONMENT | CREATE_NO_WINDOW //  | CREATE_NEW_CONSOLE
     startupInfo.ShowWindow = SW_SHOW
     startupInfo.Desktop = windows.StringToUTF16Ptr("winsta0\\default")
 
@@ -420,8 +402,7 @@ func StartProcessAsLogon(runUser, password, domain, cmdLine, workDir string, env
         lpWorkingDir = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(workDir)))
     }
 
-    if returnCode, _, err := procCreateProcessAsUser.Call(
-        uintptr(userToken),
+    if returnCode, _, err := procCreateProcessW.Call(
         lpApplicationName, // lpApplicationName 允许为空，此处统一使用lpCommandLine
         lpCommandLine,
         lpProcessAttributes,
