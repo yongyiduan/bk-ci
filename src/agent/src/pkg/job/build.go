@@ -10,13 +10,12 @@
  *
  * Terms of the MIT License:
  * ---------------------------------------------------
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
- * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of
- * the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
  * LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
@@ -32,6 +31,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/Tencent/bk-ci/src/agent/src/pkg/api"
@@ -172,23 +173,44 @@ func runBuild(buildInfo *api.ThirdPartyBuildInfo) error {
 		}
 	}
 
-	scriptFile, err := writeStartBuildAgentScript(buildInfo)
-	if err != nil {
-		errMsg := "write worker start script failed: " + err.Error()
-		logs.Error(errMsg)
-		workerBuildFinish(&api.ThirdPartyBuildWithStatus{*buildInfo, false, errMsg})
-		return err
+	if systemutil.IsWindows() {
+		startCmd := config.GetJava()
+		agentLogPrefix := fmt.Sprintf("%s_%s_agent", buildInfo.BuildId, buildInfo.VmSeqId)
+		args := []string{
+			"-Ddevops.slave.agent.role=devops.slave.agent.role.slave",
+			"-Dbuild.type=AGENT",
+			"-DAGENT_LOG_PREFIX=" + agentLogPrefix,
+			"-jar",
+			config.BuildAgentJarPath(),
+			getEncodedBuildInfo(buildInfo)}
+		pid, err := command.StartProcess(startCmd, args, workDir, goEnv, runUser)
+		if err != nil {
+			errMsg := "start worker process failed: " + err.Error()
+			logs.Error(errMsg)
+			workerBuildFinish(&api.ThirdPartyBuildWithStatus{*buildInfo, false, errMsg})
+			return err
+		}
+		GBuildManager.AddBuild(pid, buildInfo)
+		logs.Info("build started, runUser: ", runUser, ", pid: ", pid, ", buildId: ", buildInfo.BuildId, ", vmSetId: ", buildInfo.VmSeqId)
+		return nil
+	} else {
+		scriptFile, err := writeStartBuildAgentScript(buildInfo)
+		if err != nil {
+			errMsg := "write worker start script failed: " + err.Error()
+			logs.Error(errMsg)
+			workerBuildFinish(&api.ThirdPartyBuildWithStatus{*buildInfo, false, errMsg})
+			return err
+		}
+		pid, err := command.StartProcess(scriptFile, []string{}, workDir, goEnv, runUser)
+		if err != nil {
+			errMsg := "start worker process failed: " + err.Error()
+			logs.Error(errMsg)
+			workerBuildFinish(&api.ThirdPartyBuildWithStatus{*buildInfo, false, errMsg})
+			return err
+		}
+		GBuildManager.AddBuild(pid, buildInfo)
+		logs.Info("build started, runUser: ", runUser, ", pid: ", pid, ", buildId: ", buildInfo.BuildId, ", vmSetId: ", buildInfo.VmSeqId)
 	}
-	pid, err := command.StartProcess2(scriptFile, []string{}, workDir, goEnv, runUser, config.GAgentConfig.WindowsNative)
-	if err != nil {
-		errMsg := "start worker process failed: " + err.Error()
-		logs.Error(errMsg)
-		workerBuildFinish(&api.ThirdPartyBuildWithStatus{*buildInfo, false, errMsg})
-		return err
-	}
-	GBuildManager.AddBuild(pid, buildInfo)
-	logs.Info("build started, runUser: ", runUser, ", pid: ", pid, ", buildId: ",
-		buildInfo.BuildId, ", vmSetId: ", buildInfo.VmSeqId)
 	return nil
 }
 
@@ -198,6 +220,37 @@ func getEncodedBuildInfo(buildInfo *api.ThirdPartyBuildInfo) string {
 	codedBuildInfo := base64.StdEncoding.EncodeToString(strBuildInfo)
 	logs.Info("base64: ", codedBuildInfo)
 	return codedBuildInfo
+}
+
+func writeStartBuildAgentScript(buildInfo *api.ThirdPartyBuildInfo) (string, error) {
+	logs.Info("write start build agent script to file")
+	scriptFile := fmt.Sprintf(
+		"%s/devops_agent_start_%s_%s_%s.sh",
+		systemutil.GetWorkDir(),
+		buildInfo.ProjectId,
+		buildInfo.BuildId,
+		buildInfo.VmSeqId)
+
+	logs.Info("start agent script: ", scriptFile)
+	agentLogPrefix := fmt.Sprintf("%s_%s_agent", buildInfo.BuildId, buildInfo.VmSeqId)
+	lines := []string{
+		"#!/bin/bash",
+		"source /etc/profile",
+		"if [ -f ~/.bash_profile ]; then",
+		"  source ~/.bash_profile",
+		"fi",
+		fmt.Sprintf("cd %s", systemutil.GetWorkDir()),
+		fmt.Sprintf("%s -Ddevops.slave.agent.start.file=%s -Dbuild.type=AGENT -Ddevops.slave.agent.role=devops.slave.agent.role.slave -DAGENT_LOG_PREFIX=%s -jar %s %s",
+			config.GetJava(), scriptFile, agentLogPrefix, config.BuildAgentJarPath(), getEncodedBuildInfo(buildInfo)),
+	}
+	scriptContent := strings.Join(lines, "\n")
+
+	err := ioutil.WriteFile(scriptFile, []byte(scriptContent), 0777)
+	if err != nil {
+		return "", err
+	} else {
+		return scriptFile, nil
+	}
 }
 
 func workerBuildFinish(buildInfo *api.ThirdPartyBuildWithStatus) {
