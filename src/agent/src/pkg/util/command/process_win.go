@@ -234,7 +234,7 @@ func DuplicateUserTokenFromSessionID(sessionId windows.Handle) (windows.Token, e
 	return userToken, nil
 }
 
-func StartProcessAsCurrentUser(cmdLine, workDir string, envMap map[string]string) (int, error) {
+func StartProcessAsCurrentUser(command, cmdLine, workDir string, envMap map[string]string) (int, error) {
 	var (
 		sessionId windows.Handle
 		userToken windows.Token
@@ -274,7 +274,7 @@ func StartProcessAsCurrentUser(cmdLine, workDir string, envMap map[string]string
 
 	if returnCode, _, err := procCreateProcessAsUser.Call(
 		uintptr(userToken),
-		0, // lpApplicationName 允许为空，此处统一使用commandLine, 所以设置指针为0，表示不传
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(command))),
 		commandLine,
 		0,
 		0,
