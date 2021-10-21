@@ -153,7 +153,7 @@ func runBuild(buildInfo *api.ThirdPartyBuildInfo) error {
 
 	}
 
-	runUser := config.GAgentConfig.AgentUser
+	runUser := config.GAgentConfig.SlaveUser
 
 	goEnv := map[string]string{
 		"DEVOPS_AGENT_VERSION":  config.AgentVersion,
