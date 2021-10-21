@@ -3,10 +3,12 @@ package com.tencent.devops.stream.listener.buildFinish
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.tencent.devops.common.api.exception.ParamBlankException
+import com.tencent.devops.common.ci.v2.enums.gitEventKind.TGitObjectKind
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.stream.client.ScmClient
 import com.tencent.devops.stream.config.StreamBuildFinishConfig
+import com.tencent.devops.stream.pojo.GitRequestEvent
 import com.tencent.devops.stream.pojo.enums.StreamMrEventAction
 import com.tencent.devops.stream.pojo.git.GitEvent
 import com.tencent.devops.stream.pojo.git.GitMergeRequestEvent
@@ -45,13 +47,17 @@ class SendCommitCheck @Autowired constructor(
             return
         }
 
-        when (context) {
-            is StreamFinishContextV2 -> {
-                sendCommitCheckV2(context)
+        try {
+            when (context) {
+                is StreamFinishContextV2 -> {
+                    sendCommitCheckV2(context)
+                }
+                is StreamFinishContextV1 -> {
+                    sendCommitCheckV1(context)
+                }
             }
-            is StreamFinishContextV1 -> {
-                sendCommitCheckV1(context)
-            }
+        } catch (e: Throwable) {
+            logger.error("sendCommitCheck error: ${context.requestEvent}")
         }
     }
 
@@ -82,7 +88,7 @@ class SendCommitCheck @Autowired constructor(
                 mergeRequestId = if (gitEvent is GitMergeRequestEvent) {
                     gitEvent.object_attributes.id
                 } else {
-                    0L
+                    null
                 },
                 buildId = buildFinishEvent.buildId,
                 userId = buildFinishEvent.userId,
@@ -129,7 +135,7 @@ class SendCommitCheck @Autowired constructor(
             scmClient.pushCommitCheck(
                 commitId = requestEvent.commitId,
                 description = requestEvent.commitMsg ?: "",
-                mergeRequestId = requestEvent.mergeRequestId ?: 0L,
+                mergeRequestId = requestEvent.mergeRequestId,
                 pipelineId = pipeline.pipelineId,
                 buildId = buildFinishEvent.buildId,
                 userId = buildFinishEvent.userId,
@@ -140,3 +146,6 @@ class SendCommitCheck @Autowired constructor(
         }
     }
 }
+
+// 当人工触发时不推送CommitCheck消息
+private fun GitRequestEvent.sendCommitCheck() = objectKind != TGitObjectKind.MANUAL.value
