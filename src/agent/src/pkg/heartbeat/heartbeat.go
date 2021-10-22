@@ -91,6 +91,16 @@ func agentHeartbeat() error {
 	// agent环境变量
 	config.GEnvVars = heartbeatResponse.Envs
 
+	// 从环境管理->构建机详情-->环境变量增加该环境变量，用于忽略一些特殊的VPN产生的VPN
+	/*
+	  忽略一些在Windows机器上VPN代理软件所产生的虚拟网卡（有Mac地址）的IP，一般这类IP
+	  更像是一些路由器的192开头的IP，属于干扰IP，安装了这类软件的windows机器IP都会变成相同，所以需要忽略掉
+	 */
+	ignoreLocalVpnIP := config.GEnvVars["DEVOPS_IGNORE_LOCAL_VPN_IP"]
+	if len(ignoreLocalVpnIP) > 0  && GAgentEnv.AgentIp == ignoreLocalVpnIP { // Agent检测到的IP与要忽略的本地VPN IP相同，则更换真正IP
+		GAgentEnv.AgentIp = systemutil.GetAgentIp(ignoreLocalVpnIP)
+	}
+
 	// 检测agent版本与agent文件是否匹配
 	if config.AgentVersion != heartbeatResponse.MasterVersion {
 		agentFileVersion := config.DetectAgentVersion()
