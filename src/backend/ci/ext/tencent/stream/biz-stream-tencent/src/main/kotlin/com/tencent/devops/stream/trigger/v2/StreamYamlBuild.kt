@@ -55,7 +55,6 @@ import com.tencent.devops.process.pojo.BuildId
 import com.tencent.devops.common.ci.v2.enums.gitEventKind.TGitObjectKind
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.process.engine.common.VMUtils
-import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.stream.config.StreamStorageBean
 import com.tencent.devops.stream.service.GitCIPipelineService
 import com.tencent.devops.stream.trigger.parsers.modelCreate.ModelCreate
