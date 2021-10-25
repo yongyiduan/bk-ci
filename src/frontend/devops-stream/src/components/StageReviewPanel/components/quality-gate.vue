@@ -15,9 +15,8 @@
                                 ]"
                             ></i>
                             <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
-                            <span>
-                                {{ getInterceptValue(qualityItem.interceptResult) }} {{ getInterceptNum(qualityItem.interceptList) }}
-                            </span>
+                            <span :class="{ 'wait-color': qualityItem.interceptResult === 'WAIT' }">{{ getInterceptValue(qualityItem.interceptResult) }}</span>
+                            <span>{{ getInterceptNum(qualityItem.interceptList) }}</span>
                         </span>
                         <span v-if="qualityItem.interceptResult === 'WAIT'" class="summary-right">
                             <bk-button
@@ -32,7 +31,7 @@
                                         content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
                                         disabled: !isNotGateKeeper(qualityItem)
                                     }"
-                                >继续</span>
+                                >Continue</span>
                             </bk-button>
                             <bk-button
                                 text
@@ -45,7 +44,7 @@
                                         content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
                                         disabled: !isNotGateKeeper(qualityItem)
                                     }"
-                                >终止</span>
+                                >Stop</span>
                             </bk-button>
                         </span>
                         <span v-if="['INTERCEPT', 'INTERCEPT_PASS'].includes(qualityItem.interceptResult)" class="summary-right">
@@ -245,6 +244,9 @@
                 .quality-name {
                     max-width: calc(100% - 120px);
                     margin-right: 12px;
+                }
+                .wait-color {
+                    color: #ff9c01;
                 }
             }
             .summary-right {

@@ -6,7 +6,12 @@
                 <span class="info-title">
                     <span class="build-title text-ellipsis" v-bk-overflow-tips>{{ getBuildTitle(buildDetail) }}</span>
                     <span class="title-item"><icon :name="buildTypeIcon" size="14" v-bk-tooltips="{ content: buildDetail.objectKind, placements: ['top'] }"></icon></span>
-                    <span class="title-item"><img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}</span>
+                    <span class="title-item">
+                        <span v-if="buildDetail.objectKind === 'schedule'">System</span>
+                        <template v-else>
+                            <img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}
+                        </template>
+                    </span>
                 </span>
                 <span class="info-data">
                     <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
