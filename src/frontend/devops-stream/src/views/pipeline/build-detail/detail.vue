@@ -30,7 +30,9 @@
                 </span>
                 <span class="info-data">
                     <span :class="['info-item', 'text-ellipsis', { 'text-link': buildDetail.objectKind !== 'manual' }]" @click="goToCode(buildDetail)">
-                        <icon :name="buildTypeIcon" size="14"></icon>{{ getBuildSource(buildDetail) }}
+                        <icon name="commit" size="14" v-if="buildDetail.objectKind === 'schedule'"></icon>
+                        <icon :name="buildTypeIcon" size="14" v-else></icon>
+                        {{ getBuildSource(buildDetail) }}
                     </span>
                     <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
