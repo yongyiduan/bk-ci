@@ -179,11 +179,11 @@
 
         .handler-prompt-node {
             display: flex;
+            justify-content: space-between;
             margin-top: 24px;
             a {
                 cursor: pointer;
                 color: $primaryColor;
-                margin-left: 10px;
             }
         }
 
