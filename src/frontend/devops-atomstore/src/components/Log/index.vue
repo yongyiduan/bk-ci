@@ -11,8 +11,6 @@
 </template>
 
 <script>
-    import '@/components/Log/log.min.css'
-
     export default {
         name: 'pipeline-log',
         props: {
