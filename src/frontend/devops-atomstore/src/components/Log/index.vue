@@ -11,6 +11,7 @@
 </template>
 
 <script>
+    import '@/components/Log/log.min.css'
     export default {
         name: 'pipeline-log',
         props: {
@@ -58,18 +59,13 @@
         async mounted () {
             try {
                 if (!window.SodaLog) {
-                    await import('@/components/Log/log.min.css')
                     await import(
                         /* webpackChunkName: 'log' */
                         '@/components/Log/log.min.js'
                     )
-                    this.SodaLog = window.SodaLog
-                    this.buildNo && this.renderLog(this.buildNo)
-                } else {
-                    this.SodaLog = window.SodaLog
-                    this.buildNo && this.renderLog(this.buildNo)
                 }
-                
+                this.SodaLog = window.SodaLog
+                this.buildNo && this.renderLog(this.buildNo)
             } catch (error) {
                 console.log(error);
             }
