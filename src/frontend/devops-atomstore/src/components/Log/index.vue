@@ -56,19 +56,23 @@
             this._destroyLog()
         },
         async mounted () {
-            if (!window.SodaLog) {
-                await import('@/components/Log/log.min.css')
-                await import(
-                    /* webpackChunkName: 'log' */
-                    '@/components/Log/log.min.js'
-                )
+            try {
+                if (!window.SodaLog) {
+                    await import('@/components/Log/log.min.css')
+                    await import(
+                        /* webpackChunkName: 'log' */
+                        '@/components/Log/log.min.js'
+                    )
+                }
+                this.SodaLog = window.SodaLog
+                this.buildNo && this.renderLog(this.buildNo)
+            } catch (error) {
+                console.log(error);
             }
-            this.SodaLog = window.SodaLog
-            this.buildNo && this.renderLog(this.buildNo)
         },
         methods: {
             renderLog (buildNo) {
-                this.SodaLog.render(this.$refs.logContainer, `${API_URL_PREFIX}/${this.logUrl}`, buildNo, this.showTime, this.buildTag)
+                this.SodaLog.render(this.$refs.logContainer, `${window.API_URL_PREFIX}/${this.logUrl}`, buildNo, this.showTime, this.buildTag)
             },
             _destroyLog () {
                 this.SodaLog.unMount(this.$refs.logContainer)
