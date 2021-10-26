@@ -288,6 +288,7 @@ class PipelineBuildDao {
         buildId: String,
         buildStatus: BuildStatus,
         executeTime: Long?,
+        buildParameters: String?,
         recommendVersion: String?,
         remark: String? = null,
         errorInfoList: List<ErrorInfo>?
@@ -297,6 +298,7 @@ class PipelineBuildDao {
                 .set(STATUS, buildStatus.ordinal)
                 .set(END_TIME, LocalDateTime.now())
                 .set(EXECUTE_TIME, executeTime)
+                .set(BUILD_PARAMETERS, buildParameters)
                 .set(RECOMMEND_VERSION, recommendVersion)
 
             if (!remark.isNullOrBlank()) {

@@ -237,7 +237,6 @@ class PipelineRuntimeService @Autowired constructor(
 //            )
         }
 //        buildVariableService.deletePipelineBuildVar(projectId = projectId, pipelineId = pipelineId)
-        buildStartupParamService.deletePipelineBuildParam(projectId = projectId, pipelineId = pipelineId)
     }
 
     fun cancelPendingTask(projectId: String, pipelineId: String, userId: String) {
@@ -756,6 +755,7 @@ class PipelineRuntimeService @Autowired constructor(
     fun startBuild(
         pipelineInfo: PipelineInfo,
         fullModel: Model,
+        startParams: MutableMap<String, Any>,
         startParamsWithType: List<BuildParameters>,
         buildNo: Int? = null,
         buildNumRule: String? = null,
@@ -1774,6 +1774,7 @@ class PipelineRuntimeService @Autowired constructor(
                 buildId = buildId,
                 buildStatus = status,
                 executeTime = executeTime,
+                buildParameters = JsonUtil.toJson(buildParameters, formatted = false),
                 recommendVersion = recommendVersion,
                 remark = remark,
                 errorInfoList = errorInfoList
