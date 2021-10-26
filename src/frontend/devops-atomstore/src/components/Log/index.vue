@@ -58,10 +58,15 @@
             this._destroyLog()
         },
         mounted () {
-            import(/* webpackChunkName: 'log' */'@/components/Log/log.min.js').then(res => {
-                this.SodaLog = res
-                this.buildNo && this.renderLog(this.buildNo)
-            })
+            if (!window.SodaLog) {
+                await import('@/components/Log/log.min.css')
+                await import(
+                    /* webpackChunkName: 'log' */
+                    '@/components/Log/log.min.js'
+                )
+                this.SodaLog = window.SodaLog
+            }
+            this.buildNo && this.renderLog(this.buildNo)
         },
         methods: {
             renderLog (buildNo) {
