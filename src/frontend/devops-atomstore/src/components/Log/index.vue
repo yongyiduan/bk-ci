@@ -63,9 +63,13 @@
                         /* webpackChunkName: 'log' */
                         '@/components/Log/log.min.js'
                     )
+                    this.SodaLog = window.SodaLog
+                    this.buildNo && this.renderLog(this.buildNo)
+                } else {
+                    this.SodaLog = window.SodaLog
+                    this.buildNo && this.renderLog(this.buildNo)
                 }
-                this.SodaLog = window.SodaLog
-                this.buildNo && this.renderLog(this.buildNo)
+                
             } catch (error) {
                 console.log(error);
             }
