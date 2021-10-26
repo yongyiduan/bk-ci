@@ -55,7 +55,7 @@
         beforeDestroy () {
             this._destroyLog()
         },
-        mounted () {
+        async mounted () {
             if (!window.SodaLog) {
                 await import('@/components/Log/log.min.css')
                 await import(
