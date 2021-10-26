@@ -6,7 +6,12 @@
                 <span class="info-title">
                     <span class="build-title text-ellipsis" v-bk-overflow-tips>{{ getBuildTitle(buildDetail) }}</span>
                     <span class="title-item"><icon :name="buildTypeIcon" size="14" v-bk-tooltips="{ content: buildDetail.objectKind, placements: ['top'] }"></icon></span>
-                    <span class="title-item"><img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}</span>
+                    <span class="title-item">
+                        <span v-if="buildDetail.objectKind === 'schedule'">System</span>
+                        <template v-else>
+                            <img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}
+                        </template>
+                    </span>
                 </span>
                 <span class="info-data">
                     <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
@@ -25,7 +30,9 @@
                 </span>
                 <span class="info-data">
                     <span :class="['info-item', 'text-ellipsis', { 'text-link': buildDetail.objectKind !== 'manual' }]" @click="goToCode(buildDetail)">
-                        <icon :name="buildTypeIcon" size="14"></icon>{{ getBuildSource(buildDetail) }}
+                        <icon name="commit" size="14" v-if="buildDetail.objectKind === 'schedule'"></icon>
+                        <icon :name="buildTypeIcon" size="14" v-else></icon>
+                        {{ getBuildSource(buildDetail) }}
                     </span>
                     <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
@@ -186,6 +193,7 @@
             goToCode (gitRequestEvent) {
                 switch (gitRequestEvent.objectKind) {
                     case 'push':
+                    case 'schedule':
                         goCommit(this.projectInfo.web_url, gitRequestEvent.commitId)
                         break
                     case 'tag_push':

@@ -250,7 +250,8 @@
                             { name: 'Push', id: 'PUSH' },
                             { name: 'Tag push', id: 'TAG' },
                             { name: 'Merge request', id: 'MERGE' },
-                            { name: 'Manual trigger', id: 'MANUAL' }
+                            { name: 'Manual trigger', id: 'MANUAL' },
+                            { name: 'Scheduled', id: 'SCHEDULE' },
                         ]
                     },
                     {
@@ -462,6 +463,9 @@
                         break
                     case 'manual':
                         res = `Manual by ${gitRequestEvent.userId}`
+                        break
+                    case 'schedule':
+                        res = 'Scheduled'
                         break
                 }
                 return res
