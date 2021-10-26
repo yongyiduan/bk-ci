@@ -210,14 +210,6 @@ class DockerHostBuildService(
                 qpcUniquePath = dockerBuildInfo.qpcUniquePath,
                 hostConfig = hostConfig
             )
-            // 挂载bazel构建缓存
-            mountBazelOverlayfs(
-                pipelineId = dockerBuildInfo.pipelineId,
-                vmSeqId = dockerBuildInfo.vmSeqId,
-                poolNo = dockerBuildInfo.poolNo,
-                hostConfig = hostConfig
-            )
-
             val container = httpLongDockerCli.createContainerCmd(imageName)
                 .withName(containerName)
                 .withCmd("/bin/sh", ENTRY_POINT_CMD)
