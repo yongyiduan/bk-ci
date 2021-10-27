@@ -133,6 +133,8 @@
                             return 'quality-check-fail'
                         case stageControl.status === 'QUALITY_CHECK_PASS':
                             return 'review-auto-pass'
+                        case stageControl.status === 'QUALITY_CHECK_WAIT':
+                            return 'quality-check-wait'
                         case stageControl.status === 'REVIEW_ABORT':
                             return 'review-abort'
                         case this.stageStatusCls === 'SKIP':

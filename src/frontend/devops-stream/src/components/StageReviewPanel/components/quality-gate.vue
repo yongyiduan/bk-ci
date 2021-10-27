@@ -21,7 +21,6 @@
                         <span v-if="qualityItem.interceptResult === 'WAIT'" class="summary-right">
                             <bk-button
                                 text
-                                title="primary"
                                 class="mr10"
                                 :disabled="isNotGateKeeper(qualityItem)"
                                 @click.stop="changeGateWayStatus(true, qualityItem.ruleHashId)"
@@ -35,7 +34,6 @@
                             </bk-button>
                             <bk-button
                                 text
-                                title="primary"
                                 :disabled="isNotGateKeeper(qualityItem)"
                                 @click.stop="changeGateWayStatus(false, qualityItem.ruleHashId)"
                             >
@@ -72,6 +70,7 @@
 <script>
     import { mapState } from 'vuex'
     import { pipelines } from '@/http'
+    import { timeFormatter } from '@/utils'
 
     export default {
         filters: {
@@ -134,7 +133,7 @@
                     INTERCEPT: 'Stopped',
                     INTERCEPT_PASS: 'Passed'
                 }
-                return `${optNameMap[interceptResult]} by ${gateOptUser} at ${gateOptTime}`
+                return `${optNameMap[interceptResult]} by ${gateOptUser} at ${timeFormatter(gateOptTime)}`
             },
 
             getInterceptNum (interceptList = []) {
@@ -220,6 +219,9 @@
                     line-height: 20px;
                     height: 20px;
                     font-size: 12px;
+                    &:hover {
+                        color: inherit;
+                    }
                 }
             }
             .quality-title {
