@@ -664,3 +664,7 @@ export class HttpError extends Error {
         this.code = code
     }
 }
+
+export function bkVarWrapper (name) {
+    return '${{' + name + '}}'
+}

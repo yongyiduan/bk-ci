@@ -61,89 +61,65 @@
                 </bk-table-column>
             </bk-table>
         </main>
-
-        <bk-sideslider
-            class="create-atom-slider g-slide-radio"
-            :is-show.sync="createAtomsideConfig.show"
-            :title="createAtomsideConfig.title"
-            :quick-close="createAtomsideConfig.quickClose"
-            :width="createAtomsideConfig.width">
-            <template slot="content">
-                <form class="bk-form create-atom-form" v-if="hasOauth"
-                    v-bkloading="{
-                        isLoading: createAtomsideConfig.isLoading
-                    }">
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.名称') }} </label>
-                        <div class="bk-form-content atom-item-content">
-                            <input type="text" class="bk-form-input atom-name-input" :placeholder="$t('store.请输入中英文名称，不超过20个字符')"
-                                name="atomName"
-                                v-model="createAtomForm.name"
-                                v-validate="{
-                                    required: true,
-                                    max: 20,
-                                    regex: '^[\u4e00-\u9fa5a-zA-Z0-9-_]+$'
-                                }"
-                                :class="{ 'is-danger': errors.has('atomName') }">
-                            <p :class="errors.has('atomName') ? 'error-tips' : 'normal-tips'">
-                                {{ errors.first("atomName") && errors.first("atomName").indexOf($t('store.正则')) > 0 ? $t('store.由汉字、英文字母、数字、连字符(-)和下划线组成，长度小于20个字符') : errors.first("atomName") }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.标识') }} </label>
-                        <div class="bk-form-content atom-item-content is-tooltips">
-                            <div style="min-width: 100%;">
-                                <input type="text" class="bk-form-input atom-id-input" :placeholder="$t('store.请输入英文名称，不超过30个字符')"
-                                    name="atomId"
-                                    v-model="createAtomForm.atomCode"
-                                    v-validate="{
-                                        required: true,
-                                        max: 30,
-                                        regex: '^[a-zA-Z]+$'
-                                    }"
-                                    :class="{ 'is-danger': errors.has('atomId') }">
-                                <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
-                                    {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.只能输入英文') : errors.first("atomId") }}
-                                </p>
+        <template v-if="createAtomsideConfig.show">
+            <bk-sideslider
+                class="create-atom-slider g-slide-radio"
+                :is-show.sync="createAtomsideConfig.show"
+                :title="createAtomsideConfig.title"
+                :quick-close="createAtomsideConfig.quickClose"
+                :width="createAtomsideConfig.width">
+                <template slot="content">
+                    <form class="bk-form create-atom-form" v-if="hasOauth"
+                        v-bkloading="{
+                            isLoading: createAtomsideConfig.isLoading
+                        }">
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.名称') }} </label>
+                            <div class="bk-form-content atom-item-content is-tooltips">
+                                <div style="min-width: 100%">
+                                    <input type="text" class="bk-form-input atom-name-input" :placeholder="$t('store.请输入中英文名称，不超过20个字符')"
+                                        name="atomName"
+                                        v-model="createAtomForm.name"
+                                        v-validate="{
+                                            required: true,
+                                            regex: '^[\u4e00-\u9fa5a-zA-Z0-9-_.]{1,20}$'
+                                        }"
+                                        :class="{ 'is-danger': errors.has('atomName') }">
+                                    <p :class="errors.has('atomName') ? 'error-tips' : 'normal-tips'">
+                                        {{ errors.first("atomName") && errors.first("atomName").indexOf($t('store.正则')) > 0 ? $t('store.由汉字、英文字母、数字、连字符、下划线或点组成，不超过20个字符') : errors.first("atomName") }}
+                                    </p>
+                                </div>
+                                <bk-popover placement="right">
+                                    <i class="devops-icon icon-info-circle"></i>
+                                    <template slot="content">
+                                        <p> {{ $t('store.由汉字、英文字母、数字、连字符、下划线或点组成，不超过20个字符') }} </p>
+                                    </template>
+                                </bk-popover>
                             </div>
-                            <bk-popover placement="right">
-                                <i class="devops-icon icon-info-circle"></i>
-                                <template slot="content">
-                                    <p> {{ $t('store.唯一标识，创建后不能修改。将作为插件代码库路径。') }} </p>
-                                </template>
-                            </bk-popover>
+
                         </div>
-                    </div>
-                    <div class="bk-form-item is-required">
-                        <label class="bk-label"> {{ $t('store.调试项目') }} </label>
-                        <div class="bk-form-content atom-item-content is-tooltips">
-                            <div style="min-width: 100%">
-                                <bk-select v-model="createAtomForm.projectCode"
-                                    @selected="selectedProject"
-                                    @toggle="toggleProjectList"
-                                    searchable
-                                    :placeholder="$t('store.请选择调试项目')"
-                                    :enable-virtual-scroll="projectList && projectList.length > 3000"
-                                    :list="projectList"
-                                    id-key="projectCode"
-                                    display-key="projectName"
-                                >
-                                    <bk-option
-                                        v-for="item in projectList"
-                                        :key="item.projectCode"
-                                        :id="item.projectCode"
-                                        :name="item.projectName"
-                                    >
-                                    </bk-option>
-                                    <div slot="extension" style="cursor: pointer;">
-                                        <a :href="itemUrl" target="_blank">
-                                            <i class="devops-icon icon-plus-circle" />
-                                            {{ itemText }}
-                                        </a>
-                                    </div>
-                                </bk-select>
-                                <div v-if="atomErrors.projectError" class="error-tips"> {{ $t('store.项目不能为空') }} </div>
+                        <div class="bk-form-item is-required">
+                            <label class="bk-label"> {{ $t('store.标识') }} </label>
+                            <div class="bk-form-content atom-item-content is-tooltips">
+                                <div style="min-width: 100%;">
+                                    <input type="text" class="bk-form-input atom-id-input" :placeholder="$t('store.请输入英文名称，不超过30个字符')"
+                                        name="atomId"
+                                        v-model="createAtomForm.atomCode"
+                                        v-validate="{
+                                            required: true,
+                                            regex: '^[a-zA-Z][a-zA-Z0-9_-]{1,30}$'
+                                        }"
+                                        :class="{ 'is-danger': errors.has('atomId') }">
+                                    <p :class="errors.has('atomId') ? 'error-tips' : 'normal-tips'">
+                                        {{ errors.first("atomId") && errors.first("atomId").indexOf($t('store.正则')) > 0 ? $t('store.由英文字母、数字、连字符(-)或下划线(_)组成，以英文字母开头，不超过30个字符') : errors.first("atomId") }}
+                                    </p>
+                                </div>
+                                <bk-popover placement="right">
+                                    <i class="devops-icon icon-info-circle"></i>
+                                    <template slot="content">
+                                        <p> {{ $t('store.唯一标识，创建后不能修改。将作为插件代码库路径。') }} </p>
+                                    </template>
+                                </bk-popover>
                             </div>
                             <bk-popover placement="right" width="400">
                                 <i class="devops-icon icon-info-circle"></i>
