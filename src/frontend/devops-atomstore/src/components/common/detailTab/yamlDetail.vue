@@ -1,6 +1,5 @@
 <template>
     <section>
-        <h3 class="yaml-title">{{ $t('store.配置片段：') }}</h3>
         <codeSection v-bind="$props"></codeSection>
     </section>
 </template>

@@ -199,7 +199,7 @@
     "该镜像不推荐使用": "该镜像已不推荐使用",
     "yaml": "YAML 片段",
     "YAMLV1": "YAML V1 片段",
-    "YAMLV2": "YAML V2 片段",
+    "YAMLV2": "YAML 片段",
     "成员名称": "成员名称",
     "该分类下暂无容器镜像": "该分类下暂无容器镜像",
     "发布容器镜像": "发布容器镜像",
@@ -740,5 +740,5 @@
     "值类型": "值类型",
     "支持的操作": "支持的操作",
     "说明：": "说明：",
-    "说明文案": "支持在 stream 中，通过表达式${{ steps.<step-id>.outputs.<output-var-name> }} 访问; 在UI编排流水线中，通过表达式${{ <namespace>_<output-var-name> }} 访问的操作"
+    "说明文案": "在 stream 中，通过表达式${{ steps.<step-id>.outputs.<output-var-name> }} 访问; 在UI编排流水线中，通过表达式${{ <namespace>_<output-var-name> }} 访问。"
 }

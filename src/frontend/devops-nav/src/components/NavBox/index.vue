@@ -90,9 +90,9 @@
 
         @Prop({ default: true })
         withHover: boolean
-
+        
         isAbsoluteUrl = isAbsoluteUrl
-
+        
        gotoPage ({ link_new: linkNew, newWindow = false, newWindowUrl }) {
            const cAlias = this.currentPage && getServiceAliasByPath(this.currentPage['link_new'])
            const nAlias = getServiceAliasByPath(linkNew)
