@@ -755,7 +755,6 @@ class PipelineRuntimeService @Autowired constructor(
     fun startBuild(
         pipelineInfo: PipelineInfo,
         fullModel: Model,
-        startParams: MutableMap<String, Any>,
         startParamsWithType: List<BuildParameters>,
         buildNo: Int? = null,
         buildNumRule: String? = null,
@@ -1817,6 +1816,16 @@ class PipelineRuntimeService @Autowired constructor(
         } else return null
 
         return "$majorVersion.$minorVersion.$fixVersion"
+    }
+
+    fun initBuildParameters(buildId: String) {
+        val buildParameters: List<BuildParameters> = try {
+            getBuildParametersFromStartup(buildId)
+        } catch (ignore: Throwable) {
+            logger.warn("BKSystemErrorMonitor|$buildId|getBuildParameters exception:", ignore)
+            mutableListOf()
+        }
+        pipelineBuildDao.updateBuildParameters(dslContext, buildId, JsonUtil.toJson(buildParameters, false))
     }
 
     fun getBuildParametersFromStartup(buildId: String): List<BuildParameters> {
