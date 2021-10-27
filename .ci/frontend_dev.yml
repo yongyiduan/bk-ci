@@ -7,6 +7,7 @@ variables:
   ips: "11.185.144.156,9.4.20.15"
 
 on:
+  push: ["frontend-master"]
   schedules:
     cron: 0 * * * *
     branches: [ "frontend-develop" ]
@@ -30,46 +31,39 @@ stages:
           pullType: "BRANCH"
           refName: "integration"
           localPath: "devops-config"
-      # - uses: calculatehash@1.*
-      #   id: calculate
-      #   with:
-      #     file_path: src/frontend/package.json
-      #       # src/frontend/devops-nav/package.json
-      #       # src/frontend/devops-pipeline/package.json
-      #       # src/frontend/devops-atomstore/package.json
-      #       # src/frontend/devops-codelib/package.json
-      #       # src/frontend/devops-environment/package.json
-      #       # src/frontend/devops-quality/package.json
-      #       # src/frontend/devops-experience/package.json
-      #       # src/frontend/devops-turbo/package.json
-      #     calculate_func: md5
-      # - uses: cache@1.*
-      #   id: cache
-      #   with:
-      #     cacheKey: "bk_ci_frontend_dev_linux_${{ steps.calculate.outputs.hash_value }}"
-      #     cachePaths: |
-      #       src/frontend/node_modules
-      #       src/frontend/devops-nav/node_modules
-      #       src/frontend/devops-pipeline/node_modules
-      #       src/frontend/devops-atomstore/node_modules
-      #       src/frontend/devops-codelib/node_modules
-      #       src/frontend/devops-environment/node_modules
-      #       src/frontend/devops-quality/node_modules
-      #       src/frontend/devops-experience/node_modules
-      #       src/frontend/devops-turbo/node_modules
-      #       src/frontend/devops-stream/node_modules
-      #     restoreKeys: "bk_ci_frontend_dev_linux_"
+      - uses: calculatehash@1.*
+        id: calculate
+        with:
+          file_path: src/frontend/package.json,src/frontend/devops-nav/package.json,src/frontend/devops-pipeline/package.json,src/frontend/devops-atomstore/package.json,src/frontend/devops-codelib/package.json,src/frontend/devops-environment/package.json,src/frontend/devops-quality/package.json,src/frontend/devops-experience/package.json,src/frontend/devops-turbo/package.json
+          calculate_func: md5
+      - uses: cache@1.*
+        id: cache
+        with:
+          cacheKey: "bk_ci_frontend_dev_linux_${{ steps.calculate.outputs.hash_value }}"
+          cachePaths: |
+            src/frontend/node_modules
+            src/frontend/devops-nav/node_modules
+            src/frontend/devops-pipeline/node_modules
+            src/frontend/devops-atomstore/node_modules
+            src/frontend/devops-codelib/node_modules
+            src/frontend/devops-environment/node_modules
+            src/frontend/devops-quality/node_modules
+            src/frontend/devops-experience/node_modules
+            src/frontend/devops-turbo/node_modules
+            src/frontend/devops-stream/node_modules
+          restoreKeys: "bk_ci_frontend_dev_linux_"
       - name: "Bash"
         run: |
           cd src/frontend
-          # if [ ${{ steps.cache.outputs.cacheHit }} == 'false' ]
-          # then
-          #   yarn
-          # else
-          #   echo "package.json has not changed"
-          # fi
+          if [ ${{ steps.cache.outputs.cacheHit }} == 'false' ]
+          then
+            yarn
+          else
+            echo "package.json has not changed"
+          fi
           yarn
           ls -l ./node_modules/.bin
+          ls -l ./node_modules
           chmod -R 777 ./
           yarn public -e dev -t tencent -s ${{ variables.modules }}
 
