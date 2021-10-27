@@ -63,7 +63,7 @@ import com.tencent.devops.process.jmx.elements.JmxElements
 import com.tencent.devops.process.pojo.BuildTask
 import com.tencent.devops.process.pojo.BuildTaskResult
 import com.tencent.devops.process.pojo.BuildVariables
-import com.tencent.devops.process.pojo.mq.PipelineBuildContainerEvent
+import com.tencent.devops.process.engine.pojo.event.PipelineBuildContainerEvent
 import com.tencent.devops.process.service.BuildVariableService
 import com.tencent.devops.process.service.PipelineTaskPauseService
 import com.tencent.devops.process.service.PipelineTaskService
@@ -337,13 +337,23 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                 BuildTask(buildId, vmSeqId, BuildTaskStatus.WAIT)
             }
             task.taskId == VMUtils.genEndPointTaskId(task.taskSeq) -> { // 全部完成了
-                pipelineRuntimeService.claimBuildTask(buildId, task, userId) // 刷新一下这个结束的任务节点时间
+                pipelineRuntimeService.claimBuildTask(task, userId) // 刷新一下这个结束的任务节点时间
                 BuildTask(buildId, vmSeqId, BuildTaskStatus.END)
             }
             pipelineTaskService.isNeedPause(taskId = task.taskId, buildId = task.buildId, taskRecord = task) -> {
                 // 如果插件配置了前置暂停, 暂停期间关闭当前构建机，节约资源。
                 pipelineTaskService.executePause(taskId = task.taskId, buildId = task.buildId, taskRecord = task)
                 LOG.info("ENGINE|$buildId|taskId=${task.taskId}|taskAtom=${task.taskAtom} cfg pause, shutdown agent")
+                pipelineEventDispatcher.dispatch(PipelineBuildStatusBroadCastEvent(
+                    source = "TaskPause-${task.containerId}-${task.buildId}",
+                    projectId = task.projectId,
+                    pipelineId = task.pipelineId,
+                    userId = task.starter,
+                    buildId = task.buildId,
+                    taskId = task.taskId,
+                    stageId = task.stageId,
+                    actionType = ActionType.REFRESH
+                ))
                 BuildTask(buildId, vmSeqId, BuildTaskStatus.END)
             }
             else -> {
@@ -360,7 +370,7 @@ class EngineVMBuildService @Autowired(required = false) constructor(
 
                 // 如果状态未改变，则做认领任务动作
                 if (!task.status.isRunning()) {
-                    pipelineRuntimeService.claimBuildTask(buildId, task, userId)
+                    pipelineRuntimeService.claimBuildTask(task, userId)
                     taskBuildDetailService.taskStart(buildId, task.taskId)
                     jmxElements.execute(task.taskType)
                 }
@@ -391,7 +401,7 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                     type = task.taskType,
                     params = task.taskParams.map {
                         val obj = ObjectReplaceEnvVarUtil.replaceEnvVar(it.value, buildVariable)
-                        it.key to JsonUtil.toJson(obj)
+                        it.key to JsonUtil.toJson(obj, formatted = false)
                     }.filter {
                         !it.first.startsWith("@type")
                     }.toMap(),
@@ -541,11 +551,11 @@ class EngineVMBuildService @Autowired(required = false) constructor(
             val task = pipelineRuntimeService.listContainerBuildTasks(buildId, vmSeqId)
                 .firstOrNull { it.taskId == VMUtils.genEndPointTaskId(it.taskSeq) }
 
+            buildingHeartBeatUtils.dropHeartbeat(buildId = buildId, vmSeqId = vmSeqId)
             return if (task == null || task.status.isFinish()) {
-                LOG.info("ENGINE|$buildId|Agent|$vmName|END_JOB|j($vmSeqId)|Task[${task?.taskName}] ${task?.status}")
+                LOG.warn("ENGINE|$buildId|Agent|$vmName|END_JOB|j($vmSeqId)|Task[${task?.taskName}] ${task?.status}")
                 false
             } else {
-                buildingHeartBeatUtils.dropHeartbeat(buildId = buildId, vmSeqId = vmSeqId)
                 pipelineRuntimeService.completeClaimBuildTask(
                     completeTask = CompleteTask(
                         buildId = buildId,

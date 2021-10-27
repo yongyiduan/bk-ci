@@ -212,6 +212,10 @@ export function goToPage (options) {
     }
     eventBus.$emit('change-extension-route', options)
 }
+export function isAbsoluteUrl (url) {
+    return /^(http(s)?:)?\/\//.test(url)
+}
+
 export class HttpError extends Error {
     code = 500
     constructor (code, message = 'http request error message') {

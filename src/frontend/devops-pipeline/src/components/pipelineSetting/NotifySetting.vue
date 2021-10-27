@@ -118,6 +118,5 @@
             padding: 0;
             width: 180px;
         }
-
     }
 </style>

@@ -21,8 +21,9 @@
                             :href="addConsole(child.link_new)"
                             @click.prevent="gotoPage(child)"
                         >
+                            <img class="service-url-icon" v-if="isAbsoluteUrl(child.logoUrl)" :src="child.logoUrl" />
                             <i
-                                v-if="serviceIcon(child.logoUrl) === 'logo-bcs'"
+                                v-else-if="serviceIcon(child.logoUrl) === 'logo-bcs'"
                                 class="devops-icon service-icon icon-logo-bcs"
                             >
                                 <span
@@ -69,7 +70,7 @@
 <script lang="ts">
     import Vue from 'vue'
     import { Component, Prop } from 'vue-property-decorator'
-    import { urlJoin, getServiceAliasByPath } from '../../utils/util'
+    import { urlJoin, getServiceAliasByPath, isAbsoluteUrl } from '../../utils/util'
     import eventBus from '../../utils/eventBus'
 
     @Component
@@ -89,7 +90,9 @@
 
         @Prop({ default: true })
         withHover: boolean
-
+        
+        isAbsoluteUrl = isAbsoluteUrl
+        
        gotoPage ({ link_new: linkNew, newWindow = false, newWindowUrl }) {
            const cAlias = this.currentPage && getServiceAliasByPath(this.currentPage['link_new'])
            const nAlias = getServiceAliasByPath(linkNew)
@@ -186,6 +189,11 @@
                         font-size: 20px;
                         margin-right: 12px;
                         color: #6b798e;
+                    }
+                    .service-url-icon {
+                        margin-right: 12px;
+                        width: 20px;
+                        height: 20px;
                     }
                     .service-name {
                         @include ellipsis();

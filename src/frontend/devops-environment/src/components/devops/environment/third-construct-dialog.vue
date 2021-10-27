@@ -58,7 +58,11 @@
                         2.{{ $t('environment.check') }}【<a class="refresh-detail" target="_blank" :href="installDocsLink">{{ $t('environment.nodeInfo.installBuildMachineTips') }}</a>】
                     </div>
                 </div>
-                <p class="handler-prompt">{{ $t('environment.nodeInfo.connectedNodes') }}</p>
+                <div class="handler-prompt-node">
+                    <p>{{ $t('environment.nodeInfo.connectedNodes') }}</p>
+                    <a :href="spawnNodesDescLink" target="_blank">
+                        {{ $t('environment.nodeInfo.unableToSpawnNodes') }}</a>
+                </div>
                 <div class="construct-card-item connection-node-card">
                     <p class="no-connection-node" v-if="connectNodeDetail.status === 'UN_IMPORT'">
                         {{ $t('environment.nodeInfo.noConnectedNodes') }}，<span class="refresh-detail" @click="requetConstructNode">{{ $t('environment.clickToRefresh') }}</span>
@@ -125,7 +129,8 @@
         data () {
             return {
                 defaultMachineCover: require('../../../scss/logo/machine.svg'),
-                installDocsLink: `${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=36426596`
+                installDocsLink: `${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=36426596`,
+                spawnNodesDescLink: `${IWIKI_DOCS_URL}/p/1083624634`
             }
         },
         methods: {
@@ -170,6 +175,16 @@
         .handler-prompt {
             margin-top: 24px;
             text-align: left;
+        }
+
+        .handler-prompt-node {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            a {
+                cursor: pointer;
+                color: $primaryColor;
+            }
         }
 
         .gateway-item-content {

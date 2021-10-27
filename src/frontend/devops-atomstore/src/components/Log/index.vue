@@ -12,7 +12,6 @@
 
 <script>
     import '@/components/Log/log.min.css'
-
     export default {
         name: 'pipeline-log',
         props: {
@@ -57,15 +56,23 @@
         beforeDestroy () {
             this._destroyLog()
         },
-        mounted () {
-            import(/* webpackChunkName: 'log' */'@/components/Log/log.min.js').then(res => {
-                this.SodaLog = res
+        async mounted () {
+            try {
+                if (!window.SodaLog) {
+                    await import(
+                        /* webpackChunkName: 'log' */
+                        '@/components/Log/log.min.js'
+                    )
+                }
+                this.SodaLog = window.SodaLog
                 this.buildNo && this.renderLog(this.buildNo)
-            })
+            } catch (error) {
+                console.log(error);
+            }
         },
         methods: {
             renderLog (buildNo) {
-                this.SodaLog.render(this.$refs.logContainer, `${API_URL_PREFIX}/${this.logUrl}`, buildNo, this.showTime, this.buildTag)
+                this.SodaLog.render(this.$refs.logContainer, `${window.API_URL_PREFIX}/${this.logUrl}`, buildNo, this.showTime, this.buildTag)
             },
             _destroyLog () {
                 this.SodaLog.unMount(this.$refs.logContainer)
