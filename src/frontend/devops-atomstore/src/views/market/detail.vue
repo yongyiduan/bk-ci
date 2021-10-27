@@ -164,7 +164,7 @@
                     this.requestAtomStatistic({ storeCode: atomCode, storeType: 'ATOM' }),
                     this.getUserApprovalInfo(atomCode),
                     this.getAtomYaml({ atomCode }),
-                    this.getAtomYamlV2({ atomCode }),
+                    this.getAtomYamlV2({ atomCode }).catch(({ data }) => ''),
                     this.getQualityData(atomCode)
                 ]).then(([atomDetail, atomStatic, userAppInfo, yaml, yamlV2, quality]) => {
                     const detail = atomDetail || {}
