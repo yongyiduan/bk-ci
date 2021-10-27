@@ -252,7 +252,7 @@
                 },
                 // 构建机内容
                 constructImportForm: {
-                    model: 'MACOS',
+                    model: 'Linux',
                     location: '',
                     link: ''
                 },
@@ -564,7 +564,7 @@
                             this.constructImportForm.model = node.nodeType === 'DEVCLOUD' ? 'LINUX' : node.osName.toUpperCase()
                             this.requestGateway(gateway, node)
                         } else {
-                            this.constructImportForm.model = 'MACOS'
+                            this.constructImportForm.model = 'LINUX'
                             this.requestGateway()
                         }
                     } else {
