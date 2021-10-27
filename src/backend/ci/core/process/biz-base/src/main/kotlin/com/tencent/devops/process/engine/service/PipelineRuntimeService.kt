@@ -1154,18 +1154,6 @@ class PipelineRuntimeService @Autowired constructor(
                         cancelUser = ""
                     )
                 } else { // 创建构建记录
-                    // 构建号递增
-                    val buildNum = pipelineBuildSummaryDao.updateBuildNum(
-                        dslContext = transactionContext,
-                        pipelineId = pipelineId
-                    )
-                    buildVariableService.setVariable(
-                        projectId = pipelineInfo.projectId,
-                        pipelineId = pipelineId,
-                        buildId = buildId,
-                        varName = PIPELINE_BUILD_NUM,
-                        varValue = buildNum
-                    )
                     val buildNumAlias = if (!buildNumRule.isNullOrBlank()) {
                         val parsedValue = pipelineRuleService.parsePipelineRule(
                             pipelineId = pipelineId,
@@ -1177,11 +1165,6 @@ class PipelineRuntimeService @Autowired constructor(
                     } else null
                     // 写自定义构建号信息
                     if (!buildNumAlias.isNullOrBlank()) {
-                        pipelineBuildSummaryDao.updateBuildNumAlias(
-                            dslContext = transactionContext,
-                            pipelineId = pipelineId,
-                            buildNumAlias = buildNumAlias
-                        )
                         buildVariableService.setVariable(
                             projectId = pipelineInfo.projectId,
                             pipelineId = pipelineId,
@@ -1190,6 +1173,19 @@ class PipelineRuntimeService @Autowired constructor(
                             varValue = buildNumAlias
                         )
                     }
+                    // 构建号递增
+                    val buildNum = pipelineBuildSummaryDao.updateBuildNum(
+                        dslContext = transactionContext,
+                        pipelineId = pipelineId,
+                        buildNumAlias = buildNumAlias
+                    )
+                    buildVariableService.setVariable(
+                        projectId = pipelineInfo.projectId,
+                        pipelineId = pipelineId,
+                        buildId = buildId,
+                        varName = PIPELINE_BUILD_NUM,
+                        varValue = buildNum
+                    )
                     pipelineBuildDao.create(
                         dslContext = transactionContext,
                         projectId = pipelineInfo.projectId,
