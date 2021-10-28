@@ -13,7 +13,7 @@
                 <template slot-scope="props">
                     <a class="item-pipelinename" :title="props.row.pipelineName"
                         target="_blank"
-                        :href="`/pipeline/${props.row.pipelineId}/detail/${props.row.buildId}/#${projectId}`">{{ props.row.pipelineName }}
+                        :href="`/pipeline/${props.row.pipelineId}/detail/${props.row.buildId}/${projectName}`">{{ props.row.pipelineName }}
                     </a>
                 </template>
             </bk-table-column>
@@ -79,6 +79,9 @@
             ...mapState(['projectId']),
             nodeHashId () {
                 return this.$route.params.agentId
+            },
+            projectName () {
+                return this.$route.hash
             }
         },
         created () {
