@@ -13,7 +13,7 @@
                 <template slot-scope="props">
                     <a class="item-pipelinename" :title="props.row.pipelineName"
                         target="_blank"
-                        :href="`/console/pipeline/${projectId}/${props.row.pipelineId}/detail/${props.row.buildId}`">{{ props.row.pipelineName }}
+                        :href="`/pipeline/${props.row.pipelineId}/detail/${props.row.buildId}/#${projectId}`">{{ props.row.pipelineName }}
                     </a>
                 </template>
             </bk-table-column>
