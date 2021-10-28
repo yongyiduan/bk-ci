@@ -11,20 +11,20 @@ class BluekingNotifyReceiversCmdImpl : NotifyReceiversCmd() {
 
     override fun execute(commandContext: BuildNotifyContext) {
         val setting = commandContext.pipelineSetting
-        val receivers = mutableSetOf<String>()
         if (commandContext.buildStatus.isFailure()) {
-            val failReceivers = setting.failSubscription.users.split(",").toMutableSet()
-            failReceivers.forEach {
-                // 替换占位符
-                receivers.add(EnvUtils.parseEnv(it, commandContext.variables, true))
+            setting.failSubscription.users.split(",").forEach {
+                commandContext.receivers.add(EnvUtils.parseEnv(
+                    command = it,
+                    data = commandContext.variables,
+                    replaceWithEmpty = true))
             }
         } else if (commandContext.buildStatus.isSuccess()) {
-            val successReceivers = setting.successSubscription.users.split(",").toMutableSet()
-            successReceivers.forEach {
-                // 替换占位符
-                receivers.add(EnvUtils.parseEnv(it, commandContext.variables, true))
+            setting.successSubscription.users.split(",").forEach {
+                commandContext.receivers.add(EnvUtils.parseEnv(
+                    command = it,
+                    data = commandContext.variables,
+                    replaceWithEmpty = true))
             }
         }
-        commandContext.receivers = receivers
     }
 }
