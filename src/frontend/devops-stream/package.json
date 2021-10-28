@@ -51,7 +51,7 @@
     "@blueking/babel-preset-bk": "^2.0.0",
     "@blueking/log": "1.1.9",
     "@blueking/user-selector": "^1.0.6",
-    "@icon-cool/bk-icon-stream": "0.0.3",
+    "@icon-cool/bk-icon-stream": "0.0.4",
     "@vue/composition-api": "^1.2.4",
     "acorn": "^6.0.5",
     "axios": "~0.18.0",

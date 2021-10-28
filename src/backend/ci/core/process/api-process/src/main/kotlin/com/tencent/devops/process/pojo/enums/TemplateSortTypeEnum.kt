@@ -24,20 +24,20 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package com.tencent.devops.process.pojo.enums
 
-package com.tencent.devops.artifactory.service
+enum class TemplateSortTypeEnum(val value: String) {
+    PIPELINE_NAME("pipelineName"),
+    VERSION("version"),
+    UPDATE_TIME("updateTime"),
+    STATUS("status");
 
-import com.tencent.devops.artifactory.pojo.CombinationPath
-import com.tencent.devops.artifactory.pojo.FileDetail
-import com.tencent.devops.artifactory.pojo.FileInfo
-import com.tencent.devops.artifactory.pojo.PathList
-
-interface BuildCustomDirService {
-    fun list(userId: String, projectId: String, path: String): List<FileInfo>
-    fun show(userId: String, projectId: String, path: String): FileDetail
-    fun mkdir(userId: String, projectId: String, path: String)
-    fun rename(userId: String, projectId: String, fromPath: String, toPath: String)
-    fun copy(userId: String, projectId: String, combinationPath: CombinationPath)
-    fun move(userId: String, projectId: String, combinationPath: CombinationPath)
-    fun delete(userId: String, projectId: String, pathList: PathList)
+    companion object {
+        fun get(value: String): TemplateSortTypeEnum {
+            values().forEach {
+                if (value == it.value) return it
+            }
+            return PIPELINE_NAME
+        }
+    }
 }

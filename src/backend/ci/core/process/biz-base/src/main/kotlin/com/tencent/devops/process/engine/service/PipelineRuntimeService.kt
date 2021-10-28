@@ -1154,18 +1154,6 @@ class PipelineRuntimeService @Autowired constructor(
                         cancelUser = ""
                     )
                 } else { // 创建构建记录
-                    // 构建号递增
-                    val buildNum = pipelineBuildSummaryDao.updateBuildNum(
-                        dslContext = transactionContext,
-                        pipelineId = pipelineId
-                    )
-                    buildVariableService.setVariable(
-                        projectId = pipelineInfo.projectId,
-                        pipelineId = pipelineId,
-                        buildId = buildId,
-                        varName = PIPELINE_BUILD_NUM,
-                        varValue = buildNum
-                    )
                     val buildNumAlias = if (!buildNumRule.isNullOrBlank()) {
                         val parsedValue = pipelineRuleService.parsePipelineRule(
                             pipelineId = pipelineId,
@@ -1177,11 +1165,6 @@ class PipelineRuntimeService @Autowired constructor(
                     } else null
                     // 写自定义构建号信息
                     if (!buildNumAlias.isNullOrBlank()) {
-                        pipelineBuildSummaryDao.updateBuildNumAlias(
-                            dslContext = transactionContext,
-                            pipelineId = pipelineId,
-                            buildNumAlias = buildNumAlias
-                        )
                         buildVariableService.setVariable(
                             projectId = pipelineInfo.projectId,
                             pipelineId = pipelineId,
@@ -1190,6 +1173,19 @@ class PipelineRuntimeService @Autowired constructor(
                             varValue = buildNumAlias
                         )
                     }
+                    // 构建号递增
+                    val buildNum = pipelineBuildSummaryDao.updateBuildNum(
+                        dslContext = transactionContext,
+                        pipelineId = pipelineId,
+                        buildNumAlias = buildNumAlias
+                    )
+                    buildVariableService.setVariable(
+                        projectId = pipelineInfo.projectId,
+                        pipelineId = pipelineId,
+                        buildId = buildId,
+                        varName = PIPELINE_BUILD_NUM,
+                        varValue = buildNum
+                    )
                     pipelineBuildDao.create(
                         dslContext = transactionContext,
                         projectId = pipelineInfo.projectId,
@@ -1571,7 +1567,7 @@ class PipelineRuntimeService @Autowired constructor(
             if (taskRecord != null) {
                 with(taskRecord) {
                     if (BuildStatus.values()[status].isRunning()) {
-                        val taskParam = JsonUtil.toMutableMapSkipEmpty(taskParams)
+                        val taskParam = JsonUtil.toMutableMap(taskParams)
                         taskParam[BS_MANUAL_ACTION] = manualAction
                         taskParam[BS_MANUAL_ACTION_USERID] = userId
                         val result = pipelineBuildTaskDao.updateTaskParam(
@@ -1611,7 +1607,7 @@ class PipelineRuntimeService @Autowired constructor(
             if (taskRecord != null) {
                 with(taskRecord) {
                     if (BuildStatus.values()[status].isRunning()) {
-                        val taskParam = JsonUtil.toMutableMapSkipEmpty(taskParams)
+                        val taskParam = JsonUtil.toMutableMap(taskParams)
                         taskParam[BS_MANUAL_ACTION] = params.status.toString()
                         taskParam[BS_MANUAL_ACTION_USERID] = userId
                         taskParam[BS_MANUAL_ACTION_DESC] = params.desc ?: ""
@@ -1773,6 +1769,7 @@ class PipelineRuntimeService @Autowired constructor(
                 buildId = buildId,
                 buildStatus = status,
                 executeTime = executeTime,
+                buildParameters = JsonUtil.toJson(buildParameters, formatted = false),
                 recommendVersion = recommendVersion,
                 remark = remark,
                 errorInfoList = errorInfoList
@@ -1815,6 +1812,16 @@ class PipelineRuntimeService @Autowired constructor(
         } else return null
 
         return "$majorVersion.$minorVersion.$fixVersion"
+    }
+
+    fun initBuildParameters(buildId: String) {
+        val buildParameters: List<BuildParameters> = try {
+            getBuildParametersFromStartup(buildId)
+        } catch (ignore: Throwable) {
+            logger.warn("BKSystemErrorMonitor|$buildId|getBuildParameters exception:", ignore)
+            mutableListOf()
+        }
+        pipelineBuildDao.updateBuildParameters(dslContext, buildId, JsonUtil.toJson(buildParameters, false))
     }
 
     fun getBuildParametersFromStartup(buildId: String): List<BuildParameters> {
