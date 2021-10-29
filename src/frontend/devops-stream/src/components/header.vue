@@ -144,6 +144,7 @@
                 margin: 0 8px;
                 color: #f5f7fa;
                 cursor: pointer;
+                white-space: nowrap;
             }
             .setting {
                 cursor: pointer;
