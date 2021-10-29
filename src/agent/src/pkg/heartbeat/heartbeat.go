@@ -96,9 +96,12 @@ func agentHeartbeat() error {
       忽略一些在Windows机器上VPN代理软件所产生的虚拟网卡（有Mac地址）的IP，一般这类IP
       更像是一些路由器的192开头的IP，属于干扰IP，安装了这类软件的windows机器IP都会变成相同，所以需要忽略掉
     */
-    ignoreLocalVpnIP := config.GEnvVars["DEVOPS_IGNORE_LOCAL_VPN_IP"]
-    if config.GAgentEnv.AgentIp == ignoreLocalVpnIP { // Agent检测到的IP与要忽略的本地VPN IP相同，则更换真正IP
-        config.GAgentEnv.AgentIp = systemutil.GetAgentIp(ignoreLocalVpnIP)
+    ignoreLocalVpnIPs := config.GEnvVars["DEVOPS_IGNORE_LOCAL_VPN_IPS"]
+    if len(ignoreLocalVpnIPs) > 0 {
+        splitIps := util.SplitAndTrimSpace(ignoreLocalVpnIPs, ",")
+        if util.Contains(splitIps, config.GAgentEnv.AgentIp) { // Agent检测到的IP与要忽略的本地VPN IP相同，则更换真正IP
+            config.GAgentEnv.AgentIp = systemutil.GetAgentIp(splitIps)
+        }
     }
 
     // 检测agent版本与agent文件是否匹配
