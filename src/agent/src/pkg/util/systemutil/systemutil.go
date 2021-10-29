@@ -142,7 +142,8 @@ func GetHostName() string {
 	return name
 }
 
-func GetAgentIp() string {
+// GetAgentIp 返回本机IP，但允许忽略指定的IP ignoreIp, 如果一直找不到，则最终127.0.0.1 将不会被ignoreIp忽略
+func GetAgentIp(ignoreIp string) string {
 	defaultIp := "127.0.0.1"
 	ip, err := getLocalIp()
 	if err == nil {
@@ -178,7 +179,7 @@ func GetAgentIp() string {
 			}
 
 			logs.Info("localIp=%s|net=%s|flag=%s|ip=%s", ip, nc.Name, nc.Flags, ipNet.IP)
-			if ip == ipNet.IP.String() {
+			if ip == ipNet.IP.String() && ignoreIp != ip {
 				return ip // 匹配到该通信IP是真正的网卡IP
 			} else if defaultIp == ip { // 仅限于第一次找到合法ip，做赋值
 				logs.Info("localIp=%s|change defaultIp [%s] to [%s]", ip, defaultIp, ipNet.IP.String())

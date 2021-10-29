@@ -100,7 +100,7 @@ func Init() {
 
 func LoadAgentEnv() {
 	GAgentEnv = new(AgentEnv)
-	GAgentEnv.AgentIp = systemutil.GetAgentIp()
+	GAgentEnv.AgentIp = systemutil.GetAgentIp("")
 	GAgentEnv.HostName = systemutil.GetHostName()
 	GAgentEnv.OsName = systemutil.GetOsName()
 	GAgentEnv.SlaveVersion = DetectWorkerVersion()
