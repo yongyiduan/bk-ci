@@ -97,8 +97,8 @@ func agentHeartbeat() error {
       更像是一些路由器的192开头的IP，属于干扰IP，安装了这类软件的windows机器IP都会变成相同，所以需要忽略掉
     */
     ignoreLocalVpnIP := config.GEnvVars["DEVOPS_IGNORE_LOCAL_VPN_IP"]
-    if len(ignoreLocalVpnIP) > 0 && GAgentEnv.AgentIp == ignoreLocalVpnIP { // Agent检测到的IP与要忽略的本地VPN IP相同，则更换真正IP
-        GAgentEnv.AgentIp = systemutil.GetAgentIp(ignoreLocalVpnIP)
+    if config.GAgentEnv.AgentIp == ignoreLocalVpnIP { // Agent检测到的IP与要忽略的本地VPN IP相同，则更换真正IP
+        config.GAgentEnv.AgentIp = systemutil.GetAgentIp(ignoreLocalVpnIP)
     }
 
     // 检测agent版本与agent文件是否匹配
