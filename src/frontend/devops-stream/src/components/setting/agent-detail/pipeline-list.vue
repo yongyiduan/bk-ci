@@ -31,7 +31,7 @@
                 <template slot-scope="props">
                     <span :class="{
                         'is-success': props.row.status === 'DONE',
-                        'is-fail': props.row.status === 'FAIL'
+                        'is-fail': props.row.status === 'FAILURE'
                     }">{{ statusMap[props.row.status] }}</span>
                     <span v-if="props.row.agentTask && props.row.agentTask.status === 'RUNNING'">{{`（${$t('environment.nodeInfo.agentTaskRunning')}）`}}</span>
                 </template>
@@ -71,7 +71,7 @@
                     'QUEUE': this.$t('environment.nodeInfo.queuing'),
                     'RUNNING': this.$t('environment.nodeInfo.running'),
                     'DONE': this.$t('environment.nodeInfo.succeed'),
-                    'FAIL': this.$t('environment.nodeInfo.fail')
+                    'FAILURE': this.$t('environment.nodeInfo.fail')
                 }
             }
         },
