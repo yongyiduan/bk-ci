@@ -15,9 +15,11 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
     return {
         cache: {
             type: 'filesystem',
-            version: '1.0'
+            buildDependencies: {
+                config: [__filename]
+            }
         },
-        devtool: 'source-map',
+        devtool: 'eval-cheap-module-source-map',
         entry,
         output: {
             publicPath: isDev ? `http://dev.static.devops.oa.com${publicPath}` : publicPath,
@@ -104,7 +106,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             })
         ],
         optimization: {
-            chunkIds: 'named',
+            chunkIds: isDev ? 'named' : 'deterministic',
             moduleIds: 'deterministic',
             minimize: !isDev
         },
