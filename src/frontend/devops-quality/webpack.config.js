@@ -18,6 +18,7 @@
  */
 
 const webpackBaseConfig = require('../webpack.base')
+const webpack = require('webpack')
 const getConfig = require('./constConfig.js')
 
 module.exports = (env, argv) => {
