@@ -113,6 +113,7 @@ import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import com.tencent.devops.store.service.atom.AtomLabelService
 import com.tencent.devops.store.service.atom.AtomService
 import com.tencent.devops.store.service.atom.MarketAtomCommonService
+import com.tencent.devops.store.service.atom.action.AtomDecorateFactory
 import com.tencent.devops.store.service.common.ClassifyService
 import com.tencent.devops.store.service.common.StoreCommonService
 import com.tencent.devops.store.service.common.StoreProjectService
@@ -202,9 +203,7 @@ abstract class AtomServiceImpl @Autowired constructor() : AtomService {
                     page = null,
                     pageSize = null
                 ).data
-                return elementMapData?.records?.map {
-                    it.atomCode to it.name
-                }?.toMap() ?: mapOf()
+                return elementMapData?.records?.associate { it.atomCode to it.name } ?: mapOf()
             }
         })
 
@@ -524,14 +523,10 @@ abstract class AtomServiceImpl @Autowired constructor() : AtomService {
                     logoUrl = pipelineAtomRecord.logoUrl,
                     icon = pipelineAtomRecord.icon,
                     summary = pipelineAtomRecord.summary,
-                    serviceScope = if (!pipelineAtomRecord.serviceScope.isNullOrBlank()) {
-                        JsonUtil.getObjectMapper()
-                            .readValue(pipelineAtomRecord.serviceScope, List::class.java) as List<String>
-                    } else null,
+                    serviceScope =
+                    JsonUtil.toOrNull(pipelineAtomRecord.serviceScope, List::class.java) as List<String>?,
                     jobType = pipelineAtomRecord.jobType,
-                    os = if (!pipelineAtomRecord.os.isNullOrBlank()) {
-                        JsonUtil.getObjectMapper().readValue(pipelineAtomRecord.os, List::class.java) as List<String>
-                    } else null,
+                    os = JsonUtil.toOrNull(pipelineAtomRecord.os, List::class.java) as List<String>?,
                     classifyId = atomClassify?.id,
                     classifyCode = atomClassify?.classifyCode,
                     classifyName = atomClassify?.classifyName,
@@ -548,8 +543,14 @@ abstract class AtomServiceImpl @Autowired constructor() : AtomService {
                     htmlTemplateVersion = pipelineAtomRecord.htmlTemplateVersion,
                     buildLessRunFlag = pipelineAtomRecord.buildLessRunFlag,
                     weight = pipelineAtomRecord.weight,
-                    props = atomDao.convertString(pipelineAtomRecord.props),
-                    data = atomDao.convertString(pipelineAtomRecord.data),
+                    props = pipelineAtomRecord.props?.let {
+                        AtomDecorateFactory.get(AtomDecorateFactory.Kind.PROPS)
+                            ?.decorate(pipelineAtomRecord.props) as Map<String, Any>?
+                    },
+                    data = pipelineAtomRecord.data?.let {
+                        AtomDecorateFactory.get(AtomDecorateFactory.Kind.DATA)
+                            ?.decorate(pipelineAtomRecord.data) as Map<String, Any>?
+                    },
                     recommendFlag = atomFeature?.recommendFlag,
                     frontendType = FrontendTypeEnum.getFrontendTypeObj(pipelineAtomRecord.htmlTemplateVersion),
                     createTime = pipelineAtomRecord.createTime.timestampmilli(),
