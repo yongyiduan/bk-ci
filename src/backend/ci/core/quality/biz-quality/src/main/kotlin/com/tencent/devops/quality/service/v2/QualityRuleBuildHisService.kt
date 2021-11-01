@@ -31,7 +31,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.EnvUtils
-import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.api.util.HashUtil
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
