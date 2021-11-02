@@ -51,7 +51,6 @@ import com.tencent.devops.process.pojo.classify.PipelineGroupCreate
 import com.tencent.devops.process.pojo.classify.PipelineLabelCreate
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
@@ -60,10 +59,6 @@ class ModelCreate @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val modelStage: ModelStage
 ) {
-
-    @Value("\${rtx.v2GitUrl:#{null}}")
-    private val v2GitUrl: String? = null
-
     companion object {
         private val logger = LoggerFactory.getLogger(ModelCreate::class.java)
     }
@@ -100,7 +95,6 @@ class ModelCreate @Autowired constructor(
             yaml = yaml,
             gitBasicSetting = gitBasicSetting,
             event = event,
-            v2GitUrl = v2GitUrl,
             originEvent = originEvent
         )
 
