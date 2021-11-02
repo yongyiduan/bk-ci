@@ -667,6 +667,7 @@ export class HttpError extends Error {
 export function bkVarWrapper (name) {
     return '${{' + name + '}}'
 }
+
 // 计算时长换成 1min 1h 1天等
 export function formatDiff (times) {
     const timesTamp = new Date(times).getTime()
