@@ -35,6 +35,7 @@ import com.tencent.devops.common.db.util.JooqUtils
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.pipeline.enums.StartType
+import com.tencent.devops.common.pipeline.pojo.BuildParameters
 import com.tencent.devops.model.process.Tables.T_PIPELINE_BUILD_HISTORY
 import com.tencent.devops.model.process.tables.records.TPipelineBuildHistoryRecord
 import com.tencent.devops.process.engine.pojo.BuildInfo
@@ -71,6 +72,7 @@ class PipelineBuildDao {
         channelCode: ChannelCode,
         parentBuildId: String?,
         parentTaskId: String?,
+        buildParameters: List<BuildParameters>,
         webhookType: String?,
         webhookInfo: String?,
         buildMsg: String?,
@@ -96,6 +98,7 @@ class PipelineBuildDao {
                 CHANNEL,
                 VERSION,
                 QUEUE_TIME,
+                BUILD_PARAMETERS,
                 WEBHOOK_TYPE,
                 WEBHOOK_INFO,
                 BUILD_MSG,
@@ -117,6 +120,7 @@ class PipelineBuildDao {
                 channelCode.name,
                 version,
                 LocalDateTime.now(),
+                JsonUtil.toJson(buildParameters, formatted = false),
                 webhookType,
                 webhookInfo,
                 buildMsg,
@@ -288,7 +292,6 @@ class PipelineBuildDao {
         buildId: String,
         buildStatus: BuildStatus,
         executeTime: Long?,
-        buildParameters: String?,
         recommendVersion: String?,
         remark: String? = null,
         errorInfoList: List<ErrorInfo>?
@@ -298,7 +301,6 @@ class PipelineBuildDao {
                 .set(STATUS, buildStatus.ordinal)
                 .set(END_TIME, LocalDateTime.now())
                 .set(EXECUTE_TIME, executeTime)
-                .set(BUILD_PARAMETERS, buildParameters)
                 .set(RECOMMEND_VERSION, recommendVersion)
 
             if (!remark.isNullOrBlank()) {
@@ -448,6 +450,7 @@ class PipelineBuildDao {
                 } catch (ignored: Exception) {
                     null
                 },
+                buildParameters = t.buildParameters?.let { self -> JsonUtil.getObjectMapper().readValue(self) as List<BuildParameters> },
                 retryFlag = t.isRetry,
                 executeTime = t.executeTime ?: 0
             )
@@ -810,10 +813,10 @@ class PipelineBuildDao {
         }
     }
 
-    fun updateBuildParameters(dslContext: DSLContext, buildId: String, buildParameters: String) {
+    fun updateBuildParameters(dslContext: DSLContext, buildId: String, buildParameters: List<BuildParameters>) {
         with(T_PIPELINE_BUILD_HISTORY) {
             dslContext.update(this)
-                .set(BUILD_PARAMETERS, buildParameters)
+                .set(BUILD_PARAMETERS, JsonUtil.toJson(buildParameters, formatted = false))
                 .where(BUILD_ID.eq(buildId))
                 .execute()
         }
