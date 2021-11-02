@@ -73,7 +73,6 @@ object ModelParameters {
         yaml: ScriptBuildYaml,
         gitBasicSetting: GitCIBasicSetting,
         event: GitRequestEvent,
-        v2GitUrl: String?,
         originEvent: GitEvent?
     ): MutableList<BuildFormProperty> {
         val result = mutableListOf<BuildFormProperty>()
@@ -83,7 +82,6 @@ object ModelParameters {
 
         // 通用参数
         startParams[CommonVariables.CI_PIPELINE_NAME] = yaml.name ?: ""
-        startParams[CommonVariables.CI_BUILD_URL] = v2GitUrl ?: ""
         startParams[BK_CI_RUN] = "true"
         startParams[CommonVariables.CI_ACTOR] = if (event.objectKind == TGitObjectKind.SCHEDULE.value) {
             "system"
