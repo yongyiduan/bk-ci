@@ -2,7 +2,7 @@
     <bk-dialog class="codelib-operate-dialog" v-model="isShow" :width="width" :padding="padding" :close-icon="false" :quick-close="false" :loading="loading" @confirm="submitCodelib" @cancel="handleCancel">
         <h3 slot="header" class="bk-dialog-title">{{title}}</h3>
         <form class="bk-form" v-bkloading="{ isLoading: saving || fetchingCodelibDetail }">
-            <div class="bk-form-item is-required" v-if="isGit">
+            <div class="bk-form-item is-required" v-if="isGit || isGitLab">
                 <label class="bk-label">{{ $t('codelib.codelibMode') }}:</label>
                 <bk-radio-group v-model="codelib.authType" @change="authTypeChange(codelib)" class="bk-form-content form-radio">
                     <bk-radio value="OAUTH" v-if="isGit">OAUTH</bk-radio>
@@ -79,7 +79,7 @@
                     </div>
                 </div>
                 <!-- 源代码地址 end -->
-
+                
                 <!-- 别名 start -->
                 <div class="bk-form-item is-required">
                     <label class="bk-label">{{ $t('codelib.aliasName') }}:</label>
@@ -127,7 +127,7 @@
 
 <script>
     import { mapActions, mapState } from 'vuex'
-    import { getCodelibConfig, isSvn, isGit, isGithub, isTGit } from '../../config/'
+    import { getCodelibConfig, isSvn, isGit, isGithub, isTGit, isGitLab } from '../../config/'
     import { parsePathAlias, extendParsePathAlias, parsePathRegion } from '../../utils'
     export default {
         name: 'codelib-dialog',
@@ -237,6 +237,9 @@
             isTGit () {
                 return isTGit(this.codelibTypeName)
             },
+            isGitLab () {
+                return isGitLab(this.codelibTypeName)
+            },
             isGithub () {
                 return isGithub(this.codelibTypeName)
             },
@@ -290,6 +293,7 @@
             },
             codelibAliasName: {
                 get () {
+                    console.log(this.codelib)
                     return this.codelib.aliasName
                 },
 
@@ -301,8 +305,8 @@
             },
             urlPlaceholder () {
                 return (
-                    this.placeholders['url'][this.codelib.authType]
-                    || this.placeholders['url'][this.codelibConfig.label]
+                    this.placeholders['url'][this.codelibConfig.label]
+                    || this.placeholders['url'][this.codelib.authType]
                 )
             },
             credentialPlaceholder () {
