@@ -29,7 +29,7 @@
 
 <script>
     import { mapState } from 'vuex'
-    import { modifyHtmlTitle, getBuildTitle, getDisplayName } from '@/utils'
+    import { modifyHtmlTitle, getBuildTitle } from '@/utils'
     import { pipelines } from '@/http'
 
     export default {
@@ -79,7 +79,7 @@
                     const { gitRequestEvent = {}, modelDetail = {}, gitProjectPipeline = {} } = res || {}
                     this.buildNum = modelDetail.buildNum
                     this.latestBuildNum = modelDetail.latestBuildNum
-                    this.yml = getDisplayName(gitProjectPipeline.displayName)
+                    this.yml = gitProjectPipeline.displayName
                     const message = getBuildTitle(gitRequestEvent)
                     this.setHtmlTitle(message)
                 }).catch((err) => {
