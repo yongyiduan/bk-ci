@@ -312,7 +312,7 @@
         "pipelineLinkDesc": "若勾选，则会在企业微信、微信、短信通知的末尾加上相应构建详情的流水线链接",
         "enableGroup": "启用企业微信群通知",
         "groupIdTips": "请输入群ID,多个群ID以分号隔开",
-        "groupIdDesc": "可发通知至企业微信群。群ID获取方法：将'CI-Notice' 拉进群，手动@CI-Notice并输入关键字'会话ID', 发送后即可获取群ID ",
+        "groupIdDesc": "可发通知至企业微信群。群ID获取方法：添加'DevOps-notice' 群机器人，手动@DevOps-notice并输入关键字'群ID', 发送后即可获取",
         "wechatGroupMarkdownFlag": "群消息转为Markdown格式",
         "buildSuc": "构建成功",
         "buildFail": "构建失败",
