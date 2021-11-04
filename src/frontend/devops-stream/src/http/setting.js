@@ -80,8 +80,14 @@ export default {
         return api.post(`${STREAM_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
     },
 
-    resetAuthorization (projectId) {
-        return api.post(`${STREAM_PERFIX}/user/basic/setting/${projectId}/user`)
+    resetAuthorization (gitProjectId) {
+        return api.get(`${STREAM_PERFIX}/user/basic/setting/isOauth`, {
+            params: {
+                gitProjectId,
+                refreshToken: true,
+                redirectUrl: location.href
+            }
+        })
     },
 
     requestNodeList (projectId) {
