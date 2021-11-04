@@ -110,7 +110,7 @@ export function extendParsePathAlias (type, path, authType, svnType) {
             msg = `${codelibLocaleObj.httpsRule}${type}${codelibLocaleObj.address}`
             break
         case isGitLab(type) && authType === 'SSH':
-            reg = /^(git@)\gitlab-pass\.open\.oa\.com:([\w\W\.\-\/\+]*)?\git$/i
+            reg = /^(git@)\gitlab-paas\.open\.oa\.com:([\w\W\.\-\/\+]*)?\git$/i
             msg = `${codelibLocaleObj.gitlabSshRule}${type}${codelibLocaleObj.address}`
             break
         case isGit(type):
