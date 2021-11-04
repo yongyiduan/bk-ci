@@ -87,6 +87,9 @@ export default {
                 refreshToken: true,
                 redirectUrl: location.href
             }
+        }).then((res) => {
+            if (res.status === 403) location.href = res.url
+            else return res
         })
     },
 
