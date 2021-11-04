@@ -150,7 +150,7 @@
     "点击查看YAML片段": "Click to view YAML fragment",
     "YAML片段": "YAML fragment",
     "YAMLV1": "YAML V1 fragment",
-    "YAMLV2": "YAML V2 fragment",
+    "YAMLV2": "YAML fragment",
     "点击申请成为协作者": "Click Apply to become a collaborator",
     "推荐使用": "Recommended Use",
     "YAML可用": "YAML is available",
@@ -732,11 +732,13 @@
     "搜索": "Search",
     "质量红线指标": "Quality",
     "配置片段：": "Configuration Snippet:",
-    "输出参数：": "Output Parameters:",
+    "输出参数": "Output Parameters",
     "参数名": "Parameter Name",
-    "参数说明": "Parameter Description",
-    "质量红线指标：": "Quality:",
+    "指标说明": "Indicators Description",
     "指标名": "Quota Name",
+    "指标中文名": "Indicators Chinese name",
     "值类型": "Value Type",
-    "支持的操作": "Supported Operations"
+    "支持的操作": "Supported Operations",
+    "说明：": "Usage: ",
+    "说明文案": "reference by expression ${{ steps.<step-id>.outputs.<output-var-name> }}"
 }
