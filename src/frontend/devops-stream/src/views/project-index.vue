@@ -7,6 +7,7 @@
     import { mapActions, mapState } from 'vuex'
     import streamWebSocket from '@/utils/websocket'
     import register from '@/utils/websocket-register'
+    import { setCookie, getCookie } from '@/utils'
 
     export default {
         data () {
@@ -14,12 +15,15 @@
                 isLoading: false
             }
         },
+
         computed: {
             ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'permission'])
         },
+
         created () {
             this.initData()
         },
+
         beforeDestroy () {
             register.unInstallWsMessage('notify')
         },
@@ -43,6 +47,15 @@
                     if (projectPath) {
                         common.getProjectInfo(projectPath).then((projectInfo = {}) => {
                             if (projectInfo.id) {
+                                const projectId = `git_${projectInfo.id}`
+                                if (getCookie('X-DEVOPS-PROJECT-ID') !== projectId) {
+                                    // 设置cookie
+                                    setCookie('X-DEVOPS-PROJECT-ID', projectId, document.domain.split('.').slice(-2).join('.'))
+                                    if (getCookie('ROUTER_TAG') !== projectInfo.routerTag) {
+                                        setCookie('ROUTER_TAG', projectInfo.routerTag, document.domain.split('.').slice(-2).join('.'))
+                                        location.reload()
+                                    }
+                                }
                                 this.setProjectInfo(projectInfo)
                                 this.loopGetNotifications()
                                 this.getPermission()

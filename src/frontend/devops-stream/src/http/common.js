@@ -7,7 +7,7 @@ export default {
     },
 
     getProjectInfo (projectPath) {
-        return api.get(`${STREAM_PERFIX}/user/gitcode/projects/info?gitProjectId=${projectPath}`, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
+        return api.get(`${STREAM_PERFIX}/user/gitcode/projects/info?gitProjectId=${projectPath}`)
     },
 
     oauth (redirectUrl) {
