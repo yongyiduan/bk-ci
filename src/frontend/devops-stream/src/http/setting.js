@@ -86,7 +86,7 @@ export default {
                 gitProjectId,
                 refreshToken: true,
                 redirectUrl: location.href,
-                redirectUrlType: 'spec'
+                redirectUrlType: 'SPEC'
             }
         }).then((res) => {
             if (res.status === 403) location.href = res.url
