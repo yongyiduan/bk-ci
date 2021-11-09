@@ -35,7 +35,7 @@ export default {
     },
 
     getSetting (projectId) {
-        return api.get(`${STREAM_PERFIX}/user/basic/setting/${projectId}`, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
+        return api.get(`${STREAM_PERFIX}/user/basic/setting/${projectId}`)
     },
 
     getSystemPoolDetail () {
@@ -77,7 +77,7 @@ export default {
     },
 
     toggleEnableCi (enabled, projectInfo) {
-        return api.post(`${STREAM_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
+        return api.post(`${STREAM_PERFIX}/user/basic/setting/enable?enabled=${enabled}`, projectInfo)
     },
 
     resetAuthorization (gitProjectId) {

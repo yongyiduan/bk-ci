@@ -5,7 +5,6 @@
 
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { modifyRequestCommonHead } from '@/http/ajax'
 
 Vue.use(Vuex)
 
@@ -37,7 +36,6 @@ const store = new Vuex.Store({
             const projectId = `git_${projectInfo.id}`
             state.projectId = projectId
             state.projectInfo = projectInfo
-            modifyRequestCommonHead({ 'X-DEVOPS-PROJECT-ID': projectId })
         },
         setProjectSetting (state, projectSetting) {
             state.projectSetting = projectSetting || {}

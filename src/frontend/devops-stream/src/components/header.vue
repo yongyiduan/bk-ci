@@ -83,7 +83,7 @@
             this.getUserInfo()
         },
         methods: {
-            ...mapActions(['setUser']),
+            ...mapActions(['setUser', 'setExceptionInfo']),
 
             getUserInfo () {
                 return common.getUserInfo().then((userInfo = {}) => {
@@ -92,6 +92,7 @@
             },
             clickMenu (item) {
                 if (item.routeName) {
+                    this.setExceptionInfo({ type: 200 })
                     this.$router.push({
                         name: item.routeName
                     })
@@ -102,6 +103,7 @@
             goToSetting () {
                 if (!this.permission) return
 
+                this.setExceptionInfo({ type: 200 })
                 this.$router.push({ name: 'basicSetting' })
             },
 
@@ -110,6 +112,7 @@
             },
 
             goToHome () {
+                this.setExceptionInfo({ type: 200 })
                 this.$router.push({
                     name: this.$route.name === 'dashboard' ? 'home' : 'dashboard'
                 })

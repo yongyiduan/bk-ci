@@ -34,7 +34,7 @@ export default {
     },
 
     requestPermission (projectId) {
-        return api.get(`${STREAM_PERFIX}/user/permission/projects/${projectId}/resource/validate`, { headers: { 'X-DEVOPS-PROJECT-ID': 'streamproject' } })
+        return api.get(`${STREAM_PERFIX}/user/permission/projects/${projectId}/resource/validate`)
     },
 
     requestDevnetGateway () {
