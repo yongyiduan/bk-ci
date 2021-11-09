@@ -94,7 +94,7 @@
 
             resetAuthorization () {
                 this.isReseting = true
-                setting.resetAuthorization(this.projectId).then(() => {
+                setting.resetAuthorization(this.projectInfo.id).then(() => {
                     this.getSetting()
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
