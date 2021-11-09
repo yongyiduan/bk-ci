@@ -15,7 +15,7 @@
                     :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
                 >
                     <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
-                    <span class="text-ellipsis item-text" v-bk-overflow-tips>{{ getDisplayName(pipeline.displayName) }}</span>
+                    <span class="text-ellipsis item-text" v-bk-overflow-tips>{{ pipeline.displayName }}</span>
                 </li>
             </ul>
         </aside>
@@ -71,7 +71,7 @@
     import { mapState, mapActions } from 'vuex'
     import codeSection from '@/components/code-section'
     import { pipelines } from '@/http'
-    import { debounce, getDisplayName } from '@/utils'
+    import { debounce } from '@/utils'
     import register from '@/utils/websocket-register'
     import validateRule from '@/utils/validate-rule'
 
@@ -124,7 +124,6 @@
 
         methods: {
             ...mapActions(['setCurPipeline']),
-            getDisplayName,
 
             initList () {
                 this.isLoading = true

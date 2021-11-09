@@ -2,7 +2,7 @@
     <article class="pipelines-main">
         <header class="main-head section-box">
             <span class="head-text">
-                <span class="pipeline-name text-ellipsis" v-bk-overflow-tips>{{ getDisplayName(curPipeline.displayName) }}</span>
+                <span class="pipeline-name text-ellipsis" v-bk-overflow-tips>{{ curPipeline.displayName }}</span>
                 <span class="yml-name text-ellipsis" @click="goToGit" v-if="curPipeline.filePath">
                     <span v-bk-overflow-tips>{{ curPipeline.filePath }}</span>
                     <icon name="cc-jump-link" size="16"></icon>
@@ -67,7 +67,7 @@
                     <bk-option v-for="option in pipelineList"
                         :key="option.pipelineId"
                         :id="option.pipelineId"
-                        :name="getDisplayName(option.displayName)">
+                        :name="option.displayName">
                     </bk-option>
                 </bk-select>
                 <bk-button @click="resetFilter">Reset</bk-button>
@@ -88,7 +88,7 @@
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
                             <p>
                                 <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
-                                <span class="info">{{ getDisplayName(props.row.displayName) }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
+                                <span class="info">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
                         </section>
                     </template>
@@ -198,8 +198,7 @@
         timeFormatter,
         modifyHtmlTitle,
         debounce,
-        getBuildTitle,
-        getDisplayName
+        getBuildTitle
     } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
@@ -323,7 +322,6 @@
         methods: {
             ...mapActions(['setCurPipeline']),
             getBuildTitle,
-            getDisplayName,
 
             setHtmlTitle () {
                 const projectPath = (this.$route.hash || '').slice(1)
