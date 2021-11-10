@@ -3,7 +3,7 @@
         :title="job.name"
         :status="job.status"
     >
-        <section v-if="job.dispatchType && job.dispatchType.buildType !== 'GIT_CI'" class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
+        <section v-if="job.dispatchType && job.dispatchType.buildType === 'GIT_CI'" class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
             <bk-popover placement="bottom" ref="consoleRef" ext-cls="console-menu-wrapper">
                 <span>
                     Web Console
