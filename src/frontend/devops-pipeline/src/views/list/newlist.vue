@@ -482,11 +482,11 @@
                             content: [
                                 {
                                     key: this.$t('lastBuildNum'),
-                                    value: `${item.latestBuildNum ? `#${item.latestBuildNum}` : '--'}`
+                                    value: item.buildNumRule ? (item.latestBuildNumAlias ? item.latestBuildNumAlias : `#${item.latestBuildNum}`) : (item.latestBuildNum ? `#${item.latestBuildNum}` : '--')
                                 },
                                 {
                                     key: this.$t('lastExecTime'),
-                                    value: ''
+                                    value: item.latestBuildStartTime ? this.calcLatestStartBuildTime(item) : this.$t('newlist.noExecution')
                                 }
                             ],
                             runningInfo: {
@@ -703,16 +703,6 @@
 
                         feConfig = {
                             ...feConfig,
-                            content: [
-                                {
-                                    key: this.$t('lastBuildNum'),
-                                    value: item.latestBuildNumAlias ? item.latestBuildNumAlias : (item.latestBuildNum ? `#${item.latestBuildNum}` : '--')
-                                },
-                                {
-                                    key: this.$t('lastExecTime'),
-                                    value: item.latestBuildStartTime ? this.calcLatestStartBuildTime(item) : this.$t('newlist.noExecution')
-                                }
-                            ],
                             footer: [
                                 {
                                     upperText: item.taskCount,

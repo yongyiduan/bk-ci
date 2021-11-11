@@ -38,10 +38,10 @@
 
         mounted () {
             const { currentPage, pageSize, scrollBoxClassName } = this
+            const scrollTable = document.querySelector(`.${scrollBoxClassName}`)
             const len = currentPage * pageSize
             this.queryList(1, len)
 
-            const scrollTable = document.querySelector(`.${scrollBoxClassName}`)
             this.throttleScroll = throttle(this.handleScroll, 500)
             if (scrollTable) {
                 scrollTable.addEventListener('scroll', this.throttleScroll)
@@ -85,8 +85,7 @@
                     ]
 
                     this.currentPage = Math.ceil(this.list.length / pageSize)
-
-                    this.hasNext = this.currentPage < res.totalPages
+                    this.hasNext = this.list.length < res.count
                     this.totals = res.count
                     return res
                 }

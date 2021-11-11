@@ -192,7 +192,7 @@
 
                     resList.forEach(item => {
                         item = item.trim()
-                        if (/^\$\{([\w\_]+)\}$/.test(item)) {
+                        if (item.isBkVar()) {
                             temp.push(item)
                         } else {
                             errList.push(item)
@@ -327,7 +327,7 @@
                 const target = value.replace(/\s/g, '')
                 const resObj = {
                     target,
-                    reg: /^\$\{(.*)\}$/.test(target),
+                    reg: target.isBkVar(),
                     isEixt: this.selectedList.indexOf(target)
                 }
 
@@ -372,7 +372,7 @@
              *  头像格式
              */
             localCoverAvatar (data) {
-                const member = /^\$\{(.*)\}$/.test(data) ? 'un_know' : data
+                const member = data.isBkVar() ? 'un_know' : data
                 return `${USER_IMG_URL}/avatars/${member}/avatar.jpg`
             },
             // 重置input

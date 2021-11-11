@@ -310,7 +310,7 @@
         "pipelineLinkDesc": "When selected, url of the pipeline build detail will be added to the end of notification that is sent through Wechat Work, Wechat or SMS",
         "enableGroup": "Enable group notification on Wechat Work",
         "groupIdTips": "Please enter the ID of the group. If there are multiple groups, please separate IDs with semicolons",
-        "groupIdDesc": "Capable of sending notifications to groups on Wechat Work. To obtain group IDs, please invite 'CI-Notice' into your groups, @ 'CI-Notice' with keyword '会话ID' and send this message.",
+        "groupIdDesc": "Capable of sending notifications to groups on Wechat Work. To obtain group IDs, please invite 'DevOps-notice' into your groups, @ 'DevOps-notice' with keyword '群ID' and send this message.",
         "wechatGroupMarkdownFlag": "Show group message with Markdown format",
         "buildSuc": "Build successfully",
         "buildFail": "Build failed",
