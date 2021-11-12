@@ -1,6 +1,11 @@
 <template>
     <section class="plugin-log">
-        <bk-log-search :down-load-link="downLoadLink" :execute-count="executeCount" @change-execute="changeExecute" class="log-tools"></bk-log-search>
+        <bk-log-search :execute-count="executeCount" @change-execute="changeExecute" class="log-tools">
+            <template #tool>
+                <li class="more-button" @click="toggleShowDebugLog">{{ showDebug ? 'Hide Debug Log' : 'Show Debug Log' }}</li>
+                <li class="more-button" @click="downloadLog">Download Log</li>
+            </template>
+        </bk-log-search>
         <bk-log class="bk-log" ref="scroll" @tag-change="tagChange"></bk-log>
     </section>
 </template>
@@ -22,7 +27,8 @@
             return {
                 postData: {},
                 timeId: '',
-                clearIds: []
+                clearIds: [],
+                showDebug: false
             }
         },
 
@@ -62,7 +68,8 @@
                     tag: this.plugin.id,
                     subTag: '',
                     currentExe: this.plugin.executeCount,
-                    lineNo: 0
+                    lineNo: 0,
+                    debug: false
                 }
             },
 
@@ -147,6 +154,19 @@
             handleApiErr (err) {
                 const scroll = this.$refs.scroll
                 if (scroll) scroll.handleApiErr(err)
+            },
+
+            toggleShowDebugLog () {
+                this.showDebug = !this.showDebug
+                this.$refs.scroll.changeExecute()
+                this.postData.debug = this.showDebug
+                this.postData.lineNo = 0
+                this.closeLog()
+                this.getLog()
+            },
+
+            async downloadLog () {
+                location.href = this.downLoadLink
             }
         }
     }

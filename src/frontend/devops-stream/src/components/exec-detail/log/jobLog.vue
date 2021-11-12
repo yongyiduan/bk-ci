@@ -1,6 +1,11 @@
 <template>
     <section class="job-log">
-        <bk-log-search :down-load-link="curDownLink" :execute-count="executeCount" @change-execute="changeExecute" class="log-tools"></bk-log-search>
+        <bk-log-search :execute-count="executeCount" @change-execute="changeExecute" class="log-tools">
+            <template #tool>
+                <li class="more-button" @click="toggleShowDebugLog">{{ showDebug ? 'Hide Debug Log' : 'Show Debug Log' }}</li>
+                <li class="more-button" @click="downloadLog">Download Log</li>
+            </template>
+        </bk-log-search>
         <bk-multiple-log ref="multipleLog"
             class="bk-log"
             :log-list="pluginList"
@@ -45,16 +50,13 @@
             return {
                 logPostData: {},
                 closeIds: [],
-                curExe: this.executeCount
+                curExe: this.executeCount,
+                showDebug: false
             }
         },
 
         computed: {
-            ...mapState(['projectId']),
-
-            curDownLink () {
-                return `${this.downLoadLink}&executeCount=${this.curExe}`
-            }
+            ...mapState(['projectId'])
         },
 
         beforeDestroy () {
@@ -62,9 +64,19 @@
         },
 
         methods: {
+            toggleShowDebugLog () {
+                this.showDebug = !this.showDebug
+                this.clearAllLog()
+                this.$refs.multipleLog.foldAllPlugin()
+            },
+
             changeExecute (execute) {
-                this.closeLog()
                 this.curExe = execute
+                this.clearAllLog()
+            },
+
+            clearAllLog () {
+                this.closeLog()
                 const ref = this.$refs.multipleLog
                 Object.keys(this.logPostData).forEach((id) => {
                     ref.changeExecute(id)
@@ -101,7 +113,8 @@
                         buildId: this.buildId,
                         tag: id,
                         currentExe: this.curExe,
-                        lineNo: 0
+                        lineNo: 0,
+                        debug: this.showDebug
                     }
 
                     this.$nextTick(() => {
@@ -164,6 +177,11 @@
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                     if (ref) ref.handleApiErr(err.message, id)
                 })
+            },
+
+            downloadLog () {
+                const downloadLink = `${this.downLoadLink}&executeCount=${this.curExe}`
+                location.href = downloadLink
             }
         }
     }
