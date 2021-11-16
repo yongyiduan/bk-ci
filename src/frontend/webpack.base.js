@@ -99,7 +99,8 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                     {
                         from: path.join(__dirname, 'locale', dist),
                         to: buildDist
-                    }],
+                    }
+                ],
                 options: {
                     concurrency: 100
                 }
