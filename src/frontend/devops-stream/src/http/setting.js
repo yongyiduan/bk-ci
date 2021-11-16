@@ -157,7 +157,7 @@ export default {
     * 获取第三方构建机任务
     */
     requestBuildList ({ projectId, nodeHashId, page, pageSize }) {
-        return api.get(`${ENVIRNMENT_PERFIX}/user/environment/thirdPartyAgent/projects/${projectId}/nodes/${nodeHashId}/listAgentBuilds?page=${page}&pageSize=${pageSize}`).then(response => {
+        return api.get(`${STREAM_PERFIX}/user/basic/setting/projects/${projectId}/nodes/${nodeHashId}/listAgentBuilds?page=${page}&pageSize=${pageSize}`).then(response => {
             return response
         })
     },
