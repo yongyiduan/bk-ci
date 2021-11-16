@@ -338,7 +338,7 @@
             cursor: not-allowed;
             color: #bcbcbc;
         }
-        /deep/ .bk-sideslider-content {
+        ::v-deep .bk-sideslider-content {
             height: calc(100% - 60px);
         }
         .add-member {

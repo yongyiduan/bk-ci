@@ -357,7 +357,7 @@
                 margin-left: 16px;
                 position: relative;
                 &.error {
-                    /deep/ .bk-input-text input {
+                    ::v-deep .bk-input-text input {
                         border-color: #ff5656;
                     }
                     .err-info {
@@ -382,7 +382,7 @@
             padding: 32px;
             height: 100%;
         }
-        /deep/ .bk-sideslider-content {
+        ::v-deep .bk-sideslider-content {
             height: calc(100% - 60px);
             .bk-table-body-wrapper {
                 max-height: calc(100% - 43px);

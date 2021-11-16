@@ -143,7 +143,7 @@
 <style lang="scss">
     @import '../assets/scss/conf';
     .organization-dialog {
-        /deep/ .bk-dialog-body {
+        ::v-deep .bk-dialog-body {
             padding: 0;
         }
         .organization-content {
