@@ -57,18 +57,14 @@
             this._destroyLog()
         },
         async mounted () {
-            try {
-                if (!window.SodaLog) {
-                    await import(
-                        /* webpackChunkName: 'log' */
-                        '@/components/Log/log.min.js'
-                    )
-                }
+            if (!window.SodaLog) {
+                await import(
+                    /* webpackChunkName: 'log' */
+                    '@/components/Log/log.min.js'
+                )
                 this.SodaLog = window.SodaLog
-                this.buildNo && this.renderLog(this.buildNo)
-            } catch (error) {
-                console.log(error);
             }
+            this.buildNo && this.renderLog(this.buildNo)
         },
         methods: {
             renderLog (buildNo) {
