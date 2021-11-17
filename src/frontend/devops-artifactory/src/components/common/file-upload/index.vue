@@ -33,9 +33,9 @@
     </div>
 </template>
 <script>
-    import * as cookie from 'js-cookie'
-    
-    const CSRFToken = cookie.get('paas_perm_csrftoken')
+    import cookie from 'js-cookie'
+
+    const CSRFToken = cookie.get('backend_csrftoken')
     export default {
         props: {
             // 必选参数，上传的地址

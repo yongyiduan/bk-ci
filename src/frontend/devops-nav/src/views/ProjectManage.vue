@@ -279,6 +279,7 @@
             limitList: [10, 15, 20, 25, 30],
             count: 0
         }
+
         hasCreatePermission: boolean = true
         matchColorList: string[] = [
             'green',
@@ -336,11 +337,11 @@
         filterProjectList (showOfflined) {
             if (showOfflined) {
                 this.curProjectList = this.projectList.filter(project => {
-                    return project['projectName'].indexOf(this.inputValue) !== -1 && project['approvalStatus'] !== 3
+                    return project.projectName.indexOf(this.inputValue) !== -1 && project.approvalStatus !== 3
                 })
             } else {
                 this.curProjectList = this.projectList.filter(project => {
-                    return project.enabled && project['projectName'].indexOf(this.inputValue) !== -1 && project['approvalStatus'] !== 3
+                    return project.enabled && project.projectName.indexOf(this.inputValue) !== -1 && project.approvalStatus !== 3
                 })
             }
             this.initPageConf()

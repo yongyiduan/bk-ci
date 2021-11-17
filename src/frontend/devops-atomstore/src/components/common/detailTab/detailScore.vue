@@ -101,7 +101,7 @@
         },
 
         computed: {
-            ...mapGetters('store', { 'commentList': 'getCommentList', 'detail': 'getDetail' }),
+            ...mapGetters('store', { commentList: 'getCommentList', detail: 'getDetail' }),
 
             detailCode () {
                 return this.$route.params.code

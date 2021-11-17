@@ -43,26 +43,26 @@ export const atomStatusMap = {
     'CODECC_FAIL': 'store.代码检查失败'
 }
 export const templateStatusList = {
-    'INIT': 'store.初始化',
-    'AUDITING': 'store.审核中',
-    'AUDIT_REJECT': 'store.审核驳回',
-    'RELEASED': 'store.已发布',
-    'GROUNDING_SUSPENSION': 'store.上架中止',
-    'UNDERCARRIAGED': 'store.已下架'
+    INIT: 'store.初始化',
+    AUDITING: 'store.审核中',
+    AUDIT_REJECT: 'store.审核驳回',
+    RELEASED: 'store.已发布',
+    GROUNDING_SUSPENSION: 'store.上架中止',
+    UNDERCARRIAGED: 'store.已下架'
 }
 
 export const imageStatusList = {
-    'INIT': 'store.初始化',
-    'COMMITTING': 'store.提交中',
-    'CHECKING': 'store.验证中',
-    'CHECK_FAIL': 'store.验证失败',
-    'TESTING': 'store.测试中',
-    'AUDITING': 'store.审核中',
-    'AUDIT_REJECT': 'store.审核驳回',
-    'RELEASED': 'store.已发布',
-    'GROUNDING_SUSPENSION': 'store.上架中止',
-    'UNDERCARRIAGING': 'store.下架中',
-    'UNDERCARRIAGED': 'store.已下架'
+    INIT: 'store.初始化',
+    COMMITTING: 'store.提交中',
+    CHECKING: 'store.验证中',
+    CHECK_FAIL: 'store.验证失败',
+    TESTING: 'store.测试中',
+    AUDITING: 'store.审核中',
+    AUDIT_REJECT: 'store.审核驳回',
+    RELEASED: 'store.已发布',
+    GROUNDING_SUSPENSION: 'store.上架中止',
+    UNDERCARRIAGING: 'store.下架中',
+    UNDERCARRIAGED: 'store.已下架'
 }
 
 export const serviceStatusMap = {

@@ -88,7 +88,7 @@
         },
 
         computed: {
-            ...mapGetters('store', { 'markerQuey': 'getMarketQuery' }),
+            ...mapGetters('store', { markerQuey: 'getMarketQuery' }),
 
             navList () {
                 let name
@@ -264,7 +264,7 @@
                                 textAlign: 'left',
                                 'text-overflow': 'ellipsis',
                                 'white-space': 'nowrap',
-                                'overflow': 'hidden'
+                                overflow: 'hidden'
                             },
                             attrs: {
                                 title: err.message || err
