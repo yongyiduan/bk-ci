@@ -320,7 +320,7 @@
                 line-height: 24px;
             }
         }
-        /deep/ .bk-form-item {
+        ::v-deep .bk-form-item {
             &+.bk-form-item {
                 margin-top: 24px;
             }
@@ -388,10 +388,10 @@
         box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.05);
         background: $white;
         padding: 32px;
-        /deep/ .main-body {
+        ::v-deep .main-body {
             height: calc(100% - 50px);
         }
-        /deep/ .main-footer {
+        ::v-deep .main-footer {
             margin-top: 16px;
             .bk-button + .bk-button {
                 margin-left: 24px;
@@ -411,7 +411,7 @@
             border-bottom: 1px solid $lightBorder;
             .progress-steps {
                 padding: 22px 280px 0 180px;
-                /deep/ .icon-execute, /deep/ .icon-panels, /deep/ .icon-order-shape, /deep/ .icon-script-files, /deep/ .icon-panel-permission {
+                ::v-deep .icon-execute, ::v-deep .icon-panels, ::v-deep .icon-order-shape, ::v-deep .icon-script-files, ::v-deep .icon-panel-permission {
                     font-size: 14px;
                 }
             }

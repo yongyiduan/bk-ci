@@ -338,13 +338,13 @@
             cursor: not-allowed;
             color: #bcbcbc;
         }
-        /deep/ .bk-sideslider-content {
+        ::v-deep .bk-sideslider-content {
             height: calc(100% - 60px);
         }
         .add-member {
             height: 100%;
             padding: 32px;
-            /deep/ .bk-form-radio:not(:last-child) {
+            ::v-deep .bk-form-radio:not(:last-child) {
                 margin-right: 32px;
             }
         }
@@ -357,7 +357,7 @@
             }
         }
         .g-scroll-table {
-            /deep/ .bk-table .bk-table-body-wrapper {
+            ::v-deep .bk-table .bk-table-body-wrapper {
                 height: calc(100% - 43px);
             }
         }
