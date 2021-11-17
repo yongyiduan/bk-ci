@@ -69,7 +69,7 @@
         },
         computed: {
             ...mapGetters({
-                'userInfo': 'pipelines/getUserInfo'
+                userInfo: 'pipelines/getUserInfo'
             }),
             projectId () {
                 return this.$route.params.projectId

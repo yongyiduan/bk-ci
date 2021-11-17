@@ -22,8 +22,8 @@
 
         computed: {
             ...mapGetters('store', {
-                'detail': 'getDetail',
-                'userInfo': 'getUserInfo'
+                detail: 'getDetail',
+                userInfo: 'getUserInfo'
             })
         },
 

@@ -233,7 +233,7 @@
                     const res = await this.$store.dispatch('environment/requestCmdbNode', { params })
 
                     this.rowList.splice(0, this.rowList.length)
-                    res.records && res.records.map(item => {
+                    res.records && res.records.forEach(item => {
                         this.rowList.push({
                             ...item,
                             isChecked: !!this.nodeList.some(node => node.nodeType === 'CMDB' && node.ip === item.ip),

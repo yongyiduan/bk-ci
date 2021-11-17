@@ -122,7 +122,7 @@
                 } else {
                     const deptInfos = []
 
-                    this.selectedList.map(item => {
+                    this.selectedList.forEach(item => {
                         deptInfos.push({
                             deptId: item.id,
                             deptName: item.displayName

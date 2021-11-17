@@ -97,21 +97,21 @@
                     case 'rtx':
                         config.url = `${prefix}/get_all_staff_info/`
                         config.data = {
-                            'query_type': 'simple_data',
-                            'app_code': 'workbench'
+                            query_type: 'simple_data',
+                            app_code: 'workbench'
                         }
                         break
                     case 'email':
                         config.url = `${prefix}/get_all_ad_groups/`
-                        config.data['query_type'] = undefined
+                        config.data.query_type = undefined
                         config.data = {
-                            'app_code': 'workbench'
+                            app_code: 'workbench'
                         }
                         break
                     case 'all':
                         config.url = `${prefix}/get_all_rtx_and_mail_group/`
                         config.data = {
-                            'app_code': 'workbench'
+                            app_code: 'workbench'
                         }
                         break
                     default:
@@ -145,7 +145,7 @@
 
                 const callbackName = params.jsonp
                 const head = document.getElementsByTagName('head')[0]
-                params.data['callback'] = callbackName
+                params.data.callback = callbackName
 
                 const data = this.formatParams(params.data)
                 const script = document.createElement('script')

@@ -245,7 +245,7 @@
                         {
                             theme: 'default',
                             size: 'normal',
-                            handler: () => window.open(`https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=10718789`, '_blank'),
+                            handler: () => window.open('https://iwiki.oa.tencent.com/pages/viewpage.action?pageId=10718789', '_blank'),
                             text: '学习基础知识'
                         }
                     ]
@@ -268,9 +268,9 @@
 
         computed: {
             ...mapGetters({
-                'pipelineList': 'pipelines/getAllPipelineList',
-                'statusMap': 'pipelines/getStatusMap',
-                'tagGroupList': 'pipelines/getTagGroupList'
+                pipelineList: 'pipelines/getAllPipelineList',
+                statusMap: 'pipelines/getStatusMap',
+                tagGroupList: 'pipelines/getTagGroupList'
             }),
             ...mapState('pipelines', [
                 'pageLoading',
@@ -680,11 +680,9 @@
                     ? pipelineList.map((item, index) => {
                         return item.pipelineId
                     })
-                    : pipelineList.filter((item, index) => {
-                        if (item.feConfig && item.feConfig.status === 'running') return item
-                    }).map((item, index) => {
-                        return item.pipelineId
-                    })
+                    : pipelineList
+                        .filter(item => item.feConfig && item.feConfig.status === 'running')
+                        .map(item => item.pipelineId)
 
                 if (pipelineId.length === 0) return false
 
@@ -711,7 +709,7 @@
                 } = this
                 const knownErrorList = JSON.parse(localStorage.getItem('pipelineKnowError'))
 
-                pipelineList.map((pipeline, index) => {
+                pipelineList.forEach(pipeline => {
                     const cur = isFirst ? pipeline : data[pipeline.pipelineId]
                     if (cur) {
                         const customBtns = []
@@ -771,7 +769,7 @@
                                     handler: 'terminate-pipeline'
                                 })
                                 break
-                            case 'warning':
+                            case 'warning': {
                                 const tmpArr = [
                                     {
                                         text: this.$t('resume'),
@@ -784,6 +782,7 @@
                                 ]
                                 customBtns.splice(0, customBtns.length, ...tmpArr)
                                 break
+                            }
                         }
 
                         const obj = {

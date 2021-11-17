@@ -135,7 +135,7 @@
                             }
                         }
                     }, [
-                        h('i', { 'class': ['devops-icon', 'icon-question-circle'] })
+                        h('i', { class: ['devops-icon', 'icon-question-circle'] })
                     ])
                 ])
 
@@ -181,7 +181,7 @@
                         params: params
                     })
 
-                    res.records.map(item => {
+                    res.records.forEach(item => {
                         item.size = ((item.size / 1024) / 1024).toFixed(2)
                         item.properties.forEach(kk => {
                             if (kk.key === 'buildNo') {
@@ -224,7 +224,7 @@
                     })
 
                     this.fileList.splice(0, this.fileList.length)
-                    res.records.map(item => {
+                    res.records.forEach(item => {
                         item.size = ((item.size / 1024) / 1024).toFixed(2)
                         item.properties.forEach(kk => {
                             if (kk.key === 'buildNo') {

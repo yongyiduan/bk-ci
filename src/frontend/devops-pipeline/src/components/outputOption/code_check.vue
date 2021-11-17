@@ -300,7 +300,7 @@
                 return this.$route.params.buildNo
             },
             ...mapGetters({
-                'curPipeline': 'pipelines/getCurPipeline'
+                curPipeline: 'pipelines/getCurPipeline'
             }),
             ...mapState([
                 'fetchError'
@@ -423,7 +423,7 @@
 
                     options = parse(stringify(pieOption))
 
-                    opts.map(item => {
+                    opts.forEach(item => {
                         legendList.push({
                             name: item.text,
                             icon: 'circle'
@@ -474,7 +474,7 @@
 
                     if (opts instanceof Array) {
                         if (opts.length) {
-                            opts.map(item => {
+                            opts.forEach(item => {
                                 xAxisList.push(item.text)
                                 seriesList.push(data[item.key])
                             })
@@ -484,7 +484,7 @@
 
                         if (list) {
                             if (list.length) {
-                                list.map(item => {
+                                list.forEach(item => {
                                     const tempArr = []
                                     xAxisList.push(item[settings.xKey])
                                     if (settings.level) {
@@ -528,7 +528,7 @@
 
                         if (list) {
                             if (list.length) {
-                                list.map(item => {
+                                list.forEach(item => {
                                     xAxisList.push(item[settings.xKey])
                                     seriesList.push(item[settings.yKey])
                                 })
@@ -581,7 +581,7 @@
                     // }
 
                     const newSeriesList = []
-                    settings.level.map((item, index) => {
+                    settings.level.forEach((item, index) => {
                         const temp = {
                             name: item.text,
                             type: 'bar',
@@ -595,14 +595,14 @@
                             },
                             barMaxWidth: 50
                         }
-                        data[opts].map(opt => {
+                        data[opts].forEach(opt => {
                             temp.data.push(opt[item.key])
                         })
                         newSeriesList.push(temp)
                     })
 
                     options.series.splice(0, options.series.length)
-                    newSeriesList.map(series => {
+                    newSeriesList.forEach(series => {
                         options.series.push(series)
                     })
                 } else {
@@ -628,7 +628,7 @@
                 const legendList = []
                 const seriesList = []
 
-                codeccOptions[data.tool_name_en].normalLegend.map(item => {
+                codeccOptions[data.tool_name_en].normalLegend.forEach(item => {
                     legendList.push({
                         name: item.key,
                         icon: 'circle'
