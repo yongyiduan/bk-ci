@@ -50,10 +50,9 @@
                 const attachAddon = new AttachAddon(this.terminalSocket)
                 // Attach the socket to term
                 this.term.loadAddon(attachAddon)
-                
+                this.fitAddon.fit()
                 this.term.onResize(this.handleResize)
                 setTimeout(() => {
-                    this.fitAddon.fit()
                     this.term._initialized = true
                 }, 1000)
 
