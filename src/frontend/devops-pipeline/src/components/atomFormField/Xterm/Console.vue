@@ -3,9 +3,10 @@
 </template>
 
 <script>
-    import Terminal from './Xterm'
+    import { Terminal } from 'xterm'
     import { FitAddon } from 'xterm-addon-fit'
     import { AttachAddon } from 'xterm-addon-attach'
+    import 'xterm/css/xterm.css'
     export default {
         name: 'Console',
         props: {
