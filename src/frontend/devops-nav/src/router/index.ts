@@ -208,7 +208,7 @@ function parseOS (): string {
     return 'WINDOWS'
 }
 
-function getProjectId (params): string {
+export function getProjectId (params): string {
     try {
         const cookiePid = cookie.get(X_DEVOPS_PROJECT_ID)
         const projectId = window.GLOBAL_PID || cookiePid
