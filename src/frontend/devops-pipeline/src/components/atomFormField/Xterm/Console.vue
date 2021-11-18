@@ -52,9 +52,7 @@
                 this.term.loadAddon(attachAddon)
                 this.fitAddon.fit()
                 this.term.onResize(this.handleResize)
-                setTimeout(() => {
-                    this.term._initialized = true
-                }, 1000)
+                this.term._initialized = true
 
                 this.term.write('#######################################################################\r\n#                    Welcome To BKDevOps Console                      #\r\n#######################################################################\r\n')
             } else {
@@ -100,8 +98,12 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .terminal {
         height: 100%;
+        background: black;
+    }
+    ::-webkit-scrollbar {
+        background: transparent;
     }
 </style>
