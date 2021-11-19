@@ -72,6 +72,7 @@
     import { Component, Prop } from 'vue-property-decorator'
     import { urlJoin, getServiceAliasByPath, isAbsoluteUrl } from '../../utils/util'
     import eventBus from '../../utils/eventBus'
+    import { getProjectId } from '../../router'
 
     @Component
     export default class NavBox extends Vue {
@@ -102,6 +103,12 @@
                eventBus.$emit('goHome')
                return
            }
+           if (nAlias === 'bcs') {
+             console.log(this.$route.params)
+             window.open(`${newWindowUrl}/bcs/${getProjectId(this.$route.params)}`, '_blank')
+             return
+           }
+
            newWindow ? window.open(newWindowUrl, '_blank') : this.$router.push(destUrl)
        }
 

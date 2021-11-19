@@ -84,6 +84,7 @@
     import Logo from '../Logo/index.vue'
     import NavBox from '../NavBox/index.vue'
     import eventBus from '../../utils/eventBus'
+    import { getProjectId } from '../../router'
 
     @Component({
         name: 'nav-menu',
@@ -171,6 +172,10 @@
                 eventBus.$emit('goHome')
                 return
             }
+            if (nAlias === 'bcs') {
+             window.open(`${newWindowUrl}/bcs/${getProjectId(this.$route.params)}`, '_blank')
+             return
+           }
             newWindow ? window.open(newWindowUrl, '_blank') : this.$router.push(destUrl)
        }
 

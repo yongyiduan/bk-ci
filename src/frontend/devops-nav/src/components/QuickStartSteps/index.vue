@@ -68,7 +68,7 @@
             return index === this.stepIndex
         }
 
-        validate () {
+        validate (): boolean {
             return !(this.$refs.step.validate && !this.$refs.step.validate())
         }
 
@@ -79,6 +79,7 @@
 </script>
 
 <style lang='scss'>
+    @use "sass:math";
     @import '../../assets/scss/conf';
     .quick-start-step-wrapper {
         display: -webkit-box;
@@ -156,7 +157,7 @@
                         border-left: 2px dotted $borderWeightColor;
                         height: $marginHeight;
                         top: $numSize;
-                        left: $numSize / 2;
+                        left: math.div($numSize, 2);
 
                     }
                 }
