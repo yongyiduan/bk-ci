@@ -13,8 +13,6 @@
     import atomFieldMixin from '../atomFieldMixin'
     import customSelector from '@/components/common/custom-selector'
 
-    const vue = new Vue()
-
     export default {
         name: 'staff-input',
         components: {
@@ -69,7 +67,7 @@
                 const url = `/project/api/user/users/projects/${this.projectId}/list`
 
                 try {
-                    const res = await vue.$ajax.get(`${url}`).then(response => {
+                    const res = await this.$ajax.get(`${url}`).then(response => {
                         return response
                     })
 
