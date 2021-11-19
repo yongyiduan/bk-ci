@@ -142,7 +142,7 @@
                 'pipelineTemplate'
             ]),
             ...mapGetters({
-                'tagGroupList': 'pipelines/getTagGroupList'
+                tagGroupList: 'pipelines/getTagGroupList'
             }),
 
             tplTypes () {
@@ -154,7 +154,7 @@
             tempList () {
                 const list = []
                 const { pipelineTemplate } = this
-                Object.keys(pipelineTemplate || []).map(item => {
+                Object.keys(pipelineTemplate || []).forEach(item => {
                     if (!pipelineTemplate[item].category.length && pipelineTemplate[item].name !== '空白流水线') { // custom类型category为空数组
                         list.push({
                             ...pipelineTemplate[item],
@@ -186,13 +186,13 @@
         },
 
         watch: {
-            'pipelineTemplate': function (newVal, oldVal) {
+            pipelineTemplate: function (newVal, oldVal) {
                 if (newVal) {
                     this.isLoading = false
                     this.selectTemp(0)
                 }
             },
-            'isShow': function () {
+            isShow: function () {
                 if (this.isShow) {
                     this.isLoading = true
                     this.requestPipelineTemplate({

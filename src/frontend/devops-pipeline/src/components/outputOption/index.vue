@@ -37,7 +37,7 @@
         },
         computed: {
             ...mapGetters({
-                'checkHasCodecc': 'common/getHasAtomCheck'
+                checkHasCodecc: 'common/getHasAtomCheck'
             }),
             hasCodecc () {
                 return this.checkHasCodecc(this.curPipeline.stages, 'linuxPaasCodeCCScript')
@@ -47,30 +47,39 @@
             },
             tabs () {
                 return [
-                    ...(this.hasCodecc ? [{
-                        id: 'codeCheck',
-                        name: this.$t('details.codeCheck'),
-                        component: 'codeCheck',
-                        componentProps: {
+                    ...(this.hasCodecc
+                        ? [{
+                            id: 'codeCheck',
+                            name: this.$t('details.codeCheck'),
+                            component: 'codeCheck',
+                            componentProps: {
 
-                        }
-                    }] : []),
-                    ...(this.hasWetestTab ? [{
-                        id: 'wetestReport',
-                        name: this.$t('details.wetestReportName'),
-                        component: 'wetestReport',
-                        componentProps: {
-                            pipelineReportList: this.pipelineReportList
-                        }
-                    }] : []),
-                    ...(this.hasThirdPartyReport ? [{
-                        id: 'thirdReport',
-                        name: this.$t('details.thirdReport'),
-                        component: 'thirdPartyReport',
-                        componentProps: {
-                            reportList: this.thirdPartyReportList
-                        }
-                    }] : []),
+                            }
+                        }]
+                        : []
+                    ),
+                    ...(this.hasWetestTab
+                        ? [{
+                            id: 'wetestReport',
+                            name: this.$t('details.wetestReportName'),
+                            component: 'wetestReport',
+                            componentProps: {
+                                pipelineReportList: this.pipelineReportList
+                            }
+                        }]
+                        : []
+                    ),
+                    ...(this.hasThirdPartyReport
+                        ? [{
+                            id: 'thirdReport',
+                            name: this.$t('details.thirdReport'),
+                            component: 'thirdPartyReport',
+                            componentProps: {
+                                reportList: this.thirdPartyReportList
+                            }
+                        }]
+                        : []
+                    ),
                     ...this.customizeList.map(item => ({
                         ...item,
                         name: item.name,

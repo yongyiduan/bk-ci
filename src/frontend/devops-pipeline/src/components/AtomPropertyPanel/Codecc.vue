@@ -80,20 +80,20 @@
                 disAllowToolsInThird: ['CHECKSTYLE', 'STYLECOP', 'SENSITIVE', 'PHPCS', 'DETEKT', 'OCCHECK'],
                 dataMap: [
                     {
-                        'old': 'C',
-                        'new': 'C_CPP'
+                        old: 'C',
+                        new: 'C_CPP'
                     },
                     {
-                        'old': 'C_PLUS_PLUSH',
-                        'new': 'C_CPP'
+                        old: 'C_PLUS_PLUSH',
+                        new: 'C_CPP'
                     },
                     {
-                        'old': 'OBJECTIVE_C',
-                        'new': 'OC'
+                        old: 'OBJECTIVE_C',
+                        new: 'OC'
                     },
                     {
-                        'old': 'JAVASCRIPT',
-                        'new': 'JS'
+                        old: 'JAVASCRIPT',
+                        new: 'JS'
                     }
                 ],
                 otherChoice: ['path', 'asynchronous']
@@ -113,7 +113,7 @@
             commonModel () {
                 const { languages, tools } = this.newModel
                 return {
-                    'row': { languages, tools }
+                    row: { languages, tools }
                 }
             },
             accordionList () {
@@ -256,7 +256,7 @@
                 this.handleUpdateElement('scanType', '1')
             }
             if (this.element.languages && this.element.languages.length) {
-                this.element.languages.map((lang, index) => {
+                this.element.languages.forEach((lang, index) => {
                     if (this.dataMap.filter(item => item.old === lang).length > 0) {
                         this.element.languages.splice(index, 1, this.getDataMap(lang))
                     }
@@ -443,14 +443,14 @@
             },
             handleIntro (vals) {
                 let list = []
-                vals.map(val => {
+                vals.forEach(val => {
                     const curLang = this.newModel.languages.list.find(item => item.id === val)
                     if (curLang && curLang.intro) {
                         list = list.concat(curLang.intro)
                     }
                     list = Array.from(new Set(list))
                 })
-                this.newModel.tools.list.map((tool, index) => {
+                this.newModel.tools.list.forEach((tool, index) => {
                     if (list.filter(item => tool.id === item).length > 0) {
                         this.newModel.tools.list[index].disabled = false
                     } else {
@@ -516,7 +516,7 @@
                 return name
             },
             handleStrictLang () {
-                this.newModel.languages.list.map((lang, index) => {
+                this.newModel.languages.list.forEach((lang, index) => {
                     this.newModel.languages.list[index].disabled = true
                 })
             },

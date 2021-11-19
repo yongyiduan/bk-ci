@@ -72,7 +72,7 @@
                         return response.data.data
                     })
 
-                    res.map(item => {
+                    res.forEach(item => {
                         this.initData.push(item)
                         this.list.push(item)
                     })

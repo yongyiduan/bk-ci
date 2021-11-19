@@ -572,7 +572,7 @@
              */
             async getDevnetGateway () {
                 try {
-                    const res = await this.$ajax.get(`/artifactory/api/user/artifactories/checkDevnetGateway`)
+                    const res = await this.$ajax.get('/artifactory/api/user/artifactories/checkDevnetGateway')
                     return res
                 } catch (err) {
                     return false

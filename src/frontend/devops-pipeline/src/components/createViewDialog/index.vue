@@ -165,10 +165,10 @@
         },
         computed: {
             ...mapGetters({
-                'userInfo': 'pipelines/getUserInfo',
-                'tagGroupList': 'pipelines/getTagGroupList',
-                'showViewCreate': 'pipelines/getShowViewCreate',
-                'createViewForm': 'pipelines/getCreateViewForm'
+                userInfo: 'pipelines/getUserInfo',
+                tagGroupList: 'pipelines/getTagGroupList',
+                showViewCreate: 'pipelines/getShowViewCreate',
+                createViewForm: 'pipelines/getCreateViewForm'
             }),
             projectId () {
                 return this.$route.params.projectId

@@ -419,7 +419,7 @@
                                 projectId
                             }&service_code=code&${
                                 repositoryHashId
-                                    ? `role_manager=repertory`
+                                    ? 'role_manager=repertory'
                                     : 'role_creator=repertory'
                             }`
                         })

@@ -59,14 +59,16 @@
                         { label: this.$t('store.开发语言：'), value: this.detail.language },
                         { label: this.$t('store.已托管至：'), value: this.$t('store.工蜂'), link: 'https://git.code.oa.com/' },
                         { label: this.$t('store.代码库：'), value: this.detail.codeSrc, tool: { show: true, label: this.$t('store.复制'), click: () => copyString(this.detail.codeSrc) } },
-                        { label: this.$t('store.授权人：'),
-                          value: this.detail.repositoryAuthorizer,
-                          tool: {
-                              show: this.userInfo.isProjectAdmin && this.userInfo.userName !== this.detail.repositoryAuthorizer,
-                              info: this.$t('store.在发布插件时，使用授权人的身份拉取插件代码自动构建打包，或设置插件可见范围'),
-                              label: this.$t('store.重置授权'),
-                              title: this.$t('store.将使用你的身份进行插件代码库相关操作'),
-                              click: this.modifyRepoMemInfo }
+                        {
+                            label: this.$t('store.授权人：'),
+                            value: this.detail.repositoryAuthorizer,
+                            tool: {
+                                show: this.userInfo.isProjectAdmin && this.userInfo.userName !== this.detail.repositoryAuthorizer,
+                                info: this.$t('store.在发布插件时，使用授权人的身份拉取插件代码自动构建打包，或设置插件可见范围'),
+                                label: this.$t('store.重置授权'),
+                                title: this.$t('store.将使用你的身份进行插件代码库相关操作'),
+                                click: this.modifyRepoMemInfo
+                            }
                         }
                     ]
                 }
@@ -79,13 +81,15 @@
                     this.list = [
                         { label: this.$t('store.已托管至：'), value: this.$t('store.工蜂'), link: 'https://git.code.oa.com/' },
                         { label: this.$t('store.代码库：'), value: this.detail.codeSrc, tool: { show: true, label: this.$t('store.复制'), click: () => copyString(this.detail.codeSrc) } },
-                        { label: this.$t('store.授权人：'),
-                          value: this.detail.repositoryAuthorizer,
-                          tool: {
-                              show: this.userInfo.isProjectAdmin && this.userInfo.userName !== this.detail.repositoryAuthorizer,
-                              info: this.$t('store.在发布微扩展时，使用授权人的身份拉取微扩展代码自动构建打包，或设置微扩展可见范围'),
-                              label: this.$t('store.重置授权'),
-                              click: this.modifyRepoMemInfo }
+                        {
+                            label: this.$t('store.授权人：'),
+                            value: this.detail.repositoryAuthorizer,
+                            tool: {
+                                show: this.userInfo.isProjectAdmin && this.userInfo.userName !== this.detail.repositoryAuthorizer,
+                                info: this.$t('store.在发布微扩展时，使用授权人的身份拉取微扩展代码自动构建打包，或设置微扩展可见范围'),
+                                label: this.$t('store.重置授权'),
+                                click: this.modifyRepoMemInfo
+                            }
                         }
                     ]
                 }

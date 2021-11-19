@@ -256,10 +256,12 @@
                 } catch (err) {
                     if (err.code === 403) {
                         const actionId = this.isEdit ? this.$permissionActionMap.edit : this.$permissionActionMap.create
-                        const instanceId = this.isEdit ? [{
-                            id: formData.certId,
-                            type: this.$permissionResourceTypeMap.TICKET_CERT
-                        }] : []
+                        const instanceId = this.isEdit
+                            ? [{
+                                id: formData.certId,
+                                type: this.$permissionResourceTypeMap.TICKET_CERT
+                            }]
+                            : []
                         
                         this.$showAskPermissionDialog({
                             noPermissionList: [{

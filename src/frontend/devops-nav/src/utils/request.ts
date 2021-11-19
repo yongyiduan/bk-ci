@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Vue from 'vue'
-import * as cookie from 'js-cookie'
+import cookie from 'js-cookie'
 
 const request = axios.create({
     baseURL: API_URL_PREFIX,
@@ -28,10 +28,12 @@ request.interceptors.request.use(config => {
     const routePid = getCurrentPid()
     return {
         ...config,
-        headers: routePid ? {
-            'X-DEVOPS-PROJECT-ID': routePid,
-            ...(config.headers || {})
-        } : config.headers
+        headers: routePid
+            ? {
+                'X-DEVOPS-PROJECT-ID': routePid,
+                ...(config.headers || {})
+            }
+            : config.headers
     }
 }, function (error) {
     return Promise.reject(error)

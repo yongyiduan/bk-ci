@@ -64,9 +64,9 @@
                 showDialog: false,
                 visibleList: [],
                 statusMap: {
-                    'APPROVED': this.$t('store.审核通过'),
-                    'APPROVING': this.$t('store.待审核'),
-                    'REJECT': this.$t('store.审核驳回')
+                    APPROVED: this.$t('store.审核通过'),
+                    APPROVING: this.$t('store.待审核'),
+                    REJECT: this.$t('store.审核驳回')
                 },
                 deleteObj: {
                     show: false,
@@ -80,8 +80,8 @@
 
         computed: {
             ...mapGetters('store', {
-                'detail': 'getDetail',
-                'userInfo': 'getUserInfo'
+                detail: 'getDetail',
+                userInfo: 'getUserInfo'
             }),
 
             isEnterprise () {
@@ -168,6 +168,7 @@
                     if (val.selected) {
                         return val.deptId || val.deptId === 0
                     }
+                    return false
                 })
                 if (!target.length) {
                     this.$bkMessage({

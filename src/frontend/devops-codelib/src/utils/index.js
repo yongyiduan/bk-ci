@@ -127,11 +127,13 @@ export function extendParsePathAlias (type, path, authType, svnType) {
 
     const matchResult = path.match(reg)
 
-    return matchResult ? {
-        alias: alias || matchResult[nameMatchIndex]
-    } : {
-        msg
-    }
+    return matchResult
+        ? {
+            alias: alias || matchResult[nameMatchIndex]
+        }
+        : {
+            msg
+        }
 }
 
 export function parsePathRegion (path) {

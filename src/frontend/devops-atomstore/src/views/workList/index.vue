@@ -48,17 +48,19 @@
                             { name: this.$t('store.模版指引'), link: `${DOCS_URL_PREFIX}/store/store-home` }
                         ]
                     },
-                    { name: 'imageWork',
-                      label: this.$t('store.容器镜像'),
-                      links: [
-                          { name: this.$t('store.镜像指引'), link: `${DOCS_URL_PREFIX}/store/ci-images/image-build` }
-                      ]
+                    {
+                        name: 'imageWork',
+                        label: this.$t('store.容器镜像'),
+                        links: [
+                            { name: this.$t('store.镜像指引'), link: `${DOCS_URL_PREFIX}/store/ci-images/image-build` }
+                        ]
                     },
-                    { name: 'serviceWork',
-                      label: this.$t('store.微扩展'),
-                      links: [
-                          { name: this.$t('store.微扩展指引'), link: `${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=103523086` }
-                      ]
+                    {
+                        name: 'serviceWork',
+                        label: this.$t('store.微扩展'),
+                        links: [
+                            { name: this.$t('store.微扩展指引'), link: `${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=103523086` }
+                        ]
                     }
                 ]
             }

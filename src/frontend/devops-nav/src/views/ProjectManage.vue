@@ -416,7 +416,7 @@
                     resourceId: this.$permissionResourceMap.project,
                     instanceId: []
                 }],
-                applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project`
+                applyPermissionUrl: '/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project'
             })
         }
 
