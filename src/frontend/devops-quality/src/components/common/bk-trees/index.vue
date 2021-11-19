@@ -68,7 +68,7 @@
                 'curNodeOnTree'
             ]),
             ...mapGetters({
-                'sideMenuList': 'artifactory/getSideMenuList'
+                sideMenuList: 'artifactory/getSideMenuList'
             }),
             _deepCount () {
                 return this.deepCount + 1

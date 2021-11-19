@@ -235,7 +235,7 @@
                         this.nodeSelectConf.unselected = true
                     }
 
-                    this.nodeList.filter(item => {
+                    this.nodeList.forEach(item => {
                         if (item.isChecked) curCount++
                     })
 
@@ -482,11 +482,11 @@
                         if (isValid && result) {
                             let message, theme
                             const createEnv = {
-                                'name': this.createEnvForm.name.trim(),
-                                'desc': this.createEnvForm.desc,
-                                'envType': this.createEnvForm.envType,
-                                'source': this.createEnvForm.source,
-                                'envVars': []
+                                name: this.createEnvForm.name.trim(),
+                                desc: this.createEnvForm.desc,
+                                envType: this.createEnvForm.envType,
+                                source: this.createEnvForm.source,
+                                envVars: []
                             }
 
                             if (this.createEnvForm.source === 'CREATE') {
@@ -524,7 +524,7 @@
 
                                 if (theme === 'success') {
                                     this.$router.push({
-                                        'name': 'envList'
+                                        name: 'envList'
                                     })
                                 }
                             }
@@ -571,7 +571,7 @@
 
                     this.nodeList.splice(0, this.nodeList.length)
 
-                    res.map(item => {
+                    res.forEach(item => {
                         item.isChecked = false
 
                         if (this.createEnvForm.envType === 'BUILD') {
@@ -590,8 +590,8 @@
 
                         this.nodeList.push(item)
 
-                        this.previewNodeList.filter(vv => {
-                            this.nodeList.filter(kk => {
+                        this.previewNodeList.forEach(vv => {
+                            this.nodeList.forEach(kk => {
                                 if (vv.nodeHashId === kk.nodeHashId) {
                                     kk.isChecked = true
                                 }

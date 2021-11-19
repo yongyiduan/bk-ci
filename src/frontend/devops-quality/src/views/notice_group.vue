@@ -184,7 +184,7 @@
 
                     this.noticeGroupList.splice(0, this.noticeGroupList.length)
                     if (res.records) {
-                        res.records.map(item => {
+                        res.records.forEach(item => {
                             this.noticeGroupList.push(item)
                         })
                     }

@@ -181,7 +181,7 @@
         },
         watch: {
             tagGroupList (newVal) {
-                newVal.map(val => {
+                newVal.forEach(val => {
                     val['@type'] = 'filterByLabel'
                 })
                 this.viewFilterTypeList = [...this.viewFilterTypeList, ...newVal]
@@ -255,7 +255,7 @@
                 this.createViewForm.filters = [...this.createViewForm.filters]
             },
             formatForm () {
-                this.createViewForm.filters.map(value => {
+                this.createViewForm.filters.forEach(value => {
                     if (value['@type'] === 'filterByName') {
                         value.name = this.$t('pipelineName')
                         value.id = value['@type']

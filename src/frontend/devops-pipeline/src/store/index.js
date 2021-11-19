@@ -107,7 +107,7 @@ export default new Vuex.Store({
                 if (typeof response.data === 'object' && typeof response.data.data === 'object') {
                     data = response.data.data
                     if (data.ccAppId) {
-                        Object.assign(data, { 'ccAppId': data.ccAppId.toString() })
+                        Object.assign(data, { ccAppId: data.ccAppId.toString() })
                     }
                 }
                 commit('updateCurProject', data)

@@ -65,10 +65,13 @@
     export default class User extends Vue {
         @Prop()
         username: string
+
         @Prop()
         avatarUrl: string
+
         @Prop()
         chineseName: string
+
         @Prop()
         bkpaasUserId: string
         @Prop()
@@ -130,6 +133,7 @@
                 return []
             }
         }
+
         logout (): void {
           bkLogout.logout()
           window.location.href = window.getLoginUrl()

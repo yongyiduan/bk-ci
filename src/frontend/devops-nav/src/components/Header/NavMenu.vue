@@ -168,7 +168,7 @@
             const nAlias = getServiceAliasByPath(linkNew)
             const destUrl = this.addConsole(linkNew)
 
-            if (cAlias === nAlias && this.currentPage && this.currentPage['inject_type'] === 'iframe') {
+            if (cAlias === nAlias && this.currentPage && this.currentPage.inject_type === 'iframe') {
                 eventBus.$emit('goHome')
                 return
             }

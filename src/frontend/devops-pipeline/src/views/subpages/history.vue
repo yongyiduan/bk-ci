@@ -50,8 +50,8 @@
         },
         computed: {
             ...mapGetters('pipelines', {
-                'statusMap': 'getStatusMap',
-                'hisPageStatus': 'getHisPageStatus'
+                statusMap: 'getStatusMap',
+                hisPageStatus: 'getHisPageStatus'
             }),
             hooks () {
                 return this.extensionTabsHooks

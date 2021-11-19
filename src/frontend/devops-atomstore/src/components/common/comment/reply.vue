@@ -67,7 +67,7 @@
         },
 
         computed: {
-            ...mapGetters('store', { 'commentList': 'getCommentList' }),
+            ...mapGetters('store', { commentList: 'getCommentList' }),
 
             comment () {
                 const data = this.commentData || {}
