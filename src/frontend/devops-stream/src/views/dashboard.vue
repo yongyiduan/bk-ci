@@ -168,7 +168,7 @@
                 })
             },
             async getRepoList (page = 1, pageSize = this.limit) {
-                await common.getStreamProjects(this.type, page, pageSize, this.searchStr).then((res) => {
+                await common.getStreamProjects(this.type, page, pageSize, this.searchStr).then((res = {}) => {
                     this.repoList = (res.records || []).map(item => ({
                         ...item,
                         avatarUrl: (item.avatarUrl.endsWith('.jpg') || item.avatarUrl.endsWith('.jpeg') || item.avatarUrl.endsWith('.png')) ? (item.avatarUrl.replace('http:', '').replace('https:', '')) : gitcode

@@ -5,6 +5,9 @@
             :name="reviewStatausIcon(stage.checkIn)"
             size="28"
             class="review-icon"
+            v-bk-tooltips="{
+                content: '等待审核'
+            }"
             @click.native="handleIconClick('checkIn')"
         />
 
@@ -13,6 +16,9 @@
             :name="reviewStatausIcon(stage.checkOut)"
             size="28"
             class="review-icon check-out"
+            v-bk-tooltips="{
+                content: '等待审核'
+            }"
             @click.native="handleIconClick('checkOut')"
         />
 
@@ -100,10 +106,25 @@
             }
         },
 
+        mounted () {
+            this.autoOpenReview()
+        },
+
         methods: {
             ...mapActions([
                 'toggleStageReviewPanel'
             ]),
+
+            autoOpenReview () {
+                const query = this.$route.query || {}
+                const checkIn = query.checkIn
+                const checkOut = query.checkOut
+                if (+checkIn === +this.stageIndex) {
+                    this.handleIconClick('checkIn')
+                } else if (+checkOut === +this.stageIndex) {
+                    this.handleIconClick('checkOut')
+                }
+            },
 
             handleIconClick (type) {
                 this.toggleStageReviewPanel({
@@ -134,7 +155,7 @@
                         case stageControl.status === 'QUALITY_CHECK_PASS':
                             return 'review-auto-pass'
                         case stageControl.status === 'QUALITY_CHECK_WAIT':
-                            return 'quality-check-wait'
+                            return 'reviewing'
                         case stageControl.status === 'REVIEW_ABORT':
                             return 'review-abort'
                         case this.stageStatusCls === 'SKIP':
