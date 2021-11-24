@@ -139,7 +139,7 @@ export function goMR (projectUrl, mrId) {
 
 export function goBranch (projectUrl, branchName) {
     if (branchName) {
-        window.open(`${projectUrl}/tree/${branchName}`, '_blank')
+        window.open(`${projectUrl}/tree/${encodeURIComponent(branchName)}`, '_blank')
     }
 }
 
@@ -151,7 +151,7 @@ export function goTag (projectUrl, tag) {
 
 export function goYaml (projectUrl, branch, yamlName) {
     if (yamlName) {
-        window.open(`${projectUrl}/blob/${branch}/${yamlName}`, '_blank')
+        window.open(`${projectUrl}/blob/${encodeURIComponent(branch)}/${encodeURIComponent(yamlName)}`, '_blank')
     }
 }
 
