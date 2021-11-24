@@ -104,7 +104,6 @@
                return
            }
            if (nAlias === 'bcs' && newWindowUrl.indexOf('ieg.') > -1) {
-             console.log(this.$route.params)
              window.open(`${newWindowUrl}/bcs/${getProjectId(this.$route.params)}`, '_blank')
              return
            }
