@@ -249,6 +249,12 @@ export function setCookie (cname, cvalue, domain) {
     document.cookie = `${cname}=${cvalue};domain=${domain}; path=/;expires=Fri, 31 Dec 2030 23:59:59 GMT`
 }
 
+export function deleteCookie (cname, domain) {
+    const date = new Date()
+    date.setTime(date.getTime() - 10000)
+    document.cookie = cname + '=0;' + 'domain=' + domain + '; expires=' + date.toGMTString() + '; path=/'
+}
+
 export function getCookie (key) {
     const cookieStr = document.cookie || ''
     const cookieArr = cookieStr.split(';').filter(v => v)
