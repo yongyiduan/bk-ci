@@ -50,9 +50,9 @@
                                 const projectId = `git_${projectInfo.id}`
                                 if (getCookie('X-DEVOPS-PROJECT-ID') !== projectId) {
                                     // 设置cookie
-                                    setCookie('X-DEVOPS-PROJECT-ID', projectId, document.domain.split('.').slice(-2).join('.'))
+                                    setCookie('X-DEVOPS-PROJECT-ID', projectId, location.hostname)
                                     if (getCookie('ROUTER_TAG') !== projectInfo.routerTag) {
-                                        setCookie('ROUTER_TAG', projectInfo.routerTag, document.domain.split('.').slice(-2).join('.'))
+                                        setCookie('ROUTER_TAG', projectInfo.routerTag, location.hostname)
                                         location.reload()
                                     }
                                 }
