@@ -31,7 +31,9 @@ module.exports = {
         USER_INFO_URL: false,
         LOGIN_SERVICE_URL: false,
         PROXY_URL_PREFIX: false,
-        WEBSOCKET_URL_PREFIX: false
+        WEBSOCKET_URL_PREFIX: false,
+        X_DEVOPS_PROJECT_ID: false,
+        ROUTER_TAG: false
     },
     // add your custom rules hered
     rules: {

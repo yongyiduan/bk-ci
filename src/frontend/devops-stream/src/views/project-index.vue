@@ -48,11 +48,11 @@
                         common.getProjectInfo(projectPath).then((projectInfo = {}) => {
                             if (projectInfo.id) {
                                 const projectId = `git_${projectInfo.id}`
-                                if (getCookie('X-DEVOPS-PROJECT-ID') !== projectId) {
+                                if (getCookie(X_DEVOPS_PROJECT_ID) !== projectId) {
                                     // 设置cookie
-                                    setCookie('X-DEVOPS-PROJECT-ID', projectId, location.hostname)
-                                    if (getCookie('ROUTER_TAG') !== projectInfo.routerTag) {
-                                        setCookie('ROUTER_TAG', projectInfo.routerTag, location.hostname)
+                                    setCookie(X_DEVOPS_PROJECT_ID, projectId, location.hostname)
+                                    if (getCookie(ROUTER_TAG) !== projectInfo.routerTag) {
+                                        setCookie(ROUTER_TAG, projectInfo.routerTag, location.hostname)
                                         location.reload()
                                     }
                                 }

@@ -8,6 +8,7 @@
 <script>
     import streamHeader from '@/components/header'
     import { mapState } from 'vuex'
+    import { deleteCookie } from '@/utils'
 
     export default {
         name: 'App',
@@ -37,6 +38,8 @@
                     name: routeName
                 })
             }
+            deleteCookie(X_DEVOPS_PROJECT_ID, 'oa.com')
+            deleteCookie(X_DEVOPS_PROJECT_ID, 'woa.com')
         }
     }
 </script>
