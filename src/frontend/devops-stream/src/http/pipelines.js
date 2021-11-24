@@ -3,25 +3,38 @@ import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, STREAM_PERFIX, DISPATCH
 
 export default {
     // 第一次拉取日志
-    getInitLog ({ projectId, pipelineId, buildId, tag, currentExe, subTag }) {
+    getInitLog ({ projectId, pipelineId, buildId, tag, currentExe, subTag, debug }) {
         return api.get(`${LOG_PERFIX}/user/logs/${projectId}/${pipelineId}/${buildId}`, {
             params: {
                 tag,
                 executeCount: currentExe,
-                subTag
+                subTag,
+                debug
             }
         })
     },
 
     // 后续拉取日志
-    getAfterLog ({ projectId, pipelineId, buildId, tag, currentExe, lineNo, subTag }) {
+    getAfterLog ({ projectId, pipelineId, buildId, tag, currentExe, lineNo, subTag, debug }) {
         return api.get(`${LOG_PERFIX}/user/logs/${projectId}/${pipelineId}/${buildId}/after`, {
             params: {
                 start: lineNo,
                 executeCount: currentExe,
                 tag,
-                subTag
+                subTag,
+                debug
             }
+        })
+    },
+
+    getLogStatus ({ projectId, pipelineId, buildId, tag, executeCount }) {
+        return api.get(`${LOG_PERFIX}/user/logs/${projectId}/${pipelineId}/${buildId}/mode`, { params: { tag, executeCount } })
+    },
+
+    getDownloadLogFromArtifactory ({ projectId, pipelineId, buildId, tag, executeCount }) {
+        return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/log/plugin/${projectId}/${pipelineId}/${buildId}/${tag}/${executeCount}`).then((res) => {
+            const data = res.data || {}
+            return data.url || ''
         })
     },
 
