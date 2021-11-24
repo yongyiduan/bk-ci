@@ -51,7 +51,8 @@
                 logPostData: {},
                 closeIds: [],
                 curExe: this.executeCount,
-                showDebug: false
+                showDebug: false,
+                hasRetryGetLog: false
             }
         },
 
@@ -168,6 +169,10 @@
                             postData.timeId = setTimeout(() => this.getLog(id, postData), 100)
                         } else {
                             ref.addLogData(logs, id)
+                            if (!this.hasRetryGetLog) {
+                                this.hasRetryGetLog = true
+                                postData.timeId = setTimeout(() => this.getLog(id, postData), 3000)
+                            }
                         }
                     } else {
                         ref.addLogData(logs, id)

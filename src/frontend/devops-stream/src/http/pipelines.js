@@ -27,6 +27,17 @@ export default {
         })
     },
 
+    getLogStatus ({ projectId, pipelineId, buildId, tag, executeCount }) {
+        return api.get(`${LOG_PERFIX}/user/logs/${projectId}/${pipelineId}/${buildId}/mode`, { params: { tag, executeCount } })
+    },
+
+    getDownloadLogFromArtifactory ({ projectId, pipelineId, buildId, tag, executeCount }) {
+        return api.get(`${ARTIFACTORY_PREFIX}/user/artifactories/log/plugin/${projectId}/${pipelineId}/${buildId}/${tag}/${executeCount}`).then((res) => {
+            const data = res.data || {}
+            return data.url || ''
+        })
+    },
+
     requestPartFile ({ projectId, params }) {
         return api.post(`${ARTIFACTORY_PREFIX}/user/artifactories/${projectId}/search`, params)
     },
