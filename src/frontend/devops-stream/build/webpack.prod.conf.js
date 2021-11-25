@@ -7,8 +7,8 @@ import { resolve, join } from 'path'
 import webpack from 'webpack'
 import merge from 'webpack-merge'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import TerserPlugin from 'terser-webpack-plugin'
-import OptimizeCSSPlugin from 'optimize-css-assets-webpack-plugin'
+// import TerserPlugin from 'terser-webpack-plugin'
+// import OptimizeCSSPlugin from 'optimize-css-assets-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import bundleAnalyzer from 'webpack-bundle-analyzer'
@@ -28,26 +28,28 @@ const prodConf = merge(baseConf, {
         filename: assetsPath('js/[name].[chunkhash].js'),
         chunkFilename: assetsPath('js/[name].[chunkhash].js')
     },
+    devtool: 'source-map',
     optimization: {
-        minimizer: [
-            new TerserPlugin({
-                terserOptions: {
-                    compress: false,
-                    mangle: true,
-                    output: {
-                        comments: false
-                    }
-                },
-                cache: true,
-                parallel: true,
-                sourceMap: true
-            }),
-            new OptimizeCSSPlugin({
-                cssProcessorOptions: {
-                    safe: true
-                }
-            })
-        ],
+        // minimizer: [
+        //     new TerserPlugin({
+        //         terserOptions: {
+        //             compress: false,
+        //             mangle: true,
+        //             output: {
+        //                 comments: false
+        //             }
+        //         },
+        //         cache: true,
+        //         parallel: true,
+        //         sourceMap: true
+        //     }),
+        //     new OptimizeCSSPlugin({
+        //         cssProcessorOptions: {
+        //             safe: true
+        //         }
+        //     })
+        // ],
+        minimize: false,
         splitChunks: {
             chunks: 'all',
             // 表示提取出来的文件在压缩前的最小大小，默认为 30kb
