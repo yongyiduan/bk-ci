@@ -172,7 +172,7 @@
                 eventBus.$emit('goHome')
                 return
             }
-            if (nAlias === 'bcs') {
+            if (nAlias === 'bcs' && newWindowUrl.indexOf('ieg.') > -1) {
              window.open(`${newWindowUrl}/bcs/${getProjectId(this.$route.params)}`, '_blank')
              return
            }
