@@ -50,6 +50,7 @@
                                 const projectId = `git_${projectInfo.id}`
                                 if (getCookie(X_DEVOPS_PROJECT_ID) !== projectId) {
                                     // 设置cookie
+                                    console.log('write cookies')
                                     setCookie(X_DEVOPS_PROJECT_ID, projectId, location.hostname)
                                     if (getCookie(ROUTER_TAG) !== projectInfo.routerTag) {
                                         setCookie(ROUTER_TAG, projectInfo.routerTag, location.hostname)
