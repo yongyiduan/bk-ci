@@ -74,6 +74,7 @@
 
         @Prop()
         bkpaasUserId: string
+        
         @Prop()
         disabled: boolean
 
