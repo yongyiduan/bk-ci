@@ -69,17 +69,32 @@
                     </bk-radio-group>
                 </div>
                 <!-- 源代码地址 start -->
-                <div class="bk-form-item is-required">
-                    <label class="bk-label">{{ `${codelibConfig.label} ${$t('codelib.codelibUrl')}` }}:</label>
+                <div class="bk-form-item is-required" v-if="!isP4">
+                    <label class="bk-label">{{ $t('codelib.codelibUrl') }}:</label>
                     <div class="bk-form-content">
-                        <input type="text" class="bk-form-input" :placeholder="urlPlaceholder" name="codelibUrl" v-model.trim="codelibUrl" v-validate="'required'" :class="{ 'is-danger': urlErrMsg || errors.has('codelibUrl') }">
-                        <span class="error-tips" v-if="urlErrMsg || errors.has('codelibUrl')">
+                        <input type="text" class="bk-form-input" :placeholder="urlPlaceholder" name="codelibUrl" v-model.trim="codelibUrl" :v-validate="'required' ? !isP4 : false" :class="{ 'is-danger': urlErrMsg || errors.has('codelibUrl') }">
+                        <span class="error-tips" v-if="(urlErrMsg || errors.has('codelibUrl') && !isP4)">
                             {{ urlErrMsg || errors.first("codelibUrl") }}
                         </span>
                     </div>
                 </div>
                 <!-- 源代码地址 end -->
 
+                <!-- 服务器 start -->
+                <div class="bk-form-item is-required" v-if="isP4">
+                    <label class="bk-label">p4 port:</label>
+                    <div class="bk-form-content">
+                        <div class="flex-content">
+                            <input type="text" class="bk-form-input" :placeholder="portPlaceholder" name="codelibPort" v-model.trim="codelibPort" v-validate="'required'" :class="{ 'is-danger': errors.has('codelibPort') }">
+                            <i class="devops-icon icon-info-circle tip-icon" v-bk-tooltips="$t('codelib.portTips')"></i>
+                        </div>
+                        <span class="error-tips" v-if="errors.has('codelibPort')">
+                            {{ errors.first("codelibPort") }}
+                        </span>
+                    </div>
+                </div>
+                <!-- 服务器 end -->
+                
                 <!-- 别名 start -->
                 <div class="bk-form-item is-required">
                     <label class="bk-label">{{ $t('codelib.aliasName') }}:</label>
@@ -127,7 +142,7 @@
 
 <script>
     import { mapActions, mapState } from 'vuex'
-    import { getCodelibConfig, isSvn, isGit, isGithub, isTGit } from '../../config/'
+    import { getCodelibConfig, isSvn, isGit, isGithub, isTGit, isP4 } from '../../config/'
     import { parsePathAlias, extendParsePathAlias, parsePathRegion } from '../../utils'
     export default {
         name: 'codelib-dialog',
@@ -165,6 +180,9 @@
                         SVN: this.$t('codelib.svnCredPlaceholder'),
                         Git: this.$t('codelib.gitCredPlaceholder'),
                         Gitlab: this.$t('codelib.gitlabCredPlaceholder')
+                    },
+                    port: {
+                        P4: 'localhost:1666'
                     }
                 }
             }
@@ -237,6 +255,9 @@
             isTGit () {
                 return isTGit(this.codelibTypeName)
             },
+            isP4 () {
+                return isP4(this.codelibTypeName)
+            },
             isGithub () {
                 return isGithub(this.codelibTypeName)
             },
@@ -299,6 +320,18 @@
                     })
                 }
             },
+            codelibPort: {
+                get () {
+                    return this.codelib.url
+                },
+                set (url) {
+                    const param = {
+                        projectName: url,
+                        url
+                    }
+                    this.updateCodelib(param)
+                }
+            },
             urlPlaceholder () {
                 return (
                     this.placeholders.url[this.codelib.authType]
@@ -307,6 +340,9 @@
             },
             credentialPlaceholder () {
                 return this.placeholders.cred[this.codelibConfig.label]
+            },
+            portPlaceholder () {
+                return this.placeholders.port[this.codelibConfig.label]
             }
         },
 
@@ -534,7 +570,12 @@
         float: right;
         margin-top: 10px;
     }
-    .bk-form-control {
-        display: block;
+    .flex-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .tip-icon {
+            margin-left: 5px;
+        }
     }
 </style>
