@@ -197,10 +197,11 @@
         defaultProjectInfo: any = {}
         validate: object = {}
         curDepartmentInfo: any = {
-            'bg': [],
-            'dept': [],
-            'center': []
+            bg: [],
+            dept: [],
+            center: []
         }
+
         isNew: boolean = true
         isCreating: boolean = false
         deptLoading: any = {
@@ -281,9 +282,9 @@
                 this.getDepartment('bg', '0')
                 
                 if (this.isEmptyProject(this.newProject)) {
-                    this.deptLoading['bg'] = true
-                    this.deptLoading['dept'] = true
-                    this.deptLoading['center'] = true
+                    this.deptLoading.bg = true
+                    this.deptLoading.dept = true
+                    this.deptLoading.center = true
                     const res = await this.getMyDepartmentInfo()
                     if (res) {
                         this.setOrganizationValue({
@@ -301,14 +302,14 @@
         @Watch('newProject.bgId')
         watchBg (bgId: string): void {
             console.log('watch')
-            this.curDepartmentInfo['dept'] = []
-            this.curDepartmentInfo['center'] = []
+            this.curDepartmentInfo.dept = []
+            this.curDepartmentInfo.center = []
             bgId && this.getDepartment('dept', this.newProject.bgId)
         }
 
         @Watch('newProject.deptId')
         watchDept (deptId: string): void {
-            this.curDepartmentInfo['center'] = []
+            this.curDepartmentInfo.center = []
             
             deptId && this.getDepartment('center', this.newProject.deptId)
         }
@@ -378,7 +379,7 @@
                     throw Error(String(this.$t('exception.apiError')))
                 }
             } catch (err) {
-                this.handleError(err, this.$permissionActionMap.create, null, `/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project`)
+                this.handleError(err, this.$permissionActionMap.create, null, '/backend/api/perm/apply/subsystem/?client_id=project&service_code=project&role_creator=project')
             } finally {
               setTimeout(() => {
                     this.isCreating = false

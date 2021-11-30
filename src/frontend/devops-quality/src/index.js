@@ -9,7 +9,7 @@ String.prototype.isBkVar = function () {
 }
 
 window.Pages = window.Pages || {}
-window.Pages['quality'] = {
+window.Pages.quality = {
     title: '质量红线',
     routes,
     store

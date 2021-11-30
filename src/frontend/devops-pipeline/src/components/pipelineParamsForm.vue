@@ -12,7 +12,7 @@
                     <component :is="param.component" v-validate="{ required: param.required }" :click-unfold="true" :handle-change="handleParamUpdate" v-bind="Object.assign({}, param, { id: undefined, name: 'devops' + param.name })" :disabled="disabled" style="width: 100%;" :placeholder="param.placeholder"></component>
                     <span class="meta-data" v-show="showMetadata(param.type, param.value)">{{ $t('metaData') }}
                         <aside class="metadata-box">
-                            <metadata-list :is-left-render="(index % 2) === 1" :path="param.type === 'ARTIFACTORY' ? param.value : ''"></metadata-list>
+                            <metadata-list :is-left-render="(index % 2) === 1" :path="isArtifactoryParam(param.type) ? param.value : ''"></metadata-list>
                         </aside>
                     </span>
                     <div class="file-upload" v-if="showFileUploader(param.type)">
@@ -53,6 +53,7 @@
         CODE_LIB,
         CONTAINER_TYPE,
         SUB_PIPELINE,
+        ARTIFACTORY,
         TEXTAREA
     } from '@/store/modules/atom/paramsConfig'
 
@@ -132,6 +133,7 @@
             }
         },
         methods: {
+            isArtifactoryParam,
             getParamOpt (param) {
                 switch (true) {
                     case param.type === BOOLEAN:
@@ -142,6 +144,7 @@
                     case param.type === GIT_REF:
                     case param.type === CODE_LIB:
                     case param.type === CONTAINER_TYPE:
+                    case param.type === ARTIFACTORY:
                     case param.type === SUB_PIPELINE:
                         return param.options
                     default:

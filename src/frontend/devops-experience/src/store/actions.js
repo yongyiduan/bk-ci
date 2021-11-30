@@ -130,10 +130,12 @@ const actions = {
      * 校验创建体验权限
      */
     requestHasPermission ({ commit }, { projectId, payload }) {
-        return vue.$ajax.get(`${prefix}/user/experiences/${projectId}/hasPermission`, { params: {
-            path: payload.path,
-            artifactoryType: payload.artifactoryType
-        } })
+        return vue.$ajax.get(`${prefix}/user/experiences/${projectId}/hasPermission`, {
+            params: {
+                path: payload.path,
+                artifactoryType: payload.artifactoryType
+            }
+        })
     },
     /**
      * 获取项目组信息和所有人员

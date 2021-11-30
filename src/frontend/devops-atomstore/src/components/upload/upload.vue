@@ -112,7 +112,7 @@
                                 })
                             }
                             for (const p in rawFile) {
-                                if (rawFile.hasOwnProperty(p)) {
+                                if (Object.prototype.hasOwnProperty.call(rawFile, p)) {
                                     processedFile[p] = rawFile[p]
                                 }
                             }

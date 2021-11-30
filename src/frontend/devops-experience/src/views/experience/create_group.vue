@@ -140,7 +140,7 @@
                     })
 
                     this.userGroupList.splice(0, this.userGroupList.length)
-                    res.map(item => {
+                    res.forEach(item => {
                         this.userGroupList.push(item)
                     })
                 } catch (err) {

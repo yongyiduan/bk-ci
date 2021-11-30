@@ -134,7 +134,7 @@
                 return `${IWIKI_DOCS_URL}/x/tYbm`
             },
             linkUrl () {
-                return `/turbo-client/bazel.zip`
+                return '/turbo-client/bazel.zip'
             },
             migrationUrl () {
                 return `${IWIKI_DOCS_URL}/x/dj67Lw`

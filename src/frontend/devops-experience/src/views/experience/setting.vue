@@ -208,7 +208,7 @@
                     })
 
                     this.experienceList.splice(0, this.experienceList.length)
-                    res.records.map(item => {
+                    res.records.forEach(item => {
                         this.experienceList.push(item)
                         if (this.urlParams === item.groupHashId) {
                             setTimeout(() => {
@@ -312,7 +312,7 @@
             toDeleteGruop (row) {
                 if (row.permissions.canDelete) {
                     this.$bkInfo({
-                        title: `确认`,
+                        title: '确认',
                         subTitle: '确认删除该体验组',
                         confirmFn: async () => {
                             let message, theme

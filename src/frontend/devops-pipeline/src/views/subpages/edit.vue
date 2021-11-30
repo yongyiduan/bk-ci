@@ -129,26 +129,28 @@
                                 }
                             }
                         },
-                        ...(this.isDraftEdit ? [] : [{
-                            name: 'auth',
-                            label: this.$t('settings.auth'),
-                            component: 'AuthorityTab',
-                            bindData: {
-                                isLoading: !this.pipelineAuthority,
-                                pipelineAuthority: this.pipelineAuthority,
-                                projectGroupAndUsers: this.projectGroupAndUsers,
-                                updateAuthority: (name, value) => {
-                                    this.setPipelineEditing(true)
-                                    this.setAuthEditing(true)
-                                    this.updatePipelineAuthority({
-                                        pipelineAuthority: {
-                                            [name]: value
-                                        }
+                        ...(this.isDraftEdit
+                            ? []
+                            : [{
+                                name: 'auth',
+                                label: this.$t('settings.auth'),
+                                component: 'AuthorityTab',
+                                bindData: {
+                                    isLoading: !this.pipelineAuthority,
+                                    pipelineAuthority: this.pipelineAuthority,
+                                    projectGroupAndUsers: this.projectGroupAndUsers,
+                                    updateAuthority: (name, value) => {
+                                        this.setPipelineEditing(true)
+                                        this.setAuthEditing(true)
+                                        this.updatePipelineAuthority({
+                                            pipelineAuthority: {
+                                                [name]: value
+                                            }
 
-                                    })
+                                        })
+                                    }
                                 }
-                            }
-                        }]),
+                            }]),
                         {
                             name: 'baseSetting',
                             label: this.$t('editPage.baseSetting'),

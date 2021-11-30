@@ -369,7 +369,7 @@
                         }
                     })
                     this.experienceGroup.splice(0, this.experienceGroup.length)
-                    res.records.map(item => {
+                    res.records.forEach(item => {
                         item.isChecked = false
                         item.isHover = false
                         this.experienceGroup.push(item)
@@ -492,7 +492,7 @@
                     })
 
                     this.metaList.splice(0, this.metaList.length)
-                    res.map(item => {
+                    res.forEach(item => {
                         this.metaList.push(item)
                     })
 

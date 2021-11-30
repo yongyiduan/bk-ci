@@ -57,7 +57,7 @@
                     const list = []
                     if (res && res.length) {
                         for (let i = 0; i < res.length; i++) {
-                            list.push(Object.assign({}, { id: res[i]['templateId'], name: res[i]['templateName'] }))
+                            list.push(Object.assign({}, { id: res[i].templateId, name: res[i].templateName }))
                         }
                         this.newModel.templateId.list = list
                     }
@@ -74,7 +74,7 @@
                     const list = []
                     if (res && res.length) {
                         for (let i = 0; i < res.length; i++) {
-                            list.push(Object.assign({}, { key: res[i]['paramName'], value: '', seq: res[i]['seq'] }))
+                            list.push(Object.assign({}, { key: res[i].paramName, value: '', seq: res[i].seq }))
                         }
                     }
                     this.handleUpdateElement('workJson', list)

@@ -69,7 +69,7 @@
         },
         computed: {
             ...mapGetters({
-                'userInfo': 'pipelines/getUserInfo'
+                userInfo: 'pipelines/getUserInfo'
             }),
             projectId () {
                 return this.$route.params.projectId
@@ -155,7 +155,7 @@
                         projectId: this.projectId
                     })
                     this.viewList.splice(0, this.viewList.length)
-                    res.map(item => {
+                    res.forEach(item => {
                         this.viewList.push(item)
                     })
                     if (flag) {

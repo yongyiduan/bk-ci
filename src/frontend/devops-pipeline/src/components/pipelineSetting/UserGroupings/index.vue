@@ -167,7 +167,7 @@
             },
             extraGroupStr () {
                 const arr = []
-                this.extraGroupList.map((item) => {
+                this.extraGroupList.forEach(item => {
                     arr.push(item.group_name)
                 })
                 return arr.join(',')

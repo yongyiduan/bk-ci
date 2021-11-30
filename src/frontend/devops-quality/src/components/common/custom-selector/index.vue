@@ -229,7 +229,7 @@
 
                 if (this.value.length) {
                     this.filterData(this.value)
-                    this.list.map((item, index) => {
+                    this.list.forEach((item, index) => {
                         if (item === this.value) this.focusList = index
                     })
                 }
@@ -338,7 +338,7 @@
              */
             activeClass (i) {
                 return {
-                    'selected': i === this.focusList
+                    selected: i === this.focusList
                 }
             },
             /**

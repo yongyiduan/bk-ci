@@ -19,14 +19,13 @@
 
 import actions from './actions'
 import mutations from './mutations'
-import { nodeTypeMap, nodeStatusMap } from './constants'
 
 const store = {
     namespaced: true,
     state: {
         nodeDetails: {},
-        nodeTypes: nodeTypeMap,
-        nodeStatus: nodeStatusMap,
+        nodeTypes: null,
+        nodeStatus: null,
         devCloudVmQuta: {},
         currentSelectedModel: {},
         extensionMap: {},

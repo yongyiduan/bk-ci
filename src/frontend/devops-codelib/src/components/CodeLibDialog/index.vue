@@ -301,12 +301,12 @@
             },
             urlPlaceholder () {
                 return (
-                    this.placeholders['url'][this.codelib.authType]
-                    || this.placeholders['url'][this.codelibConfig.label]
+                    this.placeholders.url[this.codelib.authType]
+                    || this.placeholders.url[this.codelibConfig.label]
                 )
             },
             credentialPlaceholder () {
-                return this.placeholders['cred'][this.codelibConfig.label]
+                return this.placeholders.cred[this.codelibConfig.label]
             }
         },
 
@@ -407,17 +407,19 @@
                             noPermissionList: [{
                                 actionId,
                                 resourceId: this.$permissionResourceMap.code,
-                                instanceId: repositoryHashId ? [{
-                                    id: repositoryHashId,
-                                    name: codelib.aliasName
-                                }] : null,
+                                instanceId: repositoryHashId
+                                    ? [{
+                                        id: repositoryHashId,
+                                        name: codelib.aliasName
+                                    }]
+                                    : null,
                                 projectId
                             }],
                             applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${
                                 projectId
                             }&service_code=code&${
                                 repositoryHashId
-                                    ? `role_manager=repertory`
+                                    ? 'role_manager=repertory'
                                     : 'role_creator=repertory'
                             }`
                         })

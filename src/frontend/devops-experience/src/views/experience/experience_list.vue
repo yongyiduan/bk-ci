@@ -210,7 +210,7 @@
             async toDropOff (row) {
                 if (row.permissions.canEdit) {
                     this.$bkInfo({
-                        title: `确认`,
+                        title: '确认',
                         subTitle: '确认下架该体验',
                         confirmFn: async () => {
                             let message, theme
