@@ -123,7 +123,7 @@
             getLang (lang) {
                 const langMap = {
                     sh: 'shell',
-                    batfile: 'bat'
+                    batchfile: 'bat'
                 }
 
                 return langMap[lang] || lang
