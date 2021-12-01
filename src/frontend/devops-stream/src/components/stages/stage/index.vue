@@ -5,10 +5,7 @@
             :name="reviewStatausIcon(stage.checkIn)"
             size="28"
             class="review-icon"
-            v-bk-tooltips="{
-                content: '等待审核',
-                disabled: !['reviewing'].includes(reviewStatausIcon(stage.checkIn))
-            }"
+            v-bk-tooltips="getStageToolTip(stage.checkIn)"
             @click.native="handleIconClick('checkIn')"
         />
 
@@ -17,10 +14,7 @@
             :name="reviewStatausIcon(stage.checkOut)"
             size="28"
             class="review-icon check-out"
-            v-bk-tooltips="{
-                content: '等待审核',
-                disabled: !['reviewing'].includes(reviewStatausIcon(stage.checkOut))
-            }"
+            v-bk-tooltips="getStageToolTip(stage.checkOut)"
             @click.native="handleIconClick('checkOut')"
         />
 
@@ -116,6 +110,17 @@
             ...mapActions([
                 'toggleStageReviewPanel'
             ]),
+
+            getStageToolTip (stageControl = {}) {
+                const contentMap = {
+                    REVIEWING: '等待审核',
+                    QUALITY_CHECK_WAIT: '质量红线已拦截'
+                }
+                return {
+                    content: contentMap[stageControl.status],
+                    disabled: !['REVIEWING', 'QUALITY_CHECK_WAIT'].includes(stageControl.status)
+                }
+            },
 
             autoOpenReview () {
                 const query = this.$route.query || {}
