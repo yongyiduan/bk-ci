@@ -6,7 +6,8 @@
             size="28"
             class="review-icon"
             v-bk-tooltips="{
-                content: '等待审核'
+                content: '等待审核',
+                disabled: !['reviewing'].includes(reviewStatausIcon(stage.checkIn))
             }"
             @click.native="handleIconClick('checkIn')"
         />
@@ -17,7 +18,8 @@
             size="28"
             class="review-icon check-out"
             v-bk-tooltips="{
-                content: '等待审核'
+                content: '等待审核',
+                disabled: !['reviewing'].includes(reviewStatausIcon(stage.checkOut))
             }"
             @click.native="handleIconClick('checkOut')"
         />
@@ -119,9 +121,9 @@
                 const query = this.$route.query || {}
                 const checkIn = query.checkIn
                 const checkOut = query.checkOut
-                if (+checkIn === +this.stageIndex) {
+                if (checkIn === this.stage.id) {
                     this.handleIconClick('checkIn')
-                } else if (+checkOut === +this.stageIndex) {
+                } else if (checkOut === this.stage.id) {
                     this.handleIconClick('checkOut')
                 }
             },
