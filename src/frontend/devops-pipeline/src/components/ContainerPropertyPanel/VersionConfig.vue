@@ -140,10 +140,7 @@
             ]),
             isDefaultDiff ({ key, value }) {
                 const param = this.params.find(param => param.id === key)
-                if (param && typeof param.defaultValue === 'boolean') {
-                    param.defaultValue = String(param.defaultValue)
-                }
-                return param && key ? param.defaultValue !== value : false
+                return param && key ? String(param.defaultValue) !== String(value) : false
             },
             getVersionById (id) {
                 return this.versions.find(v => v.id === id) || {}
