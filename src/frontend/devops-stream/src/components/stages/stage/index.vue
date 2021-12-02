@@ -114,7 +114,8 @@
             getStageToolTip (stageControl = {}) {
                 const contentMap = {
                     REVIEWING: '等待审核',
-                    QUALITY_CHECK_WAIT: '质量红线已拦截'
+                    QUALITY_CHECK_FAIL: '质量红线已拦截',
+                    QUALITY_CHECK_WAIT: '等待质量红线审核'
                 }
                 return {
                     content: contentMap[stageControl.status],

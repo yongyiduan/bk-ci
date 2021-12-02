@@ -165,9 +165,9 @@
                 this.isLoading = true
                 pipelines.requestQualityGate(...params).then((res) => {
                     this.qualityList = res || []
-                    const waitQualityItem = this.qualityList.find(qualityItem => qualityItem.interceptResult === 'WAIT')
-                    if (waitQualityItem) {
-                        this.activeName.push(waitQualityItem.hashId)
+                    const waitQualityItems = this.qualityList.filter(qualityItem => qualityItem.interceptResult === 'WAIT')
+                    if (waitQualityItems.length > 0) {
+                        this.activeName.push(...waitQualityItems.map(x => x.hashId))
                     }
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
