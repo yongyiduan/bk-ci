@@ -72,9 +72,9 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        width: 240px;
+        width: 100%;
         height: 42px;
-        margin: 0 0 11px 0;
+        margin-top: 11px;
         background-color: white;
         border-radius: 2px;
         font-size: 14px;
@@ -83,11 +83,13 @@
         cursor: pointer;
         .plugin-name {
             flex: 1;
-            max-width: 148px;
+            max-width: 152px;
             color: #7b7d8a;
         }
         .plugin-time {
-            margin: 0 0px 0 2px;
+            font-size: 12px;
+            margin-right: 12px;
+            margin-left: 5px;
         }
         .plugin-index {
             display: inline-block;

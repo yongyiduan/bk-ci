@@ -31,13 +31,15 @@
             </span>
         </h3>
 
-        <job v-for="(job, jobIndex) in stage.containers"
+        <job
+            v-for="(job, jobIndex) in stage.containers"
             :job="job"
             :key="job.id"
             :job-index="jobIndex"
             :stage-index="stageIndex"
             :stage-num="stageNum"
             :stages="stages"
+            class="job-container"
         ></job>
 
         <bk-dialog v-model="showRetryStageDialog"
@@ -300,5 +302,8 @@
                 font-size: 14px;
             }
         }
+    }
+    .job-container {
+        padding: 0 20px;
     }
 </style>

@@ -15,7 +15,13 @@
                     :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
                 >
                     <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
-                    <span class="text-ellipsis item-text" v-bk-overflow-tips>{{ pipeline.displayName }}</span>
+                    <span
+                        class="text-ellipsis item-text"
+                        v-bk-overflow-tips="{
+                            content: pipeline.displayName,
+                            placement: 'right'
+                        }"
+                    >{{ pipeline.displayName }}</span>
                 </li>
             </ul>
         </aside>

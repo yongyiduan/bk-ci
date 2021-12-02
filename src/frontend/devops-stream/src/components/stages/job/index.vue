@@ -1,41 +1,23 @@
 <template>
-    <section class="job-home" ref="pipelineJob">
-        <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1, [statusClass]: true }" @click="toggleShowLog">
-            <i :class="[jobStatusIcon, 'job-status']" v-if="statusClass && !isSkip"></i>
-            <span v-else class="job-index">{{ stageIndex + 1 }}-{{ jobIndex + 1 }}</span>
-            <span class="job-name text-ellipsis" v-bk-overflow-tips>{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
-            <job-time :job="job"></job-time>
-            <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
-        </h3>
+    <section ref="pipelineJob" class="job-main">
+        <matrix-job v-bind="$props" v-if="job.matrixGroupFlag"></matrix-job>
+        <job v-bind="$props" v-else></job>
 
         <cruve-line v-if="stageIndex > 0" v-bind="cruveLineProp" direction :class="{ 'first-job': jobIndex === 0, 'connect-line left': true }" />
         <cruve-line v-if="stageIndex < stageNum - 1" v-bind="cruveLineProp" :direction="false" :class="{ 'first-job': jobIndex === 0, 'connect-line right': true }" />
-
-        <plugin v-for="(plugin, pluginIndex) in job.elements"
-            :plugin="plugin"
-            :key="plugin.id"
-            :plugin-index="pluginIndex"
-            :job-index="jobIndex"
-            :stage-index="stageIndex"
-        ></plugin>
-
-        <job-log :job="job" v-if="showJobLog" :job-index="jobIndex" :stages="stages" :stage-index="stageIndex" @close="toggleShowLog"></job-log>
     </section>
 </template>
 
 <script>
-    import { getPipelineStatusClass, getPipelineStatusShapeIconCls } from '@/components/status'
-    import cruveLine from './cruve-line'
-    import plugin from '../plugin/index'
-    import jobTime from './job-time'
-    import jobLog from '@/components/exec-detail/job'
+    import job from './job.vue'
+    import matrixJob from './matrix-job.vue'
+    import cruveLine from './children/cruve-line.vue'
 
     export default {
         components: {
-            cruveLine,
-            plugin,
-            jobTime,
-            jobLog
+            job,
+            matrixJob,
+            cruveLine
         },
 
         props: {
@@ -48,22 +30,7 @@
 
         data () {
             return {
-                cruveLineProp: {},
-                showJobLog: false
-            }
-        },
-
-        computed: {
-            jobStatusIcon () {
-                return getPipelineStatusShapeIconCls(this.job.status || 'WAITING')
-            },
-
-            statusClass () {
-                return getPipelineStatusClass(this.job.status)
-            },
-
-            isSkip () {
-                return this.statusClass === 'skip'
+                cruveLineProp: {}
             }
         },
 
@@ -79,10 +46,6 @@
                 const straight = this.jobIndex !== 0
                 const width = this.jobIndex === 0 ? 56 : 50
                 this.cruveLineProp = { width, straight, style, height }
-            },
-
-            toggleShowLog () {
-                this.showJobLog = !this.showJobLog
             }
         }
     }
@@ -91,87 +54,18 @@
 <style lang="postcss" scoped>
     @import '@/css/conf';
 
-    .job-home {
+    .job-main {
         position: relative;
-        margin: 16px 20px 0 20px;
-        .job-title {
-            position: relative;
-            margin: 0 0 16px 0;
-            width: 240px;
-            z-index: 3;
-            color: #fff;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-            background-color: #63656e;
-            cursor: pointer;
-            .job-status {
-                width: 42px;
-                height: 42px;
-                line-height: 42px;
-                color: #fff;
-            }
-            .job-index {
-                display: inline-block;
-                width: 42px;
-                text-align: center;
-                font-weight: normal;
-            }
-            &.running {
-                background-color: #459fff;
-            }
-            &.canceled {
-                background-color: #f6b026;
-            }
-            &.danger {
-                background-color: #ff5656;
-            }
-            &.success {
-                background-color: #34d97b;
-            }
-            &.pause {
-                background-color: #ff9801;
-            }
-            &.skip {
-                color: #c3cdd7;
-                .job-name {
-                    color: #c3cdd7;
-                    text-decoration: line-through;
-                }
-            }
-
-            .job-name {
-                flex: 1;
-                max-width: 152px;
-            }
-            .connector-angle {
-                position: absolute;
-                color: #c3cdd7;
-                left: -11px;
-                top: 15px;
-                font-size: 12px;
-            }
-            &.connect-dot:before {
-                content: '';
-                width: 3px;
-                height: 6px;
-                position: absolute;
-                right: -3px;
-                top: 18px;
-                background-color: #c3cdd7;
-                border-radius: 0 100px 100px 0;
-            }
-        }
         .first-job {
             &.left {
-                left: -59px;
+                left: -39px;
             }
             &.right {
-                right: -59px;
+                right: -39px;
             }
         }
     }
+
     .connect-line {
         position: absolute;
         top: 16px;
@@ -180,11 +74,11 @@
         fill: none;
         z-index: 0;
         &.left {
-            left: -50px;
+            left: -30px;
         }
         &.right {
             left: auto;
-            right: -50px;
+            right: -30px;
         }
     }
 </style>
