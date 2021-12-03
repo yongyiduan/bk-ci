@@ -8,13 +8,13 @@
                     'matrix-head-icon': true,
                     'angle-hidden': !showJobs
                 }"
-                @click.native="showJobs=!showJobs"
+                @click.native="showJobs = !showJobs"
             ></icon>
             <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips>{{ job.name }}</span>
-            <span class="matrix-head-percent">
+            <span class="matrix-head-percent" v-if="job.status === 'RUNNING'">
                 <icon name="loading" size="12"></icon>
                 <span class="matrix-head-percent-main">进度{{ getPercent() }}</span>
-                （{{ job.matrixControlOption.runningCount }}/{{ job.matrixControlOption.totalCount }}）
+                （{{ job.matrixControlOption.finishCount }}/{{ job.matrixControlOption.totalCount }}）
             </span>
         </span>
 
@@ -68,7 +68,7 @@
 
         data () {
             return {
-                showJobs: true,
+                showJobs: false,
                 hidePluginsJobIds: []
             }
         },
@@ -81,7 +81,7 @@
 
         methods: {
             getPercent () {
-                const value = this.job.matrixControlOption.runningCount * 100 / (this.job.matrixControlOption.totalCount || 1)
+                const value = this.job.matrixControlOption.finishCount * 100 / (this.job.matrixControlOption.totalCount || 1)
                 return Number(value.toString().match(/^\d+(?:\.\d{0,2})?/)) + '%'
             },
 
