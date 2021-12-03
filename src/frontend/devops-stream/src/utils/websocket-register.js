@@ -15,7 +15,7 @@ const register = {
         register.callBacks[id] = (res = {}) => {
             const { webSocketType, module, page, message } = res.data || {}
             const wsKey = webSocketType + module
-            const wsPath = getWSpath(location.href.replace(/\?.+$/, ''))
+            const wsPath = getWSpath(location.href.replace(/[\?#].+$/, ''))
             if (wsKey === key && wsPath.includes(page)) {
                 const parseMessage = JSON.parse(message || '{}')
                 callBack(parseMessage)
