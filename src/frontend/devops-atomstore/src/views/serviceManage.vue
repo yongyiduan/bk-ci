@@ -43,7 +43,7 @@
                 <bk-table-column :label="$t('store.操作时间')" prop="publishTime" width="180" :formatter="timeFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.操作')" width="150" class-name="handler-btn">
                     <template slot-scope="props">
-                        <span @click="uninstall(props.row)" v-if="props.row.uninstall">{{$t('store.卸载')}}</span>
+                        <span @click="uninstall(props.row)" v-if="props.row.isUninstall">{{$t('store.卸载')}}</span>
                     </template>
                 </bk-table-column>
             </bk-table>
