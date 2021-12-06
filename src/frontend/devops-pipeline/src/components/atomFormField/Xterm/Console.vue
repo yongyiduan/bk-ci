@@ -54,9 +54,11 @@
                 
                 this.term.onResize(this.handleResize)
 
-                this.$nextTick(() => {
+                setTimeout(() => {
                     this.fitAddon.fit()
-                })
+                    this.term.focus()
+                    this.term._initialized = true
+                }, 1000)
 
                 this.term.write('#######################################################################\r\n#                    Welcome To BKDevOps Console                      #\r\n#######################################################################\r\n')
             } else {
