@@ -20,28 +20,30 @@
 
         <bk-transition name="collapse" duration-time="200ms">
             <section v-show="showJobs" class="matrix-job-body">
-                <template v-for="(groupContainer, index) in job.groupContainers || []">
-                    <job-home v-bind="$props" :job="groupContainer" :key="index"></job-home>
+                <section
+                    v-for="(groupContainer, index) in job.groupContainers || []"
+                    :key="index"
+                    class="matrix-job-single">
+                    <job-home v-bind="$props" :job="groupContainer"></job-home>
                     <icon
-                        :key="index"
                         name="angle-down-line"
                         size="16"
                         :class="{
                             [statusClass]: true,
                             'plugin-show-icon': true,
-                            'plugin-hidden': hidePluginsJobIds.includes(groupContainer.jobId)
+                            'plugin-hidden': hidePluginsJobIds.includes(groupContainer.containerHashId)
                         }"
                         @click.native="togglePluginShow(groupContainer)"
                     ></icon>
-                    <bk-transition name="collapse" duration-time="200ms" :key="index">
-                        <section v-show="!hidePluginsJobIds.includes(groupContainer.jobId)" class="matrix-plugin-list">
+                    <bk-transition name="collapse" duration-time="200ms">
+                        <section v-show="!hidePluginsJobIds.includes(groupContainer.containerHashId)" class="matrix-plugin-list">
                             <plugin-list
                                 v-bind="$props"
                                 :job="groupContainer"
                             ></plugin-list>
                         </section>
                     </bk-transition>
-                </template>
+                </section>
             </section>
         </bk-transition>
     </section>
@@ -86,11 +88,11 @@
             },
 
             togglePluginShow (groupContainer) {
-                const index = this.hidePluginsJobIds.findIndex(hidePluginsJobId => groupContainer.jobId === hidePluginsJobId)
+                const index = this.hidePluginsJobIds.findIndex(hidePluginsJobId => groupContainer.containerHashId === hidePluginsJobId)
                 if (index > -1) {
                     this.hidePluginsJobIds.splice(index, 1)
                 } else {
-                    this.hidePluginsJobIds.push(groupContainer.jobId)
+                    this.hidePluginsJobIds.push(groupContainer.containerHashId)
                 }
             }
         }
@@ -133,8 +135,11 @@
         }
     }
     .matrix-job-body {
-        position: relative;
         margin-bottom: 16px;
+        .matrix-job-single {
+            position: relative;
+            margin-bottom: 16px;
+        }
         .matrix-plugin-list {
             padding-top: 5px;
         }
