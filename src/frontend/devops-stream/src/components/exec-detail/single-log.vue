@@ -1,12 +1,13 @@
 <template>
     <detail-container @close="$emit('close')"
-        :title="plugin.name"
-        :status="plugin.status"
+        :title="logData.name"
+        :status="logData.status"
     >
         <plugin-log :job-index="jobIndex"
             :stage-index="stageIndex"
             :plugin-index="pluginIndex"
-            :plugin="plugin"
+            :matrix-index="matrixIndex"
+            :plugin="logData"
             ref="log"
         />
     </detail-container>
@@ -23,10 +24,11 @@
         },
 
         props: {
-            plugin: Object,
+            logData: Object,
             jobIndex: Number,
             pluginIndex: Number,
-            stageIndex: Number
+            stageIndex: Number,
+            matrixIndex: Number
         },
 
         data () {

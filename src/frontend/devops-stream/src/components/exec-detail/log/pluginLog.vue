@@ -20,7 +20,8 @@
             plugin: Object,
             pluginIndex: Number,
             stageIndex: Number,
-            jobIndex: Number
+            jobIndex: Number,
+            matrixIndex: Number
         },
 
         data () {
@@ -45,7 +46,14 @@
             },
 
             downLoadLink () {
-                const fileName = encodeURI(encodeURI(`${this.stageIndex + 1}-${this.jobIndex + 1}-${this.pluginIndex + 1}-${this.plugin.name}`))
+                const getIndex = (index) => {
+                    return index !== undefined ? `-${index + 1}` : ''
+                }
+                const fileName = encodeURI(
+                    encodeURI(
+                        `${this.stageIndex + 1}${getIndex(this.jobIndex)}${getIndex(this.matrixIndex)}${getIndex(this.pluginIndex)}-${this.plugin.name}`
+                    )
+                )
                 const tag = this.plugin.id
                 return `/log/api/user/logs/${this.projectId}/${this.pipelineId}/${this.buildId}/download?tag=${tag}&executeCount=${this.postData.currentExe}&fileName=${fileName}`
             }

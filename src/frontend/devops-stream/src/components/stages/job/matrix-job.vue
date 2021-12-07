@@ -11,11 +11,7 @@
                 @click.native="showJobs = !showJobs"
             ></icon>
             <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips>{{ job.name }}</span>
-            <span class="matrix-head-percent" v-if="job.status === 'RUNNING'">
-                <icon name="loading" size="12"></icon>
-                <span class="matrix-head-percent-main">进度{{ getPercent() }}</span>
-                （{{ job.matrixControlOption.finishCount }}/{{ job.matrixControlOption.totalCount }}）
-            </span>
+            <matrix-job-status :job="job" @click.native="toggleShowLog"></matrix-job-status>
         </span>
 
         <bk-transition name="collapse" duration-time="200ms">
@@ -29,7 +25,7 @@
                         name="angle-down-line"
                         size="16"
                         :class="{
-                            [statusClass]: true,
+                            [getPipelineStatusClass(groupContainer.status)]: true,
                             'plugin-show-icon': true,
                             'plugin-hidden': hidePluginsJobIds.includes(groupContainer.containerHashId)
                         }"
@@ -39,6 +35,7 @@
                         <section v-show="!hidePluginsJobIds.includes(groupContainer.containerHashId)" class="matrix-plugin-list">
                             <plugin-list
                                 v-bind="$props"
+                                :matrix-index="index"
                                 :job="groupContainer"
                             ></plugin-list>
                         </section>
@@ -46,18 +43,29 @@
                 </section>
             </section>
         </bk-transition>
+
+        <single-log @close="toggleShowLog"
+            :log-data="{ ...job, id: job.containerHashId }"
+            :job-index="jobIndex"
+            :stage-index="stageIndex"
+            v-if="showLog"
+        ></single-log>
     </section>
 </template>
 
 <script>
     import jobHome from './children/job-home.vue'
     import pluginList from './children/plugin-list.vue'
+    import matrixJobStatus from './children/matrix-job-status.vue'
+    import singleLog from '@/components/exec-detail/single-log.vue'
     import { getPipelineStatusClass } from '@/components/status'
 
     export default {
         components: {
             jobHome,
-            pluginList
+            pluginList,
+            matrixJobStatus,
+            singleLog
         },
 
         props: {
@@ -71,21 +79,13 @@
         data () {
             return {
                 showJobs: false,
-                hidePluginsJobIds: []
-            }
-        },
-
-        computed: {
-            statusClass () {
-                return getPipelineStatusClass(this.job.status)
+                hidePluginsJobIds: [],
+                showLog: false
             }
         },
 
         methods: {
-            getPercent () {
-                const value = this.job.matrixControlOption.finishCount * 100 / (this.job.matrixControlOption.totalCount || 1)
-                return Number(value.toString().match(/^\d+(?:\.\d{0,2})?/)) + '%'
-            },
+            getPipelineStatusClass,
 
             togglePluginShow (groupContainer) {
                 const index = this.hidePluginsJobIds.findIndex(hidePluginsJobId => groupContainer.containerHashId === hidePluginsJobId)
@@ -94,6 +94,10 @@
                 } else {
                     this.hidePluginsJobIds.push(groupContainer.containerHashId)
                 }
+            },
+
+            toggleShowLog () {
+                this.showLog = !this.showLog
             }
         }
     }
@@ -111,7 +115,6 @@
     .matrix-head {
         display: flex;
         align-items: center;
-        margin: 11px 0;
         .matrix-head-icon {
             cursor: pointer;
             transition: transform 200ms;
@@ -123,15 +126,6 @@
             flex: 1;
             font-size: 14px;
             margin: 0 9px;
-        }
-        .matrix-head-percent {
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            color: #3480FF;
-            .matrix-head-percent-main {
-                margin-left: 3px;
-            }
         }
     }
     .matrix-job-body {

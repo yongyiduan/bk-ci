@@ -1,6 +1,6 @@
 <template>
-    <i :class="[pluginStatusIcon, 'plugin-icon', getPipelineStatusClass(plugin.status)]" v-if="iconType === 'icon'"></i>
-    <icon v-else name="build-hooks" size="18" :class="['svg-icon', getPipelineStatusClass(plugin.status)]"></icon>
+    <i :class="[pluginStatusIcon, 'plugin-icon', getPipelineStatusClass(statusContainer.status)]" v-if="iconType === 'icon'"></i>
+    <icon v-else name="build-hooks" size="18" :class="['svg-icon', getPipelineStatusClass(statusContainer.status)]"></icon>
 </template>
 
 <script>
@@ -8,17 +8,17 @@
 
     export default {
         props: {
-            plugin: Object
+            statusContainer: Object
         },
 
         computed: {
             pluginStatusIcon () {
-                return getPipelineStatusShapeIconCls(this.plugin.status || 'WAITING')
+                return getPipelineStatusShapeIconCls(this.statusContainer.status || 'WAITING')
             },
 
             iconType () {
                 let type = 'icon'
-                const additionalOptions = this.plugin.additionalOptions || {}
+                const additionalOptions = this.statusContainer.additionalOptions || {}
                 const elementPostInfo = additionalOptions.elementPostInfo
                 if (elementPostInfo) {
                     type = 'hooks'
