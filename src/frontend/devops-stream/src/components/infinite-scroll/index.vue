@@ -84,10 +84,12 @@
             async fetchData (page = 1, pageSize = this.pageSize) {
                 const res = await this.dataFetcher(page, pageSize)
                 if (res) {
-                    this.list = page === 1 ? res.records : [
-                        ...this.list,
-                        ...res.records
-                    ]
+                    this.list = page === 1
+                        ? res.records
+                        : [
+                            ...this.list,
+                            ...res.records
+                        ]
 
                     this.currentPage = Math.ceil(this.list.length / pageSize)
 

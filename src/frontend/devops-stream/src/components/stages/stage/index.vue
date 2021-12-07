@@ -5,6 +5,7 @@
             :name="reviewStatausIcon(stage.checkIn)"
             size="28"
             class="review-icon"
+            v-bk-tooltips="getStageToolTip(stage.checkIn)"
             @click.native="handleIconClick('checkIn')"
         />
 
@@ -13,6 +14,7 @@
             :name="reviewStatausIcon(stage.checkOut)"
             size="28"
             class="review-icon check-out"
+            v-bk-tooltips="getStageToolTip(stage.checkOut)"
             @click.native="handleIconClick('checkOut')"
         />
 
@@ -100,10 +102,37 @@
             }
         },
 
+        mounted () {
+            this.autoOpenReview()
+        },
+
         methods: {
             ...mapActions([
                 'toggleStageReviewPanel'
             ]),
+
+            getStageToolTip (stageControl = {}) {
+                const contentMap = {
+                    REVIEWING: '等待审核',
+                    QUALITY_CHECK_FAIL: '质量红线已拦截',
+                    QUALITY_CHECK_WAIT: '等待质量红线审核'
+                }
+                return {
+                    content: contentMap[stageControl.status],
+                    disabled: !['REVIEWING', 'QUALITY_CHECK_WAIT'].includes(stageControl.status)
+                }
+            },
+
+            autoOpenReview () {
+                const query = this.$route.query || {}
+                const checkIn = query.checkIn
+                const checkOut = query.checkOut
+                if (checkIn === this.stage.id) {
+                    this.handleIconClick('checkIn')
+                } else if (checkOut === this.stage.id) {
+                    this.handleIconClick('checkOut')
+                }
+            },
 
             handleIconClick (type) {
                 this.toggleStageReviewPanel({
@@ -134,7 +163,7 @@
                         case stageControl.status === 'QUALITY_CHECK_PASS':
                             return 'review-auto-pass'
                         case stageControl.status === 'QUALITY_CHECK_WAIT':
-                            return 'quality-check-wait'
+                            return 'reviewing'
                         case stageControl.status === 'REVIEW_ABORT':
                             return 'review-abort'
                         case this.stageStatusCls === 'SKIP':

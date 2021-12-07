@@ -16,31 +16,30 @@
                             ></i>
                             <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
                             <span :class="{ 'wait-color': qualityItem.interceptResult === 'WAIT' }">{{ getInterceptValue(qualityItem.interceptResult) }}</span>
-                            <span>{{ getInterceptNum(qualityItem.interceptList) }}</span>
+                            <span :class="{ 'wait-color': qualityItem.interceptResult === 'WAIT' }">{{ getInterceptNum(qualityItem.interceptList) }}</span>
                         </span>
                         <span v-if="qualityItem.interceptResult === 'WAIT'" class="summary-right">
                             <bk-button
-                                text
+                                size="small"
                                 class="mr10"
+                                theme="primary"
                                 :disabled="isNotGateKeeper(qualityItem)"
                                 @click.stop="changeGateWayStatus(true, qualityItem.ruleHashId)"
                             >
                                 <span
                                     v-bk-tooltips="{
-                                        content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
-                                        disabled: !isNotGateKeeper(qualityItem)
+                                        content: `Gate access requirement is not met. Gatekeeper【${getGateKeeper(qualityItem).join(',')}】's approval is needed.`
                                     }"
                                 >Continue</span>
                             </bk-button>
                             <bk-button
-                                text
+                                size="small"
                                 :disabled="isNotGateKeeper(qualityItem)"
                                 @click.stop="changeGateWayStatus(false, qualityItem.ruleHashId)"
                             >
                                 <span
                                     v-bk-tooltips="{
-                                        content: `由把关人【${getGateKeeper(qualityItem).join(',')}】操作`,
-                                        disabled: !isNotGateKeeper(qualityItem)
+                                        content: `Gate access requirement is not met. Gatekeeper【${getGateKeeper(qualityItem).join(',')}】's approval is needed.`
                                     }"
                                 >Stop</span>
                             </bk-button>
@@ -145,7 +144,7 @@
                 const resultMap = {
                     PASS: 'Passed',
                     FAIL: 'Blocked',
-                    WAIT: 'Wait',
+                    WAIT: 'Wait for approval',
                     INTERCEPT: 'Blocked',
                     INTERCEPT_PASS: 'Passed'
                 }
@@ -165,7 +164,11 @@
 
                 this.isLoading = true
                 pipelines.requestQualityGate(...params).then((res) => {
-                    this.qualityList = res
+                    this.qualityList = res || []
+                    const waitQualityItems = this.qualityList.filter(qualityItem => qualityItem.interceptResult === 'WAIT')
+                    if (waitQualityItems.length > 0) {
+                        this.activeName.push(...waitQualityItems.map(x => x.hashId))
+                    }
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -216,8 +219,8 @@
                 width: 100%;
                 margin-bottom: 20px;
                 .bk-collapse-item-header {
-                    line-height: 20px;
-                    height: 20px;
+                    line-height: 28px;
+                    height: 28px;
                     font-size: 12px;
                     &:hover {
                         color: inherit;
