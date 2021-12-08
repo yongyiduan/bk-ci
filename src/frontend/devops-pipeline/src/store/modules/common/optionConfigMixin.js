@@ -93,6 +93,7 @@ const optionConfigMixin = {
                     type: 'boolean',
                     component: 'atom-checkbox',
                     text: this.$t('storeMap.customEnv'),
+                    hidden: true,
                     default: false
                 },
 
@@ -181,9 +182,10 @@ const optionConfigMixin = {
                     default: [{ key: 'param1', value: '' }],
                     allowNull: false,
                     label: this.$t('storeMap.customEnv'),
-                    isHidden (element) {
-                        return !(element.additionalOptions && element.additionalOptions.enableCustomEnv === true)
-                    }
+                    hidden: true
+                    // isHidden (element) {
+                    //     return !(element.additionalOptions && element.additionalOptions.enableCustomEnv === true)
+                    // }
                 },
                 customCondition: {
                     rule: {},
