@@ -388,7 +388,7 @@
              *  过滤数据
              */
             filterData (val) {
-                this.list = this.config.data.filter(item => item.toLowerCase().indexOf(val.toLowerCase()) > -1)
+                this.list = Array.from(new Set(this.config.data.filter(item => item.toLowerCase().indexOf(val.toLowerCase()) > -1)))
                 this.resetLoadData()
             },
             /**
