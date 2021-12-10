@@ -3,26 +3,28 @@ import { LOG_PERFIX, ARTIFACTORY_PREFIX, PROCESS_PREFIX, STREAM_PERFIX, DISPATCH
 
 export default {
     // 第一次拉取日志
-    getInitLog ({ projectId, pipelineId, buildId, tag, currentExe, subTag, debug }) {
+    getInitLog ({ projectId, pipelineId, buildId, tag, currentExe, subTag, debug, jobId }) {
+        const queryType = jobId ? { jobId } : { tag }
         return api.get(`${LOG_PERFIX}/user/logs/${projectId}/${pipelineId}/${buildId}`, {
             params: {
-                tag,
                 executeCount: currentExe,
                 subTag,
-                debug
+                debug,
+                ...queryType
             }
         })
     },
 
     // 后续拉取日志
-    getAfterLog ({ projectId, pipelineId, buildId, tag, currentExe, lineNo, subTag, debug }) {
+    getAfterLog ({ projectId, pipelineId, buildId, tag, currentExe, lineNo, subTag, debug, jobId }) {
+        const queryType = jobId ? { jobId } : { tag }
         return api.get(`${LOG_PERFIX}/user/logs/${projectId}/${pipelineId}/${buildId}/after`, {
             params: {
                 start: lineNo,
                 executeCount: currentExe,
-                tag,
                 subTag,
-                debug
+                debug,
+                ...queryType
             }
         })
     },

@@ -10,7 +10,7 @@
                 }"
                 @click.native="showJobs = !showJobs"
             ></icon>
-            <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips>{{ job.name }}</span>
+            <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips @click="showJobs = !showJobs">{{ job.name }}</span>
             <matrix-job-status :job="job" @click.native="toggleShowLog"></matrix-job-status>
         </span>
 
@@ -45,7 +45,7 @@
         </bk-transition>
 
         <single-log @close="toggleShowLog"
-            :log-data="{ ...job, id: job.containerHashId }"
+            :log-data="job"
             :job-index="jobIndex"
             :stage-index="stageIndex"
             v-if="showLog"
@@ -123,6 +123,7 @@
             }
         }
         .matrix-head-name {
+            cursor: pointer;
             flex: 1;
             font-size: 14px;
             margin: 0 9px;

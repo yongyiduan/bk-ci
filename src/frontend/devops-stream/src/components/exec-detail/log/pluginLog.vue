@@ -55,7 +55,9 @@
                     )
                 )
                 const tag = this.plugin.id
-                return `/log/api/user/logs/${this.projectId}/${this.pipelineId}/${this.buildId}/download?tag=${tag}&executeCount=${this.postData.currentExe}&fileName=${fileName}`
+                const containerHashId = this.plugin.containerHashId
+                const typeQuery = containerHashId ? `jobId=${containerHashId}` : `tag=${tag}`
+                return `/log/api/user/logs/${this.projectId}/${this.pipelineId}/${this.buildId}/download?${typeQuery}&executeCount=${this.postData.currentExe}&fileName=${fileName}`
             }
         },
 
@@ -75,6 +77,7 @@
                     pipelineId: this.pipelineId,
                     buildId: this.buildId,
                     tag: this.plugin.id,
+                    jobId: this.plugin.containerHashId,
                     subTag: '',
                     currentExe: this.plugin.executeCount,
                     lineNo: 0,
