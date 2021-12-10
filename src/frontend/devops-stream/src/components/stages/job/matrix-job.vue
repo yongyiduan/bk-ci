@@ -78,7 +78,7 @@
 
         data () {
             return {
-                showJobs: false,
+                showJobs: true,
                 hidePluginsJobIds: [],
                 showLog: false
             }
