@@ -20,11 +20,7 @@
         methods: {
             getMatrixStatusTxt () {
                 const statusTxtMap = {
-                    RUNNING: `进度${this.getPercent()}（${this.job.matrixControlOption.finishCount}/${this.job.matrixControlOption.totalCount}）`,
-                    SUCCEED: '执行完毕',
-                    FAILED: '执行失败',
-                    SKIP: '跳过执行',
-                    TERMINATE: '执行中止'
+                    RUNNING: `进度${this.getPercent()}（${this.job.matrixControlOption.finishCount}/${this.job.matrixControlOption.totalCount}）`
                 }
                 return statusTxtMap[this.job.status]
             },
@@ -41,9 +37,10 @@
     @import '@/css/conf';
 
     .matrix-job-status {
-        font-size: 12px;
+        flex: 1;
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         cursor: pointer;
         .status-icon {
             width: 25px;
@@ -60,5 +57,8 @@
         &.SKIP {
             color: $pauseColor;
         }
+    }
+    .matrix-head-percent-main {
+        font-size: 12px;
     }
 </style>

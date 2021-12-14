@@ -1,6 +1,6 @@
 <template>
     <section class="matrix-job-home">
-        <span class="matrix-head">
+        <span class="matrix-head" @click="toggleShowLog">
             <icon
                 name="angle-down-line"
                 size="12"
@@ -8,10 +8,10 @@
                     'matrix-head-icon': true,
                     'angle-hidden': !showJobs
                 }"
-                @click.native="showJobs = !showJobs"
+                @click.native.stop="showJobs = !showJobs"
             ></icon>
-            <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips @click="showJobs = !showJobs">{{ job.name }}</span>
-            <matrix-job-status :job="job" @click.native="toggleShowLog"></matrix-job-status>
+            <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips @click.stop="showJobs = !showJobs">Matrix Job</span>
+            <matrix-job-status :job="job"></matrix-job-status>
         </span>
 
         <bk-transition name="collapse" duration-time="200ms">
@@ -20,19 +20,19 @@
                     v-for="(groupContainer, index) in job.groupContainers || []"
                     :key="index"
                     class="matrix-job-single">
-                    <job-home v-bind="$props" :job="groupContainer"></job-home>
+                    <job-home v-bind="$props" :job="getMatrixJob(groupContainer)"></job-home>
                     <icon
                         name="angle-down-line"
                         size="16"
                         :class="{
                             [getPipelineStatusClass(groupContainer.status)]: true,
                             'plugin-show-icon': true,
-                            'plugin-hidden': hidePluginsJobIds.includes(groupContainer.containerHashId)
+                            'plugin-hidden': !showPluginsJobIds.includes(groupContainer.containerHashId)
                         }"
                         @click.native="togglePluginShow(groupContainer)"
                     ></icon>
                     <bk-transition name="collapse" duration-time="200ms">
-                        <section v-show="!hidePluginsJobIds.includes(groupContainer.containerHashId)" class="matrix-plugin-list">
+                        <section v-show="showPluginsJobIds.includes(groupContainer.containerHashId)" class="matrix-plugin-list">
                             <plugin-list
                                 v-bind="$props"
                                 :matrix-index="index"
@@ -45,7 +45,7 @@
         </bk-transition>
 
         <single-log @close="toggleShowLog"
-            :log-data="job"
+            :log-data="{ ...job, name: 'Matrix Job' }"
             :job-index="jobIndex"
             :stage-index="stageIndex"
             v-if="showLog"
@@ -79,7 +79,7 @@
         data () {
             return {
                 showJobs: true,
-                hidePluginsJobIds: [],
+                showPluginsJobIds: [],
                 showLog: false
             }
         },
@@ -88,16 +88,25 @@
             getPipelineStatusClass,
 
             togglePluginShow (groupContainer) {
-                const index = this.hidePluginsJobIds.findIndex(hidePluginsJobId => groupContainer.containerHashId === hidePluginsJobId)
+                const index = this.showPluginsJobIds.findIndex(hidePluginsJobId => groupContainer.containerHashId === hidePluginsJobId)
                 if (index > -1) {
-                    this.hidePluginsJobIds.splice(index, 1)
+                    this.showPluginsJobIds.splice(index, 1)
                 } else {
-                    this.hidePluginsJobIds.push(groupContainer.containerHashId)
+                    this.showPluginsJobIds.push(groupContainer.containerHashId)
                 }
             },
 
             toggleShowLog () {
                 this.showLog = !this.showLog
+            },
+
+            getMatrixJob (groupContainer = {}) {
+                const env = Object.values(groupContainer.matrixContext || {}).join(',')
+                const envStr = env ? `（${env}）` : ''
+                return {
+                    ...groupContainer,
+                    name: groupContainer.name + envStr
+                }
             }
         }
     }
@@ -118,13 +127,14 @@
         .matrix-head-icon {
             cursor: pointer;
             transition: transform 200ms;
+            transform: rotate(-180deg);
             &.angle-hidden {
-                transform: rotate(-180deg);
+                transform: rotate(0);
             }
         }
         .matrix-head-name {
             cursor: pointer;
-            flex: 1;
+            max-width: 159px;
             font-size: 14px;
             margin: 0 9px;
         }
@@ -149,8 +159,9 @@
             cursor: pointer;
             background: #fff;
             transition: transform 200ms;
+            transform: rotate(-180deg);
             &.plugin-hidden {
-                transform: rotate(-180deg);
+                transform: rotate(0);
             }
             &.running {
                 color: #459fff;

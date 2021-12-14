@@ -1,6 +1,6 @@
 <template>
     <section class="plugin-log">
-        <bk-log-search :execute-count="executeCount" @change-execute="changeExecute" class="log-tools">
+        <bk-log-search :execute-count="plugin.executeCount" @change-execute="changeExecute" class="log-tools">
             <template #tool>
                 <li class="more-button" @click="toggleShowDebugLog">{{ showDebug ? 'Hide Debug Log' : 'Show Debug Log' }}</li>
                 <li class="more-button" @click="downloadLog">Download Log</li>
