@@ -732,6 +732,7 @@
         "inputEnv": "按环境别名输入",
         "mutexGroup": "设置互斥组",
         "enableMatrix": "启用Matrix Job",
+        "linkDesc": "查看指用指引和示例",
         "jobMatrix": "Matrix Job",
         "jobOption": "流程控制选项",
         "atomOption": "流程控制选项",

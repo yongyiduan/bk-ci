@@ -730,6 +730,7 @@
         "inputEnv": "Input pools alias",
         "mutexGroup": "Mutex group",
         "enableMatrix": "Enable matrix job",
+        "linkDesc": "Introduction and demos",
         "jobMatrix": "Matrix Job",
         "jobOption": " Control option",
         "atomOption": "Control option",

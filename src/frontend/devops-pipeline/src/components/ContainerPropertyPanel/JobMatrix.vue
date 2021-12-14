@@ -1,7 +1,7 @@
 <template>
     <accordion show-checkbox :show-content="enableMatrix" key="otherChoice" is-version="true">
         <header class="var-header" slot="header">
-            <span>{{ $t('editPage.enableMatrix') }}</span>
+            <span>{{ $t('editPage.enableMatrix') }}</span> <a class="title-link" target="blink" :href="`${IWIKI_DOCS_URL}/pages/viewpage.action?pageId=1294900254`">{{ $t('editPage.linkDesc') }}</a>
             <input class="accordion-checkbox" :disabled="disabled" :checked="enableMatrix" type="checkbox" @click.stop @change="toggleMatrix" />
         </header>
         <div slot="content" class="bk-form bk-form-vertical" v-if="enableMatrix">
@@ -77,3 +77,11 @@
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    .title-link {
+        cursor: pointer;
+        margin-left: 10px;
+        color: #3c96ff;
+    }
+</style>
