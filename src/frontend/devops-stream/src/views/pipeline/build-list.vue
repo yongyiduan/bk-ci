@@ -247,8 +247,8 @@
                         placeholder: 'Event',
                         data: [
                             { name: 'Push', id: 'PUSH' },
-                            { name: 'Tag push', id: 'TAG' },
-                            { name: 'Merge request', id: 'MERGE' },
+                            { name: 'Tag push', id: 'TAG_PUSH' },
+                            { name: 'Merge request', id: 'MERGE_REQUEST' },
                             { name: 'Manual trigger', id: 'MANUAL' },
                             { name: 'Scheduled', id: 'SCHEDULE' },
                         ]
