@@ -45,7 +45,7 @@
                                 >Stop</span>
                             </bk-button>
                         </span>
-                        <span v-if="['INTERCEPT', 'INTERCEPT_PASS'].includes(qualityItem.interceptResult)" class="summary-right">
+                        <span v-if="['INTERCEPT', 'INTERCEPT_PASS'].includes(qualityItem.interceptResult)" class="text-ellipsis summary-right" v-bk-overflow-tips>
                             {{ getOptValue(qualityItem) }}
                         </span>
                     </span>
