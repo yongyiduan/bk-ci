@@ -7,7 +7,11 @@
                     <div class="recent-projects-container">
                         <div v-for="repo in recentProjects" :key="repo.id" class="repo-item recent-item">
                             <div class="repo-img">
-                                <img class="img" :src="repo.avatarUrl">
+                                <img class="img"
+                                    :class="{ 'to-page-link': repo.ciInfo && repo.ciInfo.enableCI }"
+                                    :src="repo.avatarUrl"
+                                    @click="toProjectDetail('buildList', repo.nameWithNamespace, repo.ciInfo && repo.ciInfo.enableCI)"
+                                >
                             </div>
                             <div class="repo-data">
                                 <section v-if="repo.ciInfo && repo.ciInfo.enableCI">
@@ -52,7 +56,11 @@
                     </div>
                     <div v-for="repo in slotProps.list" :key="repo.id" class="repo-item">
                         <div class="repo-img">
-                            <img class="img" :src="repo.avatarUrl">
+                            <img class="img"
+                                :class="{ 'to-page-link': repo.ciInfo && repo.ciInfo.enableCI }"
+                                :src="repo.avatarUrl"
+                                @click="toProjectDetail('buildList', repo.nameWithNamespace, repo.ciInfo && repo.ciInfo.enableCI)"
+                            >
                         </div>
                         <div class="repo-data">
                             <section v-if="repo.ciInfo && repo.ciInfo.enableCI">
@@ -206,11 +214,13 @@
                 }
             },
 
-            toProjectDetail (routeName, projectId) {
-                this.$router.push({
-                    name: routeName,
-                    hash: `#${projectId}`
-                })
+            toProjectDetail (routeName, projectId, enableCi = true) {
+                if (enableCi === true) {
+                    this.$router.push({
+                        name: routeName,
+                        hash: `#${projectId}`
+                    })
+                }
             },
             
             enableCi (item) {
@@ -341,6 +351,9 @@
             margin-bottom: 10px;
             padding: 0 24px;
             cursor: default;
+            .to-page-link {
+                cursor: pointer;
+            }
             .repo-img {
                 .img {
                     width: 56px;
@@ -360,9 +373,6 @@
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     width: 100%;
-                }
-                .to-page-link {
-                    cursor: pointer;
                 }
                 .repo-desc {
                     font-size: 14px;
