@@ -62,7 +62,7 @@
                                     theme="primary"
                                     class="quality-link"
                                     target="_blank"
-                                >详情</bk-link>
+                                >查看详情</bk-link>
                             </li>
                         </ul>
                     </section>
