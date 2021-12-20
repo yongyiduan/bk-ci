@@ -7,6 +7,7 @@
                     <span class="quality-summary">
                         <span class="text-ellipsis summary-left">
                             <i
+                                v-if="qualityItem.interceptResult !== 'uncheck'"
                                 :class="[
                                     'mr5',
                                     'stream-icon',
@@ -44,18 +45,24 @@
                                 >Stop</span>
                             </bk-button>
                         </span>
-                        <span v-if="['INTERCEPT', 'INTERCEPT_PASS'].includes(qualityItem.interceptResult)" class="summary-right">
+                        <span v-if="['INTERCEPT', 'INTERCEPT_PASS'].includes(qualityItem.interceptResult)" class="text-ellipsis summary-right" v-bk-overflow-tips>
                             {{ getOptValue(qualityItem) }}
                         </span>
                     </span>
                     <section slot="content">
                         <ul>
                             <li class="quality-content text-ellipsis" v-for="(intercept, interceptIndex) in qualityItem.interceptList" :key="interceptIndex">
-                                <span :class="{ 'quality-icon': true, 'success': intercept.pass }">
+                                <span :class="{ 'quality-icon': true, 'success': intercept.pass }" v-if="qualityItem.interceptResult !== 'uncheck'">
                                     <i :class="`bk-icon ${ intercept.pass ? 'icon-check-1' : 'icon-close' }`"></i>
                                 </span>
-                                <span class="text-ellipsis mr5" v-bk-overflow-tips>{{ intercept | nameFilter }}</span>
-                                <i class="bk-icon icon-info" v-bk-tooltips="{ content: intercept.logPrompt }" v-if="intercept.logPrompt"></i>
+                                <span class="text-ellipsis mr5" v-bk-overflow-tips>{{ getRuleName(intercept, qualityItem.interceptResult) }}</span>
+                                <bk-link
+                                    v-if="intercept.logPrompt"
+                                    :href="intercept.logPrompt"
+                                    theme="primary"
+                                    class="quality-link"
+                                    target="_blank"
+                                >查看详情</bk-link>
                             </li>
                         </ul>
                     </section>
@@ -72,20 +79,6 @@
     import { timeFormatter } from '@/utils'
 
     export default {
-        filters: {
-            nameFilter (intercept) {
-                const { indicatorName, operation, actualValue, value } = intercept
-                const operationMap = {
-                    GT: '>',
-                    GE: '>=',
-                    LT: '<',
-                    LE: '<=',
-                    EQ: '='
-                }
-                return `${indicatorName}当前值(${actualValue || 'null'})，期望${operationMap[operation]}${value || 'null'}`
-            }
-        },
-
         props: {
             stageControl: {
                 type: Object,
@@ -110,6 +103,18 @@
         },
 
         methods: {
+            getRuleName (intercept, interceptResult) {
+                const { indicatorName, operation, actualValue, value } = intercept
+                const operationMap = {
+                    GT: '>',
+                    GE: '>=',
+                    LT: '<',
+                    LE: '<=',
+                    EQ: '='
+                }
+                return `${indicatorName}当前值(${interceptResult !== 'uncheck' ? (actualValue || 'null') : ''})，期望${operationMap[operation]}${value || 'null'}`
+            },
+
             getGateKeeper (qualityItem) {
                 const { qualityRuleBuildHisOpt: { gateKeepers = [] } } = qualityItem
                 return gateKeepers
@@ -303,5 +308,12 @@
     }
     .INTERCEPT_PASS {
         color: #3fc06d;
+    }
+
+    .quality-link {
+        margin-left: 5px;
+        /deep/ .bk-link-text {
+            font-size: 12px;
+        }
     }
 </style>
