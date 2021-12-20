@@ -5,7 +5,6 @@
                                                                            [atomCls(atom)]: true,
                                                                            'quality-item': (atom['@type'] === 'qualityGateOutTask') || (atom['@type'] === 'qualityGateInTask'),
                                                                            'last-quality-item': (atom['@type'] === 'qualityGateOutTask' && index === atomList.length - 1),
-                                                                           'arrival-atom': atom.status,
                                                                            'qualitt-next-atom': handlePreviousAtomCheck(atomList, index)
             }"
                 @click.stop="showPropertyPanel(index)"
@@ -104,6 +103,7 @@
             container: Object,
             stageIndex: Number,
             containerIndex: Number,
+            containerGroupIndex: Number,
             containerStatus: String,
             containerDisabled: Boolean,
             editable: {
@@ -212,13 +212,14 @@
 
             continueExecute (elementIndex) {
                 if (this.isExecStop) return
-                const { stageIndex, containerIndex } = this
+                const { stageIndex, containerIndex, containerGroupIndex } = this
                 this.togglePropertyPanel({
                     isShow: true,
                     showPanelType: 'PAUSE',
                     editingElementPos: {
                         stageIndex,
                         containerIndex,
+                        containerGroupIndex,
                         elementIndex
                     }
                 })
@@ -314,12 +315,13 @@
                 return reviewUsers
             },
             showPropertyPanel (elementIndex) {
-                const { stageIndex, containerIndex } = this
+                const { stageIndex, containerIndex, containerGroupIndex } = this
                 this.togglePropertyPanel({
                     isShow: true,
                     editingElementPos: {
                         stageIndex,
                         containerIndex,
+                        containerGroupIndex,
                         elementIndex
                     }
                 })
@@ -469,7 +471,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            width: 240px;
+            // width: 240px;
             height: $itemHeight;
             margin: 0 0 11px 0;
             background-color: white;
@@ -814,6 +816,13 @@
                     .atom-icon {
                         color: $warningColor;
                     }
+                    &:before {
+                        background: $warningColor;
+                    }
+                    &:after {
+                        border: 2px solid $warningColor;
+                        background: white;
+                    }
                 }
                 &.FAILED,
                 &.QUALITY_CHECK_FAIL,
@@ -824,13 +833,26 @@
                     .atom-icon {
                         color: $dangerColor;
                     }
+                    &:before {
+                        background: $dangerColor;
+                    }
+                    &:after {
+                        border: 2px solid $dangerColor;
+                        background: white;
+                    }
                 }
                 &.SUCCEED,
                 &.REVIEW_PROCESSED {
                     border-color: $successColor;
-
                     .atom-icon {
                         color: $successColor;
+                    }
+                    &:before {
+                        background: $successColor;
+                    }
+                    &:after {
+                        border: 2px solid $successColor;
+                        background: white;
                     }
                 }
                 &.PAUSE {
@@ -839,15 +861,13 @@
                     .atom-icon {
                         color: $pauseColor;
                     }
-                }
-            }
-            .arrival-atom {
-                &:before {
-                    background: $successColor;
-                }
-                &:after {
-                    border: 2px solid $successColor;
-                    background: white;
+                    &:before {
+                        background: $pauseColor;
+                    }
+                    &:after {
+                        border: 2px solid $pauseColor;
+                        background: white;
+                    }
                 }
             }
             .qualitt-next-atom {

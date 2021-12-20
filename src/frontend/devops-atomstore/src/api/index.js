@@ -94,5 +94,8 @@ export default {
 
     requestAtomOutputList (code) {
         return vue.$ajax.get(`${prefix}/user/market/atoms/${code}/output`)
+    },
+    requestAtomVersionDetail (code) {
+        return vue.$ajax.get(`${prefix}/user/market/atoms/${code}/showVersionInfo`)
     }
 }
