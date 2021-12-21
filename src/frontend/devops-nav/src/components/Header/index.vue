@@ -224,16 +224,16 @@
             }
 
             reload
-? location.href = path
-: this.$router.replace({
+              ? location.href = path
+              : this.$router.replace({
                 path
             })
         }
 
         handleProjectChange (id: string) {
             const { projectId } = this.$route.params
-            const oldProject = this.selectProjectList.find(project => project.projectCode === projectId)
-            const project = this.selectProjectList.find(project => project.projectCode === id)
+            const oldProject = this.selectProjectList.find(project => project.projectCode === projectId) || {}
+            const project = this.selectProjectList.find(project => project.projectCode === id) || {}
             
             window.setProjectIdCookie(id)
 
@@ -247,7 +247,7 @@
                 })
             }
             
-            if ((!oldProject && project.gray) || (oldProject && oldProject.gray !== project.gray)) {
+            if (project.routerTag !== oldProject.routerTag) {
                 this.goHomeById(id, true)
             }
         }
