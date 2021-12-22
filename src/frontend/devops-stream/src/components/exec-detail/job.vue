@@ -59,7 +59,7 @@
 
             downLoadJobLink () {
                 const fileName = encodeURI(encodeURI(`${this.stageIndex + 1}-${this.jobIndex + 1}-${this.job.name}`))
-                const jobId = this.job.containerId
+                const jobId = this.job.containerHashid
                 const { pipelineId, buildId } = this.$route.params
                 return `/log/api/user/logs/${this.projectId}/${pipelineId}/${buildId}/download?jobId=${jobId}&fileName=${fileName}`
             },
@@ -76,7 +76,7 @@
         },
         methods: {
             startDebug (cmd = '/bin/sh') {
-                const vmSeqId = this.getRealSeqId()
+                const vmSeqId = this.job.containerId || this.getRealSeqId()
                 if (this.job.status === 'RUNNING') {
                     this.getContainerInfoById(vmSeqId)
                 } else {

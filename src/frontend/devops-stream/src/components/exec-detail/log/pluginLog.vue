@@ -1,6 +1,6 @@
 <template>
     <section class="plugin-log">
-        <bk-log-search :execute-count="executeCount" @change-execute="changeExecute" class="log-tools">
+        <bk-log-search :execute-count="plugin.executeCount" @change-execute="changeExecute" class="log-tools">
             <template #tool>
                 <li class="more-button" @click="toggleShowDebugLog">{{ showDebug ? 'Hide Debug Log' : 'Show Debug Log' }}</li>
                 <li class="more-button" @click="downloadLog">Download Log</li>
@@ -20,7 +20,8 @@
             plugin: Object,
             pluginIndex: Number,
             stageIndex: Number,
-            jobIndex: Number
+            jobIndex: Number,
+            matrixIndex: Number
         },
 
         data () {
@@ -45,9 +46,18 @@
             },
 
             downLoadLink () {
-                const fileName = encodeURI(encodeURI(`${this.stageIndex + 1}-${this.jobIndex + 1}-${this.pluginIndex + 1}-${this.plugin.name}`))
+                const getIndex = (index) => {
+                    return index !== undefined ? `-${index + 1}` : ''
+                }
+                const fileName = encodeURI(
+                    encodeURI(
+                        `${this.stageIndex + 1}${getIndex(this.jobIndex)}${getIndex(this.matrixIndex)}${getIndex(this.pluginIndex)}-${this.plugin.name}`
+                    )
+                )
                 const tag = this.plugin.id
-                return `/log/api/user/logs/${this.projectId}/${this.pipelineId}/${this.buildId}/download?tag=${tag}&executeCount=${this.postData.currentExe}&fileName=${fileName}`
+                const containerHashId = this.plugin.containerHashId
+                const typeQuery = containerHashId ? `jobId=${containerHashId}` : `tag=${tag}`
+                return `/log/api/user/logs/${this.projectId}/${this.pipelineId}/${this.buildId}/download?${typeQuery}&executeCount=${this.postData.currentExe}&fileName=${fileName}`
             }
         },
 
@@ -67,6 +77,7 @@
                     pipelineId: this.pipelineId,
                     buildId: this.buildId,
                     tag: this.plugin.id,
+                    jobId: this.plugin.containerHashId,
                     subTag: '',
                     currentExe: this.plugin.executeCount,
                     lineNo: 0,

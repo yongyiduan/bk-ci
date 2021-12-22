@@ -1,17 +1,18 @@
 <template>
     <section>
         <section :class="{ 'plugin-item': true, 'first-plugin': pluginIndex === 0, [statusClass]: true }" @click="toggleShowLog">
-            <plugin-icon :plugin="plugin" v-if="!isSkip"></plugin-icon>
+            <plugin-icon :status-container="plugin" v-if="!isSkip"></plugin-icon>
             <span v-else class="plugin-index">{{ jobIndex + 1 }}-{{ pluginIndex + 1 }}</span>
             <span class="plugin-name text-ellipsis" v-bk-overflow-tips>{{ plugin.name }}</span>
             <span class="plugin-time" v-bk-tooltips="pluginTime" v-if="!isSkip">{{ pluginTime }}</span>
         </section>
 
         <plugin-log @close="toggleShowLog"
-            :plugin="plugin"
+            :log-data="plugin"
             :job-index="jobIndex"
             :plugin-index="pluginIndex"
             :stage-index="stageIndex"
+            :matrix-index="matrixIndex"
             v-if="showLog"
         ></plugin-log>
     </section>
@@ -20,8 +21,8 @@
 <script>
     import { coverTimer } from '@/utils'
     import { getPipelineStatusClass } from '@/components/status'
-    import pluginLog from '@/components/exec-detail/plugin'
-    import pluginIcon from './plugin-icon'
+    import pluginLog from '@/components/exec-detail/single-log.vue'
+    import pluginIcon from '../children/status-icon.vue'
 
     export default {
         components: {
@@ -33,7 +34,8 @@
             plugin: Object,
             pluginIndex: Number,
             jobIndex: Number,
-            stageIndex: Number
+            stageIndex: Number,
+            matrixIndex: Number
         },
 
         data () {
@@ -72,9 +74,9 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        width: 240px;
+        width: 100%;
         height: 42px;
-        margin: 0 0 11px 0;
+        margin-top: 11px;
         background-color: white;
         border-radius: 2px;
         font-size: 14px;
@@ -83,11 +85,13 @@
         cursor: pointer;
         .plugin-name {
             flex: 1;
-            max-width: 148px;
+            max-width: 152px;
             color: #7b7d8a;
         }
         .plugin-time {
-            margin: 0 0px 0 2px;
+            font-size: 12px;
+            margin-right: 12px;
+            margin-left: 5px;
         }
         .plugin-index {
             display: inline-block;
