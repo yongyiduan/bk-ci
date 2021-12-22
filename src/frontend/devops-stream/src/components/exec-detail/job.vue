@@ -76,7 +76,7 @@
         },
         methods: {
             startDebug (cmd = '/bin/sh') {
-                const vmSeqId = this.getRealSeqId()
+                const vmSeqId = this.job.containerId || this.getRealSeqId()
                 if (this.job.status === 'RUNNING') {
                     this.getContainerInfoById(vmSeqId)
                 } else {
