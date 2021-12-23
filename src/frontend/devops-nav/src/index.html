@@ -187,7 +187,7 @@
             .slice(-2)
             .join('.')
           if (projectId) {
-            deleteCookie(X_DEVOPS_PROJECT_ID, topDomain)
+            removeCookie(X_DEVOPS_PROJECT_ID, topDomain)
             setCookie(X_DEVOPS_PROJECT_ID, projectId, location.hostname)
             window.GLOBAL_PID = projectId
           }
