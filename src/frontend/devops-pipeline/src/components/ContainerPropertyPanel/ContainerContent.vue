@@ -323,6 +323,9 @@
             routeName () {
                 return this.$route.name
             },
+            isDetailPage () {
+                return this.$route.name === 'pipelinesDetail'
+            },
             projectId () {
                 return this.$route.params.projectId
             },
@@ -687,7 +690,8 @@
                 })
             },
             async startDebug () {
-                const vmSeqId = this.getRealSeqId(this.stages, this.stageIndex, this.containerIndex)
+                const realSeqId = this.getRealSeqId(this.stages, this.stageIndex, this.containerIndex)
+                const vmSeqId = this.isDetailPage ? (this.container.containerId || realSeqId) : realSeqId
                 let url = ''
                 const tab = window.open('about:blank')
                 try {
