@@ -90,7 +90,6 @@
 
             toggleShowJobs () {
                 this.showJobs = !this.showJobs
-                this.$emit('refresh-line')
             },
 
             togglePluginShow (groupContainer) {
@@ -100,7 +99,6 @@
                 } else {
                     this.showPluginsJobIds.push(groupContainer.containerHashId)
                 }
-                this.$emit('refresh-line')
             },
 
             toggleShowLog () {

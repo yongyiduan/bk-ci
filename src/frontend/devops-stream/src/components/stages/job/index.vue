@@ -1,6 +1,6 @@
 <template>
     <section ref="pipelineJob" class="job-main">
-        <matrix-job v-bind="$props" v-if="job.matrixGroupFlag" @refresh-line="initStatus"></matrix-job>
+        <matrix-job v-bind="$props" v-if="job.matrixGroupFlag"></matrix-job>
         <job v-bind="$props" v-else></job>
 
         <cruve-line v-if="stageIndex > 0" v-bind="cruveLineProp" direction :class="{ 'first-job': jobIndex === 0, 'connect-line left': true }" />
