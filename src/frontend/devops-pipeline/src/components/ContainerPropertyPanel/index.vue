@@ -25,6 +25,7 @@
         },
         props: {
             containerIndex: Number,
+            containerGroupIndex: Number,
             stageIndex: Number,
             stages: Array,
             editable: Boolean,
