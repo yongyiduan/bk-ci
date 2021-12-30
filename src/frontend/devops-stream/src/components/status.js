@@ -1,4 +1,4 @@
-export function getPipelineStatusClass (status) {
+export function getPipelineStatusClass (status, enable = true) {
     const statusMap = {
         DEPENDENT_WAITING: 'waiting',
         WAITING: 'waiting',
@@ -25,7 +25,7 @@ export function getPipelineStatusClass (status) {
         LOOP_WAITING: 'running',
         CALL_WAITING: 'running'
     }
-    return statusMap[status]
+    return enable ? statusMap[status] : 'skip'
 }
 
 export function getPipelineStatusShapeIconCls (status) {

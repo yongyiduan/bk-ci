@@ -1,6 +1,6 @@
 <template>
     <section class="matrix-job-home">
-        <span class="matrix-head" @click="toggleShowLog">
+        <span :class="['matrix-head', { 'connect-dot': stageIndex < stages.length - 1 }]" @click="toggleShowLog">
             <icon
                 name="angle-down-line"
                 size="12"
@@ -8,10 +8,11 @@
                     'matrix-head-icon': true,
                     'angle-hidden': !showJobs
                 }"
-                @click.native.stop="showJobs = !showJobs"
+                @click.native.stop="toggleShowJobs"
             ></icon>
             <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips @click.stop="showJobs = !showJobs">Matrix Job</span>
             <matrix-job-status :job="job"></matrix-job-status>
+            <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
         </span>
 
         <bk-transition name="collapse" duration-time="200ms">
@@ -20,12 +21,12 @@
                     v-for="(groupContainer, index) in job.groupContainers || []"
                     :key="index"
                     class="matrix-job-single">
-                    <job-home v-bind="$props" :job="getMatrixJob(groupContainer)"></job-home>
+                    <job-home v-bind="$props" :job="getMatrixJob(groupContainer)" is-matrix></job-home>
                     <icon
                         name="angle-down-line"
                         size="16"
                         :class="{
-                            [getPipelineStatusClass(groupContainer.status)]: true,
+                            [getPipelineStatusClass(groupContainer.status, groupContainer.jobControlOption.enable)]: true,
                             'plugin-show-icon': true,
                             'plugin-hidden': !showPluginsJobIds.includes(groupContainer.containerHashId)
                         }"
@@ -87,6 +88,11 @@
         methods: {
             getPipelineStatusClass,
 
+            toggleShowJobs () {
+                this.showJobs = !this.showJobs
+                this.$emit('refresh-line')
+            },
+
             togglePluginShow (groupContainer) {
                 const index = this.showPluginsJobIds.findIndex(hidePluginsJobId => groupContainer.containerHashId === hidePluginsJobId)
                 if (index > -1) {
@@ -94,6 +100,7 @@
                 } else {
                     this.showPluginsJobIds.push(groupContainer.containerHashId)
                 }
+                this.$emit('refresh-line')
             },
 
             toggleShowLog () {
@@ -124,6 +131,7 @@
     .matrix-head {
         display: flex;
         align-items: center;
+        position: relative;
         .matrix-head-icon {
             cursor: pointer;
             transition: transform 200ms;
@@ -137,6 +145,23 @@
             max-width: 159px;
             font-size: 14px;
             margin: 0 9px;
+        }
+        .connector-angle {
+            position: absolute;
+            color: #c3cdd7;
+            left: -24px;
+            top: 14px;
+            font-size: 12px;
+        }
+        &.connect-dot:before {
+            content: '';
+            width: 3px;
+            height: 6px;
+            position: absolute;
+            right: -16px;
+            top: 17px;
+            background-color: #c3cdd7;
+            border-radius: 0 100px 100px 0;
         }
     }
     .matrix-job-body {

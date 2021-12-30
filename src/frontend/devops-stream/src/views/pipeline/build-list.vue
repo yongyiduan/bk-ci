@@ -251,6 +251,7 @@
                             { name: 'Merge request', id: 'MERGE_REQUEST' },
                             { name: 'Manual trigger', id: 'MANUAL' },
                             { name: 'Scheduled', id: 'SCHEDULE' },
+                            { name: 'Deleted', id: 'DELETE' }
                         ]
                     },
                     {

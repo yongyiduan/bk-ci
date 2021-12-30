@@ -1,11 +1,11 @@
 <template>
     <section class="job-home">
-        <h3 :class="{ 'job-title': true, 'connect-dot': stageIndex < stageNum - 1, [statusClass]: true }" @click="toggleShowLog">
+        <h3 :class="{ 'job-title': true, 'connect-dot': (stageIndex < stageNum - 1 && !isMatrix), [statusClass]: true }" @click="toggleShowLog">
             <i :class="[jobStatusIcon, 'job-status']" v-if="statusClass && !isSkip"></i>
             <span v-else class="job-index">{{ stageIndex + 1 }}-{{ jobIndex + 1 }}</span>
             <span class="job-name text-ellipsis" v-bk-overflow-tips>{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
             <job-time :job="job"></job-time>
-            <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
+            <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0 && !isMatrix"></i>
         </h3>
 
         <job-log :job="job" v-if="showJobLog" :job-index="jobIndex" :stages="stages" :stage-index="stageIndex" @close="toggleShowLog"></job-log>
@@ -28,7 +28,8 @@
             jobIndex: Number,
             stages: Array,
             stageIndex: Number,
-            stageNum: Number
+            stageNum: Number,
+            isMatrix: Boolean
         },
 
         data () {

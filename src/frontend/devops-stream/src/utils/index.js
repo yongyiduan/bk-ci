@@ -185,15 +185,18 @@ export function commitIdFormatter (commitId) {
     return commitId ? commitId.slice(0, 9) : '--'
 }
 
-export function getbuildTypeIcon (buildType) {
-    const buildTypeIconMap = {
+export function getbuildTypeIcon (objectKind, operationKind) {
+    const operationKindMap = {
+        delete: 'close-circle'
+    }
+    const objectKindIconMap = {
         manual: 'manual',
         push: 'commit',
         tag_push: 'tag',
         merge_request: 'merge',
         schedule: 'clock_fill'
     }
-    return buildTypeIconMap[buildType] || 'well'
+    return operationKindMap[operationKind] || objectKindIconMap[objectKind] || 'well'
 }
 
 export function modifyHtmlTitle (title) {
@@ -207,12 +210,19 @@ export function debounce (callBack) {
 
 export function getBuildTitle (gitRequestEvent = {}) {
     let res = ''
-    switch (gitRequestEvent.objectKind) {
-        case 'merge_request':
-            res = gitRequestEvent.mrTitle
+    switch (gitRequestEvent.operationKind) {
+        case 'delete':
+            res = `${gitRequestEvent.deleteTag ? `Tag ${gitRequestEvent.commitId}` : `Branch ${gitRequestEvent.branch}`} deleted by ${gitRequestEvent.userId}`
             break
         default:
-            res = gitRequestEvent.commitMsg
+            switch (gitRequestEvent.objectKind) {
+                case 'merge_request':
+                    res = gitRequestEvent.mrTitle
+                    break
+                default:
+                    res = gitRequestEvent.commitMsg
+                    break
+            }
             break
     }
     return res
@@ -220,21 +230,28 @@ export function getBuildTitle (gitRequestEvent = {}) {
 
 export function getBuildSource (gitRequestEvent = {}) {
     let res = ''
-    switch (gitRequestEvent.objectKind) {
-        case 'push':
-            res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
-            break
-        case 'tag_push':
-            res = gitRequestEvent.branch
-            break
-        case 'merge_request':
-            res = `[!${gitRequestEvent.mergeRequestId}]`
-            break
-        case 'manual':
+    switch (gitRequestEvent.operationKind) {
+        case 'delete':
             res = '--'
             break
-        case 'schedule':
-            res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
+        default:
+            switch (gitRequestEvent.objectKind) {
+                case 'push':
+                    res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
+                    break
+                case 'tag_push':
+                    res = gitRequestEvent.branch
+                    break
+                case 'merge_request':
+                    res = `[!${gitRequestEvent.mergeRequestId}]`
+                    break
+                case 'manual':
+                    res = '--'
+                    break
+                case 'schedule':
+                    res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
+                    break
+            }
             break
     }
     return res
