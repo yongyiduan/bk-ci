@@ -1,6 +1,7 @@
 <template>
     <span :class="`matrix-job-status ${job.status}`">
         <status-icon :status-container="job" class="status-icon"></status-icon>
+        <span class="matrix-head-percent-main">{{ getMatrixStatusTxt() }}</span>
     </span>
 </template>
 
@@ -14,6 +15,20 @@
 
         props: {
             job: Object
+        },
+
+        methods: {
+            getMatrixStatusTxt () {
+                const statusTxtMap = {
+                    RUNNING: `进度${this.getPercent()}（${this.job.matrixControlOption.finishCount}/${this.job.matrixControlOption.totalCount}）`
+                }
+                return statusTxtMap[this.job.status]
+            },
+
+            getPercent () {
+                const value = this.job.matrixControlOption.finishCount * 100 / (this.job.matrixControlOption.totalCount || 1)
+                return Number(value.toString().match(/^\d+(?:\.\d{0,2})?/)) + '%'
+            }
         }
     }
 </script>
@@ -42,5 +57,8 @@
         &.SKIP {
             color: $pauseColor;
         }
+    }
+    .matrix-head-percent-main {
+        font-size: 12px;
     }
 </style>

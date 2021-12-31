@@ -10,7 +10,7 @@
                 }"
                 @click.native.stop="toggleShowJobs"
             ></icon>
-            <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips @click.stop="showJobs = !showJobs">Matrix Job</span>
+            <span :class="['matrix-head-name', 'text-ellipsis', { running: job.status }]" v-bk-overflow-tips @click.stop="showJobs = !showJobs">Matrix Job</span>
             <matrix-job-status :job="job"></matrix-job-status>
             <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
         </span>
@@ -37,7 +37,7 @@
                             <plugin-list
                                 v-bind="$props"
                                 :matrix-index="index"
-                                :job="groupContainer"
+                                :job="getPluginContainer(groupContainer)"
                             ></plugin-list>
                         </section>
                     </bk-transition>
@@ -112,6 +112,14 @@
                     ...groupContainer,
                     name: groupContainer.name + envStr
                 }
+            },
+
+            getPluginContainer (groupContainer) {
+                groupContainer.elements?.forEach((element, index) => {
+                    const elementModel = this.job?.elements?.[index]
+                    element.additionalOptions = elementModel.additionalOptions
+                })
+                return groupContainer
             }
         }
     }
@@ -140,9 +148,12 @@
         }
         .matrix-head-name {
             cursor: pointer;
-            max-width: 159px;
+            max-width: 120px;
             font-size: 14px;
             margin: 0 9px;
+            &.running {
+                max-width: 50px;
+            }
         }
         .connector-angle {
             position: absolute;

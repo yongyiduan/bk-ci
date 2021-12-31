@@ -3,7 +3,7 @@
         <h3 :class="{ 'job-title': true, 'connect-dot': (stageIndex < stageNum - 1 && !isMatrix), [statusClass]: true }" @click="toggleShowLog">
             <i :class="[jobStatusIcon, 'job-status']" v-if="statusClass && !isSkip"></i>
             <span v-else class="job-index">{{ stageIndex + 1 }}-{{ jobIndex + 1 }}</span>
-            <span class="job-name text-ellipsis" v-bk-overflow-tips>{{ job.status === 'PREPARE_ENV' ? '准备构建环境中' : job.name }}</span>
+            <span class="job-name text-ellipsis" v-bk-overflow-tips>{{ job.status === 'PREPARE_ENV' && !isMatrix ? '准备构建环境中' : job.name }}</span>
             <job-time :job="job"></job-time>
             <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0 && !isMatrix"></i>
         </h3>
