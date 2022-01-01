@@ -5,7 +5,16 @@
             <p class="detail-info">
                 <span class="info-title">
                     <span class="build-title text-ellipsis" v-bk-overflow-tips>{{ getBuildTitle(buildDetail) }}</span>
-                    <span class="title-item"><icon :name="buildTypeIcon" size="14" v-bk-tooltips="{ content: buildDetail.objectKind, placements: ['top'] }"></icon></span>
+                    <span class="title-item">
+                        <icon
+                            :name="buildTypeIcon"
+                            size="14"
+                            v-bk-tooltips="{
+                                content: buildDetail.operationKind === 'delete' ? 'delete' : buildDetail.objectKind,
+                                placements: ['top']
+                            }"
+                        ></icon>
+                    </span>
                     <span class="title-item">
                         <span v-if="buildDetail.objectKind === 'schedule'">System</span>
                         <template v-else>
@@ -14,7 +23,16 @@
                     </span>
                 </span>
                 <span class="info-data">
-                    <span class="info-item text-ellipsis"><icon name="source-branch" size="14"></icon>{{ buildDetail.branch }}</span>
+                    <span class="info-item text-ellipsis">
+                        <template v-if="buildDetail.operationKind === 'delete' && buildDetail.deleteTag">
+                            <icon name="tag" size="14"></icon>
+                            {{ buildDetail.commitId }}
+                        </template>
+                        <template v-else>
+                            <icon name="source-branch" size="14"></icon>
+                            {{ buildDetail.branch }}
+                        </template>
+                    </span>
                     <span class="info-item text-ellipsis"><icon name="clock" size="14"></icon>{{ buildDetail.executeTime | spendTimeFilter }}</span>
                     <span class="info-item text-ellipsis">
                         <icon name="message" size="14"></icon>
@@ -86,7 +104,7 @@
             ...mapState(['projectId', 'projectInfo', 'permission']),
 
             buildTypeIcon () {
-                return getbuildTypeIcon(this.buildDetail.objectKind)
+                return getbuildTypeIcon(this.buildDetail.objectKind, this.buildDetail.operationKind)
             }
         },
 
@@ -191,16 +209,22 @@
             },
 
             goToCode (gitRequestEvent) {
-                switch (gitRequestEvent.objectKind) {
-                    case 'push':
-                    case 'schedule':
-                        goCommit(this.projectInfo.web_url, gitRequestEvent.commitId)
+                switch (gitRequestEvent.operationKind) {
+                    case 'delete':
                         break
-                    case 'tag_push':
-                        goTag(this.projectInfo.web_url, gitRequestEvent.branch)
-                        break
-                    case 'merge_request':
-                        goMR(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
+                    default:
+                        switch (gitRequestEvent.objectKind) {
+                            case 'push':
+                            case 'schedule':
+                                goCommit(this.projectInfo.web_url, gitRequestEvent.commitId)
+                                break
+                            case 'tag_push':
+                                goTag(this.projectInfo.web_url, gitRequestEvent.branch)
+                                break
+                            case 'merge_request':
+                                goMR(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
+                                break
+                        }
                         break
                 }
             }

@@ -92,7 +92,7 @@
             ...mapState(['projectId', 'permission', 'showStageReviewPanel']),
 
             stageStatusCls () {
-                return getPipelineStatusClass(this.stage.status)
+                return getPipelineStatusClass(this.stage.status, this.stage.stageControlOption.enable)
             },
 
             stageStatusIcon () {
@@ -257,6 +257,10 @@
             &.skip {
                 color: #c3cdd7;
                 fill: #c3cdd7;
+                .stage-name {
+                    color: #c3cdd7;
+                    text-decoration: line-through;
+                }
             }
             &.running {
                 background-color: #eff5ff;

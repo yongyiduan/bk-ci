@@ -1,6 +1,6 @@
 <template>
     <section class="matrix-job-home">
-        <span class="matrix-head" @click="toggleShowLog">
+        <span :class="['matrix-head', { 'connect-dot': stageIndex < stages.length - 1 }]" @click="toggleShowLog">
             <icon
                 name="angle-down-line"
                 size="12"
@@ -8,10 +8,11 @@
                     'matrix-head-icon': true,
                     'angle-hidden': !showJobs
                 }"
-                @click.native.stop="showJobs = !showJobs"
+                @click.native.stop="toggleShowJobs"
             ></icon>
-            <span class="matrix-head-name text-ellipsis" v-bk-overflow-tips @click.stop="showJobs = !showJobs">Matrix Job</span>
+            <span :class="['matrix-head-name', 'text-ellipsis', { running: job.status }]" v-bk-overflow-tips @click.stop="showJobs = !showJobs">Matrix Job</span>
             <matrix-job-status :job="job"></matrix-job-status>
+            <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
         </span>
 
         <bk-transition name="collapse" duration-time="200ms">
@@ -20,12 +21,12 @@
                     v-for="(groupContainer, index) in job.groupContainers || []"
                     :key="index"
                     class="matrix-job-single">
-                    <job-home v-bind="$props" :job="getMatrixJob(groupContainer)"></job-home>
+                    <job-home v-bind="$props" :job="getMatrixJob(groupContainer)" is-matrix></job-home>
                     <icon
                         name="angle-down-line"
                         size="16"
                         :class="{
-                            [getPipelineStatusClass(groupContainer.status)]: true,
+                            [getPipelineStatusClass(groupContainer.status, groupContainer.jobControlOption.enable)]: true,
                             'plugin-show-icon': true,
                             'plugin-hidden': !showPluginsJobIds.includes(groupContainer.containerHashId)
                         }"
@@ -36,7 +37,7 @@
                             <plugin-list
                                 v-bind="$props"
                                 :matrix-index="index"
-                                :job="groupContainer"
+                                :job="getPluginContainer(groupContainer)"
                             ></plugin-list>
                         </section>
                     </bk-transition>
@@ -87,6 +88,10 @@
         methods: {
             getPipelineStatusClass,
 
+            toggleShowJobs () {
+                this.showJobs = !this.showJobs
+            },
+
             togglePluginShow (groupContainer) {
                 const index = this.showPluginsJobIds.findIndex(hidePluginsJobId => groupContainer.containerHashId === hidePluginsJobId)
                 if (index > -1) {
@@ -107,6 +112,14 @@
                     ...groupContainer,
                     name: groupContainer.name + envStr
                 }
+            },
+
+            getPluginContainer (groupContainer) {
+                groupContainer.elements?.forEach((element, index) => {
+                    const elementModel = this.job?.elements?.[index]
+                    element.additionalOptions = elementModel.additionalOptions
+                })
+                return groupContainer
             }
         }
     }
@@ -124,6 +137,7 @@
     .matrix-head {
         display: flex;
         align-items: center;
+        position: relative;
         .matrix-head-icon {
             cursor: pointer;
             transition: transform 200ms;
@@ -134,9 +148,29 @@
         }
         .matrix-head-name {
             cursor: pointer;
-            max-width: 159px;
+            max-width: 120px;
             font-size: 14px;
             margin: 0 9px;
+            &.running {
+                max-width: 50px;
+            }
+        }
+        .connector-angle {
+            position: absolute;
+            color: #c3cdd7;
+            left: -24px;
+            top: 14px;
+            font-size: 12px;
+        }
+        &.connect-dot:before {
+            content: '';
+            width: 3px;
+            height: 6px;
+            position: absolute;
+            right: -16px;
+            top: 17px;
+            background-color: #c3cdd7;
+            border-radius: 0 100px 100px 0;
         }
     }
     .matrix-job-body {
