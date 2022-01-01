@@ -75,6 +75,12 @@
                         active: false,
                         type: 'url',
                         url: 'https://iwiki.woa.com/x/pZMdK'
+                    },
+                    {
+                        name: 'Issue',
+                        active: false,
+                        type: 'url',
+                        url: 'http://tapd.oa.com/git_ci/prong/stories/stories_list'
                     }
                 ]
             }
