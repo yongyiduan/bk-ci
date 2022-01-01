@@ -2,7 +2,8 @@
     <article class="build-detail-home">
         <section class="section-box build-detail-header">
             <bk-breadcrumb class="build-detail-crumb" separator-class="bk-icon icon-angle-right">
-                <bk-breadcrumb-item :to="{ name: 'buildList', params: { pipelineId: curPipeline.pipelineId } }">{{yml}}</bk-breadcrumb-item>
+                <bk-breadcrumb-item v-if="!menuPipelineId" :to="{ name: 'buildList', params: {} }">All pipelines</bk-breadcrumb-item>
+                <bk-breadcrumb-item :to="{ name: 'buildList', params: { pipelineId } }">{{yml}}</bk-breadcrumb-item>
                 <bk-breadcrumb-item>
                     <span class="build-num">
                         # {{buildNum}}
@@ -49,7 +50,10 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'curPipeline'])
+            ...mapState(['projectId', 'curPipeline', 'menuPipelineId']),
+            pipelineId () {
+                return this.$route.params.pipelineId
+            }
         },
 
         watch: {

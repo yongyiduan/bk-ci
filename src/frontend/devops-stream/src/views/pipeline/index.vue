@@ -12,7 +12,7 @@
                 <li v-for="(pipeline, index) in pipelineList"
                     :key="index"
                     @click="choosePipeline(pipeline)"
-                    :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
+                    :class="{ 'nav-item': true, active: menuPipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
                 >
                     <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
                     <span
@@ -117,7 +117,21 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'curPipeline', 'permission'])
+            ...mapState(['projectId', 'curPipeline', 'menuPipelineId', 'permission'])
+        },
+
+        watch: {
+            '$route.params.pipelineId' () {
+                const pipelineId = this.$route.params.pipelineId
+                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.pipelineList[0]
+                this.setCurPipeline(curPipeline)
+            },
+            '$route.name' (val) {
+                if (val === 'buildList' && this.$route.params.pipelineId !== this.menuPipelineId) {
+                    this.setMenuPipelineId(this.$route.params.pipelineId)
+                }
+            }
+
         },
 
         created () {
@@ -129,7 +143,7 @@
         },
 
         methods: {
-            ...mapActions(['setCurPipeline']),
+            ...mapActions(['setCurPipeline', 'setMenuPipelineId']),
 
             initList () {
                 this.isLoading = true
@@ -188,6 +202,7 @@
             setDefaultPipeline () {
                 const pipelineId = this.$route.params.pipelineId
                 const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.pipelineList[0]
+                this.setMenuPipelineId(curPipeline.pipelineId)
                 this.setCurPipeline(curPipeline)
                 if (this.$route.name === 'pipeline') {
                     this.$router.push({
@@ -201,6 +216,7 @@
 
             choosePipeline (pipeline) {
                 this.setCurPipeline(pipeline)
+                this.setMenuPipelineId(pipeline.pipelineId)
                 this.$router.push({
                     name: 'buildList',
                     params: {
