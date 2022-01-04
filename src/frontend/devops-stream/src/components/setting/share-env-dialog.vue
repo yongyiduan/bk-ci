@@ -10,9 +10,9 @@
                 title: loading.title
             }">
             <div class="node-list-header">
-                <div class="title">Select projects to link
+                <div class="title">Select {{selectType.toLowerCase()}} to link
                 </div>
-                <div class="search-input-row">
+                <div class="search-input-row" v-if="selectType === 'PROJECT'">
                     <div class="biz-search-input">
                         <bk-input type="text" class="search-input" ref="searchInput"
                             right-icon="bk-icon icon-search"
@@ -33,8 +33,8 @@
                                     @change="toggleAllSelect"
                                 ></bk-checkbox>
                             </div>
-                            <div class="table-node-item node-item-ip">Id</div>
-                            <div class="table-node-item node-item-name">ProjectName</div>
+                            <div class="table-node-item node-item-ip">{{ selectType === 'PROJECT' ? 'Id' : 'Group Id'}}</div>
+                            <div class="table-node-item node-item-name">{{ selectType === 'PROJECT' ? 'Project Name' : 'Group Name'}}</div>
                         </div>
                         <div class="table-node-body">
                             <template v-for="(col, index) of rowList">
@@ -52,7 +52,7 @@
                                         <span class="node-ip">{{ col.id }}</span>
                                     </div>
                                     <div class="table-node-item node-item-name" :class="{ 'over-content': shareHandlerConf.curDisplayCount > 6 }">
-                                        <span class="node-name">{{ col.nameWithNamespace }}</span>
+                                        <span class="node-name">{{ col.name }}</span>
                                     </div>
                                 </div>
                             </template>
@@ -60,7 +60,7 @@
                     </div>
                 </section>
                 <div class="no-data-row" v-if="shareHandlerConf.searchEmpty || !rowList.length">
-                    <span>No project</span>
+                    <span>No {{selectType.toLowerCase()}}</span>
                 </div>
                 <ul class="bk-page-list">
                     <!-- 上一页 -->
@@ -93,6 +93,7 @@
 <script>
     export default {
         props: {
+            selectType: String,
             shareSelectConf: Object,
             pageConfig: Object,
             loading: Object,
