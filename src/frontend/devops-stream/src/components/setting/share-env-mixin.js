@@ -65,10 +65,11 @@ const shareEnvMixin = {
                 } else {
                     res = await common.getStreamProjects('MY_PROJECT', this.page, this.pageSize, this.searchStr, true)
                 }
-                
+                console.log(res, 'res')
                 this.hasNext = res.hasNext || false
                 res = res.records || []
                 this.curPageList = []
+                console.log(res, 'records')
                 res.map(item => {
                     // 在这里判断一下totalList里面能不能找到这一项，是否isCheck
                     if (item.projectCode !== this.projectId) {
