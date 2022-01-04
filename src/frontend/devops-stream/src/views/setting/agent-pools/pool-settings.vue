@@ -37,8 +37,8 @@
                 </bk-table>
             </section>
             <section v-else class="table-empty">
-                <h3>Link your first project</h3>
-                <h5>select projects to share your agents in this pool</h5>
+                <h3>Link your first project or group</h3>
+                <h5>select projects or groups to share your agents in this pool</h5>
                 <div>
                     <bk-button theme="primary" class="import-agent" @click="toLinkShare('PROJECT')">Link project</bk-button>
                     <bk-button @click="toLinkShare('GROUP')">Link group</bk-button>
