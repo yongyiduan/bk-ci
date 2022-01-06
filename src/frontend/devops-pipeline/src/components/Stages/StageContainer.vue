@@ -1,7 +1,7 @@
 <template>
     <div
         ref="stageContainer"
-        :class="{ 'devops-stage-container': true, 'first-stage-container': stageIndex === 0, 'readonly': !editable || containerDisabled, 'editing': isEditPage }"
+        :class="{ 'devops-stage-container': true, 'first-stage-container': stageIndex === 0, 'readonly': !editable || stageDisabled, 'editing': isEditPage }"
     >
         <template v-if="containerIndex > 0">
             <cruve-line :straight="true" :width="60" :style="`margin-top: -${cruveHeight + 2}px`" :height="cruveHeight" class="connect-line left" />
@@ -74,9 +74,6 @@
             },
             isDetailPage () {
                 return this.$route.name === 'pipelinesDetail'
-            },
-            containerDisabled () {
-                return !!(this.container.jobControlOption && this.container.jobControlOption.enable === false) || this.stageDisabled
             }
         },
         mounted () {
