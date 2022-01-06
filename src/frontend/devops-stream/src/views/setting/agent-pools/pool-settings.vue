@@ -9,7 +9,7 @@
         <main class="pool-setting-main" v-if="!isLoading">
             <section v-if="shareList.length">
                 <div class="operate-agent">
-                    <bk-button theme="primary" @click="toLinkShare('PROJECT')">Link project</bk-button>
+                    <bk-button @click="toLinkShare('PROJECT')">Link project</bk-button>
                     <bk-button @click="toLinkShare('GROUP')">Link group</bk-button>
                 </div>
                 <bk-table class="agent-table"
@@ -40,7 +40,7 @@
                 <h3>Link your first project or group</h3>
                 <h5>select projects or groups to share your agents in this pool</h5>
                 <div>
-                    <bk-button theme="primary" class="import-agent" @click="toLinkShare('PROJECT')">Link project</bk-button>
+                    <bk-button class="import-agent" @click="toLinkShare('PROJECT')">Link project</bk-button>
                     <bk-button @click="toLinkShare('GROUP')">Link group</bk-button>
                 </div>
             </section>
