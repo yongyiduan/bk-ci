@@ -75,19 +75,6 @@
             isDetailPage () {
                 return this.$route.name === 'pipelinesDetail'
             },
-            buildResourceType () {
-                try {
-                    return this.container.dispatchType.buildType
-                } catch (e) {
-                    return 'DOCKER'
-                }
-            },
-            isPublicDevCloud () {
-                return this.isPublicDevCloudContainer(this.container)
-            },
-            showDebugBtn () {
-                return this.checkShowDebugDockerBtn(this.container, this.$route.name, this.execDetail) && this.container.status === 'FAILED'
-            },
             containerDisabled () {
                 return !!(this.container.jobControlOption && this.container.jobControlOption.enable === false) || this.stageDisabled
             }
