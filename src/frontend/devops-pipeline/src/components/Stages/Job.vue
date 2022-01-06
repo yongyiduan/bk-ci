@@ -103,7 +103,7 @@
                 if (this.container.jobControlOption && this.container.jobControlOption.enable === false) {
                     return 'DISABLED'
                 }
-                
+
                 return this.container && this.container.status ? this.container.status : ''
             },
             showCheckedToatal () {
@@ -133,6 +133,13 @@
             },
             projectId () {
                 return this.$route.params.projectId
+            },
+            buildResourceType () {
+                try {
+                    return this.container.dispatchType.buildType
+                } catch (e) {
+                    return 'DOCKER'
+                }
             },
             isPublicDevCloud () {
                 return this.isPublicDevCloudContainer(this.container)
