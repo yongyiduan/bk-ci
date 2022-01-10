@@ -86,7 +86,10 @@
                     <template slot-scope="props">
                         <section class="commit-message">
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
-                            <p>
+                            <p v-if="props.row.gitRequestEvent.operationKind === 'delete'">
+                                <span class="delete-message">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
+                            </p>
+                            <p v-else>
                                 <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
                                 <span class="info">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
@@ -443,28 +446,43 @@
 
             getCommitDesc ({ gitRequestEvent }) {
                 let res = ''
-                switch (gitRequestEvent.objectKind) {
-                    case 'push':
-                        res = `Commit ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
+                switch (gitRequestEvent.operationKind) {
+                    case 'delete':
+                        res = `${gitRequestEvent.deleteTag ? `Tag ${gitRequestEvent.branch}` : `Branch ${gitRequestEvent.branch}`} deleted by ${gitRequestEvent.userId}`
                         break
-                    case 'tag_push':
-                        res = `Tag ${gitRequestEvent.branch} created by ${gitRequestEvent.userId}`
-                        break
-                    case 'merge_request':
-                        const actionMap = {
-                            'push-update': 'updated',
-                            'reopen': 'reopened',
-                            'open': 'opened',
-                            'close': 'closed',
-                            'merge': 'merged'
+                    default:
+                        switch (gitRequestEvent.objectKind) {
+                            case 'push':
+                                res = `Commit ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
+                                break
+                            case 'tag_push':
+                                res = `Tag ${gitRequestEvent.branch} created by ${gitRequestEvent.userId}`
+                                break
+                            case 'merge_request':
+                                const actionMap = {
+                                    'push-update': 'updated',
+                                    'reopen': 'reopened',
+                                    'open': 'opened',
+                                    'close': 'closed',
+                                    'merge': 'merged'
+                                }
+                                res = `Merge requests [!${gitRequestEvent.mergeRequestId}] ${actionMap[gitRequestEvent.extensionAction]} by ${gitRequestEvent.userId}`
+                                break
+                            case 'manual':
+                                res = `Manual by ${gitRequestEvent.userId}`
+                                break
+                            case 'schedule':
+                                res = 'Scheduled'
+                                break
+                            case 'openApi':
+                                res = 'Triggered by OPENAPI'
+                                break
+                            case 'review':
+                                break
+                            case 'issue':
+                                res = `Issue [!] opened by ${gitRequestEvent.userId}`
+                                break
                         }
-                        res = `Merge requests [!${gitRequestEvent.mergeRequestId}] ${actionMap[gitRequestEvent.extensionAction]} by ${gitRequestEvent.userId}`
-                        break
-                    case 'manual':
-                        res = `Manual by ${gitRequestEvent.userId}`
-                        break
-                    case 'schedule':
-                        res = 'Scheduled'
                         break
                 }
                 return res
@@ -777,6 +795,11 @@
                 color: #313328;
                 line-height: 24px;
                 margin-bottom: 4px;
+            }
+            .delete-message {
+                display: block;
+                color: #313328;
+                line-height: 32px;
             }
             .info {
                 color: #979ba5;

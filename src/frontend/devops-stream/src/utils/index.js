@@ -194,7 +194,8 @@ export function getbuildTypeIcon (objectKind, operationKind) {
         push: 'commit',
         tag_push: 'tag',
         merge_request: 'merge',
-        schedule: 'clock_fill'
+        schedule: 'clock_fill',
+        openApi: 'open-api'
     }
     return operationKindMap[operationKind] || objectKindIconMap[objectKind] || 'well'
 }
@@ -212,7 +213,7 @@ export function getBuildTitle (gitRequestEvent = {}) {
     let res = ''
     switch (gitRequestEvent.operationKind) {
         case 'delete':
-            res = `${gitRequestEvent.deleteTag ? `Tag ${gitRequestEvent.commitId}` : `Branch ${gitRequestEvent.branch}`} deleted by ${gitRequestEvent.userId}`
+            res = `${gitRequestEvent.deleteTag ? `Tag ${gitRequestEvent.branch}` : `Branch ${gitRequestEvent.branch}`} deleted by ${gitRequestEvent.userId}`
             break
         default:
             switch (gitRequestEvent.objectKind) {
