@@ -75,5 +75,7 @@ test/unit/coverage
 *.sln
 /webpack_cache
 
-/src/conf/selfsigned.crt
-/src/conf/selfsigned.key
+/src/conf/*.crt
+/src/conf/*.key
+
+/src/conf/*.pem
