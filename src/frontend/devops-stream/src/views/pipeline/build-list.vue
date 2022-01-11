@@ -86,10 +86,7 @@
                     <template slot-scope="props">
                         <section class="commit-message">
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
-                            <p v-if="props.row.gitRequestEvent.operationKind === 'delete'">
-                                <span class="delete-message">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
-                            </p>
-                            <p v-else>
+                            <p>
                                 <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
                                 <span class="info">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
                             </p>
@@ -795,11 +792,6 @@
                 color: #313328;
                 line-height: 24px;
                 margin-bottom: 4px;
-            }
-            .delete-message {
-                display: block;
-                color: #313328;
-                line-height: 32px;
             }
             .info {
                 color: #979ba5;
