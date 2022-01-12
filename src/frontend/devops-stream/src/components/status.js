@@ -52,28 +52,27 @@ export function getPipelineStatusShapeIconCls (status) {
 }
 
 export function getPipelineStatusCircleIconCls (status) {
-    const iconName = 'bk-icon'
     const iconMap = {
-        RUNNING: 'icon-circle-2-1 executing',
-        PREPARE_ENV: 'icon-circle-2-1 executing',
-        QUEUE: 'icon-circle-2-1 executing',
-        LOOP_WAITING: 'icon-circle-2-1 executing',
-        CALL_WAITING: 'icon-circle-2-1 executing',
-        DEPENDENT_WAITING: 'icon-clock',
-        WAITING: 'icon-clock',
-        CANCELED: 'icon-exclamation',
-        TERMINATE: 'icon-exclamation',
-        REVIEWING: 'icon-exclamation-triangle',
-        REVIEW_ABORT: 'icon-exclamation-triangle',
-        FAILED: 'icon-close',
-        HEARTBEAT_TIMEOUT: 'icon-close',
-        QUEUE_TIMEOUT: 'icon-close',
-        EXEC_TIMEOUT: 'icon-close',
-        SUCCEED: 'icon-check-1',
+        RUNNING: 'bk-icon icon-circle-2-1 executing',
+        PREPARE_ENV: 'bk-icon icon-circle-2-1 executing',
+        QUEUE: 'bk-icon icon-circle-2-1 executing',
+        LOOP_WAITING: 'bk-icon icon-circle-2-1 executing',
+        CALL_WAITING: 'bk-icon icon-circle-2-1 executing',
+        DEPENDENT_WAITING: 'bk-icon icon-clock',
+        WAITING: 'bk-icon icon-clock',
+        CANCELED: 'bk-icon icon-exclamation',
+        TERMINATE: 'bk-icon icon-exclamation',
+        REVIEWING: 'bk-icon icon-exclamation-triangle',
+        REVIEW_ABORT: 'bk-icon icon-exclamation-triangle',
+        FAILED: 'bk-icon icon-close',
+        HEARTBEAT_TIMEOUT: 'bk-icon icon-close',
+        QUEUE_TIMEOUT: 'bk-icon icon-close',
+        EXEC_TIMEOUT: 'bk-icon icon-close',
+        SUCCEED: 'bk-icon icon-check-1',
         REVIEW_PROCESSED: 'stream-icon stream-flag',
         STAGE_SUCCESS: 'stream-icon stream-flag'
     }
-    return [iconName, iconMap[status]]
+    return [iconMap[status]]
 }
 
 export function getPipelineStatusIconCls (status) {
