@@ -759,7 +759,7 @@
             display: flex;
             align-items: top;
             font-size: 12px;
-            .bk-icon {
+            .bk-icon, .stream-icon {
                 width: 32px;
                 height: 32px;
                 font-size: 32px;
