@@ -87,7 +87,7 @@
 
                 const host = location.host
                 const prefix = `${host.indexOf('o.ied.com') > -1 ? OIED_URL : OPEN_URL}/component/compapi/tof3`
-                
+
                 const config = {
                     url: '',
                     data: {}
@@ -97,21 +97,21 @@
                     case 'rtx':
                         config.url = `${prefix}/get_all_staff_info/`
                         config.data = {
-                            'query_type': 'simple_data',
-                            'app_code': 'workbench'
+                            query_type: 'simple_data',
+                            app_code: 'workbench'
                         }
                         break
                     case 'email':
                         config.url = `${prefix}/get_all_ad_groups/`
-                        config.data['query_type'] = undefined
+                        config.data.query_type = undefined
                         config.data = {
-                            'app_code': 'workbench'
+                            app_code: 'workbench'
                         }
                         break
                     case 'all':
                         config.url = `${prefix}/get_all_rtx_and_mail_group/`
                         config.data = {
-                            'app_code': 'workbench'
+                            app_code: 'workbench'
                         }
                         break
                     default:
@@ -126,9 +126,13 @@
                         if (res.result) {
                             const key = self.inputType === 'email' ? 'Name' : 'english_name'
                             self.initData = self.list = res.data.map(val => val[key])
-                            self.value.forEach(item => {
-                                self.list = self.list.filter(val => val.indexOf(item) === -1)
-                            })
+                            let valueMap = {}
+                            if (Array.isArray(self.value)) {
+                                valueMap = self.arrayToHashMap(self.value)
+                            } else if (typeof self.value === 'string') {
+                                valueMap = self.arrayToHashMap(self.value.split(';'))
+                            }
+                            self.list = self.list.filter(val => valueMap[val.toLowerCase()] !== 1)
                         } else {
                             console.error(res.message)
                         }
@@ -138,14 +142,19 @@
                     }
                 })
             },
-
+            arrayToHashMap (arr) {
+                return arr.reduce((acc, item) => {
+                    acc[item.toLowerCase()] = 1
+                    return acc
+                }, {})
+            },
             ajaxRequest (params) {
                 params = params || {}
                 params.data = params.data || {}
 
                 const callbackName = params.jsonp
                 const head = document.getElementsByTagName('head')[0]
-                params.data['callback'] = callbackName
+                params.data.callback = callbackName
 
                 const data = this.formatParams(params.data)
                 const script = document.createElement('script')

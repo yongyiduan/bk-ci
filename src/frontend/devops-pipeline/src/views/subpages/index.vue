@@ -118,7 +118,7 @@
         data () {
             return {
                 tabMap: {
-                    'trendData': this.$t('history.trendData')
+                    trendData: this.$t('history.trendData')
                 },
                 pipelineListSearching: false,
                 breadCrumbPath: [],
@@ -152,8 +152,8 @@
                 'isPropertyPanelVisible',
                 'showReviewDialog']),
             ...mapGetters({
-                'isEditing': 'atom/isEditing',
-                'getAllElements': 'atom/getAllElements'
+                isEditing: 'atom/isEditing',
+                getAllElements: 'atom/getAllElements'
             }),
             isEditPage () {
                 return this.$route.name === 'pipelinesEdit'
@@ -249,9 +249,11 @@
                     showTips: true,
                     tipsName: 'switch_pipeline_hint',
                     tipsContent: this.$t('subpage.switchPipelineTooltips'),
-                    to: this.$route.name === 'pipelinesHistory' ? null : {
-                        name: 'pipelinesHistory'
-                    },
+                    to: this.$route.name === 'pipelinesHistory'
+                        ? null
+                        : {
+                            name: 'pipelinesHistory'
+                        },
                     handleSelected: this.handleSelected,
                     searching: this.pipelineListSearching,
                     handleSearch: debounce(this.handleSearchPipeline, 300)
@@ -476,7 +478,7 @@
                 this.$router.push({
                     name: 'templateEdit',
                     params: {
-                        'templateId': templateId
+                        templateId: templateId
                     }
                 })
             },

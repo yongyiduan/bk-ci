@@ -116,7 +116,7 @@
 
         computed: {
             ...mapGetters('store', {
-                'detail': 'getDetail'
+                detail: 'getDetail'
             }),
             rateCalcDocUrl () {
                 return `${IWIKI_DOCS_URL}/x/kvMMBw`
@@ -213,7 +213,7 @@
 
             getToolColor (toolName) {
                 const toolColorMap = {
-                    'CLOC': '#979ba5',
+                    CLOC: '#979ba5',
                     'WOODPECKER-SENSITIVE': '#ea3636'
                 }
 
@@ -222,7 +222,7 @@
 
             getToolUnit (toolName) {
                 const toolUnitMap = {
-                    'CLOC': this.$t('store.行')
+                    CLOC: this.$t('store.行')
                 }
 
                 return toolUnitMap[toolName] || this.$t('store.个')

@@ -33,8 +33,8 @@
     </div>
 </template>
 <script>
-    import * as cookie from 'js-cookie'
-    
+    import cookie from 'js-cookie'
+
     const CSRFToken = cookie.get('paas_perm_csrftoken')
     export default {
         props: {

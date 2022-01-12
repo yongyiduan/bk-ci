@@ -62,8 +62,8 @@
                     /* webpackChunkName: 'log' */
                     '@/components/Log/log.min.js'
                 )
-                this.SodaLog = window.SodaLog
             }
+            this.SodaLog = window.SodaLog
             this.buildNo && this.renderLog(this.buildNo)
         },
         methods: {

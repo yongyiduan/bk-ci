@@ -63,6 +63,7 @@
 
         @Prop({ default: false })
         isError: boolean = false
+
         errorTip: number = 1
 
         selectedProjectId: string = this.demo ? this.demo.projectId : ''

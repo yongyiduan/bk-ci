@@ -164,15 +164,15 @@
         }
 
         gotoPage ({ link_new: linkNew, newWindow = false, newWindowUrl }) {
-            const cAlias = this.currentPage && getServiceAliasByPath(this.currentPage['link_new'])
+            const cAlias = this.currentPage && getServiceAliasByPath(this.currentPage.link_new)
             const nAlias = getServiceAliasByPath(linkNew)
             const destUrl = this.addConsole(linkNew)
 
-            if (cAlias === nAlias && this.currentPage && this.currentPage['inject_type'] === 'iframe') {
+            if (cAlias === nAlias && this.currentPage && this.currentPage.inject_type === 'iframe') {
                 eventBus.$emit('goHome')
                 return
             }
-            if (nAlias === 'bcs') {
+            if (nAlias === 'bcs' && newWindowUrl.indexOf('ieg.') > -1) {
              window.open(`${newWindowUrl}/bcs/${getProjectId(this.$route.params)}`, '_blank')
              return
            }

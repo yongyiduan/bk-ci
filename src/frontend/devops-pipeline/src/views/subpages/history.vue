@@ -1,10 +1,7 @@
 <template>
     <div class="bkdevops-pipeline-history pb20">
         <bk-tab :active.sync="currentTab" @tab-change="switchTab" :before-toggle="beforeSwitch" class="bkdevops-pipeline-tab-card" type="unborder-card">
-            <div class="bkdevops-pipeline-tab-card-setting" slot="setting" v-if="currentTab === 'trendData'">
-                <bk-date-picker :placeholder="$t('history.chooseDateRange')" :value="dateRange" :type="'daterange'" @change="changeDateRange" :shortcuts="shortcuts" :options="dateOptions"></bk-date-picker>
-            </div>
-            <div class="bkdevops-pipeline-tab-card-setting" slot="setting" v-else>
+            <div class="bkdevops-pipeline-tab-card-setting" slot="setting">
                 <i @click.stop="toggleFilterBar" class="devops-icon icon-filter-shape" :class="{ 'active': showFilterBar }"></i>
                 <i @click.stop="toggleColumnsSelectPopup(true)" class="setting-icon devops-icon icon-cog-shape" :class="{ 'active': isColumnsSelectPopupVisible }"></i>
             </div>
@@ -24,8 +21,6 @@
     import BuildHistoryTab from '@/components/BuildHistoryTab'
     import { mapGetters } from 'vuex'
     import showTooltip from '@/components/common/showTooltip'
-    import TrendData from '@/components/trendData'
-    import trendMixins from '@/components/trendData/trendMixins'
     import customExtMixin from '@/mixins/custom-extension-mixin'
     import { HistoryTabsHooks } from '@/components/Hooks/'
 
@@ -33,10 +28,9 @@
         components: {
             BuildHistoryTab,
             HistoryTabsHooks,
-            showTooltip,
-            TrendData
+            showTooltip
         },
-        mixins: [trendMixins, customExtMixin],
+        mixins: [customExtMixin],
 
         props: {
             execHandler: Function
@@ -50,8 +44,8 @@
         },
         computed: {
             ...mapGetters('pipelines', {
-                'statusMap': 'getStatusMap',
-                'hisPageStatus': 'getHisPageStatus'
+                statusMap: 'getStatusMap',
+                hisPageStatus: 'getHisPageStatus'
             }),
             hooks () {
                 return this.extensionTabsHooks
@@ -86,14 +80,6 @@
                                 isColumnsSelectPopupVisible: this.isColumnsSelectPopupVisible,
                                 showFilterBar: this.showFilterBar,
                                 toggleFilterBar: this.toggleFilterBar
-                            }
-                        },
-                        {
-                            name: 'trendData',
-                            label: this.$t('history.trendData'),
-                            component: 'TrendData',
-                            bindData: {
-                                dateRange: this.dateRange
                             }
                         },
                         ...this.extensionTabs

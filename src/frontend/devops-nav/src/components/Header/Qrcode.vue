@@ -56,6 +56,7 @@
         toggleOrcode (): void {
             this.show = !this.show
         }
+
         hideOrcode (): void {
             this.show = false
         }

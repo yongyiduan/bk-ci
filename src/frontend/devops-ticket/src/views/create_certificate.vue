@@ -256,10 +256,12 @@
                 } catch (err) {
                     if (err.code === 403) {
                         const actionId = this.isEdit ? this.$permissionActionMap.edit : this.$permissionActionMap.create
-                        const instanceId = this.isEdit ? [{
-                            id: formData.certId,
-                            type: this.$permissionResourceTypeMap.TICKET_CERT
-                        }] : []
+                        const instanceId = this.isEdit
+                            ? [{
+                                id: formData.certId,
+                                type: this.$permissionResourceTypeMap.TICKET_CERT
+                            }]
+                            : []
                         
                         this.$showAskPermissionDialog({
                             noPermissionList: [{
@@ -278,7 +280,7 @@
                     theme = 'error'
                 } finally {
                     this.$bkMessage({ message, theme })
-                    if (theme === 'success') this.$router.push({ 'name': 'certList' })
+                    if (theme === 'success') this.$router.push({ name: 'certList' })
                 }
             },
 
@@ -302,25 +304,23 @@
                 }
             },
 
-            refreshTicket (val) {
-                return new Promise(async (resolve, reject) => {
-                    if (!val) reject(new Error('val is null'))
+            async refreshTicket (val) {
+                if (!val) throw Error('val is null')
 
-                    try {
-                        const credentialRes = await this.$store.dispatch('ticket/requestCreditByPermission', {
-                            projectId: this.projectId,
-                            permission: 'USE',
-                            creTypes: 'PASSWORD'
-                        })
-                        resolve(credentialRes.records)
-                    } catch (err) {
-                        this.$bkMessage({
-                            message: err.message || err,
-                            theme: 'error'
-                        })
-                        reject(err)
-                    }
-                })
+                try {
+                    const credentialRes = await this.$store.dispatch('ticket/requestCreditByPermission', {
+                        projectId: this.projectId,
+                        permission: 'USE',
+                        creTypes: 'PASSWORD'
+                    })
+                    return credentialRes.records
+                } catch (err) {
+                    this.$bkMessage({
+                        message: err.message || err,
+                        theme: 'error'
+                    })
+                    throw err
+                }
             }
         }
     }

@@ -100,6 +100,12 @@ auth:
   iamCallBackUser: __BK_CI_IAM_CALLBACK_USER__
   # 用户组权限申请前端跳转页面HOST
   webHost: __BK_CI_IAM_WEB_URL__
+  token: __BK_CI_APP_TOKEN__
+  #  openapi服务需要配置accessToken鉴权时将enabled设为true，secret设为任意字符串string，expirationTime过期时间（毫秒）
+  accessToken:
+    enabled: __BK_CI_API_TOKEN_ENABLED__
+    secret: __BK_CI_API_TOKEN_SECRET__
+    expirationTime: __BK_CI_API_TOKEN_EXPIRED_MILLISECOND__
 
 #bk esb config for cd plugin in pipeline
 esb:
@@ -152,3 +158,8 @@ net:
       host: 127.0.0.1
       # 代理服务器端口
       port: 8080
+
+# shardingsphere分片规则配置
+sharding:
+  routing:
+    cacheSize: 100000  # 缓存分片规则最大数量

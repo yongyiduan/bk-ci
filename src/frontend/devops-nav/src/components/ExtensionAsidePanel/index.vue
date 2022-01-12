@@ -43,7 +43,7 @@
         }
 
         updateProps (props) {
-            Object.keys(props).map(prop => {
+            Object.keys(props).forEach(prop => {
               this[prop] = props[prop]
             })
         }

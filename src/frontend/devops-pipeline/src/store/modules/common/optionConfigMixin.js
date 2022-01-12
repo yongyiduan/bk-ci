@@ -78,7 +78,7 @@ const optionConfigMixin = {
                     isHidden: true
                 },
                 retryCount: {
-                    rule: { 'numeric': true, 'max_value': 5, 'min_value': 1 },
+                    rule: { numeric: true, max_value: 5, min_value: 1 },
                     component: 'vuex-input',
                     label: this.$t('storeMap.retryCount'),
                     placeholder: this.$t('storeMap.retryCountPlaceholder'),
@@ -93,6 +93,7 @@ const optionConfigMixin = {
                     type: 'boolean',
                     component: 'atom-checkbox',
                     text: this.$t('storeMap.customEnv'),
+                    hidden: true,
                     default: false
                 },
 
@@ -118,7 +119,7 @@ const optionConfigMixin = {
                     }
                 },
                 timeout: {
-                    rule: { 'numeric': true, 'max_value': 10080 },
+                    rule: { numeric: true, max_value: 10080 },
                     component: 'vuex-input',
                     label: this.$t('storeMap.atomTimeout'),
                     desc: this.$t('storeMap.timeoutDesc'),
@@ -181,9 +182,10 @@ const optionConfigMixin = {
                     default: [{ key: 'param1', value: '' }],
                     allowNull: false,
                     label: this.$t('storeMap.customEnv'),
-                    isHidden (element) {
-                        return !(element.additionalOptions && element.additionalOptions.enableCustomEnv === true)
-                    }
+                    hidden: true
+                    // isHidden (element) {
+                    //     return !(element.additionalOptions && element.additionalOptions.enableCustomEnv === true)
+                    // }
                 },
                 customCondition: {
                     rule: {},
@@ -217,9 +219,9 @@ const optionConfigMixin = {
             }, {})
 
             atomValues.failControl = [
-                ...(atomValues['continueWhenFailed'] ? ['continueWhenFailed'] : []),
-                ...(atomValues['retryWhenFailed'] ? ['retryWhenFailed'] : []),
-                ...(atomValues['manualRetry'] ? ['MANUAL_RETRY'] : [])
+                ...(atomValues.continueWhenFailed ? ['continueWhenFailed'] : []),
+                ...(atomValues.retryWhenFailed ? ['retryWhenFailed'] : []),
+                ...(atomValues.manualRetry ? ['MANUAL_RETRY'] : [])
             ]
             return atomValues
         }

@@ -18,7 +18,7 @@
  */
 
 import { mapActions, mapGetters, mapState } from 'vuex'
-import * as cookie from 'js-cookie'
+import cookie from 'js-cookie'
 import {
     navConfirm,
     HttpError
@@ -411,7 +411,7 @@ export default {
                     return item
                 })
             }
-            return this.$ajax.put(`/backend/api/perm/service/pipeline/mgr_resource/permission/`, data, { headers: { 'X-CSRFToken': cookie.get('paas_perm_csrftoken') } })
+            return this.$ajax.put('/backend/api/perm/service/pipeline/mgr_resource/permission/', data, { headers: { 'X-CSRFToken': cookie.get('paas_perm_csrftoken') } })
         },
         getPipelineSetting () {
             const { pipelineSetting } = this

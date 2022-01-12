@@ -210,7 +210,7 @@ class DispatchService constructor(
                 )
             )
         } catch (e: Exception) {
-            logger.error("[$pipelineId]|[$buildId]|[$vmSeqId]| sendDispatchMonitoring failed.", e)
+            logger.warn("[$pipelineId]|[$buildId]|[$vmSeqId]| sendDispatchMonitoring failed.", e.message)
         }
     }
 
@@ -219,7 +219,7 @@ class DispatchService constructor(
         if (result != null) {
             val secretInfo = JsonUtil.to(result, SecretInfo::class.java)
             redisOperation.delete(redisKey(secretInfo.hashId, secretInfo.secretKey))
-            logger.error("$buildId|$vmSeqId finishBuild success.")
+            logger.warn("$buildId|$vmSeqId finishBuild success.")
         } else {
             logger.error("$buildId|$vmSeqId finishBuild failed, secretInfo is null.")
         }

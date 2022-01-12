@@ -18,7 +18,7 @@
                     <component :is="panel.component" v-bind="panel.bindData" @hideColumnPopup="toggleColumnsSelectPopup(false)"></component>
                 </bk-tab-panel>
             </bk-tab>
-            <mini-map :stages="pipeline.stages" scroll-class=".bk-tab-section" v-if="!isLoading && pipeline && currentTab === 'pipeline'"></mini-map>
+            <mini-map :stages="pipeline.stages" scroll-class=".bk-tab-section .bk-tab-content" v-if="!isLoading && pipeline && currentTab === 'pipeline'"></mini-map>
         </template>
     </section>
 </template>
@@ -129,26 +129,28 @@
                                 }
                             }
                         },
-                        ...(this.isDraftEdit ? [] : [{
-                            name: 'auth',
-                            label: this.$t('settings.auth'),
-                            component: 'AuthorityTab',
-                            bindData: {
-                                isLoading: !this.pipelineAuthority,
-                                pipelineAuthority: this.pipelineAuthority,
-                                projectGroupAndUsers: this.projectGroupAndUsers,
-                                updateAuthority: (name, value) => {
-                                    this.setPipelineEditing(true)
-                                    this.setAuthEditing(true)
-                                    this.updatePipelineAuthority({
-                                        pipelineAuthority: {
-                                            [name]: value
-                                        }
+                        ...(this.isDraftEdit
+                            ? []
+                            : [{
+                                name: 'auth',
+                                label: this.$t('settings.auth'),
+                                component: 'AuthorityTab',
+                                bindData: {
+                                    isLoading: !this.pipelineAuthority,
+                                    pipelineAuthority: this.pipelineAuthority,
+                                    projectGroupAndUsers: this.projectGroupAndUsers,
+                                    updateAuthority: (name, value) => {
+                                        this.setPipelineEditing(true)
+                                        this.setAuthEditing(true)
+                                        this.updatePipelineAuthority({
+                                            pipelineAuthority: {
+                                                [name]: value
+                                            }
 
-                                    })
+                                        })
+                                    }
                                 }
-                            }
-                        }]),
+                            }]),
                         {
                             name: 'baseSetting',
                             label: this.$t('editPage.baseSetting'),

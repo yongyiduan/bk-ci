@@ -134,20 +134,25 @@
         get showProjectList (): boolean {
             return this.headerConfig.showProjectList
         }
+
         get showNav (): boolean {
             return this.headerConfig.showNav
         }
+
         get projectId (): string {
             return this.$route.params.projectId
         }
+
         get title (): string {
             const name = this.currentPage && this.currentPage.name ? this.currentPage.name : ''
             const charPos = name.indexOf('(')
             return charPos > -1 ? name.slice(0, charPos) : name
         }
+
         get serviceLogo (): string {
             return this.currentPage && this.currentPage.logoUrl ? this.currentPage.logoUrl : 'placeholder'
         }
+
         get selectProjectList (): Project[] {
             return this.enableProjectList.map(project => ({
                 ...project,
@@ -218,15 +223,17 @@
                 }
             }
 
-            reload ? location.href = path : this.$router.replace({
+            reload
+              ? location.href = path
+              : this.$router.replace({
                 path
             })
         }
 
         handleProjectChange (id: string) {
             const { projectId } = this.$route.params
-            const oldProject = this.selectProjectList.find(project => project.projectCode === projectId)
-            const project = this.selectProjectList.find(project => project.projectCode === id)
+            const oldProject = this.selectProjectList.find(project => project.projectCode === projectId) || {}
+            const project = this.selectProjectList.find(project => project.projectCode === id) || {}
             
             window.setProjectIdCookie(id)
 
@@ -240,7 +247,7 @@
                 })
             }
             
-            if ((!oldProject && project.gray) || (oldProject && oldProject.gray !== project.gray)) {
+            if (project.routerTag !== oldProject.routerTag) {
                 this.goHomeById(id, true)
             }
         }

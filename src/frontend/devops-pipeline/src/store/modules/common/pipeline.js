@@ -253,7 +253,7 @@ export const actions = {
         })
     },
     startDebugDocker: async ({ commit }, data) => {
-        return request.post(`dispatch-docker/api/user/dockerhost/startDebug/`, data).then(response => {
+        return request.post('dispatch-docker/api/user/dockerhost/startDebug/', data).then(response => {
             return response.data
         })
     },
@@ -352,8 +352,8 @@ export const actions = {
             await Promise.all(data.map(function (item, index) {
                 return request.get(`${BACKEND_API_URL_PREFIX}/api/ci/pipeline/gcloud/templates/${payload.projectId}/${item.id}/`)
             })).then((array) => {
-                data.map((item, index) => {
-                    item = Object.assign(item, { 'param': array[index].data })
+                data.forEach((item, index) => {
+                    item = Object.assign(item, { param: array[index].data })
                     data.splice(index, 1, item)
                 })
             })
@@ -369,7 +369,7 @@ export const actions = {
         })
     },
     reviewExcuteAtom: async ({ commit }, { projectId, pipelineId, buildId, elementId, action }) => {
-        return request.post(`/${PROCESS_API_URL_PREFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/${elementId}/qualityGateReview/${action}`).then(response => {
+        return request.post(`/${PROCESS_API_URL_PREFIX}/user/quality/builds/${projectId}/${pipelineId}/${buildId}/${elementId}/qualityGateReview/${action}`).then(response => {
             return response.data
         })
     },
@@ -399,6 +399,7 @@ export const getters = {
                     })
                 })
             }
+            return false
         })
     }
 }
