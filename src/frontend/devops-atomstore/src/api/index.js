@@ -29,8 +29,8 @@ export default {
         return vue.$ajax.get(`${prefix}/user/store/env/var/latest/types/${storeType}/codes/${storeCode}?scopes=${scopes}&varName=${varName}`)
     },
 
-    getEnvChangeList ({ storeType, storeCode, varName }) {
-        return vue.$ajax.get(`${prefix}/user/store/env/var/change/log/types/${storeType}/codes/${storeCode}/vars/${varName}`)
+    getEnvChangeList ({ storeType, storeCode, varName, scope }) {
+        return vue.$ajax.get(`${prefix}/user/store/env/var/change/log/types/${storeType}/codes/${storeCode}/vars/${varName}?scopes=${scope}`)
     },
 
     addEnv (params) {

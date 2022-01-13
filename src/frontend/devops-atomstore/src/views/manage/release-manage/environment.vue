@@ -2,7 +2,7 @@
     <article class="manage-environment">
         <header class="environment-head">
             <bk-button theme="primary" @click="addEnv">{{ $t('store.新增环境变量') }}</bk-button>
-            <bk-select v-model="envScope" class="head-item" :clearable="false">
+            <bk-select v-model="envScope" class="head-item">
                 <bk-option v-for="option in scopesList"
                     :key="option.id"
                     :id="option.id"
@@ -113,7 +113,7 @@
     export default {
         data () {
             return {
-                envScope: 'ALL',
+                envScope: '',
                 envName: '',
                 envList: [],
                 isLoading: false,
@@ -254,7 +254,8 @@
                 const data = {
                     storeType: this.storeType,
                     storeCode: this.storeCode,
-                    varName: row.varName
+                    varName: row.varName,
+                    scope: row.scope
                 }
                 api.getEnvChangeList(data).then((res) => {
                     this.envHistory.list = res || []
