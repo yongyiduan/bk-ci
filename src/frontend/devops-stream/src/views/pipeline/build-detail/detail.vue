@@ -18,7 +18,13 @@
                     <span class="title-item">
                         <span v-if="buildDetail.objectKind === 'schedule'">System</span>
                         <template v-else>
-                            <img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">{{ buildDetail.userId }}
+                            <img :src="`http://dayu.oa.com/avatars/${buildDetail.userId}/profile.jpg`">
+                            <template v-if="buildDetail.objectKind === 'openApi'">
+                                OPENAPI（{{ buildDetail.userId }}）
+                            </template>
+                            <template v-else>
+                                {{ buildDetail.userId }}
+                            </template>
                         </template>
                     </span>
                 </span>

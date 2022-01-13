@@ -60,6 +60,10 @@ export default {
         return api.post(`${ARTIFACTORY_PREFIX}/user/artifactories/${projectId}/${artifactoryType}/downloadUrl?path=${encodeURIComponent(path)}`)
     },
 
+    requestArtifactExternalUrl ({ projectId, artifactoryType, path }) {
+        return api.post(`${ARTIFACTORY_PREFIX}/user/artifactories/${projectId}/${artifactoryType}/externalUrl?path=${encodeURIComponent(path)}`)
+    },
+
     requestReportList ({ projectId, pipelineId, buildId }) {
         return api.get(`${STREAM_PERFIX}/user/current/build/projects/${projectId}/pipelines/${pipelineId}/builds/${buildId}/report`)
     },

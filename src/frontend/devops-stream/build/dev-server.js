@@ -81,12 +81,9 @@ app.use(bodyParser.urlencoded({
 const staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-let localDevUrl = 'https://localhost.woa.com/'
-if (localDevUrl.slice(-1) === '/') {
-    localDevUrl = localDevUrl.slice(0, -1)
-}
+const localHostName = 'local-stream.woa.com'
 
-const url = `${localDevUrl}:${port}`
+const url = `https://${localHostName}:${port}`
 
 let _resolve
 const readyPromise = new Promise(resolve => {
@@ -103,8 +100,8 @@ devMiddleware.waitUntilValid(() => {
 })
 
 // https
-const privateKey = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.key'), 'utf8')
-const certificate = fs.readFileSync(path.resolve(__dirname, '../src/conf/selfsigned.crt'), 'utf8')
+const privateKey = fs.readFileSync(path.resolve(__dirname, `../src/conf/${localHostName}.key`), 'utf8')
+const certificate = fs.readFileSync(path.resolve(__dirname, `../src/conf/${localHostName}.crt`), 'utf8')
 const credentials = { key: privateKey, cert: certificate }
 
 const server = https.createServer(credentials, app).listen(port)

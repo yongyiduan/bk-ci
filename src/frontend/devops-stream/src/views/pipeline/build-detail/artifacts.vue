@@ -21,6 +21,19 @@
                         :disabled="!hasPermission"
                         v-bk-tooltips="{ content: 'You do not have the permission to download components of the pipeline, and you cannot download', disabled: hasPermission }"
                     >Download</bk-button>
+                    <bk-popover v-if="props.row.isApkOrIpa" theme="light" trigger="click" placement="top">
+                        <bk-button
+                            text
+                            @click="requestArtifactExternalUrl(props.row)"
+                            :disabled="!hasPermission"
+                        >
+                            QRCode
+                        </bk-button>
+                        <div slot="content" v-bkloading="{ isLoading: fetchingUrl }">
+                            <qr-code v-if="hasPermission" class="qrcode-view" :text="qrCodeUrl" :size="100"></qr-code>
+                            <p v-else>You do not have the permission to download components of the pipeline and you cannot download</p>
+                        </div>
+                    </bk-popover>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -30,14 +43,20 @@
 <script>
     import { convertFileSize } from '@/utils'
     import { pipelines } from '@/http'
+    import QrCode from '@/components/QrCode'
     import { mapState } from 'vuex'
 
     export default {
+        components: {
+            QrCode
+        },
         data () {
             return {
                 hasPermission: true,
                 isLoading: true,
-                artifactories: []
+                qrCodeUrl: '',
+                artifactories: [],
+                fetchingUrl: false
             }
         },
 
@@ -76,7 +95,10 @@
                     pipelines.requestPartFile(postData),
                     pipelines.requestExecPipPermission(permissionData)
                 ]).then(([res, permission]) => {
-                    this.artifactories = res.records || []
+                    this.artifactories = res.records.map(artifact => ({
+                        ...artifact,
+                        isApkOrIpa: this.isApkOrIpa(artifact)
+                    }))
                     this.hasPermission = permission
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
@@ -100,8 +122,29 @@
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })
             },
+            async requestArtifactExternalUrl (row, key, index, type) {
+                try {
+                    this.qrCodeUrl = ''
+                    this.fetchingUrl = true
+                    const res = await pipelines.requestArtifactExternalUrl({
+                        projectId: this.projectId,
+                        artifactoryType: row.artifactoryType,
+                        path: row.path
+                    })
+                    console.log(res.url)
+                    this.qrCodeUrl = res.url
+                } catch (err) {
+                    this.$bkMessage({ theme: 'error', message: err.message || err })
+                } finally {
+                    this.fetchingUrl = false
+                }
+            },
             sizeFormatter (row, column, cellValue, index) {
                 return (cellValue >= 0 && convertFileSize(cellValue, 'B')) || ''
+            },
+            isApkOrIpa (row) {
+                const type = row.name.toUpperCase().substring(row.name.lastIndexOf('.') + 1)
+                return type === 'APK' || type === 'IPA'
             }
         }
     }
