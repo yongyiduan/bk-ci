@@ -44,7 +44,7 @@
             },
 
             statusClass () {
-                return getPipelineStatusClass(this.job.status)
+                return getPipelineStatusClass(this.job.status, this.job?.jobControlOption?.enable)
             },
 
             isSkip () {
