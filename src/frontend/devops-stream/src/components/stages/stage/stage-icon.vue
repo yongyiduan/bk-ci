@@ -55,7 +55,7 @@
                     if (this.stageCheck?.isReviewError) return 'review-error'
                     switch (true) {
                         case this.stageCheck?.status === 'REVIEWING':
-                            return 'waiting-fill'
+                            return 'reviewing'
                         case this.stageCheck?.status === 'QUEUE':
                             return 'review-waiting'
                         case this.stageCheck?.status === 'REVIEW_PROCESSED':
@@ -65,7 +65,7 @@
                         case this.stageCheck?.status === 'QUALITY_CHECK_PASS':
                             return 'check-fill'
                         case this.stageCheck?.status === 'QUALITY_CHECK_WAIT':
-                            return 'waiting-fill'
+                            return 'reviewing'
                         case this.stageCheck?.status === 'REVIEW_ABORT':
                             return 'error-fill'
                         case this.stageStatusCls === 'SKIP':
