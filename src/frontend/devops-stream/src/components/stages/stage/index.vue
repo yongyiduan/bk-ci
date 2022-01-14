@@ -213,7 +213,7 @@
 
     .stage-home {
         position: relative;
-        width: 280px;
+        min-width: 280px;
         border-radius: 2px;
         padding: 0 0 24px 0;
         background: #f5f5f5;

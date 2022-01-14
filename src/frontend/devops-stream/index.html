@@ -22,7 +22,7 @@
             function getLoginUrl (domain = LOGIN_SERVICE_URL) {
                 const cUrl = location.href
                 const loginUrl = new URL(domain)
-                const url = new URL('http://login.o.woa.com/call_back_oa/')
+                const url = new URL('https://login.o.woa.com/call_back_oa/')
                 url.searchParams.append('bk_appid', 1)
                 url.searchParams.append('bk_login', 1)
                 url.searchParams.append('c_url', cUrl)
