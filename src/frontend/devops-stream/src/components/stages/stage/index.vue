@@ -1,20 +1,16 @@
 <template>
     <section class="stage-home">
-        <icon
-            v-if="showStageCheck(stage.checkIn)"
-            :name="reviewStatausIcon(stage.checkIn)"
-            size="28"
+        <stage-icon
             class="review-icon"
-            v-bk-tooltips="getStageToolTip(stage.checkIn)"
+            v-if="showStageCheck(stage.checkIn)"
+            :stage-check="stage.checkIn"
             @click.native="handleIconClick('checkIn')"
         />
 
-        <icon
-            v-if="showStageCheck(stage.checkOut)"
-            :name="reviewStatausIcon(stage.checkOut)"
-            size="28"
+        <stage-icon
             class="review-icon check-out"
-            v-bk-tooltips="getStageToolTip(stage.checkOut)"
+            v-if="showStageCheck(stage.checkOut)"
+            :stage-check="stage.checkOut"
             @click.native="handleIconClick('checkOut')"
         />
 
@@ -67,10 +63,12 @@
     import { getPipelineStatusClass, getPipelineStatusIconCls } from '@/components/status'
     import { pipelines } from '@/http'
     import job from '../job/index'
+    import stageIcon from './stage-icon.vue'
 
     export default {
         components: {
-            job
+            job,
+            stageIcon
         },
 
         props: {
@@ -113,18 +111,6 @@
                 'toggleStageReviewPanel'
             ]),
 
-            getStageToolTip (stageControl = {}) {
-                const contentMap = {
-                    REVIEWING: '等待审核',
-                    QUALITY_CHECK_FAIL: '质量红线已拦截',
-                    QUALITY_CHECK_WAIT: '等待质量红线审核'
-                }
-                return {
-                    content: contentMap[stageControl.status],
-                    disabled: !['REVIEWING', 'QUALITY_CHECK_WAIT'].includes(stageControl.status)
-                }
-            },
-
             autoOpenReview () {
                 const query = this.$route.query || {}
                 const checkIn = query.checkIn
@@ -148,38 +134,6 @@
                 const hasReviewFlow = stageControl.manualTrigger
                 const hasReviewQuality = stageControl.ruleIds && stageControl.ruleIds.length > 0
                 return !this.isFinallyStage && (hasReviewFlow || hasReviewQuality)
-            },
-
-            reviewStatausIcon (stageControl = {}) {
-                try {
-                    if (stageControl.isReviewError) return 'review-error'
-                    switch (true) {
-                        case stageControl.status === 'REVIEWING':
-                            return 'reviewing'
-                        case stageControl.status === 'QUEUE':
-                            return 'review-waiting'
-                        case stageControl.status === 'REVIEW_PROCESSED':
-                            return 'reviewed'
-                        case stageControl.status === 'QUALITY_CHECK_FAIL':
-                            return 'quality-check-fail'
-                        case stageControl.status === 'QUALITY_CHECK_PASS':
-                            return 'review-auto-pass'
-                        case stageControl.status === 'QUALITY_CHECK_WAIT':
-                            return 'reviewing'
-                        case stageControl.status === 'REVIEW_ABORT':
-                            return 'review-abort'
-                        case this.stageStatusCls === 'SKIP':
-                        case stageControl.status === undefined:
-                            return stageControl.manualTrigger ? 'review-waiting' : 'review-auto-gray'
-                        case stageControl.status:
-                            return 'review-auto-pass'
-                        default:
-                            return stageControl.manualTrigger ? 'review-enable' : 'review-auto'
-                    }
-                } catch (e) {
-                    console.warn('get review icon error: ', e)
-                    return 'review-auto'
-                }
             },
 
             retry () {
@@ -247,7 +201,7 @@
             border: 1px solid #d0d8ea;
             color: black;
             .stage-name {
-                max-width: 130px;
+                max-width: 95px;
                 margin-left: 5px;
                 display: inline-block;
             }

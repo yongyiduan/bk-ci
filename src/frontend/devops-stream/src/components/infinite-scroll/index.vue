@@ -115,7 +115,6 @@
                     this.isLoadingMore = true
                     await this.fetchData(this.currentPage + 1, this.pageSize)
                 } catch (e) {
-                    console.log(e)
                     this.$showTips({
                         message: 'loading error',
                         theme: 'error'
