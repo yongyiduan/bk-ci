@@ -14,9 +14,21 @@ export default {
         return api.get(`${REPOSITORY_PREFIX}/user/git/isOauth?redirectUrl=${redirectUrl}`)
     },
 
-    getStreamProjects (type = 'MY_PROJECT', page = 1, limit = 20, search = '') {
+    getStreamGroups (page = 1, limit = 20) {
+        return api.get(`${STREAM_PERFIX}/user/groups/list?page=${page}&pageSize=${limit}`).then(response => {
+            return response
+        })
+    },
+
+    getStreamProjects (type = 'MY_PROJECT', page = 1, limit = 20, search = '', isAwait = false) {
         const querySearch = (search && search.trim()) ? `&search=${search.trim()}` : ''
-        return api.get(`${STREAM_PERFIX}/user/projects/${type}/list?page=${page}&pageSize=${limit}${querySearch}`)
+        if (isAwait) {
+            return api.get(`${STREAM_PERFIX}/user/projects/${type}/list?page=${page}&pageSize=${limit}${querySearch}`).then(response => {
+                return response
+            })
+        } else {
+            return api.get(`${STREAM_PERFIX}/user/projects/${type}/list?page=${page}&pageSize=${limit}${querySearch}`)
+        }
     },
     
     getRecentProjects (size = 4) {

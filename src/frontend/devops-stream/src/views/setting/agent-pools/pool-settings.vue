@@ -9,7 +9,8 @@
         <main class="pool-setting-main" v-if="!isLoading">
             <section v-if="shareList.length">
                 <div class="operate-agent">
-                    <bk-button theme="primary" @click="toLinkShare">Link project</bk-button>
+                    <bk-button @click="toLinkShare('PROJECT')">Link project</bk-button>
+                    <bk-button @click="toLinkShare('GROUP')">Link group</bk-button>
                 </div>
                 <bk-table class="agent-table"
                     :data="shareList"
@@ -20,13 +21,14 @@
                     @page-change="handlePageChange"
                     @page-limit-change="handlePageLimitChange"
                 >
-                    <bk-table-column label="Id" prop="gitProjectId">
+                    <bk-table-column label="Id" prop="gitProjectId" min-width="150">
                         <template slot-scope="props">
                             {{ props.row.gitProjectId.replace('git_', '')}}
                         </template>
                     </bk-table-column>
-                    <bk-table-column label="Name" prop="name"></bk-table-column>
-                    <bk-table-column label="Creator" prop="creator"></bk-table-column>
+                    <bk-table-column label="Name" prop="name" min-width="150"></bk-table-column>
+                    <bk-table-column label="Type" prop="type" width="150"></bk-table-column>
+                    <bk-table-column label="Creator" prop="creator" width="150"></bk-table-column>
                     <bk-table-column label="Operation" width="200" class-name="handler-btn">
                         <template slot-scope="props">
                             <span class="update-btn" @click="showDelete(props.row)">Remove</span>
@@ -35,15 +37,18 @@
                 </bk-table>
             </section>
             <section v-else class="table-empty">
-                <h3>Link your first project</h3>
-                <h5>select projects to share your agents in this pool</h5>
+                <h3>Link your first project or group</h3>
+                <h5>select projects or groups to share your agents in this pool</h5>
                 <div>
-                    <bk-button theme="primary" class="import-agent" @click="toLinkShare">Link project</bk-button>
+                    <bk-button class="import-agent" @click="toLinkShare('PROJECT')">Link project</bk-button>
+                    <bk-button @click="toLinkShare('GROUP')">Link group</bk-button>
                 </div>
             </section>
         </main>
 
-        <share-env :share-select-conf="shareSelectConf"
+        <share-env 
+            :select-type="selectType"
+            :share-select-conf="shareSelectConf"
             :row-list="curPageList"
             :total-list="totalList"
             :share-handler-conf="shareHandlerConf"
@@ -175,9 +180,13 @@
         padding: 16px;
         .operate-agent {
             margin-bottom: 20px;
+            .bk-button {
+                margin-right: 10px;
+            }
         }
         .import-agent {
             margin-left: 10px;
+            margin-right: 10px;
         }
     }
     .agent-table {

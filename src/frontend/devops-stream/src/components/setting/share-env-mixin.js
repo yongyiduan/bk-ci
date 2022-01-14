@@ -7,6 +7,7 @@ const shareEnvMixin = {
             pageSize: 100,
             hasNext: false,
             searchStr: '',
+            selectType: 'PROJECT',
             shareList: [], // 已有共享的项目列表
             curPageList: [], // 当前页项目列表
             totalList: [], // 每页列表之和
@@ -49,21 +50,28 @@ const shareEnvMixin = {
         }
     },
     methods: {
-        toLinkShare () {
+        async toLinkShare (type = 'RPOJECT') {
+            this.selectType = type
             this.shareSelectConf.isShow = true
-            this.requestProjectList()
+            this.requestList(type)
         },
 
-        requestProjectList () {
+        async requestList (type) {
             this.shareDialogLoading.isLoading = true
-
-            common.getStreamProjects('MY_PROJECT', this.page, this.pageSize, this.searchStr).then((res) => {
+            let res = {}
+            try {
+                if (type === 'GROUP') {
+                    res = await common.getStreamGroups(this.page, this.pageSize)
+                } else {
+                    res = await common.getStreamProjects('MY_PROJECT', this.page, this.pageSize, this.searchStr, true)
+                }
                 this.hasNext = res.hasNext || false
                 res = res.records || []
                 this.curPageList = []
                 res.map(item => {
                     // 在这里判断一下totalList里面能不能找到这一项，是否isCheck
                     if (item.projectCode !== this.projectId) {
+                        item.name = (type === 'PROJECT' ? (item.nameWithNamespace || item.name) : (item.full_name || item.name))
                         item.isChecked = false
                         this.curPageList.push(item)
                         if (!this.totalList.find(totalListItem => totalListItem.id === item.id)) {
@@ -80,7 +88,7 @@ const shareEnvMixin = {
                     })
                 })
                 this.shareHandlerConf.searchEmpty = this.curPageList.length <= 0
-            }).catch((err) => {
+            } catch (err) {
                 const message = err.message ? err.message : err
                 const theme = 'error'
 
@@ -88,9 +96,9 @@ const shareEnvMixin = {
                     message,
                     theme
                 })
-            }).finally(() => {
+            } finally {
                 this.shareDialogLoading.isLoading = false
-            })
+            }
         },
 
         async confirmShare (params) {
@@ -126,15 +134,15 @@ const shareEnvMixin = {
                 if (selectItems.length <= 0) {
                     this.$bkMessage({
                         theme: 'error',
-                        message: 'No project selected'
+                        message: `No ${this.selectType.toLowerCase()} selected`
                     })
                     return
                 }
                 selectItems = selectItems.map(item => {
                     return {
                         gitProjectId: `git_${item.id}`,
-                        name: item.nameWithNamespace,
-                        type: 'PROJECT'
+                        name: item.name,
+                        type: this.selectType
                     }
                 })
                 const params = Object.assign({}, { sharedProjects: selectItems })
