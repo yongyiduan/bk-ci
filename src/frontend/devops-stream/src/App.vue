@@ -38,7 +38,6 @@
                     name: routeName
                 })
             }
-            console.log('clear cookies')
             // 清除异常cookie
             deleteCookie(X_DEVOPS_PROJECT_ID, 'oa.com')
             deleteCookie(X_DEVOPS_PROJECT_ID, 'woa.com')

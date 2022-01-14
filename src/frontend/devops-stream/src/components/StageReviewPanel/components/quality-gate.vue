@@ -7,7 +7,7 @@
                     <span class="quality-summary">
                         <span class="text-ellipsis summary-left">
                             <i
-                                v-if="qualityItem.interceptResult !== 'uncheck'"
+                                v-if="qualityItem.interceptResult !== 'UNCHECK'"
                                 :class="[
                                     'mr5',
                                     'stream-icon',
@@ -17,7 +17,7 @@
                             ></i>
                             <span class="quality-name text-ellipsis" v-bk-overflow-tips>{{ qualityItem.ruleName }}</span>
                             <span :class="{ 'wait-color': qualityItem.interceptResult === 'WAIT' }">{{ getInterceptValue(qualityItem.interceptResult) }}</span>
-                            <span :class="{ 'wait-color': qualityItem.interceptResult === 'WAIT' }">{{ getInterceptNum(qualityItem.interceptList) }}</span>
+                            <span :class="{ 'wait-color': qualityItem.interceptResult === 'WAIT' }" v-if="qualityItem.interceptResult !== 'UNCHECK'">{{ getInterceptNum(qualityItem.interceptList) }}</span>
                         </span>
                         <span v-if="qualityItem.interceptResult === 'WAIT'" class="summary-right">
                             <bk-button
@@ -52,7 +52,7 @@
                     <section slot="content">
                         <ul>
                             <li class="quality-content text-ellipsis" v-for="(intercept, interceptIndex) in qualityItem.interceptList" :key="interceptIndex">
-                                <span :class="{ 'quality-icon': true, 'success': intercept.pass }" v-if="qualityItem.interceptResult !== 'uncheck'">
+                                <span :class="{ 'quality-icon': true, 'success': intercept.pass }" v-if="qualityItem.interceptResult !== 'UNCHECK'">
                                     <i :class="`bk-icon ${ intercept.pass ? 'icon-check-1' : 'icon-close' }`"></i>
                                 </span>
                                 <span class="text-ellipsis mr5" v-bk-overflow-tips>{{ getRuleName(intercept, qualityItem.interceptResult) }}</span>
@@ -112,7 +112,7 @@
                     LE: '<=',
                     EQ: '='
                 }
-                return `${indicatorName}当前值(${interceptResult !== 'uncheck' ? (actualValue || 'null') : ''})，期望${operationMap[operation]}${value || 'null'}`
+                return `${indicatorName}当前值(${interceptResult !== 'UNCHECK' ? (actualValue || 'null') : ''})，期望${operationMap[operation]}${value || 'null'}`
             },
 
             getGateKeeper (qualityItem) {
