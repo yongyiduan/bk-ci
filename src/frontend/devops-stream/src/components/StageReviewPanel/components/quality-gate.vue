@@ -7,7 +7,6 @@
                     <span class="quality-summary">
                         <span class="text-ellipsis summary-left">
                             <i
-                                v-if="qualityItem.interceptResult !== 'UNCHECK'"
                                 :class="[
                                     'mr5',
                                     'stream-icon',
@@ -170,10 +169,7 @@
                 this.isLoading = true
                 pipelines.requestQualityGate(...params).then((res) => {
                     this.qualityList = res || []
-                    const waitQualityItems = this.qualityList.filter(qualityItem => qualityItem.interceptResult === 'WAIT')
-                    if (waitQualityItems.length > 0) {
-                        this.activeName.push(...waitQualityItems.map(x => x.hashId))
-                    }
+                    this.activeName.push(...this.qualityList.map(x => x.hashId))
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
@@ -238,6 +234,7 @@
             }
             .quality-content {
                 margin-top: 12px;
+                margin-left: 25px;
                 color: #666770;
                 display: flex;
                 align-items: center;
