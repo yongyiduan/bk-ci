@@ -201,7 +201,7 @@
             border: 1px solid #d0d8ea;
             color: black;
             .stage-name {
-                max-width: 130px;
+                max-width: 95px;
                 margin-left: 5px;
                 display: inline-block;
             }
