@@ -34,11 +34,11 @@ export default {
     },
 
     addEnv (params) {
-        const { oldScope, option } = params
+        const { variableId, option } = params
         delete params.option
         if (option === 'update') {
-            delete params.oldScope
-            return vue.$ajax.post(`${prefix}/user/store/env/var/${option}?oldScope=${oldScope}`, params)
+            delete params.variableId
+            return vue.$ajax.post(`${prefix}/user/store/env/var/${option}?variableId=${variableId}`, params)
         }
         return vue.$ajax.post(`${prefix}/user/store/env/var/${option}`, params)
     },

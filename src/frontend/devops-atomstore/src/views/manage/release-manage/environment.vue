@@ -205,7 +205,7 @@
             editEnv (form) {
                 Object.assign(form, {
                     option: 'update',
-                    oldScope: form.scope
+                    variableId: form.id
                 })
                 form = JSON.parse(JSON.stringify(form))
                 Object.assign(this.addEnvObj, {
