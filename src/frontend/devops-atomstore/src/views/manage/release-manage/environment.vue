@@ -203,6 +203,10 @@
 
         methods: {
             editEnv (form) {
+                Object.assign(form, {
+                    option: 'update',
+                    oldScope: form.scope
+                })
                 form = JSON.parse(JSON.stringify(form))
                 Object.assign(this.addEnvObj, {
                     show: true,
@@ -220,6 +224,7 @@
                         varValue: '',
                         scope: 'ALL',
                         varDesc: '',
+                        option: 'create',
                         encryptFlag: false
                     }
                 })
@@ -228,6 +233,7 @@
             deleteEnv (row) {
                 this.deleteObj.show = true
                 this.deleteObj.name = row.varName
+                this.deleteObj.scope = row.scope
             },
 
             requestDelete () {
@@ -235,7 +241,8 @@
                 const data = {
                     storeType: this.storeType,
                     storeCode: this.storeCode,
-                    varNames: this.deleteObj.name
+                    varNames: this.deleteObj.name,
+                    scope: this.deleteObj.scope
                 }
                 api.deleteEnv(data).then((res) => {
                     this.getAllEnvList()

@@ -34,11 +34,17 @@ export default {
     },
 
     addEnv (params) {
-        return vue.$ajax.post(`${prefix}/user/store/env/var/create`, params)
+        const { oldScope, option } = params
+        delete params.option
+        if (option === 'update') {
+            delete params.oldScope
+            return vue.$ajax.post(`${prefix}/user/store/env/var/${option}?oldScope=${oldScope}`, params)
+        }
+        return vue.$ajax.post(`${prefix}/user/store/env/var/${option}`, params)
     },
 
-    deleteEnv ({ storeType, storeCode, varNames }) {
-        return vue.$ajax.delete(`${prefix}/user/store/env/var/types/${storeType}/codes/${storeCode}?varNames=${varNames}`)
+    deleteEnv ({ storeType, storeCode, varNames, scope }) {
+        return vue.$ajax.delete(`${prefix}/user/store/env/var/types/${storeType}/codes/${storeCode}?varNames=${varNames}&scope=${scope}`)
     },
 
     getCodeScore (storeType, storeCode, params) {
