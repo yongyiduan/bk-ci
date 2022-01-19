@@ -62,11 +62,11 @@
                 </span>
             </p>
 
-            <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" class="nav-button" v-if="buildDetail.status === 'RUNNING'">
-                <bk-button class="detail-button" @click="cancleBuild" :loading="isOperating" :disabled="!permission">Cancel Build</bk-button>
+            <div v-bk-tooltips="computedOptToolTip" class="nav-button" v-if="buildDetail.status === 'RUNNING'">
+                <bk-button class="detail-button" @click="cancleBuild" :loading="isOperating" :disabled="!curPipeline.enabled || !permission">Cancel Build</bk-button>
             </div>
-            <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" class="nav-button" v-else>
-                <bk-button class="detail-button" @click="rebuild" :loading="isOperating" :disabled="!permission">Re-build</bk-button>
+            <div v-bk-tooltips="computedOptToolTip" class="nav-button" v-else>
+                <bk-button class="detail-button" @click="rebuild" :loading="isOperating" :disabled="!curPipeline.enabled || !permission">Re-build</bk-button>
             </div>
         </section>
         <stages :stages="stageList" class="detail-stages" @refresh-stages="getPipelineBuildDetail"></stages>
@@ -107,7 +107,14 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'projectInfo', 'permission']),
+            ...mapState(['projectId', 'projectInfo', 'permission', 'curPipeline']),
+
+            computedOptToolTip () {
+                return {
+                    content: !this.curPipeline.enabled ? 'Pipeline disabled' : 'Permission denied',
+                    disabled: this.curPipeline.enabled && this.permission
+                }
+            },
 
             buildTypeIcon () {
                 return getbuildTypeIcon(this.buildDetail.objectKind, this.buildDetail.operationKind)
