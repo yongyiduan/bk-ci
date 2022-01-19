@@ -325,7 +325,7 @@
             getBuildTitle,
 
             setHtmlTitle () {
-                modifyHtmlTitle(this.projectInfo?.path_with_namespace)
+                modifyHtmlTitle(this.curPipeline?.displayName)
             },
 
             getIconClass (status) {
