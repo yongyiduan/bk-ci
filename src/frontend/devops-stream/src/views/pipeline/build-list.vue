@@ -325,8 +325,7 @@
             getBuildTitle,
 
             setHtmlTitle () {
-                const projectPath = (this.$route.hash || '').slice(1)
-                modifyHtmlTitle(decodeURIComponent(projectPath))
+                modifyHtmlTitle(this.projectInfo?.path_with_namespace)
             },
 
             getIconClass (status) {
