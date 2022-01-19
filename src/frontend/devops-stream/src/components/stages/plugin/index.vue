@@ -50,7 +50,7 @@
             },
 
             statusClass () {
-                return getPipelineStatusClass(this.plugin.status, this.plugin.additionalOptions.enable)
+                return getPipelineStatusClass(this.plugin.status, this.plugin?.additionalOptions?.enable === false)
             },
 
             isSkip () {

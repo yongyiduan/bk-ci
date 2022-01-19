@@ -26,7 +26,7 @@
                         name="angle-down-line"
                         size="16"
                         :class="{
-                            [getPipelineStatusClass(groupContainer.status, groupContainer.jobControlOption.enable)]: true,
+                            [getPipelineStatusClass(groupContainer.status, isSkip(groupContainer))]: true,
                             'plugin-show-icon': true,
                             'plugin-hidden': !showPluginsJobIds.includes(groupContainer.containerHashId)
                         }"
@@ -87,6 +87,10 @@
 
         methods: {
             getPipelineStatusClass,
+
+            isSkip (groupContainer) {
+                return groupContainer?.jobControlOption?.enable === false
+            },
 
             toggleShowJobs () {
                 this.showJobs = !this.showJobs
