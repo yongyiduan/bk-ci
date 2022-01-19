@@ -5,6 +5,9 @@
 
 import Vue from 'vue'
 import Vuex from 'vuex'
+import {
+    modifyHtmlTitle
+} from '@/utils'
 
 Vue.use(Vuex)
 
@@ -42,6 +45,7 @@ const store = new Vuex.Store({
             state.projectSetting = projectSetting || {}
         },
         setCurPipeline (state, pipeline) {
+            modifyHtmlTitle(pipeline?.displayName)
             state.curPipeline = pipeline
         },
         setMenuPipelineId (state, pipelineId) {
