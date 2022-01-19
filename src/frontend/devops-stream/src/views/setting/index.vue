@@ -33,7 +33,7 @@
         },
 
         computed: {
-            ...mapState(['projectId', 'projectSetting']),
+            ...mapState(['projectId', 'projectSetting', 'projectInfo']),
 
             // 基础设置页时才判断是否enableCi
             enableCi () {
@@ -84,8 +84,7 @@
             },
 
             setHtmlTitle () {
-                const projectPath = decodeURIComponent((this.$route.hash || '').slice(1))
-                const title = projectPath + ' : Setting'
+                const title = this.projectInfo?.path_with_namespace + ' : Setting'
                 modifyHtmlTitle(title)
             },
 
