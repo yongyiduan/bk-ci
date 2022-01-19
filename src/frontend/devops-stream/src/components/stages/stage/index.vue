@@ -97,7 +97,7 @@
             },
 
             stageStatusCls () {
-                return getPipelineStatusClass(this.stage.status, this.stage.stageControlOption.enable)
+                return getPipelineStatusClass(this.stage.status, this.stage?.stageControlOption?.enable === false)
             },
 
             stageStatusIcon () {
