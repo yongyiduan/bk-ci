@@ -59,34 +59,21 @@
             loadingTitle () {
                 return !this.isExiting ? `If the container can't be activated after one minute you did so, please contact DevOps (customer service from Blue Shield)` : 'exiting'
             },
-            consoleType () {
-                return this.$route.query.type || 'DOCKER'
-            },
             pipelineId () {
                 return this.$route.query.pipelineId
             },
             buildId () {
-                return this.$route.query.buildId
-            },
-            targetIp () {
-                return this.$route.query.targetIp
+                return this.$route.query.buildId || null
             },
             vmSeqId () {
                 return this.$route.query.vmSeqId
             },
-            containerId () {
-                return this.$route.query.containerId
+            cmd () {
+                return this.$route.query.cmd
             }
         },
         async created () {
-            if (this.consoleType === 'DOCKER') {
-                if (this.targetIp && this.pipelineId && this.containerId) {
-                    this.isRunning = true
-                    this.getLinkDetail(this.containerId, this.targetIp)
-                } else {
-                    await this.getContainerInfo()
-                }
-            }
+            this.linkConsole()
         },
         mounted () {
             this.addLeaveListenr()
@@ -95,29 +82,23 @@
             this.removeLeaveListenr()
         },
         methods: {
-            async getContainerInfo () {
-                clearTimeout(this.timer)
-                try {
-                    const res = await pipelines.getDebugStatus(this.projectId, this.pipelineId, this.vmSeqId)
-                    if (res && res.status === 2 && res.containerId && res.address) {
-                        // this.url = `ws://${PROXY_URL_PREFIX}/docker-console?pipelineId=${this.pipelineId}&containerId=${res.containerId}&projectId=${this.projectId}&targetIP=${res.address}`
-                        this.getLinkDetail(res.containerId, res.address)
-                    } else {
-                        this.timer = setTimeout(async () => {
-                            await this.getContainerInfo()
-                        }, 5000)
-                    }
-                } catch (err) {
-                    if (err && err.code === 1) {
+            linkConsole () {
+                const { projectId, pipelineId, buildId, vmSeqId, cmd } = this
+                pipelines.startDebugDocker(
+                {
+                    projectId,
+                    pipelineId,
+                    buildId,
+                    vmSeqId,
+                    cmd  
+                }).then((res) => {
+                    this.url = res
+                })
+                .catch((err) => {
+                    console.log(err)
                         this.connectError = true
-                        this.config.desc = err.message || 'Illegal name for mirroring or other errors'
-                    } else {
-                        this.$bkMessage({
-                            theme: 'error',
-                            message: err.message || err
-                        })
-                    }
-                }
+                        this.config.desc = err.message || this.$t('editPage.docker.failDesc')
+                })
             },
             async stopDebug () {
                 const content = 'You will leave this page after stop debugging sucessfully'
@@ -128,9 +109,7 @@
                     confirmLoading: true,
                     confirmFn: async () => {
                         try {
-                            if (this.consoleType === 'DOCKER') {
-                                await pipelines.stopDebugDocker(this.projectId, this.pipelineId, this.vmSeqId)
-                            }
+                            await pipelines.stopDebugDocker(this.projectId, this.pipelineId, this.vmSeqId)
                             this.$router.push({
                                 name: 'pipelineDetail',
                                 params: {
@@ -149,24 +128,6 @@
                         }
                     }
                 })
-            },
-            async getLinkDetail (containerId, targetIp) {
-                try {
-                    if (!containerId || !targetIp) {
-                        throw Error('Abnormal parameters')
-                    }
-                    const cmd = ['/bin/bash']
-                    const execId = await pipelines.getDockerExecId(containerId, this.projectId, this.pipelineId, cmd, targetIp)
-                    this.execId = execId
-                    this.resizeUrl = `docker-console-resize?pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIp=${targetIp}`
-                    const protocol = document.location.protocol === 'https:' ? 'wss:' : 'ws:'
-                    this.url = `${protocol}//${PROXY_URL_PREFIX}/docker-console-new?eventId=${execId}&pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIP=${targetIp}&containerId=${containerId}`
-                } catch (err) {
-                    this.$bkMessage({
-                        message: err.message,
-                        theme: 'error'
-                    })
-                }
             },
             addLeaveListenr () {
                 window.addEventListener('beforeunload', this.leaveSure)
