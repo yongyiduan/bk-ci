@@ -10,7 +10,7 @@
             <section class="setting-main">
                 <section>
                 <section class="main-checkbox">
-                    <bk-checkbox v-model="ticket.allowAcrossProject" class="basic-item">allow cross-repository use</bk-checkbox>
+                    <bk-checkbox v-model="ticket.allowAcrossProject" class="basic-item">Allow cross-repository use</bk-checkbox>
                 </section>
                 <p class="main-desc">Credential can be referenced across repositories when it's used in template.</p>
                 </section>
