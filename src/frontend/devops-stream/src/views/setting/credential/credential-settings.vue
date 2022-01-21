@@ -12,7 +12,7 @@
                 <section class="main-checkbox">
                     <bk-checkbox v-model="ticket.allowAcrossProject" class="basic-item">allow cross-repository use</bk-checkbox>
                 </section>
-                <p class="main-desc">Config merge request</p>
+                <p class="main-desc">Credential can be referenced across repositories when it's used in template.</p>
                 </section>
                 <bk-button class="basic-btn" @click="saveSetting" :loading="isSaving">Save</bk-button>
             </section>
