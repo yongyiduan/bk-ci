@@ -9,4 +9,4 @@ spring:
       name: rds
 
 server:
-  port: 219488
+  port: 21954
