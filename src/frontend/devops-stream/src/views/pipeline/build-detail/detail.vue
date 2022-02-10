@@ -76,7 +76,7 @@
 <script>
     import { mapState } from 'vuex'
     import { pipelines } from '@/http'
-    import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag } from '@/utils'
+    import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag, goIssue } from '@/utils'
     import stages from '@/components/stages'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import register from '@/utils/websocket-register'
@@ -237,6 +237,8 @@
                             case 'merge_request':
                                 goMR(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
                                 break
+                            case 'issue':
+                                goIssue(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
                         }
                         break
                 }

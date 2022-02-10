@@ -155,6 +155,12 @@ export function goYaml (projectUrl, branch, yamlName) {
     }
 }
 
+export function goIssue (projectUrl, issueId) {
+    if (issueId) {
+        window.open(`${projectUrl}/issues/${issueId}`, '_blank')
+    }
+}
+
 export function preciseDiff (duration) {
     if (!duration) return '--'
     const durationDate = moment.duration(Math.abs(duration))
@@ -195,7 +201,8 @@ export function getbuildTypeIcon (objectKind, operationKind) {
         tag_push: 'tag',
         merge_request: 'merge',
         schedule: 'clock_fill',
-        openApi: 'open-api'
+        openApi: 'open-api',
+        issue: 'issue'
     }
     return operationKindMap[operationKind] || objectKindIconMap[objectKind] || 'well'
 }
@@ -251,6 +258,9 @@ export function getBuildSource (gitRequestEvent = {}) {
                     break
                 case 'schedule':
                     res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
+                    break
+                case 'issue':
+                    res = `[!${gitRequestEvent.mergeRequestId}]`
                     break
             }
             break
