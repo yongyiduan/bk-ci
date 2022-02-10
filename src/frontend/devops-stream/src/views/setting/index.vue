@@ -70,6 +70,7 @@
                         settingIndex = 0
                         break
                     case 'credentialList':
+                    case 'credentialSettings':
                         settingIndex = 1
                         break
                     case 'agentPools':

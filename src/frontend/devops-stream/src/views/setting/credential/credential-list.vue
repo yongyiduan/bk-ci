@@ -18,9 +18,10 @@
             <bk-table-column label="Display Name" prop="credentialName"></bk-table-column>
             <bk-table-column label="Type" prop="credentialType"></bk-table-column>
             <bk-table-column label="Description" prop="credentialRemark"></bk-table-column>
-            <bk-table-column label="Operation" width="150" class-name="handler-btn">
+            <bk-table-column label="Operation" width="200" class-name="handler-btn">
                 <template slot-scope="props">
                     <span :class="{ 'update-btn': true, disabled: !props.row.permissions.edit }" @click="editCredential(props.row)">Edit</span>
+                    <span :class="{ 'update-btn': true, disabled: !props.row.permissions.edit }" @click="credentialSetting(props.row.credentialId)">Settings</span>
                     <span :class="{ 'update-btn': true, disabled: !props.row.permissions.delete }" @click="deleteCredential(props.row)">Delete</span>
                 </template>
             </bk-table-column>
@@ -123,6 +124,15 @@
                 if (!row.permissions.edit) return
                 this.form = row
                 this.show = true
+            },
+
+            credentialSetting (id) {
+                this.$router.push({
+                    name: 'credentialSettings',
+                    params: {
+                        credentialId: id
+                    }
+                })
             },
 
             deleteCredential (row) {

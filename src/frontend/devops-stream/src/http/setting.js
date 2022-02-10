@@ -18,12 +18,20 @@ export default {
         return api.get(`${TICKET_PERFIX}/user/credentials/${projectId}`, { params })
     },
 
+    getTicketDetail (projectId, credentialId) {
+        return api.get(`${TICKET_PERFIX}/user/credentials/${projectId}/${credentialId}`)
+    },
+
     createTicket (projectId, params) {
         return api.post(`${TICKET_PERFIX}/user/credentials/${projectId}`, params)
     },
 
     modifyTicket (projectId, params, credentialId) {
         return api.put(`${TICKET_PERFIX}/user/credentials/${projectId}/${credentialId}`, params)
+    },
+
+    updateTicketSetting (projectId, params, credentialId) {
+        return api.put(`${TICKET_PERFIX}/user/credentials/${projectId}/${credentialId}/setting`, params)
     },
 
     deleteTicket (projectId, credentialId) {

@@ -24,7 +24,8 @@ const buildConfig = () => import(/* webpackChunkName: 'buildDetail' */'@/views/p
 const webConsole = () => import(/* webpackChunkName: "webConsole" */'@/views/pipeline/web-console.vue')
 const setting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/index')
 const basicSetting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/basic')
-const credentialList = () => import(/* webpackChunkName: 'credential' */'@/views/setting/credential')
+const credentialList = () => import(/* webpackChunkName: 'credential' */'@/views/setting/credential/credential-list')
+const credentialSettings = () => import(/* webpackChunkName: 'credential' */'@/views/setting/credential/credential-settings')
 const agentPools = () => import(/* webpackChunkName: 'pool' */'@/views/setting/agent-pools/index')
 const poolSettings = () => import(/* webpackChunkName: 'pool' */'@/views/setting/agent-pools/pool-settings')
 const addAgent = () => import(/* webpackChunkName: 'agent' */'@/views/setting/agent-pools/add-agent')
@@ -119,6 +120,11 @@ const routes = [
                                 path: 'credential',
                                 name: 'credentialList',
                                 component: credentialList
+                            },
+                            {
+                                path: 'credential/:credentialId',
+                                name: 'credentialSettings',
+                                component: credentialSettings
                             },
                             {
                                 path: 'agent-pools',
