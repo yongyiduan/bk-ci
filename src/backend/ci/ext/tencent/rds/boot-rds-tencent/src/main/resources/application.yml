@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: rds
+    desc: DevOps rds Service
+    version: 4.0.0
+    packageName: com.tencent.devops.rds
+  cloud:
+    config:
+      name: rds
+
+server:
+  port: 219488
