@@ -476,7 +476,7 @@
                             case 'review':
                                 break
                             case 'issue':
-                                res = `Issue [${gitRequestEvent.mergeRequestId}] extend action by ${gitRequestEvent.userId}`
+                                res = `Issue [${gitRequestEvent.mergeRequestId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
                                 break
                         }
                         break
