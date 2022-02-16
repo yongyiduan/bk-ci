@@ -1266,10 +1266,10 @@
   resolved "https://registry.yarnpkg.com/@icon-cool/bk-icon-devops/-/bk-icon-devops-0.1.14.tgz#052f4dc45dcc182934295b4f65031332d2dfa320"
   integrity sha512-4XX39OXbtAVsKxaWmBIeg4OVzfQpS2vstvYTRjNMNyf3WwJWvl9T4RrZHN9g9Gje87E0V4GDwYU3pd+vZ4ETyA==
 
-"@icon-cool/bk-icon-devops@^0.1.17":
-  version "0.1.19"
-  resolved "http://r.tnpm.oa.com/@icon-cool%2fbk-icon-devops/-/bk-icon-devops-0.1.19.tgz#b77f83dfb47f9c4ad2ee6d9c86b08c442ae14237"
-  integrity sha512-KvVlLnKuPRtXWdQHkmdLLaBVLM41FINdkKmzC4VhGSTHB0FZDQGxgJ5Bt4WkdQkIBqMcyNWA2Ntq+ICy8aYoug==
+"@icon-cool/bk-icon-devops@^0.2.1":
+  version "0.2.1"
+  resolved "https://mirrors.tencent.com/npm/@icon-cool%2fbk-icon-devops/-/bk-icon-devops-0.2.1.tgz#7f88392d3172face36a3d5b2b2a335f05a0ca3ba"
+  integrity sha512-Rd2c5On1qC+6TpJnX1oObRc35KJyg+zfByuYskTFCRLq9sgbE3C64nAZA8QV1YRFPi5iqqa4w2LAeZBHBajCrg==
 
 "@lerna/add@3.17.0":
   version "3.17.0"
@@ -3183,10 +3183,10 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
 
-bk-magic-vue@2.3.0:
-  version "2.3.0"
-  resolved "https://mirrors.tencent.com/npm/@tencent/bk-magic-vue/-/@tencent/bk-magic-vue-2.3.0.tgz#5d9c29559d83efb668d1c3fec68293dd15a43b0e"
-  integrity sha512-Bt5MUfzPPuxnThZQ/mgX2KTUQRUXl+QpEI8wpSI4TZA1Tvb5d5+zvXHOJZmmJ4aYtmDaAKwyE2h2MSJYPh6GgQ==
+bk-magic-vue@2.4.4:
+  version "2.4.4"
+  resolved "https://mirrors.tencent.com/npm/@tencent/bk-magic-vue/-/@tencent/bk-magic-vue-2.4.4.tgz#c9694ca03082b510cc430fac9a3ff7f17ee9f723"
+  integrity sha512-N1/UNaQxmNRAUgPxNZoUQ4tSLDSPr20ykyn9QmvWbgAjPCNrYrQxs93O3KvXpqjUG8sRJQBhx1EqLPB2jNpVOg==
   dependencies:
     highlight.js "^10.7.2"
     tinycolor2 "^1.4.1"

@@ -191,7 +191,8 @@
                     })
                     this.execId = execId
                     this.resizeUrl = `docker-console-resize?pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIp=${targetIp}`
-                    this.url = `ws:${PROXY_URL_PREFIX}/docker-console-new?eventId=${execId}&pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIP=${targetIp}&containerId=${containerId}`
+                    const protocol = document.location.protocol === 'https:' ? 'wss:' : 'ws:'
+                    this.url = `${protocol}${PROXY_URL_PREFIX}/docker-console-new?eventId=${execId}&pipelineId=${this.pipelineId}&projectId=${this.projectId}&targetIP=${targetIp}&containerId=${containerId}`
                 } catch (err) {
                     this.$showTips({
                         message: err.message,

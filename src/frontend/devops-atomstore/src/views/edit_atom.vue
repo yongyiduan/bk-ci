@@ -1,16 +1,32 @@
 <template>
-    <div class="edit-atom-wrapper" v-bkloading="{ isLoading: loading.isLoading, title: loading.title }">
-        <bread-crumbs :bread-crumbs="navList" type="atom">
-            <a class="g-title-work" target="_blank" :href="docsLink"> {{ $t('store.插件指引') }} </a>
+    <div
+        class="edit-atom-wrapper"
+        v-bkloading="{ isLoading: loading.isLoading, title: loading.title }"
+    >
+        <bread-crumbs
+            :bread-crumbs="navList"
+            type="atom"
+        >
+            <a
+                class="g-title-work"
+                target="_blank"
+                :href="docsLink"
+            > {{ $t('store.插件指引') }} </a>
         </bread-crumbs>
 
-        <div class="edit-atom-content" v-if="showContent">
-            <form class="bk-form edit-atom-form g-form-radio">
+        <div
+            class="edit-atom-content"
+            v-if="showContent"
+        >
+            <div class="bk-form edit-atom-form g-form-radio">
                 <div class="bk-form-item name-form-item is-required">
                     <label class="bk-label"> {{ $t('store.名称') }} </label>
                     <div class="bk-form-content atom-item-content is-tooltips">
                         <div style="width: 40%;">
-                            <input type="text" class="bk-form-input atom-name-input" :placeholder="$t('store.请输入中英文名称')"
+                            <input
+                                type="text"
+                                class="bk-form-input atom-name-input"
+                                :placeholder="$t('store.请输入中英文名称')"
                                 ref="atomName"
                                 name="atomName"
                                 v-model="atomForm.name"
@@ -18,7 +34,8 @@
                                     required: true,
                                     max: 20
                                 }"
-                                :class="{ 'is-danger': errors.has('atomName') }">
+                                :class="{ 'is-danger': errors.has('atomName') }"
+                            >
                             <p :class="errors.has('atomName') ? 'error-tips' : 'normal-tips'">{{ errors.first("atomName") }}</p>
                         </div>
                         <bk-popover placement="right">
@@ -29,60 +46,118 @@
                         </bk-popover>
                     </div>
                 </div>
-                <div class="bk-form-item is-required" ref="categoryError">
+                <div
+                    class="bk-form-item is-required"
+                    ref="categoryError"
+                >
                     <label class="bk-label category-label"> {{ $t('store.范畴') }} </label>
                     <div class="bk-form-content atom-item-content">
-                        <bk-radio-group v-model="atomForm.category" class="radio-group">
-                            <bk-radio :value="entry.value" v-for="(entry, key) in categoryList" :key="key" @click.native="formErrors.categoryError = false">{{entry.label}}</bk-radio>
+                        <bk-radio-group
+                            v-model="atomForm.category"
+                            class="radio-group"
+                        >
+                            <bk-radio
+                                :value="entry.value"
+                                v-for="(entry, key) in categoryList"
+                                :key="key"
+                                @click.native="formErrors.categoryError = false"
+                            >{{entry.label}}</bk-radio>
                         </bk-radio-group>
-                        <div v-if="formErrors.categoryError" class="error-tips"> {{ $t('store.字段有误，请重新选择') }} </div>
+                        <div
+                            v-if="formErrors.categoryError"
+                            class="error-tips"
+                        > {{ $t('store.字段有误，请重新选择') }} </div>
                     </div>
                 </div>
-                <div class="bk-form-item  is-required" ref="sortError">
+                <div
+                    class="bk-form-item  is-required"
+                    ref="sortError"
+                >
                     <label class="bk-label"> {{ $t('store.分类') }} </label>
                     <div class="bk-form-content atom-item-content atom-classify-content">
-                        <bk-select v-model="atomForm.classifyCode" @selected="changeClassify" style="width: 40%;" searchable :clearable="false">
-                            <bk-option v-for="(option, index) in sortList"
+                        <bk-select
+                            v-model="atomForm.classifyCode"
+                            @selected="changeClassify"
+                            style="width: 40%;"
+                            searchable
+                            :clearable="false"
+                        >
+                            <bk-option
+                                v-for="(option, index) in sortList"
                                 :key="index"
                                 :id="option.classifyCode"
-                                :name="option.classifyName">
+                                :name="option.classifyName"
+                            >
                             </bk-option>
                         </bk-select>
-                        <div v-if="formErrors.sortError" class="error-tips"> {{ $t('store.分类不能为空') }} </div>
+                        <div
+                            v-if="formErrors.sortError"
+                            class="error-tips"
+                        > {{ $t('store.分类不能为空') }} </div>
                     </div>
                 </div>
-                <div class="bk-form-item is-required" ref="jobError">
+                <div
+                    class="bk-form-item is-required"
+                    ref="jobError"
+                >
                     <label class="bk-label env-label"> {{ $t('store.适用Job类型') }} </label>
                     <div class="bk-form-content atom-item-content">
-                        <bk-radio-group v-model="atomForm.jobType" class="radio-group">
-                            <bk-radio :value="entry.value" v-for="(entry, key) in jobTypeList" :key="key" @click.native="changeJobType">{{entry.label}}</bk-radio>
+                        <bk-radio-group
+                            v-model="atomForm.jobType"
+                            class="radio-group"
+                        >
+                            <bk-radio
+                                :value="entry.value"
+                                v-for="(entry, key) in jobTypeList"
+                                :key="key"
+                                @click.native="changeJobType"
+                            >{{entry.label}}</bk-radio>
                         </bk-radio-group>
-                        <div v-if="formErrors.jobError" class="error-tips"> {{ $t('store.字段有误，请重新选择') }} </div>
+                        <div
+                            v-if="formErrors.jobError"
+                            class="error-tips"
+                        > {{ $t('store.字段有误，请重新选择') }} </div>
                     </div>
                 </div>
-                <bk-checkbox-group v-model="atomForm.os" v-if="atomForm.jobType === 'AGENT'" class="bk-form-content atom-os" ref="envError">
-                    <bk-checkbox :value="entry.value" v-for="(entry, key) in envList" :key="key" @click.native="changeOs(entry.value)">
+                <bk-checkbox-group
+                    v-model="atomForm.os"
+                    v-if="atomForm.jobType === 'AGENT'"
+                    class="bk-form-content atom-os"
+                    ref="envError"
+                >
+                    <bk-checkbox
+                        :value="entry.value"
+                        v-for="(entry, key) in envList"
+                        :key="key"
+                        @click.native="changeOs(entry.value)"
+                    >
                         <p class="os-checkbox-label">
                             <i :class="{ 'devops-icon': true, [`icon-${entry.icon}`]: true }"></i>
                             <span class="bk-checkbox-text">{{ entry.label }}</span>
                         </p>
                     </bk-checkbox>
                 </bk-checkbox-group>
-                <div v-if="formErrors.envError" class="error-tips env-error"> {{ $t('store.需要选择编译环境') }} </div>
+                <div
+                    v-if="formErrors.envError"
+                    class="error-tips env-error"
+                > {{ $t('store.需要选择编译环境') }} </div>
                 <div class="bk-form-item">
                     <label class="bk-label"> {{ $t('store.功能标签') }} </label>
                     <div class="bk-form-content template-item-content">
-                        <bk-select :placeholder="$t('store.请选择功能标签')"
+                        <bk-select
+                            :placeholder="$t('store.请选择功能标签')"
                             v-model="atomForm.labelIdList"
                             @selected="changeClassify"
                             show-select-all
                             searchable
                             multiple
                         >
-                            <bk-option v-for="(option, index) in labelList"
+                            <bk-option
+                                v-for="(option, index) in labelList"
                                 :key="index"
                                 :id="option.id"
-                                :name="option.labelName">
+                                :name="option.labelName"
+                            >
                             </bk-option>
                         </bk-select>
                     </div>
@@ -90,7 +165,10 @@
                 <div class="bk-form-item introduction-form-item is-required">
                     <label class="bk-label"> {{ $t('store.简介') }} </label>
                     <div class="bk-form-content atom-item-content is-tooltips">
-                        <input type="text" class="bk-form-input atom-introduction-input" :placeholder="$t('store.插件一句话简介，不超过70个字符')"
+                        <input
+                            type="text"
+                            class="bk-form-input atom-introduction-input"
+                            :placeholder="$t('store.插件一句话简介，不超过70个字符')"
                             name="introduction"
                             maxlength="70"
                             v-model="atomForm.summary"
@@ -98,7 +176,8 @@
                                 required: true,
                                 max: 70
                             }"
-                            :class="{ 'is-danger': errors.has('introduction') }">
+                            :class="{ 'is-danger': errors.has('introduction') }"
+                        >
                         <bk-popover placement="left">
                             <i class="devops-icon icon-info-circle"></i>
                             <template slot="content">
@@ -112,7 +191,9 @@
                 <div class="bk-form-item remark-form-item">
                     <label class="bk-label"> {{ $t('store.详细描述') }} </label>
                     <div class="bk-form-content atom-item-content is-tooltips">
-                        <mavon-editor class="atom-remark-input" :placeholder="descTemplate"
+                        <mavon-editor
+                            class="atom-remark-input"
+                            :placeholder="descTemplate"
                             ref="mdHook"
                             v-model="atomForm.description"
                             :toolbars="toolbarOptions"
@@ -137,11 +218,22 @@
                         <p class="form-title"> {{ $t('store.配置') }} </p>
                         <hr class="cut-line">
                     </div>
-                    <div class="bk-form-item is-required" ref="categoryError">
+                    <div
+                        class="bk-form-item is-required"
+                        ref="categoryError"
+                    >
                         <label class="bk-label category-label"> {{ $t('store.自定义前端') }} </label>
                         <div class="bk-form-content atom-item-content">
-                            <bk-radio-group v-model="atomForm.frontendType" class="radio-group">
-                                <bk-radio :value="entry.value" :title="entry.title" v-for="(entry, key) in frontendTypeList" :key="key">{{entry.label}}</bk-radio>
+                            <bk-radio-group
+                                v-model="atomForm.frontendType"
+                                class="radio-group"
+                            >
+                                <bk-radio
+                                    :value="entry.value"
+                                    :title="entry.title"
+                                    v-for="(entry, key) in frontendTypeList"
+                                    :key="key"
+                                >{{entry.label}}</bk-radio>
                             </bk-radio-group>
                         </div>
                     </div>
@@ -153,24 +245,47 @@
                 <div class="bk-form-item name-form-item is-required">
                     <label class="bk-label"> {{ $t('store.发布者') }} </label>
                     <div class="bk-form-content atom-item-content">
-                        <input type="text" class="bk-form-input atom-name-input" :placeholder="$t('store.请输入')"
+                        <input
+                            type="text"
+                            class="bk-form-input atom-name-input"
+                            :placeholder="$t('store.请输入')"
                             name="publisher"
                             v-model="atomForm.publisher"
                             v-validate="{
                                 required: true,
                                 max: 20
                             }"
-                            :class="{ 'is-danger': errors.has('publisher') }">
+                            :class="{ 'is-danger': errors.has('publisher') }"
+                        >
                         <p :class="errors.has('publisher') ? 'error-tips' : 'normal-tips'">{{ errors.first("publisher") }}</p>
                     </div>
                 </div>
-                <div class="bk-form-item publish-form-item is-required" ref="releaseTypeError" v-if="atomForm.releaseType !== 'CANCEL_RE_RELEASE'">
+                <div
+                    class="bk-form-item publish-form-item is-required"
+                    ref="releaseTypeError"
+                    v-if="atomForm.releaseType !== 'CANCEL_RE_RELEASE'"
+                >
                     <label class="bk-label publish-type-label"> {{ $t('store.发布类型') }} </label>
                     <div class="bk-form-content atom-item-content is-tooltips radio-flex">
-                        <section v-if="atomForm.version" style="min-width: 100%;">
-                            <bk-radio-group v-model="atomForm.releaseType" class="radio-group">
-                                <bk-radio :value="entry.value" v-for="(entry, key) in publishTypeList" :key="key" @click.native="formErrors.releaseTypeError = false">
-                                    <bk-popover placement="top" :delay="800" style="margin-top:0;margin-left:0;">
+                        <section
+                            v-if="atomForm.releaseType !== 'NEW'"
+                            style="min-width: 100%;"
+                        >
+                            <bk-radio-group
+                                v-model="atomForm.releaseType"
+                                class="radio-group"
+                            >
+                                <bk-radio
+                                    :value="entry.value"
+                                    v-for="(entry, key) in publishTypeList"
+                                    :key="key"
+                                    @click.native="formErrors.releaseTypeError = false"
+                                >
+                                    <bk-popover
+                                        placement="top"
+                                        :delay="800"
+                                        style="margin-top:0;margin-left:0;"
+                                    >
                                         <span class="bk-radio-text">{{entry.label}}</span>
                                         <template slot="content">
                                             <p>{{ entry.desc }}</p>
@@ -178,32 +293,84 @@
                                     </bk-popover>
                                 </bk-radio>
                             </bk-radio-group>
-                            <div v-if="formErrors.releaseTypeError" class="error-tips"> {{ $t('store.发布类型不能为空') }} </div>
+                            <div
+                                v-if="formErrors.releaseTypeError"
+                                class="error-tips"
+                            > {{ $t('store.发布类型不能为空') }} </div>
                         </section>
-                        <section v-else style="min-width: 100%;">
-                            <bk-radio-group v-model="atomForm.releaseType" class="radio-group">
-                                <bk-radio :value="entry.value" v-for="(entry, key) in publishShelf" :key="key" @click.native="formErrors.releaseTypeError = false">{{entry.label}}</bk-radio>
+                        <section
+                            v-else
+                            style="min-width: 100%;"
+                        >
+                            <bk-radio-group
+                                v-model="atomForm.releaseType"
+                                class="radio-group"
+                            >
+                                <bk-radio
+                                    :value="entry.value"
+                                    v-for="(entry, key) in publishShelf"
+                                    :key="key"
+                                    @click.native="formErrors.releaseTypeError = false"
+                                >{{entry.label}}</bk-radio>
                             </bk-radio-group>
-                            <div v-if="formErrors.releaseTypeError" class="error-tips"> {{ $t('store.发布类型不能为空') }} </div>
+                            <div
+                                v-if="formErrors.releaseTypeError"
+                                class="error-tips"
+                            > {{ $t('store.发布类型不能为空') }} </div>
                         </section>
                     </div>
                 </div>
-                <div class="bk-form-item version-num-form-item is-required" style="margin-top: 10px">
+                <bk-alert
+                    v-if="atomForm.releaseType === 'HIS_VERSION_UPGRADE'"
+                    class="history-version-tip"
+                    type="warning"
+                    :title="$t('store.hisUpgradeTips')"
+                ></bk-alert>
+                <div
+                    class="bk-form-item version-num-form-item is-required"
+                    style="margin-top: 10px"
+                >
                     <label class="bk-label"> {{ $t('store.版本号') }} </label>
                     <div class="bk-form-content atom-item-content is-tooltips">
-                        <p class="version-num-content" style="min-width: 100%;">
-                            <span class="version-prompt"> {{ $t('store.semverType', [curVersion]) }} </span>
-                            <span class="version-modify" @click="atomForm.releaseType = 'COMPATIBILITY_FIX'" v-if="atomForm.releaseType === 'CANCEL_RE_RELEASE'"> {{ $t('store.修改') }} </span>
-                        </p>
-                        <bk-popover placement="left">
-                            <i class="devops-icon icon-info-circle"></i>
-                            <template slot="content">
-                                <p> {{ $t('store.根据发布类型自动生成') }} </p>
-                            </template>
-                        </bk-popover>
+                        <bk-input
+                            v-model="curVersion"
+                            v-if="atomForm.releaseType === 'HIS_VERSION_UPGRADE'"
+                        ></bk-input>
+                        <template v-else>
+                            <p
+                                class="version-num-content"
+                                style="min-width: 100%;"
+                            >
+                                <span class="version-prompt"> {{ $t('store.semverType', [curVersion]) }} </span>
+                                <span
+                                    class="version-modify"
+                                    @click="atomForm.releaseType = 'COMPATIBILITY_FIX'"
+                                    v-if="atomForm.releaseType === 'CANCEL_RE_RELEASE'"
+                                > {{ $t('store.修改') }} </span>
+                            </p>
+                            <bk-popover placement="left">
+                                <i class="devops-icon icon-info-circle"></i>
+                                <template slot="content">
+                                    <p> {{ $t('store.根据发布类型自动生成') }} </p>
+                                </template>
+                            </bk-popover>
+                        </template>
                     </div>
                 </div>
-                <div class="bk-form-item release-package-form-item is-required" style="margin-top: 10px" v-if="isEnterprise">
+                <div
+                    class="bk-form-item version-num-form-item is-required"
+                    style="margin-top: 10px"
+                    v-if="isEnterprise || atomForm.releaseType === 'HIS_VERSION_UPGRADE'"
+                >
+                    <label class="bk-label"> {{ $t('store.分支') }} </label>
+                    <div class="bk-form-content atom-item-content is-tooltips">
+                        <bk-input v-model="atomForm.branch"></bk-input>
+                    </div>
+                </div>
+                <div
+                    class="bk-form-item release-package-form-item is-required"
+                    v-if="isEnterprise"
+                >
                     <label class="bk-label"> {{ $t('store.发布包') }} </label>
                     <div class="bk-form-content atom-item-content">
                         <bk-file-upload
@@ -215,13 +382,17 @@
                             @uploadSuccess="uploadPackageSuccess"
                             @uploadFail="uploadPackageErr"
                         ></bk-file-upload>
-                        <div v-if="formErrors.releasePackageError" class="error-tips"> {{ $t('store.发布包不能为空') }} </div>
+                        <div
+                            v-if="formErrors.releasePackageError"
+                            class="error-tips"
+                        > {{ $t('store.发布包不能为空') }} </div>
                     </div>
                 </div>
                 <div class="bk-form-item versionlog-form-item is-required">
                     <label class="bk-label"> {{ $t('store.版本日志') }} </label>
                     <div class="bk-form-content atom-item-content">
-                        <mavon-editor :class="{ 'is-danger': errors.has('versionContent'), 'atom-remark-input': true }"
+                        <mavon-editor
+                            :class="{ 'is-danger': errors.has('versionContent'), 'atom-remark-input': true }"
                             ref="versionMd"
                             v-model="atomForm.versionContent"
                             :toolbars="toolbarOptions"
@@ -238,11 +409,19 @@
                     </div>
                 </div>
                 <div class="form-footer">
-                    <button class="bk-button bk-primary" type="button" @click="submit()"> {{ $t('store.提交') }} </button>
-                    <button class="bk-button bk-default" type="button" @click="$router.back()"> {{ $t('store.取消') }} </button>
+                    <bk-button
+                        theme="primary"
+                        @click="submit()"
+                    > {{ $t('store.提交') }} </bk-button>
+                    <bk-button @click="$router.back()"> {{ $t('store.取消') }} </bk-button>
                 </div>
-                <select-logo :form="atomForm" type="ATOM" :is-err="formErrors.logoUrlError" ref="logoUrlError"></select-logo>
-            </form>
+                <select-logo
+                    :form="atomForm"
+                    type="ATOM"
+                    :is-err="formErrors.logoUrlError"
+                    ref="logoUrlError"
+                ></select-logo>
+            </div>
         </div>
     </div>
 </template>
@@ -252,6 +431,7 @@
     import { toolbars } from '@/utils/editor-options'
     import bkFileUpload from '@/components/common/file-upload'
     import breadCrumbs from '@/components/bread-crumbs.vue'
+    import api from '@/api'
 
     export default {
         components: {
@@ -301,6 +481,11 @@
                         label: this.$t('store.兼容式问题修正'),
                         value: 'COMPATIBILITY_FIX',
                         desc: this.$t('store.当新版本为bug fix时，使用兼容式问题修正方式，发布后用户无需修改流水线中的插件版本号，默认使用最新版本。')
+                    },
+                    {
+                        label: this.$t('store.历史大版本问题修复'),
+                        value: 'HIS_VERSION_UPGRADE',
+                        desc: this.$t('store.当历史大版本下发现 bug 时，使用此方式进行 fix。不建议在此场景下新增/删除入参。')
                     }
                 ],
                 frontendTypeList: [
@@ -331,7 +516,8 @@
                     version: '1.0.0',
                     releaseType: 'NEW',
                     versionContent: '',
-                    visibilityLevel: 'LOGIN_PUBLIC'
+                    visibilityLevel: 'LOGIN_PUBLIC',
+                    branch: ''
                 },
                 formErrors: {
                     categoryError: false,
@@ -341,7 +527,8 @@
                     sortError: false,
                     envError: false,
                     releaseTypeError: false
-                }
+                },
+                versionMap: {}
             }
         },
         computed: {
@@ -389,23 +576,7 @@
             },
 
             'atomForm.releaseType' (val) {
-                const tpl = ['INCOMPATIBILITY_UPGRADE', 'COMPATIBILITY_UPGRADE', 'COMPATIBILITY_FIX']
-                let temp = this.atomForm.version.split('.')
-
-                for (let i = 0; i < temp.length; i++) {
-                    if (tpl[i] === val) {
-                        temp[i] = (parseInt(temp[i]) + 1).toString()
-                    }
-                }
-                if (val === 'INCOMPATIBILITY_UPGRADE') {
-                    temp[1] = '0'
-                    temp[2] = '0'
-                } else if (val === 'COMPATIBILITY_UPGRADE') {
-                    temp[2] = '0'
-                } else if (val === 'CANCEL_RE_RELEASE') {
-                    temp = this.atomForm.version.split('.')
-                }
-                this.curVersion = temp.join('.')
+                this.curVersion = this.versionMap[val] || ''
                 this.formErrors.releaseTypeError = false
             }
         },
@@ -450,43 +621,24 @@
                     const res = await this.$store.dispatch('store/requestAtomDetail', {
                         atomId: atomId
                     })
+                    const { showVersionList } = await api.requestAtomVersionDetail(res.atomCode)
                     if (res) {
                         Object.assign(this.atomForm, res, {})
-                        this.curVersion = res.version
                         this.atomForm.jobType = !this.atomForm.jobType ? 'AGENT' : this.atomForm.jobType
                         this.initJobType = this.atomForm.jobType
-                        this.atomForm.labelIdList = this.atomForm.labelList.map(item => {
+                        this.atomForm.labelIdList = (this.atomForm.labelList || []).map(item => {
                             return item.id
                         })
                         this.initOs = JSON.parse(JSON.stringify(this.atomForm.os))
-
-                        if (res.version) {
-                            let status = ''
-                            switch (res.atomStatus) {
-                                case 'GROUNDING_SUSPENSION':
-                                    status = 'CANCEL_RE_RELEASE'
-                                    break
-                                default: {
-                                    const types = {
-                                        NEW: 'INCOMPATIBILITY_UPGRADE',
-                                        INCOMPATIBILITY_UPGRADE: 'INCOMPATIBILITY_UPGRADE',
-                                        COMPATIBILITY_UPGRADE: 'COMPATIBILITY_UPGRADE',
-                                        COMPATIBILITY_FIX: 'COMPATIBILITY_FIX'
-                                    }
-                                    status = types[res.releaseType] || 'COMPATIBILITY_FIX'
-                                    break
-                                }
+                        // init version
+                        showVersionList.forEach((versionInfo) => {
+                            this.versionMap[versionInfo.releaseType] = versionInfo.version
+                            if (versionInfo.defaultFlag) {
+                                this.curVersion = versionInfo.version
+                                this.atomForm.releaseType = versionInfo.releaseType
+                                this.initReleaseType = versionInfo.releaseType
                             }
-                            this.$set(this.atomForm, 'releaseType', status)
-
-                            const temp = this.atomForm.version.split('.')
-                            temp[0] = (parseInt(temp[0]) + 1).toString()
-                            this.curVersion = temp.join('.')
-                        } else {
-                            this.curVersion = '1.0.0'
-                        }
-
-                        this.initReleaseType = this.atomForm.releaseType
+                        })
                     }
                 } catch (err) {
                     const message = err.message ? err.message : err
@@ -691,7 +843,8 @@
                         packageShaContent: this.atomForm.packageShaContent,
                         pkgName: this.atomForm.pkgName,
                         frontendType: this.atomForm.frontendType,
-                        fieldCheckConfirmFlag
+                        fieldCheckConfirmFlag,
+                        branch: this.atomForm.branch
                     }
 
                     return this.$store.dispatch('store/editAtom', {
@@ -746,6 +899,10 @@
     @import '@/assets/scss/conf.scss';
     .atom-item-content {
         max-width: calc(100% - 110px);
+    }
+
+    .history-version-tip {
+        margin: 5px 0 0 110px;
     }
 
     .edit-atom-wrapper {

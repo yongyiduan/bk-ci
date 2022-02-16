@@ -55,4 +55,5 @@ interface Project {
     enabled?: boolean
     logoAddr?: string
     gray?: boolean
+    routerTag?: string
 }

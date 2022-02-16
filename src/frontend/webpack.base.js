@@ -22,7 +22,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
         devtool: 'eval-cheap-module-source-map',
         entry,
         output: {
-            publicPath: isDev ? `http://dev.static.devops.oa.com${publicPath}` : publicPath,
+            publicPath: isDev ? `//dev-static.devops.woa.com${publicPath}` : publicPath,
             chunkFilename: '[name].[chunkhash].js',
             filename: '[name].[contenthash].min.js',
             path: buildDist,
@@ -74,6 +74,9 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
                         dataUrlCondition: {
                             maxSize: 8 * 1024
                         }
+                    },
+                    generator: {
+                        filename: '[name].[contenthash].[ext]'
                     }
                 }
                 
@@ -114,7 +117,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
         resolve: {
             extensions: ['.js', '.vue', '.json', '.ts', '.scss', '.css'],
             fallback: {
-                'path': false
+                path: false
             },
             alias: {
                 '@': path.resolve('src'),
@@ -122,9 +125,9 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             }
         },
         externals: {
-            'vue': 'Vue',
+            vue: 'Vue',
             'vue-router': 'VueRouter',
-            'vuex': 'Vuex'
+            vuex: 'Vuex'
         },
         devServer: {
             static: path.join(__dirname, envDist),

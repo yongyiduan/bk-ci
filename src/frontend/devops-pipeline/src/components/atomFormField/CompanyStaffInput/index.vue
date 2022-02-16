@@ -87,7 +87,7 @@
 
                 const host = location.host
                 const prefix = `${host.indexOf('o.ied.com') > -1 ? OIED_URL : OPEN_URL}/component/compapi/tof3`
-                
+
                 const config = {
                     url: '',
                     data: {}
@@ -126,9 +126,13 @@
                         if (res.result) {
                             const key = self.inputType === 'email' ? 'Name' : 'english_name'
                             self.initData = self.list = res.data.map(val => val[key])
-                            self.value.forEach(item => {
-                                self.list = self.list.filter(val => val.indexOf(item) === -1)
-                            })
+                            let valueMap = {}
+                            if (Array.isArray(self.value)) {
+                                valueMap = self.arrayToHashMap(self.value)
+                            } else if (typeof self.value === 'string') {
+                                valueMap = self.arrayToHashMap(self.value.split(';'))
+                            }
+                            self.list = self.list.filter(val => valueMap[val.toLowerCase()] !== 1)
                         } else {
                             console.error(res.message)
                         }
@@ -138,7 +142,12 @@
                     }
                 })
             },
-
+            arrayToHashMap (arr) {
+                return arr.reduce((acc, item) => {
+                    acc[item.toLowerCase()] = 1
+                    return acc
+                }, {})
+            },
             ajaxRequest (params) {
                 params = params || {}
                 params.data = params.data || {}
