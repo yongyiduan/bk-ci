@@ -30,6 +30,13 @@
 package com.tencent.devops.rds.chart
 
 object Values {
+
+    fun table(name: String):Map<String, Any>{
+        parsePath(name).forEach {  }
+    }
+
+    fun isTable(value: Any) = value is Map<*, *>
+
     fun parsePath(path: String) = path.split(".")
 
     fun joinPath(vararg path: String) = path.joinToString(".")
