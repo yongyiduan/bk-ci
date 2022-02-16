@@ -161,6 +161,18 @@ export function goIssue (projectUrl, issueId) {
     }
 }
 
+export function goCodeReview (projectUrl, reviewId) {
+    if (reviewId) {
+        window.open(`${projectUrl}/reviews/${reviewId}`, '_blank')
+    }
+}
+
+export function goNote (projectUrl, reviewId, nodeId) {
+    if (reviewId && nodeId) {
+        window.open(`${projectUrl}/reviews/${reviewId}#note_${nodeId}`, '_blank')
+    }
+}
+
 export function preciseDiff (duration) {
     if (!duration) return '--'
     const durationDate = moment.duration(Math.abs(duration))
@@ -202,7 +214,9 @@ export function getbuildTypeIcon (objectKind, operationKind) {
         merge_request: 'merge',
         schedule: 'clock_fill',
         openApi: 'open-api',
-        issue: 'issue'
+        issue: 'issue',
+        review: 'code-review',
+        note: 'comment'
     }
     return operationKindMap[operationKind] || objectKindIconMap[objectKind] || 'well'
 }
