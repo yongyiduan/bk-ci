@@ -274,11 +274,12 @@ class ServiceGitResourceImpl @Autowired constructor(
 
     override fun getGitCIFileTree(
         gitProjectId: Long,
-        path: String,
+        path: String?,
         token: String,
-        ref: String
+        ref: String?,
+        recursive: Boolean?
     ): Result<List<GitFileInfo>> {
-        return Result(gitService.getGitCIFileTree(gitProjectId, path, token, ref))
+        return Result(gitService.getGitCIFileTree(gitProjectId, path, token, ref, recursive))
     }
 
     override fun getRedirectUrl(authParamJsonStr: String): Result<String> {

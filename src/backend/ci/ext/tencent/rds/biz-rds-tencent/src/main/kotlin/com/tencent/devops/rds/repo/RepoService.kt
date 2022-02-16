@@ -25,17 +25,56 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.rds.repo
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.rds.pojo.repo.RepoFile
+import com.tencent.devops.rds.pojo.repo.RepoFileTreeInfo
+import com.tencent.devops.rds.pojo.repo.RepoInfo
 
-@ApiModel("rds项目的初始化信息")
-data class RdsInitInfo(
-    @ApiModelProperty("rds的chart")
-    val rdsChartName: String,
-    @ApiModelProperty("资源Yaml")
-    val resourceYaml: String,
-    @ApiModelProperty("设定值Yaml")
-    val valuesYaml: String?
-)
+/**
+ * 操作RDS的chart仓库的接口，具体实现可能为GIT或者BK_REPO或者MYSQL
+ */
+interface RepoService {
+
+    /**
+     * 根据用户的别名获取仓库的信息
+     * @param repoName 仓库别名
+     */
+    fun getRepoInfo(
+        repoName: String
+    ): RepoInfo
+
+    /**
+     * 获取访问仓库需要的凭证，目前只有工蜂的token，看后续需要是否可以干掉
+     * @param repoId 具体的仓库ID
+     */
+    fun getRepoToken(
+        repoId: String
+    ): String
+
+    /**
+     * 获取仓库中保存的文件列表
+     * @param repoId 具体的仓库ID
+     * @param path 当前需要获取的文件列表的前置路径
+     * @param ref 附加参数，在git中可以为分支，commit
+     */
+    fun getFileTree(
+        repoId: String,
+        path: String? = null,
+        ref: String? = null,
+        token: String? = null
+    ): List<RepoFileTreeInfo>
+
+    /**
+     * 获取仓库单个具体文件内容
+     * @param repoId 具体的仓库ID
+     * @param filePath 当前需要获取的文件路径
+     * @param ref 附加参数，在git中可以为分支，commit
+     */
+    fun getFile(
+        repoId: String,
+        filePath: String,
+        ref: String? = null,
+        token: String? = null
+    ): RepoFile
+}

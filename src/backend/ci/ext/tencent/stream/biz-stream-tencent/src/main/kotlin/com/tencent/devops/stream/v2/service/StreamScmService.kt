@@ -492,7 +492,8 @@ class StreamScmService @Autowired constructor(
                     gitProjectId = getProjectId(isMrEvent, gitRequestEvent),
                     path = filePath,
                     token = gitToken,
-                    ref = getTriggerBranch(gitRequestEvent.branch)
+                    ref = getTriggerBranch(gitRequestEvent.branch),
+                    recursive = null
                 ).data ?: emptyList()
             }
         )
@@ -516,7 +517,8 @@ class StreamScmService @Autowired constructor(
                         filePath
                         },
                     token = gitToken,
-                    ref = ""
+                    ref = "",
+                    recursive = null
                 ).data ?: emptyList()
             }
         )

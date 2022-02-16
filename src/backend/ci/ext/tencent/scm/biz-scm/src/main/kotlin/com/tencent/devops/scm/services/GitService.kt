@@ -698,17 +698,22 @@ class GitService @Autowired constructor(
 
     fun getGitCIFileTree(
         gitProjectId: Long,
-        path: String,
+        path: String?,
         token: String,
-        ref: String
+        ref: String?,
+        recursive: Boolean?
     ): List<GitFileInfo> {
-        logger.info("[$gitProjectId|$path|$ref] Start to get the git file tree")
+        logger.info("[$gitProjectId|$path|$ref|$recursive] Start to get the git file tree")
         val startEpoch = System.currentTimeMillis()
         try {
-            val url = "$gitCIUrl/api/v3/projects/$gitProjectId/repository/tree" +
-                "?path=${URLEncoder.encode(path, "UTF-8")}" +
-                "&ref_name=${URLEncoder.encode(ref, "UTF-8")}" +
-                "&access_token=$token"
+            val url = "$gitCIUrl/api/v3/projects/$gitProjectId/repository/tree?access_token=$token".addParams(
+                mapOf(
+                    "path" to path?.let { URLEncoder.encode(it, "UTF-8") },
+                    "ref_name" to ref?.let { URLEncoder.encode(it, "UTF-8") },
+                    "recursive" to recursive
+                )
+            )
+
             logger.info("request url: $url")
             val request = Request.Builder()
                 .url(url)
@@ -1690,5 +1695,15 @@ class GitService @Autowired constructor(
             }
             return Result(true)
         }
+    }
+
+    private fun String.addParams(args: Map<String, Any?>): String {
+        val sb = StringBuilder(this)
+        args.forEach { (name, value) ->
+            if (value != null) {
+                sb.append("&$name=$value")
+            }
+        }
+        return sb.toString()
     }
 }

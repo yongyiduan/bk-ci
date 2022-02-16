@@ -25,17 +25,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.rds.pojo.repo
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
-
-@ApiModel("rds项目的初始化信息")
-data class RdsInitInfo(
-    @ApiModelProperty("rds的chart")
-    val rdsChartName: String,
-    @ApiModelProperty("资源Yaml")
-    val resourceYaml: String,
-    @ApiModelProperty("设定值Yaml")
-    val valuesYaml: String?
+data class RepoFileTreeInfo(
+    val fileName: String
 )

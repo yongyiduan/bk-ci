@@ -240,13 +240,16 @@ interface ServiceGitResource {
         gitProjectId: Long,
         @ApiParam(value = "目录路径")
         @QueryParam("path")
-        path: String,
+        path: String?,
         @ApiParam(value = "token")
         @QueryParam("token")
         token: String,
         @ApiParam(value = "提交id 或者 分支")
         @QueryParam("ref")
-        ref: String
+        ref: String?,
+        @ApiParam(value = "是否支持递归目录结构")
+        @QueryParam("recursive")
+        recursive: Boolean?
     ): Result<List<GitFileInfo>>
 
     @ApiOperation("获取mr请求的代码变更")
