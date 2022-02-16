@@ -41,7 +41,7 @@
                 <bk-table-column :label="$t('store.状态')" prop="serviceStatus" :formatter="statusFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.操作人')" prop="creator"></bk-table-column>
                 <bk-table-column :label="$t('store.操作时间')" prop="publishTime" width="180" :formatter="timeFormatter"></bk-table-column>
-                <bk-table-column :label="$t('store.操作')" width="150" class-name="handler-btn">
+                <bk-table-column :label="$t('store.操作')" width="150">
                     <template slot-scope="props">
                         <span v-bk-tooltips="{ content: $t('store.微扩展初始化项目，不能卸载'), disabled: props.row.isUninstall }">
                             <bk-button text @click="uninstall(props.row)" :disabled="!props.row.isUninstall">
