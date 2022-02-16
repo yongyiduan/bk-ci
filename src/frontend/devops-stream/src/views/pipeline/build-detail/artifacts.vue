@@ -34,6 +34,9 @@
                             <p v-else>You do not have the permission to download components of the pipeline and you cannot download</p>
                         </div>
                     </bk-popover>
+                    <bk-button text
+                        @click="goToRepo(props.row)"
+                    >Location</bk-button>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -145,6 +148,14 @@
             isApkOrIpa (row) {
                 const type = row.name.toUpperCase().substring(row.name.lastIndexOf('.') + 1)
                 return type === 'APK' || type === 'IPA'
+            },
+            goToRepo (row) {
+                const properties = row.properties || []
+                const projectInfo = properties.find(property => property.key === 'projectId') || {}
+                const sourceInfo = properties.find(property => property.key === 'source') || {}
+                if (projectInfo.value && sourceInfo.value) {
+                    window.open(`https://${BKUI_HOST}/console/repo/${projectInfo.value}/generic?repoName=${sourceInfo.value}&path=${window.encodeURIComponent(row.path)}`, '_blank')
+                }
             }
         }
     }
