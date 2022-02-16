@@ -43,7 +43,11 @@
                 <bk-table-column :label="$t('store.操作时间')" prop="publishTime" width="180" :formatter="timeFormatter"></bk-table-column>
                 <bk-table-column :label="$t('store.操作')" width="150" class-name="handler-btn">
                     <template slot-scope="props">
-                        <span @click="uninstall(props.row)" v-if="props.row.isUninstall">{{$t('store.卸载')}}</span>
+                        <span v-bk-tooltips="{ content: $t('store.微扩展初始化项目，不能卸载'), disabled: props.row.isUninstall }">
+                            <bk-button text @click="uninstall(props.row)" :disabled="!props.row.isUninstall">
+                                {{$t('store.卸载')}}
+                            </bk-button>
+                        </span>
                     </template>
                 </bk-table-column>
             </bk-table>
