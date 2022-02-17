@@ -12,7 +12,7 @@
                 <li v-for="(pipeline, index) in pipelineList"
                     :key="index"
                     @click="choosePipeline(pipeline)"
-                    :class="{ 'nav-item': true, active: menuPipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
+                    :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
                 >
                     <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
                     <span
