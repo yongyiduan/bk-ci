@@ -28,6 +28,13 @@
             code: {
                 type: String,
                 require: true
+            },
+            name: String,
+            currentTab: String,
+            qualityData: Array,
+            getDataFunc: {
+                type: Function,
+                default: null
             }
         }
     }
