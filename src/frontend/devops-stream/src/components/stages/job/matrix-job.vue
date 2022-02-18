@@ -10,7 +10,7 @@
                 }"
                 @click.native.stop="toggleShowJobs"
             ></icon>
-            <span :class="['matrix-head-name', 'text-ellipsis', { running: job.status === 'RUNNING' }]" v-bk-overflow-tips @click.stop="showJobs = !showJobs">Matrix Job</span>
+            <span :class="['matrix-head-name', 'text-ellipsis', { running: job.status === 'RUNNING' }]" v-bk-overflow-tips @click.stop="showJobs = !showJobs">{{ job.name }}</span>
             <matrix-job-status :job="job"></matrix-job-status>
             <i class="bk-icon icon-right-shape connector-angle" v-if="stageIndex !== 0"></i>
         </span>
