@@ -46,7 +46,7 @@
         font-weight: 700;
         font-size: 12px;
         .explain-info {
-            font-weight: 100;
+            font-weight: 400;
             color: #a7a7a7;
         }
     }

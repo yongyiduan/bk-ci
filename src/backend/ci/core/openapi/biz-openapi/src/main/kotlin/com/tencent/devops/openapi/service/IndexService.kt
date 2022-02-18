@@ -24,18 +24,26 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package com.tencent.devops.openapi.service
 
-package com.tencent.devops.dispatch.docker.service
+import com.google.common.cache.CacheBuilder
+import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
 
-import com.tencent.devops.dispatch.docker.pojo.enums.DockerHostClusterType
-import okhttp3.Request
+@Service
+class IndexService {
+    private val indexCache = CacheBuilder.newBuilder()
+        .maximumSize(100000)
+        .expireAfterAccess(30, TimeUnit.MINUTES)
+        .build<String/*buildId*/, String>()
 
-interface DockerHostProxyService {
-    fun getDockerHostProxyRequest(
-        dockerHostUri: String,
-        dockerHostIp: String,
-        dockerHostPort: Int = 0,
-        clusterType: DockerHostClusterType = DockerHostClusterType.COMMON,
-        urlPrefix: String = "http://"
-    ): Request.Builder
+    fun getHandle(buildId: String, action: () -> String): String {
+        var index = indexCache.getIfPresent(buildId)
+        if (index != null) {
+            return index
+        }
+        index = action()
+        indexCache.put(buildId, index)
+        return index
+    }
 }

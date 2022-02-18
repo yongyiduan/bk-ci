@@ -24,52 +24,53 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package com.tencent.devops.openapi.api.apigw.v4
 
-package com.tencent.devops.quality.api.v2
-
-import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_BUILD_ID
-import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_PIPELINE_ID
-import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_PROJECT_ID
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_APP_CODE
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.process.pojo.BuildHistoryWithVars
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import javax.ws.rs.Consumes
+import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
-import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
 
-@Api(tags = ["BUILD_METADATA"], description = "构建-质量红线")
-@Path("/build/metadata")
+@Api(tags = ["OPENAPI_BUILD_V4"], description = "OPENAPI-构建资源")
+@Path("/{apigwType:apigw-user|apigw-app|apigw}/v4/projects/{projectId}")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-interface BuildQualityMetadataResource {
-
-    @ApiOperation("设置脚本原子指标的元数据")
-    @Path("/saveHisMetadata")
-    @POST
-    fun saveHisMetadata(
+@Suppress("ALL")
+interface ApigwBuildResourceV4 {
+    @ApiOperation("查看构建状态信息,#4295增加stageStatus等", tags = ["v4_app_build_status", "v4_user_build_status"])
+    @GET
+    @Path("/build_status")
+    fun getStatus(
+        @ApiParam(value = "appCode", required = true, defaultValue = AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_APP_CODE)
+        appCode: String?,
+        @ApiParam(value = "apigw Type", required = true)
+        @PathParam("apigwType")
+        apigwType: String?,
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_DEVOPS_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_USER_ID)
+        userId: String,
         @ApiParam("项目ID", required = true)
-        @HeaderParam(AUTH_HEADER_DEVOPS_PROJECT_ID)
+        @PathParam("projectId")
         projectId: String,
+        @ApiParam("流水线ID", required = false)
+        @QueryParam("pipelineId")
+        pipelineId: String?,
         @ApiParam("构建ID", required = true)
-        @HeaderParam(AUTH_HEADER_DEVOPS_PIPELINE_ID)
-        pipelineId: String,
-        @ApiParam("构建ID", required = true)
-        @HeaderParam(AUTH_HEADER_DEVOPS_BUILD_ID)
-        buildId: String,
-        @ApiParam("原子类型", required = true)
-        @QueryParam("elementType")
-        elementType: String,
-        @ApiParam("任务节点ID", required = false)
-        @QueryParam("taskId")
-        taskId: String,
-        @ApiParam("任务节点名称", required = false)
-        @QueryParam("taskName")
-        taskName: String,
-        data: Map<String, String>
-    ): Result<Boolean>
+        @QueryParam("buildId")
+        buildId: String
+    ): Result<BuildHistoryWithVars>
 }
