@@ -745,5 +745,6 @@
   "分支": "Branch",
   "历史大版本问题修复": "Historical major version problem fix",
   "当历史大版本下发现 bug 时，使用此方式进行 fix。不建议在此场景下新增/删除入参。": "When a bug is found in a major historical version, use this method to fix it. It is not recommended to add/delete input parameters in this scenario.",
-  "镜像Tag": "Image Tag"
+  "镜像Tag": "Image Tag",
+  "参数说明": "Parameters Desc"
 }
