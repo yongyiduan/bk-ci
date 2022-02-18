@@ -31,6 +31,7 @@ package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.rds.repo.GitRepoServiceImpl
+import com.tencent.devops.rds.utils.Yaml
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -57,7 +58,7 @@ class ChartService @Autowired constructor(
         }
 
         // 读取Values文件为对象
-        val values = YamlUtil.to<Map<>>(valuesYaml)
+        val values = Values.readValues(valuesYaml)
 
         streamPaths.forEach { path ->
             // 获取具体文件内容
