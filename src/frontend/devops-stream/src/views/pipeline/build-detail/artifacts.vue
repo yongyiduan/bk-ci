@@ -14,7 +14,7 @@
                 </template>
             </bk-table-column>
             <bk-table-column label="Size" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="Operation" width="150">
+            <bk-table-column label="Operation" width="300">
                 <template slot-scope="props">
                     <bk-button text
                         @click="downLoadFile(props.row)"
