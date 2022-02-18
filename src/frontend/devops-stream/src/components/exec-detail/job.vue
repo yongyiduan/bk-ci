@@ -77,59 +77,15 @@
         methods: {
             startDebug (cmd = '/bin/sh') {
                 const vmSeqId = this.job.containerId || this.getRealSeqId()
-                if (this.job.status === 'RUNNING') {
-                    this.getContainerInfoById(vmSeqId)
-                } else {
-                    this.startNewDocker(vmSeqId, cmd)
-                }
-            },
-
-            getContainerInfoById (vmSeqId) {
-                let url = ''
-                const tab = window.open('about:blank')
-                pipelines.getContainerInfoByBuildId(this.projectId, this.pipelineId, this.buildId, vmSeqId).then((res) => {
-                    if (res.containerId && res.address) {
-                        url = `/webConsole/?pipelineId=${this.pipelineId}&buildId=${this.buildId}&containerId=${res.containerId}&targetIp=${res.address}${this.hashId}`
-                    } else {
-                        tab.close()
-                    }
-                }).catch((err) => {
-                    tab.close()
-                    this.$bkMessage({
-                        theme: 'error',
-                        message: err.message || err
-                    })
-                }).finally(() => {
-                    tab.location = url
-                })
+                this.startNewDocker(vmSeqId, cmd)
             },
 
             startNewDocker (vmSeqId, cmd) {
                 let url = ''
                 const tab = window.open('about:blank')
-                pipelines.startDebugDocker(
-                    {
-                        projectId: this.projectId,
-                        pipelineId: this.pipelineId,
-                        vmSeqId,
-                        cmd,
-                        containerPool: this.job.dispatchType.value
-                    }).then((res) => {
-                    if (res === true) {
-                        url = `/webConsole/?pipelineId=${this.pipelineId}&buildId=${this.buildId}&vmSeqId=${vmSeqId}${this.hashId}`
-                    } else {
-                        tab.close()
-                    }
-                })
-                    .catch((err) => {
-                        tab.close()
-                        this.$bkMessage({
-                            theme: 'error',
-                            message: err.message || err
-                        })
-                    }).finally(() => {
-                        tab.location = url
-                    })
+                const buildIdStr = this.buildId ? `&buildId=${this.buildId}` : ''
+                url = `/webConsole?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}&cmd=${cmd}${this.hashId}`
+                tab.location = url
             },
 
             getRealSeqId () {

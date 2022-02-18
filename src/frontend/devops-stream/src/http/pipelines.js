@@ -146,29 +146,12 @@ export default {
     },
 
     startDebugDocker (params) {
-        return api.post(`${DISPATCH_STREAM_PERFIX}/user/dockerhost/startDebug/`, params)
+        return api.post(`${DISPATCH_STREAM_PERFIX}/user/docker/debug/start`, params)
     },
 
     stopDebugDocker (projectId, pipelineId, vmSeqId) {
-        return api.post(`${DISPATCH_STREAM_PERFIX}/user/dockerhost/stopDebug/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
+        return api.post(`${DISPATCH_STREAM_PERFIX}/user/docker/debug/stop/projects/${projectId}/pipelines/${pipelineId}/vmseqs/${vmSeqId}`).then(res => {
             return res
-        })
-    },
-
-    getDebugStatus (projectId, pipelineId, vmSeqId) {
-        return api.get(`${DISPATCH_STREAM_PERFIX}/user/dockerhost/getDebugStatus/${projectId}/${pipelineId}/${vmSeqId}`).then(res => {
-            return res
-        }).catch((err) => {
-            throw err
-        })
-    },
-
-    getDockerExecId (containerId, projectId, pipelineId, cmd, targetIp) {
-        const protocol = document.location.protocol || 'http:'
-        return api.post(`${protocol}//${PROXY_URL_PREFIX}/docker-console-create?pipelineId=${pipelineId}&projectId=${projectId}&targetIp=${targetIp}`, { container_id: containerId, cmd }).then(res => {
-            return res && res.Id
-        }).catch((err) => {
-            throw err
         })
     },
 
