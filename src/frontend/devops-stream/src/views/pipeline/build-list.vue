@@ -480,7 +480,7 @@
                                 res = `Issue [${gitRequestEvent.mergeRequestId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
                                 break
                             case 'note':
-                                res = `Note [${gitRequestEvent.id}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
+                                res = `Note [${gitRequestEvent.noteId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
                                 break
                         }
                         break
