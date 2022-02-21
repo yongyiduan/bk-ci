@@ -28,6 +28,7 @@
 package com.tencent.devops.rds.resources.user
 
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.chart.ChartService
@@ -44,12 +45,12 @@ class UserRdsInitResourceImpl @Autowired constructor(
         private val logger = LoggerFactory.getLogger(UserRdsInitResourceImpl::class.java)
     }
 
-    override fun init(userId: String, info: RdsInitInfo): Result<Boolean> {
+    override fun init(userId: String, info: RdsInitInfo): Result<String> {
+        val test = mutableListOf<String>()
+        info.files.forEach { multipartFile ->
+            test.add(multipartFile.name)
+        }
 
-        logger.info("init test: $userId $info")
-
-        chartService.initChart(info.rdsChartName, info.resourceYaml, info.valuesYaml)
-
-        return Result(true)
+        return Result(JsonUtil.toJson(test))
     }
 }

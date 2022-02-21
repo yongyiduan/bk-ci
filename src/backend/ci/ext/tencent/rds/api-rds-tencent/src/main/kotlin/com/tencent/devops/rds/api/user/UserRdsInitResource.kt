@@ -56,5 +56,5 @@ interface UserRdsInitResource {
         userId: String,
         @ApiParam("rds项目的初始化信息", required = true)
         info: RdsInitInfo
-    ): Result<Boolean>
+    ): Result<String>
 }

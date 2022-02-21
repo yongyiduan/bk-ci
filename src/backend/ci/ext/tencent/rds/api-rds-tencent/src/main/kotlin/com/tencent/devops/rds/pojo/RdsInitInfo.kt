@@ -29,6 +29,8 @@ package com.tencent.devops.rds.pojo
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import okhttp3.MultipartBody
+import org.springframework.web.multipart.MultipartFile
 
 @ApiModel("rds项目的初始化信息")
 data class RdsInitInfo(
@@ -37,5 +39,7 @@ data class RdsInitInfo(
     @ApiModelProperty("资源Yaml")
     val resourceYaml: String,
     @ApiModelProperty("设定值Yaml")
-    val valuesYaml: String?
+    val valuesYaml: String?,
+    @ApiModelProperty("文件列表")
+    val files: List<MultipartFile>
 )
