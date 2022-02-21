@@ -39,7 +39,5 @@ data class RdsInitInfo(
     @ApiModelProperty("资源Yaml")
     val resourceYaml: String,
     @ApiModelProperty("设定值Yaml")
-    val valuesYaml: String?,
-    @ApiModelProperty("文件列表")
-    val files: List<MultipartFile>
+    val valuesYaml: String?
 )

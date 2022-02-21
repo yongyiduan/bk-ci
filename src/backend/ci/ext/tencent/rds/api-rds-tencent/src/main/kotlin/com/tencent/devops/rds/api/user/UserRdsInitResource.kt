@@ -40,6 +40,8 @@ import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
+import org.glassfish.jersey.media.multipart.FormDataParam
+import org.springframework.web.multipart.MultipartFile
 
 @Api(tags = ["USER_RDS_INIT"], description = "user-init资源")
 @Path("/user/init")
@@ -50,11 +52,12 @@ interface UserRdsInitResource {
     @ApiOperation("初始化rds产品")
     @POST
     @Path("")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     fun init(
         @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
-        @ApiParam("rds项目的初始化信息", required = true)
-        info: RdsInitInfo
+        @FormDataParam("files")
+        files: List<MultipartFile>
     ): Result<String>
 }

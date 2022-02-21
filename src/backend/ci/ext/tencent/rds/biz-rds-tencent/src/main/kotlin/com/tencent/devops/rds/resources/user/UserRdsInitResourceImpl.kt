@@ -35,6 +35,7 @@ import com.tencent.devops.rds.chart.ChartService
 import com.tencent.devops.rds.pojo.RdsInitInfo
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.multipart.MultipartFile
 
 @RestResource
 class UserRdsInitResourceImpl @Autowired constructor(
@@ -45,9 +46,9 @@ class UserRdsInitResourceImpl @Autowired constructor(
         private val logger = LoggerFactory.getLogger(UserRdsInitResourceImpl::class.java)
     }
 
-    override fun init(userId: String, info: RdsInitInfo): Result<String> {
+    override fun init(userId: String, files: List<MultipartFile>): Result<String> {
         val test = mutableListOf<String>()
-        info.files.forEach { multipartFile ->
+        files.forEach { multipartFile ->
             test.add(multipartFile.name)
         }
 
