@@ -274,7 +274,11 @@ export function getBuildSource (gitRequestEvent = {}) {
                     res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
                     break
                 case 'issue':
-                    res = `[!${gitRequestEvent.mergeRequestId}]`
+                case 'review':
+                    res = `[${gitRequestEvent.mergeRequestId}]`
+                    break
+                case 'note':
+                    res = `[${gitRequestEvent.nodeId}]`
                     break
             }
             break
