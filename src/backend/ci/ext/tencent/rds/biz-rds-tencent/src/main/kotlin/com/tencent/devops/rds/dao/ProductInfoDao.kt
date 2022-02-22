@@ -29,4 +29,9 @@
 
 package com.tencent.devops.rds.dao
 
-class ProductInfoDao
+class ProductInfoDao {
+
+    fun saveProductInfo(): Int {
+        return 0
+    }
+}
