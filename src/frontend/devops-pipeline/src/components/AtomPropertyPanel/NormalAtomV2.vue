@@ -24,30 +24,7 @@
                 </div>
             </accordion>
         </template>
-        <accordion v-if="outputProps && Object.keys(outputProps).length > 0" show-checkbox show-content>
-            <header class="var-header" slot="header">
-                <span>{{ $t('editPage.atomOutput') }}</span>
-                <i class="devops-icon icon-angle-down" style="display: block"></i>
-            </header>
-            <div slot="content">
-                <form-field class="output-namespace" :desc="outputNamespaceDesc" :label="$t('editPage.outputNamespace')" :is-error="errors.has('namespace')" :error-msg="errors.first('namespace')">
-                    <vuex-input name="namespace" v-validate.initial="{ varRule: true }" :handle-change="handleUpdateAtomOutputNameSpace" :value="namespace" placeholder="" />
-                </form-field>
-                <div class="atom-output-var-list">
-                    <h4>{{ $t('editPage.outputItemList') }}：</h4>
-                    <p v-for="(output, key) in outputProps" :key="key">
-                        {{ namespace ? `${namespace}_` : '' }}{{ key }}
-                        <bk-popover placement="right">
-                            <i class="devops-icon icon-info-circle" />
-                            <div slot="content">
-                                {{ output.description }}
-                            </div>
-                        </bk-popover>
-                        <copy-icon :value="bkVarWrapper(namespace ? `${namespace}_${key}` : key)"></copy-icon>
-                    </p>
-                </div>
-            </div>
-        </accordion>
+        <atom-output :element="element" :atom-props-model="atomPropsModel" :set-parent-validate="() => {}"></atom-output>
     </section>
     <section v-else>
         <div class="empty-tips">{{ $t('editPage.noAppIdTips') }}</div>
@@ -68,7 +45,8 @@
     import DynamicParameter from '@/components/AtomFormComponent/DynamicParameter'
     import DynamicParameterSimple from '@/components/AtomFormComponent/DynamicParameterSimple'
     import { getAtomDefaultValue } from '@/store/modules/atom/atomUtil'
-    import copyIcon from '@/components/copyIcon'
+    import AtomOutput from './AtomOutput'
+    
     export default {
         name: 'normal-atom-v2',
         components: {
@@ -82,7 +60,7 @@
             NameSpaceVar,
             DynamicParameter,
             DynamicParameterSimple,
-            copyIcon
+            AtomOutput
         },
         mixins: [atomMixin, validMixins],
         computed: {
