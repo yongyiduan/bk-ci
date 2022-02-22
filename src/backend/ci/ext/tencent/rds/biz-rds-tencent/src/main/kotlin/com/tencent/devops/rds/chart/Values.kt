@@ -91,7 +91,7 @@ object Values {
      * @param values values为values.yaml中的某个片段组
      * @param name: 需要寻找的片段组的名字
      */
-    fun table(values: Map<String, Any>, name: String): Map<String, Any> {
+    private fun table(values: Map<String, Any>, name: String): Map<String, Any> {
         var table = values
         parsePath(name).forEach { subPath ->
             table = tableLookUp(table, subPath)
