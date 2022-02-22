@@ -46,7 +46,6 @@ import org.springframework.web.multipart.MultipartFile
 @Api(tags = ["USER_RDS_INIT"], description = "user-init资源")
 @Path("/user/init")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 interface UserRdsInitResource {
 
     @ApiOperation("初始化rds产品")
