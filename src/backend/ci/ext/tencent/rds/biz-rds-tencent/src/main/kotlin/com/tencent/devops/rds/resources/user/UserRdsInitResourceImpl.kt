@@ -33,6 +33,10 @@ import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.chart.ChartService
 import com.tencent.devops.rds.pojo.RdsInitInfo
+import com.tencent.devops.rds.utils.DefaultPathUtils
+import java.io.InputStream
+import java.nio.charset.Charset
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.multipart.MultipartFile
@@ -46,12 +50,15 @@ class UserRdsInitResourceImpl @Autowired constructor(
         private val logger = LoggerFactory.getLogger(UserRdsInitResourceImpl::class.java)
     }
 
-    override fun init(userId: String, files: List<MultipartFile>): Result<String> {
-        val test = mutableListOf<String>()
-        files.forEach { multipartFile ->
-            test.add(multipartFile.name)
-        }
-
-        return Result(JsonUtil.toJson(test))
+    override fun init(
+        userId: String,
+        chartName: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition
+    ): Result<String> {
+        val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
+        val file = DefaultPathUtils.randomFile(fileName)
+        file.outputStream().use { inputStream.copyTo(it) }
+        return Result(fileName)
     }
 }

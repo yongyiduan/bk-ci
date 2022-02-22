@@ -34,18 +34,21 @@ import com.tencent.devops.rds.pojo.RdsInitInfo
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import java.io.InputStream
 import javax.ws.rs.Consumes
 import javax.ws.rs.HeaderParam
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.glassfish.jersey.media.multipart.FormDataParam
 import org.springframework.web.multipart.MultipartFile
 
 @Api(tags = ["USER_RDS_INIT"], description = "user-init资源")
 @Path("/user/init")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 interface UserRdsInitResource {
 
     @ApiOperation("初始化rds产品")
@@ -56,7 +59,13 @@ interface UserRdsInitResource {
         @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
-        @FormDataParam("files")
-        files: List<MultipartFile>
+        @ApiParam("chart名称", required = false)
+        @FormDataParam("chartName")
+        chartName: String,
+        @ApiParam("cli替换后的压缩包chart", required = true)
+        @FormDataParam("file")
+        inputStream: InputStream,
+        @FormDataParam("file")
+        disposition: FormDataContentDisposition
     ): Result<String>
 }
