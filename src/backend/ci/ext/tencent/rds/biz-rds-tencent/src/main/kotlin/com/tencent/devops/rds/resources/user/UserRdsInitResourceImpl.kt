@@ -34,6 +34,7 @@ import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.chart.ChartService
 import com.tencent.devops.rds.common.exception.CommonErrorCodeEnum
 import java.io.InputStream
+import java.nio.charset.Charset
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,15 +54,15 @@ class UserRdsInitResourceImpl @Autowired constructor(
         inputStream: InputStream,
         disposition: FormDataContentDisposition
     ): Result<String> {
-        // 校验文件
-        if (!chartName.endsWith(".zip")) {
+        // 校验文件 TODO: 增加接收到的文件大小的校验
+        val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
+        if (!fileName.endsWith(".zip")) {
             throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.errorCode.toString(),
                 defaultMessage = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.formatErrorMessage,
                 params = arrayOf("文件类型错误")
             )
         }
-        // TODO: 增加接收到的文件大小的校验
 
         // 读取并解压缓存到本地磁盘
         val cachePath = chartService.cacheChartDisk(chartName, inputStream)
