@@ -30,7 +30,6 @@ package com.tencent.devops.rds.api.user
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID_DEFAULT_VALUE
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.rds.pojo.RdsInitInfo
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -43,7 +42,6 @@ import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.glassfish.jersey.media.multipart.FormDataParam
-import org.springframework.web.multipart.MultipartFile
 
 @Api(tags = ["USER_RDS_INIT"], description = "user-init资源")
 @Path("/user/init")

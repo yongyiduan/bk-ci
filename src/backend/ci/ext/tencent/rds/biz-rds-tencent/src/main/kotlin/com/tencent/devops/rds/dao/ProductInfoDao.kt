@@ -29,6 +29,4 @@
 
 package com.tencent.devops.rds.dao
 
-class ProductInfoDao {
-
-}
+class ProductInfoDao

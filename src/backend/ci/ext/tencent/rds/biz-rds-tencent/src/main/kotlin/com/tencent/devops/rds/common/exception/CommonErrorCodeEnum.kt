@@ -25,17 +25,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.rds.common.exception
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.pojo.ErrorType
 
-@ApiModel("rds项目的初始化信息")
-data class RdsInitInfo(
-    @ApiModelProperty("rds的chart")
-    val rdsChartName: String,
-    @ApiModelProperty("资源Yaml")
-    val resourceYaml: String,
-    @ApiModelProperty("设定值Yaml")
-    val valuesYaml: String?
-)
+enum class CommonErrorCodeEnum(
+    val errorType: ErrorType,
+    val errorCode: Int,
+    val formatErrorMessage: String
+) {
+    PARAMS_FORMAT_ERROR(
+        errorType = ErrorType.USER,
+        errorCode = 2130021,
+        formatErrorMessage = "参数格式错误 %s"
+    )
+}

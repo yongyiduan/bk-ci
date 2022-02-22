@@ -27,19 +27,16 @@
 
 package com.tencent.devops.rds.resources.user
 
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.chart.ChartService
-import com.tencent.devops.rds.pojo.RdsInitInfo
-import com.tencent.devops.rds.utils.DefaultPathUtils
+import com.tencent.devops.rds.common.exception.CommonErrorCodeEnum
 import java.io.InputStream
-import java.nio.charset.Charset
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.multipart.MultipartFile
 
 @RestResource
 class UserRdsInitResourceImpl @Autowired constructor(
@@ -56,9 +53,23 @@ class UserRdsInitResourceImpl @Autowired constructor(
         inputStream: InputStream,
         disposition: FormDataContentDisposition
     ): Result<String> {
-        val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
-        val file = DefaultPathUtils.randomFile(fileName)
-        file.outputStream().use { inputStream.copyTo(it) }
-        return Result(fileName)
+        // 校验文件
+        if (!chartName.endsWith(".zip")) {
+            throw ErrorCodeException(
+                errorCode = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.errorCode.toString(),
+                defaultMessage = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.formatErrorMessage,
+                params = arrayOf("文件类型错误")
+            )
+        }
+        // TODO: 增加接收到的文件大小的校验
+
+        // 读取并解压缓存到本地磁盘
+        val cachePath = chartService.cacheChartDisk(chartName, inputStream)
+
+        // stream模板替换
+
+        // 入库
+
+        return Result(cachePath)
     }
 }

@@ -68,7 +68,7 @@ object Values {
             throw NotValueException(paths.first())
         }
 
-        //不止一项则读取最后的那个key，然后找到最后一个table去读取key
+        // 不止一项则读取最后的那个key，然后找到最后一个table去读取key
         val valuePath = paths.last()
         val table = try {
             table(values, joinPath(paths.dropLast(1)))

@@ -27,43 +27,30 @@
  *
  */
 
-package com.tencent.devops.rds.chart
+package com.tencent.devops.rds.common.exception
 
-import org.junit.jupiter.api.Test
+import com.tencent.devops.common.api.pojo.ErrorType
 
-import org.junit.jupiter.api.Assertions.*
+enum class ApiErrorCodeEnum(
+    val errorType: ErrorType,
+    val errorCode: Int,
+    val formatErrorMessage: String
+) {
+    GET_TOKEN_ERROR(ErrorType.THIRD_PARTY, 2130001, "获取工蜂项目的TOKEN %s"),
 
-internal class ValuesTest {
+    DEVNET_TIMEOUT_ERROR(ErrorType.THIRD_PARTY, 2130002, "请求 DEVNET 环境网关超时"),
 
-    private val testValues = """
-## 单元测试相关指标
-unitTest:
-  enable: true
-  coverage: 80
+    GET_GIT_FILE_TREE_ERROR(ErrorType.THIRD_PARTY, 2130003, "获取仓库CI文件列表失败 %s"),
 
-## 静态分析相关指标
-codecc:
-  go_all_defect: 10
+    GET_YAML_CONTENT_ERROR(
+        errorType = ErrorType.THIRD_PARTY,
+        errorCode = 2130004,
+        formatErrorMessage = "获取工蜂仓库文件内容失败 %s"
+    ),
 
-build_with_database: true
-
-environments:
-  dev:
-    enable: true
-  test:
-    enable: true        
-"""
-
-    @Test
-    fun readValues() {
-
-    }
-
-    @Test
-    fun pathValue() {
-    }
-
-    @Test
-    fun table() {
-    }
+    GET_PROJECT_INFO_ERROR(
+        errorType = ErrorType.THIRD_PARTY,
+        errorCode = 2130005,
+        formatErrorMessage = "获取工蜂仓库信息失败 %s"
+    ),
 }
