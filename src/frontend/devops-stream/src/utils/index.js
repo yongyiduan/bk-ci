@@ -155,6 +155,24 @@ export function goYaml (projectUrl, branch, yamlName) {
     }
 }
 
+export function goIssue (projectUrl, issueId) {
+    if (issueId) {
+        window.open(`${projectUrl}/issues/${issueId}`, '_blank')
+    }
+}
+
+export function goCodeReview (projectUrl, reviewId) {
+    if (reviewId) {
+        window.open(`${projectUrl}/reviews/${reviewId}`, '_blank')
+    }
+}
+
+export function goNote (projectUrl, reviewId, noteId) {
+    if (reviewId && noteId) {
+        window.open(`${projectUrl}/reviews/${reviewId}#note_${noteId}`, '_blank')
+    }
+}
+
 export function preciseDiff (duration) {
     if (!duration) return '--'
     const durationDate = moment.duration(Math.abs(duration))
@@ -195,7 +213,10 @@ export function getbuildTypeIcon (objectKind, operationKind) {
         tag_push: 'tag',
         merge_request: 'merge',
         schedule: 'clock_fill',
-        openApi: 'open-api'
+        openApi: 'open-api',
+        issue: 'issue',
+        review: 'code-review',
+        note: 'comment'
     }
     return operationKindMap[operationKind] || objectKindIconMap[objectKind] || 'well'
 }
@@ -251,6 +272,13 @@ export function getBuildSource (gitRequestEvent = {}) {
                     break
                 case 'schedule':
                     res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
+                    break
+                case 'issue':
+                case 'review':
+                    res = `[${gitRequestEvent.mergeRequestId}]`
+                    break
+                case 'note':
+                    res = `[${gitRequestEvent.nodeId}]`
                     break
             }
             break

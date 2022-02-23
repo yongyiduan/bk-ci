@@ -474,9 +474,13 @@
                                 res = `Triggered by OPENAPI (${gitRequestEvent.userId})`
                                 break
                             case 'review':
+                                res = `Review [${gitRequestEvent.mergeRequestId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
                                 break
                             case 'issue':
-                                res = `Issue [!] opened by ${gitRequestEvent.userId}`
+                                res = `Issue [${gitRequestEvent.mergeRequestId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
+                                break
+                            case 'note':
+                                res = `Note [${gitRequestEvent.noteId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
                                 break
                         }
                         break
