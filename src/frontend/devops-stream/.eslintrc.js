@@ -33,7 +33,9 @@ module.exports = {
         PROXY_URL_PREFIX: false,
         WEBSOCKET_URL_PREFIX: false,
         X_DEVOPS_PROJECT_ID: false,
-        ROUTER_TAG: false
+        ROUTER_TAG: false,
+        BKUI_HOST: false,
+        DEPLOY_ENVIRONMENT: false
     },
     // add your custom rules hered
     rules: {

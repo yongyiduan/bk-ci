@@ -17,6 +17,20 @@
             var PROXY_URL_PREFIX = 'devnet.devops.woa.com'
             var X_DEVOPS_PROJECT_ID = 'X-DEVOPS-PROJECT-ID'
             var ROUTER_TAG = 'ROUTER_TAG'
+            var DEPLOY_ENVIRONMENT = function (){
+                var host = location.host
+                if (host.startsWith('dev')) return 'dev'
+                else if (host.startsWith('test')) return 'test'
+                else return 'prod'
+            }()
+            var BKUI_HOST = function () {
+                var hostMap = {
+                    dev: 'dev.devops.woa.com',
+                    test: 'test.devops.woa.com',
+                    prod: 'devops.woa.com'
+                }
+                return hostMap[DEPLOY_ENVIRONMENT]
+            }()
         </script>
         <script>
             function getLoginUrl (domain = LOGIN_SERVICE_URL) {
