@@ -29,11 +29,9 @@
 
 package com.tencent.devops.rds.chart
 
-import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.service.utils.ZipUtil
-import com.tencent.devops.rds.common.Constants
+import com.tencent.devops.rds.constants.RdsConstants
 import com.tencent.devops.rds.dao.RdsProductInfoDao
-import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.repo.GitRepoServiceImpl
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
@@ -60,44 +58,6 @@ class ChartProduct @Autowired constructor(
     @Value("\${rds.volumeData:/data/bkci/public/ci/rds}")
     private val rdsVolumeDataPath: String? = null
 
-    fun initChart(
-        userId: String,
-        productId: String,
-        chartRepoName: String,
-        resourceYaml: String,
-        valuesYaml: String?
-    ) {
-        // 先保存项目信息，这里可能出现唯一约束的报错
-        productInfoDao.saveProduct(
-            dslContext = dslContext,
-            productId = productId,
-            creator = userId
-        )
-
-        // 获取repo的访问信息
-        val repoId = repoService.getRepoInfo(chartRepoName).repoId
-        val repoToken = repoService.getRepoToken(repoId = repoId)
-
-        // 获取当前chart下的stream流水线
-        val streamPaths = repoService.getFileTree(repoId = repoId, path = "STREAM_YAML_DIR", token = repoToken).map {
-            it.fileName
-        }
-
-        // 读取Values文件为对象
-        val values = Values.readValues(valuesYaml)
-        val chartPipelines = mutableListOf<Pair<RdsPipelineCreate, Model>>()
-
-        streamPaths.forEach { path ->
-            // 获取具体文件内容
-            val fileContent = repoService.getFile(repoId, path)
-
-            // 替换values
-        }
-
-        // 创建并保存流水线
-        chartPipelineService.createChartPipelines(userId, productId, chartPipelines)
-    }
-
     fun cacheChartDisk(
         chartName: String,
         inputStream: InputStream
@@ -122,7 +82,7 @@ class ChartProduct @Autowired constructor(
     fun getCacheChartPipelineFiles(
         cachePath: String
     ): List<File> {
-        val dir = File("$cachePath/${Constants.CHART_TEMPLATE_DIR}")
+        val dir = File("$cachePath/${RdsConstants.CHART_TEMPLATE_DIR}")
         return dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
     }
 

@@ -25,18 +25,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.common.exception
+package com.tencent.devops.rds.constants
 
-import com.tencent.devops.common.api.pojo.ErrorType
-
-enum class CommonErrorCodeEnum(
-    val errorType: ErrorType,
-    val errorCode: Int,
-    val formatErrorMessage: String
-) {
-    PARAMS_FORMAT_ERROR(
-        errorType = ErrorType.USER,
-        errorCode = 2130021,
-        formatErrorMessage = "参数格式错误 %s"
-    )
+object RdsConstants {
+    // 保存chart模板文件的目录
+    const val CHART_TEMPLATE_DIR = "templates"
 }

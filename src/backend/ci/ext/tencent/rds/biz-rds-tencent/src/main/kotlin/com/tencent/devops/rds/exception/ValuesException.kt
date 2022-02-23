@@ -27,7 +27,7 @@
  *
  */
 
-package com.tencent.devops.rds.common.exception
+package com.tencent.devops.rds.exception
 
 open class ValuesException(message: String) : RuntimeException(message)
 
