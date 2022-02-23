@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel("RDS项目的信息")
 data class RdsPipelineCreate(
     @ApiModelProperty("自定义ID")
-    val productId: String,
+    val productId: Int,
     @ApiModelProperty("所在Chart相对路径")
     val filePath: String,
     @ApiModelProperty("CLI解析后的YAML内容")
