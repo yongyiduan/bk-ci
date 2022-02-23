@@ -25,24 +25,43 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.ci.v2.parsers.template.models
+package com.tencent.devops.rds.service
 
-import com.tencent.devops.common.ci.v2.Repositories
-import com.tencent.devops.common.webhook.pojo.code.git.GitEvent
-import com.tencent.devops.common.ci.v2.enums.TemplateType
+import com.tencent.devops.common.pipeline.Model
+import com.tencent.devops.rds.chart.ChartPipelineService
+import com.tencent.devops.rds.chart.ChartProduct
+import com.tencent.devops.rds.chart.stream.StreamService
+import com.tencent.devops.rds.pojo.RdsPipelineCreate
+import java.io.InputStream
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
-/**
- * 获取模板的参数接口，
- * @param path yaml中的模板路径
- * @param templateType 模板类型
- * @param nowRepoId 当前正在替换的仓库id
- * @param targetRepo 需要获取的yaml 中定义的远程模板库
- * @param extraParameters 额外参数，由各个服务具体定义
- */
-data class GetTemplateParam<T>(
-    val path: String,
-    val templateType: TemplateType?,
-    val nowRepoId: String?,
-    val targetRepo: Repositories?,
-    val extraParameters: T
-)
+@Service
+class InitService  @Autowired constructor(
+    private val chartService: ChartProduct,
+    private val streamService: StreamService,
+    private val chartPipelineService: ChartPipelineService
+){
+
+    fun init(
+        userId: String,
+        chartName: String,
+        inputStream: InputStream,
+    ): Boolean {
+        // 读取并解压缓存到本地磁盘
+        val cachePath = chartService.cacheChartDisk(chartName, inputStream)
+        val productId = ""
+
+        // stream模板替换
+        val pipelineFiles = chartService.getCacheChartPipelineFiles(cachePath)
+        pipelineFiles.forEach { pipelineFile ->
+
+        }
+
+        val chartPipelines = mutableListOf<Pair<RdsPipelineCreate, Model>>()
+
+        // 创建并保存流水线
+        chartPipelineService.createChartPipelines(userId, productId, chartPipelines)
+        return true
+    }
+}

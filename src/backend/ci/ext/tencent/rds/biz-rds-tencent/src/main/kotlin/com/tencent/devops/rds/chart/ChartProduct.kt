@@ -31,9 +31,11 @@ package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.service.utils.ZipUtil
+import com.tencent.devops.rds.common.Constants
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.repo.GitRepoServiceImpl
+import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import java.io.File
 import java.io.InputStream
@@ -45,14 +47,14 @@ import org.springframework.stereotype.Service
 import org.springframework.util.FileCopyUtils
 
 @Service
-class ChartProductService @Autowired constructor(
+class ChartProduct @Autowired constructor(
     private val dslContext: DSLContext,
     private val repoService: GitRepoServiceImpl,
     private val chartPipelineService: ChartPipelineService,
     private val productInfoDao: RdsProductInfoDao
 ) {
     companion object {
-        private val logger = LoggerFactory.getLogger(ChartProductService::class.java)
+        private val logger = LoggerFactory.getLogger(ChartProduct::class.java)
     }
 
     @Value("\${rds.volumeData:/data/bkci/public/ci/rds}")
@@ -114,6 +116,14 @@ class ChartProductService @Autowired constructor(
         ZipUtil.unZipFile(File(zipFilePath), destDir, false)
 
         return destDir
+    }
+
+    // 获取缓存中的chart的流水线文件
+    fun getCacheChartPipelineFiles(
+        cachePath: String
+    ): List<File> {
+        val dir = File("$cachePath/${Constants.CHART_TEMPLATE_DIR}")
+        return dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
     }
 
     private fun uploadFileToRepo(destPath: String, file: File) {

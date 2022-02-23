@@ -65,5 +65,5 @@ interface UserRdsInitResource {
         inputStream: InputStream,
         @FormDataParam("file")
         disposition: FormDataContentDisposition
-    ): Result<String>
+    ): Result<Boolean>
 }
