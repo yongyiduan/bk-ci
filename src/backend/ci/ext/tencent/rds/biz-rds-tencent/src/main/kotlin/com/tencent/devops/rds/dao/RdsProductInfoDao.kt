@@ -73,7 +73,6 @@ class RdsProductInfoDao {
                 .where(PRODUCT_ID.eq(productId))
                 .fetchAny() ?: return null
             return RdsProductInfo(
-                id = record.id.toInt(),
                 productId = record.productId,
                 creator = record.creator,
                 createTime = record.createTime.timestampmilli(),

@@ -27,7 +27,11 @@
 
 package com.tencent.devops.rds.constants
 
-object RdsConstants {
+object Constants {
     // 保存chart模板文件的目录
     const val CHART_TEMPLATE_DIR = "templates"
+    // 指定的main入口文件
+    const val CHART_MAIN_YAML_FILE = "main.yaml"
+    // 指定的main入口文件
+    const val CHART_MAIN_YML_FILE = "main.yml"
 }

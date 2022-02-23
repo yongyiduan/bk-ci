@@ -30,11 +30,15 @@
 package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.service.utils.ZipUtil
-import com.tencent.devops.rds.constants.RdsConstants
+import com.tencent.devops.rds.constants.Constants
+import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YAML_FILE
+import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YML_FILE
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import java.io.File
 import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -60,12 +64,12 @@ class ChartParser @Autowired constructor() {
         file.outputStream().use { inputStream.copyTo(it) }
 
         // 将文件写入磁盘
-        val cacheDir = "$rdsVolumeDataPath/$chartName${System.currentTimeMillis()}"
-        val zipFilePath = "$cacheDir/$chartName.zip"
+        val cacheDir = "$rdsVolumeDataPath${File.separator}$chartName${System.currentTimeMillis()}"
+        val zipFilePath = "$cacheDir${File.separator}$chartName.zip"
         uploadFileToRepo(zipFilePath, file)
 
         // 解压文件
-        val destDir = "$cacheDir/chart"
+        val destDir = "$cacheDir${File.separator}chart"
         ZipUtil.unZipFile(File(zipFilePath), destDir, false)
 
         return destDir
@@ -75,8 +79,21 @@ class ChartParser @Autowired constructor() {
     fun getCacheChartPipelineFiles(
         cachePath: String
     ): List<File> {
-        val dir = File("$cachePath/${RdsConstants.CHART_TEMPLATE_DIR}")
+        val dir = File("$cachePath${File.separator}${Constants.CHART_TEMPLATE_DIR}")
         return dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
+    }
+
+    // 获取缓存中的chart的main文件
+    fun getCacheChartMainFile(
+        cachePath: String
+    ): String? {
+        val mainYamlFile = File("$cachePath${File.separator}$CHART_MAIN_YAML_FILE")
+        val mainYmlFile = File("$cachePath${File.separator}$CHART_MAIN_YML_FILE")
+        return if (mainYamlFile.exists()) {
+            FileUtils.readFileToString(mainYamlFile, StandardCharsets.UTF_8)
+        } else if (mainYmlFile.exists()) {
+            FileUtils.readFileToString(mainYmlFile, StandardCharsets.UTF_8)
+        } else null
     }
 
     private fun uploadFileToRepo(destPath: String, file: File) {
