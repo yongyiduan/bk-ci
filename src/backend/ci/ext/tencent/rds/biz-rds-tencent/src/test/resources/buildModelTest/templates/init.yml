@@ -1,0 +1,11 @@
+steps:
+- uses: BCS@1.latest
+  with:
+    chart_path: ./ccc.yml
+    parameters: true
+notices:
+- type: wework-message
+  title: this is a wework-message notice
+  content: this is a wework-message notice,content is hello.
+  receivers:
+    - ${| ci.actor }}

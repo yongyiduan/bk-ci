@@ -1,0 +1,13 @@
+parameters:
+  - name: receivers
+    type: array
+    default: [ "${| ci.actor }}" ]
+
+gates:
+  - name: CodeCC
+    rule:
+      - CodeccCheckAtomDebug.ccn_average <= 7 # 代码平均圈复杂度
+      - CodeccCheckAtomDebug.ccn_new_max_value <= 10 # 接入后新代码单函数圈复杂度最大值
+    notify-on-fail:
+      - type: wework-message
+        receivers: ${| parameters.receivers }}

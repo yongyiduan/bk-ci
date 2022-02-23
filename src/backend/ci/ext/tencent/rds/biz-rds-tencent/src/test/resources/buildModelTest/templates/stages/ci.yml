@@ -1,0 +1,10 @@
+stages:
+  - name: CI
+    check-out:
+      gates:
+        - template: gates/coverage.yml
+        - template: gates/codecc.yml
+    jobs:
+      template:
+        - name: jobs/build.yml
+        - name: jobs/codecc.yml

@@ -1,0 +1,9 @@
+stages:
+  - template: stages/ci.yml
+
+notices:
+- type: wework-message
+  title: this is a wework-message notice
+  content: this is a wework-message notice,content is hello.
+  receivers:
+    - ${| ci.actor }}

@@ -1,0 +1,6 @@
+jobs:
+  codecc:
+    name: CodeCC
+    steps:
+    - checkout: self
+    - template: steps/codecc.yml

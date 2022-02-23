@@ -41,6 +41,7 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.chart.stream.InnerModelCreatorImpl
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.chart.stream.TemplateExtraParams
+import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
@@ -67,7 +68,11 @@ class StreamConverter @Autowired constructor(
     ): StreamBuildResult {
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8)
 
-        val (preYamlObject, yamlObject) = replaceTemplate(cachePath, pipelineFile.name, pipelineYaml)
+        val (preYamlObject, yamlObject) = replaceTemplate(
+            "$cachePath${File.separator}${Constants.CHART_TEMPLATE_DIR}",
+            pipelineFile.name,
+            pipelineYaml
+        )
 
         val model = modelCreate.createPipelineModel(
             modelName = RdsPipelineUtils.genBKPipelineName(productId),
@@ -86,7 +91,7 @@ class StreamConverter @Autowired constructor(
         )
     }
 
-    private fun replaceTemplate(
+    fun replaceTemplate(
         cachePath: String,
         fileName: String,
         pipelineYaml: String
@@ -109,7 +114,10 @@ class StreamConverter @Autowired constructor(
         param: GetTemplateParam<TemplateExtraParams>
     ): String {
         with(param) {
-            return FileUtils.readFileToString(File("${extraParameters.cachePath}/$path"), StandardCharsets.UTF_8)
+            return FileUtils.readFileToString(
+                File("${extraParameters.cachePath}${File.separator}$path"),
+                StandardCharsets.UTF_8
+            )
         }
     }
 

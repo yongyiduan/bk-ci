@@ -25,19 +25,30 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.rds.chart
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.nhaarman.mockito_kotlin.mock
+import com.tencent.devops.rds.utils.CommonUtils
+import java.io.File
+import java.nio.charset.StandardCharsets
+import org.apache.commons.io.FileUtils
+import org.junit.Test
 
-@ApiModel("RDS项目的信息")
-data class RdsPipelineCreate(
-    @ApiModelProperty("自定义ID")
-    val productId: Int,
-    @ApiModelProperty("所在Chart相对路径")
-    val filePath: String,
-    @ApiModelProperty("CLI解析后的YAML内容")
-    val originYaml: String,
-    @ApiModelProperty("模板解析后的YAML内容")
-    val parsedYaml: String
-)
+import org.junit.Assert.*
+import org.mockito.Mockito.mock
+import org.springframework.core.io.ClassPathResource
+
+class StreamConverterTest {
+
+    private val testService = StreamConverter(mock(), mock(), mock())
+
+    @Test
+    fun replaceTemplate() {
+        val dir = ClassPathResource("buildModelTest/templates").file
+        val pipelines = dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
+        pipelines.forEach {
+            val pipelineYaml = FileUtils.readFileToString(it, StandardCharsets.UTF_8)
+            testService.replaceTemplate(dir.parent,it.name,pipelineYaml)
+        }
+    }
+}

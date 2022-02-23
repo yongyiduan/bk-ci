@@ -1,0 +1,56 @@
+steps:
+- uses: ngtestForUnittest@1.*
+  name: TONE-单元测试
+  with:
+    code_path: ${GIT_CI_REPO_URL}
+    pull_type: "BRANCH"
+    code_tag: ${|ci.branch}}
+    git_mode: "big_git"
+    make_path: ${|parameters.make_path}}
+    is_standard_project: "disable"
+    # 前置脚本
+    standard_project_bash: ""
+    git_key: ${|ci.token}}
+    language_type: "go"
+    custom_script: ${|parameters.custom_script}}
+    # 自定义执行脚本内容
+    custom_script_content: ${|parameters.custom_script_content}}
+    # epc 上报
+    epCheck: true
+    covProduct: ${|variables.cov_appid}}
+    is_has_a1_case: "disable"
+    preMRCheck: false
+    gitSubmodule: false
+    git_event_type: ${ci.event}
+    git_mr_source_url: ${ci.repo}
+    git_mr_source_branch: ${ci.base_ref}
+    git_mr_target_url: ${ci.repo}
+    git_mr_target_branch: ${ci.head_ref}
+    # 增量覆盖率相关配置
+    baseCommitType: "gitTime"
+    diffStartSel: "specify_week"
+    diffTimeCommitId: ""
+    diffCommitTime: "1"
+    diffStartTime: ""
+    diffWeekEndTime: ""
+    diffDoubleWeekEndTime: ""
+    diffMonthEndTime: ""
+    diffUserEndTime: ""
+    diffWeekTime: "1"
+    diffDoubleWeekTime: "1"
+    diffMonthTime: "1"
+    diffUserdefTime: "1"
+    diffWeekHmsTime: ""
+    diffDoubleWeekHmsTime: ""
+    diffMonthHmsTime: ""
+    diffUserHmsTime: ""
+- name: 获取单测覆盖率红线数据
+  id: get_quality
+  uses: ngtestQuality@1.*
+  with:
+    test_type: "unitest"
+    env_type: "all"
+    data_type: "all"
+    poll_time: "10"
+    custom_group_key: ""
+    is_use_unitTest: "true"

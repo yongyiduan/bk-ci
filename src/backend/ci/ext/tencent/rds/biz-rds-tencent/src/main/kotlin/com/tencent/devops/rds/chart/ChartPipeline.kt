@@ -71,14 +71,16 @@ class ChartPipeline @Autowired constructor(
         val result = try {
             client.get(ServicePipelineResource::class).create(
                 userId = userId,
-                projectId = RdsPipelineUtils.genBKProjectCode(productInfo.id),
+                projectId = RdsPipelineUtils.genBKProjectCode(productInfo.productId),
                 pipeline = model,
                 channelCode = ChannelCode.GIT
             ).data ?: run {
                 logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
+                throw RuntimeException("")
             }
         } catch (t: Throwable) {
             logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
+            throw RuntimeException("")
         }
 
         // 根据返回结果保存

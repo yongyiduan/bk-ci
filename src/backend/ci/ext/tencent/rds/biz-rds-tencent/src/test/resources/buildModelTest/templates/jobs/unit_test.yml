@@ -1,0 +1,5 @@
+jobs:
+  unit_test:
+    name: UT-UnitTest
+    steps:
+    - template: steps/unit_test.yml
