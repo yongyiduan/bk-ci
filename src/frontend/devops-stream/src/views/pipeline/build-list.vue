@@ -471,7 +471,7 @@
                                 res = 'Scheduled'
                                 break
                             case 'openApi':
-                                res = 'Triggered by OPENAPI'
+                                res = `Triggered by OPENAPI (${gitRequestEvent.userId})`
                                 break
                             case 'review':
                                 break
