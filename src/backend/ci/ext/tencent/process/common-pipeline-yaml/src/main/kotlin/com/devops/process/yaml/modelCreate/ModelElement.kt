@@ -28,7 +28,7 @@
 package com.devops.process.yaml.modelCreate
 
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
-import com.devops.process.yaml.modelCreate.inner.ModelCreateInner
+import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.devops.process.yaml.utils.PathMatchUtils
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudTask
 import com.tencent.devops.common.ci.v2.IfType
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory
 
 class ModelElement constructor(
     val client: Client,
-    val inner: ModelCreateInner
+    val inner: InnerModelCreator
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(ModelElement::class.java)

@@ -25,9 +25,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.common
+package com.tencent.devops.rds.constants
 
-object Constants {
+object RdsConstants {
     // 保存chart模板文件的目录
     const val CHART_TEMPLATE_DIR = "templates"
 

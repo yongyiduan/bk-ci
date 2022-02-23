@@ -28,7 +28,7 @@
 package com.tencent.devops.rds.chart.stream
 
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
-import com.devops.process.yaml.modelCreate.inner.ModelCreateInner
+import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
 import com.tencent.devops.common.ci.v2.Step
 import com.tencent.devops.common.ci.v2.YamlTransferData
@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-class ModelCreateInnerImpl : ModelCreateInner {
+class InnerModelCreatorImpl : InnerModelCreator {
 
     @Value("\${stream.marketRun.enable:#{false}}")
     private val marketRunTaskData: Boolean = false

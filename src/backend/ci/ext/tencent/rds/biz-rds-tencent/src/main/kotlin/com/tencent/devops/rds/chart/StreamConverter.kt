@@ -25,9 +25,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.chart.stream
+package com.tencent.devops.rds.chart
 
 import com.devops.process.yaml.modelCreate.ModelCreate
+import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
@@ -49,7 +50,7 @@ import org.springframework.stereotype.Service
 class StreamService @Autowired constructor(
     private val client: Client,
     private val objectMapper: ObjectMapper,
-    private val modelCreateInner: ModelCreateInnerImpl
+    private val modelCreateInner: InnerModelCreator
 ) {
 
     private val modelCreate = ModelCreate(client, objectMapper, modelCreateInner)

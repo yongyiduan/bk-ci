@@ -27,8 +27,7 @@
 
 package com.tencent.devops.rds.service
 
-import com.tencent.devops.rds.chart.ChartPipelineService
-import com.tencent.devops.rds.chart.ChartProduct
+import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.stream.StreamService
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import java.io.InputStream
@@ -37,7 +36,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class InitService @Autowired constructor(
-    private val chartProduct: ChartProduct,
+    private val chartParser: ChartParser,
     private val streamService: StreamService,
     private val chartPipelineService: ChartPipelineService
 ) {
@@ -48,12 +47,12 @@ class InitService @Autowired constructor(
         inputStream: InputStream
     ): Boolean {
         // 读取并解压缓存到本地磁盘
-        val cachePath = chartProduct.cacheChartDisk(chartName, inputStream)
+        val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
         // TODO: 通过缓存读取 main.yml/resource.yml 中的内容来获取产品信息来保存
         val productId = ""
 
-        val pipelineFiles = chartProduct.getCacheChartPipelineFiles(cachePath)
+        val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
         pipelineFiles.forEach { pipelineFile ->
             // 通过stream模板替换生成流水线
             val streamBuildResult = streamService.buildModel(userId, "", cachePath, pipelineFile)

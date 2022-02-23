@@ -35,9 +35,9 @@ import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomEle
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 
 /**
- * ModelCreata的内部类，用来放一些不同使用者的不同方法和参数
+ * ModelCreate的内部类，用来放一些不同使用者的不同方法和参数
  */
-interface ModelCreateInner {
+interface InnerModelCreator {
     // 控制run插件是否是研发商店插件
     val marketRunTask: Boolean
 

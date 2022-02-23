@@ -31,7 +31,7 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
-import com.tencent.devops.rds.common.exception.CommonErrorCodeEnum
+import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.service.InitService
 import java.io.InputStream
 import java.nio.charset.Charset

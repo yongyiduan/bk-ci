@@ -25,11 +25,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds
+package com.tencent.devops.rds.exception
 
-object RdsPipelineUtils {
+import com.tencent.devops.common.api.pojo.ErrorType
 
-    fun genBKProjectCode(id: Int) = "RDS_$id"
-
-    fun genBKPipelineName(id: Int) = "RDS_" + id + "_" + System.currentTimeMillis()
+enum class CommonErrorCodeEnum(
+    val errorType: ErrorType,
+    val errorCode: Int,
+    val formatErrorMessage: String
+) {
+    PARAMS_FORMAT_ERROR(
+        errorType = ErrorType.USER,
+        errorCode = 2130021,
+        formatErrorMessage = "参数格式错误 %s"
+    )
 }

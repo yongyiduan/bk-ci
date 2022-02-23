@@ -31,7 +31,7 @@ import com.tencent.devops.common.api.exception.ClientException
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.rds.common.exception.ApiErrorCodeEnum
+import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.pojo.RdsRepoFile
 import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
 import com.tencent.devops.rds.pojo.RdsRepoInfo

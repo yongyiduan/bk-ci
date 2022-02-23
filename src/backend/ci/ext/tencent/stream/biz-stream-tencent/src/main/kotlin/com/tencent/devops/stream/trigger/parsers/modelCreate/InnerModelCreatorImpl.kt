@@ -28,7 +28,7 @@
 package com.tencent.devops.stream.trigger.parsers.modelCreate
 
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
-import com.devops.process.yaml.modelCreate.inner.ModelCreateInner
+import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.tencent.devops.common.api.exception.CustomException
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
 import com.tencent.devops.common.ci.v2.Step
@@ -51,14 +51,14 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-class ModelCreateInnerImpl @Autowired constructor(
+class InnerModelCreatorImpl @Autowired constructor(
     private val dslContext: DSLContext,
     private val gitServicesConfDao: GitCIServicesConfDao,
     private val gitCISettingDao: GitCISettingDao,
     private val streamTriggerCache: StreamTriggerCache,
     private val streamScmService: StreamScmService,
     private val oauthService: StreamOauthService
-) : ModelCreateInner {
+) : InnerModelCreator {
 
     @Value("\${stream.marketRun.enable:#{false}}")
     private val marketRunTaskData: Boolean = false
