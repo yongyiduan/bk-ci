@@ -28,16 +28,16 @@
 package com.tencent.devops.rds.chart.stream
 
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
-import com.devops.process.yaml.modelCreate.inner.ModelCreateInner
+import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
 import com.tencent.devops.common.ci.v2.YamlTransferData
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 
-class ModelCreateInnerImpl(
+class InnerModelCreatorImpl(
     override val marketRunTask: Boolean,
     override val runPlugInAtomCode: String?,
     override val runPlugInVersion: String?
-) : ModelCreateInner {
+) : InnerModelCreator {
     override fun getJobTemplateAcrossInfo(
         yamlTransferData: YamlTransferData,
         gitRequestEventId: Long,

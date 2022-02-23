@@ -27,7 +27,7 @@
  *
  */
 
-package com.tencent.devops.rds.chart
+package com.tencent.devops.rds.service
 
 import com.tencent.devops.common.api.exception.CustomException
 import com.tencent.devops.common.client.Client

@@ -31,28 +31,21 @@ package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.rds.constants.RdsConstants
-import com.tencent.devops.rds.dao.RdsProductInfoDao
-import com.tencent.devops.rds.repo.GitRepoServiceImpl
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import java.io.File
 import java.io.InputStream
-import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.springframework.util.FileCopyUtils
 
-@Service
-class ChartProduct @Autowired constructor(
-    private val dslContext: DSLContext,
-    private val repoService: GitRepoServiceImpl,
-    private val chartPipelineService: ChartPipelineService,
-    private val productInfoDao: RdsProductInfoDao
-) {
+@Component
+class ChartParser @Autowired constructor() {
+
     companion object {
-        private val logger = LoggerFactory.getLogger(ChartProduct::class.java)
+        private val logger = LoggerFactory.getLogger(ChartParser::class.java)
     }
 
     @Value("\${rds.volumeData:/data/bkci/public/ci/rds}")

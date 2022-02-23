@@ -25,16 +25,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.chart.stream
+package com.tencent.devops.rds.chart
 
-import com.devops.process.yaml.modelCreate.ModelCreate
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.ScriptBuildYaml
 import com.tencent.devops.common.ci.v2.parsers.template.YamlTemplate
 import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
 import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
-import com.tencent.devops.common.client.Client
+import com.tencent.devops.rds.chart.stream.StreamBuildResult
+import com.tencent.devops.rds.chart.stream.TemplateExtraParams
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -43,12 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class StreamService @Autowired constructor(
-    private val client: Client,
-    private val objectMapper: ObjectMapper
-) {
-
-    private val modelCreate = ModelCreate(client, objectMapper)
+class StreamConverter @Autowired constructor() {
 
     fun buildModel(cachePath: String, pipelineFile: File): StreamBuildResult {
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8)
