@@ -69,7 +69,7 @@ object TemplateYamlUtil {
     }
 
     // 校验当前模板的远程库信息，每个文件只可以使用当前文件下引用的远程库
-    fun<T> checkAndGetRepo(
+    fun <T> checkAndGetRepo(
         fromPath: String,
         repoName: String,
         templateType: TemplateType,

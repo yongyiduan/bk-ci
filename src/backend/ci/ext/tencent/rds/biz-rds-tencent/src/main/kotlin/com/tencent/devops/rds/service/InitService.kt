@@ -56,7 +56,7 @@ class InitService @Autowired constructor(
         val pipelineFiles = chartProduct.getCacheChartPipelineFiles(cachePath)
         pipelineFiles.forEach { pipelineFile ->
             // 通过stream模板替换生成流水线
-            val streamBuildResult = streamService.buildModel(cachePath, pipelineFile)
+            val streamBuildResult = streamService.buildModel(userId, "", cachePath, pipelineFile)
 
             // 创建并保存流水线
             chartPipelineService.createChartPipeline(

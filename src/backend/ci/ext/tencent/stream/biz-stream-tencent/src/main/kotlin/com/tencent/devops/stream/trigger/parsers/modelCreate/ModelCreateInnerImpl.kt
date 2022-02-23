@@ -29,9 +29,13 @@ package com.tencent.devops.stream.trigger.parsers.modelCreate
 
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.devops.process.yaml.modelCreate.inner.ModelCreateInner
+import com.tencent.devops.common.api.exception.CustomException
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
+import com.tencent.devops.common.ci.v2.Step
 import com.tencent.devops.common.ci.v2.YamlTransferData
 import com.tencent.devops.common.ci.v2.enums.TemplateType
+import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
+import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
 import com.tencent.devops.common.webhook.enums.code.tgit.TGitObjectKind
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 import com.tencent.devops.process.pojo.TemplateAcrossInfoType
@@ -40,6 +44,7 @@ import com.tencent.devops.stream.dao.GitCISettingDao
 import com.tencent.devops.stream.trigger.StreamTriggerCache
 import com.tencent.devops.stream.v2.service.StreamOauthService
 import com.tencent.devops.stream.v2.service.StreamScmService
+import javax.ws.rs.core.Response
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -63,6 +68,10 @@ class ModelCreateInnerImpl @Autowired constructor(
 
     @Value("\${stream.marketRun.atomVersion:#{null}}")
     private val runPlugInVersionData: String? = null
+
+    companion object {
+        private const val STREAM_CHECK_AUTH_TYPE = "AUTH_USER_TOKEN"
+    }
 
     override val marketRunTask: Boolean
         get() {
@@ -134,7 +143,58 @@ class ModelCreateInnerImpl @Autowired constructor(
         )
     }
 
-    override fun makeCheckoutSelf(inputMap: MutableMap<String, Any?>, event: ModelCreateEvent) {
+    override fun makeCheckoutElement(
+        step: Step,
+        event: ModelCreateEvent,
+        additionalOptions: ElementAdditionalOptions
+    ): MarketBuildAtomElement {
+        // checkout插件装配
+        val inputMap = mutableMapOf<String, Any?>()
+        if (!step.with.isNullOrEmpty()) {
+            inputMap.putAll(step.with!!)
+        }
+
+        // 用户不允许指定 stream的开启人参数
+        if ((inputMap["authType"] != null && inputMap["authType"] == STREAM_CHECK_AUTH_TYPE) ||
+            inputMap["authUserId"] != null
+        ) {
+            throw CustomException(
+                Response.Status.BAD_REQUEST,
+                "The parameter authType:AUTH_USER_TOKEN or authUserId does not support user-specified"
+            )
+        }
+
+        // 非mr和tag触发下根据commitId拉取本地工程代码
+        if (step.checkout == "self") {
+            makeCheckoutSelf(inputMap, event)
+        } else {
+            inputMap["repositoryUrl"] = step.checkout!!
+        }
+
+        // 用户未指定时缺省为 AUTH_USER_TOKEN 同时指定 开启人
+        if (inputMap["authType"] == null) {
+            inputMap["authUserId"] = event.streamData?.enableUserId
+            inputMap["authType"] = STREAM_CHECK_AUTH_TYPE
+        }
+
+        // 拼装插件固定参数
+        inputMap["repositoryType"] = "URL"
+
+        val data = mutableMapOf<String, Any>()
+        data["input"] = inputMap
+
+        return MarketBuildAtomElement(
+            id = step.taskId,
+            name = step.name ?: "checkout",
+            stepId = step.id,
+            atomCode = "checkout",
+            version = "1.*",
+            data = data,
+            additionalOptions = additionalOptions
+        )
+    }
+
+    private fun makeCheckoutSelf(inputMap: MutableMap<String, Any?>, event: ModelCreateEvent) {
         val gitData = event.gitData!!
         inputMap["repositoryUrl"] = gitData.repositoryUrl.ifBlank {
             retryGetRepositoryUrl(gitData.gitProjectId.toString())

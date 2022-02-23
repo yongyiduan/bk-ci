@@ -28,12 +28,15 @@
 package com.tencent.devops.rds.chart.stream
 
 import com.devops.process.yaml.modelCreate.ModelCreate
+import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.ScriptBuildYaml
 import com.tencent.devops.common.ci.v2.parsers.template.YamlTemplate
 import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
 import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
+import com.tencent.devops.common.ci.v2.utils.YamlCommonUtils
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
@@ -45,22 +48,39 @@ import org.springframework.stereotype.Service
 @Service
 class StreamService @Autowired constructor(
     private val client: Client,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val modelCreateInner: ModelCreateInnerImpl
 ) {
 
-    private val modelCreate = ModelCreate(client, objectMapper)
+    private val modelCreate = ModelCreate(client, objectMapper, modelCreateInner)
 
-    fun buildModel(cachePath: String, pipelineFile: File): StreamBuildResult {
+    fun buildModel(userId: String, projectId: String, cachePath: String, pipelineFile: File): StreamBuildResult {
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8)
 
-        val yamlObject = replaceTemplate(cachePath, pipelineFile.name, pipelineYaml)
+        val (preYamlObject, yamlObject) = replaceTemplate(cachePath, pipelineFile.name, pipelineYaml)
+
+        val model = modelCreate.createPipelineModel(
+            modelName = "${pipelineFile.name}_${System.currentTimeMillis()}",
+            event = ModelCreateEvent(
+                userId,
+                projectCode = projectId
+            ),
+            yaml = yamlObject,
+            pipelineParams = emptyList()
+        )
+
+        return StreamBuildResult(
+            originYaml = pipelineYaml,
+            parsedYaml = YamlCommonUtils.toYamlNotNull(preYamlObject),
+            pipelineModel = model
+        )
     }
 
     private fun replaceTemplate(
         cachePath: String,
         fileName: String,
         pipelineYaml: String
-    ): ScriptBuildYaml {
+    ): Pair<PreScriptBuildYaml, ScriptBuildYaml> {
         val preYamlObject = YamlTemplate(
             yamlObject = formatYaml(pipelineYaml),
             filePath = fileName,
@@ -72,7 +92,7 @@ class StreamService @Autowired constructor(
             repo = null
         ).replace()
 
-        return ScriptYmlUtils.normalizeRdsYaml(preYamlObject, fileName)
+        return Pair(preYamlObject, ScriptYmlUtils.normalizeRdsYaml(preYamlObject, fileName))
     }
 
     private fun getTemplate(

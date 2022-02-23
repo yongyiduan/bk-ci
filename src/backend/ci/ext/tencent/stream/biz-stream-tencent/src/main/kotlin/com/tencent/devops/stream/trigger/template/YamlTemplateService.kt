@@ -99,7 +99,6 @@ class YamlTemplateService @Autowired constructor(
                     templateType = templateType,
                     nowRemoteGitProjectId = targetRepo?.repository
                 )
-
             }
         }
         return getTemplate(streamParam)

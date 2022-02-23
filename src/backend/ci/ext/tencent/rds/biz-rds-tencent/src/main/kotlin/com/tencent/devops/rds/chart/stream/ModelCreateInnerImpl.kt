@@ -30,14 +30,46 @@ package com.tencent.devops.rds.chart.stream
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.devops.process.yaml.modelCreate.inner.ModelCreateInner
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
+import com.tencent.devops.common.ci.v2.Step
 import com.tencent.devops.common.ci.v2.YamlTransferData
+import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
+import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
+import com.tencent.devops.rds.chart.ChartPipelineStartParams
+import com.tencent.devops.rds.common.Constants
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 
-class ModelCreateInnerImpl(
-    override val marketRunTask: Boolean,
-    override val runPlugInAtomCode: String?,
+@Component
+class ModelCreateInnerImpl : ModelCreateInner {
+
+    @Value("\${stream.marketRun.enable:#{false}}")
+    private val marketRunTaskData: Boolean = false
+
+    @Value("\${stream.marketRun.atomCode:#{null}}")
+    private val runPlugInAtomCodeData: String? = null
+
+    @Value("\${stream.marketRun.atomVersion:#{null}}")
+    private val runPlugInVersionData: String? = null
+
+    companion object {
+        //  checkout通过当前用户的token来拉取
+        private const val CHECKOUT_AUTH_TYPE = "TICKET"
+    }
+
+    override val marketRunTask: Boolean
+        get() {
+            return marketRunTaskData
+        }
+    override val runPlugInAtomCode: String?
+        get() {
+            return runPlugInAtomCodeData
+        }
     override val runPlugInVersion: String?
-) : ModelCreateInner {
+        get() {
+            return runPlugInVersionData
+        }
+
     override fun getJobTemplateAcrossInfo(
         yamlTransferData: YamlTransferData,
         gitRequestEventId: Long,
@@ -55,7 +87,52 @@ class ModelCreateInnerImpl(
         return null
     }
 
-    override fun makeCheckoutSelf(inputMap: MutableMap<String, Any?>, event: ModelCreateEvent) {
-        TODO("Not yet implemented")
+    override fun makeCheckoutElement(
+        step: Step,
+        event: ModelCreateEvent,
+        additionalOptions: ElementAdditionalOptions
+    ): MarketBuildAtomElement {
+        // checkout插件装配
+        val inputMap = mutableMapOf<String, Any?>()
+        if (!step.with.isNullOrEmpty()) {
+            inputMap.putAll(step.with!!)
+        }
+
+        if (step.checkout == "self") {
+            makeCheckoutSelf(inputMap)
+        } else {
+            inputMap["repositoryUrl"] = step.checkout!!
+        }
+
+        // 用户未指定时缺省为 TICKET 同时指定 产品负责人
+        if (inputMap["authType"] == null) {
+            inputMap["authType"] = CHECKOUT_AUTH_TYPE
+            // 这里是rds创建好的ticket_id
+            inputMap["ticketId"] = Constants.RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN
+        }
+
+        // 拼装插件固定参数
+        inputMap["repositoryType"] = "URL"
+
+        val data = mutableMapOf<String, Any>()
+        data["input"] = inputMap
+
+        return MarketBuildAtomElement(
+            id = step.taskId,
+            name = step.name ?: "checkout",
+            stepId = step.id,
+            atomCode = "checkout",
+            version = "1.*",
+            data = data,
+            additionalOptions = additionalOptions
+        )
     }
+
+    private fun makeCheckoutSelf(inputMap: MutableMap<String, Any?>) {
+        inputMap["repositoryUrl"] = ChartPipelineStartParams.RDS_CHECKOUT_REPOSITORY_URL.pipelinePlaceholder()
+        inputMap["pullType"] = ChartPipelineStartParams.RDS_CHECKOUT_PULL_TYPE.pipelinePlaceholder()
+        inputMap["refName"] = ChartPipelineStartParams.RDS_CHECKOUT_REF.pipelinePlaceholder()
+    }
+
+    private fun String.pipelinePlaceholder() = "\${{ $this }}"
 }
