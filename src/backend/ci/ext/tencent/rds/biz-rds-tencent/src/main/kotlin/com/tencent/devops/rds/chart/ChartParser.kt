@@ -30,7 +30,6 @@
 package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.service.utils.ZipUtil
-import com.tencent.devops.rds.common.Constants
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.repo.GitRepoServiceImpl
 import com.tencent.devops.rds.constants.RdsConstants

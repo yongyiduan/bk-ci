@@ -28,7 +28,6 @@
 package com.tencent.devops.rds.chart
 
 import com.devops.process.yaml.modelCreate.ModelCreate
-import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
@@ -39,6 +38,10 @@ import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
 import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
 import com.tencent.devops.common.ci.v2.utils.YamlCommonUtils
 import com.tencent.devops.common.client.Client
+import com.tencent.devops.rds.chart.stream.InnerModelCreatorImpl
+import com.tencent.devops.rds.chart.stream.StreamBuildResult
+import com.tencent.devops.rds.chart.stream.TemplateExtraParams
+import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -47,21 +50,27 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class StreamService @Autowired constructor(
+class StreamConverter @Autowired constructor(
     private val client: Client,
     private val objectMapper: ObjectMapper,
-    private val modelCreateInner: InnerModelCreator
+    private val innerModelCreator: InnerModelCreatorImpl
 ) {
 
-    private val modelCreate = ModelCreate(client, objectMapper, modelCreateInner)
+    private val modelCreate = ModelCreate(client, objectMapper, innerModelCreator)
 
-    fun buildModel(userId: String, projectId: String, cachePath: String, pipelineFile: File): StreamBuildResult {
+    fun buildModel(
+        userId: String,
+        productId: Int,
+        projectId: String,
+        cachePath: String,
+        pipelineFile: File
+    ): StreamBuildResult {
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8)
 
         val (preYamlObject, yamlObject) = replaceTemplate(cachePath, pipelineFile.name, pipelineYaml)
 
         val model = modelCreate.createPipelineModel(
-            modelName = "${pipelineFile.name}_${System.currentTimeMillis()}",
+            modelName = RdsPipelineUtils.genBKPipelineName(productId),
             event = ModelCreateEvent(
                 userId,
                 projectCode = projectId
