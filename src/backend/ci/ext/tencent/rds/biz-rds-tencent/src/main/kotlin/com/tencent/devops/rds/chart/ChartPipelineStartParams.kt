@@ -25,16 +25,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.constants
+package com.tencent.devops.rds.chart
 
-object Constants {
-    // 保存chart模板文件的目录
-    const val CHART_TEMPLATE_DIR = "templates"
-    // 指定的main入口文件
-    const val CHART_MAIN_YAML_FILE = "main.yaml"
-    // 指定的main入口文件
-    const val CHART_MAIN_YML_FILE = "main.yml"
-
-    // rds会保存的产品负责人的GIT TOKEN
-    const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"
+/**
+ * 通过chart生成的流水线需要预置的启动参数
+ */
+object ChartPipelineStartParams {
+    //  checkout参数需要的占位符
+    const val RDS_CHECKOUT_AUTH_USER = "RDS_CHECKOUT_AUTH_USER"
+    const val RDS_CHECKOUT_REPOSITORY_URL = "RDS_CHECKOUT_REPOSITORY_URL"
+    const val RDS_CHECKOUT_PULL_TYPE = "RDS_CHECKOUT_PULL_TYPE"
+    const val RDS_CHECKOUT_REF = "RDS_CHECKOUT_REF"
 }

@@ -33,6 +33,8 @@ import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YAML_FILE
 import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YML_FILE
+import com.tencent.devops.rds.dao.RdsProductInfoDao
+import com.tencent.devops.rds.repo.GitRepoServiceImpl
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import java.io.File

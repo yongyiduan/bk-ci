@@ -28,7 +28,10 @@
 package com.devops.process.yaml.modelCreate.inner
 
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
+import com.tencent.devops.common.ci.v2.Step
 import com.tencent.devops.common.ci.v2.YamlTransferData
+import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
+import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 
 /**
@@ -73,12 +76,14 @@ interface InnerModelCreator {
     ): ServiceJobDevCloudInput?
 
     /**
-     * 通过 checkout: self 来构造checkout插件的输入参数
-     * @param inputMap 插件需要的输入参数
+     * 构造具有特殊语法的checkout插件
+     * @param step 当前step对象
      * @param event model创建的总事件
+     * @param additionalOptions 插件的控制参数
      */
-    fun makeCheckoutSelf(
-        inputMap: MutableMap<String, Any?>,
-        event: ModelCreateEvent
-    )
+    fun makeCheckoutElement(
+        step: Step,
+        event: ModelCreateEvent,
+        additionalOptions: ElementAdditionalOptions
+    ): MarketBuildAtomElement
 }

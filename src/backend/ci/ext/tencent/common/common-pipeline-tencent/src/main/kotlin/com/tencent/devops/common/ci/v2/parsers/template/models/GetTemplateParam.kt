@@ -28,7 +28,6 @@
 package com.tencent.devops.common.ci.v2.parsers.template.models
 
 import com.tencent.devops.common.ci.v2.Repositories
-import com.tencent.devops.common.webhook.pojo.code.git.GitEvent
 import com.tencent.devops.common.ci.v2.enums.TemplateType
 
 /**
