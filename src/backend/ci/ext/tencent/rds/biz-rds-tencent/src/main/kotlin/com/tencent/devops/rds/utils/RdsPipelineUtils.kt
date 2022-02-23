@@ -25,7 +25,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds
+package com.tencent.devops.rds.utils
 
 object RdsPipelineUtils {
 
