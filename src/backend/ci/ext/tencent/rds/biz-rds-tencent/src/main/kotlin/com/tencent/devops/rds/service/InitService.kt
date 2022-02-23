@@ -28,12 +28,10 @@
 package com.tencent.devops.rds.service
 
 import com.tencent.devops.rds.chart.ChartParser
+import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
-import java.io.File
 import java.io.InputStream
-import java.nio.charset.StandardCharsets
-import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -41,7 +39,7 @@ import org.springframework.stereotype.Service
 class InitService @Autowired constructor(
     private val chartParser: ChartParser,
     private val streamConverter: StreamConverter,
-    private val chartPipelineService: ChartPipelineService
+    private val chartPipeline: ChartPipeline
 ) {
 
     fun init(
@@ -67,7 +65,7 @@ class InitService @Autowired constructor(
             )
 
             // 创建并保存流水线
-            chartPipelineService.createChartPipeline(
+            chartPipeline.createChartPipeline(
                 userId = userId,
                 productId = productId,
                 chartPipeline = Pair(
