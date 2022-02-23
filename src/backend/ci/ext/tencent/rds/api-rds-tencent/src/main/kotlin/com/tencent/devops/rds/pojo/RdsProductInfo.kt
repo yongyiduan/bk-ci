@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel("RDS项目的信息")
 data class RdsProductInfo(
     @ApiModelProperty("RDS产品ID")
-    val productId: String,
+    val productId: Int,
     @ApiModelProperty("创建人")
     val creator: String,
     @ApiModelProperty("开始时间", required = true)

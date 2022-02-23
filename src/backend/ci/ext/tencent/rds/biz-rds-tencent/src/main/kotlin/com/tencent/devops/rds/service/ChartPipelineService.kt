@@ -58,7 +58,7 @@ class ChartPipelineService @Autowired constructor(
 
     fun createChartPipeline(
         userId: String,
-        productId: String,
+        productId: Int,
         chartPipeline: Pair<RdsPipelineCreate, Model>
     ) {
         val productInfo = productInfoDao.getProduct(dslContext, productId) ?: throw CustomException(

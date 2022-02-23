@@ -34,21 +34,19 @@ import com.tencent.devops.model.rds.tables.TRdsProductInfo
 import com.tencent.devops.rds.pojo.RdsProductInfo
 import java.time.LocalDateTime
 import org.jooq.DSLContext
+import org.jooq.types.UInteger
 
 class RdsProductInfoDao {
 
     fun saveProduct(
         dslContext: DSLContext,
-        productId: String,
         creator: String
     ): Int {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             return dslContext.insertInto(this,
-                PRODUCT_ID,
                 CREATOR,
                 CREATE_TIME
             ).values(
-                productId,
                 creator,
                 LocalDateTime.now()
             ).execute()
@@ -62,22 +60,22 @@ class RdsProductInfoDao {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             dslContext.update(this)
                 .set(UPDATE_TIME, LocalDateTime.now())
-                .where(PRODUCT_ID.eq(productInfo.productId))
+                .where(PRODUCT_ID.eq(UInteger.valueOf(productInfo.productId)))
                 .execute()
         }
     }
 
-    fun getProduct(dslContext: DSLContext, productId: String): RdsProductInfo? {
+    fun getProduct(dslContext: DSLContext, productId: Int): RdsProductInfo? {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             val record = dslContext.selectFrom(this)
-                .where(PRODUCT_ID.eq(productId))
+                .where(PRODUCT_ID.eq(UInteger.valueOf(productId)))
                 .fetchAny() ?: return null
-            return RdsProductInfo(
-                productId = record.productId,
-                creator = record.creator,
-                createTime = record.createTime.timestampmilli(),
-                updateTime = record.updateTime.timestampmilli()
-            )
+                    return RdsProductInfo(
+                        productId = record.productId.toInt(),
+                        creator = record.creator,
+                        createTime = record.createTime.timestampmilli(),
+                        updateTime = record.updateTime.timestampmilli()
+                    )
         }
     }
 }
