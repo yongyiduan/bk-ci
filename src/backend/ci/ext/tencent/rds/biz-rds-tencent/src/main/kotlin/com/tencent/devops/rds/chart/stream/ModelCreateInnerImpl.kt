@@ -25,6 +25,37 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.ci.v2.parsers.template
+package com.tencent.devops.rds.chart.stream
 
-class temp
+import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
+import com.devops.process.yaml.modelCreate.inner.ModelCreateInner
+import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
+import com.tencent.devops.common.ci.v2.YamlTransferData
+import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
+
+class ModelCreateInnerImpl(
+    override val marketRunTask: Boolean,
+    override val runPlugInAtomCode: String?,
+    override val runPlugInVersion: String?
+) :ModelCreateInner {
+    override fun getJobTemplateAcrossInfo(
+        yamlTransferData: YamlTransferData,
+        gitRequestEventId: Long,
+        gitProjectId: Long
+    ): Map<String, BuildTemplateAcrossInfo> {
+        return emptyMap()
+    }
+
+    override fun getServiceJobDevCloudInput(
+        image: String,
+        imageName: String,
+        imageTag: String,
+        params: String
+    ): ServiceJobDevCloudInput? {
+        return null
+    }
+
+    override fun makeCheckoutSelf(inputMap: MutableMap<String, Any?>, event: ModelCreateEvent) {
+        TODO("Not yet implemented")
+    }
+}

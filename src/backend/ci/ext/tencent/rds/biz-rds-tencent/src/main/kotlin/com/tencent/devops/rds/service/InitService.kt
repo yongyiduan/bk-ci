@@ -25,20 +25,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.ci.v2.parsers.template.models
+package com.tencent.devops.rds.service
 
-import com.tencent.devops.common.webhook.pojo.code.git.GitEvent
+import com.tencent.devops.rds.chart.ChartService
+import com.tencent.devops.rds.chart.stream.StreamService
+import java.io.InputStream
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
-data class TemplateProjectData(
-    val gitRequestEventId: Long,
-    // 发起者的库ID,用户名,分支
-    val triggerProjectId: Long,
-    // sourceProjectId，在fork时是源库的ID
-    val sourceProjectId: Long,
-    val triggerUserId: String,
-    val triggerRef: String,
-    val triggerToken: String,
-    val forkGitToken: String?,
-    val changeSet: Set<String>?,
-    val event: GitEvent?
-)
+@Service
+class InitService  @Autowired constructor(
+    private val chartService: ChartService,
+    private val streamService: StreamService
+){
+
+    fun init(
+        userId: String,
+        chartName: String,
+        inputStream: InputStream,
+    ):Boolean{
+        // 读取并解压缓存到本地磁盘
+        val cachePath = chartService.cacheChartDisk(chartName, inputStream)
+
+        // stream模板替换
+        val pipelineFiles = chartService.getCacheChartPipelineFiles(cachePath)
+        pipelineFiles.forEach { pipelineFile ->
+
+        }
+
+
+        // 入库
+    }
+}

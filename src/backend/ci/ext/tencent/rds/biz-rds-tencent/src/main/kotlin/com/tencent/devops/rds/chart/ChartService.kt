@@ -30,7 +30,9 @@
 package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.service.utils.ZipUtil
+import com.tencent.devops.rds.common.Constants
 import com.tencent.devops.rds.repo.GitRepoServiceImpl
+import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import java.io.File
 import java.io.InputStream
@@ -69,6 +71,14 @@ class ChartService @Autowired constructor(
         ZipUtil.unZipFile(File(zipFilePath), destDir, false)
 
         return destDir
+    }
+
+    // 获取缓存中的chart的流水线文件
+    fun getCacheChartPipelineFiles(
+        cachePath: String
+    ): List<File> {
+        val dir = File("$cachePath/${Constants.CHART_TEMPLATE_DIR}")
+        return dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
     }
 
     private fun uploadFileToRepo(destPath: String, file: File) {

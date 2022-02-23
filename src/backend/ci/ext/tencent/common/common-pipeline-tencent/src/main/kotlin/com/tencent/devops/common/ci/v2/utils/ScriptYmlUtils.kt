@@ -805,4 +805,28 @@ object ScriptYmlUtils {
             label = preScriptBuildYaml.label ?: emptyList()
         )
     }
+
+    fun normalizeRdsYaml(preScriptBuildYaml: PreScriptBuildYaml, filePath: String): ScriptBuildYaml {
+        val stages = formatStage(
+            preScriptBuildYaml,
+            null
+        )
+
+        return ScriptBuildYaml(
+            name = if (!preScriptBuildYaml.name.isNullOrBlank()) {
+                preScriptBuildYaml.name!!
+            } else {
+                filePath
+            },
+            version = preScriptBuildYaml.version,
+            triggerOn = null,
+            variables = preScriptBuildYaml.variables,
+            extends = preScriptBuildYaml.extends,
+            resource = preScriptBuildYaml.resources,
+            notices = preScriptBuildYaml.notices,
+            stages = stages,
+            finally = preJobs2Jobs(preScriptBuildYaml.finally, null),
+            label = preScriptBuildYaml.label ?: emptyList()
+        )
+    }
 }

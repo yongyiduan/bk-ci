@@ -25,24 +25,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.ci.v2.parsers.template.models
+package com.tencent.devops.rds.utils
 
-import com.tencent.devops.common.ci.v2.Repositories
-import com.tencent.devops.common.webhook.pojo.code.git.GitEvent
-import com.tencent.devops.common.ci.v2.enums.TemplateType
-
-/**
- * 获取模板的参数接口，
- * @param path yaml中的模板路径
- * @param templateType 模板类型
- * @param nowRepoId 当前正在替换的仓库id
- * @param targetRepo 需要获取的yaml 中定义的远程模板库
- * @param extraParameters 额外参数，由各个服务具体定义
- */
-data class GetTemplateParam<T>(
-    val path: String,
-    val templateType: TemplateType?,
-    val nowRepoId: String?,
-    val targetRepo: Repositories?,
-    val extraParameters: T
-)
+object CommonUtils {
+    fun ciFile(name: String): Boolean = name.endsWith(".yml") || name.endsWith(".yaml")
+}

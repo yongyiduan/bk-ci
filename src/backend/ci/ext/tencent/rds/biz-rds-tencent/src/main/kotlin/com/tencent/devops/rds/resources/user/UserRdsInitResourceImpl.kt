@@ -33,6 +33,7 @@ import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.chart.ChartService
 import com.tencent.devops.rds.common.exception.CommonErrorCodeEnum
+import com.tencent.devops.rds.service.InitService
 import java.io.InputStream
 import java.nio.charset.Charset
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
@@ -41,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
 class UserRdsInitResourceImpl @Autowired constructor(
-    private val chartService: ChartService
+    private val initService: InitService
 ) : UserRdsInitResource {
 
     companion object {
@@ -53,7 +54,7 @@ class UserRdsInitResourceImpl @Autowired constructor(
         chartName: String,
         inputStream: InputStream,
         disposition: FormDataContentDisposition
-    ): Result<String> {
+    ): Result<Boolean> {
         // 校验文件 TODO: 增加接收到的文件大小的校验
         val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
         if (!fileName.endsWith(".zip")) {
@@ -64,13 +65,6 @@ class UserRdsInitResourceImpl @Autowired constructor(
             )
         }
 
-        // 读取并解压缓存到本地磁盘
-        val cachePath = chartService.cacheChartDisk(chartName, inputStream)
-
-        // stream模板替换
-
-        // 入库
-
-        return Result(cachePath)
+        return Result(initService.init(userId, chartName, inputStream))
     }
 }

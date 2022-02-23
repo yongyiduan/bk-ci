@@ -145,11 +145,11 @@ class ModelCreateInnerImpl @Autowired constructor(
                 inputMap["pullType"] = "BRANCH"
             TGitObjectKind.TAG_PUSH -> {
                 inputMap["pullType"] = "TAG"
-                inputMap["refName"] = gitData.branch
+                inputMap["refName"] = gitData
             }
             TGitObjectKind.PUSH -> {
                 inputMap["pullType"] = "BRANCH"
-                inputMap["refName"] = gitData.branch
+                inputMap["refName"] = "\${STREAM_CHECKOUT_BRANCH}"
             }
             TGitObjectKind.MANUAL -> {
                 if (gitData.commitId.isNotBlank()) {
