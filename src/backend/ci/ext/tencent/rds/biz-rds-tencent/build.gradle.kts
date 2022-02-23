@@ -39,6 +39,7 @@ dependencies {
     api(project(":ext:tencent:rds:model-rds-tencent"))
 
     api(project(":ext:tencent:scm:api-scm"))
+    api(project(":ext:tencent:process:api-process-tencent"))
 
     testImplementation(project(":core:common:common-test"))
 }

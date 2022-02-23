@@ -32,9 +32,9 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.common.exception.ErrorCodeEnum
-import com.tencent.devops.rds.pojo.repo.RepoFile
-import com.tencent.devops.rds.pojo.repo.RepoFileTreeInfo
-import com.tencent.devops.rds.pojo.repo.RepoInfo
+import com.tencent.devops.rds.pojo.RdsRepoFile
+import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
+import com.tencent.devops.rds.pojo.RdsRepoInfo
 import com.tencent.devops.rds.utils.RetryUtils
 import com.tencent.devops.scm.api.ServiceGitCiResource
 import com.tencent.devops.scm.api.ServiceGitResource
@@ -54,10 +54,10 @@ class GitRepoServiceImpl @Autowired constructor(
         private const val CHART_REPO_BRANCH = "master"
     }
 
-    override fun getRepoInfo(repoName: String): RepoInfo {
+    override fun getRepoInfo(repoName: String): RdsRepoInfo {
         // TODO: 目前的demo版只有一个仓库，所以替换为固定的git仓库ID，后续看设计如何获取仓库ID
         val gitProjectID = 821711
-        return RepoInfo(repoId = gitProjectID.toString())
+        return RdsRepoInfo(repoId = gitProjectID.toString())
     }
 
     override fun getRepoToken(repoId: String): String {
@@ -75,7 +75,7 @@ class GitRepoServiceImpl @Autowired constructor(
         path: String?,
         ref: String?,
         token: String?
-    ): List<RepoFileTreeInfo> {
+    ): List<RdsRepoFileTreeInfo> {
         val gitProjectId = repoId.toLong()
         return retryFun(
             log = "$gitProjectId get $path file tree error",
@@ -87,7 +87,7 @@ class GitRepoServiceImpl @Autowired constructor(
                     token = token!!,
                     ref = ref ?: CHART_REPO_BRANCH,
                     recursive = null
-                ).data?.map { RepoFileTreeInfo(fileName = it.name) } ?: emptyList()
+                ).data?.map { RdsRepoFileTreeInfo(fileName = it.name) } ?: emptyList()
             }
         )
     }
@@ -97,7 +97,7 @@ class GitRepoServiceImpl @Autowired constructor(
         filePath: String,
         ref: String?,
         token: String?
-    ): RepoFile {
+    ): RdsRepoFile {
         return retryFun(
             log = "$repoId get yaml $filePath fail",
             apiErrorCode = ErrorCodeEnum.GET_YAML_CONTENT_ERROR,
@@ -109,7 +109,7 @@ class GitRepoServiceImpl @Autowired constructor(
                     ref = ref ?: CHART_REPO_BRANCH,
                     useAccessToken = true
                 ).data!!
-                RepoFile(content = content)
+                RdsRepoFile(content = content)
             }
         )
     }

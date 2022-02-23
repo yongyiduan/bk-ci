@@ -25,8 +25,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo.repo
+package com.tencent.devops.rds.pojo
 
-data class RepoFileTreeInfo(
+data class RdsRepoFileTreeInfo(
     val fileName: String
 )

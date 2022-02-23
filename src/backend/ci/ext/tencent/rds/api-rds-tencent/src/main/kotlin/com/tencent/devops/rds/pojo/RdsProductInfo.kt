@@ -34,10 +34,14 @@ import org.springframework.web.multipart.MultipartFile
 
 @ApiModel("RDS项目的信息")
 data class RdsProductInfo(
-    @ApiModelProperty("rds的chart")
-    val rdsChartName: String,
-    @ApiModelProperty("资源Yaml")
-    val resourceYaml: String,
-    @ApiModelProperty("设定值Yaml")
-    val valuesYaml: String?
+    @ApiModelProperty("RDS产品ID")
+    val id: Int,
+    @ApiModelProperty("自定义ID")
+    val productId: String,
+    @ApiModelProperty("创建人")
+    val creator: String,
+    @ApiModelProperty("开始时间", required = true)
+    val createTime: Long,
+    @ApiModelProperty("开始时间", required = true)
+    val updateTime: Long
 )

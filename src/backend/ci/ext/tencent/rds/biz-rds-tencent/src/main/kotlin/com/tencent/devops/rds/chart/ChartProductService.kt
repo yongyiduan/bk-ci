@@ -30,24 +30,40 @@
 package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.api.util.YamlUtil
+import com.tencent.devops.common.pipeline.Model
+import com.tencent.devops.rds.dao.RdsProductInfoDao
+import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.repo.GitRepoServiceImpl
 import com.tencent.devops.rds.utils.Yaml
+import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class ChartService @Autowired constructor(
-    private val repoService: GitRepoServiceImpl
+class ChartProductService @Autowired constructor(
+    private val dslContext: DSLContext,
+    private val repoService: GitRepoServiceImpl,
+    private val chartPipelineService: ChartPipelineService,
+    private val productInfoDao: RdsProductInfoDao
 ) {
     companion object {
         private const val STREAM_YAML_DIR = "templates"
     }
 
     fun initChart(
+        userId: String,
+        productId: String,
         chartRepoName: String,
         resourceYaml: String,
         valuesYaml: String?
     ) {
+        // 先保存项目信息，这里可能出现唯一约束的报错
+        productInfoDao.saveProduct(
+            dslContext = dslContext,
+            productId = productId,
+            creator = userId
+        )
+
         // 获取repo的访问信息
         val repoId = repoService.getRepoInfo(chartRepoName).repoId
         val repoToken = repoService.getRepoToken(repoId = repoId)
@@ -59,6 +75,7 @@ class ChartService @Autowired constructor(
 
         // 读取Values文件为对象
         val values = Values.readValues(valuesYaml)
+        val chartPipelines = mutableListOf<Pair<RdsPipelineCreate, Model>>()
 
         streamPaths.forEach { path ->
             // 获取具体文件内容
@@ -66,5 +83,8 @@ class ChartService @Autowired constructor(
 
             // 替换values
         }
+
+        // 创建并保存流水线
+        chartPipelineService.createChartPipelines(userId, productId, chartPipelines)
     }
 }

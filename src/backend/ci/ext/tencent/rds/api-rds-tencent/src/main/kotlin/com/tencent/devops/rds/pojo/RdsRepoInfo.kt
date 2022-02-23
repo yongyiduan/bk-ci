@@ -27,8 +27,8 @@
  *
  */
 
-package com.tencent.devops.rds.pojo.repo
+package com.tencent.devops.rds.pojo
 
-data class RepoInfo (
+data class RdsRepoInfo (
     val repoId: String
 )

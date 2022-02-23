@@ -27,9 +27,9 @@
 
 package com.tencent.devops.rds.repo
 
-import com.tencent.devops.rds.pojo.repo.RepoFile
-import com.tencent.devops.rds.pojo.repo.RepoFileTreeInfo
-import com.tencent.devops.rds.pojo.repo.RepoInfo
+import com.tencent.devops.rds.pojo.RdsRepoFile
+import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
+import com.tencent.devops.rds.pojo.RdsRepoInfo
 
 /**
  * 操作RDS的chart仓库的接口，具体实现可能为GIT或者BK_REPO或者MYSQL
@@ -42,7 +42,7 @@ interface RepoService {
      */
     fun getRepoInfo(
         repoName: String
-    ): RepoInfo
+    ): RdsRepoInfo
 
     /**
      * 获取访问仓库需要的凭证，目前只有工蜂的token，看后续需要是否可以干掉
@@ -63,7 +63,7 @@ interface RepoService {
         path: String? = null,
         ref: String? = null,
         token: String? = null
-    ): List<RepoFileTreeInfo>
+    ): List<RdsRepoFileTreeInfo>
 
     /**
      * 获取仓库单个具体文件内容
@@ -76,5 +76,5 @@ interface RepoService {
         filePath: String,
         ref: String? = null,
         token: String? = null
-    ): RepoFile
+    ): RdsRepoFile
 }

@@ -25,37 +25,21 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.resources.user
+package com.tencent.devops.rds.pojo
 
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.rds.api.user.UserRdsInitResource
-import com.tencent.devops.rds.chart.ChartProductService
-import com.tencent.devops.rds.utils.DefaultPathUtils
-import java.io.InputStream
-import java.nio.charset.Charset
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+import okhttp3.MultipartBody
+import org.springframework.web.multipart.MultipartFile
 
-@RestResource
-class UserRdsInitResourceImpl @Autowired constructor(
-    private val chartProductService: ChartProductService
-) : UserRdsInitResource {
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(UserRdsInitResourceImpl::class.java)
-    }
-
-    override fun init(
-        userId: String,
-        chartName: String,
-        inputStream: InputStream,
-        disposition: FormDataContentDisposition
-    ): Result<String> {
-        val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
-        val file = DefaultPathUtils.randomFile(fileName)
-        file.outputStream().use { inputStream.copyTo(it) }
-        return Result(fileName)
-    }
-}
+@ApiModel("RDS项目的信息")
+data class RdsPipelineCreate(
+    @ApiModelProperty("自定义ID")
+    val productId: String,
+    @ApiModelProperty("所在Chart相对路径")
+    val filePath: String,
+    @ApiModelProperty("CLI解析后的YAML内容")
+    val originYaml: String,
+    @ApiModelProperty("模板解析后的YAML内容")
+    val parsedYaml: String
+)

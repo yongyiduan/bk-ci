@@ -25,8 +25,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo.repo
+package com.tencent.devops.rds
 
-data class RepoFile(
-    val content: String
-)
+object RdsPipelineUtils {
+
+    fun genBKProjectCode(id: Int) = "RDS_$id"
+
+    fun genBKPipelineName(id: Int) = "RDS_" + id + "_" + System.currentTimeMillis()
+
+}

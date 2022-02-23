@@ -25,37 +25,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.resources.user
+package com.tencent.devops.rds.pojo
 
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.rds.api.user.UserRdsInitResource
-import com.tencent.devops.rds.chart.ChartProductService
-import com.tencent.devops.rds.utils.DefaultPathUtils
-import java.io.InputStream
-import java.nio.charset.Charset
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-
-@RestResource
-class UserRdsInitResourceImpl @Autowired constructor(
-    private val chartProductService: ChartProductService
-) : UserRdsInitResource {
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(UserRdsInitResourceImpl::class.java)
-    }
-
-    override fun init(
-        userId: String,
-        chartName: String,
-        inputStream: InputStream,
-        disposition: FormDataContentDisposition
-    ): Result<String> {
-        val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
-        val file = DefaultPathUtils.randomFile(fileName)
-        file.outputStream().use { inputStream.copyTo(it) }
-        return Result(fileName)
-    }
-}
+data class RdsRepoFile(
+    val content: String
+)
