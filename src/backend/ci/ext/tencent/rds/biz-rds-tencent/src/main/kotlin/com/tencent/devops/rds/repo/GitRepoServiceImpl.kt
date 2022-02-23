@@ -31,7 +31,7 @@ import com.tencent.devops.common.api.exception.ClientException
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.rds.common.exception.ErrorCodeEnum
+import com.tencent.devops.rds.common.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.pojo.RdsRepoFile
 import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
 import com.tencent.devops.rds.pojo.RdsRepoInfo
@@ -63,7 +63,7 @@ class GitRepoServiceImpl @Autowired constructor(
     override fun getRepoToken(repoId: String): String {
         return retryFun(
             log = "$repoId get token fail",
-            apiErrorCode = ErrorCodeEnum.GET_TOKEN_ERROR,
+            apiErrorCode = ApiErrorCodeEnum.GET_TOKEN_ERROR,
             action = {
                 client.getScm(ServiceGitCiResource::class).getToken(repoId).data!!.accessToken
             }
@@ -79,7 +79,7 @@ class GitRepoServiceImpl @Autowired constructor(
         val gitProjectId = repoId.toLong()
         return retryFun(
             log = "$gitProjectId get $path file tree error",
-            apiErrorCode = ErrorCodeEnum.GET_GIT_FILE_TREE_ERROR,
+            apiErrorCode = ApiErrorCodeEnum.GET_GIT_FILE_TREE_ERROR,
             action = {
                 client.getScm(ServiceGitResource::class).getGitCIFileTree(
                     gitProjectId = gitProjectId,
@@ -100,7 +100,7 @@ class GitRepoServiceImpl @Autowired constructor(
     ): RdsRepoFile {
         return retryFun(
             log = "$repoId get yaml $filePath fail",
-            apiErrorCode = ErrorCodeEnum.GET_YAML_CONTENT_ERROR,
+            apiErrorCode = ApiErrorCodeEnum.GET_YAML_CONTENT_ERROR,
             action = {
                 val content = client.getScm(ServiceGitCiResource::class).getGitCIFileContent(
                     gitProjectId = repoId,
@@ -114,7 +114,7 @@ class GitRepoServiceImpl @Autowired constructor(
         )
     }
 
-    private fun <T> retryFun(log: String, apiErrorCode: ErrorCodeEnum, action: () -> T): T {
+    private fun <T> retryFun(log: String, apiErrorCode: ApiErrorCodeEnum, action: () -> T): T {
         try {
             return RetryUtils.clientRetry {
                 action()
@@ -122,8 +122,8 @@ class GitRepoServiceImpl @Autowired constructor(
         } catch (e: ClientException) {
             logger.warn("retry 5 times $log: ${e.message} ")
             throw ErrorCodeException(
-                errorCode = ErrorCodeEnum.DEVNET_TIMEOUT_ERROR.errorCode.toString(),
-                defaultMessage = ErrorCodeEnum.DEVNET_TIMEOUT_ERROR.formatErrorMessage
+                errorCode = ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR.errorCode.toString(),
+                defaultMessage = ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR.formatErrorMessage
             )
         } catch (e: RemoteServiceException) {
             logger.warn("GIT_API_ERROR $log: ${e.message} ")

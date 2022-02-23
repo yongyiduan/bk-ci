@@ -29,15 +29,20 @@
 
 package com.tencent.devops.rds.chart
 
-import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.common.pipeline.Model
+import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.repo.GitRepoServiceImpl
-import com.tencent.devops.rds.utils.Yaml
+import com.tencent.devops.rds.utils.DefaultPathUtils
+import java.io.File
+import java.io.InputStream
 import org.jooq.DSLContext
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.util.FileCopyUtils
 
 @Service
 class ChartProductService @Autowired constructor(
@@ -47,8 +52,11 @@ class ChartProductService @Autowired constructor(
     private val productInfoDao: RdsProductInfoDao
 ) {
     companion object {
-        private const val STREAM_YAML_DIR = "templates"
+        private val logger = LoggerFactory.getLogger(ChartProductService::class.java)
     }
+
+    @Value("\${rds.volumeData:/data/bkci/public/ci/rds}")
+    private val rdsVolumeDataPath: String? = null
 
     fun initChart(
         userId: String,
@@ -69,7 +77,7 @@ class ChartProductService @Autowired constructor(
         val repoToken = repoService.getRepoToken(repoId = repoId)
 
         // 获取当前chart下的stream流水线
-        val streamPaths = repoService.getFileTree(repoId = repoId, path = STREAM_YAML_DIR, token = repoToken).map {
+        val streamPaths = repoService.getFileTree(repoId = repoId, path = "STREAM_YAML_DIR", token = repoToken).map {
             it.fileName
         }
 
@@ -86,5 +94,35 @@ class ChartProductService @Autowired constructor(
 
         // 创建并保存流水线
         chartPipelineService.createChartPipelines(userId, productId, chartPipelines)
+    }
+
+    fun cacheChartDisk(
+        chartName: String,
+        inputStream: InputStream
+    ): String {
+        // 创建临时文件
+        val file = DefaultPathUtils.randomFile("zip")
+        file.outputStream().use { inputStream.copyTo(it) }
+
+        // 将文件写入磁盘
+        val cacheDir = "$rdsVolumeDataPath/$chartName${System.currentTimeMillis()}"
+        val zipFilePath = "$cacheDir/$chartName.zip"
+        uploadFileToRepo(zipFilePath, file)
+
+        // 解压文件
+        val destDir = "$cacheDir/chart"
+        ZipUtil.unZipFile(File(zipFilePath), destDir, false)
+
+        return destDir
+    }
+
+    private fun uploadFileToRepo(destPath: String, file: File) {
+        logger.info("uploadFileToRepo: destPath: $destPath, file: ${file.absolutePath}")
+        val targetFile = File(destPath)
+        val parentFile = targetFile.parentFile
+        if (!parentFile.exists()) {
+            parentFile.mkdirs()
+        }
+        FileCopyUtils.copy(file, targetFile)
     }
 }

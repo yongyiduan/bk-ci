@@ -25,45 +25,59 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.api.user
+package com.tencent.devops.dispatch.docker.api.user
 
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID_DEFAULT_VALUE
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.dispatch.docker.pojo.DebugStartParam
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import java.io.InputStream
 import javax.ws.rs.Consumes
 import javax.ws.rs.HeaderParam
 import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition
-import org.glassfish.jersey.media.multipart.FormDataParam
 
-@Api(tags = ["USER_RDS_INIT"], description = "user-init资源")
-@Path("/user/init")
+@Api(tags = ["USER_DOCKER_HOST"], description = "用户-获取构建容器信息")
+@Path("/user/docker/debug")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-interface UserRdsInitResource {
+interface UserDockerDebugResource {
 
-    @ApiOperation("初始化rds产品")
+    @ApiOperation("启动调试容器-新版")
     @POST
-    @Path("")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    fun init(
+    @Path("/start")
+    fun startDebug(
         @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
-        @ApiParam("chart名称", required = false)
-        @FormDataParam("chartName")
-        chartName: String,
-        @ApiParam("cli替换后的压缩包chart", required = true)
-        @FormDataParam("file")
-        inputStream: InputStream,
-        @FormDataParam("file")
-        disposition: FormDataContentDisposition
-    ): Result<String>
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        debugStartParam: DebugStartParam
+    ): Result<String>?
+
+    @ApiOperation("终止调试容器")
+    @POST
+    @Path("/stop/projects/{projectId}/pipelines/{pipelineId}/vmseqs/{vmSeqId}")
+    fun stopDebug(
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("项目id", required = true)
+        @PathParam("projectId")
+        projectId: String,
+        @ApiParam("流水线Id", required = true)
+        @PathParam("pipelineId")
+        pipelineId: String,
+        @ApiParam("vmSeqId", required = true)
+        @PathParam("vmSeqId")
+        vmSeqId: String,
+        @ApiParam("containerName", required = false)
+        @QueryParam("containerName")
+        containerName: String?
+    ): Result<Boolean>?
 }

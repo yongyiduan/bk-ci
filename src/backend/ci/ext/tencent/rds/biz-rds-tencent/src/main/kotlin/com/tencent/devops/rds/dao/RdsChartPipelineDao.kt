@@ -82,9 +82,7 @@ class RdsChartPipelineDao {
                         productId = it.productId,
                         filePath = it.filePath,
                         originYaml = it.originYaml,
-                        parsedYaml = it.parsedYaml,
-                        createTime = it.createTime.timestampmilli(),
-                        updateTime = it.updateTime.timestampmilli()
+                        parsedYaml = it.parsedYaml
                     )
                 }
         }

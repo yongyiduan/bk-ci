@@ -35,7 +35,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.tencent.devops.common.api.util.ReflectUtil
-import org.yaml.snakeyaml.Yaml
 
 object Yaml {
     private val objectMapper = ObjectMapper(

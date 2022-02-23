@@ -25,17 +25,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.dispatch.docker.service
+package com.tencent.devops.rds.common.exception
 
-import com.tencent.devops.dispatch.docker.pojo.enums.DockerHostClusterType
-import okhttp3.Request
+import com.tencent.devops.common.api.pojo.ErrorType
 
-interface DockerHostProxyService {
-    fun getDockerHostProxyRequest(
-        dockerHostUri: String,
-        dockerHostIp: String,
-        dockerHostPort: Int = 0,
-        clusterType: DockerHostClusterType = DockerHostClusterType.COMMON,
-        urlPrefix: String = "http://"
-    ): Request.Builder
+enum class CommonErrorCodeEnum(
+    val errorType: ErrorType,
+    val errorCode: Int,
+    val formatErrorMessage: String
+) {
+    PARAMS_FORMAT_ERROR(
+        errorType = ErrorType.USER,
+        errorCode = 2130021,
+        formatErrorMessage = "参数格式错误 %s"
+    )
 }

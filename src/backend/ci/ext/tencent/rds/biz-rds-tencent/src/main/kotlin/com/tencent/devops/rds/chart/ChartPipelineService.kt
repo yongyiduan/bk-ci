@@ -30,7 +30,6 @@
 package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.api.exception.CustomException
-import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.enums.ChannelCode
