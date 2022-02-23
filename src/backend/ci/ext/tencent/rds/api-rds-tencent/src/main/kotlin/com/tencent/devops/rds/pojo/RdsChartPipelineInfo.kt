@@ -29,8 +29,6 @@ package com.tencent.devops.rds.pojo
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import okhttp3.MultipartBody
-import org.springframework.web.multipart.MultipartFile
 
 @ApiModel("RDS项目的信息")
 data class RdsChartPipelineInfo(

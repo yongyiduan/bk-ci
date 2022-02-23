@@ -29,6 +29,6 @@
 
 package com.tencent.devops.rds.pojo
 
-data class RdsRepoInfo (
+data class RdsRepoInfo(
     val repoId: String
 )

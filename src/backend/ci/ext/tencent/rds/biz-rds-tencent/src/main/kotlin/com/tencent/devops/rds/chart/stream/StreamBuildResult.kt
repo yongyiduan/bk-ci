@@ -25,21 +25,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.rds.chart.stream
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.pipeline.Model
 
-@ApiModel("RDS项目的信息")
-data class RdsProductInfo(
-    @ApiModelProperty("RDS产品ID")
-    val id: Int,
-    @ApiModelProperty("自定义ID")
-    val productId: String,
-    @ApiModelProperty("创建人")
-    val creator: String,
-    @ApiModelProperty("开始时间", required = true)
-    val createTime: Long,
-    @ApiModelProperty("开始时间", required = true)
-    val updateTime: Long
+data class StreamBuildResult(
+    val originYaml: String,
+    val parsedYaml: String,
+    val pipelineModel: Model
 )

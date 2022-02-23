@@ -29,7 +29,6 @@
 
 package com.tencent.devops.rds.dao
 
-import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.model.rds.tables.TRdsChartPipeline
 import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import java.time.LocalDateTime

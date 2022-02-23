@@ -29,15 +29,12 @@ package com.tencent.devops.rds.chart.stream
 
 import com.devops.process.yaml.modelCreate.ModelCreate
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.tencent.devops.common.api.util.YamlUtil
-import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.ScriptBuildYaml
 import com.tencent.devops.common.ci.v2.parsers.template.YamlTemplate
 import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
 import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -53,14 +50,13 @@ class StreamService @Autowired constructor(
 
     private val modelCreate = ModelCreate(client, objectMapper)
 
-    fun buildModel(cachePath: String, pipelineFile: File): Model {
+    fun buildModel(cachePath: String, pipelineFile: File): StreamBuildResult {
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8)
 
         val yamlObject = replaceTemplate(cachePath, pipelineFile.name, pipelineYaml)
-
     }
 
-    fun replaceTemplate(
+    private fun replaceTemplate(
         cachePath: String,
         fileName: String,
         pipelineYaml: String

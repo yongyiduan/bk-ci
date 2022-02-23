@@ -37,7 +37,7 @@ class ModelCreateInnerImpl(
     override val marketRunTask: Boolean,
     override val runPlugInAtomCode: String?,
     override val runPlugInVersion: String?
-) :ModelCreateInner {
+) : ModelCreateInner {
     override fun getJobTemplateAcrossInfo(
         yamlTransferData: YamlTransferData,
         gitRequestEventId: Long,

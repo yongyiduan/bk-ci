@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
 class UserRdsInitResourceImpl @Autowired constructor(
-    private val initService: InitService,
+    private val initService: InitService
 
 ) : UserRdsInitResource {
 

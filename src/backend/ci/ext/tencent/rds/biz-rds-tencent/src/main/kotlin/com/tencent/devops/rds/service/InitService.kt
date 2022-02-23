@@ -27,7 +27,6 @@
 
 package com.tencent.devops.rds.service
 
-import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.rds.chart.ChartPipelineService
 import com.tencent.devops.rds.chart.ChartProduct
 import com.tencent.devops.rds.chart.stream.StreamService
@@ -37,31 +36,44 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class InitService  @Autowired constructor(
-    private val chartService: ChartProduct,
+class InitService @Autowired constructor(
+    private val chartProduct: ChartProduct,
     private val streamService: StreamService,
     private val chartPipelineService: ChartPipelineService
-){
+) {
 
     fun init(
         userId: String,
         chartName: String,
-        inputStream: InputStream,
+        inputStream: InputStream
     ): Boolean {
         // 读取并解压缓存到本地磁盘
-        val cachePath = chartService.cacheChartDisk(chartName, inputStream)
+        val cachePath = chartProduct.cacheChartDisk(chartName, inputStream)
+
+        // TODO: 通过缓存读取 main.yml/resource.yml 中的内容来获取产品信息来保存
         val productId = ""
 
-        // stream模板替换
-        val pipelineFiles = chartService.getCacheChartPipelineFiles(cachePath)
+        val pipelineFiles = chartProduct.getCacheChartPipelineFiles(cachePath)
         pipelineFiles.forEach { pipelineFile ->
+            // 通过stream模板替换生成流水线
+            val streamBuildResult = streamService.buildModel(cachePath, pipelineFile)
 
+            // 创建并保存流水线
+            chartPipelineService.createChartPipeline(
+                userId = userId,
+                productId = productId,
+                chartPipeline = Pair(
+                    RdsPipelineCreate(
+                        productId = productId,
+                        filePath = pipelineFile.name,
+                        originYaml = streamBuildResult.originYaml,
+                        parsedYaml = streamBuildResult.parsedYaml
+                    ),
+                    streamBuildResult.pipelineModel
+                )
+            )
         }
 
-        val chartPipelines = mutableListOf<Pair<RdsPipelineCreate, Model>>()
-
-        // 创建并保存流水线
-        chartPipelineService.createChartPipelines(userId, productId, chartPipelines)
         return true
     }
 }

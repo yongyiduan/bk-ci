@@ -56,48 +56,43 @@ class ChartPipelineService @Autowired constructor(
         private val logger = LoggerFactory.getLogger(ChartPipelineService::class.java)
     }
 
-    fun createChartPipelines(
+    fun createChartPipeline(
         userId: String,
         productId: String,
-        chartPipelines: List<Pair<RdsPipelineCreate, Model>>
+        chartPipeline: Pair<RdsPipelineCreate, Model>
     ) {
-        val productInfo = productInfoDao.getProduct(dslContext, productId)
-            ?: throw CustomException(
-                Response.Status.FORBIDDEN,
-                "RDS项目不存在或已删除，如有疑问请联系蓝盾助手"
-            )
+        val productInfo = productInfoDao.getProduct(dslContext, productId) ?: throw CustomException(
+            Response.Status.FORBIDDEN,
+            "RDS项目不存在或已删除，如有疑问请联系蓝盾助手"
+        )
 
-        chartPipelines.forEach { pipelineAndModel ->
-            val pipeline = pipelineAndModel.first
-            val model = pipelineAndModel.second
+        val (pipeline, model) = chartPipeline
 
-            // 在蓝盾引擎创建项目
-            val result = try {
-                client.get(ServicePipelineResource::class).create(
-                    userId = userId,
-                    projectId = RdsPipelineUtils.genBKProjectCode(productInfo.id),
-                    pipeline = model,
-                    channelCode = ChannelCode.GIT
-                ).data ?: run {
-                    logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
-                    return@forEach
-                }
-            } catch (t: Throwable) {
-                logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
-                return@forEach
+        // TODO: 增加errorCodeException异常返回
+        // 在蓝盾引擎创建项目
+        val result = try {
+            client.get(ServicePipelineResource::class).create(
+                userId = userId,
+                projectId = RdsPipelineUtils.genBKProjectCode(productInfo.id),
+                pipeline = model,
+                channelCode = ChannelCode.GIT
+            ).data ?: run {
+                logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
             }
-
-            // 根据返回结果保存
-            chartPipelineDao.create(
-                dslContext = dslContext,
-                pipeline = RdsChartPipelineInfo(
-                    pipelineId = result.id,
-                    productId = productId,
-                    filePath = pipeline.filePath,
-                    originYaml = pipeline.originYaml,
-                    parsedYaml = pipeline.parsedYaml
-                )
-            )
+        } catch (t: Throwable) {
+            logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
         }
+
+        // 根据返回结果保存
+        chartPipelineDao.create(
+            dslContext = dslContext,
+            pipeline = RdsChartPipelineInfo(
+                pipelineId = result.id,
+                productId = productId,
+                filePath = pipeline.filePath,
+                originYaml = pipeline.originYaml,
+                parsedYaml = pipeline.parsedYaml
+            )
+        )
     }
 }

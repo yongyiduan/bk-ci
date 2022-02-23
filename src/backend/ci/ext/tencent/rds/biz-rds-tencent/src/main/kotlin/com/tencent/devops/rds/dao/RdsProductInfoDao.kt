@@ -32,7 +32,6 @@ package com.tencent.devops.rds.dao
 import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.model.rds.tables.TRdsProductInfo
 import com.tencent.devops.rds.pojo.RdsProductInfo
-import io.swagger.annotations.ApiModelProperty
 import java.time.LocalDateTime
 import org.jooq.DSLContext
 

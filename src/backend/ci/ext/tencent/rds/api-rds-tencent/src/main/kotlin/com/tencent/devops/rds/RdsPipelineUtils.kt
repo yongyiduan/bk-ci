@@ -32,5 +32,4 @@ object RdsPipelineUtils {
     fun genBKProjectCode(id: Int) = "RDS_$id"
 
     fun genBKPipelineName(id: Int) = "RDS_" + id + "_" + System.currentTimeMillis()
-
 }
