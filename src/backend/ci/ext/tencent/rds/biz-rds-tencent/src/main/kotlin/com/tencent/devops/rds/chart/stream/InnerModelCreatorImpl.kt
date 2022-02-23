@@ -36,7 +36,7 @@ import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
 import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 import com.tencent.devops.rds.chart.ChartPipelineStartParams
-import com.tencent.devops.rds.constants.RdsConstants
+import com.tencent.devops.rds.constants.Constants
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
@@ -108,7 +108,7 @@ class InnerModelCreatorImpl : InnerModelCreator {
         if (inputMap["authType"] == null) {
             inputMap["authType"] = CHECKOUT_AUTH_TYPE
             // 这里是rds创建好的ticket_id
-            inputMap["ticketId"] = RdsConstants.RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN
+            inputMap["ticketId"] = Constants.RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN
         }
 
         // 拼装插件固定参数
