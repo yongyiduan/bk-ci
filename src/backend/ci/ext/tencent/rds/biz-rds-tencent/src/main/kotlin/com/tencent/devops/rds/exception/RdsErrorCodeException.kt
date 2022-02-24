@@ -31,6 +31,6 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 
 class RdsErrorCodeException(errorCodeEnum: ErrorCodeEnum, formatParams: Array<String>? = null) : ErrorCodeException(
     errorCode = errorCodeEnum.errorCode,
-    defaultMessage = errorCodeEnum.formatErrorMessage,
-    params = formatParams
+    defaultMessage = errorCodeEnum.formatErrorMessage.format(formatParams),
+    params = null
 )

@@ -54,7 +54,7 @@ class InitService @Autowired constructor(
         val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
         // TODO: 通过缓存读取 main.yml/resource.yml 中的内容来获取产品信息来保存
-        val productId = 0
+        val productId = 1
 
         // TODO: 提前创建流水线去生成质量红线
         val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
