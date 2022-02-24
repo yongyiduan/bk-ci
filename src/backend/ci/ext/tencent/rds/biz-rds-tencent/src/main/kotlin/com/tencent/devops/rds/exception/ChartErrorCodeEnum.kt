@@ -42,5 +42,10 @@ enum class ChartErrorCodeEnum(
         errorType = ErrorType.USER,
         errorCode = "2130031",
         formatErrorMessage = "解析chart文件  %s 内容为空"
+    ),
+    CREATE_CHART_PIPELINE_ERROR(
+        errorType = ErrorType.SYSTEM,
+        errorCode = "2130032",
+        formatErrorMessage = "创建流水线  %s 失败"
     )
 }

@@ -35,6 +35,8 @@ import com.tencent.devops.process.api.service.ServicePipelineResource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.dao.RdsProductInfoDao
+import com.tencent.devops.rds.exception.ChartErrorCodeEnum
+import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import javax.ws.rs.core.Response
@@ -66,21 +68,22 @@ class ChartPipeline @Autowired constructor(
 
         val (pipeline, model) = chartPipeline
 
-        // TODO: 增加errorCodeException异常返回
         // 在蓝盾引擎创建项目
+        // TODO: 目前先写死一个项目，后续修改
         val result = try {
             client.get(ServicePipelineResource::class).create(
                 userId = userId,
-                projectId = RdsPipelineUtils.genBKProjectCode(productInfo.productId),
+//                projectId = RdsPipelineUtils.genBKProjectCode(productInfo.productId),
+                projectId = "rds-temp-test-project",
                 pipeline = model,
                 channelCode = ChannelCode.GIT
             ).data ?: run {
                 logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
-                throw RuntimeException("")
+                throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
             }
         } catch (t: Throwable) {
             logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
-            throw RuntimeException("")
+            throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
         }
 
         // 根据返回结果保存

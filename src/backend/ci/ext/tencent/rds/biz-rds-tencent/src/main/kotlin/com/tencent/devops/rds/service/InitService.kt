@@ -56,6 +56,7 @@ class InitService @Autowired constructor(
         // TODO: 通过缓存读取 main.yml/resource.yml 中的内容来获取产品信息来保存
         val productId = 0
 
+        // TODO: 提前创建流水线去生成质量红线
         val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
         pipelineFiles.forEach { pipelineFile ->
             // 通过stream模板替换生成流水线
@@ -70,19 +71,19 @@ class InitService @Autowired constructor(
             logger.info("${pipelineFile.name} model: ${streamBuildResult.pipelineModel}")
 
             // 创建并保存流水线
-//            chartPipeline.createChartPipeline(
-//                userId = userId,
-//                productId = productId,
-//                chartPipeline = Pair(
-//                    RdsPipelineCreate(
-//                        productId = productId,
-//                        filePath = pipelineFile.name,
-//                        originYaml = streamBuildResult.originYaml,
-//                        parsedYaml = streamBuildResult.parsedYaml
-//                    ),
-//                    streamBuildResult.pipelineModel
-//                )
-//            )
+            chartPipeline.createChartPipeline(
+                userId = userId,
+                productId = productId,
+                chartPipeline = Pair(
+                    RdsPipelineCreate(
+                        productId = productId,
+                        filePath = pipelineFile.name,
+                        originYaml = streamBuildResult.originYaml,
+                        parsedYaml = streamBuildResult.parsedYaml
+                    ),
+                    streamBuildResult.pipelineModel
+                )
+            )
         }
 
         return true
