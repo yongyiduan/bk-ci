@@ -35,6 +35,7 @@ module.exports = {
         X_DEVOPS_PROJECT_ID: false,
         ROUTER_TAG: false,
         BKUI_HOST: false,
+        BKREPO_HOST: false,
         DEPLOY_ENVIRONMENT: false
     },
     // add your custom rules hered
