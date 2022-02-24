@@ -33,7 +33,9 @@ import com.tencent.devops.model.rds.tables.TRdsChartPipeline
 import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import java.time.LocalDateTime
 import org.jooq.DSLContext
+import org.springframework.stereotype.Repository
 
+@Repository
 class RdsChartPipelineDao {
 
     fun create(

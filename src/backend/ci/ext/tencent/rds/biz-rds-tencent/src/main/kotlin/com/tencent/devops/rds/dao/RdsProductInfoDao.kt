@@ -35,7 +35,9 @@ import com.tencent.devops.rds.pojo.RdsProductInfo
 import java.time.LocalDateTime
 import org.jooq.DSLContext
 import org.jooq.types.UInteger
+import org.springframework.stereotype.Repository
 
+@Repository
 class RdsProductInfoDao {
 
     fun saveProduct(
