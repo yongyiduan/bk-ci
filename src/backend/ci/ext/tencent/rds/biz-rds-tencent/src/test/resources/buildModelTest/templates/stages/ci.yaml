@@ -1,0 +1,10 @@
+stages:
+  - name: CI
+    check-out:
+      gates:
+        - template: gates/coverage.yaml
+        - template: gates/codecc.yaml
+    jobs:
+      template:
+        - name: jobs/build.yaml
+        - name: jobs/codecc.yaml

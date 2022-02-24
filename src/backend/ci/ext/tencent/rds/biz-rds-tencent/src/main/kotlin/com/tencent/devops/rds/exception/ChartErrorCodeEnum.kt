@@ -25,36 +25,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.chart
+package com.tencent.devops.rds.exception
 
-import com.nhaarman.mockito_kotlin.mock
-import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
-import com.tencent.devops.common.ci.v2.utils.YamlCommonUtils
-import com.tencent.devops.rds.utils.CommonUtils
-import com.tencent.devops.rds.utils.Yaml
-import java.nio.charset.StandardCharsets
-import org.apache.commons.io.FileUtils
-import org.junit.Test
+import com.tencent.devops.common.api.pojo.ErrorType
 
-import org.junit.Assert.*
-import org.mockito.Mockito.mock
-import org.springframework.util.ResourceUtils
-
-class StreamConverterTest {
-
-    private val testService = StreamConverter(mock(), mock(), mock())
-
-    @Test
-    fun replaceTemplate() {
-        val dir = ResourceUtils.getFile("classpath:buildModelTest/templates")
-        val pipelines = dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
-        pipelines.forEach {
-            val pipelineYaml = FileUtils.readFileToString(it, StandardCharsets.UTF_8)
-            val (yamlOb, pre) = testService.replaceTemplate(dir.parent, it.name, pipelineYaml)
-            println("------------------------   pre ------------------------   ")
-            println(YamlCommonUtils.toYamlNotNull(pre))
-            println("------------------------   nor ------------------------   ")
-            println(Yaml.marshal(ScriptYmlUtils.normalizeRdsYaml(yamlOb, it.name)))
-        }
-    }
+/**
+ * 解析chart的error code
+ * 2130031 - 2130040
+ */
+enum class ChartErrorCodeEnum(
+    override val errorType: ErrorType,
+    override val errorCode: String,
+    override val formatErrorMessage: String
+) : ErrorCodeEnum {
+    READ_CHART_FILE_BLANK_ERROR(
+        errorType = ErrorType.USER,
+        errorCode = "2130031",
+        formatErrorMessage = "解析chart文件  %s 内容为空"
+    )
 }

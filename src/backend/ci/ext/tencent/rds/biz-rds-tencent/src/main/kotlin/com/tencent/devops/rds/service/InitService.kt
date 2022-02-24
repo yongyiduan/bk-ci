@@ -32,6 +32,7 @@ import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import java.io.InputStream
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -41,6 +42,8 @@ class InitService @Autowired constructor(
     private val streamConverter: StreamConverter,
     private val chartPipeline: ChartPipeline
 ) {
+
+    private val logger = LoggerFactory.getLogger(InitService::class.java)
 
     fun init(
         userId: String,
@@ -64,20 +67,22 @@ class InitService @Autowired constructor(
                 pipelineFile = pipelineFile
             )
 
+            logger.info("${pipelineFile.name} model: ${streamBuildResult.pipelineModel}")
+
             // 创建并保存流水线
-            chartPipeline.createChartPipeline(
-                userId = userId,
-                productId = productId,
-                chartPipeline = Pair(
-                    RdsPipelineCreate(
-                        productId = productId,
-                        filePath = pipelineFile.name,
-                        originYaml = streamBuildResult.originYaml,
-                        parsedYaml = streamBuildResult.parsedYaml
-                    ),
-                    streamBuildResult.pipelineModel
-                )
-            )
+//            chartPipeline.createChartPipeline(
+//                userId = userId,
+//                productId = productId,
+//                chartPipeline = Pair(
+//                    RdsPipelineCreate(
+//                        productId = productId,
+//                        filePath = pipelineFile.name,
+//                        originYaml = streamBuildResult.originYaml,
+//                        parsedYaml = streamBuildResult.parsedYaml
+//                    ),
+//                    streamBuildResult.pipelineModel
+//                )
+//            )
         }
 
         return true

@@ -31,26 +31,30 @@ package com.tencent.devops.rds.exception
 
 import com.tencent.devops.common.api.pojo.ErrorType
 
+/**
+ * 工蜂接口的error code
+ * 2130001 - 2130020
+ */
 enum class ApiErrorCodeEnum(
-    val errorType: ErrorType,
-    val errorCode: Int,
-    val formatErrorMessage: String
-) {
-    GET_TOKEN_ERROR(ErrorType.THIRD_PARTY, 2130001, "获取工蜂项目的TOKEN %s"),
+    override val errorType: ErrorType,
+    override val errorCode: String,
+    override val formatErrorMessage: String
+) : ErrorCodeEnum {
+    GET_TOKEN_ERROR(ErrorType.THIRD_PARTY, "2130001", "获取工蜂项目的TOKEN %s"),
 
-    DEVNET_TIMEOUT_ERROR(ErrorType.THIRD_PARTY, 2130002, "请求 DEVNET 环境网关超时"),
+    DEVNET_TIMEOUT_ERROR(ErrorType.THIRD_PARTY, "2130002", "请求 DEVNET 环境网关超时"),
 
-    GET_GIT_FILE_TREE_ERROR(ErrorType.THIRD_PARTY, 2130003, "获取仓库CI文件列表失败 %s"),
+    GET_GIT_FILE_TREE_ERROR(ErrorType.THIRD_PARTY, "2130003", "获取仓库CI文件列表失败 %s"),
 
     GET_YAML_CONTENT_ERROR(
         errorType = ErrorType.THIRD_PARTY,
-        errorCode = 2130004,
+        errorCode = "2130004",
         formatErrorMessage = "获取工蜂仓库文件内容失败 %s"
     ),
 
     GET_PROJECT_INFO_ERROR(
         errorType = ErrorType.THIRD_PARTY,
-        errorCode = 2130005,
+        errorCode = "2130005",
         formatErrorMessage = "获取工蜂仓库信息失败 %s"
     ),
 }

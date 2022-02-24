@@ -32,8 +32,6 @@ object Constants {
     const val CHART_TEMPLATE_DIR = "templates"
     // 指定的main入口文件
     const val CHART_MAIN_YAML_FILE = "main.yaml"
-    // 指定的main入口文件
-    const val CHART_MAIN_YML_FILE = "main.yml"
 
     // rds会保存的产品负责人的GIT TOKEN
     const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"

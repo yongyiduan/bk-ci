@@ -3,4 +3,4 @@ jobs:
     name: CodeCC
     steps:
     - checkout: self
-    - template: steps/codecc.yml
+    - template: steps/codecc.yaml

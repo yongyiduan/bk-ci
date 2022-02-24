@@ -32,14 +32,12 @@ package com.tencent.devops.rds.chart
 import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YAML_FILE
-import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YML_FILE
-import com.tencent.devops.rds.dao.RdsProductInfoDao
-import com.tencent.devops.rds.repo.GitRepoServiceImpl
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -81,7 +79,7 @@ class ChartParser @Autowired constructor() {
     fun getCacheChartPipelineFiles(
         cachePath: String
     ): List<File> {
-        val dir = File("$cachePath${File.separator}${Constants.CHART_TEMPLATE_DIR}")
+        val dir = File(Paths.get(cachePath, Constants.CHART_TEMPLATE_DIR).toUri())
         return dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
     }
 
@@ -89,12 +87,9 @@ class ChartParser @Autowired constructor() {
     fun getCacheChartMainFile(
         cachePath: String
     ): String? {
-        val mainYamlFile = File("$cachePath${File.separator}$CHART_MAIN_YAML_FILE")
-        val mainYmlFile = File("$cachePath${File.separator}$CHART_MAIN_YML_FILE")
+        val mainYamlFile = File(Paths.get(cachePath, CHART_MAIN_YAML_FILE).toUri())
         return if (mainYamlFile.exists()) {
             FileUtils.readFileToString(mainYamlFile, StandardCharsets.UTF_8)
-        } else if (mainYmlFile.exists()) {
-            FileUtils.readFileToString(mainYmlFile, StandardCharsets.UTF_8)
         } else null
     }
 

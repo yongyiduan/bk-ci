@@ -32,6 +32,7 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
+import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.RdsRepoFile
 import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
 import com.tencent.devops.rds.pojo.RdsRepoInfo
@@ -121,21 +122,18 @@ class GitRepoServiceImpl @Autowired constructor(
             }
         } catch (e: ClientException) {
             logger.warn("retry 5 times $log: ${e.message} ")
-            throw ErrorCodeException(
-                errorCode = ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR.errorCode.toString(),
-                defaultMessage = ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR.formatErrorMessage
-            )
+            throw RdsErrorCodeException(ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR)
         } catch (e: RemoteServiceException) {
             logger.warn("GIT_API_ERROR $log: ${e.message} ")
             throw ErrorCodeException(
                 statusCode = e.httpStatus,
-                errorCode = apiErrorCode.errorCode.toString(),
+                errorCode = apiErrorCode.errorCode,
                 defaultMessage = "$log: ${e.errorMessage}"
             )
         } catch (e: Throwable) {
             logger.error("retryFun error $log: ${e.message} ")
             throw ErrorCodeException(
-                errorCode = apiErrorCode.errorCode.toString(),
+                errorCode = apiErrorCode.errorCode,
                 defaultMessage = if (e.message.isNullOrBlank()) {
                     "$log: ${apiErrorCode.formatErrorMessage}"
                 } else {

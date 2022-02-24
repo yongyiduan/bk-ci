@@ -29,14 +29,18 @@ package com.tencent.devops.rds.exception
 
 import com.tencent.devops.common.api.pojo.ErrorType
 
+/**
+ * 通用的error code
+ * 2130021 - 2130030
+ */
 enum class CommonErrorCodeEnum(
-    val errorType: ErrorType,
-    val errorCode: Int,
-    val formatErrorMessage: String
-) {
+    override val errorType: ErrorType,
+    override val errorCode: String,
+    override val formatErrorMessage: String
+) : ErrorCodeEnum {
     PARAMS_FORMAT_ERROR(
         errorType = ErrorType.USER,
-        errorCode = 2130021,
+        errorCode = "2130021",
         formatErrorMessage = "参数格式错误 %s"
     )
 }

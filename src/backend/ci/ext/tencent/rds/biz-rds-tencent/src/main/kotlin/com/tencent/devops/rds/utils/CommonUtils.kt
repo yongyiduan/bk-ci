@@ -28,5 +28,5 @@
 package com.tencent.devops.rds.utils
 
 object CommonUtils {
-    fun ciFile(name: String): Boolean = name.endsWith(".yml") || name.endsWith(".yaml")
+    fun ciFile(name: String): Boolean = name.endsWith(".yaml")
 }

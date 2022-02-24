@@ -42,10 +42,14 @@ import com.tencent.devops.rds.chart.stream.InnerModelCreatorImpl
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.chart.stream.TemplateExtraParams
 import com.tencent.devops.rds.constants.Constants
+import com.tencent.devops.rds.exception.ChartErrorCodeEnum
+import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
 import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
+import java.util.regex.Pattern
 import org.apache.commons.io.FileUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -66,10 +70,12 @@ class StreamConverter @Autowired constructor(
         cachePath: String,
         pipelineFile: File
     ): StreamBuildResult {
-        val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8)
+        val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8).ifBlank {
+            throw RdsErrorCodeException(ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR, arrayOf(pipelineFile.name))
+        }
 
         val (preYamlObject, yamlObject) = replaceTemplate(
-            "$cachePath${File.separator}${Constants.CHART_TEMPLATE_DIR}",
+            cachePath,
             pipelineFile.name,
             pipelineYaml
         )
@@ -114,11 +120,30 @@ class StreamConverter @Autowired constructor(
         param: GetTemplateParam<TemplateExtraParams>
     ): String {
         with(param) {
-            return FileUtils.readFileToString(
-                File("${extraParameters.cachePath}${File.separator}$path"),
-                StandardCharsets.UTF_8
-            )
+            val path = File(Paths.get(extraParameters.cachePath, Constants.CHART_TEMPLATE_DIR, path).toUri())
+            val content = FileUtils.readFileToString(path, StandardCharsets.UTF_8).ifBlank {
+                throw RdsErrorCodeException(ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR, arrayOf(path.name))
+            }
+            // 针对可能会与go template冲突的字段进行替换
+            val newContent = replaceTemplatePlaceholder(content)
+            return ScriptYmlUtils.formatYaml(newContent)
         }
+    }
+
+    /**
+     * // TODO: 临时方案
+     * go template 使用 {{}} 会与现在的 stream的 ${{}} 产生冲突
+     * 目前方案是在 origin中使用 ${| }} 在这个函数中再换回 ${{}}
+     */
+    private fun replaceTemplatePlaceholder(content: String): String {
+        var newContent = content
+        val pattern = Pattern.compile("\\$\\{\\|([^{}]+?)}}")
+        val matcher = pattern.matcher(content)
+        while (matcher.find()) {
+            val value = matcher.group()
+            newContent = newContent.replace(matcher.group(), "\${{${value.removePrefix("\${|")}")
+        }
+        return newContent
     }
 
     private fun formatYaml(

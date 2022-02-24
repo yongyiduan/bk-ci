@@ -1,8 +1,6 @@
-steps:
-- uses: BCS@1.latest
-  with:
-    chart_path: ./ccc.yml
-    parameters: true
+stages:
+  - template: stages/ci.yaml
+
 notices:
 - type: wework-message
   title: this is a wework-message notice

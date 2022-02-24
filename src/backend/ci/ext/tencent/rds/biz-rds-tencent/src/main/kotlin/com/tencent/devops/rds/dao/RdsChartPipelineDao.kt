@@ -41,19 +41,22 @@ class RdsChartPipelineDao {
         pipeline: RdsChartPipelineInfo
     ): Int {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
-            return dslContext.insertInto(this,
+            return dslContext.insertInto(
+                this,
                 PIPELINE_ID,
                 PRODUCT_ID,
                 FILE_PATH,
                 ORIGIN_YAML,
                 PARSED_YAML,
-                CREATE_TIME
+                CREATE_TIME,
+                UPDATE_TIME
             ).values(
                 pipeline.pipelineId,
-                pipeline.productId,
+                pipeline.productId.toString(),
                 pipeline.filePath,
                 pipeline.originYaml,
                 pipeline.parsedYaml,
+                LocalDateTime.now(),
                 LocalDateTime.now()
             ).execute()
         }
@@ -78,7 +81,7 @@ class RdsChartPipelineDao {
                 .fetch().map {
                     RdsChartPipelineInfo(
                         pipelineId = it.pipelineId,
-                        productId = it.productId,
+                        productId = it.productId.toInt(),
                         filePath = it.filePath,
                         originYaml = it.originYaml,
                         parsedYaml = it.parsedYaml

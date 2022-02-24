@@ -1,0 +1,7 @@
+steps:
+- name: "Gradle Build"
+  env:
+    mysqlURL: "${|steps.mysqlservice.outputs.MYSQL_IP}}:${|steps.mysqlservice.outputs.MYSQL_PORT}}"
+    mysqlUser: root
+    mysqlPasswd: root
+  run: xxxxx

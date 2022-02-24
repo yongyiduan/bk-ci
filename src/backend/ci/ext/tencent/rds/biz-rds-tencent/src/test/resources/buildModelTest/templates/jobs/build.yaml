@@ -1,0 +1,9 @@
+jobs:
+  build:
+    name: build
+    steps:
+    - checkout: self
+    - template: steps/install.yaml
+    - template: steps/pre_build.yaml
+    - template: steps/build.yaml
+    - template: steps/post_build.yaml
