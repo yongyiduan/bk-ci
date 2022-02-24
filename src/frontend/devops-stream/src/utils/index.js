@@ -278,7 +278,7 @@ export function getBuildSource (gitRequestEvent = {}) {
                     res = `[${gitRequestEvent.mergeRequestId}]`
                     break
                 case 'note':
-                    res = `[${gitRequestEvent.nodeId}]`
+                    res = `[${gitRequestEvent.noteId}]`
                     break
             }
             break
