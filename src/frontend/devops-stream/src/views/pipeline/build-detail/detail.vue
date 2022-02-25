@@ -244,7 +244,7 @@
                                 goCodeReview(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
                                 break
                             case 'note':
-                                goNote(this.projectInfo.web_url, gitRequestEvent.id, gitRequestEvent.noteId)
+                                goNote(gitRequestEvent.noteUrl)
                                 break
                         }
                         break
