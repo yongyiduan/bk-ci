@@ -167,9 +167,9 @@ export function goCodeReview (projectUrl, reviewId) {
     }
 }
 
-export function goNote (projectUrl, reviewId, noteId) {
-    if (reviewId && noteId) {
-        window.open(`${projectUrl}/reviews/${reviewId}#note_${noteId}`, '_blank')
+export function goNote (url) {
+    if (url) {
+        window.open(url, '_blank')
     }
 }
 
