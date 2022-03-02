@@ -3,7 +3,7 @@
         :title="job.name"
         :status="job.status"
     >
-        <section v-if="job.dispatchType && job.dispatchType.buildType === 'GIT_CI'" class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
+        <section v-if="showDebugBtn" class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
             <bk-popover placement="bottom" ref="consoleRef" ext-cls="console-menu-wrapper">
                 <span>
                     Web Console
@@ -27,7 +27,6 @@
     import { mapState } from 'vuex'
     import jobLog from './log/jobLog'
     import detailContainer from './detailContainer'
-    import { pipelines } from '@/http'
 
     export default {
         components: {
@@ -43,7 +42,7 @@
         },
 
         computed: {
-            ...mapState(['projectId']),
+            ...mapState(['projectId', 'modelDetail']),
             
             pipelineId () {
                 return this.$route.params.pipelineId || ''
@@ -55,6 +54,10 @@
 
             hashId () {
                 return this.$route.hash
+            },
+
+            showDebugBtn () {
+                return this.job.dispatchType && this.job.dispatchType.buildType === 'GIT_CI' && this.modelDetail && this.modelDetail.buildNum === this.modelDetail.latestBuildNum
             },
 
             downLoadJobLink () {

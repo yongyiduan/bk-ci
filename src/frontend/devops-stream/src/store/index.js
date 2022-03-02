@@ -21,6 +21,7 @@ const store = new Vuex.Store({
         projectSetting: {},
         curPipeline: {},
         menuPipelineId: '',
+        modelDetail: {},
         exceptionInfo: {
             type: 200
         },
@@ -51,6 +52,9 @@ const store = new Vuex.Store({
         setMenuPipelineId (state, pipelineId) {
             state.menuPipelineId = pipelineId
         },
+        setModelDetail (state, detail) {
+            state.modelDetail = detail
+        },
         setExceptionInfo (state, exceptionInfo) {
             state.exceptionInfo = exceptionInfo
         },
@@ -76,6 +80,9 @@ const store = new Vuex.Store({
         },
         setMenuPipelineId ({ commit }, pipelineId) {
             commit('setMenuPipelineId', pipelineId)
+        },
+        setModelDetail ({ commit }, detail) {
+            commit('setModelDetail', detail)
         },
         setExceptionInfo ({ commit }, exceptionInfo) {
             commit('setExceptionInfo', exceptionInfo)
