@@ -74,7 +74,7 @@
 </template>
 
 <script>
-    import { mapState } from 'vuex'
+    import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
     import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag, goIssue, goCodeReview, goNote } from '@/utils'
     import stages from '@/components/stages'
@@ -136,6 +136,8 @@
         },
 
         methods: {
+            ...mapActions(['setModelDetail']),
+
             getBuildTitle,
             getBuildSource,
 
@@ -156,6 +158,7 @@
                 return pipelines.getPipelineBuildDetail(this.projectId, params).then((res) => {
                     const modelDetail = res.modelDetail || {}
                     const model = modelDetail.model || {}
+                    this.setModelDetail(modelDetail)
                     this.stageList = (model.stages || []).slice(1)
                     this.buildDetail = {
                         ...res.gitProjectPipeline,
