@@ -48,6 +48,8 @@ export function parsePathAlias (type, path, authType, svnType) {
         case isGitLab(type) && authType === 'HTTP':
             reg = /^https?\:\/\/([\-\.a-z0-9A-Z]+)(:[0-9]{2,5})?\/([\w\W\.\-\_\/\+]+)\.git$/i
             msg = `${codelibLocaleObj.httpOrHttpsRule}${type}${codelibLocaleObj.address}`
+
+            aliasIndex = 4
             break
         case isGitLab(type) && authType === 'SSH':
             reg = /^(git@)?([\-\.a-z0-9A-Z]+)\:(.*).git$/i
