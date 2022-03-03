@@ -83,6 +83,7 @@
   "从工蜂自动同步": "Automatic synchronization from git",
   "暂时没有微扩展": "No micro expansion",
   "微扩展名称": "Micro extension name",
+  "微扩展初始化项目，不能卸载": "Micro extension initializer project, cannot be unloaded",
   "微扩展标识": "Micro-extended logo",
   "扩展类型": "Extension type",
   "新增微扩展": "New micro extension",
