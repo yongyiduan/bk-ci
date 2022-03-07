@@ -31,7 +31,7 @@
                         <span>从用户组导入</span>
                         <i :class="['devops-icon icon-angle-down',{ 'icon-flip': isDropdownShow }]"></i>
                     </bk-button>
-                    <ul class="bk-dropdown-list" slot="dropdown-content">
+                    <ul class="bk-dropdown-list users-group" slot="dropdown-content">
                         <li v-for="(entry, index) in userGroupList" :key="index">
                             <a href="javascript:;" @click="selectUsers(entry.users)">
                                 {{ entry.groupName }}
@@ -200,3 +200,9 @@
         }
     }
 </script>
+
+<style>
+    .users-group {
+        overflow: scroll;
+    }
+</style>
