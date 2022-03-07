@@ -109,7 +109,6 @@ export function getCodelibConfig (typeName, svnType = 'ssh', authType = 'ssh') {
     if (type === 'gitlab' && authType === 'HTTP') {
         type = 'gitlab_http'
     }
-
     return codelibConfig[type]
 }
 
