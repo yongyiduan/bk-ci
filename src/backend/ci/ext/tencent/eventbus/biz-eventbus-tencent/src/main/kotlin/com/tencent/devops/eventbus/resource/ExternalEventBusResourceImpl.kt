@@ -39,6 +39,7 @@ import com.tencent.devops.common.web.RestResource
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.Base64
+import javax.ws.rs.core.HttpHeaders
 
 @RestResource
 class ExternalEventBusResourceImpl @Autowired constructor(
@@ -51,7 +52,7 @@ class ExternalEventBusResourceImpl @Autowired constructor(
 
     override fun webhook(
         webhookId: String,
-        headers: Map<String, String>,
+        headers: HttpHeaders,
         payload: String
     ): Result<Boolean> {
         logger.info("receive webhook|$webhookId|$payload")
@@ -61,7 +62,9 @@ class ExternalEventBusResourceImpl @Autowired constructor(
                 projectId = webhookInfo.projectId,
                 source = webhookInfo.source,
                 busId = webhookInfo.busId,
-                headers = headers,
+                headers = headers.requestHeaders
+                    .map { (key, values) -> Pair(key, values.first()) }
+                    .toMap(),
                 payload = payload
             )
         )

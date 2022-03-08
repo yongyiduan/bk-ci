@@ -27,8 +27,9 @@
 
 package com.tencent.devops.eventbus.pojo.event
 
-import com.tencent.devops.eventbus.constant.MQ
 import com.tencent.devops.common.event.annotation.Event
+import com.tencent.devops.eventbus.constant.MQ
+import javax.ws.rs.core.HttpHeaders
 
 @Event(MQ.EXCHANGE_EVENT_BUS_LISTENER_DIRECT, MQ.ROUTE_EVENT_BUS_REQUEST)
 data class EventBusRequestEvent(
