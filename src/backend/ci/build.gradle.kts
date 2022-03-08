@@ -70,7 +70,14 @@ allprojects {
             dependencySet("com.github.taptap:${Versions.PinyinPlus}") {
                 entry("pinyin-plus")
             }
+
             dependency("com.perforce:p4java:${Versions.p4}")
+            dependency("io.appform.rules:json-rules:${Versions.jsonRules}")
+            dependencySet("io.cloudevents:${Versions.cloudEvents}") {
+                entry("cloudevents-spring")
+                entry("cloudevents-http-basic")
+                entry("cloudevents-json-jackson")
+            }
         }
     }
 
