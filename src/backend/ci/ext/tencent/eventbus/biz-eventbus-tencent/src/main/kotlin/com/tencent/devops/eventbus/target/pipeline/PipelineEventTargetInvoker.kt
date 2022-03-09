@@ -48,15 +48,15 @@ class PipelineEventTargetInvoker @Autowired constructor(
     }
 
     override fun invoke(targetRequestParam: PipelineRequestParam) {
-        logger.info("invoke pipeline target by params $targetRequestParam")
+        logger.info("invoke [pipeline] target by params $targetRequestParam")
         with(targetRequestParam) {
             client.get(ServiceBuildResource::class).manualStartupNew(
                 userId = userId,
                 projectId = projectId,
                 pipelineId = pipelineId,
                 values = values,
-                channelCode = ChannelCode.BS,
-                startType = StartType.WEB_HOOK
+                channelCode = ChannelCode.GIT,
+                startType = StartType.SERVICE
             )
         }
     }

@@ -86,7 +86,7 @@ class EventBusRequestService @Autowired constructor(
             )
             val node = CloudEventJsonUtil.serializeAsJsonNode(event = cloudEvent)
             ruleList.forEach { rule ->
-                if (RuleUtil.matches(node = node, expression = rule.filterPattern)) {
+                if (RuleUtil.matches(node = node, filterPattern = rule.filterPattern)) {
                     dispatchRuleTarget(
                         projectId = projectId,
                         ruleId = rule.ruleId,

@@ -36,12 +36,12 @@ object RuleUtil {
 
     private val logger = LoggerFactory.getLogger(RuleUtil::class.java)
 
-    fun matches(node: JsonNode, expression: String): Boolean {
-        val expression = JsonUtil.to(expression, Expression::class.java)
+    fun matches(node: JsonNode, filterPattern: String): Boolean {
+        val expression = JsonUtil.to(filterPattern, Expression::class.java)
         val failureDetail = expression.debug(node)
         if (failureDetail.isFailed) {
             logger.info("event rule matching failure reason:${failureDetail.reason}")
         }
-        return failureDetail.isFailed
+        return !failureDetail.isFailed
     }
 }
