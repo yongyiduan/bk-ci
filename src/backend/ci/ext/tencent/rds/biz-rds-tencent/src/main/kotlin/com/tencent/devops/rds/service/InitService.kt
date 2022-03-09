@@ -27,10 +27,13 @@
 
 package com.tencent.devops.rds.service
 
+import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
+import com.tencent.devops.rds.pojo.yaml.PreMain
+import com.tencent.devops.rds.pojo.yaml.PreResource
 import java.io.InputStream
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,6 +58,24 @@ class InitService @Autowired constructor(
 
         // TODO: 通过缓存读取 main.yml/resource.yml 中的内容来获取产品信息来保存
         val productId = 1
+
+        val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
+        logger.info("RDS|MainFile|mainYamlStr=$mainYamlStr")
+        val mainYaml = YamlUtil.getObjectMapper().readValue(
+            mainYamlStr,
+            PreMain::class.java
+        )
+        val mainObject = mainYaml.getMainObject()
+        logger.info("RDS|MainFile|mainYaml=$mainYaml|mainObject=$mainObject")
+
+        val resourceYamlStr = chartParser.getCacheChartResourceFile(cachePath)
+        logger.info("RDS|ResourceFile|resourceYamlStr=$resourceYamlStr")
+        val resourceYaml = YamlUtil.getObjectMapper().readValue(
+            resourceYamlStr,
+            PreResource::class.java
+        )
+        val resourceObject = resourceYaml.getResourceObject()
+        logger.info("RDS|ResourceFile|resourceYaml=$resourceYaml|resourceObject=$resourceObject")
 
         // TODO: 提前创建流水线去生成质量红线
         val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)

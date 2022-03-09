@@ -32,5 +32,18 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class PreMain(
     val init: Init?,
     @JsonProperty("on")
-    val on: Map<String, PreOn?>?
-)
+    val on: Map<String, PreOn>
+) {
+    fun getMainObject(): Main {
+        return Main(
+            init = init,
+            on = on.map { (k, v) ->
+                On(
+                    id = k,
+                    filter = v.filter,
+                    action = v.action
+                )
+            }.toList()
+        )
+    }
+}

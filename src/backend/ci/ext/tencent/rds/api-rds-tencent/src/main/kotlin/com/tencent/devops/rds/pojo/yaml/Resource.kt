@@ -27,8 +27,10 @@
 
 package com.tencent.devops.rds.pojo.yaml
 
-data class On(
-    val id: String,
-    val filter: Map<String, Any>,
-    val action: Action
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class Resource(
+    @JsonProperty("product_id")
+    val productId: String,
+    val projects: List<Project>
 )

@@ -37,5 +37,5 @@ data class Project(
     val bcsId: String?,
     @JsonProperty("repo_url")
     val repoUrl: String?,
-    val services: List<Service>
+    val services: List<Service>?
 )

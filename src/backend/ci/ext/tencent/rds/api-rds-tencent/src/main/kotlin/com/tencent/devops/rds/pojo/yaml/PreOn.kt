@@ -28,6 +28,6 @@
 package com.tencent.devops.rds.pojo.yaml
 
 data class PreOn(
-    val filter: Map<String, Any?>?,
-    val action: Action?
+    val filter: Map<String, Any>,
+    val action: Action
 )

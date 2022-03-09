@@ -33,4 +33,38 @@ data class PreResource(
     @JsonProperty("product_id")
     val productId: String,
     val projects: List<Map<String, PreProject>>
-)
+) {
+    fun getResourceObject(): Resource {
+        val projectList = mutableListOf<Project>()
+        projects.forEach { projectMap ->
+            projectMap.map { (k, v) ->
+                Project(
+                    id = k,
+                    tapdId = v.tapdId,
+                    bcsId = v.bcsId,
+                    repoUrl = v.repoUrl,
+                    services = v.services?.let {  getServiceList(it) }
+                )
+            }.toList()
+        }
+        return Resource(
+            productId = productId,
+            projects = projectList
+        )
+    }
+
+    private fun getServiceList(
+        services: List<Map<String, PreService>>
+    ): List<Service> {
+        val serviceList = mutableListOf<Service>()
+        services.forEach { serviceMap ->
+            serviceMap.map { (k, v) ->
+                Service(
+                    id = k,
+                    repoUrl = v.repoUrl
+                )
+            }
+        }
+        return serviceList
+    }
+}
