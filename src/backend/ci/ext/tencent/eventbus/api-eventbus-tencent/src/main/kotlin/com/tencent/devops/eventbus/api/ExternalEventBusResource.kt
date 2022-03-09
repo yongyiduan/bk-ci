@@ -47,12 +47,18 @@ import javax.ws.rs.core.MediaType
 interface ExternalEventBusResource {
 
     @ApiOperation("外部请求触发")
-    @Path("/webhook/{webhookId}")
+    @Path("/webhook/{source}/{projectId}/{busId}")
     @POST
     fun webhook(
-        @ApiParam("webhookId")
-        @PathParam("webhookId")
-        webhookId: String,
+        @ApiParam("事件源名称")
+        @PathParam("source")
+        source: String,
+        @ApiParam("项目ID")
+        @PathParam("projectId")
+        projectId: String,
+        @ApiParam("总线ID")
+        @PathParam("busId")
+        busId: String,
         @ApiParam("请求头")
         @Context
         headers: HttpHeaders,

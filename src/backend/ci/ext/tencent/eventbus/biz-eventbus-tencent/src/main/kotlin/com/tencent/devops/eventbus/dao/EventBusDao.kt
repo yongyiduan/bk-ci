@@ -27,8 +27,10 @@
 
 package com.tencent.devops.eventbus.dao
 
+import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.eventbus.pojo.EventBus
 import com.tencent.devops.model.eventbus.tables.TEventBus
+import com.tencent.devops.model.eventbus.tables.records.TEventBusRecord
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -61,6 +63,35 @@ class EventBusDao {
                     eventBus.updater
                 )
                 .execute()
+        }
+    }
+
+    fun getByBusId(
+        dslContext: DSLContext,
+        projectId: String,
+        busId: String
+    ): EventBus? {
+        val record = with(TEventBus.T_EVENT_BUS) {
+            dslContext.selectFrom(this)
+                .where(PROJECT_ID.eq(projectId))
+                .and(BUS_ID.eq(busId))
+                .fetchOne()
+        } ?: return null
+        return convert(record)
+    }
+
+    fun convert(record: TEventBusRecord): EventBus {
+        return with(record) {
+            EventBus(
+                busId = busId,
+                projectId = projectId,
+                name = name,
+                desc = desc,
+                createTime = createTime.timestampmilli(),
+                creator = creator,
+                updateTime = updateTime.timestampmilli(),
+                updater = updater
+            )
         }
     }
 }

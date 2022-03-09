@@ -27,18 +27,13 @@
 
 package com.tencent.devops.eventbus.resource
 
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.eventbus.api.ExternalEventBusResource
 import com.tencent.devops.eventbus.dispatcher.EventBusDispatcher
-import com.tencent.devops.eventbus.pojo.WebhookInfo
 import com.tencent.devops.eventbus.pojo.event.EventBusRequestEvent
-import com.tencent.devops.common.api.exception.InvalidParamException
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.api.util.JsonUtil
-import com.tencent.devops.common.web.RestResource
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.Base64
 import javax.ws.rs.core.HttpHeaders
 
 @RestResource
@@ -51,17 +46,18 @@ class ExternalEventBusResourceImpl @Autowired constructor(
     }
 
     override fun webhook(
-        webhookId: String,
+        source: String,
+        projectId: String,
+        busId: String,
         headers: HttpHeaders,
         payload: String
     ): Result<Boolean> {
-        logger.info("receive webhook|$webhookId|$payload")
-        val webhookInfo = getWebhookInfo(webhookId)
+        logger.info("receive webhook|$source|$projectId|$busId|$payload")
         eventBusDispatcher.dispatch(
             EventBusRequestEvent(
-                projectId = webhookInfo.projectId,
-                source = webhookInfo.source,
-                busId = webhookInfo.busId,
+                projectId = projectId,
+                source = source,
+                busId = busId,
                 headers = headers.requestHeaders
                     .map { (key, values) -> Pair(key, values.first()) }
                     .toMap(),
@@ -69,19 +65,5 @@ class ExternalEventBusResourceImpl @Autowired constructor(
             )
         )
         return Result(true)
-    }
-
-    private fun getWebhookInfo(webhookId: String): WebhookInfo {
-        val webhookInfoStr = String(Base64.getDecoder().decode(webhookId))
-        try {
-            logger.info("Start read the webhook info ($webhookInfoStr)")
-            return JsonUtil.getObjectMapper().readValue(webhookInfoStr)
-        } catch (ignore: Throwable) {
-            logger.error("Fail to read the webhook Info", ignore)
-            throw InvalidParamException(
-                message = "invalid webhookId",
-                params = arrayOf(webhookId)
-            )
-        }
     }
 }

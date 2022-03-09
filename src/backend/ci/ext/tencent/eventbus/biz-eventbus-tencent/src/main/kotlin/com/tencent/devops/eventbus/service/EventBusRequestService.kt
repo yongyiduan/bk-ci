@@ -43,6 +43,7 @@ import com.tencent.devops.eventbus.util.RuleUtil
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.eventbus.dao.EventBusDao
 import io.cloudevents.CloudEvent
 import io.cloudevents.http.HttpMessageFactory
 import org.jooq.DSLContext
@@ -53,6 +54,7 @@ import org.springframework.stereotype.Service
 @Service
 class EventBusRequestService @Autowired constructor(
     private val dslContext: DSLContext,
+    private val eventBusDao: EventBusDao,
     private val eventBusRuleDao: EventBusRuleDao,
     private val eventbusRuleTargetDao: EventRuleTargetDao,
     private val eventBusDispatcher: EventBusDispatcher
@@ -65,6 +67,16 @@ class EventBusRequestService @Autowired constructor(
     fun handle(event: EventBusRequestEvent) {
         with(event) {
             val cloudEvent = toCloudEvent()
+            logger.info("$source|convert cloudEvent|${CloudEventJsonUtil.serializeAsJsonNode(cloudEvent)}")
+            val eventBus = eventBusDao.getByBusId(
+                dslContext = dslContext,
+                projectId = projectId,
+                busId = busId
+            )
+            if (eventBus == null) {
+                logger.info("$projectId|$busId event bus not exist")
+                return
+            }
             val ruleList = eventBusRuleDao.listBySource(
                 dslContext = dslContext,
                 projectId = projectId,
