@@ -60,13 +60,13 @@ class InitService @Autowired constructor(
         val productId = 1
 
         val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
-        logger.info("RDS|MainFile|mainYamlStr=$mainYamlStr")
+        logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
         val mainYaml = YamlUtil.getObjectMapper().readValue(
             mainYamlStr,
             PreMain::class.java
         )
         val mainObject = mainYaml.getMainObject()
-        logger.info("RDS|MainFile|mainYaml=$mainYaml|mainObject=$mainObject")
+        logger.info("RDS|init|MainFile|mainObject=$mainObject|mainYaml=$mainYaml")
 
         val resourceYamlStr = chartParser.getCacheChartResourceFile(cachePath)
         logger.info("RDS|ResourceFile|resourceYamlStr=$resourceYamlStr")
@@ -75,7 +75,7 @@ class InitService @Autowired constructor(
             PreResource::class.java
         )
         val resourceObject = resourceYaml.getResourceObject()
-        logger.info("RDS|ResourceFile|resourceYaml=$resourceYaml|resourceObject=$resourceObject")
+        logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
 
         // TODO: 提前创建流水线去生成质量红线
         val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
