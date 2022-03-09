@@ -30,19 +30,28 @@ package com.tencent.devops.eventbus.service
 import com.tencent.devops.eventbus.pojo.event.EventTargetRunEvent
 import com.tencent.devops.eventbus.target.IEventTargetInvoker
 import com.tencent.devops.common.service.utils.SpringContextUtil
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class EventTargetRunService {
 
+    companion object {
+        private val logger = LoggerFactory.getLogger(EventTargetRunService::class.java)
+    }
+
     fun handle(event: EventTargetRunEvent) {
         with(event) {
-            val targetRequestParamMap = mutableMapOf<String, Any>()
-            targetRequestParamMap[projectId] = projectId
-            targetRequestParamMap[ruleId] = ruleId
-            targetRequestParamMap.putAll(targetParamMap)
+            try {
+                val targetRequestParamMap = mutableMapOf<String, Any>()
+                targetRequestParamMap["projectId"] = projectId
+                targetRequestParamMap["ruleId"] = ruleId
+                targetRequestParamMap.putAll(targetParamMap)
 
-            SpringContextUtil.getBean(IEventTargetInvoker::class.java, targetName).invoke(targetRequestParamMap)
+                SpringContextUtil.getBean(IEventTargetInvoker::class.java, targetName).invoke(targetRequestParamMap)
+            } catch (ignore: Throwable) {
+                logger.warn("${projectId}|${ruleId}|Fail to invoke the target [$targetName]", ignore)
+            }
         }
     }
 }
