@@ -497,12 +497,11 @@
                     subTitle: this.$t('environment.nodeInfo.modifyOperatorTips'),
                     confirmFn: async () => {
                         let message, theme
-                        const params = {}
+                        
                         try {
                             await this.$store.dispatch('environment/changeCreatedUser', {
                                 projectId: this.projectId,
-                                nodeHashId: id,
-                                params
+                                nodeHashId: id
                             })
 
                             message = this.$t('environment.successfullyModified')
