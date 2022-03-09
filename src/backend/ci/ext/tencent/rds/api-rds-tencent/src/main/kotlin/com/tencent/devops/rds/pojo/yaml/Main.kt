@@ -25,15 +25,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.constants
+package com.tencent.devops.rds.pojo.yaml
 
-object Constants {
-    // 保存chart模板文件的目录
-    const val CHART_TEMPLATE_DIR = "templates"
-    // 指定的main入口文件
-    const val CHART_MAIN_YAML_FILE = "main.yaml"
-    // 指定的resource声明文件
-    const val CHART_RESOURCE_YAML_FILE = "resource.yaml"
-    // rds会保存的产品负责人的GIT TOKEN
-    const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"
-}
+data class Main(
+    val init: Init?,
+    val on: List<On>
+)

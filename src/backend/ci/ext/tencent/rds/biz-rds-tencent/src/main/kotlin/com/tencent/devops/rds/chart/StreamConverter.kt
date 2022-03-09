@@ -75,9 +75,9 @@ class StreamConverter @Autowired constructor(
         }
 
         val (preYamlObject, yamlObject) = replaceTemplate(
-            cachePath,
-            pipelineFile.name,
-            pipelineYaml
+            cachePath = cachePath,
+            fileName = pipelineFile.name,
+            pipelineYaml = pipelineYaml
         )
 
         val model = modelCreate.createPipelineModel(

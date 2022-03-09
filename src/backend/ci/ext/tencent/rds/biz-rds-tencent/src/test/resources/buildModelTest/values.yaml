@@ -1,0 +1,12 @@
+## 单元测试相关指标
+unitTest:
+  enable: true
+  coverage: 80
+
+## 静态分析相关指标
+codecc:
+  go_all_defect: 10
+
+build_with_database: true
+
+helmfile_repo_prefix: https://git.woa.com/bk/helmfiles

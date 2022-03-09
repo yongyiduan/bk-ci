@@ -1,0 +1,33 @@
+strategy: cd_with_canary
+env_list:
+  - name: 特性环境
+    type: feature
+    deploy_to: bcs
+    with:
+      namespace: {{ .Values.projects.name }}-feature
+      kubeconfig: {{ .Values.helmfile_repo_prefix }}/{{ .Values.projects.name }}.git@secrets/kubeconfig.yml
+      helmfile: {{ .Values.helmfile_repo_prefix }}/{{ .Values.projects.name }}.git@envs/feature
+
+  - name: 金丝雀环境
+    type: canary
+    deploy_to: bcs
+    schedule:
+      cron: 0 15 * * 3
+      pick_up: last_good
+      always: false
+    with:
+      namespace: {{ .Values.projects.name }}-canary
+      kubeconfig: {{ .Values.helmfile_repo_prefix }}/{{ .Values.projects.name }}.git@secrets/kubeconfig.yml
+      helmfile: {{ .Values.helmfile_repo_prefix }}/{{ .Values.projects.name }}.git@envs/canary
+
+  - name: 生产环境
+    type: prod
+    deploy_to: bcs
+    schedule:
+      cron: 0 15 * * 4
+      pick_up: last_good
+      always: false
+    with:
+      namespace: {{ .Values.projects.name }}-prod
+      kubeconfig: {{ .Values.helmfile_repo_prefix }}/{{ .Values.projects.name }}.git@secrets/kubeconfig.yml
+      helmfile: {{ .Values.helmfile_repo_prefix }}/{{ .Values.projects.name }}.git@envs/prod

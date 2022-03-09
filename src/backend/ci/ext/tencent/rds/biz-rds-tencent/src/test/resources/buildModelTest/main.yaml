@@ -1,0 +1,41 @@
+init:
+  stream_path: init.yml
+on:
+  mr:
+    filter:
+      target-branches: master
+    action:
+      type: stream                       # stream/cls 2选1
+      path: pre_mr.yml
+
+  mr-approve:
+    filter:
+      target-branches: master
+    action:
+      type: stream                       # stream/cls 2选1
+      path: post_mr.yml
+
+  branch_create:
+    filter:
+      branches: [ 'feat/**' ]
+    action:
+      type: rds
+      path: create_envs
+      with:
+        env_type: feature
+
+  push:
+    filter:
+      branches: [ 'feat/**' ]
+    action:
+      type: rds
+      path: upgrade_envs
+
+  branch_delete:
+    filter:
+      branches: [ 'feat/**' ]
+    action:
+      type: rds
+      path: destroy_envs
+      with:
+        env_: feature

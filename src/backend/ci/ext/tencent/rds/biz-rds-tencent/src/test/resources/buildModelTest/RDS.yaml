@@ -1,0 +1,11 @@
+RDSVersion: v1                   # 服务版本号
+name: 蓝盾研发实践                # RDS名称 （必需）
+code: bk-ci
+version: 1.0.0                   # 语义化 版本（必需）
+description: 基于蓝盾团队总结得出的研发实践 # 一句话对这个实践的描述（可选）
+home: http://rdshub.woa.com/bk-ci   # 项目home页面的URL （可选）
+icon: https://cdn.woa.com/xxx.png   # 用做icon的SVG或PNG图片URL （可选）
+keywords: [ Main, TestOne, BCS, Kotlin ]
+maintainers: # （可选）
+  - name: "zanyzhao"              # 维护者名字 （每个维护者都需要）
+    email: "zanyzhao@msn.com"     # 维护者邮箱 （每个维护者可选）

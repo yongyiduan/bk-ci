@@ -25,15 +25,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.constants
+package com.tencent.devops.rds.pojo.yaml
 
-object Constants {
-    // 保存chart模板文件的目录
-    const val CHART_TEMPLATE_DIR = "templates"
-    // 指定的main入口文件
-    const val CHART_MAIN_YAML_FILE = "main.yaml"
-    // 指定的resource声明文件
-    const val CHART_RESOURCE_YAML_FILE = "resource.yaml"
-    // rds会保存的产品负责人的GIT TOKEN
-    const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"
-}
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class PreProject(
+    @JsonProperty("tapd_id")
+    val tapdId: String?,
+    @JsonProperty("bcs_id")
+    val bcsId: String?,
+    @JsonProperty("repo_url")
+    val repoUrl: String?,
+    val services: List<Map<String, PreService>>?
+)

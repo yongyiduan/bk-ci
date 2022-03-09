@@ -32,6 +32,7 @@ package com.tencent.devops.rds.chart
 import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YAML_FILE
+import com.tencent.devops.rds.constants.Constants.CHART_RESOURCE_YAML_FILE
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import java.io.File
@@ -90,6 +91,16 @@ class ChartParser @Autowired constructor() {
         val mainYamlFile = File(Paths.get(cachePath, CHART_MAIN_YAML_FILE).toUri())
         return if (mainYamlFile.exists()) {
             FileUtils.readFileToString(mainYamlFile, StandardCharsets.UTF_8)
+        } else null
+    }
+
+    // 获取缓存中的chart的main文件
+    fun getCacheChartResourceFile(
+        cachePath: String
+    ): String? {
+        val mainResourceFile = File(Paths.get(cachePath, CHART_RESOURCE_YAML_FILE).toUri())
+        return if (mainResourceFile.exists()) {
+            FileUtils.readFileToString(mainResourceFile, StandardCharsets.UTF_8)
         } else null
     }
 
