@@ -138,7 +138,7 @@
         "nodeSource": "节点来源",
         "source": "来源",
         "selectNodeSource": "请选择节点来源",
-        "modifyOperatorTips": "是否修改主机责任人为当前用户",
+        "modifyOperatorTips": "是否修改主机责任人为当前用户？",
         "importer": "导入人",
         "modifyImporter": "修改导入人",
         "owner": "拥有者",

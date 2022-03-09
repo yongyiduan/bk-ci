@@ -265,6 +265,7 @@
         <node-select :node-select-conf="nodeSelectConf"
             :search-info="searchInfo"
             :cur-user-info="curUserInfo"
+            :change-created-user="changeCreatedUser"
             :row-list="importNodeList"
             :select-handlerc-conf="selectHandlercConf"
             :confirm-fn="confirmFn"
@@ -1114,6 +1115,33 @@
              */
             localConvertTime (timestamp) {
                 return convertTime(timestamp * 1000)
+            },
+            async changeCreatedUser (id) {
+                this.$bkInfo({
+                    title: this.$t('environment.nodeInfo.modifyImporter'),
+                    subTitle: this.$t('environment.nodeInfo.modifyOperatorTips'),
+                    confirmFn: async () => {
+                        let message, theme
+                        try {
+                            await this.$store.dispatch('environment/changeCreatedUser', {
+                                projectId: this.projectId,
+                                nodeHashId: id
+                            })
+
+                            message = this.$t('environment.successfullyModified')
+                            theme = 'success'
+                        } catch (err) {
+                            message = err.message ? err.message : err
+                            theme = 'error'
+                        } finally {
+                            this.$bkMessage({
+                                message,
+                                theme
+                            })
+                            this.requestList()
+                        }
+                    }
+                })
             }
         }
     }
