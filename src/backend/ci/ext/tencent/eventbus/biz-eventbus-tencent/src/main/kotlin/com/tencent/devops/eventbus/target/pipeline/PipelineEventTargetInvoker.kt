@@ -55,8 +55,8 @@ class PipelineEventTargetInvoker @Autowired constructor(
                 projectId = projectId,
                 pipelineId = pipelineId,
                 values = values,
-                channelCode = ChannelCode.BS,
-                startType = StartType.WEB_HOOK
+                channelCode = ChannelCode.GIT,
+                startType = StartType.SERVICE
             )
         }
     }
