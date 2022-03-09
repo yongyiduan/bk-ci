@@ -147,8 +147,8 @@ const actions = {
     /**
      * 修改节点导入人
      */
-    changeCreatedUser ({ commit }, { projectId, nodeHashId, params }) {
-        return vue.$ajax.post(`${prefix}/user/envnode/${projectId}/${nodeHashId}/changeCreatedUser`, params).then(response => {
+    changeCreatedUser ({ commit }, { projectId, nodeHashId }) {
+        return vue.$ajax.post(`${prefix}/user/envnode/${projectId}/${nodeHashId}/changeCreatedUser`).then(response => {
             return response
         })
     },

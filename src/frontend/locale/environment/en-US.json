@@ -138,7 +138,7 @@
         "nodeSource": "Source",
         "source": "Source",
         "selectNodeSource": "Select agent source",
-        "modifyOperatorTips": "Modify to me",
+        "modifyOperatorTips": "Modify to me? ",
         "importer": "Importer",
         "modifyImporter": "Modify importer",
         "owner": "Owner",
