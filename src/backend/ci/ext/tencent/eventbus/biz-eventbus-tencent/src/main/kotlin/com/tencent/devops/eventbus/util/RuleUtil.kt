@@ -38,6 +38,7 @@ object RuleUtil {
 
     fun matches(node: JsonNode, filterPattern: String): Boolean {
         val expression = JsonUtil.to(filterPattern, Expression::class.java)
+        logger.info("expression:$expression")
         val failureDetail = expression.debug(node)
         if (failureDetail.isFailed) {
             logger.info("event rule matching failure reason:${failureDetail.reason}")
