@@ -43,10 +43,27 @@ import org.springframework.stereotype.Repository
 @Repository
 class RdsProductInfoDao {
 
-    fun saveProduct(
+    fun createProduct(
         dslContext: DSLContext,
         projectId: String,
-        creator: String,
+        creator: String
+    ): Int {
+        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
+            return dslContext.insertInto(this,
+                CREATOR,
+                PROJECT_ID,
+                CREATE_TIME
+            ).values(
+                creator,
+                projectId,
+                LocalDateTime.now()
+            ).execute()
+        }
+    }
+
+    fun saveProductInfo(
+        dslContext: DSLContext,
+        projectId: String,
         mainYaml: String?,
         main: Main?,
         resourceYaml: String?,
@@ -54,21 +71,17 @@ class RdsProductInfoDao {
     ): Int {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             return dslContext.insertInto(this,
-                CREATOR,
                 PROJECT_ID,
                 MAIN_YAML,
                 MAIN_PARSED,
                 RESOURCE_YAML,
-                RESOURCE_PARSED,
-                CREATE_TIME
+                RESOURCE_PARSED
             ).values(
-                creator,
                 projectId,
                 mainYaml,
                 main?.let { YamlUtil.toYaml(it) },
                 resourceYaml,
-                resource?.let { YamlUtil.toYaml(it) },
-                LocalDateTime.now()
+                resource?.let { YamlUtil.toYaml(it) }
             ).execute()
         }
     }

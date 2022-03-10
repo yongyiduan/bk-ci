@@ -77,7 +77,7 @@ class EventBusService @Autowired constructor(
             ))
         }
 
-        val success = try {
+        return  try {
             client.get(ServiceEventRegisterResource::class).register(
                 userId = userId,
                 projectId = projectId,
@@ -90,6 +90,5 @@ class EventBusService @Autowired constructor(
             logger.error("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns", t)
             throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR)
         }
-        return success
     }
 }

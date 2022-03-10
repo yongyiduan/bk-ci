@@ -28,11 +28,13 @@
 package com.tencent.devops.rds.service
 
 import com.tencent.devops.common.api.util.YamlUtil
+import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
-import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.dao.RdsProductInfoDao
+import com.tencent.devops.rds.exception.CommonErrorCodeEnum
+import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
@@ -44,7 +46,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class InitService @Autowired constructor(
+class ProductInitService @Autowired constructor(
+    private val client: Client,
     private val dslContext: DSLContext,
     private val chartParser: ChartParser,
     private val streamConverter: StreamConverter,
@@ -53,7 +56,26 @@ class InitService @Autowired constructor(
     private val eventBusService: EventBusService
 ) {
 
-    private val logger = LoggerFactory.getLogger(InitService::class.java)
+    private val logger = LoggerFactory.getLogger(ProductInitService::class.java)
+
+    fun createProduct(productId: Long, userId: String, rdsProjectName: String?) {
+        val origin = productInfoDao.getProduct(dslContext, productId)
+        if (origin != null) {
+            throw RdsErrorCodeException(CommonErrorCodeEnum.PARAMS_FORMAT_ERROR, arrayOf(productId.toString()))
+        }
+        // TODO 创建什么样的蓝盾项目待定
+//        val projectResult =
+//            client.get(ServiceTxProjectResource::class).createGitCIProject(
+//                gitProjectId = productId,
+//                userId = userId,
+//                gitProjectName = rdsProjectName
+//            )
+//        if (projectResult.isNotOk()) {
+//            throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
+//        }
+        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
+        productInfoDao.createProduct(dslContext, projectId, userId)
+    }
 
     fun init(
         userId: String,
@@ -62,11 +84,6 @@ class InitService @Autowired constructor(
     ): Boolean {
         // 读取并解压缓存到本地磁盘
         val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
-
-        // TODO: 创建对应的蓝盾项目
-        val productId = 1L
-//        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
-        val projectId = "rds-temp-test-project"
 
         val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
         logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
@@ -85,11 +102,12 @@ class InitService @Autowired constructor(
         )
         val resourceObject = resourceYaml.getResourceObject()
         logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
+        val productId = resourceObject.productId
+        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
 
-        productInfoDao.saveProduct(
+        productInfoDao.saveProductInfo(
             dslContext = dslContext,
             projectId = projectId,
-            creator = userId,
             mainYaml = mainYamlStr,
             main = mainObject,
             resourceYaml = resourceYamlStr,

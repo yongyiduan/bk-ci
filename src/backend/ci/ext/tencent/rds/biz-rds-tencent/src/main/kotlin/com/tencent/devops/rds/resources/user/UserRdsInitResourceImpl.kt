@@ -32,7 +32,7 @@ import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.exception.RdsErrorCodeException
-import com.tencent.devops.rds.service.InitService
+import com.tencent.devops.rds.service.ProductInitService
 import java.io.InputStream
 import java.nio.charset.Charset
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
 class UserRdsInitResourceImpl @Autowired constructor(
-    private val initService: InitService
+    private val productInitService: ProductInitService
 
 ) : UserRdsInitResource {
 
@@ -61,6 +61,6 @@ class UserRdsInitResourceImpl @Autowired constructor(
             throw RdsErrorCodeException(CommonErrorCodeEnum.PARAMS_FORMAT_ERROR, arrayOf("文件类型错误"))
         }
 
-        return Result(initService.init(userId, chartName, inputStream))
+        return Result(productInitService.init(userId, chartName, inputStream))
     }
 }

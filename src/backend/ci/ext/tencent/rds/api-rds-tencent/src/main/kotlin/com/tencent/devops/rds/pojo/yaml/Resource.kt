@@ -31,6 +31,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Resource(
     @JsonProperty("product_id")
-    val productId: String,
+    val productId: Long,
     val projects: List<Project>
 )
