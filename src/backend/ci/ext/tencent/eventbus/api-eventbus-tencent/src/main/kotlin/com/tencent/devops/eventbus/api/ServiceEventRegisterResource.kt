@@ -50,7 +50,7 @@ import javax.ws.rs.core.MediaType
 @Consumes(MediaType.APPLICATION_JSON)
 interface ServiceEventRegisterResource {
 
-    @ApiOperation("外部请求触发")
+    @ApiOperation("注册触发事件规则")
     @Path("/{projectId}/add")
     @POST
     fun register(
