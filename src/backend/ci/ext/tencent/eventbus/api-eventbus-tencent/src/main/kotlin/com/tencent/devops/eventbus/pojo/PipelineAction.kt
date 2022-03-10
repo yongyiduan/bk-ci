@@ -25,19 +25,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.eventbus.pojo
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
-
-@ApiModel("RDS项目的信息")
-data class RdsProductInfo(
-    @ApiModelProperty("RDS产品ID")
-    val productId: Long,
-    @ApiModelProperty("创建人")
-    val creator: String,
-    @ApiModelProperty("开始时间", required = true)
-    val createTime: Long,
-    @ApiModelProperty("开始时间", required = true)
-    val updateTime: Long
+data class PipelineAction(
+    val type: String,
+    val pipelineId: String,
+    val variables: Map<String, Any>?
 )

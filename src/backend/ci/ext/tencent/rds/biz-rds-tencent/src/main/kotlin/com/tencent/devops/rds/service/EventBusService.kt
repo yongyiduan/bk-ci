@@ -25,70 +25,71 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.chart
+package com.tencent.devops.rds.service
 
-import com.tencent.devops.common.api.exception.CustomException
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.pipeline.Model
-import com.tencent.devops.common.pipeline.enums.ChannelCode
-import com.tencent.devops.process.api.service.ServicePipelineResource
-import com.tencent.devops.rds.utils.RdsPipelineUtils
+import com.tencent.devops.eventbus.api.ServiceEventRegisterResource
+import com.tencent.devops.eventbus.pojo.PipelineAction
+import com.tencent.devops.eventbus.pojo.TriggerOn
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
-import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
 import com.tencent.devops.rds.exception.RdsErrorCodeException
-import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
-import com.tencent.devops.rds.pojo.RdsPipelineCreate
-import javax.ws.rs.core.Response
+import com.tencent.devops.rds.pojo.yaml.Main
+import com.tencent.devops.rds.pojo.yaml.Resource
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class ChartPipeline @Autowired constructor(
+class EventBusService @Autowired constructor(
     private val client: Client,
     private val dslContext: DSLContext,
-    private val chartPipelineDao: RdsChartPipelineDao,
-    private val productInfoDao: RdsProductInfoDao
+    private val chartPipelineDao: RdsChartPipelineDao
 ) {
-    companion object {
-        private val logger = LoggerFactory.getLogger(ChartPipeline::class.java)
-    }
 
-    fun createChartPipeline(
+    private val logger = LoggerFactory.getLogger(EventBusService::class.java)
+
+    fun addWebhook(
         userId: String,
         productId: Long,
         projectId: String,
-        chartPipeline: Pair<RdsPipelineCreate, Model>
-    ) {
-        val (pipeline, model) = chartPipeline
-        // 在蓝盾引擎创建项目
-        val result = try {
-            client.get(ServicePipelineResource::class).create(
-                userId = userId,
-                projectId = projectId,
-                pipeline = model,
-                channelCode = ChannelCode.GIT
-            ).data ?: run {
-                logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
-                throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
-            }
-        } catch (t: Throwable) {
-            logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
-            throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
+        main: Main,
+        resource: Resource
+    ): Boolean {
+        // 取出已经注册成功的流水线
+        val triggerOns = mutableListOf<TriggerOn>()
+        val mainOnMap = main.on.map {
+            it.action.path to it
+        }.toMap()
+        val pipelines = chartPipelineDao.getChartPipelines(dslContext, productId)
+        pipelines.forEach { pipeline ->
+            // 使用文件名匹配
+            val on = mainOnMap[pipeline.filePath] ?: return@forEach
+            triggerOns.add(TriggerOn(
+                id = on.id,
+                filter = on.filter,
+                action = PipelineAction(
+                    type = on.action.type,
+                    pipelineId = pipeline.pipelineId,
+                    variables = on.action.with
+                )
+            ))
         }
 
-        // 根据返回结果保存
-        chartPipelineDao.create(
-            dslContext = dslContext,
-            pipeline = RdsChartPipelineInfo(
-                pipelineId = result.id,
-                productId = productId,
-                filePath = pipeline.filePath,
-                originYaml = pipeline.originYaml,
-                parsedYaml = pipeline.parsedYaml
-            )
-        )
+        val success = try {
+            client.get(ServiceEventRegisterResource::class).register(
+                userId = userId,
+                projectId = projectId,
+                triggerOn = triggerOns
+            ).data ?: run {
+                logger.warn("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns")
+                throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR)
+            }
+        } catch (t: Throwable) {
+            logger.error("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns", t)
+            throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR)
+        }
+        return success
     }
 }

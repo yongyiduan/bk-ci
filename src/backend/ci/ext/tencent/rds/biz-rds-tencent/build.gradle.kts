@@ -37,6 +37,7 @@ dependencies {
 
     api(project(":ext:tencent:rds:api-rds-tencent"))
     api(project(":ext:tencent:rds:model-rds-tencent"))
+    api(project(":ext:tencent:eventbus:api-eventbus-tencent"))
 
     api(project(":ext:tencent:process:common-pipeline-yaml"))
     api(project(":ext:tencent:scm:api-scm"))

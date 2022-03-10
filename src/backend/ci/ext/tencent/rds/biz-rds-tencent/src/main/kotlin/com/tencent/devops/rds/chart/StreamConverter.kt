@@ -65,7 +65,7 @@ class StreamConverter @Autowired constructor(
 
     fun buildModel(
         userId: String,
-        productId: Int,
+        productId: Long,
         projectId: String,
         cachePath: String,
         pipelineFile: File

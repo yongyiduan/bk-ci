@@ -54,7 +54,7 @@ class RdsChartPipelineDao {
                 UPDATE_TIME
             ).values(
                 pipeline.pipelineId,
-                pipeline.productId.toString(),
+                pipeline.productId,
                 pipeline.filePath,
                 pipeline.originYaml,
                 pipeline.parsedYaml,
@@ -76,14 +76,14 @@ class RdsChartPipelineDao {
         }
     }
 
-    fun getChartPipelines(dslContext: DSLContext, productId: String): List<RdsChartPipelineInfo> {
+    fun getChartPipelines(dslContext: DSLContext, productId: Long): List<RdsChartPipelineInfo> {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             return dslContext.selectFrom(this)
                 .where(PRODUCT_ID.eq(productId))
                 .fetch().map {
                     RdsChartPipelineInfo(
                         pipelineId = it.pipelineId,
-                        productId = it.productId.toInt(),
+                        productId = it.productId,
                         filePath = it.filePath,
                         originYaml = it.originYaml,
                         parsedYaml = it.parsedYaml

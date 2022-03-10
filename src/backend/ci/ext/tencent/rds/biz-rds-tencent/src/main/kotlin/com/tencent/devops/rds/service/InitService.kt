@@ -31,19 +31,26 @@ import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
+import com.tencent.devops.rds.dao.RdsChartPipelineDao
+import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
+import com.tencent.devops.rds.utils.RdsPipelineUtils
 import java.io.InputStream
+import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
 class InitService @Autowired constructor(
+    private val dslContext: DSLContext,
     private val chartParser: ChartParser,
     private val streamConverter: StreamConverter,
-    private val chartPipeline: ChartPipeline
+    private val chartPipeline: ChartPipeline,
+    private val productInfoDao: RdsProductInfoDao,
+    private val eventBusService: EventBusService
 ) {
 
     private val logger = LoggerFactory.getLogger(InitService::class.java)
@@ -57,7 +64,8 @@ class InitService @Autowired constructor(
         val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
         // TODO: 创建对应的蓝盾项目
-        val productId = 1
+        val productId = 1L
+//        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
         val projectId = "rds-temp-test-project"
 
         val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
@@ -77,6 +85,16 @@ class InitService @Autowired constructor(
         )
         val resourceObject = resourceYaml.getResourceObject()
         logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
+
+        productInfoDao.saveProduct(
+            dslContext = dslContext,
+            projectId = projectId,
+            creator = userId,
+            mainYaml = mainYamlStr,
+            main = mainObject,
+            resourceYaml = resourceYamlStr,
+            resource = resourceObject
+        )
 
         // TODO: 提前创建流水线去生成质量红线
         val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
@@ -108,6 +126,7 @@ class InitService @Autowired constructor(
                 )
             )
         }
+        eventBusService.addWebhook(productId, projectId, mainObject, resourceObject)
 
         return true
     }
