@@ -43,7 +43,7 @@ data class PreResource(
                     tapdId = v.tapdId,
                     bcsId = v.bcsId,
                     repoUrl = v.repoUrl,
-                    services = v.services?.let {  getServiceList(it) }
+                    services = v.services?.let { getServiceList(it) }
                 )
             }.toList()
         }

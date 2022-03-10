@@ -27,19 +27,16 @@
 
 package com.tencent.devops.rds.chart
 
-import com.tencent.devops.common.api.exception.CustomException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.process.api.service.ServicePipelineResource
-import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
 import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
-import javax.ws.rs.core.Response
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

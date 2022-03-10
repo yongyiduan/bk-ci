@@ -77,7 +77,7 @@ class EventBusService @Autowired constructor(
             ))
         }
 
-        return  try {
+        return try {
             client.get(ServiceEventRegisterResource::class).register(
                 userId = userId,
                 projectId = projectId,
