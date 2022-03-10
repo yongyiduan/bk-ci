@@ -180,5 +180,9 @@ export default {
 
     changeGateWayStatus (val, hashId) {
         return api.put(`${QUALITY_PREFIX}/user/rules/v3/update/${hashId}?pass=${val}`)
+    },
+
+    getEventList () {
+        return api.get(`${STREAM_PERFIX}/user/request/eventType`)
     }
 }
