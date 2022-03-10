@@ -80,12 +80,14 @@ class EventBusService @Autowired constructor(
             ))
         }
         resource.projects.forEach { project ->
-            val map = mutableMapOf<String, List<String>>()
-            project.tapdId?.let { map["tapd_id"] = listOf(it) }
-            project.bcsId?.let { map["bcs_id"] = listOf(it) }
-            project.repoUrl?.let { map["repo_url"] = listOf(it) }
+            val map = mutableMapOf<String, MutableList<String>>()
+            project.tapdId?.let { map["tapd_id"] = mutableListOf(it) }
+            project.bcsId?.let { map["bcs_id"] = mutableListOf(it) }
+            project.repoUrl?.let { map["repo_url"] = mutableListOf(it) }
             project.services?.forEach { service ->
-                map["repo_url"] = listOf(service.repoUrl)
+                map["repo_url"]?.add(service.repoUrl) ?: run {
+                    map["repo_url"] = mutableListOf(service.repoUrl)
+                }
             }
             triggerResources.add(TriggerResource(
                 id = project.id,
