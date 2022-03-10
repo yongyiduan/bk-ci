@@ -31,6 +31,8 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.eventbus.api.ServiceEventRegisterResource
 import com.tencent.devops.eventbus.pojo.PipelineAction
 import com.tencent.devops.eventbus.pojo.TriggerOn
+import com.tencent.devops.eventbus.pojo.TriggerRegisterRequest
+import com.tencent.devops.eventbus.pojo.TriggerResource
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
 import com.tencent.devops.rds.exception.RdsErrorCodeException
@@ -59,6 +61,7 @@ class EventBusService @Autowired constructor(
     ): Boolean {
         // 取出已经注册成功的流水线
         val triggerOns = mutableListOf<TriggerOn>()
+        val triggerResources = mutableListOf<TriggerResource>()
         val mainOnMap = main.on.map {
             it.action.path to it
         }.toMap()
@@ -76,18 +79,34 @@ class EventBusService @Autowired constructor(
                 )
             ))
         }
-
+        resource.projects.forEach { project ->
+            val map = mutableMapOf<String, List<String>>()
+            project.tapdId?.let { map["tapd_id"] = listOf(it) }
+            project.bcsId?.let { map["bcs_id"] = listOf(it) }
+            project.repoUrl?.let { map["repo_url"] = listOf(it) }
+            project.services?.forEach { service ->
+                map["repo_url"] = listOf(service.repoUrl)
+            }
+            triggerResources.add(TriggerResource(
+                id = project.id,
+                resources = map
+            ))
+        }
+        logger.info("RDS|EVENT_BUS_REGISTER|triggerOns=$triggerOns|triggerResources=$triggerResources")
         return try {
             client.get(ServiceEventRegisterResource::class).register(
                 userId = userId,
                 projectId = projectId,
-                triggerOn = triggerOns
+                request = TriggerRegisterRequest(
+                    triggerOn = triggerOns,
+                    triggerResource = triggerResources
+                )
             ).data ?: run {
-                logger.warn("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns")
+                logger.warn("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns|triggerResources=$triggerResources")
                 throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR)
             }
         } catch (t: Throwable) {
-            logger.error("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns", t)
+            logger.error("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns|triggerResources=$triggerResources", t)
             throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR)
         }
     }
