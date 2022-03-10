@@ -46,17 +46,17 @@ class ExternalEventBusResourceImpl @Autowired constructor(
     }
 
     override fun webhook(
-        source: String,
+        sourceName: String,
         projectId: String,
         busId: String,
         headers: HttpHeaders,
         payload: String
     ): Result<Boolean> {
-        logger.info("receive webhook|$source|$projectId|$busId|$payload")
+        logger.info("receive webhook|$sourceName|$projectId|$busId|$payload")
         eventBusDispatcher.dispatch(
             EventBusRequestEvent(
                 projectId = projectId,
-                source = source,
+                sourceName = sourceName,
                 busId = busId,
                 headers = headers.requestHeaders
                     .map { (key, values) -> Pair(key, values.first()) }

@@ -29,7 +29,6 @@ package com.tencent.devops.eventbus.target.pipeline
 
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.pipeline.enums.StartType
 import com.tencent.devops.eventbus.constant.TargetType
 import com.tencent.devops.eventbus.target.IEventTargetInvoker
@@ -55,7 +54,7 @@ class PipelineEventTargetInvoker @Autowired constructor(
                 projectId = projectId,
                 pipelineId = pipelineId,
                 values = values,
-                channelCode = ChannelCode.GIT,
+                channelCode = channelCode,
                 startType = StartType.SERVICE
             )
         }

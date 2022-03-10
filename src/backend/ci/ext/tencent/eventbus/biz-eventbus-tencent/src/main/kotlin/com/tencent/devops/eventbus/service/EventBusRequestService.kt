@@ -67,21 +67,23 @@ class EventBusRequestService @Autowired constructor(
     fun handle(event: EventBusRequestEvent) {
         with(event) {
             val cloudEvent = toCloudEvent()
-            logger.info("$source|convert cloudEvent|${CloudEventJsonUtil.serializeAsJsonNode(cloudEvent)}")
+            logger.info(
+                "start to handle event bus request:${busId},${cloudEvent.source},${cloudEvent.type},${cloudEvent.id}"
+            )
             val eventBus = eventBusDao.getByBusId(
                 dslContext = dslContext,
                 projectId = projectId,
                 busId = busId
             )
             if (eventBus == null) {
-                logger.info("$projectId|$busId event bus not exist")
+                logger.info("$projectId|$busId| event bus not exist")
                 return
             }
             val ruleList = eventBusRuleDao.listBySource(
                 dslContext = dslContext,
                 projectId = projectId,
                 busId = busId,
-                source = source,
+                source = cloudEvent.source.toString(),
                 type = cloudEvent.type
             )
             val node = CloudEventJsonUtil.serializeAsJsonNode(event = cloudEvent)
@@ -99,9 +101,9 @@ class EventBusRequestService @Autowired constructor(
 
     private fun EventBusRequestEvent.toCloudEvent(): CloudEvent {
         val eventSourceHandler = try {
-            SpringContextUtil.getBean(IEventSourceHandler::class.java, source)
+            SpringContextUtil.getBean(IEventSourceHandler::class.java, sourceName)
         } catch (ignore: Throwable) {
-            logger.warn("$source event source plugin not found")
+            logger.warn("$sourceName event source plugin not found")
             null
         }
         return eventSourceHandler?.toCloudEvent(
@@ -110,8 +112,8 @@ class EventBusRequestService @Autowired constructor(
         ) ?: HttpMessageFactory.createReader(headers, payload.toByteArray()).toEvent()
         ?: throw ErrorCodeException(
             errorCode = SOURCE_NOT_SUPPORT,
-            params = arrayOf(source),
-            defaultMessage = "event source ($source) not support"
+            params = arrayOf(sourceName),
+            defaultMessage = "event source ($sourceName) not support"
         )
     }
 
