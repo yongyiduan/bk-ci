@@ -27,7 +27,10 @@
 
 package com.tencent.devops.eventbus.pojo
 
-data class TriggerResource(
-    val id: String,
-    val resources: Map<String, List<String>>
+import io.swagger.annotations.ApiModel
+
+@ApiModel("事件规则注册请求")
+data class TriggerRegisterRequest(
+    val triggerOn: List<TriggerOn>,
+    val triggerResource: List<TriggerResource>
 )

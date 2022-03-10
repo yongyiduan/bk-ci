@@ -27,8 +27,10 @@
 
 package com.tencent.devops.eventbus.pojo
 
-data class TriggerOn(
+import io.swagger.annotations.ApiModel
+
+@ApiModel("事件资源")
+data class TriggerResource(
     val id: String,
-    val filter: Map<String, Any>,
-    val action: PipelineAction
+    val resources: Map<String, List<String?>>
 )
