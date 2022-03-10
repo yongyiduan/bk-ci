@@ -91,7 +91,7 @@ module.exports = ({ entry, publicPath, dist, port = 8080, argv, env }) => {
             }),
             new MiniCssExtractPlugin({
                 filename: '[name].[contenthash].css',
-                chunkFilename: '[id].css',
+                chunkFilename: '[id].[contenthash].css',
                 ignoreOrder: true
             }),
             new webpack.DefinePlugin({
