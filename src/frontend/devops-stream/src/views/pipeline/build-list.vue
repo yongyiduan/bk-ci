@@ -88,7 +88,7 @@
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
                             <p>
                                 <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
-                                <span class="info">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ getCommitDesc(props.row) }}</span>
+                                <span class="info">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ props.row.reason }}</span>
                             </p>
                         </section>
                     </template>
@@ -438,54 +438,6 @@
                     })
                     this.compactPaging.count = res.count
                 })
-            },
-
-            getCommitDesc ({ gitRequestEvent }) {
-                let res = ''
-                switch (gitRequestEvent.operationKind) {
-                    case 'delete':
-                        res = `${gitRequestEvent.deleteTag ? `Tag ${gitRequestEvent.branch}` : `Branch ${gitRequestEvent.branch}`} deleted by ${gitRequestEvent.userId}`
-                        break
-                    default:
-                        switch (gitRequestEvent.objectKind) {
-                            case 'push':
-                                res = `Commit ${gitRequestEvent.commitId.slice(0, 9)} pushed by ${gitRequestEvent.userId}`
-                                break
-                            case 'tag_push':
-                                res = `Tag ${gitRequestEvent.branch} created by ${gitRequestEvent.userId}`
-                                break
-                            case 'merge_request':
-                                const actionMap = {
-                                    'push-update': 'updated',
-                                    'reopen': 'reopened',
-                                    'open': 'opened',
-                                    'close': 'closed',
-                                    'merge': 'merged'
-                                }
-                                res = `Merge requests [!${gitRequestEvent.mergeRequestId}] ${actionMap[gitRequestEvent.extensionAction]} by ${gitRequestEvent.userId}`
-                                break
-                            case 'manual':
-                                res = `Manual by ${gitRequestEvent.userId}`
-                                break
-                            case 'schedule':
-                                res = 'Scheduled'
-                                break
-                            case 'openApi':
-                                res = `Triggered by OPENAPI (${gitRequestEvent.userId})`
-                                break
-                            case 'review':
-                                res = `Review [${gitRequestEvent.mergeRequestId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
-                                break
-                            case 'issue':
-                                res = `Issue [${gitRequestEvent.mergeRequestId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
-                                break
-                            case 'note':
-                                res = `Note [${gitRequestEvent.noteId}] ${gitRequestEvent.extensionAction} by ${gitRequestEvent.userId}`
-                                break
-                        }
-                        break
-                }
-                return res
             },
 
             togglePipelineEnable () {
