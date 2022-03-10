@@ -126,7 +126,13 @@ class InitService @Autowired constructor(
                 )
             )
         }
-        eventBusService.addWebhook(productId, projectId, mainObject, resourceObject)
+        eventBusService.addWebhook(
+            userId = userId,
+            productId = productId,
+            projectId = projectId,
+            main = mainObject,
+            resource = resourceObject
+        )
 
         return true
     }
