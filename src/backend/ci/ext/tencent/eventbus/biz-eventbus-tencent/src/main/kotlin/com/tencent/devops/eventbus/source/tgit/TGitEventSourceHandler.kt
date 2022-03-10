@@ -44,16 +44,15 @@ class TGitEventSourceHandler : IEventSourceHandler {
         val secretToken = headers["X-Token"]
         val traceId = headers["X-TRACE-ID"]
 
-        val (source, type) = when (eventType) {
-            "Push Hook" ->
-                Pair(URI.create(JsonPath.parse(payload).read("$.repository.homepage")), "push")
+        val type = when (eventType) {
+            "Push Hook" -> "push"
             else ->
                 return null
         }
         return CloudEventBuilder.v1()
             .withId(traceId)
             .withType(type)
-            .withSource(source)
+            .withSource(URI.create(SourceType.TGIT))
             .withData("application/json",payload.toByteArray(StandardCharsets.UTF_8))
             .build()
     }

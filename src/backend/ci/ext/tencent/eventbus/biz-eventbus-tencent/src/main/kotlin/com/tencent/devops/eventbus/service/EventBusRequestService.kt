@@ -67,7 +67,9 @@ class EventBusRequestService @Autowired constructor(
     fun handle(event: EventBusRequestEvent) {
         with(event) {
             val cloudEvent = toCloudEvent()
-            logger.info("start to handle event bus request:${cloudEvent.source}, ${cloudEvent.id}")
+            logger.info(
+                "start to handle event bus request:${busId},${cloudEvent.source},${cloudEvent.type},${cloudEvent.id}"
+            )
             val eventBus = eventBusDao.getByBusId(
                 dslContext = dslContext,
                 projectId = projectId,
