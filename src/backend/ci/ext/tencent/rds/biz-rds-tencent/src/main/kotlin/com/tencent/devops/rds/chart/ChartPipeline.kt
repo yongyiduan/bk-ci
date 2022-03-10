@@ -59,6 +59,7 @@ class ChartPipeline @Autowired constructor(
     fun createChartPipeline(
         userId: String,
         productId: Int,
+        projectId: String,
         chartPipeline: Pair<RdsPipelineCreate, Model>
     ) {
         val productInfo = productInfoDao.getProduct(dslContext, productId) ?: throw CustomException(
@@ -74,7 +75,7 @@ class ChartPipeline @Autowired constructor(
             client.get(ServicePipelineResource::class).create(
                 userId = userId,
 //                projectId = RdsPipelineUtils.genBKProjectCode(productInfo.productId),
-                projectId = "rds-temp-test-project",
+                projectId = projectId,
                 pipeline = model,
                 channelCode = ChannelCode.GIT
             ).data ?: run {

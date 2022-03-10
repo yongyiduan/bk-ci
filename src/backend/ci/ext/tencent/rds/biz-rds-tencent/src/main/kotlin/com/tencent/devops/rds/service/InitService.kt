@@ -56,8 +56,9 @@ class InitService @Autowired constructor(
         // 读取并解压缓存到本地磁盘
         val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
-        // TODO: 通过缓存读取 main.yml/resource.yml 中的内容来获取产品信息来保存
+        // TODO: 创建对应的蓝盾项目
         val productId = 1
+        val projectId = "rds-temp-test-project"
 
         val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
         logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
@@ -84,7 +85,7 @@ class InitService @Autowired constructor(
             val streamBuildResult = streamConverter.buildModel(
                 userId = userId,
                 productId = productId,
-                projectId = "",
+                projectId = projectId,
                 cachePath = cachePath,
                 pipelineFile = pipelineFile
             )
@@ -95,6 +96,7 @@ class InitService @Autowired constructor(
             chartPipeline.createChartPipeline(
                 userId = userId,
                 productId = productId,
+                projectId = projectId,
                 chartPipeline = Pair(
                     RdsPipelineCreate(
                         productId = productId,
