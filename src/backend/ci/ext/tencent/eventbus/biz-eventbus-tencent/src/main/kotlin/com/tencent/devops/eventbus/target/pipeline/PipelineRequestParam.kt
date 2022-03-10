@@ -37,5 +37,5 @@ data class PipelineRequestParam(
     val projectId: String,
     val pipelineId: String,
     val values: Map<String, String>,
-    val channelCode: String = ChannelCode.BS.name
+    val channelCode: ChannelCode = ChannelCode.BS
 )

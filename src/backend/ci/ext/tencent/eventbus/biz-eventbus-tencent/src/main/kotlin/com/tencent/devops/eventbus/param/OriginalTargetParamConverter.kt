@@ -25,44 +25,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.eventbus.api
+package com.tencent.devops.eventbus.param
 
-import com.tencent.devops.common.api.pojo.Result
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import javax.ws.rs.Consumes
-import javax.ws.rs.POST
-import javax.ws.rs.Path
-import javax.ws.rs.PathParam
-import javax.ws.rs.Produces
-import javax.ws.rs.core.Context
-import javax.ws.rs.core.HttpHeaders
-import javax.ws.rs.core.MediaType
+import com.fasterxml.jackson.databind.JsonNode
+import com.tencent.devops.eventbus.constant.TargetFormType
+import com.tencent.devops.eventbus.pojo.TargetParam
+import org.springframework.stereotype.Component
 
-@Api(tags = ["EXTERNAL_EVENTBUS"], description = "事件总线-外部触发")
-@Path("/external/eventbus")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-interface ExternalEventBusResource {
+@Component(TargetFormType.ORIGINAL)
+class OriginalTargetParamConverter : ITargetParamConverter {
 
-    @ApiOperation("外部请求触发")
-    @Path("/webhook/{source}/{projectId}/{busId}")
-    @POST
-    fun webhook(
-        @ApiParam("事件源名称")
-        @PathParam("source")
-        sourceName: String,
-        @ApiParam("项目ID")
-        @PathParam("projectId")
-        projectId: String,
-        @ApiParam("总线ID")
-        @PathParam("busId")
-        busId: String,
-        @ApiParam("请求头")
-        @Context
-        headers: HttpHeaders,
-        @ApiParam("请求体")
-        payload: String
-    ): Result<Boolean>
+    override fun convert(node: JsonNode, targetParam: TargetParam): Pair<String, Any> {
+        return Pair(targetParam.resourceKey, node.toString())
+    }
 }

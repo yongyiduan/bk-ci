@@ -35,7 +35,7 @@ import javax.ws.rs.core.HttpHeaders
 data class EventBusRequestEvent(
     override var projectId: String,
     val busId: String,
-    val source: String,
+    val sourceName: String,
     val headers: Map<String, String>,
     val payload: String
 ) : IEventBusEvent(

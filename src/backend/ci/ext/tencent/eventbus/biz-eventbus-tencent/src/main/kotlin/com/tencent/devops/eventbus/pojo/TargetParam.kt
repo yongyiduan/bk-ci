@@ -33,6 +33,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 data class TargetParam(
     val resourceKey: String,
     val form: String,
-    val value: Any?,
+    val value: Any? = null,
     val template: Any? = null
 )
