@@ -46,6 +46,20 @@
                         :name="option">
                     </bk-option>
                 </bk-select>
+                 <bk-select v-model="filterData.event"
+                    class="filter-item"
+                    placeholder="Event"
+                    multiple
+                    searchable
+                    :loading="isLoadingEvent"
+                    @toggle="toggleFilterEvent"
+                >
+                    <bk-option v-for="event in eventList"
+                        :key="event.id"
+                        :id="event.id"
+                        :name="event.name">
+                    </bk-option>
+                </bk-select>
                 <bk-select v-model="filterData[filter.id]" v-for="filter in filterList" :key="filter.id" class="filter-item" :placeholder="filter.placeholder" multiple>
                     <bk-option v-for="option in filter.data"
                         :key="option.id"
@@ -243,18 +257,6 @@
                 branchList: [],
                 filterList: [
                     {
-                        id: 'event',
-                        placeholder: 'Event',
-                        data: [
-                            { name: 'Push', id: 'PUSH' },
-                            { name: 'Tag push', id: 'TAG_PUSH' },
-                            { name: 'Merge request', id: 'MERGE_REQUEST' },
-                            { name: 'Manual trigger', id: 'MANUAL' },
-                            { name: 'Scheduled', id: 'SCHEDULE' },
-                            { name: 'Deleted', id: 'DELETE' }
-                        ]
-                    },
-                    {
                         id: 'status',
                         placeholder: 'Status',
                         data: [
@@ -280,7 +282,9 @@
                 triggerCommits: [],
                 checkYaml: validateRule.checkYaml,
                 pipelineList: [],
-                isLoadingPipeline: false
+                isLoadingPipeline: false,
+                isLoadingEvent: false,
+                eventList: []
             }
         },
 
@@ -351,6 +355,19 @@
                         })
                     })
                 })
+            },
+
+            toggleFilterEvent (isOpen) {
+                if (isOpen) {
+                    this.isLoadingEvent = true
+                    pipelines.getEventList().then((res) => {
+                        this.eventList = res || []
+                    }).catch((err) => {
+                        this.messageError(err.message || err)
+                    }).finally(() => {
+                        this.isLoadingEvent = false
+                    })
+                }
             },
 
             toggleFilterPipeline (isOpen) {
