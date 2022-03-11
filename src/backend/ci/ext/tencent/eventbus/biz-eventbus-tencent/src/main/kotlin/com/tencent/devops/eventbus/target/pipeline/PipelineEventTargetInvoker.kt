@@ -49,14 +49,15 @@ class PipelineEventTargetInvoker @Autowired constructor(
     override fun invoke(targetRequestParam: PipelineRequestParam) {
         logger.info("invoke [pipeline] target by params $targetRequestParam")
         with(targetRequestParam) {
-            client.get(ServiceBuildResource::class).manualStartupNew(
+            val buildId = client.get(ServiceBuildResource::class).manualStartupNew(
                 userId = userId,
                 projectId = projectId,
                 pipelineId = pipelineId,
                 values = values,
                 channelCode = channelCode,
                 startType = StartType.SERVICE
-            )
+            ).data
+            logger.info("${buildId?.id}|invoke [pipeline] target success")
         }
     }
 

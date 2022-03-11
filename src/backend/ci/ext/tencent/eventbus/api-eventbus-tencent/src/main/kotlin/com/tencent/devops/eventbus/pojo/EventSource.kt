@@ -35,8 +35,6 @@ data class EventSource(
     val id: Long?,
     @ApiModelProperty("事件源名称")
     val name: String,
-    @ApiModelProperty("事件源域名")
-    val domain: String?,
     @ApiModelProperty("事件源描述")
     val desc: String?,
     @ApiModelProperty("创建时间", required = false)

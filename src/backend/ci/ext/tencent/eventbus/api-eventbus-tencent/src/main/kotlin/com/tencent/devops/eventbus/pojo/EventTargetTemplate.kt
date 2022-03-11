@@ -25,34 +25,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.eventbus.source.tgit
+package com.tencent.devops.eventbus.pojo
 
-import com.tencent.devops.eventbus.constant.SourceType
-import com.tencent.devops.eventbus.source.IEventSourceHandler
-import io.cloudevents.CloudEvent
-import io.cloudevents.core.builder.CloudEventBuilder
-import org.springframework.stereotype.Component
-import java.net.URI
-import java.nio.charset.StandardCharsets
+import io.swagger.annotations.ApiModelProperty
 
-@Component(SourceType.TGIT)
-class TGitEventSourceHandler : IEventSourceHandler {
-
-    override fun toCloudEvent(headers: Map<String, String>, payload: String): CloudEvent? {
-        val eventType = headers["X-Event"]
-        val secretToken = headers["X-Token"]
-        val traceId = headers["X-TRACE-ID"]
-
-        val type = when (eventType) {
-            "Push Hook" -> "push"
-            else ->
-                return null
-        }
-        return CloudEventBuilder.v1()
-            .withId(traceId)
-            .withType(type)
-            .withSource(URI.create(SourceType.TGIT))
-            .withData("application/json",payload.toByteArray(StandardCharsets.UTF_8))
-            .build()
-    }
-}
+data class EventTargetTemplate(
+    val id: Long?,
+    @ApiModelProperty("事件源ID")
+    val sourceId: Long,
+    @ApiModelProperty("事件类型ID")
+    val eventTypeId: Long,
+    @ApiModelProperty("事件目标名称")
+    val targetName: String,
+    @ApiModelProperty("事件目标重试策略")
+    val pushRetryStrategy: String,
+    @ApiModelProperty("事件目标参数")
+    val targetParams: String,
+    @ApiModelProperty("创建时间", required = false)
+    val createTime: Long,
+    @ApiModelProperty("更新时间", required = false)
+    val updateTime: Long
+)
