@@ -127,9 +127,9 @@ class EventTypeDao {
             }
 
             val where = if (conditions.isNotEmpty()) {
-                dslContext.selectFrom(this).where(conditions)
+                dslContext.selectCount().from(this).where(conditions)
             } else {
-                dslContext.selectFrom(this)
+                dslContext.selectCount().from(this)
             }
             return where.fetchOne(0, Long::class.java)!!
         }
