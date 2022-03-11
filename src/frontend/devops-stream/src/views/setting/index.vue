@@ -44,7 +44,8 @@
                 return [
                     { label: 'Basic Settings', name: 'basicSetting', icon: 'edit', enable: true },
                     { label: 'Credential Settings', name: 'credentialList', icon: 'lock', enable: this.enableCi },
-                    { label: 'Agent Pools', name: 'agentPools', icon: 'cc-cabinet', enable: this.enableCi }
+                    { label: 'Agent Pools', name: 'agentPools', icon: 'cc-cabinet', enable: this.enableCi },
+                    { label: 'Experience Groups', name: 'expGroups', icon: 'user', enable: this.enableCi }
                 ]
             }
         },
@@ -79,6 +80,9 @@
                     case 'agentDetail':
                     case 'poolSettings':
                         settingIndex = 2
+                        break
+                    case 'expGroups':
+                        settingIndex = 3
                         break
                 }
                 this.curSetting = this.settingList[settingIndex]

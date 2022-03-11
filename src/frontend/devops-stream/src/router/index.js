@@ -26,6 +26,7 @@ const setting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/i
 const basicSetting = () => import(/* webpackChunkName: 'setting' */'@/views/setting/basic')
 const credentialList = () => import(/* webpackChunkName: 'credential' */'@/views/setting/credential/credential-list')
 const credentialSettings = () => import(/* webpackChunkName: 'credential' */'@/views/setting/credential/credential-settings')
+const expGroupsList = () => import(/* webpackChunkName: 'expGroups' */'@/views/setting/exp-groups')
 const agentPools = () => import(/* webpackChunkName: 'pool' */'@/views/setting/agent-pools/index')
 const poolSettings = () => import(/* webpackChunkName: 'pool' */'@/views/setting/agent-pools/pool-settings')
 const addAgent = () => import(/* webpackChunkName: 'agent' */'@/views/setting/agent-pools/add-agent')
@@ -125,6 +126,11 @@ const routes = [
                                 path: 'credential/:credentialId',
                                 name: 'credentialSettings',
                                 component: credentialSettings
+                            },
+                            {
+                                path: 'expGroups',
+                                name: 'expGroups',
+                                component: expGroupsList
                             },
                             {
                                 path: 'agent-pools',
