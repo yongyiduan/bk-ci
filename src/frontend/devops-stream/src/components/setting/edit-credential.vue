@@ -105,7 +105,7 @@
                                 required: true,
                                 rules: [
                                     {
-                                        validator: (val) => (/^(-----BEGIN RSA PRIVATE KEY-----){1}[\s\S]*(-----END RSA PRIVATE KEY-----)$/.test(val)),
+                                        validator: (val) => (/^(-----BEGIN (RSA|OPENSSH) PRIVATE KEY-----){1}[\s\S]*(-----END (RSA|OPENSSH) PRIVATE KEY-----)$/.test(val)),
                                         message: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center',
                                         trigger: 'blur'
                                     },
@@ -129,7 +129,7 @@
                                 required: true,
                                 rules: [
                                     {
-                                        validator: (val) => (/^(-----BEGIN RSA PRIVATE KEY-----){1}[\s\S]*(-----END RSA PRIVATE KEY-----)$/.test(val)),
+                                        validator: (val) => (/^(-----BEGIN (RSA|OPENSSH) PRIVATE KEY-----){1}[\s\S]*(-----END (RSA|OPENSSH) PRIVATE KEY-----)$/.test(val)),
                                         message: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center',
                                         trigger: 'blur'
                                     },
