@@ -30,12 +30,14 @@ package com.tencent.devops.eventbus.resource
 import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.PageUtil
+import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.eventbus.api.OpEventTargetTemplateResource
 import com.tencent.devops.eventbus.dao.EventTargetTemplateDao
 import com.tencent.devops.eventbus.pojo.EventTargetTemplate
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 
+@RestResource
 class OpEventTargetTemplateResourceImpl @Autowired constructor(
     private val dslContext: DSLContext,
     private val eventTargetTemplateDao: EventTargetTemplateDao

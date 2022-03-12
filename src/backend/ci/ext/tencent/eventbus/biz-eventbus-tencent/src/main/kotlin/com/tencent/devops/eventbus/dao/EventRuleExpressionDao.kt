@@ -74,6 +74,7 @@ class EventRuleExpressionDao {
                 .set(EXPRESSIONS, eventRuleExpression.expressions)
                 .set(DESC, eventRuleExpression.desc)
                 .set(UPDATE_TIME, now)
+                .where(ID.eq(eventRuleExpression.id))
                 .execute()
         }
     }

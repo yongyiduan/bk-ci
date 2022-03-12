@@ -74,6 +74,7 @@ class EventSourceWebhookDao {
                 .set(PROP_NAME, eventSourceWebhook.propName)
                 .set(WEBHOOK_PARAMS, eventSourceWebhook.webhookParams)
                 .set(UPDATE_TIME, now)
+                .where(ID.eq(eventSourceWebhook.id))
                 .execute()
         }
     }

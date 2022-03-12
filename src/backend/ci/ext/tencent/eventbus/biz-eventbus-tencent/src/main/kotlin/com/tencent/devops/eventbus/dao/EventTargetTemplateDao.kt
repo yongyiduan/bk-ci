@@ -74,6 +74,7 @@ class EventTargetTemplateDao {
                 .set(PUSH_RETRY_STRATEGY, eventTargetTemplate.pushRetryStrategy)
                 .set(TARGET_PARAMS, eventTargetTemplate.targetParams)
                 .set(UPDATE_TIME, now)
+                .where(ID.eq(eventTargetTemplate.id))
                 .execute()
         }
     }

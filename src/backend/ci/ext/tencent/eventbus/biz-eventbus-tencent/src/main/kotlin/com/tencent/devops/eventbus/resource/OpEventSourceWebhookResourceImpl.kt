@@ -30,12 +30,14 @@ package com.tencent.devops.eventbus.resource
 import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.PageUtil
+import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.eventbus.api.OpEventSourceWebhookResource
 import com.tencent.devops.eventbus.dao.EventSourceWebhookDao
 import com.tencent.devops.eventbus.pojo.EventSourceWebhook
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 
+@RestResource
 class OpEventSourceWebhookResourceImpl @Autowired constructor(
     private val dslContext: DSLContext,
     private val eventSourceWebhookDao: EventSourceWebhookDao
