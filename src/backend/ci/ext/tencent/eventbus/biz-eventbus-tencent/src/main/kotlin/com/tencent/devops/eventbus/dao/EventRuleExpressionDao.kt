@@ -47,7 +47,7 @@ class EventRuleExpressionDao {
                 SOURCE_ID,
                 EVENT_TYPE_ID,
                 FILTER_NAME,
-                EXPRESSION,
+                EXPRESSIONS,
                 DESC,
                 CREATE_TIME,
                 UPDATE_TIME
@@ -55,7 +55,7 @@ class EventRuleExpressionDao {
                 eventRuleExpression.sourceId,
                 eventRuleExpression.eventTypeId,
                 eventRuleExpression.filterName,
-                eventRuleExpression.expression,
+                eventRuleExpression.expressions,
                 eventRuleExpression.desc,
                 now,
                 now
@@ -71,7 +71,7 @@ class EventRuleExpressionDao {
                 .set(SOURCE_ID, eventRuleExpression.sourceId)
                 .set(EVENT_TYPE_ID, eventRuleExpression.eventTypeId)
                 .set(FILTER_NAME, eventRuleExpression.filterName)
-                .set(EXPRESSION, eventRuleExpression.expression)
+                .set(EXPRESSIONS, eventRuleExpression.expressions)
                 .set(DESC, eventRuleExpression.desc)
                 .set(UPDATE_TIME, now)
                 .execute()
@@ -159,7 +159,7 @@ class EventRuleExpressionDao {
                 sourceId = sourceId,
                 eventTypeId = eventTypeId,
                 filterName = filterName,
-                expression = expression,
+                expressions = expressions,
                 desc = desc,
                 createTime = createTime.timestampmilli(),
                 updateTime = updateTime.timestampmilli()

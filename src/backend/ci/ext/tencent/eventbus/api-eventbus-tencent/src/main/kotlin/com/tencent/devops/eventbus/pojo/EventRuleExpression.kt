@@ -40,7 +40,7 @@ data class EventRuleExpression(
     @ApiModelProperty("过滤字段名")
     val filterName: String,
     @ApiModelProperty("规则表达式")
-    val expression: String,
+    val expressions: String,
     @ApiModelProperty("事件源描述")
     val desc: String?,
     @ApiModelProperty("创建时间", required = false)
