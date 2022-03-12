@@ -96,7 +96,7 @@ class EventTargetTemplateDao {
                 conditions.add(EVENT_TYPE_ID.eq(eventTypeId))
             }
             if (targetName != null) {
-                conditions.add(TARGET_PARAMS.eq(targetName))
+                conditions.add(TARGET_NAME.eq(targetName))
             }
             val where = if (conditions.isNotEmpty()) {
                 dslContext.selectFrom(this).where(conditions)
