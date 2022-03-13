@@ -73,24 +73,12 @@ class EventBusRuleDao {
     }
 
     fun batchCreate(dslContext: DSLContext, eventBusRules: List<EventBusRule>) {
-        val now = LocalDateTime.now()
-        val records = eventBusRules.map {
-            TEventBusRuleRecord(
-                it.ruleId,
-                it.projectId,
-                it.busId,
-                it.name,
-                it.source,
-                it.type,
-                it.filterPattern,
-                it.desc,
-                now,
-                it.creator,
-                now,
-                it.updater
+        eventBusRules.forEach { eventBusRule ->
+            create(
+                dslContext = dslContext,
+                eventBusRule = eventBusRule
             )
         }
-        dslContext.batchInsert(records).execute()
     }
 
     fun listBySource(

@@ -132,7 +132,11 @@ class RdsRegisterService @Autowired constructor(
                     eventTypeId = eventType.id!!,
                     sourceName = eventSource.name,
                     triggerResource = request.triggerResource
-                ) ?: return@eventType
+                )
+                if (webhookProp == null || webhookProp.second.isEmpty()) {
+                    logger.info("Failed to register webhook with source($eventSource.name)")
+                    return@eventType
+                }
                 val ruleId = IdGeneratorUtil.getRuleId()
                 eventBusRuleSet.add(
                     getEventBusRule(
@@ -169,6 +173,7 @@ class RdsRegisterService @Autowired constructor(
                     updater = userId,
                 )
             )
+
             eventBusSourceDao.batchCreate(
                 dslContext = context,
                 eventBusSources = eventBusSourceSet.toList()
@@ -208,9 +213,8 @@ class RdsRegisterService @Autowired constructor(
                     TargetParamUtil.convert(MissingNode.getInstance(), eventSourceWebhook.webhookParams).toMutableMap()
                 val webhookUrl = "$eventBusWebhookUrl/$sourceName/$projectId/$busId"
                 val eventsourceHandler = SpringContextUtil.getBean(IEventSourceHandler::class.java, sourceName)
-                webhookParamMap.plus(propName to propValue)
-                if (eventsourceHandler.registerWebhook(webhookUrl, webhookParamMap)) {
-                    successPropValueList.add(propValue!!)
+                if (eventsourceHandler.registerWebhook(webhookUrl, webhookParamMap.plus(propName to propValue!!))) {
+                    successPropValueList.add(propValue)
                 }
             }
         }
@@ -237,10 +241,13 @@ class RdsRegisterService @Autowired constructor(
             filterNames = filterNames
         )
 
+        val filter = on.filter.toMutableMap()
+        filter[webhookProp.first] = webhookProp.second
+
         val ruleExpressionList = eventRuleExpressions.map { ruleExpression ->
             val replaceExpression = ObjectReplaceEnvVarUtil.replaceEnvVar(
                 ruleExpression.expressions,
-                mapOf(webhookProp.first to JsonUtil.toJson(webhookProp.second))
+                filter.map { (key, value) -> Pair(key, JsonUtil.toJson(value)) }.toMap()
             )
             JsonUtil.to(replaceExpression.toString(), object : TypeReference<List<Expression>>() {})
         }.flatten()
