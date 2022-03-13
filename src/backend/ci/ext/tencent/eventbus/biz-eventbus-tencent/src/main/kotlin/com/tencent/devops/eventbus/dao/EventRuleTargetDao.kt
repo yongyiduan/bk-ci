@@ -66,7 +66,7 @@ class EventRuleTargetDao {
                 eventRuleTarget.creator,
                 now,
                 eventRuleTarget.updater
-            )
+            ).execute()
         }
     }
 

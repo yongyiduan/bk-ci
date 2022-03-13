@@ -137,7 +137,12 @@ class RdsRegisterService @Autowired constructor(
                     logger.info("Failed to register webhook with source($eventSource.name)")
                     return@eventType
                 }
-                val ruleId = IdGeneratorUtil.getRuleId()
+                val ruleId = eventBusRuleDao.getByName(
+                    dslContext = dslContext,
+                    projectId = projectId,
+                    busId = busId,
+                    name = "${eventSource.name}_${eventType.aliasName}"
+                )?.ruleId ?: IdGeneratorUtil.getRuleId()
                 eventBusRuleSet.add(
                     getEventBusRule(
                         projectId = projectId,

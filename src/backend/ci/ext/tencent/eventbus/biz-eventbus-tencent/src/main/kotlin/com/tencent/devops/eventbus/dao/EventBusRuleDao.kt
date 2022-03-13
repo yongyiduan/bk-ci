@@ -68,7 +68,13 @@ class EventBusRuleDao {
                 eventBusRule.creator,
                 now,
                 eventBusRule.updater
-            ).execute()
+            ).onDuplicateKeyUpdate()
+                .set(SOURCE, eventBusRule.source)
+                .set(TYPE, eventBusRule.type)
+                .set(FILTER_PATTERN, eventBusRule.filterPattern)
+                .set(UPDATE_TIME, now)
+                .set(UPDATER, eventBusRule.updater)
+                .execute()
         }
     }
 
@@ -96,6 +102,22 @@ class EventBusRuleDao {
                 .and(TYPE.eq(type))
                 .fetch()
         }.map { convert(it) }
+    }
+
+    fun getByName(
+        dslContext: DSLContext,
+        projectId: String,
+        busId: String,
+        name: String
+    ): EventBusRule? {
+        val record = with(TEventBusRule.T_EVENT_BUS_RULE) {
+            dslContext.selectFrom(this)
+                .where(PROJECT_ID.eq(projectId))
+                .and(BUS_ID.eq(busId))
+                .and(NAME.eq(name))
+                .fetchOne()
+        } ?: return null
+        return convert(record)
     }
 
     fun convert(record: TEventBusRuleRecord): EventBusRule {
