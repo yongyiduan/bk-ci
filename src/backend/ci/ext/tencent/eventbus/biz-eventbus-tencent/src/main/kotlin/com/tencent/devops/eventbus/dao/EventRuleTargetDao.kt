@@ -48,7 +48,7 @@ class EventRuleTargetDao {
                 RULE_ID,
                 TARGET_NAME,
                 PUSH_RETRY_STRATEGY,
-                TARGET_NAME,
+                TARGET_PARAMS,
                 DESC,
                 CREATE_TIME,
                 CREATOR,
@@ -57,16 +57,22 @@ class EventRuleTargetDao {
             ).values(
                 eventRuleTarget.targetId,
                 eventRuleTarget.projectId,
+                eventRuleTarget.ruleId,
                 eventRuleTarget.targetName,
                 eventRuleTarget.pushRetryStrategy,
-                eventRuleTarget.pushRetryStrategy,
-                eventRuleTarget.targetName,
+                eventRuleTarget.targetParams,
                 eventRuleTarget.desc,
                 now,
                 eventRuleTarget.creator,
                 now,
                 eventRuleTarget.updater
-            ).execute()
+            ).onDuplicateKeyUpdate()
+                .set(TARGET_NAME,  eventRuleTarget.targetName)
+                .set(PUSH_RETRY_STRATEGY, eventRuleTarget.pushRetryStrategy)
+                .set(TARGET_PARAMS, eventRuleTarget.targetParams)
+                .set(UPDATE_TIME, now)
+                .set(UPDATER, eventRuleTarget.updater)
+                .execute()
         }
     }
 
@@ -87,9 +93,25 @@ class EventRuleTargetDao {
         return with(TEventRuleTarget.T_EVENT_RULE_TARGET) {
             dslContext.selectFrom(this)
                 .where(PROJECT_ID.eq(projectId))
-                .and(RULE_ID.eq(ruleId)).
-                fetch()
+                .and(RULE_ID.eq(ruleId))
+                .fetch()
         }.map { convert(it) }
+    }
+
+    fun getByTargetName(
+        dslContext: DSLContext,
+        projectId: String,
+        ruleId: String,
+        targetName: String
+    ): EventRuleTarget? {
+        val record = with(TEventRuleTarget.T_EVENT_RULE_TARGET) {
+            dslContext.selectFrom(this)
+                .where(PROJECT_ID.eq(projectId))
+                .and(RULE_ID.eq(ruleId))
+                .and(TARGET_NAME.eq(targetName))
+                .fetchAny()
+        } ?: return null
+        return convert(record)
     }
 
     fun convert(record: TEventRuleTargetRecord): EventRuleTarget {

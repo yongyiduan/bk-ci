@@ -290,8 +290,14 @@ class RdsRegisterService @Autowired constructor(
                 "pipelineId" to on.action.pipelineId
             )
         )
+        val targetId = eventRuleTargetDao.getByTargetName(
+            dslContext = dslContext,
+            projectId = projectId,
+            ruleId = ruleId,
+            targetName = eventTargetTemplate.targetName
+        )?.targetId ?: IdGeneratorUtil.getTargetId()
         return EventRuleTarget(
-            targetId = IdGeneratorUtil.getTargetId(),
+            targetId = targetId,
             ruleId = ruleId,
             projectId = projectId,
             targetName = eventTargetTemplate.targetName,
