@@ -25,27 +25,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.eventbus.pojo
+package com.tencent.devops.eventbus.util
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.JsonNode
+import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.eventbus.param.ITargetParamConverter
+import com.tencent.devops.eventbus.pojo.TargetParam
 
-@ApiModel("事件总线")
-data class EventBus(
-    @ApiModelProperty("事件总线ID")
-    val busId: String,
-    @ApiModelProperty("项目ID")
-    val projectId: String,
-    @ApiModelProperty("事件总线名称")
-    val name: String,
-    @ApiModelProperty("事件总线描述")
-    val desc: String? = null,
-    @ApiModelProperty("创建时间", required = false)
-    val createTime: Long? = null,
-    @ApiModelProperty("创建者", required = false)
-    val creator: String,
-    @ApiModelProperty("更新时间", required = false)
-    val updateTime: Long? = null,
-    @ApiModelProperty("更新者", required = false)
-    val updater: String
-)
+object TargetParamUtil {
+
+    fun convert(node: JsonNode, targetParams: String): Map<String, Any> {
+        val targetParamList = JsonUtil.to(targetParams, object : TypeReference<List<TargetParam>>() {})
+        return targetParamList.associate { targetParam ->
+            SpringContextUtil.getBean(ITargetParamConverter::class.java, targetParam.form)
+                .convert(node = node, targetParam = targetParam)
+        }
+    }
+}

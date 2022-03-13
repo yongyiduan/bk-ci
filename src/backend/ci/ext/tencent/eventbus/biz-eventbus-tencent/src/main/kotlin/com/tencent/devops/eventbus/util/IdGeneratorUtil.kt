@@ -25,27 +25,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.eventbus.pojo
+package com.tencent.devops.eventbus.util
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.util.UUIDUtil
 
-@ApiModel("事件总线")
-data class EventBus(
-    @ApiModelProperty("事件总线ID")
-    val busId: String,
-    @ApiModelProperty("项目ID")
-    val projectId: String,
-    @ApiModelProperty("事件总线名称")
-    val name: String,
-    @ApiModelProperty("事件总线描述")
-    val desc: String? = null,
-    @ApiModelProperty("创建时间", required = false)
-    val createTime: Long? = null,
-    @ApiModelProperty("创建者", required = false)
-    val creator: String,
-    @ApiModelProperty("更新时间", required = false)
-    val updateTime: Long? = null,
-    @ApiModelProperty("更新者", required = false)
-    val updater: String
-)
+object IdGeneratorUtil {
+
+    fun getBusId(): String = "bus-${UUIDUtil.generate()}"
+
+    fun getRuleId(): String = "rule-${UUIDUtil.generate()}"
+
+    fun getTargetId(): String = "target-${UUIDUtil.generate()}"
+}

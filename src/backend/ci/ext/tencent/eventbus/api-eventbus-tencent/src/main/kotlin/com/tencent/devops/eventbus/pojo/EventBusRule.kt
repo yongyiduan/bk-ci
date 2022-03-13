@@ -38,7 +38,7 @@ data class EventBusRule(
     val busId: String,
     @ApiModelProperty("项目ID")
     val projectId: String,
-    @ApiModelProperty("事件总线名称")
+    @ApiModelProperty("事件规则名称")
     val name: String,
     @ApiModelProperty("事件源名称")
     val source: String,
@@ -47,13 +47,13 @@ data class EventBusRule(
     @ApiModelProperty("事件规则表达式")
     val filterPattern: String,
     @ApiModelProperty("事件规则描述")
-    val desc: String?,
+    val desc: String? = null,
     @ApiModelProperty("创建时间", required = false)
-    val createTime: Long,
+    val createTime: Long? = null,
     @ApiModelProperty("创建者", required = false)
     val creator: String,
     @ApiModelProperty("更新时间", required = false)
-    val updateTime: Long,
+    val updateTime: Long? = null,
     @ApiModelProperty("更新者", required = false)
     val updater: String
 )

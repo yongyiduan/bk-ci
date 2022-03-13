@@ -27,8 +27,8 @@
 
 package com.tencent.devops.eventbus.dao
 
-import com.tencent.devops.eventbus.pojo.EventBusRule
 import com.tencent.devops.common.api.util.timestampmilli
+import com.tencent.devops.eventbus.pojo.EventBusRule
 import com.tencent.devops.model.eventbus.tables.TEventBusRule
 import com.tencent.devops.model.eventbus.tables.records.TEventBusRuleRecord
 import org.jooq.DSLContext
@@ -70,6 +70,27 @@ class EventBusRuleDao {
                 eventBusRule.updater
             ).execute()
         }
+    }
+
+    fun batchCreate(dslContext: DSLContext, eventBusRules: List<EventBusRule>) {
+        val now = LocalDateTime.now()
+        val records = eventBusRules.map {
+            TEventBusRuleRecord(
+                it.ruleId,
+                it.projectId,
+                it.busId,
+                it.name,
+                it.source,
+                it.type,
+                it.filterPattern,
+                it.desc,
+                now,
+                it.creator,
+                now,
+                it.updater
+            )
+        }
+        dslContext.batchInsert(records).execute()
     }
 
     fun listBySource(

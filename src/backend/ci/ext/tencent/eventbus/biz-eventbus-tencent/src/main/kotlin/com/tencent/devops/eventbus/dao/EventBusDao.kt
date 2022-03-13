@@ -61,7 +61,7 @@ class EventBusDao {
                     eventBus.creator,
                     now,
                     eventBus.updater
-                )
+                ).onDuplicateKeyIgnore()
                 .execute()
         }
     }
@@ -75,6 +75,20 @@ class EventBusDao {
             dslContext.selectFrom(this)
                 .where(PROJECT_ID.eq(projectId))
                 .and(BUS_ID.eq(busId))
+                .fetchOne()
+        } ?: return null
+        return convert(record)
+    }
+
+    fun getByName(
+        dslContext: DSLContext,
+        projectId: String,
+        name: String
+    ): EventBus? {
+        val record = with(TEventBus.T_EVENT_BUS) {
+            dslContext.selectFrom(this)
+                .where(PROJECT_ID.eq(projectId))
+                .and(NAME.eq(name))
                 .fetchOne()
         } ?: return null
         return convert(record)

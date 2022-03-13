@@ -44,13 +44,13 @@ data class EventRuleTarget(
     @ApiModelProperty("事件目标参数")
     val targetParams: String,
     @ApiModelProperty("事件目标描述")
-    val desc: String?,
+    val desc: String? = null,
     @ApiModelProperty("创建时间", required = false)
-    val createTime: Long,
+    val createTime: Long? = null,
     @ApiModelProperty("创建者", required = false)
     val creator: String,
     @ApiModelProperty("更新时间", required = false)
-    val updateTime: Long,
+    val updateTime: Long? = null,
     @ApiModelProperty("更新者", required = false)
     val updater: String
 )

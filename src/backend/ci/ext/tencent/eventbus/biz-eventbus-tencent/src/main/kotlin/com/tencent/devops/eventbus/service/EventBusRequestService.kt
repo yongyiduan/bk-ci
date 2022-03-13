@@ -27,23 +27,20 @@
 
 package com.tencent.devops.eventbus.service
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
+import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.service.utils.SpringContextUtil
 import com.tencent.devops.eventbus.constant.EventBusMessageCode.SOURCE_NOT_SUPPORT
+import com.tencent.devops.eventbus.dao.EventBusDao
 import com.tencent.devops.eventbus.dao.EventBusRuleDao
 import com.tencent.devops.eventbus.dao.EventRuleTargetDao
 import com.tencent.devops.eventbus.dispatcher.EventBusDispatcher
-import com.tencent.devops.eventbus.pojo.TargetParam
 import com.tencent.devops.eventbus.pojo.event.EventBusRequestEvent
 import com.tencent.devops.eventbus.pojo.event.EventTargetRunEvent
 import com.tencent.devops.eventbus.source.IEventSourceHandler
-import com.tencent.devops.eventbus.param.ITargetParamConverter
 import com.tencent.devops.eventbus.util.CloudEventJsonUtil
 import com.tencent.devops.eventbus.util.RuleUtil
-import com.tencent.devops.common.api.exception.ErrorCodeException
-import com.tencent.devops.common.api.util.JsonUtil
-import com.tencent.devops.common.service.utils.SpringContextUtil
-import com.tencent.devops.eventbus.dao.EventBusDao
+import com.tencent.devops.eventbus.util.TargetParamUtil
 import io.cloudevents.CloudEvent
 import io.cloudevents.http.HttpMessageFactory
 import org.jooq.DSLContext
@@ -128,11 +125,7 @@ class EventBusRequestService @Autowired constructor(
             ruleId = ruleId
         )
         val targetRunEvents = targetList.map { target ->
-            val targetParamList = JsonUtil.to(target.targetParams, object : TypeReference<List<TargetParam>>() {})
-            val targetParamMap = targetParamList.associate { targetParam ->
-                SpringContextUtil.getBean(ITargetParamConverter::class.java, targetParam.form)
-                    .convert(node = node, targetParam = targetParam)
-            }
+            val targetParamMap = TargetParamUtil.convert(node = node, targetParams = target.targetParams)
             EventTargetRunEvent(
                 projectId = projectId,
                 ruleId = ruleId,

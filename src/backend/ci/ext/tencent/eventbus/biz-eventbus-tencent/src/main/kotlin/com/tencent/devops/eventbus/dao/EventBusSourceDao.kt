@@ -29,6 +29,7 @@ package com.tencent.devops.eventbus.dao
 
 import com.tencent.devops.eventbus.pojo.EventBusSource
 import com.tencent.devops.model.eventbus.tables.TEventBusSource
+import com.tencent.devops.model.eventbus.tables.records.TEventBusSourceRecord
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -59,8 +60,25 @@ class EventBusSourceDao {
                     eventBusSource.creator,
                     now,
                     eventBusSource.updater
-                )
+                ).onDuplicateKeyIgnore()
                 .execute()
         }
+    }
+
+    fun batchCreate(dslContext: DSLContext, eventBusSources: List<EventBusSource>) {
+        val now = LocalDateTime.now()
+        val records = eventBusSources.map {
+            TEventBusSourceRecord(
+                it.projectId,
+                it.busId,
+                it.name,
+                it.desc,
+                now,
+                it.creator,
+                now,
+                it.updater
+            )
+        }
+        dslContext.batchInsert(records).execute()
     }
 }

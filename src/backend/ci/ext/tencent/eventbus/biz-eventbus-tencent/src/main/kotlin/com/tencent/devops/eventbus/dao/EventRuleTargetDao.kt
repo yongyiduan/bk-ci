@@ -70,6 +70,26 @@ class EventRuleTargetDao {
         }
     }
 
+    fun batchCreate(dslContext: DSLContext, eventRuleTargets: List<EventRuleTarget>) {
+        val now = LocalDateTime.now()
+        val records = eventRuleTargets.map {
+            TEventRuleTargetRecord(
+                it.targetId,
+                it.projectId,
+                it.ruleId,
+                it.targetName,
+                it.pushRetryStrategy,
+                it.targetParams,
+                it.desc,
+                now,
+                it.creator,
+                now,
+                it.updater
+            )
+        }
+        dslContext.batchInsert(records).execute()
+    }
+
     fun listByRuleId(
         dslContext: DSLContext,
         projectId: String,

@@ -147,16 +147,16 @@ class EventTypeDao {
         return convert(record)
     }
 
-    fun getByAliasName(
+    fun listByAliasName(
         dslContext: DSLContext,
         aliasName: String
-    ) : EventType? {
-        val record = with(TEventType.T_EVENT_TYPE) {
+    ) : List<EventType> {
+        return with(TEventType.T_EVENT_TYPE) {
             dslContext.selectFrom(this)
                 .where(ALIAS_NAME.eq(aliasName))
-                .fetchOne()
-        } ?: return null
-        return convert(record)
+                .fetch()
+                .map { convert(it) }
+        }
     }
 
     fun convert(record: TEventTypeRecord): EventType {

@@ -32,10 +32,18 @@ import io.cloudevents.CloudEvent
 /**
  * 事件源处理类
  */
-interface IEventSourceHandler {
+interface IEventSourceHandler<T> {
 
     fun toCloudEvent(
         headers: Map<String, String>,
         payload: String
     ): CloudEvent?
+
+    fun registerWebhook(webhookUrl: String, webhookRequestParam: T): Boolean
+
+    fun registerWebhook(webhookUrl: String, webhookParamMap: Map<String, Any>): Boolean {
+        return registerWebhook(webhookUrl, getWebhookRequestParam(webhookParamMap))
+    }
+
+    fun getWebhookRequestParam(webhookParamMap: Map<String, Any>): T
 }
