@@ -85,7 +85,7 @@ class RdsRegisterService @Autowired constructor(
         private const val TYPE_FILTER_NAME = "type"
     }
 
-    @Value("\${eventbus:webhookUrl}")
+    @Value("\${eventbus.webhookUrl}")
     private val eventBusWebhookUrl = ""
 
     fun register(
