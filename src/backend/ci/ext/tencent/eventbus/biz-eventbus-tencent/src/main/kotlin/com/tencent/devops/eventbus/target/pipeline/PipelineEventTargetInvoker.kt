@@ -47,17 +47,24 @@ class PipelineEventTargetInvoker @Autowired constructor(
     }
 
     override fun invoke(targetRequestParam: PipelineRequestParam) {
-        logger.info("invoke [pipeline] target by params $targetRequestParam")
         with(targetRequestParam) {
-            val buildId = client.get(ServiceBuildResource::class).manualStartupNew(
-                userId = userId,
-                projectId = projectId,
-                pipelineId = pipelineId,
-                values = values,
-                channelCode = channelCode,
-                startType = StartType.SERVICE
-            ).data
-            logger.info("${buildId?.id}|invoke [pipeline] target success")
+            try {
+                logger.info(
+                    "${projectId}|$pipelineId|Start to invoke [pipeline] event target by params $targetRequestParam"
+                )
+                val buildId = client.get(ServiceBuildResource::class).manualStartupNew(
+                    userId = userId,
+                    projectId = projectId,
+                    pipelineId = pipelineId,
+                    values = values,
+                    channelCode = channelCode,
+                    startType = StartType.SERVICE
+                ).data
+                logger.info("${projectId}|$pipelineId|${buildId?.id}|Success to invoke [pipeline] event target")
+
+            } catch (ignore: Throwable) {
+                logger.error("${projectId}|$pipelineId|Failed to invoke [pipeline] event target")
+            }
         }
     }
 

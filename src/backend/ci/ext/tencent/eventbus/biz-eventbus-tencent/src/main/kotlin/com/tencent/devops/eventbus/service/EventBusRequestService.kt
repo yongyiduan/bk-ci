@@ -83,9 +83,19 @@ class EventBusRequestService @Autowired constructor(
                 source = cloudEvent.source.toString(),
                 type = cloudEvent.type
             )
+            if (ruleList.isEmpty()) {
+                logger.info("$projectId|$busId|${cloudEvent.source}|${cloudEvent.type}| event rule is empty")
+                return
+            }
             val node = CloudEventJsonUtil.serializeAsJsonNode(event = cloudEvent)
             ruleList.forEach { rule ->
-                if (RuleUtil.matches(node = node, filterPattern = rule.filterPattern)) {
+                if (RuleUtil.matches(
+                        projectId = projectId,
+                        ruleId = rule.ruleId,
+                        node = node,
+                        filterPattern = rule.filterPattern
+                    )
+                ) {
                     dispatchRuleTarget(
                         projectId = projectId,
                         ruleId = rule.ruleId,
@@ -124,6 +134,10 @@ class EventBusRequestService @Autowired constructor(
             projectId = projectId,
             ruleId = ruleId
         )
+        if (targetList.isEmpty()) {
+            logger.info("$projectId|$ruleId|event target is empty")
+            return
+        }
         val targetRunEvents = targetList.map { target ->
             val targetParamMap = TargetParamUtil.convert(node = node, targetParams = target.targetParams)
             EventTargetRunEvent(

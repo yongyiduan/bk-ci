@@ -42,6 +42,7 @@ class EventTargetRunService {
 
     fun handle(event: EventTargetRunEvent) {
         with(event) {
+            logger.info("$projectId|$ruleId|$targetName|Started to handle target")
             try {
                 val targetRequestParamMap = mutableMapOf<String, Any>()
                 targetRequestParamMap["projectId"] = projectId
