@@ -27,13 +27,41 @@
 
 package com.tencent.devops.rds.chart
 
+import com.tencent.devops.common.pipeline.enums.BuildFormPropertyType
+import com.tencent.devops.common.pipeline.pojo.BuildFormProperty
+
 /**
  * 通过chart生成的流水线需要预置的启动参数
  */
 object ChartPipelineStartParams {
     //  checkout参数需要的占位符
-    const val RDS_CHECKOUT_AUTH_USER = "RDS_CHECKOUT_AUTH_USER"
     const val RDS_CHECKOUT_REPOSITORY_URL = "RDS_CHECKOUT_REPOSITORY_URL"
     const val RDS_CHECKOUT_PULL_TYPE = "RDS_CHECKOUT_PULL_TYPE"
     const val RDS_CHECKOUT_REF = "RDS_CHECKOUT_REF"
+
+    // TODO: 目前全是string后续再修改
+    // 将上面的参数变为空的流水线参数
+    fun emptyPipelineParams(): List<BuildFormProperty> {
+        return listOf(
+            RDS_CHECKOUT_REPOSITORY_URL,
+            RDS_CHECKOUT_PULL_TYPE,
+            RDS_CHECKOUT_REF
+        ).map {
+            BuildFormProperty(
+                id = it,
+                required = true,
+                type = BuildFormPropertyType.STRING,
+                readOnly = false,
+                defaultValue = "",
+                options = null,
+                desc = null,
+                properties = null,
+                glob = null,
+                containerType = null,
+                scmType = null,
+                repoHashId = null,
+                relativePath = null,
+            )
+        }
+    }
 }

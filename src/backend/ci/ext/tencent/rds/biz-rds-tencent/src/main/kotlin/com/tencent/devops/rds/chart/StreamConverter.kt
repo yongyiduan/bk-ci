@@ -87,7 +87,7 @@ class StreamConverter @Autowired constructor(
                 projectCode = projectId
             ),
             yaml = yamlObject,
-            pipelineParams = emptyList()
+            pipelineParams = ChartPipelineStartParams.emptyPipelineParams()
         )
 
         return StreamBuildResult(
