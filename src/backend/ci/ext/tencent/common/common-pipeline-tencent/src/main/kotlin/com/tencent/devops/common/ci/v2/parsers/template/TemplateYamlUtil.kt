@@ -29,11 +29,12 @@ package com.tencent.devops.common.ci.v2.parsers.template
 
 import com.tencent.devops.common.ci.v2.ParametersTemplateNull
 import com.tencent.devops.common.ci.v2.ParametersType
+import com.tencent.devops.common.ci.v2.PreStage
 import com.tencent.devops.common.ci.v2.Repositories
-import com.tencent.devops.common.ci.v2.exception.YamlFormatException
-import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
-import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
 import com.tencent.devops.common.ci.v2.enums.TemplateType
+import com.tencent.devops.common.ci.v2.exception.YamlFormatException
+import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
+import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
 
 object TemplateYamlUtil {
 
@@ -65,6 +66,19 @@ object TemplateYamlUtil {
                 )
             }
             false
+        }
+    }
+
+    fun checkJobIdGlobalUnique(stageList: MutableList<PreStage>, filePath: String) {
+        val allJobIds = mutableSetOf<String>()
+        stageList.forEach { stage ->
+            val jobIds = stage.jobs?.keys
+            jobIds?.forEach {
+                if (allJobIds.contains(it)) {
+                    error(Constants.TEMPLATE_JOB_ID_DUPLICATE.format(it, filePath))
+                }
+                allJobIds.add(it)
+            }
         }
     }
 

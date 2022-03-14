@@ -33,20 +33,21 @@ import com.tencent.devops.common.ci.v2.GitNotices
 import com.tencent.devops.common.ci.v2.PreJob
 import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
 import com.tencent.devops.common.ci.v2.PreStage
+import com.tencent.devops.common.ci.v2.PreStep
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.Repositories
+import com.tencent.devops.common.ci.v2.TemplateInfo
 import com.tencent.devops.common.ci.v2.Variable
+import com.tencent.devops.common.ci.v2.enums.TemplateType
+import com.tencent.devops.common.ci.v2.exception.YamlFormatException
+import com.tencent.devops.common.ci.v2.parsers.template.TemplateYamlUtil.checkJobIdGlobalUnique
+import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
+import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
+import com.tencent.devops.common.ci.v2.parsers.template.models.TemplateDeepTreeNode
 import com.tencent.devops.common.ci.v2.stageCheck.Gate
 import com.tencent.devops.common.ci.v2.stageCheck.GateTemplate
 import com.tencent.devops.common.ci.v2.stageCheck.PreStageCheck
 import com.tencent.devops.common.ci.v2.stageCheck.PreTemplateStageCheck
-import com.tencent.devops.common.ci.v2.PreStep
-import com.tencent.devops.common.ci.v2.TemplateInfo
-import com.tencent.devops.common.ci.v2.exception.YamlFormatException
-import com.tencent.devops.common.ci.v2.enums.TemplateType
-import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
-import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
-import com.tencent.devops.common.ci.v2.parsers.template.models.TemplateDeepTreeNode
 
 @Suppress("ALL")
 class YamlTemplate<T>(
@@ -254,6 +255,7 @@ class YamlTemplate<T>(
         stages.forEach { stage ->
             stageList.addAll(replaceStageTemplate(listOf(stage), filePath, deepTree))
         }
+        checkJobIdGlobalUnique(stageList, filePath)
         preYamlObject.stages = stageList
     }
 
