@@ -14,6 +14,7 @@
             empty-text="No group yet"
             class="group-table"
         >
+            <bk-table-column label="Id" prop="groupHashId"></bk-table-column>
             <bk-table-column label="Name" prop="name"></bk-table-column>
             <bk-table-column label="OA users" prop="innerUsers">
                 <template slot-scope="props">

@@ -1,5 +1,5 @@
 <template>
-    <bk-sideslider :is-show.sync="show" :quick-close="true" @hidden="hidden" :width="622" :title="isEdit ? 'Edit Credential' : 'Add Credential'">
+    <bk-sideslider :is-show.sync="show" :quick-close="true" @hidden="hidden" :width="622" :title="isEdit ? 'Edit experience group' : 'Add experience group'">
         <bk-form :model="formData" ref="groupForm" slot="content" class="group-form" form-type="vertical" :label-width="400">
             <bk-form-item label="Name" :required="true" :rules="[requireRule('Name'), nameRule]" property="name" error-display-type="normal">
                 <bk-input v-model="formData.name" placeholder="No more than 10 characters"></bk-input>
@@ -9,7 +9,7 @@
                     v-model="formData.innerUsers"
                     class="user-select-item"
                     style="height: 100px"
-                    placeholder="Please input OA users"
+                    placeholder="Please enter OA users"
                     api="https://api.open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/">
                 </bk-user-selector>
             </bk-form-item>
