@@ -17,7 +17,6 @@
                     :outer-border="false"
                     :header-border="false"
                     :header-cell-style="{ background: '#fafbfd' }"
-                    :height="tableHeight"
                 >
                     <bk-table-column label="Display Name" prop="displayName">
                         <template slot-scope="props">
@@ -117,14 +116,10 @@
         },
 
         computed: {
-            ...mapState(['appHeight', 'projectId']),
+            ...mapState(['projectId']),
 
             envHashId () {
                 return this.$route.params.poolId
-            },
-
-            tableHeight () {
-                return Math.min(this.appHeight - 152, 43 + (this.agentList.length || 4) * 42)
             }
         },
 
@@ -230,6 +225,8 @@
     }
     .agent-list-main {
         padding: 16px;
+        height: calc(100% - 49px);
+        overflow-y: auto;
         .operate-agent {
             margin-bottom: 20px;
         }
