@@ -61,7 +61,6 @@ class YamlTemplate<T>(
     val nowRepo: Repositories?,
     // 目标库信息(发起库没有库信息)
     val repo: Repositories?,
-
     // 来自文件
     private val fileFromPath: String? = null,
 
@@ -82,6 +81,9 @@ class YamlTemplate<T>(
 ) {
     // 存储当前库的模板信息，减少重复获取 key: templatePath value： template
     private val templateLib = TemplateLibrary(extraParameters, getTemplateMethod)
+
+    // Job全局ID一致Set
+    private val allJobIds: MutableSet<String> = mutableSetOf()
 
     // 添加图防止模版的循环嵌套
     private val templateGraph = TemplateGraph()
@@ -253,9 +255,10 @@ class YamlTemplate<T>(
     ) {
         val stageList = mutableListOf<PreStage>()
         stages.forEach { stage ->
-            stageList.addAll(replaceStageTemplate(listOf(stage), filePath, deepTree))
+            val newStage = replaceStageTemplate(listOf(stage), filePath, deepTree)
+            checkJobIdGlobalUnique(newStage, filePath, allJobIds)
+            stageList.addAll(newStage)
         }
-        checkJobIdGlobalUnique(stageList, filePath)
         preYamlObject.stages = stageList
     }
 
@@ -375,7 +378,6 @@ class YamlTemplate<T>(
             if (Constants.TEMPLATE_KEY in stage.keys) {
                 val toPath = stage[Constants.TEMPLATE_KEY].toString()
                 templateGraph.saveAndCheckCyclicTemplate(fromPath, toPath, TemplateType.STAGE)
-
                 val parameters = YamlObjects.transNullValue<Map<String, Any?>>(
                     file = fromPath,
                     type = Constants.PARAMETERS_KEY,
@@ -414,7 +416,6 @@ class YamlTemplate<T>(
                 toPathList.forEach { item ->
                     val toPath = item[Constants.OBJECT_TEMPLATE_PATH].toString()
                     templateGraph.saveAndCheckCyclicTemplate(fromPath, toPath, TemplateType.JOB)
-
                     val parameters = YamlObjects.transNullValue<Map<String, Any?>>(
                         file = fromPath,
                         type = Constants.PARAMETERS_KEY,

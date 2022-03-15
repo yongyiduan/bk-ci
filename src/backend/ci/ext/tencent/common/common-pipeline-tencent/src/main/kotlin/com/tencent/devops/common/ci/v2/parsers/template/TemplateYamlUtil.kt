@@ -69,15 +69,12 @@ object TemplateYamlUtil {
         }
     }
 
-    fun checkJobIdGlobalUnique(stageList: MutableList<PreStage>, filePath: String) {
-        val allJobIds = mutableSetOf<String>()
+    fun checkJobIdGlobalUnique(stageList: List<PreStage>, filePath: String, allJobIds: MutableSet<String>) {
         stageList.forEach { stage ->
-            val jobIds = stage.jobs?.keys
-            jobIds?.forEach {
-                if (allJobIds.contains(it)) {
-                    error(Constants.TEMPLATE_JOB_ID_DUPLICATE.format(it, filePath))
-                }
-                allJobIds.add(it)
+            val jobKeys = stage.jobs?.keys
+            if (jobKeys != null) {
+                checkDuplicateKey(filePath, jobKeys, allJobIds)
+                allJobIds.addAll(jobKeys)
             }
         }
     }
