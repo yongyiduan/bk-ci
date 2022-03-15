@@ -13,7 +13,7 @@
                     api="https://api.open.woa.com/api/c/compapi/v2/usermanage/fs_list_users/">
                 </bk-user-selector>
             </bk-form-item>
-            <bk-form-item label="Non-OA users" property="outerUsers" :desc="{ content: 'Non-OA users 为外部协作用户，需要在蓝鲸用户管理先注册用户，指引参考：https://iwiki.woa.com/pages/viewpage.action?pageId=777738612', width: '400px' }">
+            <bk-form-item label="Non-OA users" property="outerUsers" :desc="{ content: 'Non-OA users 为外部协作用户，需要在蓝鲸用户管理先注册用户，指引参考：https://iwiki.woa.com/pages/viewpage.action?pageId=1556183163', width: '400px' }">
                 <bk-select
                     v-model="formData.outerUsers"
                     ext-cls="select-custom"
