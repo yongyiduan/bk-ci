@@ -5,37 +5,18 @@ on:
     filter:
       target-branches: master
     action:
-      type: stream                       # stream/cls 2选1
-      path: pre_mr.yml
+      type: stream
+      path: primary_ci.yaml
 
   mr-approve:
     filter:
       target-branches: master
     action:
-      type: stream                       # stream/cls 2选1
-      path: post_mr.yml
-
-  branch_create:
-    filter:
-      branches: [ 'feat/**' ]
-    action:
-      type: rds
-      path: create_envs
-      with:
-        env_type: feature
-
+      type: stream
+      path: secondary_ci.yaml
   push:
     filter:
       branches: [ 'feat/**' ]
     action:
-      type: rds
-      path: upgrade_envs
-
-  branch_delete:
-    filter:
-      branches: [ 'feat/**' ]
-    action:
-      type: rds
-      path: destroy_envs
-      with:
-        env_: feature
+      type: stream
+      path: primary_ci.yaml

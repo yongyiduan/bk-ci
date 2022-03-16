@@ -81,7 +81,7 @@ class StreamConverter @Autowired constructor(
         )
 
         val model = modelCreate.createPipelineModel(
-            modelName = RdsPipelineUtils.genBKPipelineName(productId),
+            modelName = RdsPipelineUtils.genBKPipelineName(pipelineFile.name),
             event = ModelCreateEvent(
                 userId,
                 projectCode = projectId

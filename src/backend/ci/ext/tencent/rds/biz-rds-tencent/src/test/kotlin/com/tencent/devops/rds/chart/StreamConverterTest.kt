@@ -89,10 +89,11 @@ class StreamConverterTest {
         val formatResourceStr = YamlUtil.toYaml(obj)
         println(formatResourceStr)
         println("---")
-        val mainYaml = YamlUtil.getObjectMapper().readValue(
+        val resource = YamlUtil.getObjectMapper().readValue(
             resourceYamlStr,
             PreResource::class.java
         )
-        println(mainYaml)
+        println(resource)
+        println(resource.getResourceObject())
     }
 }
