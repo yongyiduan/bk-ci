@@ -31,10 +31,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class PreProject(
     @JsonProperty("tapd_id")
-    val tapdId: String?,
+    val tapdId: Any?,
     @JsonProperty("bcs_id")
-    val bcsId: String?,
+    val bcsId: Any?,
     @JsonProperty("repo_url")
-    val repoUrl: String?,
-    val services: List<Map<String, PreService>>?
+    val repoUrl: Any?,
+    val services: List<Map<Any, PreService>>?
 )

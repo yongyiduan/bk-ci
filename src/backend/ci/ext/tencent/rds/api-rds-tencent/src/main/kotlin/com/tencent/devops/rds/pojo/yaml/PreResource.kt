@@ -32,17 +32,17 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class PreResource(
     @JsonProperty("product_id")
     val productId: Long,
-    val projects: List<Map<String, PreProject>>
+    val projects: List<Map<Any, PreProject>>
 ) {
     fun getResourceObject(): Resource {
         val projectList = mutableListOf<Project>()
         projects.forEach { projectMap ->
             projectMap.map { (k, v) ->
                 Project(
-                    id = k,
-                    tapdId = v.tapdId,
-                    bcsId = v.bcsId,
-                    repoUrl = v.repoUrl,
+                    id = k.toString(),
+                    tapdId = v.tapdId.toString(),
+                    bcsId = v.bcsId.toString(),
+                    repoUrl = v.repoUrl.toString(),
                     services = v.services?.let { getServiceList(it) }
                 )
             }.toList()
@@ -54,14 +54,14 @@ data class PreResource(
     }
 
     private fun getServiceList(
-        services: List<Map<String, PreService>>
+        services: List<Map<Any, PreService>>
     ): List<Service> {
         val serviceList = mutableListOf<Service>()
         services.forEach { serviceMap ->
             serviceMap.map { (k, v) ->
                 Service(
-                    id = k,
-                    repoUrl = v.repoUrl
+                    id = k.toString(),
+                    repoUrl = v.repoUrl.toString()
                 )
             }
         }
