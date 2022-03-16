@@ -40,6 +40,7 @@ import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import java.io.InputStream
+import kotlin.math.log
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -82,76 +83,80 @@ class ProductInitService @Autowired constructor(
         chartName: String,
         inputStream: InputStream
     ): Boolean {
-        // 读取并解压缓存到本地磁盘
-        val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
+        try {
+            // 读取并解压缓存到本地磁盘
+            val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
-        val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
-        logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
-        val mainYaml = YamlUtil.getObjectMapper().readValue(
-            mainYamlStr,
-            PreMain::class.java
-        )
-        val mainObject = mainYaml.getMainObject()
-        logger.info("RDS|init|MainFile|mainObject=$mainObject|mainYaml=$mainYaml")
+            val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
+            logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
+            val mainYaml = YamlUtil.getObjectMapper().readValue(
+                mainYamlStr,
+                PreMain::class.java
+            )
+            val mainObject = mainYaml.getMainObject()
+            logger.info("RDS|init|MainFile|mainObject=$mainObject|mainYaml=$mainYaml")
 
-        val resourceYamlStr = chartParser.getCacheChartResourceFile(cachePath)
-        logger.info("RDS|ResourceFile|resourceYamlStr=$resourceYamlStr")
-        val resourceYaml = YamlUtil.getObjectMapper().readValue(
-            resourceYamlStr,
-            PreResource::class.java
-        )
-        val resourceObject = resourceYaml.getResourceObject()
-        logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
-        val productId = resourceObject.productId
-        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
+            val resourceYamlStr = chartParser.getCacheChartResourceFile(cachePath)
+            logger.info("RDS|ResourceFile|resourceYamlStr=$resourceYamlStr")
+            val resourceYaml = YamlUtil.getObjectMapper().readValue(
+                resourceYamlStr,
+                PreResource::class.java
+            )
+            val resourceObject = resourceYaml.getResourceObject()
+            logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
+            val productId = resourceObject.productId
+            val projectId = RdsPipelineUtils.genBKProjectCode(productId)
 
-        productInfoDao.saveProductInfo(
-            dslContext = dslContext,
-            projectId = projectId,
-            mainYaml = mainYamlStr,
-            main = mainObject,
-            resourceYaml = resourceYamlStr,
-            resource = resourceObject
-        )
-
-        // TODO: 提前创建流水线去生成质量红线
-        val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
-        pipelineFiles.forEach { pipelineFile ->
-            // 通过stream模板替换生成流水线
-            val streamBuildResult = streamConverter.buildModel(
-                userId = userId,
+            productInfoDao.updateProduct(
+                dslContext = dslContext,
                 productId = productId,
-                projectId = projectId,
-                cachePath = cachePath,
-                pipelineFile = pipelineFile
+                mainYaml = mainYamlStr,
+                main = mainObject,
+                resourceYaml = resourceYamlStr,
+                resource = resourceObject
             )
 
-            logger.info("${pipelineFile.name} model: ${streamBuildResult.pipelineModel}")
-
-            // 创建并保存流水线
-            chartPipeline.createChartPipeline(
-                userId = userId,
-                productId = productId,
-                projectId = projectId,
-                chartPipeline = Pair(
-                    RdsPipelineCreate(
-                        productId = productId,
-                        filePath = pipelineFile.name,
-                        originYaml = streamBuildResult.originYaml,
-                        parsedYaml = streamBuildResult.parsedYaml
-                    ),
-                    streamBuildResult.pipelineModel
+            // TODO: 提前创建流水线去生成质量红线
+            val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
+            pipelineFiles.forEach { pipelineFile ->
+                // 通过stream模板替换生成流水线
+                val streamBuildResult = streamConverter.buildModel(
+                    userId = userId,
+                    productId = productId,
+                    projectId = projectId,
+                    cachePath = cachePath,
+                    pipelineFile = pipelineFile
                 )
-            )
-        }
-        eventBusService.addWebhook(
-            userId = userId,
-            productId = productId,
-            projectId = projectId,
-            main = mainObject,
-            resource = resourceObject
-        )
 
+                logger.info("${pipelineFile.name} model: ${streamBuildResult.pipelineModel}")
+
+                // 创建并保存流水线
+                chartPipeline.createChartPipeline(
+                    userId = userId,
+                    productId = productId,
+                    projectId = projectId,
+                    chartPipeline = Pair(
+                        RdsPipelineCreate(
+                            productId = productId,
+                            filePath = pipelineFile.name,
+                            originYaml = streamBuildResult.originYaml,
+                            parsedYaml = streamBuildResult.parsedYaml
+                        ),
+                        streamBuildResult.pipelineModel
+                    )
+                )
+            }
+            eventBusService.addWebhook(
+                userId = userId,
+                productId = productId,
+                projectId = projectId,
+                main = mainObject,
+                resource = resourceObject
+            )
+        } catch (t: Throwable) {
+            logger.error("RDS|init error|userId=$userId|chartName=$chartName", t)
+            return false
+        }
         return true
     }
 }

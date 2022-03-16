@@ -61,32 +61,26 @@ class RdsProductInfoDao {
         }
     }
 
-    fun saveProductInfo(
+    fun updateProduct(
         dslContext: DSLContext,
-        projectId: String,
+        productId: Long,
         mainYaml: String?,
         main: Main?,
         resourceYaml: String?,
         resource: Resource?
-    ): Int {
+    ) {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
-            return dslContext.insertInto(this,
-                PROJECT_ID,
-                MAIN_YAML,
-                MAIN_PARSED,
-                RESOURCE_YAML,
-                RESOURCE_PARSED
-            ).values(
-                projectId,
-                mainYaml,
-                main?.let { YamlUtil.toYaml(it) },
-                resourceYaml,
-                resource?.let { YamlUtil.toYaml(it) }
-            ).execute()
+            dslContext.update(this)
+                .set(MAIN_YAML, mainYaml)
+                .set(MAIN_PARSED, main?.let { YamlUtil.toYaml(it) })
+                .set(RESOURCE_YAML, resourceYaml)
+                .set(RESOURCE_PARSED, resource?.let { YamlUtil.toYaml(it) })
+                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .execute()
         }
     }
 
-    fun updateProduct(
+    fun updateProductInfo(
         dslContext: DSLContext,
         productInfo: RdsProductInfo
     ) {
