@@ -103,6 +103,7 @@ class RdsRegisterService @Autowired constructor(
         val eventBusRuleSet = mutableSetOf<EventBusRule>()
         val ruleTargetSet = mutableSetOf<EventRuleTarget>()
         request.triggerOn.forEach on@{ on ->
+            logger.info("trigger ${on.id} event type")
             val eventTypeList = eventTypeDao.listByAliasName(
                 dslContext = dslContext,
                 aliasName = on.id
