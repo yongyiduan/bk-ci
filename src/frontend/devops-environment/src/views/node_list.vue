@@ -1042,7 +1042,7 @@
                     cursor: pointer;
                 }
                 .useless {
-                  color: $fontLigtherColor;
+                  color: $fontLighterColor;
                 }
                 .icon-edit {
                     position: relative;
@@ -1074,9 +1074,9 @@
             .node-item-row {
               &.node-row-useless {
                 cursor: url('../images/cursor-lock.png'), auto;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
                 .node-count-item {
-                  color: $fontLigtherColor;
+                  color: $fontLighterColor;
                 }
               }
               .no-node-delete-permission {

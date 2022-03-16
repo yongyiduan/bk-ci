@@ -71,7 +71,7 @@
         height: 100%;
         display: flex;
         align-items: center;
-        color: $fontLigtherColor;
+        color: $fontLighterColor;
 
         > .qrcode-tips {
             margin: 0 10px;

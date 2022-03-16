@@ -1313,7 +1313,7 @@
             text-align: left;
         }
         .tree-view {
-            border: 1px solid $fontLigtherColor;
+            border: 1px solid $fontLighterColor;
             padding: 20px 0;
             margin: 20px 0 0;
             max-height: 500px;

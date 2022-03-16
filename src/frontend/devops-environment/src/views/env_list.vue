@@ -251,9 +251,9 @@
             cursor: pointer;
             &.env-row-useless {
               cursor: url('../images/cursor-lock.png'), auto;
-              color: $fontLigtherColor;
+              color: $fontLighterColor;
               .node-count-item {
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
               }
             }
             .no-env-delete-permission {

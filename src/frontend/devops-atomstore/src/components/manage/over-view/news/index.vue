@@ -73,7 +73,8 @@
                     this.list = records.map((x) => ({
                         tag: x.createTime,
                         content: `${x.creator} ${this.$t('store.新增版本')} ${x.version}`
-                    }))
+                    }))]
+                    this.loadEnd = res.count <= this.list.length
                 })
             },
             scrollLoadMore (event) {

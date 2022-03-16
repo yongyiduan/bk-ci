@@ -39,7 +39,7 @@
                     :key="panel.name"
                 >
                     <div :class="panel.className" style="height: 100%">
-                        <component :is="panel.component" v-bind="panel.bindData"></component>
+                        <component :is="panel.component" v-bind="panel.bindData" v-on="panel.listeners"></component>
                     </div>
                 </bk-tab-panel>
             </bk-tab>
@@ -57,13 +57,13 @@
                 />
             </template>
             <template v-else-if="showLog">
-                <plugin @close="showLog = false" />
+                <plugin :exec-detail="execDetail" :editing-element-pos="editingElementPos" @close="showLog = false" />
             </template>
             <template v-else-if="showContainerPanel">
-                <job @close="showLog = false" />
+                <job :exec-detail="execDetail" :editing-element-pos="editingElementPos" @close="showLog = false" />
             </template>
             <template v-else-if="showStagePanel">
-                <stage @close="showLog = false" />
+                <stage :exec-detail="execDetail" :editing-element-pos="editingElementPos" @close="showLog = false" />
             </template>
             <template v-else-if="showStageReviewPanel.isShow">
                 <stage-review-panel :stage="stage" @approve="requestPipelineExecDetail(routerParams)" />
@@ -73,13 +73,31 @@
             <complete-log @close="showLog = false"></complete-log>
         </template>
         <mini-map :stages="execDetail.model.stages" scroll-class=".exec-pipeline" v-if="!isLoading && !fetchingAtomList && curItemTab === 'executeDetail' && !hasNoPermission"></mini-map>
+        <bk-dialog
+            v-model="showRetryStageDialog"
+            render-directive="if"
+            ext-cls="stage-retry-dialog"
+            :width="400"
+            :auto-close="false"
+            @confirm="retryPipeline(true)"
+        >
+            <bk-radio-group v-model="failedContainer">
+                <bk-radio :value="false">{{ $t('editPage.retryAllJobs') }}</bk-radio>
+                <bk-radio :value="true">{{ $t('editPage.retryFailJobs') }}</bk-radio>
+            </bk-radio-group>
+        </bk-dialog>
+
+        <check-atom-dialog
+            :is-show-check-dialog="isShowCheckDialog"
+            :toggle-check="toggleCheckDialog"
+            :element="currentAtom"
+        ></check-atom-dialog>
     </section>
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex'
     import webSocketMessage from '@/utils/webSocketMessage'
-    import stages from '@/components/Stages'
     import viewPart from '@/components/viewPart'
     import codeRecord from '@/components/codeRecord'
     import outputOption from '@/components/outputOption'
@@ -98,10 +116,10 @@
     import customExtMixin from '@/mixins/custom-extension-mixin'
     import AtomPropertyPanel from '@/components/AtomPropertyPanel'
     import { ExecuteDetailTabHooks } from '@/components/Hooks/'
+    import CheckAtomDialog from '@/components/CheckAtomDialog'
 
     export default {
         components: {
-            stages,
             StagePropertyPanel,
             viewPart,
             codeRecord,
@@ -114,7 +132,8 @@
             stageReviewPanel,
             Logo,
             MiniMap,
-            AtomPropertyPanel
+            AtomPropertyPanel,
+            CheckAtomDialog
         },
         mixins: [pipelineOperateMixin, pipelineConstMixin, customExtMixin],
 
@@ -123,6 +142,12 @@
                 isLoading: true,
                 hasNoPermission: false,
                 linkUrl: WEB_URL_PREFIX + location.pathname,
+                showRetryStageDialog: false,
+                retryTaskId: '',
+                skipTask: false,
+                failedContainer: false,
+                isShowCheckDialog: false,
+                currentAtom: {},
                 noPermissionTipsConfig: {
                     title: this.$t('noPermission'),
                     desc: this.$t('history.noPermissionTips'),
@@ -151,6 +176,10 @@
         },
 
         computed: {
+            ...mapState('common', [
+                'ruleList',
+                'templateRuleList'
+            ]),
             ...mapState('atom', [
                 'execDetail',
                 'editingElementPos',
@@ -158,10 +187,14 @@
                 'isShowCompleteLog',
                 'showPanelType',
                 'fetchingAtomList',
+                'pipeline',
                 'showStageReviewPanel'
             ]),
             ...mapState([
                 'fetchError'
+            ]),
+            ...mapGetters('atom', [
+                'getRealSeqId'
             ]),
             hooks () {
                 return this.extensionExecuteDetailTabsHooks
@@ -187,12 +220,26 @@
                 return [{
                             name: 'executeDetail',
                             label: this.$t('details.executeDetail'),
-                            component: 'stages',
+                            component: 'bk-pipeline',
                             className: 'exec-pipeline',
                             bindData: {
                                 editable: false,
                                 isExecDetail: true,
-                                stages: this.execDetail && this.execDetail.model && this.execDetail.model.stages
+                                userName: this.$userInfo.username,
+                                cancelUserId: this.execDetail && this.execDetail.cancelUserId,
+                                isLatestBuild: this.isLatestBuild,
+                                pipeline: this.execDetail && this.execDetail.model,
+                                matchRules: this.curMatchRules
+                            },
+                            listeners: {
+                                click: this.handlePiplineClick,
+                                'stage-check': this.handleStageCheck,
+                                'stage-retry': this.handleRetry,
+                                'atom-quality-check': this.qualityCheck,
+                                'atom-review': this.reviewAtom,
+                                'atom-continue': this.handleContinue,
+                                'atom-exec': this.handleExec,
+                                'debug-container': this.debugDocker
                             }
                         }, {
                             name: 'partView',
@@ -240,13 +287,6 @@
                 const { editingElementPos, isPropertyPanelVisible } = this
                 return typeof editingElementPos.containerIndex !== 'undefined' && isPropertyPanelVisible
             },
-            currentJob () {
-                const { editingElementPos, execDetail } = this
-                const model = execDetail.model || {}
-                const stages = model.stages || []
-                const currentStage = stages[editingElementPos.stageIndex] || []
-                return currentStage.containers[editingElementPos.containerIndex]
-            },
             stage () {
                 const { editingElementPos, execDetail } = this
                 if (editingElementPos) {
@@ -256,20 +296,6 @@
                     return stage
                 }
                 return null
-            },
-            currentElement () {
-                const {
-                    editingElementPos: { stageIndex, containerIndex, elementIndex },
-                    execDetail: { model: { stages } }
-                } = this
-                return stages[stageIndex].containers[containerIndex].elements[elementIndex]
-            },
-            getElementId () {
-                const {
-                    editingElementPos: { stageIndex, containerIndex, elementIndex },
-                    execDetail: { model: { stages } }
-                } = this
-                return stages[stageIndex].containers[containerIndex].elements[elementIndex].id || ''
             },
             getElementViewName () {
                 try {
@@ -284,17 +310,6 @@
                     return ''
                 }
             },
-            getExecuteCount () {
-                const {
-                    editingElementPos: { stageIndex, containerIndex, elementIndex },
-                    execDetail: { model: { stages } }
-                } = this
-                const element = stages[stageIndex].containers[containerIndex].elements[elementIndex]
-                if (element !== undefined) {
-                    return element.executeCount || 1
-                }
-                return 1
-            },
             sidePanelConfig () {
                 return this.showLog
                     ? {
@@ -307,10 +322,6 @@
                         width: 640
                     }
             },
-            buildNum () {
-                const { execDetail } = this
-                return execDetail && execDetail.buildNum ? execDetail.buildNum : ''
-            },
             routerParams () {
                 return this.$route.params
             },
@@ -319,6 +330,16 @@
             },
             showRetryIcon () {
                 return this.execDetail && ['RUNNING', 'QUEUE', 'STAGE_SUCCESS'].indexOf(this.execDetail.status) < 0
+            },
+            isInstanceEditable () {
+                return this.pipeline && this.pipeline.instanceFromTemplate
+            },
+            curMatchRules () {
+                return this.$route.path.indexOf('template') > 0 ? this.templateRuleList : this.isInstanceEditable ? this.templateRuleList.concat(this.ruleList) : this.ruleList
+            },
+            isLatestBuild () {
+                const { execDetail } = this
+                return execDetail && execDetail.buildNum === execDetail.latestBuildNum && execDetail.curVersion === execDetail.latestVersion
             }
         },
 
@@ -360,22 +381,225 @@
 
         methods: {
             ...mapActions('atom', [
-                'updateAtom',
+                'reviewExcuteAtom',
                 'togglePropertyPanel',
+                'toggleStageReviewPanel',
                 'requestPipelineExecDetail',
                 'setPipelineDetail',
                 'getInitLog',
-                'getAfterLog'
+                'getAfterLog',
+                'pausePlugin'
             ]),
             ...mapActions('common', [
                 'requestInterceptAtom'
             ]),
             convertMStoStringByRule,
+            handlePiplineClick (args) {
+                this.togglePropertyPanel({
+                    isShow: true,
+                    editingElementPos: args
+                })
+            },
+            handleStageCheck ({ type, stageIndex }) {
+                this.toggleStageReviewPanel({
+                    showStageReviewPanel: {
+                        isShow: true,
+                        type
+                    },
+                    editingElementPos: {
+                        stageIndex
+                    }
+                })
+            },
+            async qualityCheck ({ elementId, action }, done) {
+                try {
+                    const data = {
+                        projectId: this.routerParams.projectId,
+                        pipelineId: this.routerParams.pipelineId,
+                        buildId: this.routerParams.buildNo,
+                        elementId,
+                        action
+                    }
+                    const res = await this.reviewExcuteAtom(data)
+                    if (res) {
+                        this.$showTips({
+                            message: this.$t('editPage.operateSuc'),
+                            theme: 'success'
+                        })
+                    }
+                } catch (err) {
+                    this.$showTips({
+                        message: err.message || err,
+                        theme: 'error'
+                    })
+                } finally {
+                    done()
+                }
+            },
+            toggleCheckDialog (isShow = false) {
+                this.isShowCheckDialog = isShow
+                if (!isShow) {
+                    this.currentAtom = {}
+                }
+            },
+            async reviewAtom (atom) {
+                // 人工审核
+                this.currentAtom = atom
+                this.toggleCheckDialog(true)
+            },
+            async handleContinue ({ taskId, skip = false }, done) {
+                this.retryTaskId = taskId
+                this.skipTask = skip
+                await this.retryPipeline()
+                done()
+            },
+            
+            async handleExec ({
+                stageIndex,
+                containerIndex,
+                containerGroupIndex,
+                isContinue,
+                elementIndex,
+                showPanelType,
+                stageId,
+                containerId,
+                taskId,
+                atom
+            }, done) {
+                if (!isContinue) {
+                    const postData = {
+                        projectId: this.routerParams.projectId,
+                        pipelineId: this.routerParams.pipelineId,
+                        buildId: this.routerParams.buildNo,
+                        stageId,
+                        containerId,
+                        taskId,
+                        isContinue,
+                        element: atom
+                    }
+                    
+                    try {
+                        await this.pausePlugin(postData)
+                        this.requestPipelineExecDetail(this.routerParams)
+                    } catch (err) {
+                        this.$showTips({
+                            message: err.message || err,
+                            theme: 'error'
+                        })
+                    } finally {
+                        done()
+                    }
+                } else {
+                    this.togglePropertyPanel({
+                        isShow: true,
+                        showPanelType,
+                        editingElementPos: {
+                            stageIndex,
+                            containerIndex,
+                            containerGroupIndex,
+                            elementIndex
+                        }
+                    })
+                }
+            },
+            handleRetry ({ taskId, skip = false }) {
+                this.showRetryStageDialog = true
+                this.retryTaskId = taskId
+                this.skipTask = skip
+            },
+            async retryPipeline (isStageRetry) {
+                let message, theme
+                this.showRetryStageDialog = false
+                try {
+                    // 请求执行构建
+                    const res = await this.requestRetryPipeline({
+                        projectId: this.routerParams.projectId,
+                        pipelineId: this.routerParams.pipelineId,
+                        buildId: this.routerParams.buildNo,
+                        taskId: this.retryTaskId,
+                        skip: this.skipTask,
+                        ...(isStageRetry ? { failedContainer: this.failedContainer } : {})
+                    })
+                    if (res.id) {
+                        message = this.$t('subpage.retrySuc')
+                        theme = 'success'
+                    } else {
+                        message = this.$t('subpage.retryFail')
+                        theme = 'error'
+                    }
+                } catch (err) {
+                    this.handleError(err, [{
+                        actionId: this.$permissionActionMap.execute,
+                        resourceId: this.$permissionResourceMap.pipeline,
+                        instanceId: [{
+                            id: this.routerParams.pipelineId,
+                            name: this.routerParams.pipelineId
+                        }],
+                        projectId: this.routerParams.projectId
+                    }])
+                } finally {
+                    message && this.$showTips({
+                        message,
+                        theme
+                    })
+                    this.retryTaskId = ''
+                    this.skipTask = false
+                }
+            },
+            async debugDocker ({ stageIndex, containerIndex, container, isPubDevcloud, isDocker }) {
+                const vmSeqId = container.containerId || this.getRealSeqId(this.execDetail.model.stages, stageIndex, containerIndex)
+                const { projectId, pipelineId, buildNo: buildId } = this.$route.params
+                const url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                const { dispatchType = {}, dockerBuildVersion, buildEnv } = container
+                const tab = window.open('about:blank')
+                try {
+                    if (isDocker) {
+                        const res = await this.startDebugDocker({
+                            projectId: projectId,
+                            pipelineId: pipelineId,
+                            vmSeqId,
+                            imageCode: dispatchType.imageCode,
+                            imageVersion: dispatchType.imageVersion,
+                            imageName: dispatchType.value ? dispatchType.value : dockerBuildVersion,
+                            buildEnv,
+                            imageType: dispatchType.imageType || 'BKDEVOPS',
+                            credentialId: dispatchType.credentialId || ''
+                        })
+                        if (res === true) {
+                            tab.location = url
+                        }
+                    } else if (isPubDevcloud) {
+                        const buildIdStr = buildId ? `&buildId=${buildId}` : ''
+                        tab.location = `${url}&type=DEVCLOUD${buildIdStr}`
+                    }
+                } catch (err) {
+                    tab.close()
+                    if (err.code === 403) {
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                actionId: this.$permissionActionMap.edit,
+                                resourceId: this.$permissionResourceMap.pipeline,
+                                instanceId: [{
+                                    id: pipelineId,
+                                    name: pipelineId
+                                }],
+                                projectId
+                            }],
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&role_manager=pipeline:${pipelineId}`
+                        })
+                    } else {
+                        this.$showTips({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    }
+                }
+            },
             switchTab (tabType = 'executeDetail') {
                 this.$router.push({
                     name: 'pipelinesDetail',
                     params: {
-                        ...this.$route.params,
+                        ...this.routerParams,
                         type: tabType
                     }
                 })
@@ -418,7 +642,7 @@
         }
         .inner-header-title > i {
             font-size: 12px;
-            color: $fontLigtherColor;
+            color: $fontLighterColor;
             font-style: normal;
         }
         .pipeline-detail-wrapper .inner-header {

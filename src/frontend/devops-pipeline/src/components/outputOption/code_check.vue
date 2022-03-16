@@ -836,7 +836,7 @@
             // .card-title {
             //     margin-bottom: 4px;
             //     font-size: 18px;
-            //     color: $fontLigtherColor;
+            //     color: $fontLighterColor;
             // }
             // .code-check-detail {
             //     display: flex;

@@ -362,7 +362,7 @@
             //     margin-top: 14px;
             //     margin-right: 14px;
             //     font-size: 12px;
-            //     color: $fontLigtherColor;
+            //     color: $fontLighterColor;
             //     cursor: pointer;
             // }
             .atom-name {

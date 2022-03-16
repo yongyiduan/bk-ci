@@ -92,7 +92,7 @@
                             <div class="detail-info">
                                 <div class="detail-info-label"><span>Info</span></div>
                                 <ul>
-                                    <template v-for="(item, key) of sideSliderConfig.detailData.info">    
+                                    <template v-for="(item, key) of sideSliderConfig.detailData.info">
                                         <li
                                             v-if="!(lastClickItem.folder && item.key === 'size')"
                                             :key="`detail${key}`">
@@ -633,7 +633,7 @@
             .artifactory-table-label {
                 height: 50px;
                 font-size: 14px;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
                 line-height: 50px;
                 padding-left: 20px;
             }
