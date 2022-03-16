@@ -70,6 +70,9 @@ class RdsChartPipelineDao {
     ) {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             dslContext.update(this)
+                .set(ORIGIN_YAML, pipeline.originYaml)
+                .set(PARSED_YAML, pipeline.parsedYaml)
+                .set(FILE_PATH, pipeline.filePath)
                 .set(UPDATE_TIME, LocalDateTime.now())
                 .where(PIPELINE_ID.eq(pipeline.pipelineId))
                 .execute()

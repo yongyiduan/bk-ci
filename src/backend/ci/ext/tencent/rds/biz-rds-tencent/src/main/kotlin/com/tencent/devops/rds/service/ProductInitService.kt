@@ -117,6 +117,10 @@ class ProductInitService @Autowired constructor(
                 resource = resourceObject
             )
 
+            val pipelineMap = chartPipeline.getProductPipelines(productId).map {
+                it.filePath to it
+            }.toMap()
+
             // TODO: 提前创建流水线去生成质量红线
             val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
             pipelineFiles.forEach { pipelineFile ->
@@ -129,23 +133,43 @@ class ProductInitService @Autowired constructor(
                     pipelineFile = pipelineFile
                 )
 
-                logger.info("${pipelineFile.name} model: ${streamBuildResult.pipelineModel}")
-
-                // 创建并保存流水线
-                chartPipeline.createChartPipeline(
-                    userId = userId,
-                    productId = productId,
-                    projectId = projectId,
-                    chartPipeline = Pair(
-                        RdsPipelineCreate(
-                            productId = productId,
-                            filePath = pipelineFile.name,
-                            originYaml = streamBuildResult.originYaml,
-                            parsedYaml = streamBuildResult.parsedYaml
-                        ),
-                        streamBuildResult.pipelineModel
+                logger.info("RDS|init|${pipelineFile.name}|model: ${streamBuildResult.pipelineModel}")
+                val existsPipeline = pipelineMap[pipelineFile.name]
+                if (existsPipeline == null) {
+                    // 创建并保存流水线
+                    chartPipeline.createChartPipeline(
+                        userId = userId,
+                        productId = productId,
+                        projectId = projectId,
+                        chartPipeline = Pair(
+                            RdsPipelineCreate(
+                                productId = productId,
+                                filePath = pipelineFile.name,
+                                originYaml = streamBuildResult.originYaml,
+                                parsedYaml = streamBuildResult.parsedYaml
+                            ),
+                            streamBuildResult.pipelineModel
+                        )
                     )
-                )
+                } else {
+                    // 更新已有流水线
+                    chartPipeline.updateChartPipeline(
+                        userId = userId,
+                        productId = productId,
+                        projectId = projectId,
+                        pipelineId = existsPipeline.pipelineId,
+                        chartPipeline = Pair(
+                            RdsPipelineCreate(
+                                productId = productId,
+                                filePath = pipelineFile.name,
+                                originYaml = streamBuildResult.originYaml,
+                                parsedYaml = streamBuildResult.parsedYaml
+                            ),
+                            streamBuildResult.pipelineModel
+                        )
+                    )
+                }
+
             }
             eventBusService.addWebhook(
                 userId = userId,

@@ -88,4 +88,46 @@ class ChartPipeline @Autowired constructor(
             )
         )
     }
+
+    fun updateChartPipeline(
+        userId: String,
+        pipelineId: String,
+        productId: Long,
+        projectId: String,
+        chartPipeline: Pair<RdsPipelineCreate, Model>
+    ) {
+        val (pipeline, model) = chartPipeline
+        // 在蓝盾引擎创建项目
+        try {
+            val success = client.get(ServicePipelineResource::class).edit(
+                userId = userId,
+                projectId = projectId,
+                pipelineId = pipelineId,
+                pipeline = model,
+                channelCode = ChannelCode.BS
+            ).data
+            if (success != true) {
+                logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
+            }
+        } catch (t: Throwable) {
+            logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
+            throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
+        }
+
+        // 根据返回结果保存
+        chartPipelineDao.updatePipeline(
+            dslContext = dslContext,
+            pipeline = RdsChartPipelineInfo(
+                pipelineId = pipelineId,
+                productId = productId,
+                filePath = pipeline.filePath,
+                originYaml = pipeline.originYaml,
+                parsedYaml = pipeline.parsedYaml
+            )
+        )
+    }
+
+    fun getProductPipelines(productId: Long): List<RdsChartPipelineInfo> {
+        return chartPipelineDao.getChartPipelines(dslContext, productId)
+    }
 }
