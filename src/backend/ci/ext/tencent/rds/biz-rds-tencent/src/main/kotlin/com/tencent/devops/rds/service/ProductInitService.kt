@@ -105,6 +105,7 @@ class ProductInitService @Autowired constructor(
             val resourceObject = resourceYaml.getResourceObject()
             logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
             val productId = resourceObject.productId
+            // TODO: 待定项目ID以及渠道
             val projectId = RdsPipelineUtils.genBKProjectCode(productId)
 
             productInfoDao.updateProduct(
