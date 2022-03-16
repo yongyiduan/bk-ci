@@ -66,7 +66,7 @@ class ChartPipeline @Autowired constructor(
                 userId = userId,
                 projectId = projectId,
                 pipeline = model,
-                channelCode = ChannelCode.GIT
+                channelCode = ChannelCode.BS
             ).data ?: run {
                 logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
                 throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
