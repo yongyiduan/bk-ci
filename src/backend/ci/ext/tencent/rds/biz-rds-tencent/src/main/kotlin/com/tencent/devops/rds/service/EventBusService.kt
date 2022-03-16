@@ -62,22 +62,24 @@ class EventBusService @Autowired constructor(
         // 取出已经注册成功的流水线
         val triggerOns = mutableListOf<TriggerOn>()
         val triggerResources = mutableListOf<TriggerResource>()
-        val mainOnMap = main.on.map {
-            it.action.path to it
-        }.toMap()
+        val pathAndOn = main.on.map {
+            Pair(it.action.path, it)
+        }.toList()
         val pipelines = chartPipelineDao.getChartPipelines(dslContext, productId)
-        pipelines.forEach { pipeline ->
+        pipelines.forEach nextPipeline@{ pipeline ->
             // 使用文件名匹配
-            val on = mainOnMap[pipeline.filePath] ?: return@forEach
-            triggerOns.add(TriggerOn(
-                id = on.id,
-                filter = on.filter,
-                action = PipelineAction(
-                    type = on.action.type,
-                    pipelineId = pipeline.pipelineId,
-                    variables = on.action.with
-                )
-            ))
+            pathAndOn.forEach nextTrigger@{ (path, on) ->
+                if (path != pipeline.filePath) return@nextTrigger
+                triggerOns.add(TriggerOn(
+                    id = on.id,
+                    filter = on.filter,
+                    action = PipelineAction(
+                        type = on.action.type,
+                        pipelineId = pipeline.pipelineId,
+                        variables = on.action.with
+                    )
+                ))
+            }
         }
         resource.projects.forEach { project ->
             val map = mutableMapOf<String, MutableList<String>>()
