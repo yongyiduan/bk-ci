@@ -15,6 +15,7 @@
             <span @click.stop v-if="showCheckedToatal && canSkipElement">
                 <bk-checkbox class="atom-canskip-checkbox" v-model="container.runContainer" :disabled="containerDisabled"></bk-checkbox>
             </span>
+            <bk-button v-if="showDebugBtn" class="debug-btn" theme="warning" @click.stop="debugDocker">{{ $t('editPage.docker.debugConsole') }}</bk-button>
             <i v-if="(isEditPage || isPreview) && container.matrixGroupFlag" class="matrix-flag-icon bk-devops-icon icon-matrix"></i>
             <i v-if="showMatrixStatus" class="fold-atom-icon devops-icon" :class="[container.isOpen ? 'icon-angle-up' : 'icon-angle-down', container.status || 'readonly']" style="display:block" @click.stop="toggleShowAtom"></i>
         </h3>
@@ -87,7 +88,10 @@
             ]),
             ...mapGetters('atom', [
                 'isTriggerContainer',
-                'getAllContainers'
+                'getAllContainers',
+                'isPublicDevCloudContainer',
+                'getRealSeqId',
+                'checkShowDebugDockerBtn'
             ]),
             isEditPage () {
                 return this.$route.name === 'pipelinesEdit' || this.$route.name === 'templateEdit'
@@ -129,6 +133,19 @@
             },
             projectId () {
                 return this.$route.params.projectId
+            },
+            buildResourceType () {
+                try {
+                    return this.container.dispatchType.buildType
+                } catch (e) {
+                    return 'DOCKER'
+                }
+            },
+            isPublicDevCloud () {
+                return this.isPublicDevCloudContainer(this.container)
+            },
+            showDebugBtn () {
+                return this.checkShowDebugDockerBtn(this.container, this.$route.name, this.execDetail) && this.container.status === 'FAILED'
             },
             containerDisabled () {
                 return !!(this.container.jobControlOption && this.container.jobControlOption.enable === false) || this.stageDisabled
@@ -180,6 +197,9 @@
             }
         },
         methods: {
+            ...mapActions('common', [
+                'startDebugDocker'
+            ]),
             ...mapActions('atom', [
                 'togglePropertyPanel',
                 'addAtom',
@@ -249,6 +269,57 @@
                         theme: 'error',
                         message: this.$t('editPage.copyJobFail')
                     })
+                }
+            },
+            async debugDocker () {
+                const vmSeqId = this.container.containerId || this.getRealSeqId(this.execDetail.model.stages, this.stageIndex, this.containerIndex)
+                const projectId = this.$route.params.projectId
+                const pipelineId = this.$route.params.pipelineId
+                const buildId = this.$route.params.buildNo
+                let url = ''
+                const tab = window.open('about:blank')
+                try {
+                    if (this.buildResourceType === 'DOCKER') {
+                        const res = await this.startDebugDocker({
+                            projectId: projectId,
+                            pipelineId: pipelineId,
+                            vmSeqId,
+                            imageCode: this.container.dispatchType && this.container.dispatchType.imageCode,
+                            imageVersion: this.container.dispatchType && this.container.dispatchType.imageVersion,
+                            imageName: this.container.dispatchType && this.container.dispatchType.value ? this.container.dispatchType.value : this.container.dockerBuildVersion,
+                            buildEnv: this.container.buildEnv,
+                            imageType: this.container.dispatchType && this.container.dispatchType.imageType ? this.container.dispatchType.imageType : 'BKDEVOPS',
+                            credentialId: this.container.dispatchType && this.container.dispatchType.credentialId ? this.container.dispatchType.credentialId : ''
+                        })
+                        if (res === true) {
+                            url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                        }
+                    } else if (this.isPublicDevCloud) {
+                        const buildIdStr = buildId ? `&buildId=${buildId}` : ''
+                        url = `${WEB_URL_PREFIX}/pipeline/${this.projectId}/dockerConsole/?type=DEVCLOUD&pipelineId=${pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
+                    }
+                    tab.location = url
+                } catch (err) {
+                    tab.close()
+                    if (err.code === 403) {
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                actionId: this.$permissionActionMap.edit,
+                                resourceId: this.$permissionResourceMap.pipeline,
+                                instanceId: [{
+                                    id: pipelineId,
+                                    name: pipelineId
+                                }],
+                                projectId
+                            }],
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&role_manager=pipeline:${pipelineId}`
+                        })
+                    } else {
+                        this.$showTips({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    }
                 }
             },
             toggleShowAtom () {

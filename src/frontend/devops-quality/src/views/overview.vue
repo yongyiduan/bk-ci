@@ -133,7 +133,7 @@
                 showContent: false,
                 isEmptyRule: false,
                 totalInterceptRecor: 0,
-                docsUrl: `${DOCS_URL_PREFIX}/x/MYbm`,
+                docsUrl: `${IWIKI_DOCS_URL}/x/MYbm`,
                 pipelineListLabel: [],
                 pipelineListValue: [],
                 trendList: [],

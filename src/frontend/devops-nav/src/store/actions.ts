@@ -23,10 +23,26 @@ import {
     SET_SERVICES,
     TOGGLE_PERMISSION_DIALOG,
     SET_CURRENT_NOTICE,
-    AUTH_API_URL_PREFIX
+    SET_SERVICE_HOOKS,
+    AUTH_API_URL_PREFIX,
+    STORE_API_URL_PREFIX
 } from './constants'
 
 const actions: ActionTree<RootState, any> = {
+    async fetchServiceHooks ({ commit }: ActionContext<RootState, any>, { serviceId }: any) {
+        try {
+            const extHooks = await Request.get(`${PROJECT_API_URL_PREFIX}/user/ext/items/list?serviceId=${serviceId}`)
+            commit(SET_SERVICE_HOOKS, {
+                extHooks: extHooks,
+                serviceId
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    fetchExtensionByHookId: (_, { projectCode, itemIds }) => {
+        return Request.get(`${STORE_API_URL_PREFIX}/user/ext/services/items/projects/${projectCode}/list?itemIds=${itemIds}`)
+    },
     togglePermissionDialog ({ commit }: ActionContext<RootState, any>, visible: boolean) {
         commit(TOGGLE_PERMISSION_DIALOG, visible)
     },
@@ -45,7 +61,7 @@ const actions: ActionTree<RootState, any> = {
     async toggleServiceCollect (_, { serviceId, isCollected }: any) {
         return Request.put(`${PROJECT_API_URL_PREFIX}/user/services/${serviceId}?collector=${isCollected}`)
     },
-    async fetchLinks ({ commit }, { type }) {
+    async fetchLinks ({ commit }: ActionContext<RootState, any>, { type }) {
         try {
             const links = await Request.get(`${PROJECT_API_URL_PREFIX}/user/activities/types/${type}`)
             commit(SET_LINKS, {
@@ -74,6 +90,9 @@ const actions: ActionTree<RootState, any> = {
             window.setLsCacheItem('projectList', projectList.filter((project: Project) => project.enabled))
         }
     },
+    getDepartmentInfo (_, { type, id }) {
+        return Request.get(`${PROJECT_API_URL_PREFIX}/user/organizations/types/${type}/ids/${id}`)
+    },
     ajaxUpdatePM (_, { projectCode, data }) {
         return Request.put(`${PROJECT_API_URL_PREFIX}/user/projects/${projectCode}/`, data)
     },
@@ -82,6 +101,9 @@ const actions: ActionTree<RootState, any> = {
     },
     toggleProjectEnable (_, { projectCode, enabled }) {
         return Request.put(`${PROJECT_API_URL_PREFIX}/user/projects/${projectCode}/enable?enabled=${enabled}`)
+    },
+    getMyDepartmentInfo () {
+        return Request.get(`${PROJECT_API_URL_PREFIX}/user/users/detail/`)
     },
     selectDemoProject ({ commit }, { project }) {
         commit(SET_DEMO_PROJECT, {

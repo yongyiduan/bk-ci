@@ -162,7 +162,7 @@
         &.right {
             right: -$StageMargin - $addIconLeft - $addBtnSize - 2;
         }
-     
+
         &.first-connect-line {
             height: 76px;
             width: $svgWidth;

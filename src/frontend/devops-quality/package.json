@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "",
   "dependencies": {
+    "vue": "2.6.12",
     "vue-echarts": "^3.0.9",
     "vuex-class": "^0.3.0"
   },

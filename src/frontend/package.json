@@ -5,6 +5,7 @@
     "@commitlint/cli": "^9.1.1",
     "@commitlint/config-conventional": "^9.1.1",
     "chalk": "^4.0.0",
+    "cross-env": "^7.0.3",
     "gulp": "^4.0.2",
     "gulp-rename": "^1.4.0",
     "gulp-svg-sprite": "^1.5.0",
@@ -36,14 +37,13 @@
     "devops-codelib",
     "devops-environment",
     "devops-atomstore",
-    "devops-artifactory",
     "devops-ticket",
     "devops-pipeline",
+    "devops-experience",
+    "devops-artifactory",
+    "devops-turbo",
+    "devops-vs",
     "devops-quality",
-    "devops-nav",
-    "devops-turbo"
-  ],
-  "dependencies": {
-    "cross-env": "^7.0.3"
-  }
+    "devops-nav"
+  ]
 }

@@ -364,7 +364,7 @@
                             name: this.$route.params.pipelineId
                         }],
                         projectId: this.$route.params.projectId
-                    }])
+                    }], this.getPermUrlByRole(this.$route.params.projectId, this.$route.params.pipelineId, this.roleMap.executor))
                 } finally {
                     message && this.$showTips({
                         message,

@@ -17,6 +17,7 @@ interface RootState {
     currentNotice: object,
     moduleLoading: boolean,
     isPermissionDialogShow: boolean
+    hookMap: any
 }
 
 interface Link {
@@ -42,10 +43,17 @@ interface Project {
     ccAppId?: number
     deployType?: object[]
     kind?: string
+    bgId?: string
+    bgName?: string
+    deptId?: string
+    deptName?: string
+    centerId?: string
+    centerName?: string
     isSecrecy?: boolean
     ccAppName?: string
     approvalStatus?: number
     enabled?: boolean
     logoAddr?: string
     gray?: boolean
+    routerTag?: string
 }

@@ -34,6 +34,7 @@
                             <div class="table-node-item node-item-os">{{ $t('environment.nodeInfo.os') }}</div>
                             <div class="table-node-item node-item-area">{{ $t('environment.nodeInfo.gateway') }}</div>
                             <div class="table-node-item node-item-status">{{ $t('environment.nodeInfo.cpuStatus') }}</div>
+                            <div class="table-node-item node-item-agstatus" v-if="isExtendTx">{{ $t('environment.nodeInfo.gseAgentStatus') }}</div>
                             <div class="table-node-item node-item-handler node-header-head">{{ $t('environment.operation') }}</div>
                         </div>
                         <div class="table-node-body" ref="scrollBox">
@@ -59,7 +60,7 @@
                                 </div>
                                 <div class="table-node-item node-item-status">
                                     <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
-                                        v-if="row.nodeStatus === $t('environment.nodeInfo.normal')">
+                                        v-if="row.nodeStatus === $t('environment.nodeInfo.creating')">
                                         <div class="rotate rotate1"></div>
                                         <div class="rotate rotate2"></div>
                                         <div class="rotate rotate3"></div>
@@ -75,6 +76,25 @@
                                     </span>
 
                                     <span class="node-status">{{ row.nodeStatus }}</span>
+                                </div>
+                                <div class="table-node-item node-item-agstatus" v-if="isExtendTx">
+                                    <span class="node-status-icon normal-stutus-icon" v-if="row.agentStatus"></span>
+                                    <span class="node-status-icon abnormal-stutus-icon" v-if="!row.agentStatus && row.nodeType !== $t('environment.BCSVirtualMachine')"></span>
+                                    <div class="bk-spin-loading bk-spin-loading-mini bk-spin-loading-primary"
+                                        v-if="!row.agentStatus && row.nodeType === $t('environment.BCSVirtualMachine')">
+                                        <div class="rotate rotate1"></div>
+                                        <div class="rotate rotate2"></div>
+                                        <div class="rotate rotate3"></div>
+                                        <div class="rotate rotate4"></div>
+                                        <div class="rotate rotate5"></div>
+                                        <div class="rotate rotate6"></div>
+                                        <div class="rotate rotate7"></div>
+                                        <div class="rotate rotate8"></div>
+                                    </div>
+                                    <span class="node-agstatus" v-if="row.nodeType === $t('environment.BCSVirtualMachine')">{{ row.agentStatus ? $t('environment.nodeInfo.normal') : $t('environment.nodeInfo.refreshing') }}</span>
+                                    <span class="node-agstatus" v-else>{{ row.agentStatus ? $t('environment.nodeInfo.normal') : $t('environment.nodeInfo.abnormal') }}</span>
+                                    <span class="install-btn" v-if="(row.nodeType === 'CMDB' || row.nodeType === 'CC') && !row.agentStatus "
+                                        @click="toInstall">{{ $t('environment.nodeInfo.installGseAgent') }}</span>
                                 </div>
                                 <div class="table-node-item node-item-handler">
                                     <span class="node-delete delete-node-text" @click.stop="confirmDelete(row, index)">{{ $t('environment.remove') }}</span>
@@ -245,6 +265,7 @@
         <node-select :node-select-conf="nodeSelectConf"
             :search-info="searchInfo"
             :cur-user-info="curUserInfo"
+            :change-created-user="changeCreatedUser"
             :row-list="importNodeList"
             :select-handlerc-conf="selectHandlercConf"
             :confirm-fn="confirmFn"
@@ -527,11 +548,11 @@
                         })
 
                         if (this.curEnvDetail.envType === 'BUILD') {
-                            if (kk.nodeType !== 'THIRDPARTY' || !kk.canUse) {
+                            if (!(['THIRDPARTY', 'DEVCLOUD'].includes(kk.nodeType)) || !kk.canUse) {
                                 kk.isDisplay = false
                             }
                         } else {
-                            if (kk.nodeType === 'THIRDPARTY' || !kk.canUse) {
+                            if (['THIRDPARTY', 'DEVCLOUD'].includes(kk.nodeType) || !kk.canUse) {
                                 kk.isDisplay = false
                             }
                         }
@@ -583,10 +604,11 @@
                     style: {
                         textAlign: 'center'
                     }
-                }, `${this.$t('environment.nodeInfo.removeNodetips')}(${row.nodeId})？`)
+                }, `${this.$t('environment.nodeInfo.removeNodetips', [row.nodeId])}`)
 
                 this.$bkInfo({
-                    title: this.$t('environment.remove'),
+                    type: 'warning',
+                    theme: 'warning',
                     subHeader: content,
                     confirmFn: async () => {
                         let message, theme
@@ -710,7 +732,8 @@
                     }, `${this.$t('environment.deleteConfigItem')}?`)
 
                     this.$bkInfo({
-                        title: this.$t('environment.delete'),
+                        type: 'warning',
+                        theme: 'warning',
                         subHeader: content,
                         confirmFn: async () => {
                             let message, theme
@@ -850,7 +873,7 @@
 
                         if (this.curEnvDetail.envType === 'BUILD') {
                             for (let i = 0; i < target.length; i++) {
-                                if (target[i] && str === target[i] && item.nodeType === 'THIRDPARTY' && item.canUse) {
+                                if (target[i] && str === target[i] && ['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType) && item.canUse) {
                                     item.isDisplay = true
                                     break
                                 } else {
@@ -859,7 +882,7 @@
                             }
                         } else {
                             for (let i = 0; i < target.length; i++) {
-                                if (target[i] && str === target[i] && item.nodeType !== 'THIRDPARTY' && item.canUse) {
+                                if (target[i] && str === target[i] && !(['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType)) && item.canUse) {
                                     item.isDisplay = true
                                     break
                                 } else {
@@ -883,13 +906,13 @@
 
                     if (this.curEnvDetail.envType === 'BUILD') {
                         this.importNodeList.forEach(item => {
-                            if (item.nodeType === 'THIRDPARTY' && item.canUse) {
+                            if (['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType) && item.canUse) {
                                 item.isDisplay = true
                             }
                         })
                     } else {
                         this.importNodeList.forEach(item => {
-                            if (item.nodeType !== 'THIRDPARTY' && item.canUse) {
+                            if (!(['THIRDPARTY', 'DEVCLOUD'].includes(item.nodeType)) && item.canUse) {
                                 item.isDisplay = true
                             }
                         })
@@ -1056,6 +1079,10 @@
                 this.lastSelectConfig = newItem
                 this.configList.unshift(newItem)
             },
+            toInstall () {
+                const url = `${IWIKI_DOCS_URL}/x/WtMrAg`
+                window.open(url, '_blank')
+            },
             importNewNode () {
                 this.searchInfo = {
                     search: ''
@@ -1088,6 +1115,33 @@
              */
             localConvertTime (timestamp) {
                 return convertTime(timestamp * 1000)
+            },
+            async changeCreatedUser (id) {
+                this.$bkInfo({
+                    title: this.$t('environment.nodeInfo.modifyImporter'),
+                    subTitle: this.$t('environment.nodeInfo.modifyOperatorTips'),
+                    confirmFn: async () => {
+                        let message, theme
+                        try {
+                            await this.$store.dispatch('environment/changeCreatedUser', {
+                                projectId: this.projectId,
+                                nodeHashId: id
+                            })
+
+                            message = this.$t('environment.successfullyModified')
+                            theme = 'success'
+                        } catch (err) {
+                            message = err.message ? err.message : err
+                            theme = 'error'
+                        } finally {
+                            this.$bkMessage({
+                                message,
+                                theme
+                            })
+                            this.requestList()
+                        }
+                    }
+                })
             }
         }
     }

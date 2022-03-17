@@ -25,6 +25,31 @@ export default {
         return vue.$ajax.put(`${prefix}/user/market/desk/store/member/test/project/change?projectCode=${params.projectCode}&storeCode=${params.storeCode}&storeType=${params.storeType}&storeMember=${params.storeMember}`)
     },
 
+    getAllEnv ({ storeType, storeCode, scopes, varName }) {
+        return vue.$ajax.get(`${prefix}/user/store/env/var/latest/types/${storeType}/codes/${storeCode}?scopes=${scopes}&varName=${varName}`)
+    },
+
+    getEnvChangeList ({ storeType, storeCode, varName }) {
+        return vue.$ajax.get(`${prefix}/user/store/env/var/change/log/types/${storeType}/codes/${storeCode}/vars/${varName}`)
+    },
+
+    addEnv (params) {
+        return vue.$ajax.post(`${prefix}/user/store/env/var/create`, params)
+    },
+
+    deleteEnv ({ storeType, storeCode, varNames }) {
+        return vue.$ajax.delete(`${prefix}/user/store/env/var/types/${storeType}/codes/${storeCode}?varNames=${varNames}`)
+    },
+
+    getCodeScore (storeType, storeCode, params) {
+        return vue.$ajax.get(`${prefix}/user/store/codecc/types/${storeType}/codes/${storeCode}/measurement`, { params })
+    },
+
+    startCodecc (storeType, storeCode, storeId) {
+        const queryStr = storeId ? `?storeId=${storeId}` : ''
+        return vue.$ajax.post(`${prefix}/user/store/codecc/types/${storeType}/codes/${storeCode}/task/start${queryStr}`)
+    },
+
     requestStaticChartData (storeType, storeCode, params) {
         return vue.$ajax.get(`${prefix}/user/store/statistic/types/${storeType}/codes/${storeCode}/trend/data`, { params })
     },
@@ -67,6 +92,9 @@ export default {
         return vue.$ajax.get(`${qualityPerfix}/user/metadata/market/atom/${code}/indicator/list`)
     },
 
+    requestAtomOutputList (code) {
+        return vue.$ajax.get(`${prefix}/user/market/atoms/${code}/output`)
+    },
     requestAtomVersionDetail (code) {
         return vue.$ajax.get(`${prefix}/user/market/atoms/${code}/showVersionInfo`)
     }

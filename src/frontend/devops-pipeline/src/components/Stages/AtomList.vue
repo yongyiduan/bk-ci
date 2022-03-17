@@ -1,48 +1,109 @@
 <template>
     <section>
-        <draggable class="container-atom-list" :class="{ 'trigger-container': isTriggerContainer(container), 'readonly': !editable }" :data-baseos="container.baseOS || container.classType" v-model="atomList" v-bind="dragOptions" :move="checkMove">
-            <li v-for="(atom, index) in atomList" :key="atom.id" :class="{ 'atom-item': true,
-                                                                           [atomCls(atom)]: true,
-                                                                           'quality-item': (atom['@type'] === 'qualityGateOutTask') || (atom['@type'] === 'qualityGateInTask'),
-                                                                           'last-quality-item': (atom['@type'] === 'qualityGateOutTask' && index === atomList.length - 1),
-                                                                           'qualitt-next-atom': handlePreviousAtomCheck(atomList, index)
-            }"
+        <draggable
+            class="container-atom-list"
+            :class="{ 'trigger-container': isTriggerContainer(container), 'readonly': !editable }"
+            :data-baseos="container.baseOS || container.classType"
+            v-model="atomList"
+            v-bind="dragOptions"
+            :move="checkMove"
+        >
+            <li
+                v-for="(atom, index) in atomList"
+                :key="atom.id"
+                :class="{ 'atom-item': true,
+                          [atomCls(atom)]: true,
+                          'quality-item': (atom['@type'] === 'qualityGateOutTask') || (atom['@type'] === 'qualityGateInTask'),
+                          'last-quality-item': (atom['@type'] === 'qualityGateOutTask' && index === atomList.length - 1),
+                          'qualitt-next-atom': handlePreviousAtomCheck(atomList, index)
+                }"
                 @click.stop="showPropertyPanel(index)"
             >
-                <section class="atom-item atom-section normal-atom" :class="{ [atomCls(atom)]: true,
-                                                                              'is-error': atom.isError,
-                                                                              'quality-atom': atom['@type'] === 'qualityGateOutTask',
-                                                                              'is-intercept': atom.isQualityCheck,
-                                                                              'template-compare-atom': atom.templateModify }"
-                    v-if="atom['@type'] !== 'qualityGateInTask' && atom['@type'] !== 'qualityGateOutTask'">
-                    <status-icon v-if="atom.status && atom.status !== 'SKIP'" type="element" :status="atom.status" :is-hook="((atom.additionalOptions || {}).elementPostInfo || false)" />
-                    <status-icon v-else-if="isWaiting && atom.status !== 'SKIP'" type="element" status="WAITING" />
-                    <img v-else-if="atomMap[atom.atomCode] && atomMap[atom.atomCode].icon && !(atom.additionalOptions || {}).elementPostInfo" :src="atomMap[atom.atomCode].icon" :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }" />
-                    <logo v-else :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }" :name="getAtomIcon(atom)" size="18" />
+                <section
+                    class="atom-item atom-section normal-atom"
+                    :class="{ [atomCls(atom)]: true,
+                              'is-error': atom.isError,
+                              'quality-atom': atom['@type'] === 'qualityGateOutTask',
+                              'is-intercept': atom.isQualityCheck,
+                              'template-compare-atom': atom.templateModify }"
+                    v-if="atom['@type'] !== 'qualityGateInTask' && atom['@type'] !== 'qualityGateOutTask'"
+                >
+                    <status-icon
+                        v-if="atom.status && atom.status !== 'SKIP'"
+                        type="element"
+                        :status="atom.status"
+                        :is-hook="((atom.additionalOptions || {}).elementPostInfo || false)"
+                    />
+                    <status-icon
+                        v-else-if="isWaiting && atom.status !== 'SKIP'"
+                        type="element"
+                        status="WAITING"
+                    />
+                    <img
+                        v-else-if="atomMap[atom.atomCode] && atomMap[atom.atomCode].icon && !(atom.additionalOptions || {}).elementPostInfo"
+                        :src="atomMap[atom.atomCode].icon"
+                        :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }"
+                    />
+                    <logo
+                        v-else
+                        :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }"
+                        :name="getAtomIcon(atom)"
+                        size="18"
+                    />
                     <p class="atom-name">
-                        <span :title="atom.name" :class="{ 'skip-name': useSkipStyle(atom) }">{{ atom.atomCode ? atom.name : $t('editPage.pendingAtom') }}</span>
+                        <span
+                            :title="atom.name"
+                            :class="{ 'skip-name': useSkipStyle(atom) }"
+                        >{{ atom.atomCode ? atom.name : $t('editPage.pendingAtom') }}</span>
                     </p>
-                    <bk-popover placement="top" v-if="atom.isReviewing">
-                        <span @click.stop="checkAtom(atom, index)" :class="isCurrentUser(atom.computedReviewers) ? 'atom-reviewing-tips' : 'atom-review-diasbled-tips'">{{ $t('editPage.toCheck') }}</span>
+                    <bk-popover
+                        placement="top"
+                        v-if="atom.isReviewing"
+                    >
+                        <span
+                            @click.stop="checkAtom(atom, index)"
+                            :class="isCurrentUser(atom.computedReviewers) ? 'atom-reviewing-tips' : 'atom-review-diasbled-tips'"
+                        >{{ $t('editPage.toCheck') }}</span>
                         <template slot="content">
                             <p>{{ $t('editPage.checkUser') }}{{ atom.computedReviewers.join(';') }}</p>
                         </template>
                     </bk-popover>
-                    <bk-popover placement="top" v-if="atom.status === 'REVIEW_ABORT'">
+                    <bk-popover
+                        placement="top"
+                        v-if="atom.status === 'REVIEW_ABORT'"
+                    >
                         <span class="atom-review-diasbled-tips">{{ $t('editPage.aborted') }}</span>
                         <template slot="content">
                             <p>{{ $t('editPage.abortTips') }}{{ $t('editPage.checkUser') }}{{ execDetail.cancelUserId }}</p>
                         </template>
                     </bk-popover>
                     <template v-if="atom.status === 'PAUSE'">
-                        <span @click.stop="continueExecute(index)" :class="[{ 'disabled': isExecStop }, 'pause-button']">{{ $t('resume') }}</span>
-                        <span @click.stop="stopExecute(index)" class="pause-button">
-                            <i class="devops-icon icon-circle-2-1 executing-job" v-if="isExecStop" />
+                        <span
+                            @click.stop="continueExecute(index)"
+                            :class="[{ 'disabled': isExecStop }, 'pause-button']"
+                        >{{ $t('resume') }}</span>
+                        <span
+                            @click.stop="stopExecute(index)"
+                            class="pause-button"
+                        >
+                            <i
+                                class="devops-icon icon-circle-2-1 executing-job"
+                                v-if="isExecStop"
+                            />
                             <span v-else>{{ $t('pause') }}</span>
                         </span>
                     </template>
-                    <a href="javascript: void(0);" class="atom-single-retry" v-else-if="atom.status !== 'SKIP' && atom.canRetry" @click.stop="singleRetry(atom.id)">{{ $t('retry') }}</a>
-                    <bk-popover placement="top" v-else-if="atom.status !== 'SKIP' && !atom.canSkip" :disabled="!atom.elapsed">
+                    <a
+                        href="javascript: void(0);"
+                        class="atom-single-retry"
+                        v-else-if="atom.status !== 'SKIP' && atom.canRetry"
+                        @click.stop="singleRetry(atom.id)"
+                    >{{ $t('retry') }}</a>
+                    <bk-popover
+                        placement="top"
+                        v-else-if="atom.status !== 'SKIP' && !atom.canSkip"
+                        :disabled="!atom.elapsed"
+                    >
                         <span :class="atom.status === 'SUCCEED' ? 'atom-success-timer' : (atom.status === 'REVIEW_ABORT' ? 'atom-warning-timer' : 'atom-fail-timer')">
                             <span v-if="atom.elapsed && atom.elapsed >= 36e5">&gt;</span>{{ atom.elapsed ? atom.elapsed > 36e5 ? '1h' : localTime(atom.elapsed) : '' }}
                         </span>
@@ -50,38 +111,90 @@
                             <p>{{ atom.elapsed ? localTime(atom.elapsed) : '' }}</p>
                         </template>
                     </bk-popover>
-                    <a href="javascript: void(0);" class="atom-single-skip" v-if="atom.status !== 'SKIP' && atom.canSkip" @click.stop="singleRetry(atom.id, true)">{{ $t('details.statusMap.SKIP') }}</a>
-                    <span class="devops-icon copy" v-if="editable && stageIndex !== 0 && !atom.isError" :title="$t('editPage.copyAtom')" @click.stop="copyAtom(index)">
-                        <Logo name="copy" size="18"></Logo>
+                    <a
+                        href="javascript: void(0);"
+                        class="atom-single-skip"
+                        v-if="atom.status !== 'SKIP' && atom.canSkip"
+                        @click.stop="singleRetry(atom.id, true)"
+                    >{{ $t('details.statusMap.SKIP') }}</a>
+                    <span
+                        class="devops-icon copy"
+                        v-if="editable && stageIndex !== 0 && !atom.isError"
+                        :title="$t('editPage.copyAtom')"
+                        @click.stop="copyAtom(index)"
+                    >
+                        <Logo
+                            name="copy"
+                            size="18"
+                        ></Logo>
                     </span>
-                    <i v-if="editable" @click.stop="editAtom(index, false)" class="add-plus-icon close" />
-                    <i v-if="editable && atom.isError" class="devops-icon icon-exclamation-triangle-shape" />
-                    <span @click.stop="" v-if="isPreview && canSkipElement && container['@type'].indexOf('trigger') < 0">
-                        <bk-checkbox class="atom-canskip-checkbox" v-model="atom.canElementSkip" :disabled="useSkipStyle(atom)" />
+                    <i
+                        v-if="editable"
+                        @click.stop="editAtom(index, false)"
+                        class="add-plus-icon close"
+                    />
+                    <i
+                        v-if="editable && atom.isError"
+                        class="devops-icon icon-exclamation-triangle-shape"
+                    />
+                    <span
+                        @click.stop=""
+                        v-if="isPreview && canSkipElement && container['@type'].indexOf('trigger') < 0"
+                    >
+                        <bk-checkbox
+                            class="atom-canskip-checkbox"
+                            v-model="atom.canElementSkip"
+                            :disabled="useSkipStyle(atom)"
+                        />
                     </span>
                 </section>
 
-                <section class="atom-section quality-atom"
-                    :class="{ 'is-in-group': containerGroupIndex !== undefined,
-                              'is-review': atom.isReviewing,
-                              'is-success': (atom.status === 'SUCCEED' || atom.status === 'REVIEW_PROCESSED'),
-                              'is-fail': (atom.status === 'QUALITY_CHECK_FAIL' || atom.status === 'REVIEW_ABORT') }"
-                    v-if="atom['@type'] === 'qualityGateInTask' || atom['@type'] === 'qualityGateOutTask'">
+                <section
+                    class="atom-section quality-atom"
+                    :class="{
+                        'is-in-group': containerGroupIndex !== undefined,
+                        'is-review': atom.isReviewing,
+                        'is-success': (atom.status === 'SUCCEED' || atom.status === 'REVIEW_PROCESSED'),
+                        'is-fail': (atom.status === 'QUALITY_CHECK_FAIL' || atom.status === 'REVIEW_ABORT')
+                    }"
+                    v-if="atom['@type'] === 'qualityGateInTask' || atom['@type'] === 'qualityGateOutTask'"
+                >
                     <span class="atom-title">{{ $t('details.quality.quality') }}</span>
-                    <span class="handler-list" :class="{ 'disabled-review': atom.isReviewing && !isCurrentUser(atom.computedReviewers) }"
-                        v-if="atom.isReviewing && !reviewLoading">
-                        <span class="revire-btn continue-excude" @click.stop="reviewExcute(atom, 'PROCESS', atom.computedReviewers)">{{ $t('resume') }}</span>
-                        <span class="review-btn stop-excude" @click.stop="reviewExcute(atom, 'ABORT', atom.computedReviewers)">{{ $t('terminate') }}</span>
+                    <span
+                        class="handler-list"
+                        :class="{ 'disabled-review': atom.isReviewing && !isCurrentUser(atom.computedReviewers) }"
+                        v-if="atom.isReviewing && !reviewLoading"
+                    >
+                        <span
+                            class="revire-btn continue-excude"
+                            @click.stop="reviewExcute(atom, 'PROCESS', atom.computedReviewers)"
+                        >{{ $t('resume') }}</span>
+                        <span
+                            class="review-btn stop-excude"
+                            @click.stop="reviewExcute(atom, 'ABORT', atom.computedReviewers)"
+                        >{{ $t('terminate') }}</span>
                     </span>
-                    <i class="devops-icon icon-circle-2-1 executing-job" v-if="atom.isReviewing && reviewLoading"></i>
+                    <i
+                        class="devops-icon icon-circle-2-1 executing-job"
+                        v-if="atom.isReviewing && reviewLoading"
+                    ></i>
                 </section>
             </li>
-            <span v-if="editable" :class="{ 'add-atom-entry': true, 'block-add-entry': atomList.length === 0 }" @click="editAtom(atomList.length - 1, true)">
+            <span
+                v-if="editable"
+                :class="{ 'add-atom-entry': true, 'block-add-entry': atomList.length === 0 }"
+                @click="editAtom(atomList.length - 1, true)"
+            >
                 <i class="add-plus-icon" />
                 <span v-if="atomList.length === 0">{{ $t('editPage.addAtom') }}</span>
             </span>
         </draggable>
-        <check-atom-dialog :is-show-check-dialog="isShowCheckDialog" :atom="currentAtom" :toggle-check="toggleCheckDialog" :element="element"></check-atom-dialog>
+        <check-atom-dialog
+            :is-show-check-dialog="isShowCheckDialog"
+            :atom="currentAtom"
+            :toggle-check="toggleCheckDialog"
+            :element="element"
+        ></check-atom-dialog>
     </section>
 </template>
 
@@ -818,8 +931,8 @@
                         color: #c4cdd6;
                     }
                 }
+                // &.SKIP,
                 &.CANCELED,
-                &.SKIP,
                 &.REVIEWING {
                     border-color: $warningColor;
                     .atom-icon {
@@ -866,7 +979,7 @@
                 }
                 &.PAUSE {
                     border-color: $pauseColor;
-                    
+
                     .atom-icon {
                         color: $pauseColor;
                     }
