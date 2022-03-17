@@ -541,7 +541,7 @@
                 height: 18px;
                 display: block;
                 border-radius: 100%;
-                border: 1px solid $fontLigtherColor;
+                border: 1px solid $fontLighterColor;
                 margin-right: 10px;
                 &.checked:after {
                     position: absolute;

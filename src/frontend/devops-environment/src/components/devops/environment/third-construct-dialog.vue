@@ -237,7 +237,7 @@
         .no-connection-node {
             margin-top: 18px;
             width: 100%;
-            color: $fontLigtherColor;
+            color: $fontLighterColor;
         }
 
         .refresh-detail {
@@ -288,7 +288,7 @@
             .icon-close {
                 position: relative;
                 top: -26px;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
                 font-size: 12px;
                 cursor: pointer;
             }

@@ -229,12 +229,12 @@
 
                     &[disabled] {
                         pointer-events: none;
-                        color: $fontLigtherColor;
+                        color: $fontLighterColor;
                         cursor: default;
 
                         > a,
                         .devops-icon.service-icon {
-                            color: $fontLigtherColor;
+                            color: $fontLighterColor;
                         }
                     }
 

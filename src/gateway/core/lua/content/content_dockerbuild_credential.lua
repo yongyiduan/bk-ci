@@ -23,14 +23,24 @@ local httpc = http.new()
 local jfrogConfig = config.artifactory
 --- 开始连接
 httpc:set_timeout(3000)
+<<<<<<< HEAD
 httpc:connect(jfrogConfig.domain, jfrogConfig.port)
 --- 发送请求
 local auth_code = "Basic " .. ngx.encode_base64(jfrogConfig.user .. ":" .. jfrogConfig.password)
+=======
+httpc:connect(jfrogConfig.host, jfrogConfig.port)
+--- 发送请求
+local auth_code = ngx.encode_base64(config.artifactory.user .. ":" .. config.artifactory.password)
+>>>>>>> origin/story_5592
 local res, err = httpc:request({
   path = "/api/plugins/execute/createDockerUser?params=projectCode=" .. ngx.var.projectId .. ";permanent=false",
   method = "GET",
   headers = {
+<<<<<<< HEAD
     ["Host"] = jfrogConfig.domain,
+=======
+    ["Host"] = jfrogConfig.host,
+>>>>>>> origin/story_5592
     ["Authorization"] = auth_code,
   }
 })
@@ -69,7 +79,11 @@ end
 local return_result = {
   user = result.data.user,
   password = result.data.password,
+<<<<<<< HEAD
   host = jfrogConfig.domain,
+=======
+  host = jfrogConfig.host,
+>>>>>>> origin/story_5592
   port = jfrogConfig.docker
 }
 ngx.say(json.encode(return_result))

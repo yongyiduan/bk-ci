@@ -333,7 +333,7 @@
                     outline: none;
                 }
                 .bk-select-dropdown .bk-select-name {
-                    color: $fontLigtherColor;
+                    color: $fontLighterColor;
                     height: 36px;
                     line-height: 36px;
                     font-size: 14px;
@@ -347,7 +347,7 @@
                 height: 100%;
                 padding: 0 18px;
                 margin-left: 10px;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
                 font-size: 14px;
                 cursor: pointer;
 
@@ -380,14 +380,14 @@
             > .seperate-line {
                 padding: 0 5px;
                 font-size: 20px;
-                // color: $fontLigtherColor;
+                // color: $fontLighterColor;
                 line-height: $headerHeight;
             }
 
             > .devops-icon {
                 padding: 0 10px;
                 font-size: 20px;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
                 line-height: $headerHeight;
                 cursor: pointer;
             }

@@ -226,7 +226,7 @@
             display: flex;
         }
         .bk-tooltip {
-            color: $fontLigtherColor;
+            color: $fontLighterColor;
             p {
                 max-width: 250px;
                 text-align: left;

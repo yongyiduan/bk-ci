@@ -1669,7 +1669,7 @@
                 .bk-selector-input {
                     border-radius: 0;
                     border-color: #DDE4EB;
-                    // color: $fontLigtherColor;
+                    // color: $fontLighterColor;
                     border: none;
                 }
             }

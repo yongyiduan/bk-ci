@@ -633,7 +633,7 @@
             .artifactory-table-label {
                 height: 50px;
                 font-size: 14px;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
                 line-height: 50px;
                 padding-left: 20px;
             }

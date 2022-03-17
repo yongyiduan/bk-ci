@@ -134,8 +134,8 @@
                     &.done {
                         > span {
                             color: white;
-                            background-color: $fontLigtherColor;
-                            border-color: $fontLigtherColor;
+                            background-color: $fontLighterColor;
+                            border-color: $fontLighterColor;
                         }
                     }
                     > span {

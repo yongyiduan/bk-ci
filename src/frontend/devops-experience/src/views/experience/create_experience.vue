@@ -866,7 +866,7 @@
                     cursor: pointer;
                     color: $primaryColor;
                     &.is-unedit {
-                        color: $fontLigtherColor;
+                        color: $fontLighterColor;
                     }
                 }
             }

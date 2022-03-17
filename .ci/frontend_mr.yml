@@ -1,0 +1,35 @@
+version: "v2.0"
+name: "前端MR代码检查"
+
+on:
+  mr: [ frontend-integration ]
+
+stages:
+- name: check
+  check-out:
+    gates:
+      - template: frontend.yml
+  jobs:
+    job1:
+      runs-on: docker
+      steps:
+      - checkout: self
+      - uses: CodeccCheckAtomDebug@4.*
+        with:
+          languages:
+          - "JS"           
+          languageRuleSetMap:
+            JS_RULE:
+            - "js_eslint_sec"
+          newDefectJudgeFromDate: "2021-06-03"
+          path:
+          - "src/frontend"
+          customPath:
+          - "sfisfoisifairwinsun"
+          - ".*/.*\\.svg"
+          - ".*/static/lib\\.bundle\\.js"
+          - "yarn.lock"
+          - "src/frontend/devops-codecc"
+
+notices:
+- type: wework-message

@@ -219,7 +219,7 @@
     align-items: center;
 
     .nav-entry {
-        color: $fontLigtherColor;
+        color: $fontLighterColor;
         padding: 0 20px;
         cursor: pointer;
         line-height: $headerHeight;
