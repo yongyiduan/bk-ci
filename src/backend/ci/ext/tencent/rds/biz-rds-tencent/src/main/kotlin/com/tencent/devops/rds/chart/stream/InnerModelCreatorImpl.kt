@@ -191,7 +191,8 @@ class InnerModelCreatorImpl @Autowired constructor(
         )
 
         return PublicDevCloudDispathcType(
-            image = JsonUtil.toJson(containerPool),
+            //            image = JsonUtil.toJson(containerPool),
+            image = defaultImage,
             imageType = ImageType.THIRD,
             performanceConfigId = "0"
         )
