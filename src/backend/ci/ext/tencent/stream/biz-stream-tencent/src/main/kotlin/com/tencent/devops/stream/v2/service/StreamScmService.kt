@@ -502,7 +502,8 @@ class StreamScmService @Autowired constructor(
                     gitProjectId = gitProjectId,
                     path = filePath,
                     token = token,
-                    ref = ref
+                    ref = ref,
+                    recursive = null
                 ).data ?: emptyList()
             }
         )

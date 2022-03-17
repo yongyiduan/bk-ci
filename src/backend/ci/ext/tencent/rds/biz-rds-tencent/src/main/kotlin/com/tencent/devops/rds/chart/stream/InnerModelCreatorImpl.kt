@@ -29,19 +29,35 @@ package com.tencent.devops.rds.chart.stream
 
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
+import com.tencent.devops.common.api.util.EnvUtils
+import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.ci.image.BuildType
+import com.tencent.devops.common.ci.image.Credential
+import com.tencent.devops.common.ci.image.Pool
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
+import com.tencent.devops.common.ci.v2.Job
+import com.tencent.devops.common.ci.v2.Resources
 import com.tencent.devops.common.ci.v2.Step
 import com.tencent.devops.common.ci.v2.YamlTransferData
 import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
 import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
+import com.tencent.devops.common.pipeline.type.DispatchType
+import com.tencent.devops.common.pipeline.type.agent.AgentType
+import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentEnvDispatchType
+import com.tencent.devops.common.pipeline.type.devcloud.PublicDevCloudDispathcType
+import com.tencent.devops.common.pipeline.type.docker.ImageType
+import com.tencent.devops.common.pipeline.type.macos.MacOSDispatchType
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
+import com.tencent.devops.process.util.StreamDispatchUtils
 import com.tencent.devops.rds.chart.ChartPipelineStartParams
 import com.tencent.devops.rds.constants.Constants
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-class InnerModelCreatorImpl : InnerModelCreator {
+class InnerModelCreatorImpl @Autowired constructor(
+) : InnerModelCreator {
 
     @Value("\${stream.marketRun.enable:#{false}}")
     private val marketRunTaskData: Boolean = false
@@ -52,23 +68,25 @@ class InnerModelCreatorImpl : InnerModelCreator {
     @Value("\${stream.marketRun.atomVersion:#{null}}")
     private val runPlugInVersionData: String? = null
 
+    // TODO: 后续改为配置
+    val defaultImageData: String = "http://mirrors.tencent.com/ci/tlinux3_ci:1.5.0"
+
     companion object {
         //  checkout通过当前用户的token来拉取
         private const val CHECKOUT_AUTH_TYPE = "TICKET"
     }
 
     override val marketRunTask: Boolean
-        get() {
-            return marketRunTaskData
-        }
+        get() = marketRunTaskData
+
     override val runPlugInAtomCode: String?
-        get() {
-            return runPlugInAtomCodeData
-        }
+        get() = runPlugInAtomCodeData
+
     override val runPlugInVersion: String?
-        get() {
-            return runPlugInVersionData
-        }
+        get() = runPlugInVersionData
+
+    override val defaultImage: String
+        get() = defaultImageData
 
     override fun getJobTemplateAcrossInfo(
         yamlTransferData: YamlTransferData,
@@ -125,6 +143,57 @@ class InnerModelCreatorImpl : InnerModelCreator {
             version = "1.*",
             data = data,
             additionalOptions = additionalOptions
+        )
+    }
+
+    // TODO: 先写普通版，后续看不同构建机和matrix怎么改
+    override fun getJobDispatchType(
+        job: Job,
+        projectCode: String,
+        defaultImage: String,
+        resources: Resources?,
+        containsMatrix: Boolean?,
+        buildTemplateAcrossInfo: BuildTemplateAcrossInfo?
+    ): DispatchType {
+        val poolName = job.runsOn.poolName
+        val workspace = job.runsOn.workspace
+
+        // 第三方构建机
+        if (job.runsOn.selfHosted == true) {
+            return ThirdPartyAgentEnvDispatchType(
+                envName = poolName,
+                workspace = workspace,
+                agentType = AgentType.NAME
+            )
+        }
+
+        // macos构建机
+        if (poolName.startsWith("macos")) {
+            return MacOSDispatchType(
+                macOSEvn = "Catalina10.15.4:12.2",
+                systemVersion = "Catalina10.15.4",
+                xcodeVersion = "12.2"
+            )
+        }
+
+        // TODO: 目前只做简单的镜像构建，后续看产品设计
+        // 公共docker构建机
+        val containerPool = Pool(
+            container = defaultImage,
+            credential = Credential(
+                user = "",
+                password = ""
+            ),
+            macOS = null,
+            third = null,
+            env = job.env,
+            buildType = BuildType.DEVCLOUD
+        )
+
+        return PublicDevCloudDispathcType(
+            image = JsonUtil.toJson(containerPool),
+            imageType = ImageType.THIRD,
+            performanceConfigId = "0"
         )
     }
 

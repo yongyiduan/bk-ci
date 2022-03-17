@@ -90,9 +90,7 @@ class ModelContainer constructor(
             jobControlOption = getJobControlOption(
                 job = job, jobEnable = jobEnable, finalStage = finalStage
             ),
-            dispatchType = StreamDispatchUtils.getDispatchType(
-                client = client,
-                objectMapper = objectMapper,
+            dispatchType = inner.getJobDispatchType(
                 job = job,
                 projectCode = projectCode,
                 defaultImage = defaultImage,
