@@ -47,6 +47,9 @@ interface InnerModelCreator {
     // 研发商店的run插件的版本
     val runPlugInVersion: String?
 
+    // 默认的公共镜像
+    val defaultImage: String
+
     /**
      * 获取job级别的跨项目模板共享凭证信息
      * @param yamlTransferData yaml模板装换的中间数据
