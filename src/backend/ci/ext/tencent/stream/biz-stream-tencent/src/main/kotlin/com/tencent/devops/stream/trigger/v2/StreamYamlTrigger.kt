@@ -118,7 +118,8 @@ class StreamYamlTrigger @Autowired constructor(
 
         if (!isTrigger && !isTiming && !isDelete) {
             logger.warn(
-                "Matcher is false, return, gitProjectId: ${gitRequestEvent.gitProjectId}, " +
+                "${gitProjectPipeline.pipelineId}|" +
+                        "Matcher is false, return, gitProjectId: ${gitRequestEvent.gitProjectId}, " +
                         "eventId: ${gitRequestEvent.id}"
             )
             triggerError(
@@ -147,11 +148,13 @@ class StreamYamlTrigger @Autowired constructor(
         val parsedYaml = YamlCommonUtils.toYamlNotNull(yamlReplaceResult.preYaml)
         logger.info("${gitProjectPipeline.pipelineId} parsedYaml: $parsedYaml normalize yaml: $normalizedYaml")
 
-        // 若是Yaml格式没问题，则取Yaml中的流水线名称，并修改当前流水线名称
-        gitProjectPipeline.displayName = if (!yamlObject.name.isNullOrBlank()) {
-            yamlObject.name!!
-        } else {
-            gitProjectPipeline.filePath
+        // 除了新建的流水线，若是Yaml格式没问题，则取Yaml中的流水线名称，并修改当前流水线名称，只在当前yml文件变更时进行
+        if (gitProjectPipeline.pipelineId.isBlank() ||
+            (!changeSet.isNullOrEmpty() && changeSet.contains(gitProjectPipeline.filePath))
+        ) {
+            gitProjectPipeline.displayName = yamlObject.name?.ifBlank {
+                gitProjectPipeline.filePath
+            } ?: gitProjectPipeline.filePath
         }
 
         // 拼接插件时会需要传入GIT仓库信息需要提前刷新下状态，只有url或者名称不对才更新

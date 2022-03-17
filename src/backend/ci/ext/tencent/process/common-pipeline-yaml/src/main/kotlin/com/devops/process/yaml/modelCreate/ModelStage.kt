@@ -64,7 +64,7 @@ class ModelStage constructor(
     val objectMapper: ObjectMapper,
     val inner: InnerModelCreator
 ) {
-    private val modelContainer = ModelContainer(client, objectMapper)
+    private val modelContainer = ModelContainer(client, objectMapper, inner)
     private val modelElement = ModelElement(client, inner)
 
     companion object {

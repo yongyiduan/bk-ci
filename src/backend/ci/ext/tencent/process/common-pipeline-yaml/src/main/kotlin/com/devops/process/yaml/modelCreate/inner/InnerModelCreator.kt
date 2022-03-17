@@ -28,10 +28,13 @@
 package com.devops.process.yaml.modelCreate.inner
 
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
+import com.tencent.devops.common.ci.v2.Job
+import com.tencent.devops.common.ci.v2.Resources
 import com.tencent.devops.common.ci.v2.Step
 import com.tencent.devops.common.ci.v2.YamlTransferData
 import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
 import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
+import com.tencent.devops.common.pipeline.type.DispatchType
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 
 /**
@@ -46,6 +49,9 @@ interface InnerModelCreator {
 
     // 研发商店的run插件的版本
     val runPlugInVersion: String?
+
+    // 默认的公共镜像
+    val defaultImage: String
 
     /**
      * 获取job级别的跨项目模板共享凭证信息
@@ -86,4 +92,23 @@ interface InnerModelCreator {
         event: ModelCreateEvent,
         additionalOptions: ElementAdditionalOptions
     ): MarketBuildAtomElement
+
+
+    /**
+     * 获取job的dispatch类型
+     * @param job 当前yaml的job对象
+     * @param projectCode 蓝盾项目code
+     * @param defaultImage 镜像名称 "http://mirrors.tencent.com/ci/tlinux3_ci:0.1.1.0"
+     * @param resources yaml的资源引用信息，如构建机池，模板库
+     * @param containsMatrix 视频否启用matrix
+     * @param buildTemplateAcrossInfo 跨项目模板构建信息
+     */
+    fun getJobDispatchType(
+        job: Job,
+        projectCode: String,
+        defaultImage: String,
+        resources: Resources? = null,
+        containsMatrix: Boolean? = false,
+        buildTemplateAcrossInfo: BuildTemplateAcrossInfo? = null
+    ): DispatchType
 }

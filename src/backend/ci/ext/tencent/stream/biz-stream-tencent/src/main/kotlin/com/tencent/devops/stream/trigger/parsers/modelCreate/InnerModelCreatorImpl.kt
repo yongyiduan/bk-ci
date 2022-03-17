@@ -27,32 +27,40 @@
 
 package com.tencent.devops.stream.trigger.parsers.modelCreate
 
-import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
+import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.devops.common.api.exception.CustomException
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
+import com.tencent.devops.common.ci.v2.Job
+import com.tencent.devops.common.ci.v2.Resources
 import com.tencent.devops.common.ci.v2.Step
 import com.tencent.devops.common.ci.v2.YamlTransferData
 import com.tencent.devops.common.ci.v2.enums.TemplateType
+import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
 import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
+import com.tencent.devops.common.pipeline.type.DispatchType
 import com.tencent.devops.common.webhook.enums.code.tgit.TGitObjectKind
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 import com.tencent.devops.process.pojo.TemplateAcrossInfoType
+import com.tencent.devops.process.util.StreamDispatchUtils
 import com.tencent.devops.stream.dao.GitCIServicesConfDao
 import com.tencent.devops.stream.dao.GitCISettingDao
 import com.tencent.devops.stream.trigger.StreamTriggerCache
 import com.tencent.devops.stream.v2.service.StreamOauthService
 import com.tencent.devops.stream.v2.service.StreamScmService
-import javax.ws.rs.core.Response
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import javax.ws.rs.core.Response
 
 @Component
 class InnerModelCreatorImpl @Autowired constructor(
     private val dslContext: DSLContext,
+    private val objectMapper: ObjectMapper,
+    private val client: Client,
     private val gitServicesConfDao: GitCIServicesConfDao,
     private val gitCISettingDao: GitCISettingDao,
     private val streamTriggerCache: StreamTriggerCache,
@@ -69,22 +77,24 @@ class InnerModelCreatorImpl @Autowired constructor(
     @Value("\${stream.marketRun.atomVersion:#{null}}")
     private val runPlugInVersionData: String? = null
 
+    @Value("\${container.defaultImage:#{null}}")
+    private val defaultImageData: String = "http://mirrors.tencent.com/ci/tlinux3_ci:1.5.0"
+
     companion object {
         private const val STREAM_CHECK_AUTH_TYPE = "AUTH_USER_TOKEN"
     }
 
     override val marketRunTask: Boolean
-        get() {
-            return marketRunTaskData
-        }
+        get() = marketRunTaskData
+
     override val runPlugInAtomCode: String?
-        get() {
-            return runPlugInAtomCodeData
-        }
+        get() = runPlugInAtomCodeData
+
     override val runPlugInVersion: String?
-        get() {
-            return runPlugInVersionData
-        }
+        get() = runPlugInVersionData
+
+    override val defaultImage: String
+        get() = defaultImageData
 
     override fun getJobTemplateAcrossInfo(
         yamlTransferData: YamlTransferData,
@@ -201,8 +211,11 @@ class InnerModelCreatorImpl @Autowired constructor(
         }
 
         when (event.streamData!!.objectKind) {
-            TGitObjectKind.MERGE_REQUEST ->
+            TGitObjectKind.MERGE_REQUEST -> {
                 inputMap["pullType"] = "BRANCH"
+                // mr merged时,需要拉取目标分支,如果是mr open,插件不会读取这个值
+                inputMap["refName"] = gitData.branch
+            }
             TGitObjectKind.TAG_PUSH -> {
                 inputMap["pullType"] = "TAG"
                 inputMap["refName"] = gitData
@@ -230,6 +243,27 @@ class InnerModelCreatorImpl @Autowired constructor(
                 inputMap["refName"] = gitData.commitId
             }
         }
+    }
+
+
+    override fun getJobDispatchType(
+        job: Job,
+        projectCode: String,
+        defaultImage: String,
+        resources: Resources?,
+        containsMatrix: Boolean?,
+        buildTemplateAcrossInfo: BuildTemplateAcrossInfo?
+    ): DispatchType {
+        return StreamDispatchUtils.getDispatchType(
+            client = client,
+            objectMapper = objectMapper,
+            job = job,
+            projectCode = projectCode,
+            defaultImage = defaultImage,
+            resources = resources,
+            containsMatrix = containsMatrix,
+            buildTemplateAcrossInfo = buildTemplateAcrossInfo
+        )
     }
 
     private fun retryGetRepositoryUrl(projectId: String): String? {
