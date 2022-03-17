@@ -29,10 +29,9 @@ package com.tencent.devops.eventbus.target.pipeline
 
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.pipeline.enums.StartType
 import com.tencent.devops.eventbus.constant.TargetType
 import com.tencent.devops.eventbus.target.IEventTargetInvoker
-import com.tencent.devops.process.api.service.ServiceBuildResource
+import com.tencent.devops.process.api.service.ServiceWebhookBuildResource
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -52,18 +51,16 @@ class PipelineEventTargetInvoker @Autowired constructor(
                 logger.info(
                     "${projectId}|$pipelineId|Start to invoke [pipeline] event target by params $targetRequestParam"
                 )
-                val buildId = client.get(ServiceBuildResource::class).manualStartupNew(
+                val buildId = client.get(ServiceWebhookBuildResource::class).webhookTrigger(
                     userId = userId,
                     projectId = projectId,
                     pipelineId = pipelineId,
-                    values = values,
-                    channelCode = channelCode,
-                    startType = StartType.SERVICE
+                    params = values,
+                    channelCode = channelCode
                 ).data
-                logger.info("${projectId}|$pipelineId|${buildId?.id}|Success to invoke [pipeline] event target")
-
+                logger.info("${projectId}|$pipelineId|${buildId}|Success to invoke [pipeline] event target")
             } catch (ignore: Throwable) {
-                logger.error("${projectId}|$pipelineId|Failed to invoke [pipeline] event target")
+                logger.error("${projectId}|$pipelineId|Failed to invoke [pipeline] event target", ignore)
             }
         }
     }

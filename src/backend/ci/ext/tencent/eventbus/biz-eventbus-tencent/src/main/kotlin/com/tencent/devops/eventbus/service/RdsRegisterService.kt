@@ -103,20 +103,23 @@ class RdsRegisterService @Autowired constructor(
         val eventBusRuleSet = mutableSetOf<EventBusRule>()
         val ruleTargetSet = mutableSetOf<EventRuleTarget>()
         request.triggerOn.forEach on@{ on ->
-            logger.info("trigger ${on.id} event type")
+            logger.info("$projectId|trigger ${on.id} event type")
             val eventTypeList = eventTypeDao.listByAliasName(
                 dslContext = dslContext,
                 aliasName = on.id
             )
             if (eventTypeList.isEmpty()) {
-                logger.info("${on.id} event type not exist")
+                logger.info("$projectId|${on.id} event type not exist")
                 return@on
             }
             eventTypeList.forEach eventType@{ eventType ->
                 val eventSource = eventSourceDao.get(
                     dslContext = dslContext,
                     id = eventType.sourceId
-                ) ?: return@eventType
+                ) ?: run {
+                    logger.info("$projectId|${eventType.sourceId} event source not exist")
+                    return@eventType
+                }
                 eventBusSourceSet.add(
                     EventBusSource(
                         busId = busId,
@@ -135,7 +138,7 @@ class RdsRegisterService @Autowired constructor(
                     triggerResource = request.triggerResource
                 )
                 if (webhookProp == null || webhookProp.second.isEmpty()) {
-                    logger.info("Failed to register webhook with source($eventSource.name)")
+                    logger.info("$projectId|${eventSource.name}|${eventType.name}| does not need webhook registration")
                     return@eventType
                 }
                 val ruleId = eventBusRuleDao.getByName(
@@ -208,7 +211,6 @@ class RdsRegisterService @Autowired constructor(
             sourceId = sourceId,
             eventTypeId = eventTypeId
         ) ?: run {
-            logger.info("$sourceName does not need webhook registration")
             return null
         }
         val successPropValueList = mutableListOf<String>()
