@@ -216,6 +216,8 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                         buildStatus = BuildStatus.SUCCEED
                     )
 
+                    LOG.info("TEST =======>: ${JsonUtil.toJson(context)}")
+
                     return BuildVariables(
                         buildId = buildId,
                         vmSeqId = vmSeqId,
@@ -253,7 +255,12 @@ class EngineVMBuildService @Autowired(required = false) constructor(
             context.putAll(customBuildEnv.map {
                 "$ENV_CONTEXT_KEY_PREFIX${it.key}" to EnvUtils.parseEnv(it.value, context)
             }.toMap())
+
+            context.putAll(customBuildEnv.map {
+                it.key to EnvUtils.parseEnv(it.value, context)
+            }.toMap())
         }
+
         if (matrixContext?.isNotEmpty() == true) context.putAll(matrixContext)
     }
 
