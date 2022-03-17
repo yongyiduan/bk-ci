@@ -506,7 +506,7 @@
                 left: 0;
                 font-size: 30px;
                 width: 38px;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
             }
         }
         .part-item-path {
@@ -583,10 +583,10 @@
             }
         }
         .disabled-btn {
-            color: $fontLigtherColor;
+            color: $fontLighterColor;
             cursor: url(../../images/cursor-lock.png),auto;
             &:hover {
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
             }
         }
         .handler-btn-tool {

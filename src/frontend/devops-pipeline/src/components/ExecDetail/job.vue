@@ -33,7 +33,7 @@
                 :execute-count="executeCount"
                 ref="jobLog"
             />
-            <container-content v-show="currentTab === 'setting'"
+            <container-content v-if="currentTab === 'setting'"
                 :container-index="editingElementPos.containerIndex"
                 :container-group-index="editingElementPos.containerGroupIndex"
                 :stage-index="editingElementPos.stageIndex"
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-    import { mapState, mapGetters } from 'vuex'
+    import { mapGetters } from 'vuex'
     import jobLog from './log/jobLog'
     import pluginLog from './log/pluginLog'
     import detailContainer from './detailContainer'
@@ -59,7 +59,16 @@
             pluginLog,
             ContainerContent
         },
-
+        props: {
+            execDetail: {
+                type: Object,
+                required: true
+            },
+            editingElementPos: {
+                type: Object,
+                required: true
+            }
+        },
         data () {
             return {
                 showTime: false,
@@ -69,10 +78,6 @@
         },
 
         computed: {
-            ...mapState('atom', [
-                'execDetail',
-                'editingElementPos'
-            ]),
 
             ...mapGetters('atom', [
                 'checkShowDebugDockerBtn'
