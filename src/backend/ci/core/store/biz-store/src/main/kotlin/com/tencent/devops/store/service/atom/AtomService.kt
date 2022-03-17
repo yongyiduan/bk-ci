@@ -54,23 +54,36 @@ interface AtomService {
         accessToken: String,
         userId: String,
         serviceScope: String?,
+        jobType: String?,
         os: String?,
         projectCode: String,
         category: String?,
         classifyId: String?,
-        page: Int?,
-        pageSize: Int?
+        recommendFlag: Boolean?,
+        keyword: String?,
+        queryProjectAtomFlag: Boolean = true,
+        fitOsFlag: Boolean? = true,
+        queryFitAgentBuildLessAtomFlag: Boolean? = true,
+        page: Int = 1,
+        pageSize: Int = 10
     ): Result<AtomResp<AtomRespItem>?>
 
     /**
      * 获取插件列表
      */
     fun serviceGetPipelineAtoms(
+        userId: String,
         serviceScope: String?,
+        jobType: String?,
         os: String?,
         projectCode: String,
         category: String?,
         classifyId: String?,
+        recommendFlag: Boolean?,
+        keyword: String?,
+        queryProjectAtomFlag: Boolean = true,
+        fitOsFlag: Boolean? = true,
+        queryFitAgentBuildLessAtomFlag: Boolean? = true,
         page: Int?,
         pageSize: Int?
     ): Result<AtomResp<AtomRespItem>?>
@@ -146,8 +159,9 @@ interface AtomService {
         userId: String,
         projectCode: String,
         classifyCode: String?,
-        page: Int?,
-        pageSize: Int?
+        name: String?,
+        page: Int,
+        pageSize: Int
     ): Page<InstalledAtom>
 
     /**
