@@ -42,7 +42,7 @@
                 </div>
             </div>
             <div class="node-select-table">
-                <bk-table :data="rowList" class="node-table-message">
+                <bk-table :data="visibleRowList" class="node-table-message">
                     <bk-table-column width="60" :render-header="renderHeader">
                         <template slot-scope="{ row }">
                             <bk-checkbox :true-value="true" :false-value="false" :disabled="row.isEixtEnvNode"
@@ -165,6 +165,9 @@
                 return this.rowList.some(row => {
                     return ['THIRDPARTY', 'DEVCLOUD'].includes(row.nodeType) && row.isDisplay
                 })
+            },
+            visibleRowList () {
+                return this.rowList.filter(row => row.isDisplay)
             },
             isAllSelected () {
                 return this.selectHandlercConf.allNodeSelected
@@ -352,6 +355,7 @@
         position: absolute;
         top: 10px;
         right: 20px;
+        z-index: 1;
       }
 
       .search-tool-row {
