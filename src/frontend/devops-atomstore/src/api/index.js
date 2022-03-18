@@ -29,16 +29,22 @@ export default {
         return vue.$ajax.get(`${prefix}/user/store/env/var/latest/types/${storeType}/codes/${storeCode}?scopes=${scopes}&varName=${varName}`)
     },
 
-    getEnvChangeList ({ storeType, storeCode, varName }) {
-        return vue.$ajax.get(`${prefix}/user/store/env/var/change/log/types/${storeType}/codes/${storeCode}/vars/${varName}`)
+    getEnvChangeList ({ storeType, storeCode, varName, scope }) {
+        return vue.$ajax.get(`${prefix}/user/store/env/var/change/log/types/${storeType}/codes/${storeCode}/vars/${varName}?scopes=${scope}`)
     },
 
     addEnv (params) {
-        return vue.$ajax.post(`${prefix}/user/store/env/var/create`, params)
+        const { variableId, option } = params
+        delete params.option
+        if (option === 'update') {
+            delete params.variableId
+            return vue.$ajax.post(`${prefix}/user/store/env/var/${option}?variableId=${variableId}`, params)
+        }
+        return vue.$ajax.post(`${prefix}/user/store/env/var/${option}`, params)
     },
 
-    deleteEnv ({ storeType, storeCode, varNames }) {
-        return vue.$ajax.delete(`${prefix}/user/store/env/var/types/${storeType}/codes/${storeCode}?varNames=${varNames}`)
+    deleteEnv ({ storeType, storeCode, varNames, scope }) {
+        return vue.$ajax.delete(`${prefix}/user/store/env/var/types/${storeType}/codes/${storeCode}?varNames=${varNames}&scope=${scope}`)
     },
 
     getCodeScore (storeType, storeCode, params) {
