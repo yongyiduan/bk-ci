@@ -31,11 +31,10 @@ import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.parsers.template.YamlTemplate
-import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
 import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
+import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
 import com.tencent.devops.common.ci.v2.utils.YamlCommonUtils
 import org.junit.Test
-
 import org.springframework.core.io.ClassPathResource
 import java.io.BufferedReader
 import java.io.InputStream
@@ -52,11 +51,11 @@ class YamlTemplateTest {
         check("$sampleDir/$dir/all.yml")
     }
 
-    @Test
-    fun testStagesTemplate() {
-        val dir = "stages"
-        check("$sampleDir/$dir/stages.yml")
-    }
+//    @Test
+//    fun testStagesTemplate() {
+//        val dir = "stages"
+//        check("$sampleDir/$dir/stages.yml")
+//    }
 
     @Test
     fun testJobsTemplate() {

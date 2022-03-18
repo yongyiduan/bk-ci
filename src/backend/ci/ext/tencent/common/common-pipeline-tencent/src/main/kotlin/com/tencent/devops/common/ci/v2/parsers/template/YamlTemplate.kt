@@ -33,20 +33,21 @@ import com.tencent.devops.common.ci.v2.GitNotices
 import com.tencent.devops.common.ci.v2.PreJob
 import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
 import com.tencent.devops.common.ci.v2.PreStage
+import com.tencent.devops.common.ci.v2.PreStep
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.Repositories
+import com.tencent.devops.common.ci.v2.TemplateInfo
 import com.tencent.devops.common.ci.v2.Variable
+import com.tencent.devops.common.ci.v2.enums.TemplateType
+import com.tencent.devops.common.ci.v2.exception.YamlFormatException
+import com.tencent.devops.common.ci.v2.parsers.template.TemplateYamlUtil.checkJobIdGlobalUnique
+import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
+import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
+import com.tencent.devops.common.ci.v2.parsers.template.models.TemplateDeepTreeNode
 import com.tencent.devops.common.ci.v2.stageCheck.Gate
 import com.tencent.devops.common.ci.v2.stageCheck.GateTemplate
 import com.tencent.devops.common.ci.v2.stageCheck.PreStageCheck
 import com.tencent.devops.common.ci.v2.stageCheck.PreTemplateStageCheck
-import com.tencent.devops.common.ci.v2.PreStep
-import com.tencent.devops.common.ci.v2.TemplateInfo
-import com.tencent.devops.common.ci.v2.exception.YamlFormatException
-import com.tencent.devops.common.ci.v2.enums.TemplateType
-import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
-import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
-import com.tencent.devops.common.ci.v2.parsers.template.models.TemplateDeepTreeNode
 
 @Suppress("ALL")
 class YamlTemplate<T>(
@@ -60,7 +61,6 @@ class YamlTemplate<T>(
     val nowRepo: Repositories?,
     // 目标库信息(发起库没有库信息)
     val repo: Repositories?,
-
     // 来自文件
     private val fileFromPath: String? = null,
 
@@ -81,6 +81,9 @@ class YamlTemplate<T>(
 ) {
     // 存储当前库的模板信息，减少重复获取 key: templatePath value： template
     private val templateLib = TemplateLibrary(extraParameters, getTemplateMethod)
+
+    // Job全局ID一致Set
+    private val allJobIds: MutableSet<String> = mutableSetOf()
 
     // 添加图防止模版的循环嵌套
     private val templateGraph = TemplateGraph()
@@ -252,7 +255,9 @@ class YamlTemplate<T>(
     ) {
         val stageList = mutableListOf<PreStage>()
         stages.forEach { stage ->
-            stageList.addAll(replaceStageTemplate(listOf(stage), filePath, deepTree))
+            val newStage = replaceStageTemplate(listOf(stage), filePath, deepTree)
+            checkJobIdGlobalUnique(newStage, filePath, allJobIds)
+            stageList.addAll(newStage)
         }
         preYamlObject.stages = stageList
     }
@@ -373,7 +378,6 @@ class YamlTemplate<T>(
             if (Constants.TEMPLATE_KEY in stage.keys) {
                 val toPath = stage[Constants.TEMPLATE_KEY].toString()
                 templateGraph.saveAndCheckCyclicTemplate(fromPath, toPath, TemplateType.STAGE)
-
                 val parameters = YamlObjects.transNullValue<Map<String, Any?>>(
                     file = fromPath,
                     type = Constants.PARAMETERS_KEY,
@@ -412,7 +416,6 @@ class YamlTemplate<T>(
                 toPathList.forEach { item ->
                     val toPath = item[Constants.OBJECT_TEMPLATE_PATH].toString()
                     templateGraph.saveAndCheckCyclicTemplate(fromPath, toPath, TemplateType.JOB)
-
                     val parameters = YamlObjects.transNullValue<Map<String, Any?>>(
                         file = fromPath,
                         type = Constants.PARAMETERS_KEY,
