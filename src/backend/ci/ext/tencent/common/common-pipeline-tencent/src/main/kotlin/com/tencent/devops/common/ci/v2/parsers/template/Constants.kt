@@ -52,6 +52,7 @@ object Constants {
 
     // 异常模板
     const val TEMPLATE_ID_DUPLICATE = "Format error: ID [%s] in template [%s] and template [%s] are duplicated"
+    const val TEMPLATE_JOB_ID_DUPLICATE = "Format error: JOB_ID [%s] in template [%s] are duplicated"
     const val TEMPLATE_ROOT_ID_DUPLICATE = "[%s] Format error: IDs [%s] are duplicated"
     const val TRANS_AS_ERROR = "[%s]Keyword [%s] format error"
     const val REPO_NOT_FOUND_ERROR =
