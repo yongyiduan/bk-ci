@@ -1,5 +1,5 @@
 {
-  "name": "@tencent/bk-pipeline",
+  "name": "bkui-pipeline",
   "version": "0.1.2",
   "description": "",
   "main": "dist/bk-pipeline.min.js",
