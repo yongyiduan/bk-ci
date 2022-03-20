@@ -3,25 +3,61 @@
         <aside class="aside-nav section-box" v-bkloading="{ isLoading }">
             <h3 class="nav-title">
                 Pipelines
-                <div v-bk-tooltips="{ content: 'Permission denied', disabled: permission }" class="nav-button">
-                    <bk-button size="small" theme="primary" @click="showAddYml" :disabled="!permission">New</bk-button>
+                <div
+                    v-bk-tooltips="{ content: 'Permission denied', disabled: permission }"
+                    class="nav-button"
+                >
+                    <bk-button
+                        size="small"
+                        theme="primary"
+                        :disabled="!permission"
+                        @click="showAddYml"
+                    >New</bk-button>
                 </div>
             </h3>
 
             <ul v-if="!isLoading" @scroll.passive="scrollLoadMore">
-                <li v-for="(pipeline, index) in pipelineList"
-                    :key="index"
-                    @click="choosePipeline(pipeline)"
-                    :class="{ 'nav-item': true, active: curPipeline.pipelineId === pipeline.pipelineId, disabled: !pipeline.enabled }"
+                <li
+                    :class="{
+                        'nav-item': true,
+                        active: curPipeline.pipelineId === undefined
+                    }"
+                    @click="choosePipeline(allPipeline)"
                 >
-                    <icon :name="pipeline.icon || 'pipeline'" size="24"></icon>
-                    <span
-                        class="text-ellipsis item-text"
-                        v-bk-overflow-tips="{
-                            content: pipeline.displayName,
-                            placement: 'right'
-                        }"
-                    >{{ pipeline.displayName }}</span>
+                    <icon name="all" size="24"></icon>
+                    <span class="text-ellipsis item-text">All pipelines</span>
+                </li>
+                <li
+                    v-bkloading="{ isLoading: sideItem === activeDir && isLoadingPipeline }"
+                    v-for="(sideItem, index) in renderSideList"
+                    :key="index"
+                    :class="{
+                        'nav-item': true,
+                        'is-pipeline': sideItem.displayName,
+                        active: typeof sideItem !== 'string' && curPipeline.pipelineId === sideItem.pipelineId
+                    }"
+                    @click="handleClickSideItem(sideItem)"
+                >
+                    <template v-if="!sideItem.pipelineId">
+                        <icon :name="activeDir === sideItem ? 'folder-open-shape' : 'folder-shape'" size="16"></icon>
+                        <span
+                            class="text-ellipsis item-text"
+                            v-bk-overflow-tips="{
+                                content: sideItem,
+                                placement: 'right'
+                            }"
+                        >{{ sideItem }}</span>
+                    </template>
+                    <template v-else>
+                        <icon name="pipeline" size="24"></icon>
+                        <span
+                            class="text-ellipsis item-text"
+                            v-bk-overflow-tips="{
+                                content: sideItem.displayName,
+                                placement: 'right'
+                            }"
+                        >{{ sideItem.displayName }}</span>
+                    </template>
                 </li>
             </ul>
         </aside>
@@ -88,6 +124,7 @@
 
         data () {
             return {
+                dirList: [],
                 pipelineList: [],
                 branchList: [],
                 yamlData: {
@@ -112,19 +149,41 @@
                     trigger: 'blur'
                 },
                 checkYaml: validateRule.checkYaml,
-                allPipeline: { displayName: 'All pipelines', enabled: true, icon: 'all' }
+                allPipeline: { displayName: 'All pipelines', enabled: true },
+                activeDir: '',
+                isLoadingPipeline: false
             }
         },
 
         computed: {
-            ...mapState(['projectId', 'curPipeline', 'menuPipelineId', 'permission'])
+            ...mapState([
+                'projectId',
+                'curPipeline',
+                'menuPipelineId',
+                'permission'
+            ]),
+
+            renderSideList () {
+                const currentDirIndex = this.dirList.findIndex((dir) => (dir === this.activeDir))
+                if (currentDirIndex > -1) {
+                    return [...this.dirList.slice(0, currentDirIndex + 1), ...this.pipelineList, ...this.dirList.slice(currentDirIndex + 1)]
+                } else {
+                    return this.dirList
+                }
+            }
         },
 
         watch: {
             '$route.params.pipelineId' () {
                 const pipelineId = this.$route.params.pipelineId
-                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.pipelineList[0]
-                this.setCurPipeline(curPipeline)
+                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId))
+                if (curPipeline) {
+                    this.setCurPipeline(curPipeline)
+                } else if (this.$route.params.pipelineId === this.allPipeline.pipelineId) {
+                    this.setCurPipeline(this.allPipeline)
+                } else {
+                    this.getPipelineDirList()
+                }
             },
             '$route.name' (val) {
                 if (val === 'buildList' && this.$route.params.pipelineId !== this.menuPipelineId) {
@@ -135,7 +194,7 @@
         },
 
         created () {
-            this.initList()
+            this.initStatus()
         },
 
         beforeDestroy () {
@@ -143,42 +202,74 @@
         },
 
         methods: {
-            ...mapActions(['setCurPipeline', 'setMenuPipelineId']),
+            ...mapActions([
+                'setCurPipeline',
+                'setMenuPipelineId'
+            ]),
 
-            initList () {
+            initStatus () {
+                register.installWsMessage(this.resetStatus, 'IFRAMEstream', 'pipelineList')
                 this.isLoading = true
-                this.initPipelineList().then(() => {
-                    this.pipelineList.unshift(this.allPipeline)
-                    this.setDefaultPipeline()
-                }).catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                }).finally(() => {
+                this.getPipelineDirList().finally(() => {
                     this.isLoading = false
                 })
+            },
+
+            // 收到ws消息，会更新列表
+            resetStatus () {
+                this.page = 1
+                this.pipelineList = []
+                this.getPipelineDirList()
+            },
+
+            getPipelineDirList () {
+                return pipelines.getPipelineDirList(this.projectId, {
+                    pipelineId: this.$route.params.pipelineId
+                }).then((data) => {
+                    this.dirList = data.allPath || []
+                    this.activeDir = data.currentPath || ''
+                    this.getPipelineList(this.activeDir).then(() => {
+                        this.setDefaultPipeline()
+                    })
+                }).catch((err) => {
+                    this.messageError(err.message || err)
+                })
+            },
+
+            handleClickSideItem (item) {
+                if (item?.pipelineId) {
+                    this.choosePipeline(item)
+                } else {
+                    this.handleExpandDir(item)
+                }
+            },
+
+            handleExpandDir (filePath) {
+                if (this.activeDir !== filePath) {
+                    this.page = 1
+                    this.activeDir = filePath
+                    this.pipelineList = []
+                    this.isLoadingPipeline = true
+                    this.getPipelineList(filePath).finally(() => {
+                        this.isLoadingPipeline = false
+                    })
+                } else {
+                    this.activeDir = ''
+                }
             },
 
             scrollLoadMore (event) {
                 const target = event.target
                 const bottomDis = target.scrollHeight - target.clientHeight - target.scrollTop
-                if (bottomDis <= 200 && !this.isLoadEnd && !this.isLoadingMore) this.getPipelineList()
+                if (bottomDis <= 200 && !this.isLoadEnd && !this.isLoadingMore) {
+                    this.getPipelineList(this.activeDir)
+                }
             },
 
-            initPipelineList () {
-                register.installWsMessage(this.resetPipelineList, 'IFRAMEstream', 'pipelineList')
-                return this.getPipelineList()
-            },
-
-            resetPipelineList () {
-                this.page = 1
-                this.pipelineList = [this.allPipeline]
-                this.getPipelineList().catch((err) => {
-                    this.$bkMessage({ theme: 'error', message: err.message || err })
-                })
-            },
-
-            getPipelineList () {
+            getPipelineList (filePath) {
                 this.isLoadingMore = true
                 const params = {
+                    filePath,
                     projectId: this.projectId,
                     page: this.page,
                     pageSize: this.pageSize
@@ -201,7 +292,7 @@
 
             setDefaultPipeline () {
                 const pipelineId = this.$route.params.pipelineId
-                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.pipelineList[0]
+                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.allPipeline
                 this.setMenuPipelineId(curPipeline.pipelineId)
                 this.setCurPipeline(curPipeline)
                 if (this.$route.name === 'pipeline') {
@@ -269,7 +360,7 @@
                     pipelines.getPipelineBranches(params).then((res) => {
                         this.branchList = res || []
                     }).catch((err) => {
-                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                        this.messageError(err.message || err)
                     }).finally(() => {
                         resolve()
                     })
@@ -286,12 +377,12 @@
                     pipelines.addPipelineYamlFile(this.projectId, postData).then(() => {
                         this.hidden()
                     }).catch((err) => {
-                        this.$bkMessage({ theme: 'error', message: err.message || err })
+                        this.messageError(err.message || err)
                     }).finally(() => {
                         this.isSaving = false
                     })
                 }, (err) => {
-                    this.$bkMessage({ theme: 'error', message: err.content || err })
+                    this.messageError(err.content || err)
                 })
             },
 
@@ -331,6 +422,9 @@
         width: calc(100vw - 290px);
         height: 100%;
         background: #f5f6fa;
+    }
+    .is-pipeline {
+        padding-left: 20px;
     }
     .yaml-form {
         padding: 20px 30px;
