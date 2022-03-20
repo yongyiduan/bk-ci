@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon" />
+        <link href="https://radosgw.open.woa.com/bkicon-default-9/stream-0.0.7/fonts/style.css" rel="stylesheet">
+        <meta charset="utf-8">
+        <title> 蓝盾 | Stream </title>
+    </head>
+    <body>
+        <div id="app"></div>
+        <script>
+            var SITE_URL = ''
+            var STATIC_URL = '/'
+            var REMOTE_STATIC_URL = ''
+            var LOGIN_SERVICE_URL = 'https://passport.woa.com/modules/passport/signin.ashx'
+            var PROXY_URL_PREFIX = 'devnet.devops.woa.com'
+            var X_DEVOPS_PROJECT_ID = 'X-DEVOPS-PROJECT-ID'
+            var ROUTER_TAG = 'ROUTER_TAG'
+            var DEPLOY_ENVIRONMENT = function (){
+                var host = location.host
+                if (host.startsWith('dev')) return 'dev'
+                else if (host.startsWith('test')) return 'test'
+                else return 'prod'
+            }()
+            var BKUI_HOST = function () {
+                var hostMap = {
+                    dev: 'dev.devops.woa.com',
+                    test: 'test.devops.woa.com',
+                    prod: 'devops.woa.com'
+                }
+                return hostMap[DEPLOY_ENVIRONMENT]
+            }()
+            var BKREPO_HOST = function () {
+                var hostMap = {
+                    dev: 'dev.bkrepo.woa.com',
+                    test: 'test.bkrepo.woa.com',
+                    prod: 'bkrepo.woa.com'
+                }
+                return hostMap[DEPLOY_ENVIRONMENT]
+            }()
+        </script>
+        <script>
+            function getLoginUrl (domain = LOGIN_SERVICE_URL) {
+                const cUrl = location.href
+                const loginUrl = new URL(domain)
+                const url = new URL('https://login.o.woa.com/call_back_oa/')
+                url.searchParams.append('bk_appid', 1)
+                url.searchParams.append('bk_login', 1)
+                url.searchParams.append('c_url', cUrl)
+                
+                loginUrl.searchParams.append('title', 'bklogin')
+                loginUrl.searchParams.append('appkey', '909a565c052c4379b90d3d82152d2da1')
+                loginUrl.searchParams.append('url', url)
+                
+                return loginUrl.href
+            }
+        </script>
+        <script src="https://radosgw.open.woa.com/bkicon-default-9/stream-0.0.7/fonts/iconcool.js"></script>
+        <script src="/static/lib.bundle.js"></script>
+    </body>
+</html>
