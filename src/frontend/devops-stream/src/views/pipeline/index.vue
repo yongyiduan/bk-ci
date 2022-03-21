@@ -35,7 +35,7 @@
                         'nav-item': true,
                         'is-pipeline': sideItem.displayName,
                         active: typeof sideItem !== 'string' && curPipeline.pipelineId === sideItem.pipelineId,
-                        disabled: !sideItem.enabled
+                        disabled: typeof sideItem !== 'string' && !sideItem.enabled
                     }"
                     @click="handleClickSideItem(sideItem)"
                 >
