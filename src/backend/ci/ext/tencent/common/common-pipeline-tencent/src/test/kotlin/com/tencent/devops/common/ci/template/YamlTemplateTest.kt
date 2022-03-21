@@ -51,11 +51,11 @@ class YamlTemplateTest {
         check("$sampleDir/$dir/all.yml")
     }
 
-//    @Test
-//    fun testStagesTemplate() {
-//        val dir = "stages"
-//        check("$sampleDir/$dir/stages.yml")
-//    }
+    @Test
+    fun testStagesTemplate() {
+        val dir = "stages"
+        check("$sampleDir/$dir/stages.yml")
+    }
 
     @Test
     fun testJobsTemplate() {
