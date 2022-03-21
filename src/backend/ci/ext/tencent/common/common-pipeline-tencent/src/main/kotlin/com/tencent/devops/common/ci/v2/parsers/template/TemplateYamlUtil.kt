@@ -72,7 +72,7 @@ object TemplateYamlUtil {
     fun checkJobIdGlobalUnique(stageList: List<PreStage>, filePath: String, allJobIds: MutableSet<String>) {
         stageList.forEach { stage ->
             val jobKeys = stage.jobs?.keys
-            if (jobKeys != null) {
+            if (!jobKeys.isNullOrEmpty()) {
                 checkDuplicateKey(filePath, jobKeys, allJobIds)
                 allJobIds.addAll(jobKeys)
             }
