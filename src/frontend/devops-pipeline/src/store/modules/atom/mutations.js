@@ -340,7 +340,8 @@ export default {
     },
     [INSERT_ATOM]: (state, { elements, insertIndex }) => {
         elements.splice(insertIndex, 0, {
-            data: {}
+            data: {},
+            isError: true
         })
     },
     [DELETE_ATOM]: (state, { elements, atomIndex }) => {
