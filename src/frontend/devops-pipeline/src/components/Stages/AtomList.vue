@@ -19,37 +19,16 @@
                 }"
                 @click.stop="showPropertyPanel(index)"
             >
-                <section
-                    class="atom-item atom-section normal-atom"
-                    :class="{ [atomCls(atom)]: true,
-                              'is-error': atom.isError,
-                              'quality-atom': atom['@type'] === 'qualityGateOutTask',
-                              'is-intercept': atom.isQualityCheck,
-                              'template-compare-atom': atom.templateModify }"
-                    v-if="atom['@type'] !== 'qualityGateInTask' && atom['@type'] !== 'qualityGateOutTask'"
-                >
-                    <status-icon
-                        v-if="atom.status && atom.status !== 'SKIP'"
-                        type="element"
-                        :status="atom.status"
-                        :is-hook="((atom.additionalOptions || {}).elementPostInfo || false)"
-                    />
-                    <status-icon
-                        v-else-if="isWaiting && atom.status !== 'SKIP'"
-                        type="element"
-                        status="WAITING"
-                    />
-                    <img
-                        v-else-if="atomMap[atom.atomCode] && atomMap[atom.atomCode].icon && !(atom.additionalOptions || {}).elementPostInfo"
-                        :src="atomMap[atom.atomCode].icon"
-                        :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }"
-                    />
-                    <logo
-                        v-else
-                        :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }"
-                        :name="getAtomIcon(atom)"
-                        size="18"
-                    />
+                <section class="atom-item atom-section normal-atom" :class="{ [atomCls(atom)]: true,
+                                                                              'is-error': atom.isError || !atom.atomCode,
+                                                                              'quality-atom': atom['@type'] === 'qualityGateOutTask',
+                                                                              'is-intercept': atom.isQualityCheck,
+                                                                              'template-compare-atom': atom.templateModify }"
+                    v-if="atom['@type'] !== 'qualityGateInTask' && atom['@type'] !== 'qualityGateOutTask'">
+                    <status-icon v-if="atom.status && atom.status !== 'SKIP'" type="element" :status="atom.status" :is-hook="((atom.additionalOptions || {}).elementPostInfo || false)" />
+                    <status-icon v-else-if="isWaiting && atom.status !== 'SKIP'" type="element" status="WAITING" />
+                    <img v-else-if="atomMap[atom.atomCode] && atomMap[atom.atomCode].icon && !(atom.additionalOptions || {}).elementPostInfo" :src="atomMap[atom.atomCode].icon" :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }" />
+                    <logo v-else :class="{ 'atom-icon': true, 'skip-icon': useSkipStyle(atom) }" :name="getAtomIcon(atom)" size="18" />
                     <p class="atom-name">
                         <span
                             :title="atom.name"
@@ -186,7 +165,10 @@
                 @click="editAtom(atomList.length - 1, true)"
             >
                 <i class="add-plus-icon" />
-                <span v-if="atomList.length === 0">{{ $t('editPage.addAtom') }}</span>
+                <span v-if="atomList.length === 0">
+                    {{ $t('editPage.addAtom') }}
+                    <i class="devops-icon icon-exclamation-triangle-shape error-icon" />
+                </span>
             </span>
         </draggable>
         <check-atom-dialog
@@ -746,7 +728,7 @@
                 margin-right: 6px;
             }
         }
-
+        
         .quality-item {
             height: 24px;
             line-height: 20px;
@@ -884,6 +866,15 @@
             background-color: white;
             cursor: pointer;
             z-index: 3;
+            span {
+                width: 76%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .error-icon {
+                color: $iconFailColor;
+            }
             .add-plus-icon {
                 @include add-plus-icon($fontLigtherColor, $fontLigtherColor, white, 18px, true);
                 @include add-plus-icon-hover($primaryColor, $primaryColor, white);
@@ -892,8 +883,7 @@
                 @extend .atom-item;
                 position: static;
                 border-style: dashed;
-                color: $borderWeightColor;
-                border-color: $borderWeightColor;
+                border-color: $dangerColor;
                 border-width: 1px;
                 .add-plus-icon {
                     margin: 12px 13px;
