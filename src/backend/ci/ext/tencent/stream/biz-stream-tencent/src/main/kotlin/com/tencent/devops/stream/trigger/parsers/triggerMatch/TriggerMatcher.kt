@@ -32,6 +32,7 @@ import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
 import com.tencent.devops.common.webhook.enums.code.tgit.TGitPushActionType
 import com.tencent.devops.common.webhook.pojo.code.git.GitTagPushEvent
 import com.tencent.devops.common.webhook.pojo.code.git.isCreateBranch
+import com.tencent.devops.common.webhook.pojo.code.git.isCreateBranchAndPushFile
 import com.tencent.devops.stream.pojo.enums.StreamMrEventAction
 import com.tencent.devops.stream.trigger.parsers.triggerMatch.matchUtils.BranchMatchUtils
 import com.tencent.devops.stream.trigger.parsers.triggerMatch.matchUtils.UserMatchUtils
@@ -123,7 +124,7 @@ class TriggerMatcher @Autowired constructor(
         val isDelete = if (gitRequestEvent.isDefaultBranchTrigger(defaultBranch)) {
             // 只有更改了delete相关流水线才做更新
             PathMatchUtils.isIncludePathMatch(listOf(pipelineFilePath), changeSet) &&
-                isDeleteMatch(triggerOn.delete, context.requestEvent, context.pipeline)
+                    isDeleteMatch(triggerOn.delete, context.requestEvent, context.pipeline)
         } else {
             false
         }
@@ -277,7 +278,7 @@ class TriggerMatcher @Autowired constructor(
             return false
         }
         // action
-        if (!checkActionMatch(pushRule.action, gitPushEvent.isCreateBranch())) {
+        if (!checkActionMatch(pushRule.action, gitPushEvent)) {
             return false
         }
         logger.info("Git trigger branch($eventBranch) is included and path(${pushRule.paths}) is included")
@@ -476,16 +477,16 @@ class TriggerMatcher @Autowired constructor(
         return changeSet
     }
 
-    private fun checkActionMatch(actionList: List<String>?, isCreateBranch: Boolean): Boolean {
+    private fun checkActionMatch(actionList: List<String>?, gitPushEvent: GitPushEvent): Boolean {
         if (actionList.isNullOrEmpty()) {
             return true
         }
         actionList.forEach {
-            if (it == TGitPushActionType.NEW_BRANCH.value && isCreateBranch) {
-                return true
-            }
-            if (it == TGitPushActionType.PUSH_FILE.value && !isCreateBranch) {
-                return true
+            when {
+                it == TGitPushActionType.NEW_BRANCH_AND_PUSH_FILE.value &&
+                        gitPushEvent.isCreateBranchAndPushFile() -> return true
+                it == TGitPushActionType.NEW_BRANCH.value && gitPushEvent.isCreateBranch() -> return true
+                it == TGitPushActionType.PUSH_FILE.value && !gitPushEvent.isCreateBranch() -> return true
             }
         }
 
