@@ -742,7 +742,7 @@
   "值类型": "值类型",
   "支持的操作": "支持的操作",
   "说明：": "说明：",
-  "说明文案": "在 stream 中，通过表达式${{ steps.<step-id>.outputs.<output-var-name> }} 访问; 在UI编排流水线中，通过表达式${{ <namespace>_<output-var-name> }} 访问。",
+  "说明文案": "通过表达式${{ jobs.<job_id>.steps.<step-id>.outputs.<output-var-name> }} 访问，如 ${{ jobs.job1.steps.step1.outputs.a }}",
   "hisUpgradeTips": "请谨慎操作，在对应大版本的最新版本基础上进行兼容式问题修正，不建议在此场景下新增/删除入参，避免发布后导致使用指定大版本.latest的流水线执行异常。",
   "分支": "分支",
   "历史大版本问题修复": "历史大版本问题修复",
