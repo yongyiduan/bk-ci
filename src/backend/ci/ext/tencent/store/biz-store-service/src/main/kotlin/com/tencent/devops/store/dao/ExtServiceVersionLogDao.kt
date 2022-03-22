@@ -144,4 +144,12 @@ class ExtServiceVersionLogDao {
             return dslContext.selectCount().from(this).where(SERVICE_ID.eq(serviceId)).fetchOne(0, Int::class.java)!!
         }
     }
+
+    fun deleteByServiceCode(dslContext: DSLContext, extServiceId: String) {
+        with(TExtensionServiceVersionLog.T_EXTENSION_SERVICE_VERSION_LOG) {
+            dslContext.deleteFrom(this)
+                .where(SERVICE_ID.eq(extServiceId))
+                .execute()
+        }
+    }
 }

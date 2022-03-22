@@ -110,4 +110,12 @@ class ExtServiceEnvDao {
                 .fetchOne()
         }
     }
+
+    fun deleteEnvInfo(dslContext: DSLContext, extServiceId: String) {
+        with(TExtensionServiceEnvInfo.T_EXTENSION_SERVICE_ENV_INFO) {
+            dslContext.deleteFrom(this)
+                .where(SERVICE_ID.eq(extServiceId))
+                .execute()
+        }
+    }
 }
