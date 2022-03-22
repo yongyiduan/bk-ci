@@ -220,8 +220,7 @@
                 ],
                 noticeTypeList: [
                     { name: '企业微信', value: 'RTX', isChecked: false },
-                    { name: '邮件', value: 'EMAIL', isChecked: false },
-                    { name: '微信', value: 'WECHAT', isChecked: false }
+                    { name: '邮件', value: 'EMAIL', isChecked: false }
                 ],
                 metaList: [],
                 outersList: [],
@@ -879,6 +878,7 @@
             }
             .item-groupid {
                 margin-top: 12px;
+                margin-left: 40px;
             }
         }
         
