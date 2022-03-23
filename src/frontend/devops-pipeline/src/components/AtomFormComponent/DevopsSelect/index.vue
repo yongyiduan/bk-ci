@@ -1,6 +1,18 @@
 <template>
     <div class="select-input" v-bk-clickoutside="handleBlur">
-        <input class="bk-form-input" v-bind="restProps" v-model="displayName" :disabled="disabled || loading" ref="inputArea" :title="value" autocomplete="off" @focus="handleFocus" @keypress.enter.prevent="handleEnterOption" @keydown.up.prevent="handleKeyup" @keydown.down.prevent="handleKeydown" @keydown.tab.prevent="handleBlur" />
+        <input
+            ref="inputArea"
+            class="bk-form-input"
+            v-bind="restProps"
+            v-model="displayName"
+            :disabled="disabled || loading"
+            :title="displayName"
+            autocomplete="off"
+            @focus="handleFocus"
+            @keypress.enter.prevent="handleEnterOption"
+            @keydown.up.prevent="handleKeyup"
+            @keydown.down.prevent="handleKeydown"
+            @keydown.tab.prevent="handleBlur" />
         <i v-if="loading" class="bk-icon icon-circle-2-1 option-fetching-icon spin-icon" />
         <i v-else-if="!disabled && value" class="bk-icon icon-close-circle-shape option-fetching-icon" @click.stop="clearValue" />
         <div class="dropbox-container" v-show="hasOption && optionListVisible && !loading" ref="dropMenu">
@@ -13,7 +25,10 @@
                         <div class="option-group-item"
                             v-for="(child, childIndex) in item.children"
                             :key="child.id"
-                            :class="{ active: child.id === value, selected: selectedPointer === childIndex && selectedGroupPointer === index }"
+                            :class="{
+                                active: child.active,
+                                selected: child.selected
+                            }"
                             :disabled="child.disabled"
                             @click.stop="selectOption(child)"
                             @mouseover="setSelectGroupPointer(index, childIndex)"
@@ -22,8 +37,21 @@
                     </li>
                 </template>
                 <template v-else>
-                    <li class="option-item" v-for="(item, index) in filteredList" :key="item.id" :class="{ active: item.id === value, selected: selectedPointer === index }" :disabled="item.disabled" @click.stop="selectOption(item)" @mouseover="setSelectPointer(index)" :title="item.name">
+                    <li
+                        v-for="(item, index) in filteredList"
+                        :key="item.id"
+                        :class="{
+                            'option-item': true,
+                            active: item.active,
+                            selected: item.selected
+                        }"
+                        :title="item.name"
+                        :disabled="item.disabled"
+                        @click.stop="selectOption(item)"
+                        @mouseover="setSelectPointer(index)"
+                    >
                         {{ item.name }}
+                        <i v-if="isMultiple && value.includes(item.id)" class="devops-icon icon-check-1"></i>
                     </li>
                 </template>
             </ul>
@@ -51,7 +79,8 @@
                 loading: this.isLoading,
                 selectedPointer: 0,
                 selectedGroupPointer: 0,
-                displayName: ''
+                displayName: '',
+                selectedMap: {}
             }
         },
         computed: {
@@ -61,6 +90,9 @@
             },
             hasGroup () {
                 return this.mergedOptionsConf && this.mergedOptionsConf.hasGroup
+            },
+            isMultiple () {
+                return this.mergedOptionsConf && this.mergedOptionsConf.multiple
             },
             filteredList () {
                 const { displayName, optionList } = this
@@ -75,7 +107,7 @@
             queryParams (newQueryParams, oldQueryParams) {
                 if (this.isParamsChanged(newQueryParams, oldQueryParams)) {
                     this.debounceGetOptionList()
-                    this.handleChange(this.name, '')
+                    this.handleChange(this.name, this.isMultiple ? [] : '')
                     this.displayName = ''
                 }
             },
@@ -87,6 +119,16 @@
             },
             isLoading (isLoading) {
                 this.loading = isLoading
+            },
+            selectedMap (obj) {
+                const keyArr = []
+                const params = []
+                for (const key in obj) {
+                    keyArr.push(obj[key])
+                    params.push(key)
+                }
+                this.displayName = keyArr.join(',')
+                this.handleChange(this.name, params)
             }
         },
         created () {
@@ -94,7 +136,11 @@
                 this.getOptionList()
                 this.debounceGetOptionList = debounce(this.getOptionList)
             } else {
-                this.displayName = this.getDisplayName(this.value)
+                if (this.isMultiple) {
+                    this.getMultipleDisplayName(this.value)
+                } else {
+                    this.displayName = this.getDisplayName(this.value)
+                }
             }
         },
         beforeDestroy () {
@@ -112,29 +158,33 @@
                     noSensiveKeyword = keyword.toLowerCase()
                 }
                 if (this.hasGroup) {
-                    return list.reduce((result, item) => {
+                    return list.reduce((result, item, index) => {
                         if (isObject(item) && Array.isArray(item.children) && item.children.length > 0) {
-                            const children = item.children.map(child => {
+                            const children = item.children.map((child, childIndex) => {
                                 return {
                                     ...child,
                                     id: child[paramId],
-                                    name: child[paramName]
+                                    name: child[paramName],
+                                    active: child.id === this.value,
+                                    selected: this.selectedPointer === childIndex && this.selectedGroupPointer === index && !this.isMultiple
                                 }
                             })
                             result.push({
                                 ...item,
-                                children: noSensiveKeyword ? children.filter(child => child.name.toLowerCase().indexOf(noSensiveKeyword) > -1) : children
+                                children: (noSensiveKeyword && !this.isMultiple) ? children.filter(child => child.name.toLowerCase().indexOf(noSensiveKeyword) > -1) : children
                             })
                         }
                         return result
                     }, [])
                 }
-                const resultList = list.map(item => {
+                const resultList = list.map((item, index) => {
                     if (isObject(item)) {
                         return {
                             ...item,
                             id: item[paramId],
-                            name: item[paramName]
+                            name: item[paramName],
+                            active: !this.isMultiple ? item.id === this.value : this.value.includes(item.id),
+                            selected: this.selectedPointer === index && !this.isMultiple
                         }
                     }
 
@@ -144,19 +194,29 @@
                     }
                 })
 
-                return noSensiveKeyword ? resultList.filter(item => item.name.toLowerCase().indexOf(noSensiveKeyword) > -1) : resultList
+                return (noSensiveKeyword && !this.isMultiple) ? resultList.filter(item => item.name.toLowerCase().indexOf(noSensiveKeyword) > -1) : resultList
             },
+
             selectOption ({ id, name, disabled = false }) {
                 if (disabled) return
-                this.handleChange(this.name, id)
-                this.$nextTick(() => {
-                    this.handleBlur()
-                })
+                if (!this.isMultiple) {
+                    this.handleChange(this.name, id)
+                    this.$nextTick(() => {
+                        this.handleBlur()
+                    })
+                } else {
+                    if (id in this.selectedMap) {
+                        this.$delete(this.selectedMap, id)
+                    } else {
+                        this.$set(this.selectedMap, id, name)
+                    }
+                }
             },
 
             clearValue () {
-                this.handleChange(this.name, '')
                 this.displayName = ''
+                this.selectedMap = {}
+                this.handleChange(this.name, this.isMultiple ? [] : '')
                 this.$refs.inputArea.focus()
             },
 
@@ -171,12 +231,21 @@
                 this.isFocused = false
                 this.$refs.inputArea && this.$refs.inputArea.blur()
                 this.$emit('blur', null)
-                if (this.isEnvVar(this.displayName)) {
-                    this.handleChange(this.name, this.displayName.trim())
-                } else if (this.isEnvVar(this.value)) {
-                    this.displayName = this.value
+                
+                if (this.isMultiple) {
+                    if (this.displayName) {
+                        this.getMultipleDisplayName(this.displayName)
+                    } else {
+                        this.getMultipleDisplayName(this.value)
+                    }
                 } else {
-                    this.displayName = this.getDisplayName(this.value)
+                    if (this.isEnvVar(this.displayName)) {
+                        this.handleChange(this.name, this.displayName.trim())
+                    } else if (this.isEnvVar(this.value)) {
+                        this.displayName = this.value
+                    } else {
+                        this.displayName = this.getDisplayName(this.value)
+                    }
                 }
             },
 
@@ -198,6 +267,31 @@
                 this.selectedPointer = childIndex
                 this.adjustViewPort()
             },
+            getMultipleDisplayName (val) {
+                if (typeof val === 'string') {
+                    val = val.split(',')
+                }
+                const valSet = new Set(val)
+                let opts = this.optionList
+                if (this.hasGroup) {
+                    opts = this.optionList.reduce((cur, option) => {
+                        cur = [...cur, ...option.children]
+                        return cur
+                    }, [])
+                }
+                const typeMap = opts.reduce((cur, opt) => {
+                    cur[opt.id] = opt
+                    return cur
+                }, [])
+                valSet.forEach(v => {
+                    if (this.isEnvVar(v)) {
+                        this.$set(this.selectedMap, v, v)
+                    } else if (Object.prototype.hasOwnProperty.call(typeMap, v)) {
+                        const selectOpt = typeMap[v]
+                        this.$set(this.selectedMap, selectOpt.id, selectOpt.name)
+                    }
+                })
+            },
             getDisplayName (val) {
                 if (this.isEnvVar(val)) {
                     return val
@@ -206,7 +300,6 @@
                     for (let i = 0; i < this.optionList.length; i++) {
                         const option = this.optionList[i]
                         const matchVal = option.children.find(child => child.id === val)
-                        console.log(matchVal)
                         if (matchVal) {
                             return matchVal.name
                         }
@@ -221,7 +314,13 @@
             },
             async getOptionList () {
                 if (this.isLackParam) { // 缺少参数时，选择列表置空
-                    if (this.value !== '') this.displayName = this.getDisplayName(this.value)
+                    if (this.value.length) {
+                        if (this.isMultiple) {
+                            this.getMultipleDisplayName(this.value)
+                        } else {
+                            this.displayName = this.getDisplayName(this.value)
+                        }
+                    }
                     this.optionList = []
                     return
                 }
@@ -236,8 +335,12 @@
                 } catch (e) {
                     console.error(e)
                 } finally {
-                    if (this.value) {
-                        this.displayName = this.getDisplayName(this.value)
+                    if (this.value.length) {
+                        if (this.isMultiple) {
+                            this.getMultipleDisplayName(this.value)
+                        } else {
+                            this.displayName = this.getDisplayName(this.value)
+                        }
                     }
                     this.loading = false
                 }
@@ -309,6 +412,12 @@
                     color: #999;
 
                 }
+                .option-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
                 .option-item,
                 .option-group-item {
                     line-height: 36px;
