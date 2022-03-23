@@ -285,13 +285,15 @@
                 const typeMap = opts.reduce((cur, opt) => {
                     cur[opt.id] = opt
                     return cur
-                }, [])
+                }, {})
                 valSet.forEach(v => {
                     if (this.isEnvVar(v)) {
                         this.$set(this.selectedMap, v, v)
                     } else if (Object.prototype.hasOwnProperty.call(typeMap, v)) {
                         const selectOpt = typeMap[v]
                         this.$set(this.selectedMap, selectOpt.id, selectOpt.name)
+                    } else {
+                        console.log('not var or list option')
                     }
                 })
             },
