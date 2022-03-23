@@ -212,12 +212,12 @@
                 }
             },
 
-            clearValue() (isFocus = true) {
+            clearValue (isFocus = true) {
                 this.displayName = ''
                 if (this.isMultiple) {
                     this.selectedMap = {}
                 } else {
-                    this.handleChange(this.name,  '')
+                    this.handleChange(this.name, '')
                 }
 
                 isFocus && this.$refs.inputArea.focus()
