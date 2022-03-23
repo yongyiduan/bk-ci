@@ -3,7 +3,7 @@
         <section class="section-box build-detail-header">
             <bk-breadcrumb class="build-detail-crumb" separator-class="bk-icon icon-angle-right">
                 <bk-breadcrumb-item v-if="!menuPipelineId" :to="{ name: 'buildList', params: {} }">All pipelines</bk-breadcrumb-item>
-                <bk-breadcrumb-item :to="{ name: 'buildList', params: { pipelineId } }">{{yml}}</bk-breadcrumb-item>
+                <bk-breadcrumb-item :to="{ name: 'buildList', params: { pipelineId } }" @click.native="handleClickRoute">{{yml}}</bk-breadcrumb-item>
                 <bk-breadcrumb-item>
                     <span class="build-num">
                         # {{buildNum}}
@@ -111,6 +111,14 @@
             setHtmlTitle (message) {
                 const title = message + ' #' + this.buildNum
                 modifyHtmlTitle(title)
+            },
+
+            handleClickRoute () {
+                if (this.menuPipelineId) {
+                    this.$nextTick(() => {
+                        this.$parent.getPipelineDirList()
+                    })
+                }
             }
         }
     }

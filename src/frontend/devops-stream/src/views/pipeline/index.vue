@@ -28,37 +28,40 @@
                     <span class="text-ellipsis item-text">All pipelines</span>
                 </li>
                 <li
-                    v-bkloading="{ isLoading: sideItem === activeDir && isLoadingPipeline }"
-                    v-for="(sideItem, index) in renderSideList"
+                    v-for="(dir, index) in dirList"
+                    v-bkloading="{ isLoading: dir.isInitPipeline }"
                     :key="index"
-                    :class="{
-                        'nav-item': true,
-                        'is-pipeline': sideItem.displayName,
-                        active: typeof sideItem !== 'string' && curPipeline.pipelineId === sideItem.pipelineId,
-                        disabled: typeof sideItem !== 'string' && !sideItem.enabled
-                    }"
-                    @click="handleClickSideItem(sideItem)"
                 >
-                    <template v-if="!sideItem.pipelineId">
-                        <icon :name="activeDir === sideItem ? 'folder-open-shape' : 'folder-shape'" size="16"></icon>
+                    <section v-if="dir.isShow" @click="chooseDir(dir)" class="nav-item">
+                        <icon :name="activeDirList.includes(dir) ? 'folder-open-shape' : 'folder-shape'" size="16"></icon>
                         <span
                             class="text-ellipsis item-text"
                             v-bk-overflow-tips="{
-                                content: sideItem,
+                                content: dir.filePath,
                                 placement: 'right'
                             }"
-                        >{{ sideItem }}</span>
-                    </template>
-                    <template v-else>
+                        >{{ dir.filePath }}</span>
+                    </section>
+                    <section
+                        v-for="(pipeline) in dir.children"
+                        :key="pipeline.pipelineId"
+                        :class="{
+                            'nav-item': true,
+                            'dir-pipeline': dir.isShow,
+                            active: curPipeline.pipelineId === pipeline.pipelineId,
+                            disabled: !pipeline.enabled
+                        }"
+                        @click="choosePipeline(pipeline)"
+                    >
                         <icon name="pipeline" size="24"></icon>
                         <span
                             class="text-ellipsis item-text"
                             v-bk-overflow-tips="{
-                                content: sideItem.displayName,
+                                content: pipeline.displayName,
                                 placement: 'right'
                             }"
-                        >{{ sideItem.displayName }}</span>
-                    </template>
+                        >{{ pipeline.displayName }}</span>
+                    </section>
                 </li>
             </ul>
         </aside>
@@ -118,6 +121,17 @@
     import register from '@/utils/websocket-register'
     import validateRule from '@/utils/validate-rule'
 
+    const getDefaultDir = (filePath, isShow = true) => ({
+        filePath,
+        children: [],
+        isShow,
+        isLoadEnd: false,
+        isLoadingMore: false,
+        isInitPipeline: false,
+        page: 1,
+        pageSize: 100
+    })
+
     export default {
         components: {
             codeSection
@@ -125,8 +139,8 @@
 
         data () {
             return {
+                allPipeline: { displayName: 'All pipelines', enabled: true },
                 dirList: [],
-                pipelineList: [],
                 branchList: [],
                 yamlData: {
                     file_name: '',
@@ -138,10 +152,6 @@
                 isLoading: false,
                 isLoadingBranches: false,
                 isSaving: false,
-                isLoadingMore: false,
-                isLoadEnd: false,
-                page: 1,
-                pageSize: 100,
                 nameRule: {
                     validator (val) {
                         return /^[a-zA-Z0-9_\-\.]+$/.test(val)
@@ -150,9 +160,7 @@
                     trigger: 'blur'
                 },
                 checkYaml: validateRule.checkYaml,
-                allPipeline: { displayName: 'All pipelines', enabled: true },
-                activeDir: '',
-                isLoadingPipeline: false
+                activeDirList: []
             }
         },
 
@@ -162,36 +170,15 @@
                 'curPipeline',
                 'menuPipelineId',
                 'permission'
-            ]),
-
-            renderSideList () {
-                const currentDirIndex = this.dirList.findIndex((dir) => (dir === this.activeDir))
-                if (currentDirIndex > -1) {
-                    return [...this.dirList.slice(0, currentDirIndex + 1), ...this.pipelineList, ...this.dirList.slice(currentDirIndex + 1)]
-                } else {
-                    return this.dirList
-                }
-            }
+            ])
         },
 
         watch: {
-            '$route.params.pipelineId' () {
-                const pipelineId = this.$route.params.pipelineId
-                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId))
-                if (curPipeline) {
-                    this.setCurPipeline(curPipeline)
-                } else if (this.$route.params.pipelineId === this.allPipeline.pipelineId) {
-                    this.setCurPipeline(this.allPipeline)
-                } else {
-                    this.getPipelineDirList()
-                }
-            },
             '$route.name' (val) {
                 if (val === 'buildList' && this.$route.params.pipelineId !== this.menuPipelineId) {
                     this.setMenuPipelineId(this.$route.params.pipelineId)
                 }
             }
-
         },
 
         created () {
@@ -209,27 +196,27 @@
             ]),
 
             initStatus () {
-                register.installWsMessage(this.resetStatus, 'IFRAMEstream', 'pipelineList')
+                register.installWsMessage(this.getPipelineDirList, 'IFRAMEstream', 'pipelineList')
                 this.isLoading = true
                 this.getPipelineDirList().finally(() => {
                     this.isLoading = false
                 })
             },
 
-            // 收到ws消息，会更新列表
-            resetStatus () {
-                this.page = 1
-                this.pipelineList = []
-                this.getPipelineDirList()
-            },
-
             getPipelineDirList () {
                 return pipelines.getPipelineDirList(this.projectId, {
                     pipelineId: this.$route.params.pipelineId
                 }).then((data) => {
-                    this.dirList = data.allPath || []
-                    this.activeDir = data.currentPath || ''
-                    this.getPipelineList(this.activeDir).then(() => {
+                    const allDirs = (data.allPath || []).map((path) => getDefaultDir(path))
+                    const ciDir = getDefaultDir('.ci/', false)
+                    this.dirList = [...allDirs, ciDir]
+
+                    // 展开最外层和当前流水线目录
+                    const currentDir = allDirs.find((dir) => (dir.filePath === data.currentPath))
+                    Promise.all([
+                        this.chooseDir(ciDir),
+                        this.chooseDir(currentDir)
+                    ]).then(() => {
                         this.setDefaultPipeline()
                     })
                 }).catch((err) => {
@@ -237,43 +224,51 @@
                 })
             },
 
-            handleClickSideItem (item) {
-                if (item?.pipelineId) {
-                    this.choosePipeline(item)
-                } else {
-                    this.handleExpandDir(item)
-                }
-            },
+            chooseDir (dir) {
+                return new Promise((resolve) => {
+                    if (typeof dir !== 'object') {
+                        resolve()
+                        return
+                    }
 
-            handleExpandDir (filePath) {
-                if (this.activeDir !== filePath) {
-                    this.page = 1
-                    this.activeDir = filePath
-                    this.pipelineList = []
-                    this.isLoadingPipeline = true
-                    this.getPipelineList(filePath).finally(() => {
-                        this.isLoadingPipeline = false
-                    })
-                } else {
-                    this.activeDir = ''
-                }
+                    const dirIndex = this.activeDirList.findIndex((activeDir) => activeDir === dir)
+                    if (dirIndex < 0) {
+                        this.activeDirList.push(dir)
+                        dir.isInitPipeline = true
+                        this.getPipelineList(dir).finally(() => {
+                            dir.isInitPipeline = false
+                            resolve()
+                        })
+                    } else {
+                        dir.isLoadEnd = false
+                        dir.isLoadingMore = false
+                        dir.page = 1
+                        dir.children = []
+                        this.activeDirList.splice(dirIndex, 1)
+                        resolve()
+                    }
+                })
             },
 
             scrollLoadMore (event) {
                 const target = event.target
                 const bottomDis = target.scrollHeight - target.clientHeight - target.scrollTop
-                if (bottomDis <= 200 && !this.isLoadEnd && !this.isLoadingMore) {
-                    this.getPipelineList(this.activeDir)
+                if (bottomDis <= 200) {
+                    this.activeDirList.forEach((dir) => {
+                        if (!dir.isLoadEnd && !dir.isLoadingMore) {
+                            this.getPipelineList(dir)
+                        }
+                    })
                 }
             },
 
-            getPipelineList (filePath) {
-                this.isLoadingMore = true
+            getPipelineList (dir) {
+                dir.isLoadingMore = true
                 const params = {
-                    filePath,
+                    filePath: dir.filePath,
                     projectId: this.projectId,
-                    page: this.page,
-                    pageSize: this.pageSize
+                    page: dir.page,
+                    pageSize: dir.pageSize
                 }
                 return pipelines.getPipelineList(params).then((res = {}) => {
                     const pipelines = (res.records || []).map((pipeline) => ({
@@ -283,17 +278,26 @@
                         filePath: pipeline.filePath,
                         branch: pipeline.latestBuildBranch
                     }))
-                    this.page++
-                    this.pipelineList = [...this.pipelineList, ...pipelines]
-                    this.isLoadEnd = this.pipelineList.length > res.count
+                    dir.page++
+                    this.$set(dir, 'children', [...dir.children, ...pipelines])
+                    dir.isLoadEnd = dir.children.length > res.count
+                }).catch((err) => {
+                    this.messageError(err.message || err)
                 }).finally(() => {
-                    this.isLoadingMore = false
+                    dir.isLoadingMore = false
                 })
             },
 
             setDefaultPipeline () {
                 const pipelineId = this.$route.params.pipelineId
-                const curPipeline = this.pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId)) || this.allPipeline
+                let curPipeline = this.allPipeline
+                this.dirList.forEach((dir) => {
+                    const pipelineList = dir.children || []
+                    const tempPipeline = pipelineList.find((pipeline) => (pipeline.pipelineId === pipelineId))
+                    if (tempPipeline) {
+                        curPipeline = tempPipeline
+                    }
+                })
                 this.setMenuPipelineId(curPipeline.pipelineId)
                 this.setCurPipeline(curPipeline)
                 if (this.$route.name === 'pipeline') {
