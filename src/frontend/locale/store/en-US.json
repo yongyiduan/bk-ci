@@ -742,6 +742,7 @@
   "支持的操作": "Supported Operations",
   "说明：": "Usage: ",
   "说明文案": "reference by expression ${{ steps.<step-id>.outputs.<output-var-name> }}",
+  "触发器说明文案": "Accessed through the expression ${{ variable name }}",
   "hisUpgradeTips": "Please be cautious and correct compatibility issues based on the latest version of the corresponding major version. It is not recommended to add/delete input parameters in this scenario to avoid abnormal execution of the pipeline using the specified major version.latest after release.",
   "分支": "Branch",
   "历史大版本问题修复": "Historical major version problem fix",
