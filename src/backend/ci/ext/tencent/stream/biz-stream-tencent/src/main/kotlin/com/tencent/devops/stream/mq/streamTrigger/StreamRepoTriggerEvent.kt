@@ -25,26 +25,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.stream.mq.streamMrConflict
+package com.tencent.devops.stream.mq.streamTrigger
 
 import com.tencent.devops.common.event.annotation.Event
-import org.slf4j.LoggerFactory
-import org.springframework.amqp.rabbit.core.RabbitTemplate
+import com.tencent.devops.common.service.trace.TraceTag
+import com.tencent.devops.stream.constant.MQ
+import com.tencent.devops.stream.pojo.GitRequestEvent
+import com.tencent.devops.common.webhook.pojo.code.git.GitEvent
+import org.slf4j.MDC
 
-object GitCIMrConflictCheckDispatcher {
-
-    fun dispatch(rabbitTemplate: RabbitTemplate, event: GitCIMrConflictCheckEvent) {
-        try {
-            logger.info("[${event.gitRequestEventForHandle}] Dispatch the event")
-            val eventType = event::class.java.annotations.find { s -> s is Event } as Event
-            rabbitTemplate.convertAndSend(eventType.exchange, eventType.routeKey, event) { message ->
-                message.messageProperties.setHeader("x-delay", event.delayMills)
-                message
-            }
-        } catch (e: Throwable) {
-            logger.error("Fail to dispatch the event($event)", e)
-        }
-    }
-
-    private val logger = LoggerFactory.getLogger(GitCIMrConflictCheckDispatcher::class.java)
-}
+@Event(MQ.EXCHANGE_STREAM_TRIGGER_REPO_PIPELINE_EVENT, MQ.ROUTE_STREAM_TRIGGER_REPO_PIPELINE_EVENT)
+data class StreamRepoTriggerEvent(
+    val gitRequestEvent: GitRequestEvent,
+    val event: GitEvent,
+    val traceId: String? = MDC.get(TraceTag.BIZID)
+)
