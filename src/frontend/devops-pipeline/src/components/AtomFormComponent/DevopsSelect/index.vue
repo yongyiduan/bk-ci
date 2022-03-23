@@ -14,7 +14,7 @@
             @keydown.down.prevent="handleKeydown"
             @keydown.tab.prevent="handleBlur" />
         <i v-if="loading" class="bk-icon icon-circle-2-1 option-fetching-icon spin-icon" />
-        <i v-else-if="!disabled && value" class="bk-icon icon-close-circle-shape option-fetching-icon" @click.stop="clearValue" />
+        <i v-else-if="!disabled && value" class="bk-icon icon-close-circle-shape option-fetching-icon" @click.stop="clearValue()" />
         <div class="dropbox-container" v-show="hasOption && optionListVisible && !loading" ref="dropMenu">
             <ul>
                 <template v-if="hasGroup">
@@ -107,8 +107,7 @@
             queryParams (newQueryParams, oldQueryParams) {
                 if (this.isParamsChanged(newQueryParams, oldQueryParams)) {
                     this.debounceGetOptionList()
-                    this.handleChange(this.name, this.isMultiple ? [] : '')
-                    this.displayName = ''
+                    this.clearValue(false)
                 }
             },
             options (newOptions) {
@@ -213,11 +212,15 @@
                 }
             },
 
-            clearValue () {
+            clearValue() (isFocus = true) {
                 this.displayName = ''
-                this.selectedMap = {}
-                this.handleChange(this.name, this.isMultiple ? [] : '')
-                this.$refs.inputArea.focus()
+                if (this.isMultiple) {
+                    this.selectedMap = {}
+                } else {
+                    this.handleChange(this.name,  '')
+                }
+
+                isFocus && this.$refs.inputArea.focus()
             },
 
             isEnvVar (str) {
