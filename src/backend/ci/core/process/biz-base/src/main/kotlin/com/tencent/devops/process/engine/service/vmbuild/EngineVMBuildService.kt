@@ -157,7 +157,7 @@ class EngineVMBuildService @Autowired(required = false) constructor(
         // var表中获取环境变量，并对老版本变量进行兼容
         val variables = buildVariableService.getAllVariable(projectId, buildId)
 
-        var variablesWithType = buildVariableService.getAllVariableWithType(projectId, buildId)
+        val variablesWithType = buildVariableService.getAllVariableWithType(projectId, buildId).toMutableList()
         val model = containerBuildDetailService.getBuildModel(projectId, buildId)
         Preconditions.checkNotNull(model, NotFoundException("Build Model ($buildId) is not exist"))
         var vmId = 1
