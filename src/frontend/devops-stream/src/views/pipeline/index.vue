@@ -428,7 +428,7 @@
         height: 100%;
         background: #f5f6fa;
     }
-    .is-pipeline {
+    .dir-pipeline {
         padding-left: 20px;
     }
     .yaml-form {
