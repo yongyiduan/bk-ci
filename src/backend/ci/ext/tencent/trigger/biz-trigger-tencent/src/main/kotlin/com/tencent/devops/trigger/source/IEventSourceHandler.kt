@@ -25,23 +25,25 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.source
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import io.cloudevents.CloudEvent
 
-    testImplementation(project(":core:common:common-test"))
+/**
+ * 事件源处理类
+ */
+interface IEventSourceHandler<T> {
+
+    fun toCloudEvent(
+        headers: Map<String, String>,
+        payload: String
+    ): CloudEvent?
+
+    fun registerWebhook(webhookUrl: String, webhookRequestParam: T): Boolean
+
+    fun registerWebhook(webhookUrl: String, webhookParamMap: Map<String, Any>): Boolean {
+        return registerWebhook(webhookUrl, getWebhookRequestParam(webhookParamMap))
+    }
+
+    fun getWebhookRequestParam(webhookParamMap: Map<String, Any>): T
 }

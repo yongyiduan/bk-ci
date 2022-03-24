@@ -4,7 +4,7 @@ build/
 !com/tencent/devops/common/pipeline/pojo/element/build/
 !/element/build/
 target/
-!**/biz-eventbus-tencent/src/main/**/target/
+!**/biz-trigger-tencent/src/main/**/target/
 out/
 release/
 reports/

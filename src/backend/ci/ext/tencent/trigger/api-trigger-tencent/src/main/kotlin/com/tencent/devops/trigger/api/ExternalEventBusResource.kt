@@ -25,23 +25,44 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.api
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import com.tencent.devops.common.api.pojo.Result
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import javax.ws.rs.Consumes
+import javax.ws.rs.POST
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
+import javax.ws.rs.Produces
+import javax.ws.rs.core.Context
+import javax.ws.rs.core.HttpHeaders
+import javax.ws.rs.core.MediaType
 
-    testImplementation(project(":core:common:common-test"))
+@Api(tags = ["EXTERNAL_EVENTBUS"], description = "事件总线-外部触发")
+@Path("/external/trigger")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface ExternalEventBusResource {
+
+    @ApiOperation("外部请求触发")
+    @Path("/webhook/{source}/{projectId}/{busId}")
+    @POST
+    fun webhook(
+        @ApiParam("事件源名称")
+        @PathParam("source")
+        sourceName: String,
+        @ApiParam("项目ID")
+        @PathParam("projectId")
+        projectId: String,
+        @ApiParam("总线ID")
+        @PathParam("busId")
+        busId: String,
+        @ApiParam("请求头")
+        @Context
+        headers: HttpHeaders,
+        @ApiParam("请求体")
+        payload: String
+    ): Result<Boolean>
 }

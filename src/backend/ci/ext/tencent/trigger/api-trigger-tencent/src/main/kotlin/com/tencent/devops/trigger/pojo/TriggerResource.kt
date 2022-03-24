@@ -25,23 +25,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.pojo
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import io.swagger.annotations.ApiModel
 
-    testImplementation(project(":core:common:common-test"))
-}
+@ApiModel("事件资源")
+data class TriggerResource(
+    val id: String,
+    val resources: Map<String, List<String?>>
+)

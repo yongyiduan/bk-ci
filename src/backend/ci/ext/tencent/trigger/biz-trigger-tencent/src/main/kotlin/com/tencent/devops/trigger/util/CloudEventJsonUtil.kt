@@ -25,23 +25,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.util
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import com.fasterxml.jackson.databind.JsonNode
+import com.tencent.devops.common.api.util.JsonUtil
+import io.cloudevents.CloudEvent
+import io.cloudevents.core.provider.EventFormatProvider
+import io.cloudevents.jackson.JsonFormat
+import java.nio.charset.StandardCharsets
 
-    testImplementation(project(":core:common:common-test"))
+object CloudEventJsonUtil {
+
+    private val eventFormat = EventFormatProvider.getInstance().resolveFormat(JsonFormat.CONTENT_TYPE)!!
+    private val mapper = JsonUtil.getObjectMapper()
+
+    fun deserialize(json: String): CloudEvent {
+        return eventFormat.deserialize(json.toByteArray(StandardCharsets.UTF_8))
+    }
+
+    fun serialize(event: CloudEvent): ByteArray {
+        return eventFormat.serialize(event)
+    }
+
+    fun serializeAsString(event: CloudEvent): String {
+        return String(eventFormat.serialize(event), StandardCharsets.UTF_8)
+    }
+
+    fun serializeAsJsonNode(event: CloudEvent): JsonNode {
+        return mapper.readValue(eventFormat.serialize(event), JsonNode::class.java)
+    }
 }

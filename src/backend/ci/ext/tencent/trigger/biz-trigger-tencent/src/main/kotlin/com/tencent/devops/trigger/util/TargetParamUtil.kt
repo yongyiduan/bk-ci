@@ -25,23 +25,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.util
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.JsonNode
+import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.trigger.param.ITargetParamConverter
+import com.tencent.devops.trigger.pojo.TargetParam
 
-    testImplementation(project(":core:common:common-test"))
+object TargetParamUtil {
+
+    fun convert(node: JsonNode, targetParams: String): Map<String, Any> {
+        val targetParamList = JsonUtil.to(targetParams, object : TypeReference<List<TargetParam>>() {})
+        return targetParamList.associate { targetParam ->
+            SpringContextUtil.getBean(ITargetParamConverter::class.java, targetParam.form)
+                .convert(node = node, targetParam = targetParam)
+        }
+    }
 }

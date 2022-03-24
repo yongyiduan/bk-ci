@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: trigger
+    desc: DevOps Environment Service
+    version: 4.0
+    packageName: com.tencent.devops.trigger

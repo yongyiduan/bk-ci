@@ -25,23 +25,27 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.pojo
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-    testImplementation(project(":core:common:common-test"))
-}
+@ApiModel("事件总线")
+data class EventBus(
+    @ApiModelProperty("事件总线ID")
+    val busId: String,
+    @ApiModelProperty("项目ID")
+    val projectId: String,
+    @ApiModelProperty("事件总线名称")
+    val name: String,
+    @ApiModelProperty("事件总线描述")
+    val desc: String? = null,
+    @ApiModelProperty("创建时间", required = false)
+    val createTime: Long? = null,
+    @ApiModelProperty("创建者", required = false)
+    val creator: String,
+    @ApiModelProperty("更新时间", required = false)
+    val updateTime: Long? = null,
+    @ApiModelProperty("更新者", required = false)
+    val updater: String
+)

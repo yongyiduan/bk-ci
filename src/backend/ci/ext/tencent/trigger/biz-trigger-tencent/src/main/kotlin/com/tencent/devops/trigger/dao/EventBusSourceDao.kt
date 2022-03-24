@@ -25,23 +25,48 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.dao
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import com.tencent.devops.trigger.pojo.EventBusSource
+import com.tencent.devops.model.trigger.tables.TEventBusSource
+import org.jooq.DSLContext
+import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
-    testImplementation(project(":core:common:common-test"))
+@Repository
+class EventBusSourceDao {
+
+    fun create(dslContext: DSLContext, eventBusSource: EventBusSource) {
+        val now = LocalDateTime.now()
+        with(TEventBusSource.T_EVENT_BUS_SOURCE) {
+            dslContext.insertInto(
+                this,
+                BUS_ID,
+                PROJECT_ID,
+                NAME,
+                DESC,
+                CREATE_TIME,
+                CREATOR,
+                UPDATE_TIME,
+                UPDATER
+            )
+                .values(
+                    eventBusSource.busId,
+                    eventBusSource.projectId,
+                    eventBusSource.name,
+                    eventBusSource.desc,
+                    now,
+                    eventBusSource.creator,
+                    now,
+                    eventBusSource.updater
+                ).onDuplicateKeyIgnore()
+                .execute()
+        }
+    }
+
+    fun batchCreate(dslContext: DSLContext, eventBusSources: List<EventBusSource>) {
+        eventBusSources.forEach { eventBusSource ->
+            create(dslContext = dslContext, eventBusSource)
+        }
+    }
 }

@@ -25,23 +25,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.pojo.event
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import com.tencent.devops.common.event.annotation.Event
+import com.tencent.devops.trigger.constant.MQ
+import javax.ws.rs.core.HttpHeaders
 
-    testImplementation(project(":core:common:common-test"))
-}
+@Event(MQ.EXCHANGE_EVENT_BUS_LISTENER_DIRECT, MQ.ROUTE_EVENT_BUS_REQUEST)
+data class EventBusRequestEvent(
+    override var projectId: String,
+    val busId: String,
+    val sourceName: String,
+    val headers: Map<String, String>,
+    val payload: String
+) : IEventBusEvent(
+    projectId = projectId
+)

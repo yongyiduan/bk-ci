@@ -25,23 +25,34 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    api(project(":core:common:common-service"))
-    api(project(":core:common:common-web"))
-    api(project(":core:common:common-client"))
-    api(project(":core:common:common-redis"))
-    api(project(":core:common:common-auth"))
-    api(project(":core:common:common-archive"))
-    api(project(":core:common:common-db"))
-    api(project(":core:common:common-scm"))
+package com.tencent.devops.trigger.service
 
-    api(project(":ext:tencent:rds:api-rds-tencent"))
-    api(project(":ext:tencent:rds:model-rds-tencent"))
-    api(project(":ext:tencent:trigger:api-trigger-tencent"))
-    api(project(":ext:tencent:project:api-project-tencent"))
-    api(project(":ext:tencent:process:common-pipeline-yaml"))
-    api(project(":ext:tencent:scm:api-scm"))
-    api(project(":ext:tencent:process:api-process-tencent"))
+import com.tencent.devops.trigger.pojo.event.EventTargetRunEvent
+import com.tencent.devops.trigger.target.IEventTargetInvoker
+import com.tencent.devops.common.service.utils.SpringContextUtil
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 
-    testImplementation(project(":core:common:common-test"))
+@Service
+class EventTargetRunService {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(EventTargetRunService::class.java)
+    }
+
+    fun handle(event: EventTargetRunEvent) {
+        with(event) {
+            logger.info("$projectId|$ruleId|$targetName|Started to handle target")
+            try {
+                val targetRequestParamMap = mutableMapOf<String, Any>()
+                targetRequestParamMap["projectId"] = projectId
+                targetRequestParamMap["ruleId"] = ruleId
+                targetRequestParamMap.putAll(targetParamMap)
+
+                SpringContextUtil.getBean(IEventTargetInvoker::class.java, targetName).invoke(targetRequestParamMap)
+            } catch (ignore: Throwable) {
+                logger.warn("${projectId}|${ruleId}|Fail to invoke the target [$targetName]", ignore)
+            }
+        }
+    }
 }
