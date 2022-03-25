@@ -748,7 +748,7 @@ class PipelineBuildFacadeService(
                         params.params.forEach {
                             when (it.valueType) {
                                 ManualReviewParamType.BOOLEAN -> {
-                                    it.value = it.value ?: it.value.toString().toBoolean()
+                                    it.value = it.value ?: false
                                 }
                                 else -> {
                                     it.value = buildVariableService.replaceTemplate(
