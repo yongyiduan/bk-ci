@@ -28,6 +28,7 @@
 package com.tencent.devops.stream.pojo
 
 import com.tencent.devops.common.webhook.enums.code.tgit.TGitObjectKind
+import com.tencent.devops.common.webhook.enums.code.tgit.TGitPushOperationKind
 import com.tencent.devops.common.webhook.pojo.code.git.GitEvent
 import com.tencent.devops.common.webhook.pojo.code.git.GitIssueEvent
 import com.tencent.devops.common.webhook.pojo.code.git.GitMergeRequestEvent
@@ -134,7 +135,6 @@ data class GitRequestEventReq(
                 val event = gitRequestEvent.gitEvent as GitPushEvent
                 if (deleteBranch) {
                     buildTitle = "Branch $branch deleted by $userId"
-                    buildSource = "--"
                 } else {
                     jumpUrl = event.repository.homepage + "/commit/" + gitRequestEvent.commitId
                     buildTitle = commitMsg
@@ -145,7 +145,6 @@ data class GitRequestEventReq(
                 val event = gitRequestEvent.gitEvent as GitTagPushEvent
                 if (deleteTag) {
                     buildTitle = "Tag $branch deleted by $userId"
-                    buildSource = "--"
                 } else {
                     jumpUrl = event.repository.homepage + "/-/tags/" + gitRequestEvent.branch
                     buildTitle = commitMsg
@@ -171,15 +170,25 @@ data class GitRequestEventReq(
                 buildSource = "[$mergeRequestId]"
             }
             else -> {
-                buildTitle = commitMsg
                 when (objectKind) {
                     TGitObjectKind.SCHEDULE.value -> {
                         buildSource = commitId.take(9)
                     }
-                    TGitObjectKind.MANUAL.value -> {
-                        buildSource = "--"
-                    }
                     else -> {}
+                }
+                // 兼容给list接口有title数据。list接口并没有生成大对象，减少负担
+                when (operationKind) {
+                    TGitPushOperationKind.DELETE.value -> {
+                        if (objectKind == TGitObjectKind.PUSH.value) {
+                            buildTitle = "Branch $branch deleted by $userId"
+                        }
+                        if (objectKind == TGitObjectKind.TAG_PUSH.value) {
+                            buildTitle = "Tag $branch deleted by $userId"
+                        }
+                    }
+                    else -> {
+                        buildTitle = commitMsg
+                    }
                 }
             }
         }
