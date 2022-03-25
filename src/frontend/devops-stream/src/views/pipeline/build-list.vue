@@ -101,7 +101,7 @@
                         <section class="commit-message">
                             <i :class="getIconClass(props.row.buildHistory.status)"></i>
                             <p>
-                                <span class="message">{{ getBuildTitle(props.row.gitRequestEvent) }}</span>
+                                <span class="message">{{ props.row.gitRequestEvent.buildTitle }}</span>
                                 <span class="info">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ props.row.reason }}</span>
                             </p>
                         </section>
@@ -211,8 +211,7 @@
         preciseDiff,
         timeFormatter,
         modifyHtmlTitle,
-        debounce,
-        getBuildTitle
+        debounce
     } from '@/utils'
     import optMenu from '@/components/opt-menu'
     import codeSection from '@/components/code-section'
@@ -326,7 +325,6 @@
 
         methods: {
             ...mapActions(['setCurPipeline']),
-            getBuildTitle,
 
             setHtmlTitle () {
                 modifyHtmlTitle(this.curPipeline?.displayName)
