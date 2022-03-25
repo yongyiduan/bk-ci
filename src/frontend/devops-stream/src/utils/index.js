@@ -125,51 +125,9 @@ export function convertFileSize (size, unit) {
     }
 }
 
-export function goCommit (projectUrl, commitId) {
-    if (commitId) {
-        window.open(`${projectUrl}/commit/${commitId}`, '_blank')
-    }
-}
-
-export function goMR (projectUrl, mrId) {
-    if (mrId) {
-        window.open(`${projectUrl}/merge_requests/${mrId}`, '_blank')
-    }
-}
-
-export function goBranch (projectUrl, branchName) {
-    if (branchName) {
-        window.open(`${projectUrl}/tree/${encodeURIComponent(branchName)}`, '_blank')
-    }
-}
-
-export function goTag (projectUrl, tag) {
-    if (tag) {
-        window.open(`${projectUrl}/-/tags/${encodeURIComponent(tag)}`, '_blank')
-    }
-}
-
 export function goYaml (projectUrl, branch, yamlName) {
     if (yamlName) {
         window.open(`${projectUrl}/blob/${encodeURIComponent(branch)}/${encodeURIComponent(yamlName)}`, '_blank')
-    }
-}
-
-export function goIssue (projectUrl, issueId) {
-    if (issueId) {
-        window.open(`${projectUrl}/issues/${issueId}`, '_blank')
-    }
-}
-
-export function goCodeReview (projectUrl, reviewId) {
-    if (reviewId) {
-        window.open(`${projectUrl}/reviews/${reviewId}`, '_blank')
-    }
-}
-
-export function goNote (url) {
-    if (url) {
-        window.open(url, '_blank')
     }
 }
 
@@ -228,62 +186,6 @@ export function modifyHtmlTitle (title) {
 export function debounce (callBack) {
     window.clearTimeout(debounce.timeId)
     debounce.timeId = window.setTimeout(callBack, 200)
-}
-
-export function getBuildTitle (gitRequestEvent = {}) {
-    let res = ''
-    switch (gitRequestEvent.operationKind) {
-        case 'delete':
-            res = `${gitRequestEvent.deleteTag ? `Tag ${gitRequestEvent.branch}` : `Branch ${gitRequestEvent.branch}`} deleted by ${gitRequestEvent.userId}`
-            break
-        default:
-            switch (gitRequestEvent.objectKind) {
-                case 'merge_request':
-                    res = gitRequestEvent.mrTitle
-                    break
-                default:
-                    res = gitRequestEvent.commitMsg
-                    break
-            }
-            break
-    }
-    return res
-}
-
-export function getBuildSource (gitRequestEvent = {}) {
-    let res = ''
-    switch (gitRequestEvent.operationKind) {
-        case 'delete':
-            res = '--'
-            break
-        default:
-            switch (gitRequestEvent.objectKind) {
-                case 'push':
-                    res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
-                    break
-                case 'tag_push':
-                    res = gitRequestEvent.branch
-                    break
-                case 'merge_request':
-                    res = `[!${gitRequestEvent.mergeRequestId}]`
-                    break
-                case 'manual':
-                    res = '--'
-                    break
-                case 'schedule':
-                    res = gitRequestEvent.commitId ? gitRequestEvent.commitId.slice(0, 9) : '--'
-                    break
-                case 'issue':
-                case 'review':
-                    res = `[${gitRequestEvent.mergeRequestId}]`
-                    break
-                case 'note':
-                    res = `[${gitRequestEvent.noteId}]`
-                    break
-            }
-            break
-    }
-    return res
 }
 
 export function getWSpath (path = '') {
