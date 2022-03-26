@@ -45,7 +45,7 @@ class TapdEventSourceHandler : IEventSourceHandler<Unit> {
         return CloudEventBuilder.v1()
             .withId(ctx.read<String>("$.event_id"))
             .withType(ctx.read<String>("$.event"))
-            .withSource(URI.create(SourceType.TGIT))
+            .withSource(URI.create(SourceType.TAPD))
             .withData("application/json",payload.toByteArray(StandardCharsets.UTF_8))
             .withExtension(CloudEventExtensionKey.THIRD_ID, ctx.read<String>("$.workspace_id"))
             .build()
