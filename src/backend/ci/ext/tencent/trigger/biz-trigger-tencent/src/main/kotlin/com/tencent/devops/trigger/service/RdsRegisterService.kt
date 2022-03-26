@@ -244,7 +244,9 @@ class RdsRegisterService @Autowired constructor(
                 }
             }
         }
-        logger.info("$projectId|$busId|$sourceName|Success to register webhook resource $successPropValueList")
+        logger.info("" +
+            "$projectId|$busId|$sourceName|Success to register webhook resource ($propName->$successPropValueList)"
+        )
         return Pair(propName, successPropValueList)
     }
 
@@ -271,6 +273,7 @@ class RdsRegisterService @Autowired constructor(
         val filter = on.filter.toMutableMap()
         filter[webhookProp.first] = webhookProp.second
 
+        logger.info("$projectId|$busId|$ruleId|filter conditions: $filter")
         val ruleExpressionList = eventRuleExpressions.map { ruleExpression ->
             val replaceExpression = ObjectReplaceEnvVarUtil.replaceEnvVar(
                 ruleExpression.expressions,
