@@ -25,8 +25,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.constant
+package com.tencent.devops.trigger.config
 
-object CloudEventExtensionKey {
-    const val THIRD_ID = "thirdid"
+import com.jayway.jsonpath.Configuration
+import com.jayway.jsonpath.Option
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider
+import com.jayway.jsonpath.spi.json.JsonProvider
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider
+import com.jayway.jsonpath.spi.mapper.MappingProvider
+
+class JacksonConfiguration : Configuration.Defaults {
+    private val jsonProvider = JacksonJsonProvider()
+    private val mappingProvider = JacksonMappingProvider()
+
+    override fun jsonProvider(): JsonProvider {
+        return jsonProvider
+    }
+
+    override fun options(): Set<Option> {
+        return emptySet()
+    }
+
+    override fun mappingProvider(): MappingProvider {
+        return mappingProvider
+    }
 }

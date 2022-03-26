@@ -25,8 +25,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.constant
+package com.tencent.devops.trigger.config
 
-object CloudEventExtensionKey {
-    const val THIRD_ID = "thirdid"
+import org.springframework.context.annotation.Configuration
+import javax.annotation.PostConstruct
+
+@Configuration
+class JsonPathConfiguration {
+
+    @PostConstruct
+    fun jsonProvider() {
+        com.jayway.jsonpath.Configuration.setDefaults(JacksonConfiguration())
+    }
 }

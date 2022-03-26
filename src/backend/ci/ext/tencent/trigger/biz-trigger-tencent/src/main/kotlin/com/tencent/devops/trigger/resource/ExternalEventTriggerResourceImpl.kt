@@ -53,7 +53,7 @@ class ExternalEventTriggerResourceImpl @Autowired constructor(
         headers: HttpHeaders,
         payload: String
     ): Result<Boolean> {
-        logger.info("receive webhook|$sourceName|$projectId|$busId|$headers|$payload")
+        logger.info("receive webhook|$sourceName|$projectId|$busId|${headers.requestHeaders}|$payload")
         eventTriggerDispatcher.dispatch(
             EventWebhookRequestEvent(
                 projectId = projectId,
@@ -69,7 +69,7 @@ class ExternalEventTriggerResourceImpl @Autowired constructor(
     }
 
     override fun appWebhook(sourceName: String, headers: HttpHeaders, payload: String): Result<Boolean> {
-        logger.info("receive app webhook|$sourceName|$headers|$payload")
+        logger.info("receive app webhook|$sourceName|${headers.requestHeaders}|$payload")
         eventTriggerDispatcher.dispatch(
             EventAppWebhookRequestEvent(
                 sourceName = sourceName,
