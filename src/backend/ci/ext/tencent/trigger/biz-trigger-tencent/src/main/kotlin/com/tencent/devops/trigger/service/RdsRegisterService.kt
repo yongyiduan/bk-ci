@@ -244,6 +244,7 @@ class RdsRegisterService @Autowired constructor(
                 }
             }
         }
+        logger.info("$projectId|$busId|$sourceName|Success to register webhook resource $successPropValueList")
         return Pair(propName, successPropValueList)
     }
 
