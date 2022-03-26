@@ -25,19 +25,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.pojo.event
+package com.tencent.devops.trigger.constant
 
-import com.tencent.devops.common.event.annotation.Event
-import com.tencent.devops.trigger.constant.MQ
-import javax.ws.rs.core.HttpHeaders
-
-@Event(MQ.EXCHANGE_EVENT_BUS_LISTENER_DIRECT, MQ.ROUTE_EVENT_BUS_REQUEST)
-data class EventBusRequestEvent(
-    override var projectId: String,
-    val busId: String,
-    val sourceName: String,
-    val headers: Map<String, String>,
-    val payload: String
-) : IEventBusEvent(
-    projectId = projectId
-)
+object CloudEventExtensionKey {
+    const val THIRD_ID = "thirdId"
+}

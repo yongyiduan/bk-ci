@@ -27,15 +27,15 @@
 
 package com.tencent.devops.trigger.listener
 
-import com.tencent.devops.trigger.dispatcher.EventBusDispatcher
-import com.tencent.devops.trigger.pojo.event.IEventBusEvent
+import com.tencent.devops.trigger.dispatcher.EventTriggerDispatcher
+import com.tencent.devops.trigger.pojo.event.IEventTriggerEvent
 import com.tencent.devops.common.event.listener.Listener
 import com.tencent.devops.common.service.trace.TraceTag
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 
-abstract class EventBusBaseListener<in T : IEventBusEvent>(
-    private val eventBusDispatcher: EventBusDispatcher
+abstract class EventTriggerBaseListener<in T : IEventTriggerEvent>(
+    private val eventTriggerDispatcher: EventTriggerDispatcher
 ) : Listener<T> {
 
     companion object {
@@ -72,7 +72,7 @@ abstract class EventBusBaseListener<in T : IEventBusEvent>(
                         event.delayMills = TryInterval3
                     }
                 }
-                eventBusDispatcher.dispatch(event)
+                eventTriggerDispatcher.dispatch(event)
                 logger.warn("[EVENT_BUS_MQ_SEVERE][${event.projectId}]|FAIL_TO_RETRY")
             }
             MDC.remove(TraceTag.BIZID)

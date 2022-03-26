@@ -30,13 +30,16 @@ package com.tencent.devops.trigger.service
 import com.fasterxml.jackson.databind.JsonNode
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.trigger.constant.CloudEventExtensionKey.THIRD_ID
 import com.tencent.devops.trigger.constant.EventBusMessageCode.SOURCE_NOT_SUPPORT
 import com.tencent.devops.trigger.dao.EventBusDao
 import com.tencent.devops.trigger.dao.EventBusRuleDao
+import com.tencent.devops.trigger.dao.EventRouteDao
 import com.tencent.devops.trigger.dao.EventRuleTargetDao
-import com.tencent.devops.trigger.dispatcher.EventBusDispatcher
-import com.tencent.devops.trigger.pojo.event.EventBusRequestEvent
+import com.tencent.devops.trigger.dispatcher.EventTriggerDispatcher
+import com.tencent.devops.trigger.pojo.event.EventAppWebhookRequestEvent
 import com.tencent.devops.trigger.pojo.event.EventTargetRunEvent
+import com.tencent.devops.trigger.pojo.event.EventWebhookRequestEvent
 import com.tencent.devops.trigger.source.IEventSourceHandler
 import com.tencent.devops.trigger.util.CloudEventJsonUtil
 import com.tencent.devops.trigger.util.RuleUtil
@@ -49,64 +52,125 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class EventBusRequestService @Autowired constructor(
+class EventWebhookRequestService @Autowired constructor(
     private val dslContext: DSLContext,
     private val eventBusDao: EventBusDao,
     private val eventBusRuleDao: EventBusRuleDao,
     private val triggerRuleTargetDao: EventRuleTargetDao,
-    private val eventBusDispatcher: EventBusDispatcher
+    private val eventTriggerDispatcher: EventTriggerDispatcher,
+    private val eventRouteDao: EventRouteDao
 ) {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(EventBusRequestService::class.java)
+        private val logger = LoggerFactory.getLogger(EventWebhookRequestService::class.java)
     }
 
-    fun handle(event: EventBusRequestEvent) {
+    fun webhook(event: EventWebhookRequestEvent) {
         with(event) {
-            val cloudEvent = toCloudEvent()
             logger.info(
-                "start to handle event bus request:${busId},${cloudEvent.source},${cloudEvent.type},${cloudEvent.id}"
+                "${projectId}|${busId}|start to handle event webhook request," +
+                    "sourceName:$sourceName,payload:$payload,headers:$headers"
             )
-            val eventBus = eventBusDao.getByBusId(
-                dslContext = dslContext,
-                projectId = projectId,
-                busId = busId
+            val cloudEvent = toCloudEvent(
+                sourceName = sourceName,
+                headers = headers,
+                payload = payload
             )
-            if (eventBus == null) {
-                logger.info("$projectId|$busId| event bus not exist")
-                return
-            }
-            val ruleList = eventBusRuleDao.listBySource(
-                dslContext = dslContext,
+            logger.info(
+                "${projectId}|${busId}|toCloudEvent,${cloudEvent.source},${cloudEvent.type},${cloudEvent.id}"
+            )
+            handleWebhook(
                 projectId = projectId,
                 busId = busId,
-                source = cloudEvent.source.toString(),
-                type = cloudEvent.type
+                cloudEvent = cloudEvent
             )
-            if (ruleList.isEmpty()) {
-                logger.info("$projectId|$busId|${cloudEvent.source}|${cloudEvent.type}| event rule is empty")
+        }
+    }
+
+    fun appWebhook(event: EventAppWebhookRequestEvent) {
+        with(event) {
+            logger.info(
+                "start to handle event app webhook request,sourceName:$sourceName,payload:$payload,headers:$headers"
+            )
+            val cloudEvent = toCloudEvent(
+                sourceName = sourceName,
+                headers = headers,
+                payload = payload
+            )
+            logger.info(
+                "toCloudEvent,${cloudEvent.source},${cloudEvent.type},${cloudEvent.id}"
+            )
+            val thirdId = cloudEvent.getExtension(THIRD_ID)?.toString() ?: run {
+                logger.warn("$sourceName| third id is null")
                 return
             }
-            val node = CloudEventJsonUtil.serializeAsJsonNode(event = cloudEvent)
-            ruleList.forEach { rule ->
-                if (RuleUtil.matches(
-                        projectId = projectId,
-                        ruleId = rule.ruleId,
-                        node = node,
-                        filterPattern = rule.filterPattern
-                    )
-                ) {
-                    dispatchRuleTarget(
-                        projectId = projectId,
-                        ruleId = rule.ruleId,
-                        node = node
-                    )
-                }
+            val eventRouteList = eventRouteDao.listByThirdId(
+                dslContext = dslContext,
+                source = sourceName,
+                thirdId = thirdId
+            )
+            if (eventRouteList.isEmpty()) {
+                logger.warn("$sourceName|event route not found")
+                return
+            }
+            eventRouteList.forEach { eventRoute ->
+                handleWebhook(
+                    projectId = eventRoute.projectId,
+                    busId = eventRoute.busId,
+                    cloudEvent = cloudEvent
+                )
             }
         }
     }
 
-    private fun EventBusRequestEvent.toCloudEvent(): CloudEvent {
+    private fun handleWebhook(
+        projectId: String,
+        busId: String,
+        cloudEvent: CloudEvent
+    ) {
+        val eventBus = eventBusDao.getByBusId(
+            dslContext = dslContext,
+            projectId = projectId,
+            busId = busId
+        )
+        if (eventBus == null) {
+            logger.info("$projectId|$busId| event bus not exist")
+            return
+        }
+        val ruleList = eventBusRuleDao.listBySource(
+            dslContext = dslContext,
+            projectId = projectId,
+            busId = busId,
+            source = cloudEvent.source.toString(),
+            type = cloudEvent.type
+        )
+        if (ruleList.isEmpty()) {
+            logger.info("$projectId|$busId|${cloudEvent.source}|${cloudEvent.type}| event rule is empty")
+            return
+        }
+        val node = CloudEventJsonUtil.serializeAsJsonNode(event = cloudEvent)
+        ruleList.forEach { rule ->
+            if (RuleUtil.matches(
+                    projectId = projectId,
+                    ruleId = rule.ruleId,
+                    node = node,
+                    filterPattern = rule.filterPattern
+                )
+            ) {
+                dispatchRuleTarget(
+                    projectId = projectId,
+                    ruleId = rule.ruleId,
+                    node = node
+                )
+            }
+        }
+    }
+
+    private fun toCloudEvent(
+        sourceName: String,
+        headers: Map<String, String>,
+        payload: String
+    ): CloudEvent {
         val eventSourceHandler = try {
             SpringContextUtil.getBean(IEventSourceHandler::class.java, sourceName)
         } catch (ignore: Throwable) {
@@ -148,6 +212,6 @@ class EventBusRequestService @Autowired constructor(
                 targetParamMap = targetParamMap
             )
         }.toList()
-        eventBusDispatcher.dispatch(*targetRunEvents.toTypedArray())
+        eventTriggerDispatcher.dispatch(*targetRunEvents.toTypedArray())
     }
 }

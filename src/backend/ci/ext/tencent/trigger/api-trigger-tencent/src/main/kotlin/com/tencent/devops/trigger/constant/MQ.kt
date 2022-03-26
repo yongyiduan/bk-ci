@@ -28,11 +28,14 @@
 package com.tencent.devops.trigger.constant
 
 object MQ {
-    const val EXCHANGE_EVENT_BUS_LISTENER_DIRECT = "e.event.bus.listener"
+    const val EXCHANGE_EVENT_TRIGGER_LISTENER_DIRECT = "e.event.trigger.listener"
 
-    // 事件总线请求
-    const val ROUTE_EVENT_BUS_REQUEST = "r.event.bus.request"
-    const val QUEUE_EVENT_BUS_REQUEST = "q.event.bus.request"
+    // 事件webhook请求
+    const val ROUTE_EVENT_WEBHOOK_REQUEST = "r.event.webhook.request"
+    const val QUEUE_EVENT_WEBHOOK_REQUEST = "q.event.webhook.request"
+
+    const val ROUTE_EVENT_APP_WEBHOOK_REQUEST = "r.event.app.webhook.request"
+    const val QUEUE_EVENT_APP_WEBHOOK_REQUEST = "q.event.app.webhook.request"
 
     // 事件目标运行
     const val ROUTE_EVENT_TARGET_RUN = "r.event.target.run"

@@ -25,45 +25,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.resource
+package com.tencent.devops.trigger.listener
 
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.trigger.api.ExternalEventBusResource
-import com.tencent.devops.trigger.dispatcher.EventBusDispatcher
-import com.tencent.devops.trigger.pojo.event.EventBusRequestEvent
-import org.slf4j.LoggerFactory
+import com.tencent.devops.trigger.dispatcher.EventTriggerDispatcher
+import com.tencent.devops.trigger.pojo.event.EventAppWebhookRequestEvent
+import com.tencent.devops.trigger.service.EventWebhookRequestService
 import org.springframework.beans.factory.annotation.Autowired
-import javax.ws.rs.core.HttpHeaders
+import org.springframework.stereotype.Component
 
-@RestResource
-class ExternalEventBusResourceImpl @Autowired constructor(
-    private val eventBusDispatcher: EventBusDispatcher
-) : ExternalEventBusResource {
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(ExternalEventBusResourceImpl::class.java)
-    }
-
-    override fun webhook(
-        sourceName: String,
-        projectId: String,
-        busId: String,
-        headers: HttpHeaders,
-        payload: String
-    ): Result<Boolean> {
-        logger.info("receive webhook|$sourceName|$projectId|$busId|$payload")
-        eventBusDispatcher.dispatch(
-            EventBusRequestEvent(
-                projectId = projectId,
-                sourceName = sourceName,
-                busId = busId,
-                headers = headers.requestHeaders
-                    .map { (key, values) -> Pair(key, values.first()) }
-                    .toMap(),
-                payload = payload
-            )
-        )
-        return Result(true)
+@Component
+class EventAppWebhookRequestListener @Autowired constructor(
+    eventTriggerDispatcher: EventTriggerDispatcher,
+    private val eventWebhookRequestService: EventWebhookRequestService
+) : EventTriggerBaseListener<EventAppWebhookRequestEvent>(
+    eventTriggerDispatcher = eventTriggerDispatcher
+) {
+    override fun run(event: EventAppWebhookRequestEvent) {
+        eventWebhookRequestService.appWebhook(event = event)
     }
 }

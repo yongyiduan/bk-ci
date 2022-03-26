@@ -25,22 +25,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.listener
+package com.tencent.devops.trigger.pojo.event
 
-import com.tencent.devops.trigger.dispatcher.EventBusDispatcher
-import com.tencent.devops.trigger.pojo.event.EventBusRequestEvent
-import com.tencent.devops.trigger.service.EventBusRequestService
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
+import com.tencent.devops.common.event.annotation.Event
+import com.tencent.devops.trigger.constant.MQ
 
-@Component
-class EventBusRequestListener @Autowired constructor(
-    eventBusDispatcher: EventBusDispatcher,
-    private val eventBusRequestService: EventBusRequestService
-) : EventBusBaseListener<EventBusRequestEvent>(
-    eventBusDispatcher = eventBusDispatcher
-) {
-    override fun run(event: EventBusRequestEvent) {
-        eventBusRequestService.handle(event)
-    }
-}
+@Event(MQ.EXCHANGE_EVENT_TRIGGER_LISTENER_DIRECT, MQ.ROUTE_EVENT_APP_WEBHOOK_REQUEST)
+data class EventAppWebhookRequestEvent(
+    override var projectId: String = "",
+    val sourceName: String,
+    val headers: Map<String, String>,
+    val payload: String
+) : IEventTriggerEvent(
+    projectId = projectId
+ )

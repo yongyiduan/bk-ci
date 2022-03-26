@@ -36,6 +36,7 @@ import com.tencent.devops.trigger.constant.TargetType
 import com.tencent.devops.trigger.dao.EventBusDao
 import com.tencent.devops.trigger.dao.EventBusRuleDao
 import com.tencent.devops.trigger.dao.EventBusSourceDao
+import com.tencent.devops.trigger.dao.EventRouteDao
 import com.tencent.devops.trigger.dao.EventRuleExpressionDao
 import com.tencent.devops.trigger.dao.EventRuleTargetDao
 import com.tencent.devops.trigger.dao.EventSourceDao
@@ -45,6 +46,7 @@ import com.tencent.devops.trigger.dao.EventTypeDao
 import com.tencent.devops.trigger.pojo.EventBus
 import com.tencent.devops.trigger.pojo.EventBusRule
 import com.tencent.devops.trigger.pojo.EventBusSource
+import com.tencent.devops.trigger.pojo.EventRoute
 import com.tencent.devops.trigger.pojo.EventRuleTarget
 import com.tencent.devops.trigger.pojo.EventSource
 import com.tencent.devops.trigger.pojo.EventType
@@ -75,6 +77,7 @@ class RdsRegisterService @Autowired constructor(
     private val eventBusSourceDao: EventBusSourceDao,
     private val eventBusRuleDao: EventBusRuleDao,
     private val eventRuleTargetDao: EventRuleTargetDao,
+    private val eventRouteDao: EventRouteDao
 ) {
 
     companion object {
@@ -102,6 +105,7 @@ class RdsRegisterService @Autowired constructor(
         val eventBusSourceSet = mutableSetOf<EventBusSource>()
         val eventBusRuleSet = mutableSetOf<EventBusRule>()
         val ruleTargetSet = mutableSetOf<EventRuleTarget>()
+        val eventRouteSet = mutableSetOf<EventRoute>()
         request.triggerOn.forEach on@{ on ->
             logger.info("$projectId|trigger ${on.id} event type")
             val eventTypeList = eventTypeDao.listByAliasName(
@@ -140,6 +144,16 @@ class RdsRegisterService @Autowired constructor(
                 if (webhookProp == null || webhookProp.second.isEmpty()) {
                     logger.info("$projectId|${eventSource.name}|${eventType.name}| does not need webhook registration")
                     return@eventType
+                }
+                webhookProp.second.forEach { thirdId ->
+                    eventRouteSet.add(
+                        EventRoute(
+                            source = eventSource.name,
+                            thirdId = thirdId,
+                            projectId = projectId,
+                            busId = busId
+                        )
+                    )
                 }
                 val ruleId = eventBusRuleDao.getByName(
                     dslContext = dslContext,
@@ -186,6 +200,10 @@ class RdsRegisterService @Autowired constructor(
             eventBusSourceDao.batchCreate(
                 dslContext = context,
                 eventBusSources = eventBusSourceSet.toList()
+            )
+            eventRouteDao.batchCreate(
+                dslContext = dslContext,
+                eventRoutes = eventRouteSet.toList()
             )
             eventBusRuleDao.batchCreate(
                 dslContext = context,

@@ -33,7 +33,7 @@ import org.slf4j.MDC
 /**
  * 事件总线事件
  */
-open class IEventBusEvent(
+open class IEventTriggerEvent(
     open var projectId: String,
     open var delayMills: Int = 0,
     open var retryTime: Int = 1,

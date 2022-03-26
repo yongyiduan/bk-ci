@@ -29,4 +29,5 @@ package com.tencent.devops.trigger.constant
 
 object SourceType {
     const val TGIT = "tgit"
+    const val TAPD = "tapd"
 }

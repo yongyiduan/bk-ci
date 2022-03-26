@@ -25,44 +25,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.api
+package com.tencent.devops.trigger.pojo
 
-import com.tencent.devops.common.api.pojo.Result
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import javax.ws.rs.Consumes
-import javax.ws.rs.POST
-import javax.ws.rs.Path
-import javax.ws.rs.PathParam
-import javax.ws.rs.Produces
-import javax.ws.rs.core.Context
-import javax.ws.rs.core.HttpHeaders
-import javax.ws.rs.core.MediaType
+import io.swagger.annotations.ApiModelProperty
 
-@Api(tags = ["EXTERNAL_EVENTBUS"], description = "事件总线-外部触发")
-@Path("/external/trigger")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-interface ExternalEventBusResource {
-
-    @ApiOperation("外部请求触发")
-    @Path("/webhook/{source}/{projectId}/{busId}")
-    @POST
-    fun webhook(
-        @ApiParam("事件源名称")
-        @PathParam("source")
-        sourceName: String,
-        @ApiParam("项目ID")
-        @PathParam("projectId")
-        projectId: String,
-        @ApiParam("总线ID")
-        @PathParam("busId")
-        busId: String,
-        @ApiParam("请求头")
-        @Context
-        headers: HttpHeaders,
-        @ApiParam("请求体")
-        payload: String
-    ): Result<Boolean>
-}
+data class EventRoute(
+    val id: Long? = null,
+    @ApiModelProperty("事件源名")
+    val source: String,
+    @ApiModelProperty("第三方唯一ID")
+    val thirdId: String,
+    @ApiModelProperty("项目ID")
+    val projectId: String,
+    @ApiModelProperty("事件总线ID")
+    val busId: String,
+    @ApiModelProperty("创建时间", required = false)
+    val createTime: Long? = null,
+    @ApiModelProperty("更新时间", required = false)
+    val updateTime: Long? = null
+)

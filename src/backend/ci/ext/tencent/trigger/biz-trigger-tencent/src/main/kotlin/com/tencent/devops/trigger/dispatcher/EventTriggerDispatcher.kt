@@ -25,23 +25,40 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.listener
+package com.tencent.devops.trigger.dispatcher
 
-import com.tencent.devops.trigger.dispatcher.EventTriggerDispatcher
-import com.tencent.devops.trigger.pojo.event.EventTargetRunEvent
-import com.tencent.devops.trigger.service.EventTargetRunService
+import com.tencent.devops.trigger.pojo.event.IEventTriggerEvent
+import com.tencent.devops.common.event.annotation.Event
+import com.tencent.devops.common.event.dispatcher.EventDispatcher
+import org.slf4j.LoggerFactory
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-class EventTargetRunListener @Autowired constructor(
-    eventTriggerDispatcher: EventTriggerDispatcher,
-    private val eventTargetRunService: EventTargetRunService
-) : EventTriggerBaseListener<EventTargetRunEvent>(
-    eventTriggerDispatcher = eventTriggerDispatcher
-) {
+class EventTriggerDispatcher @Autowired constructor(
+    private val rabbitTemplate: RabbitTemplate
+) : EventDispatcher<IEventTriggerEvent> {
 
-    override fun run(event: EventTargetRunEvent) {
-        eventTargetRunService.handle(event)
+    companion object {
+        private val logger = LoggerFactory.getLogger(EventTriggerDispatcher::class.java)
+    }
+
+    override fun dispatch(vararg events: IEventTriggerEvent) {
+        events.forEach { event ->
+            try {
+                val eventType = event::class.java.annotations.find { s -> s is Event } as Event
+                rabbitTemplate.convertAndSend(eventType.exchange, eventType.routeKey, event) { message ->
+                    when {
+                        event.delayMills > 0 -> message.messageProperties.setHeader("x-delay", event.delayMills)
+                        eventType.delayMills > 0 -> // 事件类型固化默认值
+                            message.messageProperties.setHeader("x-delay", eventType.delayMills)
+                    }
+                    message
+                }
+            } catch (ignored: Exception) {
+                logger.error("Fail to dispatch the event($events)", ignored)
+            }
+        }
     }
 }

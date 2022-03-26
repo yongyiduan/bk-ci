@@ -25,23 +25,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.trigger.listener
+package com.tencent.devops.trigger.source.tapd
 
-import com.tencent.devops.trigger.dispatcher.EventTriggerDispatcher
-import com.tencent.devops.trigger.pojo.event.EventTargetRunEvent
-import com.tencent.devops.trigger.service.EventTargetRunService
-import org.springframework.beans.factory.annotation.Autowired
+import com.jayway.jsonpath.JsonPath
+import com.tencent.devops.trigger.constant.CloudEventExtensionKey
+import com.tencent.devops.trigger.constant.SourceType
+import com.tencent.devops.trigger.source.IEventSourceHandler
+import io.cloudevents.CloudEvent
+import io.cloudevents.core.builder.CloudEventBuilder
 import org.springframework.stereotype.Component
+import java.net.URI
+import java.nio.charset.StandardCharsets
 
-@Component
-class EventTargetRunListener @Autowired constructor(
-    eventTriggerDispatcher: EventTriggerDispatcher,
-    private val eventTargetRunService: EventTargetRunService
-) : EventTriggerBaseListener<EventTargetRunEvent>(
-    eventTriggerDispatcher = eventTriggerDispatcher
-) {
+@Component(SourceType.TAPD)
+class TapdEventSourceHandler : IEventSourceHandler<Unit> {
 
-    override fun run(event: EventTargetRunEvent) {
-        eventTargetRunService.handle(event)
+    override fun toCloudEvent(headers: Map<String, String>, payload: String): CloudEvent? {
+        val ctx = JsonPath.parse(payload)
+        return CloudEventBuilder.v1()
+            .withId(ctx.read<String>("$.event_id"))
+            .withType(ctx.read<String>("$.event"))
+            .withSource(URI.create(SourceType.TGIT))
+            .withData("application/json",payload.toByteArray(StandardCharsets.UTF_8))
+            .withExtension(CloudEventExtensionKey.THIRD_ID, ctx.read<String>("$.workspace_id"))
+            .build()
     }
+
+    override fun registerWebhook(webhookUrl: String, webhookRequestParam: Unit) = true
+
+    override fun getWebhookRequestParam(webhookParamMap: Map<String, Any>) = Unit
 }

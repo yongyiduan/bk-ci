@@ -29,9 +29,10 @@ package com.tencent.devops.trigger.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.devops.trigger.constant.MQ
-import com.tencent.devops.trigger.listener.EventBusRequestListener
+import com.tencent.devops.trigger.listener.EventWebhookRequestListener
 import com.tencent.devops.trigger.listener.EventTargetRunListener
 import com.tencent.devops.common.event.dispatcher.pipeline.mq.Tools
+import com.tencent.devops.trigger.listener.EventAppWebhookRequestListener
 import org.springframework.amqp.core.Binding
 import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.DirectExchange
@@ -46,7 +47,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class EventBusMQConfiguration {
+class EventTriggerMQConfiguration {
 
     @Bean
     fun rabbitAdmin(connectionFactory: ConnectionFactory): RabbitAdmin {
@@ -57,40 +58,77 @@ class EventBusMQConfiguration {
     fun messageConverter(objectMapper: ObjectMapper) = Jackson2JsonMessageConverter(objectMapper)
 
     @Bean
-    fun eventBusExchange(): DirectExchange {
-        val directExchange = DirectExchange(MQ.EXCHANGE_EVENT_BUS_LISTENER_DIRECT, true, false)
+    fun eventTriggerExchange(): DirectExchange {
+        val directExchange = DirectExchange(MQ.EXCHANGE_EVENT_TRIGGER_LISTENER_DIRECT, true, false)
         directExchange.isDelayed = true
         return directExchange
     }
 
     @Bean
-    fun eventBusRequestQueue() = Queue(MQ.QUEUE_EVENT_BUS_REQUEST)
+    fun eventWebhookRequestQueue() = Queue(MQ.QUEUE_EVENT_WEBHOOK_REQUEST)
 
     @Bean
-    fun eventBusRequestQueueBind(
-        @Autowired eventBusRequestQueue: Queue,
-        @Autowired eventBusExchange: DirectExchange
+    fun eventWebhookRequestQueueBind(
+        @Autowired eventWebhookRequestQueue: Queue,
+        @Autowired eventTriggerExchange: DirectExchange
     ): Binding {
-        return BindingBuilder.bind(eventBusRequestQueue).to(eventBusExchange)
-            .with(MQ.ROUTE_EVENT_BUS_REQUEST)
+        return BindingBuilder.bind(eventWebhookRequestQueue).to(eventTriggerExchange)
+            .with(MQ.ROUTE_EVENT_WEBHOOK_REQUEST)
     }
 
     @Bean
-    fun eventBusRequestListenerContainer(
+    fun eventWebhookRequestListenerContainer(
         @Autowired connectionFactory: ConnectionFactory,
-        @Autowired eventBusRequestQueue: Queue,
+        @Autowired eventWebhookRequestQueue: Queue,
         @Autowired rabbitAdmin: RabbitAdmin,
-        @Autowired eventBusRequestListener: EventBusRequestListener,
+        @Autowired eventWebhookRequestListener: EventWebhookRequestListener,
         @Autowired messageConverter: Jackson2JsonMessageConverter
     ): SimpleMessageListenerContainer {
         val adapter = MessageListenerAdapter(
-            eventBusRequestListener,
-            eventBusRequestListener::execute.name
+            eventWebhookRequestListener,
+            eventWebhookRequestListener::execute.name
         )
         adapter.setMessageConverter(messageConverter)
         return Tools.createSimpleMessageListenerContainerByAdapter(
             connectionFactory = connectionFactory,
-            queue = eventBusRequestQueue,
+            queue = eventWebhookRequestQueue,
+            rabbitAdmin = rabbitAdmin,
+            startConsumerMinInterval = 10000,
+            consecutiveActiveTrigger = 5,
+            concurrency = 10,
+            maxConcurrency = 50,
+            adapter = adapter
+        )
+    }
+
+    @Bean
+    fun eventAppWebhookRequestQueue() = Queue(MQ.QUEUE_EVENT_APP_WEBHOOK_REQUEST)
+
+    @Bean
+    fun eventAppWebhookRequestQueueBind(
+        @Autowired eventAppWebhookRequestQueue: Queue,
+        @Autowired eventTriggerExchange: DirectExchange
+    ): Binding {
+        return BindingBuilder.bind(eventAppWebhookRequestQueue).to(eventTriggerExchange)
+            .with(MQ.ROUTE_EVENT_APP_WEBHOOK_REQUEST)
+    }
+
+    @Bean
+    fun eventAppWebhookRequestListenerContainer(
+        @Autowired connectionFactory: ConnectionFactory,
+        @Autowired eventAppWebhookRequestQueue: Queue,
+        @Autowired rabbitAdmin: RabbitAdmin,
+        @Autowired eventAppWebhookRequestListener: EventAppWebhookRequestListener,
+        @Autowired messageConverter: Jackson2JsonMessageConverter
+    ): SimpleMessageListenerContainer {
+        val adapter = MessageListenerAdapter(
+            eventAppWebhookRequestListener,
+            eventAppWebhookRequestListener::execute.name
+        )
+        adapter.setMessageConverter(messageConverter)
+        return Tools.createSimpleMessageListenerContainerByAdapter(
+            connectionFactory = connectionFactory,
+            queue = eventAppWebhookRequestQueue,
             rabbitAdmin = rabbitAdmin,
             startConsumerMinInterval = 10000,
             consecutiveActiveTrigger = 5,
@@ -106,9 +144,9 @@ class EventBusMQConfiguration {
     @Bean
     fun eventTargetRunQueueBind(
         @Autowired eventTargetRunQueue: Queue,
-        @Autowired eventBusExchange: DirectExchange
+        @Autowired eventTriggerExchange: DirectExchange
     ): Binding {
-        return BindingBuilder.bind(eventTargetRunQueue).to(eventBusExchange)
+        return BindingBuilder.bind(eventTargetRunQueue).to(eventTriggerExchange)
             .with(MQ.ROUTE_EVENT_TARGET_RUN)
     }
 
