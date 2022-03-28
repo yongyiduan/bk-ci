@@ -161,14 +161,13 @@ class PipelineRetryFacadeService @Autowired constructor(
             } else if (task.taskName.startsWith(VMUtils.getWaitLabel()) &&
                 task.taskId.startsWith(VMUtils.getEndLabel())) {
                 startAndEndTask.add(task)
+            } else if (task.status == BuildStatus.UNEXEC) {
+                startAndEndTask.add(task)
             }
         }
         startAndEndTask.forEach {
             pipelineTaskService.updateTaskStatus(task = it, userId = userId, buildStatus = BuildStatus.QUEUE)
         }
-
-        taskBuildDetailService.taskStart(projectId, buildId, taskId)
-
         // 修改容器状态位运行
         pipelineContainerService.updateContainerStatus(
             projectId = containerInfo.projectId,
