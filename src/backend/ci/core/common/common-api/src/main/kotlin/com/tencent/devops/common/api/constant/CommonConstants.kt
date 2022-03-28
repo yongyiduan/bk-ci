@@ -105,6 +105,7 @@ const val OR = "or" // 或
 const val TIMETOSELECT = "timetoSelect" // 时必选
 const val API_ACCESS_TOKEN_PROPERTY = "access_token"
 const val MASTER = "master" // 主干
+const val SYSTEM = "system" // 系统
 
 const val KEY_START_TIME = "startTime"
 const val KEY_END_TIME = "endTime"
