@@ -41,7 +41,6 @@ import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.container.Container
-import com.tencent.devops.common.pipeline.container.Stage
 import com.tencent.devops.common.pipeline.container.VMBuildContainer
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.pipeline.pojo.element.Element
@@ -659,12 +658,27 @@ abstract class MarketTemplateServiceImpl @Autowired constructor() : MarketTempla
         val templateDetail = templateDetailResult.data
         val templateModel = templateDetail?.templateModel
             ?: return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.SYSTEM_ERROR)
+        return verificationModelComponentVisibleDept(
+            userId = userId,
+            model = templateModel,
+            projectCodeList = projectCodeList,
+            templateCode = templateCode
+        )
+    }
+
+    override fun verificationModelComponentVisibleDept(
+        userId: String,
+        model: Model,
+        projectCodeList: ArrayList<String>,
+        templateCode: String?
+    ): Result<Boolean> {
+
         val invalidImageList = mutableListOf<String>()
         val invalidAtomList = mutableListOf<String>()
         val needInstallImageMap = mutableMapOf<String, StoreBaseInfo>()
         val needInstallAtomMap = mutableMapOf<String, StoreBaseInfo>()
         val userDeptIdList = storeUserService.getUserDeptList(userId) // 获取用户的机构ID信息
-        val stageList = templateModel.stages
+        val stageList = model.stages
         // 获取模板下镜像的机构信息
         val templateImageDeptMap = storeDeptService.getTemplateImageDeptMap(stageList)
         // 获取每个模板下插件的机构信息
@@ -726,87 +740,18 @@ abstract class MarketTemplateServiceImpl @Autowired constructor() : MarketTempla
                     params = arrayOf(JsonUtil.toJson(invalidAtomList))
                 )
             }
-            val validateTempleAtomVisibleResult = validateTemplateVisibleDept(
-                templateCode = templateDetail.templateCode,
-                templateModel = templateModel,
-                validImageCodes = validImageCodes,
-                validAtomCodes = validAtomCodes
-            )
-            if (validateTempleAtomVisibleResult.isNotOk()) {
-                return validateTempleAtomVisibleResult
-            }
-            // 安装镜像
-            installStoreComponent(needInstallImageMap, userId, projectCode, StoreTypeEnum.IMAGE)
-            // 安装插件
-            installStoreComponent(needInstallAtomMap, userId, projectCode, StoreTypeEnum.ATOM)
-        }
-        return Result(data = true)
-    }
-
-    override fun verificationModelComponentVisibleDept(userId: String, stageList: List<Stage>, projectCode: String): Result<Boolean> {
-        val invalidImageList = mutableListOf<String>()
-        val invalidAtomList = mutableListOf<String>()
-        val needInstallImageMap = mutableMapOf<String, StoreBaseInfo>()
-        val needInstallAtomMap = mutableMapOf<String, StoreBaseInfo>()
-        val userDeptIdList = storeUserService.getUserDeptList(userId) // 获取用户的机构ID信息
-        // 获取模板下镜像的机构信息
-        val modelImageDeptMap = storeDeptService.getTemplateImageDeptMap(stageList)
-        // 获取每个模板下插件的机构信息
-        val modelAtomDeptMap = storeDeptService.getTemplateAtomDeptMap(stageList)
-            // 获取可用的镜像标识列表
-            val validImageCodes = getValidStoreCodes(
-                projectCode = projectCode,
-                storeCodes = modelImageDeptMap.keys,
-                storeType = StoreTypeEnum.IMAGE
-            )
-            // 获取可用的插件标识列表
-            val validAtomCodes = getValidStoreCodes(
-                projectCode = projectCode,
-                storeCodes = modelAtomDeptMap.keys,
-                storeType = StoreTypeEnum.ATOM
-            )
-            stageList.forEach { stage ->
-                val containerList = stage.containers
-                containerList.forEach { container ->
-                    // 判断用户的组织架构是否在镜像的可见范围之内
-                    validateUserImageVisible(
-                        container = container,
-                        templateImageDeptMap = modelImageDeptMap,
-                        userId = userId,
-                        userDeptIdList = userDeptIdList,
-                        validImageCodes = validImageCodes,
-                        invalidImageList = invalidImageList,
-                        needInstallImageMap = needInstallImageMap
-                    )
-                    val elementList = container.elements
-                    elementList.forEach { element ->
-                        // 判断用户的组织架构是否在插件的可见范围之内
-                        validateUserAtomVisible(
-                            element = element,
-                            userId = userId,
-                            userDeptIdList = userDeptIdList,
-                            templateAtomDeptMap = modelAtomDeptMap,
-                            validAtomCodes = validAtomCodes,
-                            invalidAtomList = invalidAtomList,
-                            needInstallAtomMap = needInstallAtomMap
-                        )
-                    }
+            if (!templateCode.isNullOrBlank()) {
+                val validateTempleAtomVisibleResult = validateTemplateVisibleDept(
+                    templateCode = templateCode,
+                    templateModel = model,
+                    validImageCodes = validImageCodes,
+                    validAtomCodes = validAtomCodes
+                )
+                if (validateTempleAtomVisibleResult.isNotOk()) {
+                    return validateTempleAtomVisibleResult
                 }
-            if (invalidImageList.isNotEmpty()) {
-                // 存在用户不在镜像的可见范围内的镜像，给出错误提示
-                throw ErrorCodeException(
-                    errorCode = StoreMessageCode.USER_IMAGE_PROJECT_IS_INVALID,
-                    params = arrayOf(JsonUtil.toJson(invalidImageList), projectCode)
-                )
             }
-            logger.info("validateModelComponentVisibleDept invalidAtomList:$invalidAtomList")
-            if (invalidAtomList.isNotEmpty()) {
-                // 存在用户不在插件的可见范围内的插件，给出错误提示
-                throw ErrorCodeException(
-                    errorCode = StoreMessageCode.USER_ATOM_VISIBLE_DEPT_IS_INVALID,
-                    params = arrayOf(JsonUtil.toJson(invalidAtomList))
-                )
-            }
+
             // 安装镜像
             installStoreComponent(needInstallImageMap, userId, projectCode, StoreTypeEnum.IMAGE)
             // 安装插件
