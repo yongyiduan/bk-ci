@@ -28,9 +28,9 @@
 package com.tencent.devops.store.resources.template
 
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.common.pipeline.container.Stage
 import com.tencent.devops.store.api.template.ServiceTemplateResource
 import com.tencent.devops.store.pojo.template.InstallTemplateReq
 import com.tencent.devops.store.pojo.template.MarketTemplateResp
@@ -80,7 +80,11 @@ class ServiceTemplateResourceImpl @Autowired constructor(
         )
     }
 
-    override fun validateModelComponentVisibleDept(userId: String, model: Model, projectCode: String): Result<Boolean> {
-        return marketTemplateService.verificationModelComponentVisibleDept(userId, model, projectCode)
+    override fun validateModelComponentVisibleDept(
+        userId: String,
+        stageList: List<Stage>,
+        projectCode: String
+    ): Result<Boolean> {
+        return marketTemplateService.verificationModelComponentVisibleDept(userId, stageList, projectCode)
     }
 }
