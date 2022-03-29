@@ -230,7 +230,6 @@
                 } else {
                     this.handleChange(this.name, '')
                 }
-                
                 if (focus) {
                     this.$refs.inputArea.focus()
                 }
@@ -329,24 +328,31 @@
                 }
             },
             getDisplayName (val) {
-                if (this.isEnvVar(val)) {
-                    return val
+                const defaultVal = Array.isArray(val) ? val.join(',') : val
+
+                if (typeof defaultVal !== 'string') {
+                    console.log(`${this.name}, default value invalid, should be a string`)
+                    return ''
+                }
+                
+                if (this.isEnvVar(defaultVal)) {
+                    return defaultVal
                 }
                 if (this.hasGroup) {
                     for (let i = 0; i < this.optionList.length; i++) {
                         const option = this.optionList[i]
-                        const matchVal = option.children.find(child => child.id === val)
+                        const matchVal = option.children.find(child => child.id === defaultVal)
                         if (matchVal) {
                             return matchVal.name
                         }
                     }
                 } else {
-                    const option = this.optionList.find(option => option.id === val)
+                    const option = this.optionList.find(option => option.id === defaultVal)
                     if (option) {
                         return option.name
                     }
                 }
-                val && !this.loading && this.showValValidTips(val)
+                defaultVal && !this.loading && this.showValValidTips(defaultVal)
                 return ''
             },
             showValValidTips (val) {
