@@ -25,38 +25,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.lambda.config
+package com.tencent.devops.common.event.pojo.pipeline
 
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Configuration
+import com.tencent.devops.common.event.annotation.Event
+import com.tencent.devops.common.event.dispatcher.pipeline.mq.MQ
+import com.tencent.devops.common.event.enums.ActionType
 
-@Configuration
-class LambdaKafkaTopicConfig {
-
-    @Value("\${spring.kafka.topics.buildHistoryTopic:#{null}}")
-    val buildHistoryTopic: String? = null
-
-    @Value("\${spring.kafka.topics.buildDetailTopic:#{null}}")
-    val buildDetailTopic: String? = null
-
-    @Value("\${spring.kafka.topics.jobDetailTopic:#{null}}")
-    val jobDetailTopic: String? = null
-
-    @Value("\${spring.kafka.topics.taskDetailTopic:#{null}}")
-    val taskDetailTopic: String? = null
-
-    @Value("\${spring.kafka.topics.projectInfoTopic:#{null}}")
-    val projectInfoTopic: String? = null
-
-    @Value("\${spring.kafka.topics.pipelineInfoTopic:#{null}}")
-    val pipelineInfoTopic: String? = null
-
-    @Value("\${spring.kafka.topics.pipelineResourceTopic:#{null}}")
-    val pipelineResourceTopic: String? = null
-
-    @Value("\${spring.kafka.topics.gitTaskTopic:#{null}}")
-    val gitTaskTopic: String? = null
-
-    @Value("\${spring.kafka.topics.buildCommitsTopic:#{null}}")
-    val buildCommitsTopic: String? = null
-}
+@Event(MQ.EXCHANGE_PIPELINE_BUILD_COMMITS_FINISH_FANOUT)
+data class PipelineBuildCommitsFinishEvent(
+    override val source: String,
+    override val projectId: String,
+    override val pipelineId: String,
+    override val userId: String = "",
+    val buildId: String,
+    override var actionType: ActionType = ActionType.START,
+    override var delayMills: Int = 0
+) : IPipelineEvent(actionType, source, projectId, pipelineId, userId, delayMills)
