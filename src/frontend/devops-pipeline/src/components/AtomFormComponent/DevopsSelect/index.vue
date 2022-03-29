@@ -110,8 +110,7 @@
             queryParams (newQueryParams, oldQueryParams) {
                 if (this.isParamsChanged(newQueryParams, oldQueryParams)) {
                     this.debounceGetOptionList()
-                    this.handleChange(this.name, this.isMultiple ? [] : '')
-                    this.displayName = ''
+                    this.clearValue(false)
                 }
             },
             options (newOptions) {
@@ -224,11 +223,16 @@
                 }
             },
 
-            clearValue () {
+            clearValue (focus = true) {
                 this.displayName = ''
-                this.selectedMap = {}
-                this.handleChange(this.name, this.isMultiple ? [] : '')
-                this.$refs.inputArea.focus()
+                if (this.isMultiple) {
+                    this.selectedMap = {}
+                } else {
+                    this.handleChange(this.name, '')
+                }
+                if (focus) {
+                    this.$refs.inputArea.focus()
+                }
             },
 
             isEnvVar (str) {
