@@ -559,7 +559,7 @@ export default {
                 ])
 
                 if (responses.some(res => res.code === 403)) {
-                    throw HttpError(403)
+                    throw new HttpError(403)
                 }
                 this.setPipelineEditing(false)
                 this.setAuthEditing(false)
