@@ -110,7 +110,7 @@
             queryParams (newQueryParams, oldQueryParams) {
                 if (this.isParamsChanged(newQueryParams, oldQueryParams)) {
                     this.debounceGetOptionList()
-                    this.clearValue(false)
+                    this.clearValue()
                 }
             },
             options (newOptions) {
@@ -248,7 +248,7 @@
                 
                 if (this.isMultiple) {
                     if (this.displayName) {
-                        this.getMultipleDisplayName(this.displayName)
+                        this.getMultipleDisplayName(this.displayName, 'name')
                     } else {
                         this.getMultipleDisplayName(this.value)
                     }
@@ -294,7 +294,7 @@
                 this.selectedPointer = childIndex
                 this.adjustViewPort()
             },
-            getMultipleDisplayName (val) {
+            getMultipleDisplayName (val, type = 'id') {
                 if (typeof val === 'string') {
                     val = val === '' ? [] : val.split(',')
                 }
@@ -307,7 +307,8 @@
                     }, [])
                 }
                 const typeMap = opts.reduce((cur, opt) => {
-                    cur[opt.id] = opt
+                    const key = type === 'name' ? opt.name : opt.id
+                    cur[key] = opt
                     return cur
                 }, {})
                 const resultMap = {}
@@ -328,13 +329,11 @@
                 }
             },
             getDisplayName (val) {
-                const defaultVal = Array.isArray(val) ? val.join(',') : val
-
+                const defaultVal = Array.isArray(val) ? val.join(',') : val.trim()
                 if (typeof defaultVal !== 'string') {
-                    console.log(`${this.name}, default value invalid, should be a string`)
+                    console.log(`invalid default value ${this.name}`)
                     return ''
                 }
-                
                 if (this.isEnvVar(defaultVal)) {
                     return defaultVal
                 }
