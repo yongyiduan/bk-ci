@@ -32,7 +32,6 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
-import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.RdsRepoFile
 import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
 import com.tencent.devops.rds.pojo.RdsRepoInfo
@@ -122,7 +121,10 @@ class GitRepoServiceImpl @Autowired constructor(
             }
         } catch (e: ClientException) {
             logger.warn("retry 5 times $log: ${e.message} ")
-            throw RdsErrorCodeException(ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR)
+            throw ErrorCodeException(
+                errorCode = ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR.errorCode,
+                defaultMessage = ApiErrorCodeEnum.DEVNET_TIMEOUT_ERROR.formatErrorMessage
+            )
         } catch (e: RemoteServiceException) {
             logger.warn("GIT_API_ERROR $log: ${e.message} ")
             throw ErrorCodeException(

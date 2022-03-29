@@ -30,6 +30,7 @@ package com.tencent.devops.rds.chart
 import com.devops.process.yaml.modelCreate.ModelCreate
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.ScriptBuildYaml
@@ -43,7 +44,6 @@ import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.chart.stream.TemplateExtraParams
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
-import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
@@ -71,7 +71,11 @@ class StreamConverter @Autowired constructor(
         pipelineFile: File
     ): StreamBuildResult {
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8).ifBlank {
-            throw RdsErrorCodeException(ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR, arrayOf(pipelineFile.name))
+            throw ErrorCodeException(
+                errorCode = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.errorCode,
+                defaultMessage = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.formatErrorMessage,
+                params = arrayOf(pipelineFile.name)
+            )
         }
 
         val (preYamlObject, yamlObject) = replaceTemplate(
@@ -122,7 +126,11 @@ class StreamConverter @Autowired constructor(
         with(param) {
             val path = File(Paths.get(extraParameters.cachePath, Constants.CHART_TEMPLATE_DIR, path).toUri())
             val content = FileUtils.readFileToString(path, StandardCharsets.UTF_8).ifBlank {
-                throw RdsErrorCodeException(ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR, arrayOf(path.name))
+                throw ErrorCodeException(
+                    errorCode = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.errorCode,
+                    defaultMessage = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.formatErrorMessage,
+                    params = arrayOf(path.name)
+                )
             }
             // 针对可能会与go template冲突的字段进行替换
             val newContent = replaceTemplatePlaceholder(content)

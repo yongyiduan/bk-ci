@@ -27,6 +27,7 @@
 
 package com.tencent.devops.rds.chart
 
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.enums.ChannelCode
@@ -34,7 +35,6 @@ import com.tencent.devops.process.api.service.ServicePipelineResource
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
-import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import org.jooq.DSLContext
@@ -69,11 +69,19 @@ class ChartPipeline @Autowired constructor(
                 channelCode = ChannelCode.BS
             ).data ?: run {
                 logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model")
-                throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
+                throw ErrorCodeException(
+                    errorCode = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.errorCode,
+                    defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage,
+                    params = arrayOf(pipeline.filePath)
+                )
             }
         } catch (t: Throwable) {
             logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
-            throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
+            throw ErrorCodeException(
+                errorCode = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.errorCode,
+                defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage,
+                params = arrayOf(pipeline.filePath)
+            )
         }
 
         // 根据返回结果保存
@@ -111,7 +119,11 @@ class ChartPipeline @Autowired constructor(
             }
         } catch (t: Throwable) {
             logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=$model", t)
-            throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR, arrayOf(pipeline.filePath))
+            throw ErrorCodeException(
+                errorCode = ChartErrorCodeEnum.UPDATE_CHART_PIPELINE_ERROR.errorCode,
+                defaultMessage = ChartErrorCodeEnum.UPDATE_CHART_PIPELINE_ERROR.formatErrorMessage,
+                params = arrayOf(pipeline.filePath)
+            )
         }
 
         // 根据返回结果保存

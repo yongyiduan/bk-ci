@@ -27,17 +27,17 @@
 
 package com.tencent.devops.rds.service
 
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.eventbus.api.ServiceEventRegisterResource
-import com.tencent.devops.eventbus.pojo.PipelineAction
-import com.tencent.devops.eventbus.pojo.TriggerOn
-import com.tencent.devops.eventbus.pojo.TriggerRegisterRequest
-import com.tencent.devops.eventbus.pojo.TriggerResource
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
-import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.yaml.Main
 import com.tencent.devops.rds.pojo.yaml.Resource
+import com.tencent.devops.trigger.api.ServiceEventRegisterResource
+import com.tencent.devops.trigger.pojo.PipelineAction
+import com.tencent.devops.trigger.pojo.TriggerOn
+import com.tencent.devops.trigger.pojo.TriggerRegisterRequest
+import com.tencent.devops.trigger.pojo.TriggerResource
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -107,11 +107,17 @@ class EventBusService @Autowired constructor(
                 )
             ).data ?: run {
                 logger.warn("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns|triggerResources=$triggerResources")
-                throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR)
+                throw ErrorCodeException(
+                    errorCode = ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR.errorCode,
+                    defaultMessage = ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR.formatErrorMessage
+                )
             }
         } catch (t: Throwable) {
             logger.error("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns|triggerResources=$triggerResources", t)
-            throw RdsErrorCodeException(ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR)
+            throw ErrorCodeException(
+                errorCode = ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR.errorCode,
+                defaultMessage = ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR.formatErrorMessage
+            )
         }
     }
 }

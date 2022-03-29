@@ -52,5 +52,10 @@ enum class ChartErrorCodeEnum(
         errorType = ErrorType.SYSTEM,
         errorCode = "2130033",
         formatErrorMessage = "创建事件总线规则失败"
+    ),
+    UPDATE_CHART_PIPELINE_ERROR(
+        errorType = ErrorType.SYSTEM,
+        errorCode = "2130032",
+        formatErrorMessage = "更新流水线  %s 失败"
     )
 }

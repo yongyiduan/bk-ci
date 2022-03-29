@@ -27,6 +27,7 @@
 
 package com.tencent.devops.rds.service
 
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.chart.ChartParser
@@ -34,13 +35,11 @@ import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
-import com.tencent.devops.rds.exception.RdsErrorCodeException
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import java.io.InputStream
-import kotlin.math.log
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,7 +61,11 @@ class ProductInitService @Autowired constructor(
     fun createProduct(productId: Long, userId: String, rdsProjectName: String?) {
         val origin = productInfoDao.getProduct(dslContext, productId)
         if (origin != null) {
-            throw RdsErrorCodeException(CommonErrorCodeEnum.PARAMS_FORMAT_ERROR, arrayOf(productId.toString()))
+            throw ErrorCodeException(
+                errorCode = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.errorCode,
+                defaultMessage = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.formatErrorMessage,
+                params = arrayOf(productId.toString())
+            )
         }
         // TODO 创建什么样的蓝盾项目待定
 //        val projectResult =
