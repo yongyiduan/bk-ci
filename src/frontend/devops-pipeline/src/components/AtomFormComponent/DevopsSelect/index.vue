@@ -3,6 +3,7 @@
         <input
             ref="inputArea"
             class="bk-form-input"
+            type="text"
             v-bind="restProps"
             v-model="displayName"
             :disabled="disabled || loading"
@@ -15,7 +16,7 @@
             @keydown.down.prevent="handleKeydown"
             @keydown.tab.prevent="handleBlur" />
         <i v-if="loading" class="bk-icon icon-circle-2-1 option-fetching-icon spin-icon" />
-        <i v-else-if="!disabled && value" class="bk-icon icon-close-circle-shape option-fetching-icon" @click.stop="clearValue()" />
+        <i v-else-if="!disabled && value" class="bk-icon icon-close-circle-shape option-fetching-icon" @click.stop="clearValue" />
         <div class="dropbox-container" v-show="hasOption && optionListVisible && !loading" ref="dropMenu">
             <ul>
                 <template v-if="hasGroup">
@@ -114,8 +115,16 @@
             },
             options (newOptions) {
                 this.optionList = newOptions
-                this.isFocused && !this.disabled && this.$nextTick(() => {
-                    this.$refs.inputArea.focus()
+                this.$nextTick(() => {
+                    if (this.isFocused && !this.disabled) {
+                        this.$refs.inputArea.focus()
+                    }
+                        
+                    if (this.isMultiple) {
+                        this.getMultipleDisplayName(this.value)
+                    } else {
+                        this.displayName = this.getDisplayName(this.value)
+                    }
                 })
             },
             isLoading (isLoading) {
@@ -214,15 +223,17 @@
                 }
             },
 
-            clearValue (isFocus = true) {
+            clearValue (focus = true) {
                 this.displayName = ''
                 if (this.isMultiple) {
                     this.selectedMap = {}
                 } else {
                     this.handleChange(this.name, '')
                 }
-
-                isFocus && this.$refs.inputArea.focus()
+                
+                if (focus) {
+                    this.$refs.inputArea.focus()
+                }
             },
 
             isEnvVar (str) {
@@ -313,7 +324,7 @@
                     }
                 })
                 this.selectedMap = resultMap
-                if (invalidVal.length > 0) {
+                if (!this.loading && invalidVal.length > 0) {
                     this.showValValidTips(invalidVal.join(','))
                 }
             },
@@ -335,7 +346,7 @@
                         return option.name
                     }
                 }
-                val && this.showValValidTips(val)
+                val && !this.loading && this.showValValidTips(val)
                 return ''
             },
             showValValidTips (val) {
