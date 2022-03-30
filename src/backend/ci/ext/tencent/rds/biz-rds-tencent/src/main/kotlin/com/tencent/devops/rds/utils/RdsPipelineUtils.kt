@@ -37,9 +37,9 @@ object RdsPipelineUtils {
         serviceName: String?
     ): String {
         return if (serviceName.isNullOrBlank()) {
-            "【RDS】$projectName-$serviceName-$fileName"
-        } else {
             "【RDS】$projectName-$fileName"
+        } else {
+            "【RDS】$projectName-$serviceName-$fileName"
         }
     }
 }
