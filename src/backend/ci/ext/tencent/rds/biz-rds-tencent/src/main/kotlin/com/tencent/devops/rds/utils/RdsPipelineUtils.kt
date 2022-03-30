@@ -34,6 +34,12 @@ object RdsPipelineUtils {
     fun genBKPipelineName(
         fileName: String,
         projectName: String,
-        serviceName: String
-    ) = "【RDS】$projectName-$serviceName-$fileName"
+        serviceName: String?
+    ): String {
+        return if (serviceName.isNullOrBlank()) {
+            "【RDS】$projectName-$serviceName-$fileName"
+        } else {
+            "【RDS】$projectName-$fileName"
+        }
+    }
 }

@@ -193,7 +193,9 @@ class ProductInitService @Autowired constructor(
                     serviceName = serviceName,
                     originYaml = stream.originYaml,
                     parsedYaml = stream.parsedYaml,
-                    model = stream.pipelineModel
+                    model = stream.pipelineModel.copy(name = RdsPipelineUtils.genBKPipelineName(
+                        filePath, projectName, serviceName
+                    ))
                 )
             )
         } else {
@@ -210,7 +212,9 @@ class ProductInitService @Autowired constructor(
                     serviceName = serviceName,
                     originYaml = stream.originYaml,
                     parsedYaml = stream.parsedYaml,
-                    model = stream.pipelineModel
+                    model = stream.pipelineModel.copy(name = RdsPipelineUtils.genBKPipelineName(
+                        filePath, projectName, serviceName
+                    ))
                 )
             )
         }
