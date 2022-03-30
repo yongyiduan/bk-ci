@@ -31,7 +31,7 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
-import com.tencent.devops.rds.exception.ApiErrorCodeEnum
+import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.service.ProductInitService
 import java.io.InputStream
@@ -58,7 +58,7 @@ class UserRdsInitResourceImpl @Autowired constructor(
     ): Result<Boolean> {
         // 校验文件 TODO: 增加接收到的文件大小的校验
         val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
-        if (!fileName.endsWith(".zip")) {
+        if (!fileName.endsWith(Constants.CHART_PACKAGE_FORMAT)) {
             throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.errorCode,
                 defaultMessage = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.formatErrorMessage,

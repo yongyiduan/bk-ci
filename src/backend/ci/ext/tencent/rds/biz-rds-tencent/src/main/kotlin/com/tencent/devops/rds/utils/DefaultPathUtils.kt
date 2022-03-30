@@ -58,8 +58,7 @@ object DefaultPathUtils {
     }
 
     fun randomFile(fileExtension: String = DEFAULT_EXTENSION): File {
-        val suffix = if (fileExtension.isBlank()) "" else ".$fileExtension"
-        return Files.createTempFile(UUIDUtil.generate(), suffix).toFile()
+        return Files.createTempFile(UUIDUtil.generate(), fileExtension).toFile()
     }
 
     fun randomFileName(fileExtension: String = DEFAULT_EXTENSION): String {

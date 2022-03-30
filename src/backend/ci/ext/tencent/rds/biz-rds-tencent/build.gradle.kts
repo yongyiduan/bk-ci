@@ -43,5 +43,7 @@ dependencies {
     api(project(":ext:tencent:scm:api-scm"))
     api(project(":ext:tencent:process:api-process-tencent"))
 
+    api("org.apache.commons:commons-compress")
+
     testImplementation(project(":core:common:common-test"))
 }

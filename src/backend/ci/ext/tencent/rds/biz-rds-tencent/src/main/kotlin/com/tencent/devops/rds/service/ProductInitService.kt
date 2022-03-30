@@ -172,7 +172,6 @@ class ProductInitService @Autowired constructor(
                         )
                     )
                 }
-
             }
             eventBusService.addWebhook(
                 userId = userId,

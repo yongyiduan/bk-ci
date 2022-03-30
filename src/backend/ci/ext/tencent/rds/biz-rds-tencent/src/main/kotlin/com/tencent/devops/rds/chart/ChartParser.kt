@@ -29,12 +29,13 @@
 
 package com.tencent.devops.rds.chart
 
-import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.constants.Constants.CHART_MAIN_YAML_FILE
+import com.tencent.devops.rds.constants.Constants.CHART_PACKAGE_FORMAT
 import com.tencent.devops.rds.constants.Constants.CHART_RESOURCE_YAML_FILE
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
+import com.tencent.devops.rds.utils.TarUtils
 import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
@@ -61,17 +62,17 @@ class ChartParser @Autowired constructor() {
         inputStream: InputStream
     ): String {
         // 创建临时文件
-        val file = DefaultPathUtils.randomFile("zip")
+        val file = DefaultPathUtils.randomFile(CHART_PACKAGE_FORMAT)
         file.outputStream().use { inputStream.copyTo(it) }
 
         // 将文件写入磁盘
         val cacheDir = "$rdsVolumeDataPath${File.separator}$chartName${System.currentTimeMillis()}"
-        val zipFilePath = "$cacheDir${File.separator}$chartName.zip"
-        uploadFileToRepo(zipFilePath, file)
+        val tgzFilePath = "$cacheDir${File.separator}$chartName$CHART_PACKAGE_FORMAT"
+        uploadFileToRepo(tgzFilePath, file)
 
         // 解压文件
-        val destDir = "$cacheDir${File.separator}chart"
-        ZipUtil.unZipFile(File(zipFilePath), destDir, false)
+        val destDir = "$cacheDir${File.separator}$chartName"
+        TarUtils.unTarGZ(tgzFilePath, cacheDir)
 
         return destDir
     }
