@@ -111,7 +111,7 @@ class EventBusService @Autowired constructor(
             // 使用文件名+项目+服务匹配
             main.on.forEach nextTrigger@{ on ->
                 if (on.action.path == pipeline.filePath) triggerOns.add(TriggerOn(
-                    id = "${on.id}_${pipeline.projectName}_${pipeline.serviceName}",
+                    id = on.id,
                     filter = on.filter,
                     action = PipelineAction(
                         type = on.action.type,

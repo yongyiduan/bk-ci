@@ -147,7 +147,6 @@ class ProductInitService @Autowired constructor(
                     project.services?.forEach nextService@{ service ->
                         saveChartPipeline(userId, productId, path, project.id, service.id, stream)
                     } ?: run {
-                        val map = project.getProjectResource()
                         saveChartPipeline(userId, productId, path, project.id, null, stream)
                     }
                 }
