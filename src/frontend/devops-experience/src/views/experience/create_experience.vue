@@ -90,7 +90,7 @@
                         </bk-form-item>
                         <bk-form-item label="体验范围" label-width="190" :required="true">
                             <bk-radio-group v-model="experienceRange">
-                                <bk-radio value="public">公开体验</bk-radio>
+                                <bk-radio value="public" class="mr20">公开体验</bk-radio>
                                 <bk-radio value="internals">内部体验组</bk-radio>
                             </bk-radio-group>
                         </bk-form-item>
@@ -348,17 +348,6 @@
             },
             projectId (val) {
                 this.toExperienceList()
-            },
-            experienceRange: {
-                handler (val) {
-                    if (val === 'public') {
-                        // kygplomw---公开体验id
-                        this.createReleaseForm.experienceGroups = ['kygplomw']
-                    } else {
-                        this.createReleaseForm.experienceGroups = []
-                    }
-                },
-                immediate: true
             }
             
         },
@@ -386,7 +375,7 @@
                     const res = await this.$store.dispatch('experience/requestGroupList', {
                         projectId: this.projectId,
                         params: {
-                            returnPublic: true
+                            returnPublic: false
                         }
                     })
                     this.experienceGroup.splice(0, this.experienceGroup.length)
@@ -472,7 +461,8 @@
                     this.createReleaseForm.enableWechatGroups = res.enableWechatGroups
                     this.createReleaseForm.experienceGroups = res.experienceGroups
                     // 体验组如果为kygplomw,选中公开体验
-                    this.experienceRange = this.createReleaseForm.experienceGroups.includes('kygplomw') ? 'public' : 'internals'
+                    const publicGroup = this.createReleaseForm.experienceGroups.find(item => item.groupHashId === 'kygplomw')
+                    this.experienceRange = publicGroup ? 'public' : 'internals'
                     if (res.enableWechatGroups) {
                         this.createReleaseForm.wechatGroups = res.wechatGroups
                     }
@@ -709,6 +699,9 @@
                 localStorage.setItem('groupIdStr', this.groupIdStorage.sort().join(';'))
             },
             async submitFn () {
+                if (this.experienceRange === 'public') {
+                    this.createReleaseForm.experienceGroups = ['kygplomw']
+                }
                 let message
                 const theme = 'error'
                 if (!this.createReleaseForm.desc || !this.createReleaseForm.name || !this.createReleaseForm.end_date || !this.createReleaseForm.versionTitle || !this.createReleaseForm.categoryId || !this.createReleaseForm.productOwner.length || !this.createReleaseForm.experienceGroups.length) {
