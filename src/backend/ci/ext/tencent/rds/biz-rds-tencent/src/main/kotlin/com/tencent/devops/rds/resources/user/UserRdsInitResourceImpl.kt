@@ -31,7 +31,6 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
-import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.service.ProductInitService
 import java.io.InputStream
@@ -66,6 +65,6 @@ class UserRdsInitResourceImpl @Autowired constructor(
             )
         }
 
-        return Result(productInitService.init(userId, chartName, inputStream))
+        return Result(productInitService.initChart(userId, chartName, inputStream))
     }
 }

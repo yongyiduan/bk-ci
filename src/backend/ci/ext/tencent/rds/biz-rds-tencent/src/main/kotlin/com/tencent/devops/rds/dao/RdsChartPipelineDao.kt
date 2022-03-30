@@ -38,7 +38,7 @@ import org.springframework.stereotype.Repository
 @Repository
 class RdsChartPipelineDao {
 
-    fun create(
+    fun createPipeline(
         dslContext: DSLContext,
         pipeline: RdsChartPipelineInfo
     ): Int {
@@ -48,6 +48,8 @@ class RdsChartPipelineDao {
                 PIPELINE_ID,
                 PRODUCT_ID,
                 FILE_PATH,
+                PROJECT_NAME,
+                SERVICE_NAME,
                 ORIGIN_YAML,
                 PARSED_YAML,
                 CREATE_TIME,
@@ -56,6 +58,8 @@ class RdsChartPipelineDao {
                 pipeline.pipelineId,
                 pipeline.productId,
                 pipeline.filePath,
+                pipeline.projectName,
+                pipeline.serviceName,
                 pipeline.originYaml,
                 pipeline.parsedYaml,
                 LocalDateTime.now(),
@@ -73,6 +77,8 @@ class RdsChartPipelineDao {
                 .set(ORIGIN_YAML, pipeline.originYaml)
                 .set(PARSED_YAML, pipeline.parsedYaml)
                 .set(FILE_PATH, pipeline.filePath)
+                .set(PROJECT_NAME, pipeline.projectName)
+                .set(SERVICE_NAME, pipeline.serviceName)
                 .set(UPDATE_TIME, LocalDateTime.now())
                 .where(PIPELINE_ID.eq(pipeline.pipelineId))
                 .execute()
@@ -88,10 +94,41 @@ class RdsChartPipelineDao {
                         pipelineId = it.pipelineId,
                         productId = it.productId,
                         filePath = it.filePath,
+                        projectName = it.projectName,
+                        serviceName = it.serviceName,
                         originYaml = it.originYaml,
                         parsedYaml = it.parsedYaml
                     )
                 }
+        }
+    }
+
+    fun getProductPipelineByService(
+        dslContext: DSLContext,
+        productId: Long,
+        filePath: String,
+        projectName: String,
+        serviceName: String?
+    ): RdsChartPipelineInfo? {
+        with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
+            val select = dslContext.selectFrom(this)
+                .where(
+                    PRODUCT_ID.eq(productId)
+                        .and(PROJECT_NAME.eq(projectName))
+                        .and(FILE_PATH.eq(filePath))
+                )
+            serviceName?.let { select.and(SERVICE_NAME.eq(it)) }
+            return select.fetchAny()?.let {
+                RdsChartPipelineInfo(
+                    pipelineId = it.pipelineId,
+                    productId = it.productId,
+                    filePath = it.filePath,
+                    projectName = it.projectName,
+                    serviceName = it.serviceName,
+                    originYaml = it.originYaml,
+                    parsedYaml = it.parsedYaml
+                )
+            }
         }
     }
 }

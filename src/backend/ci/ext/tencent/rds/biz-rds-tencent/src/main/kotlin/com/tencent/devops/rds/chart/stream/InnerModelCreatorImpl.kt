@@ -29,8 +29,6 @@ package com.tencent.devops.rds.chart.stream
 
 import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
-import com.tencent.devops.common.api.util.EnvUtils
-import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.ci.image.BuildType
 import com.tencent.devops.common.ci.image.Credential
 import com.tencent.devops.common.ci.image.Pool
@@ -48,7 +46,6 @@ import com.tencent.devops.common.pipeline.type.devcloud.PublicDevCloudDispathcTy
 import com.tencent.devops.common.pipeline.type.docker.ImageType
 import com.tencent.devops.common.pipeline.type.macos.MacOSDispatchType
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
-import com.tencent.devops.process.util.StreamDispatchUtils
 import com.tencent.devops.rds.chart.ChartPipelineStartParams
 import com.tencent.devops.rds.constants.Constants
 import org.springframework.beans.factory.annotation.Autowired
@@ -56,8 +53,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-class InnerModelCreatorImpl @Autowired constructor(
-) : InnerModelCreator {
+class InnerModelCreatorImpl @Autowired constructor() : InnerModelCreator {
 
     @Value("\${stream.marketRun.enable:#{false}}")
     private val marketRunTaskData: Boolean = false

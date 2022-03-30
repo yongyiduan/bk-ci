@@ -52,50 +52,15 @@ class EventBusService @Autowired constructor(
 
     private val logger = LoggerFactory.getLogger(EventBusService::class.java)
 
-    fun addWebhook(
+    fun addEventBusWebhook(
         userId: String,
         productId: Long,
         projectId: String,
         main: Main,
         resource: Resource
     ): Boolean {
-        // 取出已经注册成功的流水线
-        val triggerOns = mutableListOf<TriggerOn>()
-        val triggerResources = mutableListOf<TriggerResource>()
-        val pathAndOn = main.on.map {
-            Pair(it.action.path, it)
-        }.toList()
-        val pipelines = chartPipelineDao.getChartPipelines(dslContext, productId)
-        pipelines.forEach nextPipeline@{ pipeline ->
-            // 使用文件名匹配
-            pathAndOn.forEach nextTrigger@{ (path, on) ->
-                if (path != pipeline.filePath) return@nextTrigger
-                triggerOns.add(TriggerOn(
-                    id = on.id,
-                    filter = on.filter,
-                    action = PipelineAction(
-                        type = on.action.type,
-                        pipelineId = pipeline.pipelineId,
-                        variables = on.action.with
-                    )
-                ))
-            }
-        }
-        resource.projects.forEach { project ->
-            val map = mutableMapOf<String, MutableList<String>>()
-            project.tapdId?.let { map["tapd_id"] = mutableListOf(it) }
-            project.bcsId?.let { map["bcs_id"] = mutableListOf(it) }
-            project.repoUrl?.let { map["repo_url"] = mutableListOf(it) }
-            project.services?.forEach { service ->
-                map["repo_url"]?.add(service.repoUrl) ?: run {
-                    map["repo_url"] = mutableListOf(service.repoUrl)
-                }
-            }
-            triggerResources.add(TriggerResource(
-                id = project.id,
-                resources = map
-            ))
-        }
+        val triggerOns = generateTriggerOn(productId, main)
+        val triggerResources = generateTriggerResource(resource)
         logger.info("RDS|EVENT_BUS_REGISTER|triggerOns=$triggerOns|triggerResources=$triggerResources")
         return try {
             client.get(ServiceEventRegisterResource::class).register(
@@ -119,5 +84,43 @@ class EventBusService @Autowired constructor(
                 defaultMessage = ChartErrorCodeEnum.CREATE_CHART_EVENT_BUS_ERROR.formatErrorMessage
             )
         }
+    }
+
+    private fun generateTriggerResource(
+        resource: Resource
+    ): List<TriggerResource> {
+        val triggerResources = mutableListOf<TriggerResource>()
+        resource.projects.forEach { project ->
+            val map = project.getProjectResource()
+            triggerResources.add(TriggerResource(
+                id = project.id,
+                resources = map
+            ))
+        }
+        return triggerResources
+    }
+
+    private fun generateTriggerOn(
+        productId: Long,
+        main: Main
+    ): List<TriggerOn> {
+        // 取出已经注册成功的流水线
+        val pipelines = chartPipelineDao.getChartPipelines(dslContext, productId)
+        val triggerOns = mutableListOf<TriggerOn>()
+        pipelines.forEach nextPipeline@{ pipeline ->
+            // 使用文件名+项目+服务匹配
+            main.on.forEach nextTrigger@{ on ->
+                if (on.action.path == pipeline.filePath) triggerOns.add(TriggerOn(
+                    id = "${on.id}_${pipeline.projectName}_${pipeline.serviceName}",
+                    filter = on.filter,
+                    action = PipelineAction(
+                        type = on.action.type,
+                        pipelineId = pipeline.pipelineId,
+                        variables = on.action.with
+                    )
+                ))
+            }
+        }
+        return triggerOns
     }
 }

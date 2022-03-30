@@ -60,7 +60,7 @@ object ChartPipelineStartParams {
                 containerType = null,
                 scmType = null,
                 repoHashId = null,
-                relativePath = null,
+                relativePath = null
             )
         }
     }
