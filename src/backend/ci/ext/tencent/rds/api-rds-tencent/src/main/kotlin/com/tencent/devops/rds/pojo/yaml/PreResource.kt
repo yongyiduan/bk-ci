@@ -59,10 +59,10 @@ data class PreResource(
         val serviceList = mutableListOf<Service>()
         services.forEach { serviceMap ->
             serviceMap.map { (k, v) ->
-                Service(
+                serviceList.add(Service(
                     id = k.toString(),
                     repoUrl = v.repoUrl.toString()
-                )
+                ))
             }
         }
         return serviceList
