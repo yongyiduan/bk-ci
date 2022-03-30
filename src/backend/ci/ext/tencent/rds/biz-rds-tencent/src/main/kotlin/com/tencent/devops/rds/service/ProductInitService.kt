@@ -185,7 +185,7 @@ class ProductInitService @Autowired constructor(
             chartPipeline.createChartPipeline(
                 userId = userId,
                 productId = productId,
-                projectId = projectName,
+                projectId = RdsPipelineUtils.genBKProjectCode(productId),
                 pipeline = RdsPipelineCreate(
                     productId = productId,
                     filePath = filePath,
@@ -201,7 +201,7 @@ class ProductInitService @Autowired constructor(
             chartPipeline.updateChartPipeline(
                 userId = userId,
                 productId = productId,
-                projectId = projectName,
+                projectId = RdsPipelineUtils.genBKProjectCode(productId),
                 pipelineId = existsPipeline.pipelineId,
                 pipeline = RdsPipelineCreate(
                     productId = productId,
