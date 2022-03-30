@@ -63,8 +63,16 @@
                 <bk-input v-else @change="changeThirdImage" :value="buildResource" :disabled="!editable" class="bk-image" :placeholder="$t('editPage.thirdImageHolder')" v-validate.initial="'required'" name="buildResource"></bk-input>
             </form-field>
 
-            <form-field :label="$t('editPage.assignResource')" v-if="buildResourceType !== 'MACOS' && !isPublicResourceType && containerModalId && !['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)" :required="true" :is-error="errors.has('buildResource')" :error-msg="errors.first('buildResource')" :desc="buildResourceType === 'THIRD_PARTY_AGENT_ENV' ? this.$t('editPage.thirdSlaveTips') : ''">
-                <container-env-node :disabled="!editable"
+            <form-field
+                :label="$t('editPage.assignResource')"
+                v-if="buildResourceType !== 'MACOS' && !isPublicResourceType && containerModalId && !['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)"
+                :is-error="errors.has('buildResource')"
+                :error-msg="errors.first('buildResource')"
+                :desc="buildResourceType === 'THIRD_PARTY_AGENT_ENV' ? this.$t('editPage.thirdSlaveTips') : ''"
+            >
+                <container-env-node
+                    :required="true"
+                    :disabled="!editable"
                     :os="container.baseOS"
                     :container-id="containerModalId"
                     :build-resource-type="buildResourceType"
@@ -74,6 +82,7 @@
                     :handle-change="changeBuildResource"
                     :add-thrid-slave="addThridSlave"
                     :value="buildResource"
+                    :env-project-id="buildResourceProj"
                     :has-error="errors.has('buildResource')"
                     v-validate.initial="'required'"
                     name="buildResource"
@@ -385,6 +394,9 @@
             buildResource () {
                 return this.container.dispatchType.value
             },
+            buildResourceProj () {
+                return this.container.dispatchType.envProjectId
+            },
             buildImageType () {
                 return this.container.dispatchType.imageType
             },
@@ -641,8 +653,12 @@
                 this.handleContainerChange('isError', isError)
             },
 
-            changeBuildResource (name, value) {
-                const emptyValueObj = (name === 'imageType' || name === 'agentType') ? { value: '' } : {}
+            changeBuildResource (name, value, envProjectId) {
+                console.log(name, value, envProjectId)
+                const emptyValueObj = (name === 'imageType' || name === 'agentType') ? { value: '', envProjectId: '' } : {}
+                if (name === 'value' && envProjectId) {
+                    emptyValueObj.envProjectId = envProjectId
+                }
                 this.handleContainerChange('dispatchType', Object.assign({
                     ...this.container.dispatchType,
                     [name]: value
