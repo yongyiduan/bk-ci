@@ -457,14 +457,12 @@
             deleteService (row) {
                 const confirmFn = () => {
                     this.isLoading = true
-                    this.$store.dispatch('store/requestDelService', {
-                        projectCode: row.projectName,
-                        serviceCode: row.serviceCod
-                    }).then((res) => {
-                        this.requestList()
-                    }).catch((err) => {
-                        this.$bkMessage({ message: err.message || err, theme: 'error' })
-                    }).finally(() => (this.isLoading = false))
+                    this.$store.dispatch('store/requestDelService', row.serviceCode)
+                        .then((res) => {
+                            this.requestList()
+                        }).catch((err) => {
+                            this.$bkMessage({ message: err.message || err, theme: 'error' })
+                        }).finally(() => (this.isLoading = false))
                 }
                 this.$bkInfo({
                     title: this.$t('store.确认要删除？'),
