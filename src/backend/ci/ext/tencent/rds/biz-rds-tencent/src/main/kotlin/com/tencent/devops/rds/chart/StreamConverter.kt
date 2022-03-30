@@ -44,7 +44,6 @@ import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.chart.stream.TemplateExtraParams
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
-import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.utils.Yaml
 import java.io.File
 import java.nio.charset.StandardCharsets
@@ -85,7 +84,7 @@ class StreamConverter @Autowired constructor(
         )
 
         val model = modelCreate.createPipelineModel(
-            modelName = RdsPipelineUtils.genBKPipelineName(pipelineFile.name),
+            modelName = "",
             event = ModelCreateEvent(
                 userId,
                 projectCode = projectId

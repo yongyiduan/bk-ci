@@ -29,10 +29,10 @@ package com.tencent.devops.rds.service
 
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.YamlUtil
-import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
+import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
@@ -47,7 +47,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class ProductInitService @Autowired constructor(
-    private val client: Client,
     private val dslContext: DSLContext,
     private val chartParser: ChartParser,
     private val streamConverter: StreamConverter,
@@ -81,7 +80,7 @@ class ProductInitService @Autowired constructor(
         productInfoDao.createProduct(dslContext, projectId, userId)
     }
 
-    fun init(
+    fun initChart(
         userId: String,
         chartName: String,
         inputStream: InputStream
@@ -120,60 +119,39 @@ class ProductInitService @Autowired constructor(
                 resource = resourceObject
             )
 
-            val pipelineMap = chartPipeline.getProductPipelines(productId).map {
-                it.filePath to it
-            }.toMap()
-
-            // TODO: 提前创建流水线去生成质量红线
-            val pipelineFiles = chartParser.getCacheChartPipelineFiles(cachePath)
-            pipelineFiles.forEach { pipelineFile ->
-                // 通过stream模板替换生成流水线
-                val streamBuildResult = streamConverter.buildModel(
-                    userId = userId,
-                    productId = productId,
-                    projectId = projectId,
-                    cachePath = cachePath,
-                    pipelineFile = pipelineFile
-                )
-
-                logger.info("RDS|init|${pipelineFile.name}|model: ${streamBuildResult.pipelineModel}")
-                val existsPipeline = pipelineMap[pipelineFile.name]
-                if (existsPipeline == null) {
-                    // 创建并保存流水线
-                    chartPipeline.createChartPipeline(
+            // 每个流水线YAML文件与对应编排的映射
+            val filePipelineMap = mutableMapOf<String, StreamBuildResult>()
+            chartParser.getCacheChartPipelineFiles(cachePath).forEach { file ->
+                try {
+                    // 生成未指定名称的流水线模型
+                    val streamBuildResult = streamConverter.buildModel(
                         userId = userId,
                         productId = productId,
                         projectId = projectId,
-                        chartPipeline = Pair(
-                            RdsPipelineCreate(
-                                productId = productId,
-                                filePath = pipelineFile.name,
-                                originYaml = streamBuildResult.originYaml,
-                                parsedYaml = streamBuildResult.parsedYaml
-                            ),
-                            streamBuildResult.pipelineModel
-                        )
+                        cachePath = cachePath,
+                        pipelineFile = file
                     )
-                } else {
-                    // 更新已有流水线
-                    chartPipeline.updateChartPipeline(
-                        userId = userId,
-                        productId = productId,
-                        projectId = projectId,
-                        pipelineId = existsPipeline.pipelineId,
-                        chartPipeline = Pair(
-                            RdsPipelineCreate(
-                                productId = productId,
-                                filePath = pipelineFile.name,
-                                originYaml = streamBuildResult.originYaml,
-                                parsedYaml = streamBuildResult.parsedYaml
-                            ),
-                            streamBuildResult.pipelineModel
-                        )
-                    )
+                    logger.info("RDS|init|${file.name}|generate model: ${streamBuildResult.pipelineModel}")
+                    filePipelineMap[file.name] = streamBuildResult
+                } catch (ignore: Throwable) {
+                    logger.warn("RDS|init|${file.name}|generate model with error:", ignore)
                 }
             }
-            eventBusService.addWebhook(
+
+            // 对每一个project下的每一个service分别创建对应流水线
+            filePipelineMap.forEach nextPipeline@{ (path, stream) ->
+                resourceObject.projects.forEach nextProject@{ project ->
+                    // 对于没有细分service的直接按project创建
+                    project.services?.forEach nextService@{ service ->
+                        saveChartPipeline(userId, productId, path, project.id, service.id, stream)
+                    } ?: run {
+                        val map = project.getProjectResource()
+                        saveChartPipeline(userId, productId, path, project.id, null, stream)
+                    }
+                }
+            }
+
+            eventBusService.addEventBusWebhook(
                 userId = userId,
                 productId = productId,
                 projectId = projectId,
@@ -185,5 +163,56 @@ class ProductInitService @Autowired constructor(
             return false
         }
         return true
+    }
+
+    private fun saveChartPipeline(
+        userId: String,
+        productId: Long,
+        filePath: String,
+        projectName: String,
+        serviceName: String?,
+        stream: StreamBuildResult
+    ) {
+        val existsPipeline = chartPipeline.getProductPipelineByService(
+            productId = productId,
+            filePath = filePath,
+            projectName = projectName,
+            serviceName = serviceName
+        )
+        // TODO: 提前创建流水线去生成质量红线
+        if (existsPipeline == null) {
+            // 创建并保存流水线
+            chartPipeline.createChartPipeline(
+                userId = userId,
+                productId = productId,
+                projectId = projectName,
+                pipeline = RdsPipelineCreate(
+                    productId = productId,
+                    filePath = filePath,
+                    projectName = projectName,
+                    serviceName = serviceName,
+                    originYaml = stream.originYaml,
+                    parsedYaml = stream.parsedYaml,
+                    model = stream.pipelineModel
+                )
+            )
+        } else {
+            // 更新已有流水线
+            chartPipeline.updateChartPipeline(
+                userId = userId,
+                productId = productId,
+                projectId = projectName,
+                pipelineId = existsPipeline.pipelineId,
+                pipeline = RdsPipelineCreate(
+                    productId = productId,
+                    filePath = filePath,
+                    projectName = projectName,
+                    serviceName = serviceName,
+                    originYaml = stream.originYaml,
+                    parsedYaml = stream.parsedYaml,
+                    model = stream.pipelineModel
+                )
+            )
+        }
     }
 }

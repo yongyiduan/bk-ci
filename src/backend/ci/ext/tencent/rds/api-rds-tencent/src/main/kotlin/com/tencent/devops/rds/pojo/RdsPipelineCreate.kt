@@ -27,6 +27,7 @@
 
 package com.tencent.devops.rds.pojo
 
+import com.tencent.devops.common.pipeline.Model
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
@@ -36,8 +37,14 @@ data class RdsPipelineCreate(
     val productId: Long,
     @ApiModelProperty("所在Chart相对路径")
     val filePath: String,
+    @ApiModelProperty("所属项目名")
+    val projectName: String,
+    @ApiModelProperty("所属服务名")
+    val serviceName: String?,
     @ApiModelProperty("CLI解析后的YAML内容")
     val originYaml: String,
     @ApiModelProperty("模板解析后的YAML内容")
-    val parsedYaml: String
+    val parsedYaml: String,
+    @ApiModelProperty("通过stream转换的流水线编排")
+    val model: Model
 )

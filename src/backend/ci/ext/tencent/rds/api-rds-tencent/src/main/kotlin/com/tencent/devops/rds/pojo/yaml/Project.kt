@@ -38,4 +38,17 @@ data class Project(
     @JsonProperty("repo_url")
     val repoUrl: String?,
     val services: List<Service>?
-)
+) {
+    fun getProjectResource(): MutableMap<String, MutableList<String>> {
+        val map = mutableMapOf<String, MutableList<String>>()
+        tapdId?.let { map["tapd_id"] = mutableListOf(it) }
+        bcsId?.let { map["bcs_id"] = mutableListOf(it) }
+        repoUrl?.let { map["repo_url"] = mutableListOf(it) }
+        services?.forEach { service ->
+            map["repo_url"]?.add(service.repoUrl) ?: run {
+                map["repo_url"] = mutableListOf(service.repoUrl)
+            }
+        }
+        return map
+    }
+}

@@ -66,6 +66,6 @@ class UserRdsInitResourceImpl @Autowired constructor(
             )
         }
 
-        return Result(productInitService.init(userId, chartName, inputStream))
+        return Result(productInitService.initChart(userId, chartName, inputStream))
     }
 }

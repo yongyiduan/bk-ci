@@ -31,5 +31,9 @@ object RdsPipelineUtils {
 
     fun genBKProjectCode(productId: Long) = "rds-$productId"
 
-    fun genBKPipelineName(fileName: String) = "【RDS】$fileName"
+    fun genBKPipelineName(
+        fileName: String,
+        projectName: String,
+        serviceName: String
+    ) = "【RDS】$projectName-$serviceName-$fileName"
 }
