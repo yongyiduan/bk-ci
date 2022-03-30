@@ -30,7 +30,7 @@
 
 <script>
     import { mapState } from 'vuex'
-    import { modifyHtmlTitle, getBuildTitle } from '@/utils'
+    import { modifyHtmlTitle } from '@/utils'
     import { pipelines } from '@/http'
 
     export default {
@@ -84,8 +84,7 @@
                     this.buildNum = modelDetail.buildNum
                     this.latestBuildNum = modelDetail.latestBuildNum
                     this.yml = gitProjectPipeline.displayName
-                    const message = getBuildTitle(gitRequestEvent)
-                    this.setHtmlTitle(message)
+                    this.setHtmlTitle(gitRequestEvent.buildTitle)
                 }).catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 })

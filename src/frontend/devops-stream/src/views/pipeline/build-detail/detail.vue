@@ -4,7 +4,7 @@
             <i :class="[getIconClass(buildDetail.status), 'header-icon']"></i>
             <p class="detail-info">
                 <span class="info-title">
-                    <span class="build-title text-ellipsis" v-bk-overflow-tips>{{ getBuildTitle(buildDetail) }}</span>
+                    <span class="build-title text-ellipsis" v-bk-overflow-tips>{{ buildDetail.buildTitle }}</span>
                     <span class="title-item">
                         <icon
                             :name="buildTypeIcon"
@@ -53,10 +53,10 @@
                     </span>
                 </span>
                 <span class="info-data">
-                    <span :class="['info-item', 'text-ellipsis', { 'text-link': buildDetail.objectKind !== 'manual' }]" @click="goToCode(buildDetail)">
+                    <span :class="['info-item', 'text-ellipsis', { 'text-link': buildDetail.jumpUrl }]" @click="goToLink(buildDetail.jumpUrl)">
                         <icon name="commit" size="14" v-if="buildDetail.objectKind === 'schedule'"></icon>
                         <icon :name="buildTypeIcon" size="14" v-else></icon>
-                        {{ getBuildSource(buildDetail) }}
+                        {{ buildDetail.buildSource || '--' }}
                     </span>
                     <span class="info-item text-ellipsis"><icon name="date" size="14"></icon>{{ buildDetail.startTime | timeFilter }}</span>
                 </span>
@@ -76,7 +76,11 @@
 <script>
     import { mapState, mapActions } from 'vuex'
     import { pipelines } from '@/http'
-    import { preciseDiff, timeFormatter, getbuildTypeIcon, getBuildTitle, getBuildSource, goCommit, goMR, goTag, goIssue, goCodeReview, goNote } from '@/utils'
+    import {
+        preciseDiff,
+        timeFormatter,
+        getbuildTypeIcon
+    } from '@/utils'
     import stages from '@/components/stages'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import register from '@/utils/websocket-register'
@@ -137,9 +141,6 @@
 
         methods: {
             ...mapActions(['setModelDetail']),
-
-            getBuildTitle,
-            getBuildSource,
 
             initData () {
                 this.isLoading = true
@@ -224,33 +225,9 @@
                 return [getPipelineStatusClass(status), ...getPipelineStatusCircleIconCls(status)]
             },
 
-            goToCode (gitRequestEvent) {
-                switch (gitRequestEvent.operationKind) {
-                    case 'delete':
-                        break
-                    default:
-                        switch (gitRequestEvent.objectKind) {
-                            case 'push':
-                            case 'schedule':
-                                goCommit(this.projectInfo.web_url, gitRequestEvent.commitId)
-                                break
-                            case 'tag_push':
-                                goTag(this.projectInfo.web_url, gitRequestEvent.branch)
-                                break
-                            case 'merge_request':
-                                goMR(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
-                                break
-                            case 'issue':
-                                goIssue(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
-                                break
-                            case 'review':
-                                goCodeReview(this.projectInfo.web_url, gitRequestEvent.mergeRequestId)
-                                break
-                            case 'note':
-                                goNote(gitRequestEvent.noteUrl)
-                                break
-                        }
-                        break
+            goToLink (url) {
+                if (url) {
+                    window.open(url, '_blank')
                 }
             }
         }
