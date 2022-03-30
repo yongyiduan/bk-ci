@@ -51,10 +51,14 @@ enum class ApiErrorCodeEnum(
         errorCode = "2130004",
         formatErrorMessage = "获取工蜂仓库文件内容失败 %s"
     ),
-
     GET_PROJECT_INFO_ERROR(
         errorType = ErrorType.THIRD_PARTY,
         errorCode = "2130005",
         formatErrorMessage = "获取工蜂仓库信息失败 %s"
+    ),
+    UNKNOWN_ERROR(
+        errorType = ErrorType.SYSTEM,
+        errorCode = "2130006",
+        formatErrorMessage = "未知异常 %s"
     ),
 }

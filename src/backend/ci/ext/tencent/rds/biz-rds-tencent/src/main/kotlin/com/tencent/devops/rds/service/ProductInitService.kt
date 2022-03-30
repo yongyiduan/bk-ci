@@ -27,6 +27,7 @@
 
 package com.tencent.devops.rds.service
 
+import com.tencent.devops.common.api.constant.HTTP_500
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.rds.chart.ChartParser
@@ -34,6 +35,7 @@ import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.dao.RdsProductInfoDao
+import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
@@ -158,9 +160,15 @@ class ProductInitService @Autowired constructor(
                 main = mainObject,
                 resource = resourceObject
             )
+        } catch (e: ErrorCodeException) {
+            throw e
         } catch (t: Throwable) {
             logger.error("RDS|init error|userId=$userId|chartName=$chartName", t)
-            return false
+            throw ErrorCodeException(
+                statusCode = HTTP_500,
+                errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
+                params = arrayOf(t.message ?: "")
+            )
         }
         return true
     }
