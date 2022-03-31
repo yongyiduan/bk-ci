@@ -99,8 +99,8 @@ class YamlSchemaCheck @Autowired constructor(
     private fun checkYamlSchema(originYaml: String, templateType: TemplateType? = null, isCiFile: Boolean) {
         // 解析锚点
         val yamlJson = YamlUtil.getObjectMapper().readTree(YamlUtil.toYaml(yaml.load(originYaml))).replaceOn()
-        // v1 不走这里的校验逻辑
-        if (yamlJson.checkV1()) {
+        // v1 的ci文件不走这里的校验逻辑
+        if (isCiFile && yamlJson.checkV1()) {
             return
         }
         if (isCiFile) {
