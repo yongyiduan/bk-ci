@@ -329,7 +329,7 @@
                 }
             },
             getDisplayName (val) {
-                const defaultVal = Array.isArray(val) ? val.join(',') : val.trim()
+                const defaultVal = Array.isArray(val) ? val.join(',') : val
                 if (typeof defaultVal !== 'string') {
                     console.log(`invalid default value ${this.name}`)
                     return ''
@@ -351,7 +351,10 @@
                         return option.name
                     }
                 }
-                defaultVal && !this.loading && this.showValValidTips(defaultVal)
+                if (defaultVal && !this.loading) {
+                    this.showValValidTips(defaultVal)
+                    this.handleChange(this.name, '')
+                }
                 return ''
             },
             showValValidTips (val) {
