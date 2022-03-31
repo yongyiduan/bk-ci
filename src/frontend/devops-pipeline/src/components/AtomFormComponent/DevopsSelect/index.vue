@@ -258,7 +258,7 @@
                     } else if (this.isEnvVar(this.value)) {
                         this.displayName = this.value
                     } else {
-                        this.displayName = this.getDisplayName(this.value)
+                        this.displayName = this.getDisplayName(this.value || this.displayName)
                     }
                 }
             },
@@ -329,11 +329,7 @@
                 }
             },
             getDisplayName (val) {
-                const defaultVal = Array.isArray(val) ? val.join(',') : val.trim()
-                if (typeof defaultVal !== 'string') {
-                    console.log(`invalid default value ${this.name}`)
-                    return ''
-                }
+                const defaultVal = Array.isArray(val) ? val.join(',') : val
                 if (this.isEnvVar(defaultVal)) {
                     return defaultVal
                 }
@@ -386,13 +382,12 @@
                 } catch (e) {
                     console.error(e)
                 } finally {
-                    if (this.value.length) {
-                        if (this.isMultiple) {
-                            this.getMultipleDisplayName(this.value)
-                        } else {
-                            this.displayName = this.getDisplayName(this.value)
-                        }
+                    if (this.isMultiple) {
+                        this.getMultipleDisplayName(this.value)
+                    } else {
+                        this.displayName = this.getDisplayName(this.value)
                     }
+                    
                     this.loading = false
                 }
             },

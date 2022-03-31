@@ -28,42 +28,19 @@
 package com.tencent.devops.process.api
 
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.pipeline.enums.StartType
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.process.api.user.UserBuildParametersResource
-import com.tencent.devops.process.utils.PIPELINE_BUILD_ID
-import com.tencent.devops.process.utils.PIPELINE_BUILD_NUM
-import com.tencent.devops.process.utils.PIPELINE_ELEMENT_ID
-import com.tencent.devops.process.utils.PIPELINE_ID
-import com.tencent.devops.process.utils.PIPELINE_NAME
-import com.tencent.devops.process.utils.PIPELINE_START_TYPE
-import com.tencent.devops.process.utils.PIPELINE_START_USER_NAME
-import com.tencent.devops.process.utils.PIPELINE_VMSEQ_ID
-import com.tencent.devops.process.utils.PROJECT_NAME
+import com.tencent.devops.process.engine.service.PipelineBuildParamsService
 import com.tencent.devops.store.pojo.app.BuildEnvParameters
+import org.springframework.beans.factory.annotation.Autowired
 
 @Suppress("UNUSED")
 @RestResource
-class UserBuildParametersResourceImpl : UserBuildParametersResource {
-
-    private val result = Result(
-        data = listOf(
-            BuildEnvParameters(name = PIPELINE_START_USER_NAME, desc = "当前构建的启动人"),
-            BuildEnvParameters(
-                name = PIPELINE_START_TYPE,
-                desc = "当前构建的启动方式，从${StartType.values().joinToString("/") { it.name }}中取值"
-            ),
-            BuildEnvParameters(name = PIPELINE_BUILD_NUM, desc = "当前构建的唯一标示ID，从1开始自增"),
-            BuildEnvParameters(name = PROJECT_NAME, desc = "项目英文名"),
-            BuildEnvParameters(name = PIPELINE_ID, desc = "流水线ID"),
-            BuildEnvParameters(name = PIPELINE_NAME, desc = "流水线名称"),
-            BuildEnvParameters(name = PIPELINE_BUILD_ID, desc = "当前构建ID"),
-            BuildEnvParameters(name = PIPELINE_VMSEQ_ID, desc = "流水线JOB ID"),
-            BuildEnvParameters(name = PIPELINE_ELEMENT_ID, desc = "流水线Task ID")
-        )
-    )
+class UserBuildParametersResourceImpl @Autowired constructor(
+    private val pipelineBuildParamsService: PipelineBuildParamsService
+) : UserBuildParametersResource {
 
     override fun getCommonBuildParams(userId: String): Result<List<BuildEnvParameters>> {
-        return result
+        return Result(pipelineBuildParamsService.getCommonBuildParams())
     }
 }

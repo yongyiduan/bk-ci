@@ -25,6 +25,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package config
+package com.tencent.devops.process.api
 
-const AgentVersion = "v1.8.3"
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.process.api.service.ServiceBuildParametersResource
+import com.tencent.devops.process.engine.service.PipelineBuildParamsService
+import org.springframework.beans.factory.annotation.Autowired
+
+@RestResource
+class ServiceBuildParametersResourceImpl @Autowired constructor(
+    private val pipelineBuildParamsService: PipelineBuildParamsService
+
+) : ServiceBuildParametersResource {
+
+    override fun formatCustomBuildEnv(
+        buildId: String,
+        vmSeqId: String,
+        containerHashId: String,
+        executeCount: String,
+        customBuildEnv: Map<String, String>?
+    ): Result<Map<String, String>?> {
+        return Result(pipelineBuildParamsService
+            .formatCustomBuildEnv(buildId, vmSeqId, containerHashId, executeCount, customBuildEnv))
+    }
+}
