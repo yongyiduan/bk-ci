@@ -30,6 +30,9 @@ package com.tencent.devops.rds.service
 import com.tencent.devops.common.api.constant.HTTP_500
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.YamlUtil
+import com.tencent.devops.common.client.Client
+import com.tencent.devops.project.api.service.ServiceProjectResource
+import com.tencent.devops.project.pojo.ProjectCreateInfo
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
@@ -37,6 +40,7 @@ import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
+import com.tencent.devops.rds.pojo.ProductCreateInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
@@ -49,17 +53,20 @@ import org.springframework.stereotype.Service
 
 @Service
 class ProductInitService @Autowired constructor(
+    private val client: Client,
     private val dslContext: DSLContext,
     private val chartParser: ChartParser,
     private val streamConverter: StreamConverter,
     private val chartPipeline: ChartPipeline,
     private val productInfoDao: RdsProductInfoDao,
+    private val productUserService: ProductUserService,
     private val eventBusService: EventBusService
 ) {
 
     private val logger = LoggerFactory.getLogger(ProductInitService::class.java)
 
-    fun createProduct(productId: Long, userId: String, rdsProjectName: String?) {
+    fun createProduct(userId: String, productCreateInfo: ProductCreateInfo): Boolean {
+        val productId = productCreateInfo.productId
         val origin = productInfoDao.getProduct(dslContext, productId)
         if (origin != null) {
             throw ErrorCodeException(
@@ -68,18 +75,24 @@ class ProductInitService @Autowired constructor(
                 params = arrayOf(productId.toString())
             )
         }
-        // TODO 创建什么样的蓝盾项目待定
-//        val projectResult =
-//            client.get(ServiceTxProjectResource::class).createGitCIProject(
-//                gitProjectId = productId,
-//                userId = userId,
-//                gitProjectName = rdsProjectName
-//            )
-//        if (projectResult.isNotOk()) {
-//            throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
-//        }
         val projectId = RdsPipelineUtils.genBKProjectCode(productId)
-        productInfoDao.createProduct(dslContext, projectId, userId)
+        val projectResult =
+            client.get(ServiceProjectResource::class).create(
+                userId = userId,
+                projectCreateInfo = ProjectCreateInfo(
+                    projectName = productCreateInfo.productName,
+                    englishName = projectId,
+                    description = "RDS project with product id: $productId"
+                )
+            )
+        if (projectResult.isNotOk()) {
+            throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
+        }
+        productInfoDao.createProduct(dslContext, projectId, productCreateInfo)
+        productCreateInfo.members?.let {
+            productUserService.saveProductMembers(userId, productId, projectId, it)
+        }
+        return true
     }
 
     fun initChart(
@@ -109,10 +122,9 @@ class ProductInitService @Autowired constructor(
             val resourceObject = resourceYaml.getResourceObject()
             logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
             val productId = resourceObject.productId
-            // TODO: 待定项目ID以及渠道
             val projectId = RdsPipelineUtils.genBKProjectCode(productId)
 
-            productInfoDao.updateProduct(
+            productInfoDao.updateProductChart(
                 dslContext = dslContext,
                 productId = productId,
                 mainYaml = mainYamlStr,

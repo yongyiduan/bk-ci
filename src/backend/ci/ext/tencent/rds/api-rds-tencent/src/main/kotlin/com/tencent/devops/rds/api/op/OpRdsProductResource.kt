@@ -25,19 +25,37 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.rds.api.op
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
+import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID_DEFAULT_VALUE
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.rds.pojo.ProductCreateInfo
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import javax.ws.rs.Consumes
+import javax.ws.rs.HeaderParam
+import javax.ws.rs.POST
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
 
-@ApiModel("RDS项目的信息")
-data class RdsProductInfo(
-    @ApiModelProperty("RDS产品ID")
-    val productId: Long,
-    @ApiModelProperty("创建人")
-    val master: String,
-    @ApiModelProperty("开始时间", required = true)
-    val createTime: Long,
-    @ApiModelProperty("开始时间", required = true)
-    val updateTime: Long
-)
+@Api(tags = ["OP_RDS_PRODUCT"], description = "op-产品管理")
+@Path("/op/product")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface OpRdsProductResource {
+
+    @ApiOperation("初始化RDS产品")
+    @POST
+    @Path("/create")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    fun createProduct(
+        @ApiParam(value = "创建操作者", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("产品创建信息", required = true)
+        productCreateInfo: ProductCreateInfo
+    ): Result<Boolean>
+}

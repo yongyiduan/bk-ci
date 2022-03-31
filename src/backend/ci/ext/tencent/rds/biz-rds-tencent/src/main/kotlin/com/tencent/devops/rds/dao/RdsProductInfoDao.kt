@@ -32,6 +32,7 @@ package com.tencent.devops.rds.dao
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.model.rds.tables.TRdsProductInfo
+import com.tencent.devops.rds.pojo.ProductCreateInfo
 import com.tencent.devops.rds.pojo.RdsProductInfo
 import com.tencent.devops.rds.pojo.yaml.Main
 import com.tencent.devops.rds.pojo.yaml.Resource
@@ -46,22 +47,19 @@ class RdsProductInfoDao {
     fun createProduct(
         dslContext: DSLContext,
         projectId: String,
-        creator: String
+        productCreateInfo: ProductCreateInfo
     ): Int {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
-            return dslContext.insertInto(this,
-                CREATOR,
-                PROJECT_ID,
-                CREATE_TIME
-            ).values(
-                creator,
-                projectId,
-                LocalDateTime.now()
-            ).execute()
+            return dslContext.insertInto(this)
+                .set(PRODUCT_ID, ULong.valueOf(productCreateInfo.productId))
+                .set(PRODUCT_NAME, productCreateInfo.productName)
+                .set(MASTER, productCreateInfo.master)
+                .set(PROJECT_ID, projectId)
+                .execute()
         }
     }
 
-    fun updateProduct(
+    fun updateProductChart(
         dslContext: DSLContext,
         productId: Long,
         mainYaml: String?,
@@ -99,7 +97,7 @@ class RdsProductInfoDao {
                 .fetchAny() ?: return null
                     return RdsProductInfo(
                         productId = record.productId.toLong(),
-                        creator = record.creator,
+                        master = record.master,
                         createTime = record.createTime.timestampmilli(),
                         updateTime = record.updateTime.timestampmilli()
                     )

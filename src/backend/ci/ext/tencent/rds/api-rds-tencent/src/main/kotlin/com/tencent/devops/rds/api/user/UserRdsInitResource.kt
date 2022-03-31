@@ -49,7 +49,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam
 @Consumes(MediaType.APPLICATION_JSON)
 interface UserRdsInitResource {
 
-    @ApiOperation("初始化rds产品")
+    @ApiOperation("初始化RDS产品chart")
     @POST
     @Path("")
     @Consumes(MediaType.MULTIPART_FORM_DATA)

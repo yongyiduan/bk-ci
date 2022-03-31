@@ -30,14 +30,14 @@ package com.tencent.devops.rds.pojo
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
-@ApiModel("RDS项目的信息")
-data class RdsProductInfo(
+@ApiModel("产品-新增模型")
+data class ProductCreateInfo(
     @ApiModelProperty("RDS产品ID")
     val productId: Long,
-    @ApiModelProperty("创建人")
+    @ApiModelProperty("产品名称")
+    val productName: String,
+    @ApiModelProperty("管理员")
     val master: String,
-    @ApiModelProperty("开始时间", required = true)
-    val createTime: Long,
-    @ApiModelProperty("开始时间", required = true)
-    val updateTime: Long
+    @ApiModelProperty("用户成员")
+    val members: List<String>?
 )

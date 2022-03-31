@@ -25,19 +25,27 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.pojo
+package com.tencent.devops.rds.resources.op
 
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.rds.api.op.OpRdsProductResource
+import com.tencent.devops.rds.pojo.ProductCreateInfo
+import com.tencent.devops.rds.service.ProductInitService
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 
-@ApiModel("RDS项目的信息")
-data class RdsProductInfo(
-    @ApiModelProperty("RDS产品ID")
-    val productId: Long,
-    @ApiModelProperty("创建人")
-    val master: String,
-    @ApiModelProperty("开始时间", required = true)
-    val createTime: Long,
-    @ApiModelProperty("开始时间", required = true)
-    val updateTime: Long
-)
+@RestResource
+class OpRdsProductResourceImpl @Autowired constructor(
+    private val productInitService: ProductInitService
+) : OpRdsProductResource {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(OpRdsProductResourceImpl::class.java)
+    }
+
+    override fun createProduct(userId: String, productCreateInfo: ProductCreateInfo): Result<Boolean> {
+        logger.info("RDS|createProduct|userId=$userId|productCreateInfo: $productCreateInfo")
+        return Result(productInitService.createProduct(userId, productCreateInfo))
+    }
+}
