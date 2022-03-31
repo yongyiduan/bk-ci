@@ -34,17 +34,15 @@ const actions = {
      * 根据projectcode获取项目详情
      */
     requestProjectDetail: async ({ commit }, { projectId }) => {
-        return request.get(`backend/api/projects/${projectId}/`).then(response => {
+        return request.get(`backend/mesos/api/projects/${projectId}/`).then(response => {
             Object.assign(response.data, { ccAppName: response.ccAppName })
             return response.data
         })
     },
     getBcsProjectInstance: async ({ commit }, { projectId, ccId, category, namespace = '' }) => {
-        let url = ''
+        let url = `backend/api/ci/paas-cd/apps/cc_app_ids/${ccId}/projects/${projectId}/instances?category=${category}`
         if (namespace) {
-            url = `backend/api/ci/paas-cd/apps/cc_app_ids/${ccId}/projects/${projectId}/instances?category=${category}&namespace=${namespace}`
-        } else {
-            url = `backend/api/ci/paas-cd/apps/cc_app_ids/${ccId}/projects/${projectId}/instances?category=${category}`
+            url += `&namespace=${namespace}`
         }
         return request.get(url).then(response => {
             return response.data
