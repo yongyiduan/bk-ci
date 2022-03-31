@@ -89,9 +89,15 @@ class ProductInitService @Autowired constructor(
             throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
         }
         productInfoDao.createProduct(dslContext, projectId, productCreateInfo)
-        productCreateInfo.members?.let {
-            productUserService.saveProductMembers(userId, productId, projectId, it)
-        }
+
+        // 增加所有项目成员
+        productUserService.saveProductMembers(
+            userId = userId,
+            productId = productId,
+            projectId = projectId,
+            members = productCreateInfo.members,
+            masterUserId = productCreateInfo.master
+        )
         return true
     }
 

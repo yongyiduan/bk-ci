@@ -64,4 +64,19 @@ class RdsProductUserDao {
             }
         }
     }
+
+    fun batchDelete(
+        dslContext: DSLContext,
+        productId: Long,
+        userList: List<String>
+    ) {
+        with(TRdsProductUser.T_RDS_PRODUCT_USER) {
+            userList.forEach {
+                dslContext.deleteFrom(this)
+                    .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                    .and(USER_ID.eq(it))
+                    .execute()
+            }
+        }
+    }
 }

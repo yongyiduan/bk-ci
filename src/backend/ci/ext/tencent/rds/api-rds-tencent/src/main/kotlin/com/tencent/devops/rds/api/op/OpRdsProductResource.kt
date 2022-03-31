@@ -38,6 +38,7 @@ import javax.ws.rs.Consumes
 import javax.ws.rs.HeaderParam
 import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 
@@ -50,12 +51,39 @@ interface OpRdsProductResource {
     @ApiOperation("初始化RDS产品")
     @POST
     @Path("/create")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     fun createProduct(
         @ApiParam(value = "创建操作者", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
         @ApiParam("产品创建信息", required = true)
         productCreateInfo: ProductCreateInfo
+    ): Result<Boolean>
+
+    @ApiOperation("新增RDS产品使用成员")
+    @POST
+    @Path("/{productId}/add_members")
+    fun addMembers(
+        @ApiParam(value = "操作者", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("产品ID", required = false)
+        @PathParam("productId")
+        productId: Long,
+        @ApiParam("新增人员集合", required = true)
+        members: List<String>
+    ): Result<Boolean>
+
+    @ApiOperation("新增RDS产品使用成员")
+    @POST
+    @Path("/{productId}/delete_members")
+    fun deleteMembers(
+        @ApiParam(value = "操作者", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("产品ID", required = false)
+        @PathParam("productId")
+        productId: Long,
+        @ApiParam("删除人员集合", required = true)
+        members: List<String>
     ): Result<Boolean>
 }

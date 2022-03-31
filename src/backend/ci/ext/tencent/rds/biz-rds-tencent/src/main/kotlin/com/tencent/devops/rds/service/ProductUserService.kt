@@ -49,7 +49,8 @@ class ProductUserService @Autowired constructor(
         userId: String,
         productId: Long,
         projectId: String,
-        members: List<String>
+        members: List<String>?,
+        masterUserId: String?
     ): Boolean {
         try {
             val member = client.get(ServiceProjectResource::class).createProjectUser(
@@ -61,20 +62,47 @@ class ProductUserService @Autowired constructor(
                     userIds = members
                 )
             )
+            val managerUsers = mutableListOf(userId)
+            masterUserId?.let { managerUsers.add(masterUserId) }
             val manager = client.get(ServiceProjectResource::class).createProjectUser(
                 projectId = projectId,
                 createInfo = ProjectCreateUserInfo(
                     createUserId = userId,
                     roleName = "管理员",
                     roleId = 2,
-                    userIds = listOf(userId)
+                    userIds = managerUsers
                 )
             )
             val success = member.data == true && manager.data == true
-            if (success) {
+            if (success && members != null) {
                 productUserDao.batchSave(dslContext, productId, members)
             }
             return success
+        } catch (t: Throwable) {
+            logger.error("RDS|saveProductMembers failed with: ", t)
+        }
+        return false
+    }
+
+    fun deleteProductMembers(
+        userId: String,
+        productId: Long,
+        projectId: String,
+        members: List<String>
+    ): Boolean {
+        try {
+            // TODO: 增加蓝盾删除项目成员（等V3支持）
+//            val member = client.get(ServiceProjectResource::class).createProjectUser(
+//                projectId = projectId,
+//                createInfo = ProjectCreateUserInfo(
+//                    createUserId = userId,
+//                    roleName = "CI管理员",
+//                    roleId = 9,
+//                    userIds = members
+//                )
+//            )
+            productUserDao.batchDelete(dslContext, productId, members)
+            return true
         } catch (t: Throwable) {
             logger.error("RDS|saveProductMembers failed with: ", t)
         }

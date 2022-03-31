@@ -32,12 +32,15 @@ import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.op.OpRdsProductResource
 import com.tencent.devops.rds.pojo.ProductCreateInfo
 import com.tencent.devops.rds.service.ProductInitService
+import com.tencent.devops.rds.service.ProductUserService
+import com.tencent.devops.rds.utils.RdsPipelineUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
 class OpRdsProductResourceImpl @Autowired constructor(
-    private val productInitService: ProductInitService
+    private val productInitService: ProductInitService,
+    private val productUserService: ProductUserService
 ) : OpRdsProductResource {
 
     companion object {
@@ -47,5 +50,27 @@ class OpRdsProductResourceImpl @Autowired constructor(
     override fun createProduct(userId: String, productCreateInfo: ProductCreateInfo): Result<Boolean> {
         logger.info("RDS|createProduct|userId=$userId|productCreateInfo: $productCreateInfo")
         return Result(productInitService.createProduct(userId, productCreateInfo))
+    }
+
+    override fun addMembers(
+        userId: String,
+        productId: Long,
+        members: List<String>
+    ): Result<Boolean> {
+        logger.info("RDS|addMembers|userId=$userId|members: $members")
+        productUserService.saveProductMembers(
+            userId = userId,
+            productId = productId,
+            projectId = RdsPipelineUtils.genBKProjectCode(productId),
+            members = members,
+            masterUserId = null
+        )
+        return Result(true)
+    }
+
+    override fun deleteMembers(userId: String, productId: Long, members: List<String>): Result<Boolean> {
+        logger.info("RDS|deleteMembers|userId=$userId|members: $members")
+
+        return Result(true)
     }
 }
