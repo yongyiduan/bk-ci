@@ -63,7 +63,11 @@ class ProductUserService @Autowired constructor(
                 )
             )
             val managerUsers = mutableListOf(userId)
-            masterUserId?.let { managerUsers.add(masterUserId) }
+            val productUsers = mutableListOf<String>()
+            masterUserId?.let {
+                managerUsers.add(masterUserId)
+                productUsers.add(masterUserId)
+            }
             val manager = client.get(ServiceProjectResource::class).createProjectUser(
                 projectId = projectId,
                 createInfo = ProjectCreateUserInfo(
@@ -74,8 +78,12 @@ class ProductUserService @Autowired constructor(
                 )
             )
             val success = member.data == true && manager.data == true
-            if (success && members != null) {
-                productUserDao.batchSave(dslContext, productId, members)
+            if (success) {
+                productUserDao.batchSave(
+                    dslContext = dslContext,
+                    productId = productId,
+                    userList = productUsers.plus(members ?: emptyList())
+                )
             }
             return success
         } catch (t: Throwable) {
