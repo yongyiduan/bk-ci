@@ -329,11 +329,7 @@
                 }
             },
             getDisplayName (val) {
-                const defaultVal = Array.isArray(val) ? val.join(',') : val.trim()
-                if (typeof defaultVal !== 'string') {
-                    console.log(`invalid default value ${this.name}`)
-                    return ''
-                }
+                const defaultVal = Array.isArray(val) ? val.join(',') : val
                 if (this.isEnvVar(defaultVal)) {
                     return defaultVal
                 }
