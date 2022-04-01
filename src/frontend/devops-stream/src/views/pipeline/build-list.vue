@@ -261,7 +261,7 @@
                         data: [
                             { name: 'Succeed', id: 'SUCCEED' },
                             { name: 'Failed', id: 'FAILED' },
-                            { name: 'Cancelled', id: 'CANCELED' }
+                            { name: 'Canceled', id: 'CANCELED' }
                         ]
                     }
                 ],

@@ -184,5 +184,9 @@ export default {
 
     getEventList () {
         return api.get(`${STREAM_PERFIX}/user/request/eventType`)
+    },
+
+    getPipelineDirList (projectId, params) {
+        return api.get(`${STREAM_PERFIX}/user/pipelines/${projectId}/dir_list`, { params })
     }
 }
