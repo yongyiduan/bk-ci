@@ -245,7 +245,6 @@
             ]),
             ...mapState('atom', [
                 'globalEnvs',
-                'atomCodeList',
                 'atomClassifyCodeList',
                 'atomMap',
                 'atomModalMap',
@@ -708,7 +707,7 @@
     .atom-form-box.readonly {
         pointer-events: none;
     }
-    
+
     .atom-main-content {
         font-size: 12px;
         .atom-link {

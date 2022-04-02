@@ -385,8 +385,16 @@ export default {
         Vue.set(state, 'showAtomSelectorPopup', show)
         return state
     },
-    [SET_STORE_DATA]: (state, data) => {
+    [SET_STORE_DATA]: (state, data, atomMap = {}, atomCodeList = []) => {
         Vue.set(state, 'storeAtomData', data)
+        Vue.set(state, 'atomMap', {
+            ...state.atomMap,
+            ...atomMap
+        })
+        Vue.set(state, 'atomCodeList', [
+            ...state.atomCodeList,
+            ...atomCodeList
+        ])
     },
     [SET_STORE_LOADING]: (state, data) => {
         state.storeAtomData.loading = data

@@ -355,8 +355,9 @@
             scrollLoadMore (classify, $event) {
                 if (classify !== RD_STORE_CODE) return
 
-                const target = event.target
+                const target = $event.target
                 const bottomDis = target.scrollHeight - target.clientHeight - target.scrollTop
+                console.log(bottomDis)
                 if (bottomDis <= 400) this.addStoreAtom()
             }
         }

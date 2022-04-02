@@ -125,26 +125,29 @@ export default {
     addStoreAtom ({ commit, state }) {
         const store = state.storeAtomData || {}
         let page = store.page || 1
-        const pageSize = store.pageSize || 1500
+        const pageSize = store.pageSize || 36
         const keyword = store.keyword || undefined
         const loadEnd = store.loadEnd || false
         const loading = store.loading || false
+        console.log(store.loading)
         if (loadEnd || loading) return
 
         commit(SET_STORE_LOADING, true)
+        console.log('get request')
         return request.get(`${STORE_API_URL_PREFIX}/user/market/atom/list`, { params: { page, pageSize, keyword } }).then((res) => {
             const data = res.data || {}
             const records = data.records || []
             const atomList = store.data || []
+            const [atomCodeList, atomMap] = getMapByKey(data.records, 'atomCode')
             const storeData = {
                 data: [...atomList, ...records],
                 page: ++page,
-                pageSize: 2000,
+                pageSize: 36,
                 loadEnd: records.length < pageSize,
                 loading: false,
                 keyword
             }
-            commit(SET_STORE_DATA, storeData)
+            commit(SET_STORE_DATA, storeData, atomMap, atomCodeList)
         }).catch((e) => {
             if (e.code === 403) e.message = ''
             rootCommit(commit, FETCH_ERROR, e)
@@ -215,7 +218,7 @@ export default {
             rootCommit(commit, FETCH_ERROR, e)
         }
     },
-    
+
     requestBuildParams: async ({ commit }, { projectId, pipelineId, buildId }) => {
         try {
             const response = await request.get(`/${PROCESS_API_URL_PREFIX}/user/builds/${projectId}/${pipelineId}/${buildId}/parameters`)
