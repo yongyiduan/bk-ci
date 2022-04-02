@@ -260,7 +260,9 @@ export default {
                 request.get(`${STORE_API_URL_PREFIX}/user/pipeline/atom/classify`),
                 request.get(`${STORE_API_URL_PREFIX}/user/pipeline/atom`, {
                     params: {
-                        projectCode
+                        projectCode,
+                        page: 1,
+                        pageSize: 100
                     }
                 })
             ])
