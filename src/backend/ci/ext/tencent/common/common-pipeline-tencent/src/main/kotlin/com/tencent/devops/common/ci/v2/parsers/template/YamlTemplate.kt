@@ -36,21 +36,23 @@ import com.tencent.devops.common.ci.v2.PreJob
 import com.tencent.devops.common.ci.v2.PreParametersTemplate
 import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
 import com.tencent.devops.common.ci.v2.PreStage
-import com.tencent.devops.common.ci.v2.PreStep
 import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
 import com.tencent.devops.common.ci.v2.Repositories
-import com.tencent.devops.common.ci.v2.TemplateInfo
 import com.tencent.devops.common.ci.v2.Variable
-import com.tencent.devops.common.ci.v2.enums.TemplateType
-import com.tencent.devops.common.ci.v2.exception.YamlFormatException
-import com.tencent.devops.common.ci.v2.parsers.template.TemplateYamlUtil.checkJobIdGlobalUnique
-import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
-import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
-import com.tencent.devops.common.ci.v2.parsers.template.models.TemplateDeepTreeNode
 import com.tencent.devops.common.ci.v2.stageCheck.Gate
 import com.tencent.devops.common.ci.v2.stageCheck.GateTemplate
 import com.tencent.devops.common.ci.v2.stageCheck.PreStageCheck
 import com.tencent.devops.common.ci.v2.stageCheck.PreTemplateStageCheck
+import com.tencent.devops.common.ci.v2.PreStep
+import com.tencent.devops.common.ci.v2.ResourcesPools
+import com.tencent.devops.common.ci.v2.TemplateInfo
+import com.tencent.devops.common.ci.v2.enums.TemplateType
+import com.tencent.devops.common.ci.v2.exception.YamlFormatException
+import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
+import com.tencent.devops.common.ci.v2.parsers.template.models.NoReplaceTemplate
+import com.tencent.devops.common.ci.v2.parsers.template.models.TemplateDeepTreeNode
+import com.tencent.devops.common.ci.v2.format
+import com.tencent.devops.common.ci.v2.parsers.template.TemplateYamlUtil.checkJobIdGlobalUnique
 
 @Suppress("ALL")
 class YamlTemplate<T>(
@@ -64,6 +66,10 @@ class YamlTemplate<T>(
     val nowRepo: Repositories?,
     // 目标库信息(发起库没有库信息)
     val repo: Repositories?,
+
+    // 额外所有引用的resource-pool，这样不会干扰替换逻辑
+    val resourcePoolMapExt: MutableMap<String, ResourcesPools>? = null,
+
     // 来自文件
     private val fileFromPath: String? = null,
 
@@ -624,7 +630,14 @@ class YamlTemplate<T>(
             )
         }
         // 将模板文件实例化
-        return YamlObjects.getObjectFromYaml(toPath, newTemplate)
+        val yamlObject = YamlObjects.getObjectFromYaml<Map<String, Any>>(toPath, newTemplate)
+        // 将模板引用的pools加入
+        if (yamlObject["resources"] != null) {
+            YamlObjects.getResourcePools(toPath, yamlObject["resources"]!!).forEach { pool ->
+                resourcePoolMapExt?.put(pool.format(), pool)
+            }
+        }
+        return yamlObject
     }
 
     // 对远程仓库中的模板进行远程仓库替换
@@ -647,8 +660,16 @@ class YamlTemplate<T>(
             repo = toRepo,
             rootDeepTree = deepTree,
             resTemplateType = templateType,
-            getTemplateMethod = getTemplateMethod
+            getTemplateMethod = getTemplateMethod,
+            resourcePoolMapExt = resourcePoolMapExt
         ).replace(parameters = parameters)
+
+        // 将远程模板引用的pools加入
+        if (resYamlObject.resources?.pools != null) {
+            resYamlObject.resources?.pools?.forEach { pool ->
+                resourcePoolMapExt?.put(pool.format(), pool)
+            }
+        }
         // 替换后的远程模板去除不必要参数
         resYamlObject.resources = null
         return TemplateYamlMapper.toYaml(resYamlObject)
