@@ -702,6 +702,8 @@
             async submitFn () {
                 if (this.experienceRange === 'public') {
                     this.createReleaseForm.experienceGroups = ['kygplomw']
+                    this.createReleaseForm.internal_list = []
+                    this.createReleaseForm.external_list = []
                 }
                 let message
                 const theme = 'error'
