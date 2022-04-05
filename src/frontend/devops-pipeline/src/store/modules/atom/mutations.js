@@ -206,7 +206,7 @@ export default {
     },
     [UPDATE_ATOM_TYPE] (state, { container, atomCode, version, atomIndex }) {
         const key = getAtomModalKey(atomCode, version)
-        const atomModal = state.atomModalMap[key]
+        const atomModal = state.atomModalMap[key] || { props: {} }
         const preVerEle = container.elements[atomIndex]
         const preVerkey = getAtomModalKey(preVerEle.atomCode, preVerEle.version)
         const preVerAtomModal = state.atomModalMap[preVerkey] || { props: {} }
