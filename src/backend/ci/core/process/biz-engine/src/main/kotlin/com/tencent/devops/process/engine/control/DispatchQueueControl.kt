@@ -33,7 +33,6 @@ import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.process.engine.common.Timeout
 import com.tencent.devops.process.engine.common.VMUtils
 import com.tencent.devops.process.engine.pojo.PipelineBuildContainer
-import com.tencent.devops.process.engine.service.PipelineContainerService
 import com.tencent.devops.process.utils.PIPELINE_CON_RUNNING_CONTAINER_SIZE_MAX
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,8 +43,7 @@ import java.util.concurrent.TimeUnit
 @Component
 class DispatchQueueControl @Autowired constructor(
     private val buildLogPrinter: BuildLogPrinter,
-    private val redisOperation: RedisOperation,
-    private val pipelineContainerService: PipelineContainerService
+    private val redisOperation: RedisOperation
 ) {
 
     companion object {
