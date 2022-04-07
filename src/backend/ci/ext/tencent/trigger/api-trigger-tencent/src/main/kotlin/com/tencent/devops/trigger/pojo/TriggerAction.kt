@@ -27,8 +27,8 @@
 
 package com.tencent.devops.trigger.pojo
 
-data class PipelineAction(
+data class TriggerAction(
     val type: String,
-    val pipelineId: String,
+    val path: String,
     val variables: Map<String, Any>?
 )

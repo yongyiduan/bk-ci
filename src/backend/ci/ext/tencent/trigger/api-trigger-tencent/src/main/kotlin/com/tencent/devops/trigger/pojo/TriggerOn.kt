@@ -29,7 +29,6 @@ package com.tencent.devops.trigger.pojo
 
 data class TriggerOn(
     val id: String,
-
     val filter: Map<String, Any>,
-    val action: PipelineAction
+    val action: TriggerAction
 )

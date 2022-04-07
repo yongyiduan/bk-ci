@@ -37,6 +37,8 @@ data class EventRuleTarget(
     val ruleId: String?,
     @ApiModelProperty("项目ID")
     val projectId: String,
+    @ApiModelProperty("总线ID")
+    val busId: String,
     @ApiModelProperty("事件目标名称")
     val targetName: String,
     @ApiModelProperty("事件目标重试策略")

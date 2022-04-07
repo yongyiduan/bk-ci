@@ -34,7 +34,7 @@ import com.tencent.devops.rds.exception.ChartErrorCodeEnum
 import com.tencent.devops.rds.pojo.yaml.Main
 import com.tencent.devops.rds.pojo.yaml.Resource
 import com.tencent.devops.trigger.api.ServiceEventRegisterResource
-import com.tencent.devops.trigger.pojo.PipelineAction
+import com.tencent.devops.trigger.pojo.TriggerAction
 import com.tencent.devops.trigger.pojo.TriggerOn
 import com.tencent.devops.trigger.pojo.TriggerRegisterRequest
 import com.tencent.devops.trigger.pojo.TriggerResource
@@ -59,16 +59,23 @@ class EventBusService @Autowired constructor(
         main: Main,
         resource: Resource
     ): Boolean {
-        val triggerOns = generateTriggerOn(productId, main)
+        val triggerOns = generateTriggerOn(main)
         val triggerResources = generateTriggerResource(resource)
-        logger.info("RDS|EVENT_BUS_REGISTER|triggerOns=$triggerOns|triggerResources=$triggerResources")
+        val triggerPipelines = chartPipelineDao.getChartPipelines(dslContext, productId).associate { pipeline ->
+            "${pipeline.projectName}:${pipeline.serviceName}:${pipeline.filePath}" to pipeline.pipelineId
+        }
+        logger.info(
+            "RDS|EVENT_BUS_REGISTER|triggerOns=$triggerOns|triggerResources=$triggerResources|" +
+                "triggerPipelines=$triggerPipelines"
+        )
         return try {
             client.get(ServiceEventRegisterResource::class).register(
                 userId = userId,
                 projectId = projectId,
                 request = TriggerRegisterRequest(
                     triggerOn = triggerOns,
-                    triggerResource = triggerResources
+                    triggerResource = triggerResources,
+                    triggerPipelines = triggerPipelines
                 )
             ).data ?: run {
                 logger.warn("RDS|EVENT_BUS_ERROR|triggerOns=$triggerOns|triggerResources=$triggerResources")
@@ -91,36 +98,40 @@ class EventBusService @Autowired constructor(
     ): List<TriggerResource> {
         val triggerResources = mutableListOf<TriggerResource>()
         resource.projects.forEach { project ->
-            val map = project.getProjectResource()
-            triggerResources.add(TriggerResource(
-                id = project.id,
-                resources = map
-            ))
+            project.services?.forEach nextService@{ service ->
+                val map = service.getServiceResource()
+                triggerResources.add(
+                    TriggerResource(
+                        id = "${project.id}:${service.id}",
+                        resources = map
+                    )
+                )
+            } ?: run {
+                val map = project.getProjectResource()
+                triggerResources.add(
+                    TriggerResource(
+                        id = project.id,
+                        resources = map
+                    )
+                )
+            }
         }
         return triggerResources
     }
 
     private fun generateTriggerOn(
-        productId: Long,
         main: Main
     ): List<TriggerOn> {
-        // 取出已经注册成功的流水线
-        val pipelines = chartPipelineDao.getChartPipelines(dslContext, productId)
-        val triggerOns = mutableListOf<TriggerOn>()
-        pipelines.forEach nextPipeline@{ pipeline ->
-            // 使用文件名+项目+服务匹配
-            main.on.forEach nextTrigger@{ on ->
-                if (on.action.path == pipeline.filePath) triggerOns.add(TriggerOn(
-                    id = on.id,
-                    filter = on.filter,
-                    action = PipelineAction(
-                        type = on.action.type,
-                        pipelineId = pipeline.pipelineId,
-                        variables = on.action.with
-                    )
-                ))
-            }
-        }
-        return triggerOns
+        return main.on.map { on ->
+            TriggerOn(
+                id = on.id,
+                filter = on.filter,
+                action = TriggerAction(
+                    type = on.action.type,
+                    path = on.action.path,
+                    variables = on.action.with
+                )
+            )
+        }.toList()
     }
 }

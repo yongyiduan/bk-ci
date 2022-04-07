@@ -69,4 +69,13 @@ class EventBusSourceDao {
             create(dslContext = dslContext, eventBusSource)
         }
     }
+
+    fun deleteByBusId(dslContext: DSLContext, busId: String, projectId: String) {
+        with(TEventBusSource.T_EVENT_BUS_SOURCE) {
+            dslContext.deleteFrom(this)
+                .where(BUS_ID.eq(busId))
+                .and(PROJECT_ID.eq(projectId))
+                .execute()
+        }
+    }
 }

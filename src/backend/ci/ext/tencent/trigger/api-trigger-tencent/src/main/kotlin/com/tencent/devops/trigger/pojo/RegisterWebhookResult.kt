@@ -27,8 +27,8 @@
 
 package com.tencent.devops.trigger.pojo
 
-data class WebhookInfo(
-    val projectId: String,
-    val busId: String,
-    val source: String
+data class RegisterWebhookResult(
+    val id: String,
+    val resourceKey: String,
+    val resourceValue: String
 )

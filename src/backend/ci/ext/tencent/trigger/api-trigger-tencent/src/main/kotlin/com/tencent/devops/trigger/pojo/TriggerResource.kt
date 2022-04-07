@@ -32,5 +32,5 @@ import io.swagger.annotations.ApiModel
 @ApiModel("事件资源")
 data class TriggerResource(
     val id: String,
-    val resources: Map<String, List<String?>>
+    val resources: Map<String, String?>
 )

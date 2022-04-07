@@ -93,4 +93,13 @@ class EventRouteDao {
             )
         }
     }
+
+    fun deleteByBusId(dslContext: DSLContext, busId: String, projectId: String) {
+        with(TEventRoute.T_EVENT_ROUTE) {
+            dslContext.deleteFrom(this)
+                .where(BUS_ID.eq(busId))
+                .and(PROJECT_ID.eq(projectId))
+                .execute()
+        }
+    }
 }

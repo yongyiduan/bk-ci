@@ -28,9 +28,9 @@
 package com.tencent.devops.trigger.dao
 
 import com.tencent.devops.common.api.util.timestampmilli
-import com.tencent.devops.trigger.pojo.EventBusRule
 import com.tencent.devops.model.trigger.tables.TEventBusRule
 import com.tencent.devops.model.trigger.tables.records.TEventBusRuleRecord
+import com.tencent.devops.trigger.pojo.EventBusRule
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -136,6 +136,15 @@ class EventBusRuleDao {
                 updateTime = updateTime.timestampmilli(),
                 updater = updater
             )
+        }
+    }
+
+    fun deleteByBusId(dslContext: DSLContext, busId: String, projectId: String) {
+        with(TEventBusRule.T_EVENT_BUS_RULE) {
+            dslContext.deleteFrom(this)
+                .where(BUS_ID.eq(busId))
+                .and(PROJECT_ID.eq(projectId))
+                .execute()
         }
     }
 }

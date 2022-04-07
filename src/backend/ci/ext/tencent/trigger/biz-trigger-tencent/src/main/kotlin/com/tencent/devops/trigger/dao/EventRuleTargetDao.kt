@@ -27,10 +27,10 @@
 
 package com.tencent.devops.trigger.dao
 
-import com.tencent.devops.trigger.pojo.EventRuleTarget
 import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.model.trigger.tables.TEventRuleTarget
 import com.tencent.devops.model.trigger.tables.records.TEventRuleTargetRecord
+import com.tencent.devops.trigger.pojo.EventRuleTarget
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
@@ -45,6 +45,7 @@ class EventRuleTargetDao {
                 this,
                 TARGET_ID,
                 PROJECT_ID,
+                BUS_ID,
                 RULE_ID,
                 TARGET_NAME,
                 PUSH_RETRY_STRATEGY,
@@ -57,6 +58,7 @@ class EventRuleTargetDao {
             ).values(
                 eventRuleTarget.targetId,
                 eventRuleTarget.projectId,
+                eventRuleTarget.busId,
                 eventRuleTarget.ruleId,
                 eventRuleTarget.targetName,
                 eventRuleTarget.pushRetryStrategy,
@@ -120,6 +122,7 @@ class EventRuleTargetDao {
                 targetId = targetId,
                 ruleId = ruleId,
                 projectId = projectId,
+                busId = busId,
                 targetName = targetName,
                 pushRetryStrategy = pushRetryStrategy,
                 targetParams = targetParams,
@@ -129,6 +132,15 @@ class EventRuleTargetDao {
                 updateTime = updateTime.timestampmilli(),
                 updater = updater
             )
+        }
+    }
+
+    fun deleteByBusId(dslContext: DSLContext, busId: String, projectId: String) {
+        with(TEventRuleTarget.T_EVENT_RULE_TARGET) {
+            dslContext.deleteFrom(this)
+                .where(BUS_ID.eq(busId))
+                .and(PROJECT_ID.eq(projectId))
+                .execute()
         }
     }
 }

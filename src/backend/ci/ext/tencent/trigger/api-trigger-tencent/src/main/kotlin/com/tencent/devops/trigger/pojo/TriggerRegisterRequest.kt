@@ -32,5 +32,9 @@ import io.swagger.annotations.ApiModel
 @ApiModel("事件规则注册请求")
 data class TriggerRegisterRequest(
     val triggerOn: List<TriggerOn>,
-    val triggerResource: List<TriggerResource>
+    val triggerResource: List<TriggerResource>,
+    /**
+     * rds生成的流水线映射,key是projectName:serviceName:path,值是流水线ID
+     */
+    val triggerPipelines: Map<String, String>
 )

@@ -39,16 +39,11 @@ data class Project(
     val repoUrl: String?,
     val services: List<Service>?
 ) {
-    fun getProjectResource(): MutableMap<String, MutableList<String>> {
-        val map = mutableMapOf<String, MutableList<String>>()
-        tapdId?.let { map["tapd_id"] = mutableListOf(it) }
-        bcsId?.let { map["bcs_id"] = mutableListOf(it) }
-        repoUrl?.let { map["repo_url"] = mutableListOf(it) }
-        services?.forEach { service ->
-            map["repo_url"]?.add(service.repoUrl) ?: run {
-                map["repo_url"] = mutableListOf(service.repoUrl)
-            }
-        }
+    fun getProjectResource(): MutableMap<String, String?> {
+        val map = mutableMapOf<String, String?>()
+        tapdId?.let { map["tapd_id"] = it }
+        bcsId?.let { map["bcs_id"] = it }
+        repoUrl?.let { map["repo_url"] = it }
         return map
     }
 }
