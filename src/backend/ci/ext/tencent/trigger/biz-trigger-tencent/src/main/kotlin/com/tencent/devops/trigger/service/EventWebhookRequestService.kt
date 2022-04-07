@@ -68,7 +68,7 @@ class EventWebhookRequestService @Autowired constructor(
     fun webhook(event: EventWebhookRequestEvent) {
         with(event) {
             logger.info(
-                "${projectId}|${busId}|start to handle event webhook request," +
+                "$projectId|$busId|start to handle event webhook request," +
                     "sourceName:$sourceName,payload:$payload,headers:$headers"
             )
             val cloudEvent = toCloudEvent(
@@ -77,7 +77,7 @@ class EventWebhookRequestService @Autowired constructor(
                 payload = payload
             )
             logger.info(
-                "${projectId}|${busId}|toCloudEvent,${cloudEvent.source},${cloudEvent.type},${cloudEvent.id}"
+                "$projectId|$busId|toCloudEvent,source=${cloudEvent.source},type=${cloudEvent.type},id=${cloudEvent.id}"
             )
             handleWebhook(
                 projectId = projectId,

@@ -61,7 +61,7 @@ abstract class EventTriggerBaseListener<in T : IEventTriggerEvent>(
             run(event)
             result = true
         } catch (ignored: Throwable) {
-            logger.error("[EVENT_BUS_MQ_SEVERE][${event.projectId}]|FAIL|e=$ignored")
+            logger.error("[EVENT_BUS_MQ_SEVERE][${event.projectId}]|FAIL", ignored)
         } finally {
             if (!result && event.retryTime > 0) {
                 event.retryTime = event.retryTime - 1
