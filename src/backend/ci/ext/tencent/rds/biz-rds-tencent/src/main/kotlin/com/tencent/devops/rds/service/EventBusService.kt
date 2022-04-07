@@ -62,7 +62,11 @@ class EventBusService @Autowired constructor(
         val triggerOns = generateTriggerOn(main)
         val triggerResources = generateTriggerResource(resource)
         val triggerPipelines = chartPipelineDao.getChartPipelines(dslContext, productId).associate { pipeline ->
-            "${pipeline.projectName}:${pipeline.serviceName}:${pipeline.filePath}" to pipeline.pipelineId
+            if (pipeline.serviceName.isNullOrBlank()) {
+                "${pipeline.projectName}:${pipeline.filePath}" to pipeline.pipelineId
+            } else {
+                "${pipeline.projectName}:${pipeline.serviceName}:${pipeline.filePath}" to pipeline.pipelineId
+            }
         }
         logger.info(
             "RDS|EVENT_BUS_REGISTER|triggerOns=$triggerOns|triggerResources=$triggerResources|" +

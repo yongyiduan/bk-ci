@@ -51,7 +51,7 @@ class EventTargetRunService {
 
                 SpringContextUtil.getBean(IEventTargetInvoker::class.java, targetName).invoke(targetRequestParamMap)
             } catch (ignore: Throwable) {
-                logger.warn("${projectId}|${ruleId}|Fail to invoke the target [$targetName]", ignore)
+                logger.warn("$projectId|$ruleId|Fail to invoke the target [$targetName]", ignore)
             }
         }
     }
