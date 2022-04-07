@@ -53,14 +53,14 @@ const shareEnvMixin = {
         async toLinkShare (type = 'RPOJECT') {
             this.selectType = type
             this.shareSelectConf.isShow = true
-            this.requestList(type)
+            this.requestList()
         },
 
-        async requestList (type) {
+        async requestList () {
             this.shareDialogLoading.isLoading = true
             let res = {}
             try {
-                if (type === 'GROUP') {
+                if (this.selectType === 'GROUP') {
                     res = await common.getStreamGroups(this.page, this.pageSize)
                 } else {
                     res = await common.getStreamProjects('MY_PROJECT', this.page, this.pageSize, this.searchStr, true)
@@ -71,7 +71,7 @@ const shareEnvMixin = {
                 res.map(item => {
                     // 在这里判断一下totalList里面能不能找到这一项，是否isCheck
                     if (item.projectCode !== this.projectId) {
-                        item.name = (type === 'PROJECT' ? (item.nameWithNamespace || item.name) : (item.full_name || item.name))
+                        item.name = (this.selectType === 'PROJECT' ? (item.nameWithNamespace || item.name) : (item.full_name || item.name))
                         item.isChecked = false
                         this.curPageList.push(item)
                         if (!this.totalList.find(totalListItem => totalListItem.id === item.id)) {
@@ -184,13 +184,13 @@ const shareEnvMixin = {
             if (this.searchStr !== inputVal) {
                 this.searchStr = inputVal
                 this.page = 1
-                this.requestProjectList()
+                this.requestList()
             }
         },
         // 翻页
         updatePage (page) {
             this.page = page
-            this.requestProjectList()
+            this.requestList()
         },
         // 弹窗全选联动
         decideToggle () {
