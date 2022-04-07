@@ -49,7 +49,7 @@ class PipelineEventTargetInvoker @Autowired constructor(
         with(targetRequestParam) {
             try {
                 logger.info(
-                    "${projectId}|$pipelineId|Start to invoke [pipeline] event target by params $targetRequestParam"
+                    "$projectId|$pipelineId|Start to invoke [pipeline] event target by params $targetRequestParam"
                 )
                 val buildId = client.get(ServiceWebhookBuildResource::class).webhookTrigger(
                     userId = userId,
@@ -58,9 +58,9 @@ class PipelineEventTargetInvoker @Autowired constructor(
                     params = values,
                     channelCode = channelCode
                 ).data
-                logger.info("${projectId}|$pipelineId|${buildId}|Success to invoke [pipeline] event target")
+                logger.info("$projectId|$pipelineId|$buildId|Success to invoke [pipeline] event target")
             } catch (ignore: Throwable) {
-                logger.error("${projectId}|$pipelineId|Failed to invoke [pipeline] event target", ignore)
+                logger.error("$projectId|$pipelineId|Failed to invoke [pipeline] event target", ignore)
             }
         }
     }

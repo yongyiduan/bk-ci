@@ -29,6 +29,7 @@ package com.tencent.devops.trigger.service
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.node.MissingNode
+import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.ObjectReplaceEnvVarUtil
 import com.tencent.devops.common.service.utils.SpringContextUtil
@@ -337,15 +338,23 @@ class RdsRegisterService @Autowired constructor(
             eventTypeId = eventTypeId,
             targetName = TargetType.PIPELINE
         ) ?: return null
-        val replaceTargetParams = ObjectReplaceEnvVarUtil.replaceEnvVar(
+        val replaceTargetParams = EnvUtils.parseEnv(
             eventTargetTemplate.targetParams,
             mapOf(
                 "projectId" to projectId,
                 "pipelineId" to pipelineId
             )
         )
-        val finalTargetParams = JsonUtil.toMutableMap(replaceTargetParams)
-            .putAll(on.action.variables ?: emptyMap())
+        /*val targetParamList = JsonUtil.to(replaceTargetParams, object : TypeReference<MutableList<TargetParam>>() {})
+        if (!on.action.variables.isNullOrEmpty()) {
+            val customTargetParam = TargetParam(
+                resourceKey = "customParams",
+                form = TargetFormType.CONSTANT,
+                value = on.action.variables
+            )
+            targetParamList.add(customTargetParam)
+        }*/
+
         val targetId = IdGeneratorUtil.getTargetId()
         return EventRuleTarget(
             targetId = targetId,
@@ -354,7 +363,7 @@ class RdsRegisterService @Autowired constructor(
             busId = busId,
             targetName = eventTargetTemplate.targetName,
             pushRetryStrategy = eventTargetTemplate.pushRetryStrategy,
-            targetParams = JsonUtil.toJson(finalTargetParams),
+            targetParams = JsonUtil.toJson(replaceTargetParams),
             creator = userId,
             updater = userId
         )
