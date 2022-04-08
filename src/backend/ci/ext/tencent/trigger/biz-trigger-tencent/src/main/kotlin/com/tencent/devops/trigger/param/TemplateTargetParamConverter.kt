@@ -29,8 +29,8 @@ package com.tencent.devops.trigger.param
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.jayway.jsonpath.JsonPath
-import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.api.util.ObjectReplaceEnvVarUtil
 import com.tencent.devops.trigger.constant.TargetFormType
 import com.tencent.devops.trigger.pojo.TargetParam
 import io.appform.jsonrules.utils.ComparisonUtils.SUPPRESS_EXCEPTION_CONFIG
@@ -47,7 +47,7 @@ class TemplateTargetParamConverter : ITargetParamConverter {
         val valueMap = JsonUtil.toMap(targetParam.value).map { (key, value) ->
             Pair(key, JsonUtil.toJson(ctx.read(value.toString()) ?: ""))
         }.toMap()
-        val templateValue = EnvUtils.parseEnv(JsonUtil.toJson(targetParam.template), valueMap)
+        val templateValue = ObjectReplaceEnvVarUtil.replaceEnvVar(targetParam.template, valueMap)
         return Pair(targetParam.resourceKey, templateValue)
     }
 }

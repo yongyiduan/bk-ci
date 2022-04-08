@@ -338,7 +338,7 @@ class RdsRegisterService @Autowired constructor(
             eventTypeId = eventTypeId,
             targetName = TargetType.PIPELINE
         ) ?: return null
-        val replaceTargetParams = EnvUtils.parseEnv(
+        val replaceTargetParams = ObjectReplaceEnvVarUtil.replaceEnvVar(
             eventTargetTemplate.targetParams,
             mapOf(
                 "projectId" to projectId,
