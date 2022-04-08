@@ -29,8 +29,10 @@ package com.tencent.devops.trigger.param
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.jayway.jsonpath.JsonPath
+import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.trigger.constant.TargetFormType
 import com.tencent.devops.trigger.pojo.TargetParam
+import io.appform.jsonrules.utils.ComparisonUtils.SUPPRESS_EXCEPTION_CONFIG
 import org.springframework.stereotype.Component
 
 @Component(TargetFormType.JSON_PATH)
@@ -40,7 +42,14 @@ class JsonPathTargetParamConverter : ITargetParamConverter {
         return if (targetParam.value == null) {
             Pair(targetParam.resourceKey, "")
         } else {
-            Pair(targetParam.resourceKey, JsonPath.read(node.toString(), targetParam.value.toString()))
+            Pair(
+                targetParam.resourceKey,
+                JsonUtil.toJson(
+                    JsonPath.using(SUPPRESS_EXCEPTION_CONFIG)
+                        .parse(node.toString())
+                        .read(targetParam.value.toString()) ?: ""
+                )
+            )
         }
     }
 }

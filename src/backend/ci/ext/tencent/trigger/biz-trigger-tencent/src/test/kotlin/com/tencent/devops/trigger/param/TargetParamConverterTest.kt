@@ -76,7 +76,8 @@ class TargetParamConverterTest {
     fun templateTest() {
         val value = mapOf(
             "branch" to "$.data.ref",
-            "repoUrl" to "$.data.repository.git_http_url"
+            "repoUrl" to "$.data.repository.git_http_url",
+            "notExist" to "$.data.notExist"
         )
         val template = mapOf(
             "BK_CI_BRANCH" to "\${branch}",
@@ -90,10 +91,14 @@ class TargetParamConverterTest {
         )
         Assert.assertEquals(
             TemplateTargetParamConverter().convert(node!!, targetParam),
-            Pair(targetParam.resourceKey, mapOf(
-                "BK_CI_BRANCH" to "refs/heads/merge_base_test",
-                "BK_CI_REPO_URL" to "http://git.code.tencent.com/mingshewhe/webhook_test.git"
-            ))
+            Pair(
+                targetParam.resourceKey, JsonUtil.toJson(
+                    mapOf(
+                        "BK_CI_BRANCH" to "refs/heads/merge_base_test",
+                        "BK_CI_REPO_URL" to "http://git.code.tencent.com/mingshewhe/webhook_test.git"
+                    )
+                )
+            )
         )
     }
 }

@@ -29,10 +29,11 @@ package com.tencent.devops.trigger.param
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.jayway.jsonpath.JsonPath
+import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.api.util.JsonUtil
-import com.tencent.devops.common.api.util.ObjectReplaceEnvVarUtil
 import com.tencent.devops.trigger.constant.TargetFormType
 import com.tencent.devops.trigger.pojo.TargetParam
+import io.appform.jsonrules.utils.ComparisonUtils.SUPPRESS_EXCEPTION_CONFIG
 import org.springframework.stereotype.Component
 
 @Component(TargetFormType.TEMPLATE)
@@ -42,11 +43,11 @@ class TemplateTargetParamConverter : ITargetParamConverter {
         if (targetParam.value == null || targetParam.template == null) {
             return Pair(targetParam.resourceKey, "")
         }
-        val ctx = JsonPath.parse(node.toString())
+        val ctx = JsonPath.using(SUPPRESS_EXCEPTION_CONFIG).parse(node.toString())
         val valueMap = JsonUtil.toMap(targetParam.value).map { (key, value) ->
-            Pair(key, ctx.read<String>(value.toString()))
+            Pair(key, JsonUtil.toJson(ctx.read(value.toString()) ?: ""))
         }.toMap()
-        val templateValue = ObjectReplaceEnvVarUtil.replaceEnvVar(JsonUtil.toMap(targetParam.template), valueMap)
+        val templateValue = EnvUtils.parseEnv(JsonUtil.toJson(targetParam.template), valueMap)
         return Pair(targetParam.resourceKey, templateValue)
     }
 }
