@@ -162,7 +162,7 @@ class RdsRegisterService @Autowired constructor(
                         dslContext = dslContext,
                         projectId = projectId,
                         busId = busId,
-                        name = "${result.id}:${result.resourceKey}"
+                        name = "${result.id}:${result.resourceKey}:${eventType.aliasName}"
                     )?.ruleId ?: IdGeneratorUtil.getRuleId()
                     eventBusRuleSet.add(
                         getEventBusRule(
@@ -296,7 +296,7 @@ class RdsRegisterService @Autowired constructor(
             ruleId = ruleId,
             busId = busId,
             projectId = projectId,
-            name = "${webhookResult.id}:${webhookResult.resourceKey}",
+            name = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}",
             source = eventSource.name,
             type = eventType.name,
             filterPattern = JsonUtil.toJson(AndExpression.builder().children(ruleExpressionList).build()),
