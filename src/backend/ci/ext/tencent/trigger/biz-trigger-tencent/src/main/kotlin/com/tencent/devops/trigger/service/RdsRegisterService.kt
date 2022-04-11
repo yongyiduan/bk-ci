@@ -94,6 +94,7 @@ class RdsRegisterService @Autowired constructor(
     @Value("\${trigger.webhookUrl}")
     private val eventBusWebhookUrl = ""
 
+    @SuppressWarnings("LongMethod", "ReturnCount")
     fun register(
         userId: String,
         projectId: String,
@@ -109,7 +110,6 @@ class RdsRegisterService @Autowired constructor(
         val eventBusRuleSet = mutableSetOf<EventBusRule>()
         val ruleTargetSet = mutableSetOf<EventRuleTarget>()
         val eventRouteSet = mutableSetOf<EventRoute>()
-        var ruleIndex = 0
         request.triggerOn.forEach on@{ on ->
             logger.info("$projectId|trigger ${on.id} event type")
             val eventTypeList = eventTypeDao.listByAliasName(
@@ -158,7 +158,12 @@ class RdsRegisterService @Autowired constructor(
                             busId = busId
                         )
                     )
-                    val ruleId = IdGeneratorUtil.getRuleId()
+                    val ruleId = eventBusRuleDao.getByName(
+                        dslContext = dslContext,
+                        projectId = projectId,
+                        busId = busId,
+                        name = "${result.id}:${result.resourceKey}"
+                    )?.ruleId ?: IdGeneratorUtil.getRuleId()
                     eventBusRuleSet.add(
                         getEventBusRule(
                             projectId = projectId,
@@ -168,8 +173,7 @@ class RdsRegisterService @Autowired constructor(
                             eventType = eventType,
                             eventSource = eventSource,
                             on = on,
-                            webhookResult = result,
-                            index = ruleIndex++
+                            webhookResult = result
                         )
                     )
                     val pipelineKey = "${result.id}:${on.action.path}"
@@ -201,37 +205,17 @@ class RdsRegisterService @Autowired constructor(
                 )
             )
 
-            eventBusSourceDao.deleteByBusId(
-                dslContext = dslContext,
-                busId = busId,
-                projectId = projectId
-            )
             eventBusSourceDao.batchCreate(
                 dslContext = context,
                 eventBusSources = eventBusSourceSet.toList()
-            )
-            eventRouteDao.deleteByBusId(
-                dslContext = dslContext,
-                busId = busId,
-                projectId = projectId
             )
             eventRouteDao.batchCreate(
                 dslContext = dslContext,
                 eventRoutes = eventRouteSet.toList()
             )
-            eventBusRuleDao.deleteByBusId(
-                dslContext = dslContext,
-                busId = busId,
-                projectId = projectId
-            )
             eventBusRuleDao.batchCreate(
                 dslContext = context,
                 eventBusRules = eventBusRuleSet.toList()
-            )
-            eventRuleTargetDao.deleteByBusId(
-                dslContext = dslContext,
-                busId = busId,
-                projectId = projectId
             )
             eventRuleTargetDao.batchCreate(
                 dslContext = context,
@@ -285,8 +269,7 @@ class RdsRegisterService @Autowired constructor(
         eventType: EventType,
         eventSource: EventSource,
         on: TriggerOn,
-        webhookResult: RegisterWebhookResult,
-        index: Int
+        webhookResult: RegisterWebhookResult
     ): EventBusRule {
         val filterNames = on.filter.keys.toMutableList()
         filterNames.add(TYPE_FILTER_NAME)
@@ -313,7 +296,7 @@ class RdsRegisterService @Autowired constructor(
             ruleId = ruleId,
             busId = busId,
             projectId = projectId,
-            name = "${eventSource.name}_${eventType.aliasName}_$index",
+            name = "${webhookResult.id}:${webhookResult.resourceKey}",
             source = eventSource.name,
             type = eventType.name,
             filterPattern = JsonUtil.toJson(AndExpression.builder().children(ruleExpressionList).build()),
@@ -355,7 +338,12 @@ class RdsRegisterService @Autowired constructor(
             targetParamList.add(customTargetParam)
         }*/
 
-        val targetId = IdGeneratorUtil.getTargetId()
+        val targetId = eventRuleTargetDao.getByTargetName(
+            dslContext = dslContext,
+            projectId = projectId,
+            ruleId = ruleId,
+            targetName = eventTargetTemplate.targetName
+        )?.targetId ?: IdGeneratorUtil.getTargetId()
         return EventRuleTarget(
             targetId = targetId,
             ruleId = ruleId,

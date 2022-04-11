@@ -37,6 +37,7 @@ import com.tencent.devops.trigger.dao.EventBusRuleDao
 import com.tencent.devops.trigger.dao.EventRouteDao
 import com.tencent.devops.trigger.dao.EventRuleTargetDao
 import com.tencent.devops.trigger.dispatcher.EventTriggerDispatcher
+import com.tencent.devops.trigger.pojo.EventBusRule
 import com.tencent.devops.trigger.pojo.event.EventAppWebhookRequestEvent
 import com.tencent.devops.trigger.pojo.event.EventTargetRunEvent
 import com.tencent.devops.trigger.pojo.event.EventWebhookRequestEvent
@@ -150,6 +151,16 @@ class EventWebhookRequestService @Autowired constructor(
         }
         val node = CloudEventJsonUtil.serializeAsJsonNode(event = cloudEvent)
         ruleList.forEach { rule ->
+            matchAndDispatch(projectId, rule, node)
+        }
+    }
+
+    private fun matchAndDispatch(
+        projectId: String,
+        rule: EventBusRule,
+        node: JsonNode
+    ) {
+        try {
             if (RuleUtil.matches(
                     projectId = projectId,
                     ruleId = rule.ruleId,
@@ -163,6 +174,8 @@ class EventWebhookRequestService @Autowired constructor(
                     node = node
                 )
             }
+        } catch (ignore: Throwable) {
+            logger.warn("$projectId|${rule.ruleId}|match and dispatch error", ignore)
         }
     }
 
@@ -212,6 +225,8 @@ class EventWebhookRequestService @Autowired constructor(
                 targetParamMap = targetParamMap
             )
         }.toList()
-        eventTriggerDispatcher.dispatch(*targetRunEvents.toTypedArray())
+        targetRunEvents.forEach { event ->
+            eventTriggerDispatcher.dispatch(event)
+        }
     }
 }
