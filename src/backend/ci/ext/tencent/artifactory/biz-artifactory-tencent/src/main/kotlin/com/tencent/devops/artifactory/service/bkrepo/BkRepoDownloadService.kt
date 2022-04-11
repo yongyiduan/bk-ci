@@ -365,6 +365,7 @@ open class BkRepoDownloadService @Autowired constructor(
         }
 
         val resultList = mutableListOf<String>()
+        logger.info("regionUrl:${RegionUtil.getRegionUrl(region)}")
         fileList.forEach {
             val repoName = RepoUtils.getRepoByType(artifactoryType)
             val shareUri = bkRepoClient.createShareUri(
