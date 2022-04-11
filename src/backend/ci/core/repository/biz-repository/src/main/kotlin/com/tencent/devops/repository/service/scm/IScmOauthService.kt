@@ -91,7 +91,8 @@ interface IScmOauthService {
         token: String?,
         region: CodeSvnRegion?,
         userName: String,
-        event: String?
+        event: String?,
+        hookUrl: String? = null
     )
 
     fun addCommitCheck(

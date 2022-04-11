@@ -183,23 +183,28 @@ class ScmOauthService @Autowired constructor(
         token: String?,
         region: CodeSvnRegion?,
         userName: String,
-        event: String?
+        event: String?,
+        hookUrl: String?
     ) {
         logger.info("[$projectName|$url|$type|$userName] Start to add web hook")
         val startEpoch = System.currentTimeMillis()
         try {
-            val hookUrl = when (type) {
-                ScmType.CODE_GIT -> {
-                    gitConfig.gitHookUrl
-                }
-                ScmType.CODE_GITLAB -> {
-                    gitConfig.gitlabHookUrl
-                }
-                ScmType.CODE_SVN -> {
-                    svnConfig.svnHookUrl
-                }
-                else -> {
-                    throw IllegalArgumentException("Unknown repository type ($type) when add webhook")
+            val realHookUrl = if (!hookUrl.isNullOrBlank()) {
+                hookUrl
+            } else {
+                when (type) {
+                    ScmType.CODE_GIT -> {
+                        gitConfig.gitHookUrl
+                    }
+                    ScmType.CODE_GITLAB -> {
+                        gitConfig.gitlabHookUrl
+                    }
+                    ScmType.CODE_SVN -> {
+                        svnConfig.svnHookUrl
+                    }
+                    else -> {
+                        throw IllegalArgumentException("Unknown repository type ($type) when add webhook")
+                    }
                 }
             }
             ScmOauthFactory.getScm(projectName = projectName,
@@ -212,7 +217,7 @@ class ScmOauthService @Autowired constructor(
                 region = region,
                 userName = userName,
                 event = event)
-                .addWebHook(hookUrl)
+                .addWebHook(realHookUrl)
         } finally {
             logger.info("It took ${System.currentTimeMillis() - startEpoch}ms to add web hook")
         }
