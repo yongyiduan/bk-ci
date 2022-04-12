@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component
 @Component(TargetFormType.CONSTANT)
 class ConstantTargetParamConverter : ITargetParamConverter {
 
-    override fun convert(node: JsonNode, targetParam: TargetParam): Pair<String, Any> {
+    override fun convert(projectId: String, node: JsonNode, targetParam: TargetParam): Pair<String, Any> {
         return Pair(targetParam.resourceKey, targetParam.value ?: "")
     }
 }

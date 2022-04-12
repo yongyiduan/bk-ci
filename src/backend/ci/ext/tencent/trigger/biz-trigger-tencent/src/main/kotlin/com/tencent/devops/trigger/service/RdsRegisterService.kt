@@ -242,7 +242,11 @@ class RdsRegisterService @Autowired constructor(
         triggerResource.forEach { resource ->
             val propValue = resource.resources[propName] ?: return@forEach
             val webhookParamMap =
-                TargetParamUtil.convert(MissingNode.getInstance(), eventSourceWebhook.webhookParams).toMutableMap()
+                TargetParamUtil.convert(
+                    projectId = projectId,
+                    node = MissingNode.getInstance(),
+                    targetParams = eventSourceWebhook.webhookParams
+                ).toMutableMap()
             val webhookUrl = "$eventBusWebhookUrl/$sourceName/$projectId/$busId"
             val eventsourceHandler = SpringContextUtil.getBean(IEventSourceHandler::class.java, sourceName)
             if (eventsourceHandler.registerWebhook(webhookUrl, webhookParamMap.plus(propName to propValue))) {

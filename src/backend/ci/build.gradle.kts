@@ -72,7 +72,7 @@ allprojects {
             }
 
             dependency("com.perforce:p4java:${Versions.p4}")
-            dependency("io.appform.rules:json-rules:${Versions.jsonRules}")
+            dependency("com.tencent.devops.rules:json-rules:${Versions.jsonRules}")
             dependencySet("io.cloudevents:${Versions.cloudEvents}") {
                 entry("cloudevents-spring")
                 entry("cloudevents-http-basic")

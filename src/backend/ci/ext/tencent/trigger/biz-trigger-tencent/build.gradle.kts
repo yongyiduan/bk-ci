@@ -36,8 +36,9 @@ dependencies {
     api(project(":ext:tencent:trigger:model-trigger-tencent"))
     api(project(":ext:tencent:process:api-process-tencent"))
     api(project(":ext:tencent:repository:api-repository-tencent"))
+    api(project(":ext:tencent:ticket:api-ticket-tencent"))
 
-    api("io.appform.rules:json-rules")
+    api("com.tencent.devops.rules:json-rules")
     api("io.cloudevents:cloudevents-spring")
     api("io.cloudevents:cloudevents-http-basic")
     api("io.cloudevents:cloudevents-json-jackson")

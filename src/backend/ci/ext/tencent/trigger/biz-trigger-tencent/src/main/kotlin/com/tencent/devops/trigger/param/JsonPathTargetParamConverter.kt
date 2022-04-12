@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component
 @Component(TargetFormType.JSON_PATH)
 class JsonPathTargetParamConverter : ITargetParamConverter {
 
-    override fun convert(node: JsonNode, targetParam: TargetParam): Pair<String, Any> {
+    override fun convert(projectId: String, node: JsonNode, targetParam: TargetParam): Pair<String, Any> {
         return if (targetParam.value == null) {
             Pair(targetParam.resourceKey, "")
         } else {

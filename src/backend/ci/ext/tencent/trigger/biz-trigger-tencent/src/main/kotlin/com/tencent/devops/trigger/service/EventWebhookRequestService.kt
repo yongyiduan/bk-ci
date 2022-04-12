@@ -216,7 +216,11 @@ class EventWebhookRequestService @Autowired constructor(
             return
         }
         val targetRunEvents = targetList.map { target ->
-            val targetParamMap = TargetParamUtil.convert(node = node, targetParams = target.targetParams)
+            val targetParamMap = TargetParamUtil.convert(
+                projectId = projectId,
+                node = node,
+                targetParams = target.targetParams
+            )
             EventTargetRunEvent(
                 projectId = projectId,
                 ruleId = ruleId,

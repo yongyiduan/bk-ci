@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component
 @Component(TargetFormType.TEMPLATE)
 class TemplateTargetParamConverter : ITargetParamConverter {
 
-    override fun convert(node: JsonNode, targetParam: TargetParam): Pair<String, Any> {
+    override fun convert(projectId: String, node: JsonNode, targetParam: TargetParam): Pair<String, Any> {
         if (targetParam.value == null || targetParam.template == null) {
             return Pair(targetParam.resourceKey, "")
         }

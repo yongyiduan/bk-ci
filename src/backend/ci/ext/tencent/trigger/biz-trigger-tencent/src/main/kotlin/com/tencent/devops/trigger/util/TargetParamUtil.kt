@@ -36,11 +36,11 @@ import com.tencent.devops.trigger.pojo.TargetParam
 
 object TargetParamUtil {
 
-    fun convert(node: JsonNode, targetParams: String): Map<String, Any> {
+    fun convert(projectId: String, node: JsonNode, targetParams: String): Map<String, Any> {
         val targetParamList = JsonUtil.to(targetParams, object : TypeReference<List<TargetParam>>() {})
         return targetParamList.associate { targetParam ->
             SpringContextUtil.getBean(ITargetParamConverter::class.java, targetParam.form)
-                .convert(node = node, targetParam = targetParam)
+                .convert(projectId = projectId, node = node, targetParam = targetParam)
         }
     }
 }

@@ -35,5 +35,5 @@ import com.tencent.devops.trigger.pojo.TargetParam
  */
 interface ITargetParamConverter {
 
-    fun convert(node: JsonNode, targetParam: TargetParam): Pair<String, Any>
+    fun convert(projectId: String, node: JsonNode, targetParam: TargetParam): Pair<String, Any>
 }
