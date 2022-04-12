@@ -206,7 +206,10 @@ interface ServiceScmOauthResource {
         userName: String,
         @ApiParam("事件类型", required = false)
         @QueryParam("event")
-        event: String?
+        event: String?,
+        @ApiParam("回调url", required = false)
+        @QueryParam("hookUrl")
+        hookUrl: String? = null
     ): Result<Boolean>
 
     @ApiOperation("添加Git Commit Check")

@@ -182,36 +182,41 @@ class ScmOauthService @Autowired constructor(
         token: String?,
         region: CodeSvnRegion?,
         userName: String,
-        event: String?
+        event: String?,
+        hookUrl: String?
     ) {
         logger.info("[$projectName|$url|$type|$userName] Start to add web hook")
         val startEpoch = System.currentTimeMillis()
         try {
-            val hookUrl = when (type) {
-                ScmType.CODE_GIT -> {
-                    if (gitConfig.gitHookUrl.isBlank()) {
-                        logger.warn("The git webhook url is not settle")
-                        throw RuntimeException("The git hook url is not settle")
+            val realHookUrl = if (!hookUrl.isNullOrBlank()) {
+                hookUrl
+            } else {
+                when (type) {
+                    ScmType.CODE_GIT -> {
+                        if (gitConfig.gitHookUrl.isBlank()) {
+                            logger.warn("The git webhook url is not settle")
+                            throw IllegalArgumentException("The git hook url is not settle")
+                        }
+                        gitConfig.gitHookUrl
                     }
-                    gitConfig.gitHookUrl
-                }
-                ScmType.CODE_GITLAB -> {
-                    if (gitConfig.gitlabHookUrl.isBlank()) {
-                        logger.warn("The gitlab webhook url is not settle")
-                        throw RuntimeException("The gitlab webhook url is not settle")
+                    ScmType.CODE_GITLAB -> {
+                        if (gitConfig.gitlabHookUrl.isBlank()) {
+                            logger.warn("The gitlab webhook url is not settle")
+                            throw IllegalArgumentException("The gitlab webhook url is not settle")
+                        }
+                        gitConfig.gitlabHookUrl
                     }
-                    gitConfig.gitlabHookUrl
-                }
-                ScmType.CODE_SVN -> {
-                    if (svnConfig.svnHookUrl.isBlank()) {
-                        logger.warn("The svn webhook url is not settle")
-                        throw RuntimeException("The svn webhook url is not settle")
+                    ScmType.CODE_SVN -> {
+                        if (svnConfig.svnHookUrl.isBlank()) {
+                            logger.warn("The svn webhook url is not settle")
+                            throw IllegalArgumentException("The svn webhook url is not settle")
+                        }
+                        svnConfig.svnHookUrl
                     }
-                    svnConfig.svnHookUrl
-                }
-                else -> {
-                    logger.warn("Unknown repository type ($type) when add webhook")
-                    throw RuntimeException("Unknown repository type ($type) when add webhook")
+                    else -> {
+                        logger.warn("Unknown repository type ($type) when add webhook")
+                        throw IllegalArgumentException("Unknown repository type ($type) when add webhook")
+                    }
                 }
             }
             ScmOauthFactory.getScm(
@@ -225,7 +230,7 @@ class ScmOauthService @Autowired constructor(
                 region = region,
                 userName = userName,
                 event = event
-            ).addWebHook(hookUrl)
+            ).addWebHook(realHookUrl)
         } finally {
             logger.info("It took ${System.currentTimeMillis() - startEpoch}ms to add web hook")
         }

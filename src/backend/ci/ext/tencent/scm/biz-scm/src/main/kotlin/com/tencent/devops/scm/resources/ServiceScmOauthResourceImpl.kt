@@ -167,11 +167,12 @@ class ServiceScmOauthResourceImpl @Autowired constructor(private val scmOauthSer
         token: String?,
         region: CodeSvnRegion?,
         userName: String,
-        event: String?
+        event: String?,
+        hookUrl: String?
     ): Result<Boolean> {
         logger.info(
             "Start to add the web hook of " +
-                "(projectName=$projectName, url=$url, type=$type, username=$userName, event=$event)"
+                "(projectName=$projectName, url=$url, type=$type, username=$userName, event=$event,hookUrl=$hookUrl)"
         )
         scmOauthService.addWebHook(
             projectName = projectName,
@@ -182,7 +183,8 @@ class ServiceScmOauthResourceImpl @Autowired constructor(private val scmOauthSer
             token = token,
             region = region,
             userName = userName,
-            event = event
+            event = event,
+            hookUrl = hookUrl
         )
         return Result(true)
     }

@@ -142,7 +142,8 @@ class TencentScmOauthServiceImpl @Autowired constructor(val client: Client) : IS
         token: String?,
         region: CodeSvnRegion?,
         userName: String,
-        event: String?
+        event: String?,
+        hookUrl: String?
     ) {
         client.getScm(ServiceScmOauthResource::class).addWebHook(
             projectName = projectName,
@@ -153,7 +154,8 @@ class TencentScmOauthServiceImpl @Autowired constructor(val client: Client) : IS
             token = token,
             region = region,
             userName = userName,
-            event = event
+            event = event,
+            hookUrl
         )
     }
 
