@@ -30,7 +30,7 @@ package com.tencent.devops.trigger.source.tgit
 import com.tencent.devops.common.api.enums.ScmType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.repository.api.scm.ServiceScmOauthResource
+import com.tencent.devops.repository.api.scm.ServiceScmResource
 import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.trigger.constant.SourceType
 import com.tencent.devops.trigger.source.IEventSourceHandler
@@ -68,7 +68,7 @@ class TGitEventSourceHandler(
             logger.info("Started to register tgit webhook with url($repoUrl) event($event)")
             try {
                 val projectName = GitUtils.getProjectName(repoUrl)
-                client.get(ServiceScmOauthResource::class).addWebHook(
+                client.get(ServiceScmResource::class).addWebHook(
                     projectName = projectName,
                     url = repoUrl,
                     type = ScmType.CODE_GIT,
