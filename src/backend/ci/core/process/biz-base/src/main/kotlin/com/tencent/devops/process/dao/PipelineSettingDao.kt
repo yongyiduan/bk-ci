@@ -38,6 +38,7 @@ import com.tencent.devops.process.utils.PIPELINE_RES_NUM_MIN
 import com.tencent.devops.process.utils.PIPELINE_SETTING_MAX_QUEUE_SIZE_DEFAULT
 import com.tencent.devops.process.utils.PIPELINE_SETTING_WAIT_QUEUE_TIME_MINUTE_DEFAULT
 import com.tencent.devops.process.utils.PIPELINE_START_USER_NAME
+import org.checkerframework.checker.units.qual.C
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.Record1
@@ -134,7 +135,9 @@ class PipelineSettingDao {
                 IS_TEMPLATE,
                 MAX_PIPELINE_RES_NUM,
                 MAX_CON_RUNNING_QUEUE_SIZE,
-                BUILD_NUM_RULE
+                BUILD_NUM_RULE,
+                CONCURRENCY_GROUP,
+                CONCURRENCY_CANCEL_IN_PROGRESS
             )
                 .values(
                     setting.projectId,
@@ -163,7 +166,9 @@ class PipelineSettingDao {
                     isTemplate,
                     setting.maxPipelineResNum,
                     setting.maxConRunningQueueSize,
-                    setting.buildNumRule
+                    setting.buildNumRule,
+                    setting.concurrencyGroup,
+                    setting.concurrencyCancelInProgress
                 ).onDuplicateKeyUpdate()
                 .set(NAME, setting.pipelineName)
                 .set(DESC, setting.desc)
@@ -190,6 +195,8 @@ class PipelineSettingDao {
                 .set(MAX_PIPELINE_RES_NUM, setting.maxPipelineResNum)
                 .set(MAX_CON_RUNNING_QUEUE_SIZE, setting.maxConRunningQueueSize)
                 .set(BUILD_NUM_RULE, setting.buildNumRule)
+                .set(CONCURRENCY_GROUP, setting.concurrencyGroup)
+                .set(CONCURRENCY_CANCEL_IN_PROGRESS, setting.concurrencyCancelInProgress)
                 .execute()
         }
     }

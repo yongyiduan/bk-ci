@@ -36,7 +36,6 @@ import com.tencent.devops.process.constant.ProcessMessageCode.PIPELINE_SETTING_N
 import com.tencent.devops.process.engine.pojo.Response
 import com.tencent.devops.process.engine.pojo.event.PipelineBuildCancelEvent
 import com.tencent.devops.process.engine.service.PipelineRedisService
-import com.tencent.devops.process.engine.service.PipelineRepositoryService
 import com.tencent.devops.process.engine.service.PipelineRuntimeExtService
 import com.tencent.devops.process.engine.service.PipelineRuntimeService
 import com.tencent.devops.process.pojo.setting.PipelineRunLockType
@@ -51,7 +50,6 @@ import org.springframework.stereotype.Component
 @Suppress("ALL")
 class QueueInterceptor @Autowired constructor(
     private val pipelineRuntimeService: PipelineRuntimeService,
-    private val pipelineRepositoryService: PipelineRepositoryService,
     private val pipelineRuntimeExtService: PipelineRuntimeExtService,
     private val pipelineEventDispatcher: PipelineEventDispatcher,
     private val buildLogPrinter: BuildLogPrinter,
@@ -61,28 +59,119 @@ class QueueInterceptor @Autowired constructor(
     override fun execute(task: InterceptData): Response<BuildStatus> {
         val projectId = task.pipelineInfo.projectId
         val pipelineId = task.pipelineInfo.pipelineId
-        val setting = pipelineRepositoryService.getSetting(projectId, pipelineId)
-            ?: return Response(status = PIPELINE_SETTING_NOT_EXISTS.toInt(), message = "流水线设置不存在/Setting not found")
+        val setting = task.setting
+            ?: return Response(
+                status = PIPELINE_SETTING_NOT_EXISTS.toInt(),
+                message = "流水线设置不存在/Setting not found"
+            )
         val runLockType = setting.runLockType
-
         val buildSummaryRecord = pipelineRuntimeService.getBuildSummaryRecord(projectId, pipelineId)
-        return if (buildSummaryRecord == null) {
-            // Summary为空是不正常的，抛错
-            Response(status = ERROR_PIPELINE_SUMMARY_NOT_FOUND.toInt(), message = "异常：流水线的基础构建数据Summary不存在，请联系管理员")
-        } else if (runLockType == PipelineRunLockType.SINGLE || runLockType == PipelineRunLockType.SINGLE_LOCK) {
-            // 如果最后一次构建被标记为refresh,则即便是串行也放行。因refresh的buildId都会被取消掉
-            if (buildSummaryRecord.latestBuildId == null ||
-                pipelineRedisService.getBuildRestartValue(buildSummaryRecord.latestBuildId) != null) {
-                return Response(data = BuildStatus.RUNNING)
-            }
+        return when {
+            buildSummaryRecord == null ->
+                // Summary为空是不正常的，抛错
+                Response(
+                    status = ERROR_PIPELINE_SUMMARY_NOT_FOUND.toInt(),
+                    message = "异常：流水线的基础构建数据Summary不存在，请联系管理员"
+                )
+            runLockType == PipelineRunLockType.SINGLE || runLockType == PipelineRunLockType.SINGLE_LOCK ->
+                checkRunLockWithSingleType(
+                    task = task,
+                    latestBuildId = buildSummaryRecord.latestBuildId,
+                    latestStartUser = buildSummaryRecord.latestStartUser,
+                    runningCount = buildSummaryRecord.runningCount,
+                    queueCount = buildSummaryRecord.queueCount
+                )
+            setting.maxConRunningQueueSize <= (buildSummaryRecord.queueCount + buildSummaryRecord.runningCount) ->
+                Response(
+                    status = ERROR_PIPELINE_QUEUE_FULL.toInt(),
+                    message = "并行上限/Max parallel: ${setting.maxConRunningQueueSize}"
+                )
+            else -> Response(data = BuildStatus.RUNNING)
+        }
+    }
 
-            val maxQueue = setting.maxQueueSize
-            if (maxQueue == 0 && buildSummaryRecord.runningCount == 0 && buildSummaryRecord.queueCount == 0) {
-                // 设置了最大排队数量限制为0，但此时没有构建正在执行
+    private fun checkRunLockWithSingleType(
+        task: InterceptData,
+        latestBuildId: String?,
+        latestStartUser: String,
+        runningCount: Int,
+        queueCount: Int
+    ): Response<BuildStatus> {
+        val projectId = task.pipelineInfo.projectId
+        val pipelineId = task.pipelineInfo.pipelineId
+        val setting = task.setting
+            ?: return Response(
+                status = PIPELINE_SETTING_NOT_EXISTS.toInt(),
+                message = "流水线设置不存在/Setting not found"
+            )
+        val concurrencyGroup = setting.concurrencyGroup
+        return when {
+            // 如果最后一次构建被标记为refresh,则即便是串行也放行。因refresh的buildId都会被取消掉
+            latestBuildId == null || pipelineRedisService.getBuildRestartValue(latestBuildId) != null ->
                 Response(data = BuildStatus.RUNNING)
-            } else if (maxQueue == 0 && (buildSummaryRecord.runningCount > 0 || buildSummaryRecord.queueCount > 0)) {
-                Response(status = ERROR_PIPELINE_QUEUE_FULL.toInt(), message = "流水线串行，排队数设置为0")
-            } else if (buildSummaryRecord.queueCount >= maxQueue) {
+            !concurrencyGroup.isNullOrBlank() -> {
+                // cancel-in-progress: true时， 若有相同 group 的流水线正在执行，则取消正在执行的流水线，新来的触发开始执行
+                if (setting.concurrencyCancelInProgress) {
+                    pipelineRuntimeExtService.popAllConcurrencyGroupBuildInfo(
+                        projectId = projectId,
+                        concurrencyGroup = concurrencyGroup,
+                        buildStatus = BuildStatus.RUNNING
+                    ).forEach { buildInfo ->
+                        buildLogPrinter.addRedLine(
+                            buildId = buildInfo.buildId,
+                            message = "[$pipelineId] because concurrency cancel in progress, cancel all running build",
+                            tag = "QueueInterceptor",
+                            jobId = "",
+                            executeCount = 1
+                        )
+                        pipelineEventDispatcher.dispatch(
+                            PipelineBuildCancelEvent(
+                                source = javaClass.simpleName,
+                                projectId = buildInfo.projectId,
+                                pipelineId = pipelineId,
+                                userId = latestStartUser,
+                                buildId = buildInfo.buildId,
+                                status = BuildStatus.CANCELED
+                            )
+                        )
+                    }
+                    Response(data = BuildStatus.RUNNING)
+                } else {
+                    pipelineRuntimeExtService.popAllConcurrencyGroupBuildInfo(
+                        projectId = projectId,
+                        concurrencyGroup = concurrencyGroup,
+                        buildStatus = BuildStatus.QUEUE
+                    ).forEach { buildInfo ->
+                        buildLogPrinter.addRedLine(
+                            buildId = buildInfo.buildId,
+                            message = "[$pipelineId] because concurrency cancel in progress, cancel all queue build",
+                            tag = "QueueInterceptor",
+                            jobId = "",
+                            executeCount = 1
+                        )
+                        pipelineEventDispatcher.dispatch(
+                            PipelineBuildCancelEvent(
+                                source = javaClass.simpleName,
+                                projectId = buildInfo.projectId,
+                                pipelineId = pipelineId,
+                                userId = latestStartUser,
+                                buildId = buildInfo.buildId,
+                                status = BuildStatus.CANCELED
+                            )
+                        )
+                    }
+                    Response(data = BuildStatus.RUNNING)
+                }
+            }
+            // 设置了最大排队数量限制为0，但此时没有构建正在执行
+            setting.maxQueueSize == 0 && runningCount == 0 && queueCount == 0 ->
+                Response(data = BuildStatus.RUNNING)
+            setting.maxQueueSize == 0 && (runningCount > 0 || queueCount > 0) ->
+                Response(
+                    status = ERROR_PIPELINE_QUEUE_FULL.toInt(),
+                    message = "流水线串行，排队数设置为0"
+                )
+            queueCount >= setting.maxQueueSize -> {
                 // 排队数量超过最大限制,排队数量已满，将该流水线最靠前的排队记录，置为"取消构建"，取消人为本次新构建的触发人
                 val buildInfo = pipelineRuntimeExtService.popNextQueueBuildInfo(
                     projectId = projectId,
@@ -102,24 +191,17 @@ class QueueInterceptor @Autowired constructor(
                             source = javaClass.simpleName,
                             projectId = buildInfo.projectId,
                             pipelineId = pipelineId,
-                            userId = buildSummaryRecord.latestStartUser,
+                            userId = latestStartUser,
                             buildId = buildInfo.buildId,
                             status = BuildStatus.CANCELED
                         )
                     )
                 }
                 Response(data = BuildStatus.RUNNING)
-            } else {
-                // 满足条件
-                Response(data = BuildStatus.RUNNING)
             }
-        } else {
-            val maxRunningQueue = setting.maxConRunningQueueSize
-            if (maxRunningQueue <= (buildSummaryRecord.queueCount + buildSummaryRecord.runningCount)) {
-                Response(status = ERROR_PIPELINE_QUEUE_FULL.toInt(), message = "并行上限/Max parallel: $maxRunningQueue")
-            } else {
+            // 满足条件
+            else ->
                 Response(data = BuildStatus.RUNNING)
-            }
         }
     }
 }

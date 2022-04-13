@@ -44,14 +44,13 @@ import org.springframework.stereotype.Component
  */
 @Component
 class RunLockInterceptor @Autowired constructor(
-    private val pipelineRuntimeService: PipelineRuntimeService,
-    private val pipelineRepositoryService: PipelineRepositoryService
+    private val pipelineRuntimeService: PipelineRuntimeService
 ) : PipelineInterceptor {
 
     override fun execute(task: InterceptData): Response<BuildStatus> {
         val projectId = task.pipelineInfo.projectId
         val pipelineId = task.pipelineInfo.pipelineId
-        val setting = pipelineRepositoryService.getSetting(projectId, pipelineId)
+        val setting = task.setting
         val runLockType = setting?.runLockType
         return checkRunLock(runLockType, projectId, pipelineId)
     }

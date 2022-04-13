@@ -125,6 +125,7 @@ import com.tencent.devops.process.pojo.ReviewParam
 import com.tencent.devops.process.pojo.code.WebhookInfo
 import com.tencent.devops.process.pojo.pipeline.PipelineLatestBuild
 import com.tencent.devops.process.pojo.pipeline.enums.PipelineRuleBusCodeEnum
+import com.tencent.devops.process.pojo.setting.PipelineSetting
 import com.tencent.devops.process.service.BuildVariableService
 import com.tencent.devops.process.service.ProjectCacheService
 import com.tencent.devops.process.service.StageTagService
@@ -520,7 +521,8 @@ class PipelineRuntimeService @Autowired constructor(
                     channelCode = ChannelCode.valueOf(channel)
                 ),
                 buildNumAlias = buildNumAlias,
-                updateTime = updateTime?.timestampmilli() ?: endTime?.timestampmilli() ?: 0L // 防止空异常
+                updateTime = updateTime?.timestampmilli() ?: endTime?.timestampmilli() ?: 0L, // 防止空异常
+                concurrencyGroup = concurrencyGroup
             )
         }
     }
@@ -696,6 +698,7 @@ class PipelineRuntimeService @Autowired constructor(
         fullModel: Model,
         originStartParams: List<BuildParameters>,
         startParamsWithType: List<BuildParameters>,
+        setting: PipelineSetting?,
         buildNo: Int? = null,
         buildNumRule: String? = null,
         acquire: Boolean? = false
@@ -1052,7 +1055,8 @@ class PipelineRuntimeService @Autowired constructor(
                         webhookType = startParamMap[PIPELINE_WEBHOOK_TYPE] as String?,
                         webhookInfo = getWebhookInfo(startParamMap),
                         buildMsg = getBuildMsg(startParamMap[PIPELINE_BUILD_MSG] as String?),
-                        buildNumAlias = buildNumAlias
+                        buildNumAlias = buildNumAlias,
+                        concurrencyGroup = setting?.concurrencyGroup
                     )
                     // detail记录,未正式启动，先排队状态
                     buildDetailDao.create(
