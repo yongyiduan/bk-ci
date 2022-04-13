@@ -35,10 +35,12 @@ import com.tencent.devops.process.constant.ProcessMessageCode.ERROR_PIPELINE_SUM
 import com.tencent.devops.process.constant.ProcessMessageCode.PIPELINE_SETTING_NOT_EXISTS
 import com.tencent.devops.process.engine.pojo.Response
 import com.tencent.devops.process.engine.pojo.event.PipelineBuildCancelEvent
+import com.tencent.devops.process.engine.service.PipelineBuildDetailService
 import com.tencent.devops.process.engine.service.PipelineRedisService
 import com.tencent.devops.process.engine.service.PipelineRuntimeExtService
 import com.tencent.devops.process.engine.service.PipelineRuntimeService
 import com.tencent.devops.process.pojo.setting.PipelineRunLockType
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -50,11 +52,16 @@ import org.springframework.stereotype.Component
 @Suppress("ALL")
 class QueueInterceptor @Autowired constructor(
     private val pipelineRuntimeService: PipelineRuntimeService,
+    private val buildDetailService: PipelineBuildDetailService,
     private val pipelineRuntimeExtService: PipelineRuntimeExtService,
     private val pipelineEventDispatcher: PipelineEventDispatcher,
     private val buildLogPrinter: BuildLogPrinter,
     private val pipelineRedisService: PipelineRedisService
 ) : PipelineInterceptor {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(QueueInterceptor::class.java)
+    }
 
     override fun execute(task: InterceptData): Response<BuildStatus> {
         val projectId = task.pipelineInfo.projectId
@@ -120,19 +127,15 @@ class QueueInterceptor @Autowired constructor(
                         buildLogPrinter.addRedLine(
                             buildId = buildInfo.buildId,
                             message = "[$pipelineId] because concurrency cancel in progress, cancel all running build",
-                            tag = "QueueInterceptor",
+                            tag = "",
                             jobId = "",
                             executeCount = 1
                         )
-                        pipelineEventDispatcher.dispatch(
-                            PipelineBuildCancelEvent(
-                                source = javaClass.simpleName,
-                                projectId = buildInfo.projectId,
-                                pipelineId = pipelineId,
-                                userId = latestStartUser ?: task.pipelineInfo.creator,
-                                buildId = buildInfo.buildId,
-                                status = BuildStatus.CANCELED
-                            )
+                        cancelBuildPipeline(
+                            projectId = projectId,
+                            pipelineId = pipelineId,
+                            buildId = buildInfo.buildId,
+                            userId = latestStartUser ?: task.pipelineInfo.creator
                         )
                     }
                     Response(data = BuildStatus.RUNNING)
@@ -145,19 +148,15 @@ class QueueInterceptor @Autowired constructor(
                         buildLogPrinter.addRedLine(
                             buildId = buildInfo.buildId,
                             message = "[$pipelineId] because concurrency cancel in progress, cancel all queue build",
-                            tag = "QueueInterceptor",
+                            tag = "",
                             jobId = "",
                             executeCount = 1
                         )
-                        pipelineEventDispatcher.dispatch(
-                            PipelineBuildCancelEvent(
-                                source = javaClass.simpleName,
-                                projectId = buildInfo.projectId,
-                                pipelineId = pipelineId,
-                                userId = latestStartUser ?: task.pipelineInfo.creator,
-                                buildId = buildInfo.buildId,
-                                status = BuildStatus.CANCELED
-                            )
+                        cancelBuildPipeline(
+                            projectId = projectId,
+                            pipelineId = pipelineId,
+                            buildId = buildInfo.buildId,
+                            userId = latestStartUser ?: task.pipelineInfo.creator
                         )
                     }
                     Response(data = BuildStatus.RUNNING)
@@ -202,6 +201,26 @@ class QueueInterceptor @Autowired constructor(
             // 满足条件
             else ->
                 Response(data = BuildStatus.RUNNING)
+        }
+    }
+
+    private fun cancelBuildPipeline(projectId: String, pipelineId: String, buildId: String, userId: String) {
+        try {
+            pipelineRuntimeService.cancelBuild(
+                projectId = projectId,
+                pipelineId = pipelineId,
+                buildId = buildId,
+                userId = userId,
+                buildStatus = BuildStatus.CANCELED
+            )
+            buildDetailService.updateBuildCancelUser(
+                projectId = projectId,
+                buildId = buildId,
+                cancelUserId = userId
+            )
+            logger.info("Cancel the pipeline($pipelineId) of instance($buildId) by the user($userId)")
+        } catch (t: Throwable) {
+            logger.warn("Fail to shutdown the build($buildId) of pipeline($pipelineId)", t)
         }
     }
 }
