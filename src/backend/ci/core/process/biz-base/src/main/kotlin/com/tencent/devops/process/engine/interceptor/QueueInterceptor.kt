@@ -93,7 +93,7 @@ class QueueInterceptor @Autowired constructor(
     private fun checkRunLockWithSingleType(
         task: InterceptData,
         latestBuildId: String?,
-        latestStartUser: String,
+        latestStartUser: String?,
         runningCount: Int,
         queueCount: Int
     ): Response<BuildStatus> {
@@ -129,7 +129,7 @@ class QueueInterceptor @Autowired constructor(
                                 source = javaClass.simpleName,
                                 projectId = buildInfo.projectId,
                                 pipelineId = pipelineId,
-                                userId = latestStartUser,
+                                userId = latestStartUser ?: task.pipelineInfo.creator,
                                 buildId = buildInfo.buildId,
                                 status = BuildStatus.CANCELED
                             )
@@ -154,7 +154,7 @@ class QueueInterceptor @Autowired constructor(
                                 source = javaClass.simpleName,
                                 projectId = buildInfo.projectId,
                                 pipelineId = pipelineId,
-                                userId = latestStartUser,
+                                userId = latestStartUser ?: task.pipelineInfo.creator,
                                 buildId = buildInfo.buildId,
                                 status = BuildStatus.CANCELED
                             )
@@ -191,7 +191,7 @@ class QueueInterceptor @Autowired constructor(
                             source = javaClass.simpleName,
                             projectId = buildInfo.projectId,
                             pipelineId = pipelineId,
-                            userId = latestStartUser,
+                            userId = latestStartUser ?: task.pipelineInfo.creator,
                             buildId = buildInfo.buildId,
                             status = BuildStatus.CANCELED
                         )
