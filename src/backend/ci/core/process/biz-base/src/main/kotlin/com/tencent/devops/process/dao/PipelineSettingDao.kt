@@ -38,7 +38,6 @@ import com.tencent.devops.process.utils.PIPELINE_RES_NUM_MIN
 import com.tencent.devops.process.utils.PIPELINE_SETTING_MAX_QUEUE_SIZE_DEFAULT
 import com.tencent.devops.process.utils.PIPELINE_SETTING_WAIT_QUEUE_TIME_MINUTE_DEFAULT
 import com.tencent.devops.process.utils.PIPELINE_START_USER_NAME
-import org.checkerframework.checker.units.qual.C
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.Record1

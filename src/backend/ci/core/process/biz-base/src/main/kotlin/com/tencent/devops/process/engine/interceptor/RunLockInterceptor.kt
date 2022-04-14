@@ -30,7 +30,6 @@ package com.tencent.devops.process.engine.interceptor
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.process.constant.ProcessMessageCode.ERROR_PIPELINE_LOCK
 import com.tencent.devops.process.engine.pojo.Response
-import com.tencent.devops.process.engine.service.PipelineRepositoryService
 import com.tencent.devops.process.engine.service.PipelineRuntimeService
 import com.tencent.devops.process.pojo.setting.PipelineRunLockType
 import org.slf4j.LoggerFactory

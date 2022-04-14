@@ -138,7 +138,6 @@ class PipelineRuntimeExtService @Autowired constructor(
                     oldBuildStatus = BuildStatus.QUEUE,
                     newBuildStatus = BuildStatus.UNEXEC
                 )
-
             } finally {
                 redisLock.unlock()
             }
