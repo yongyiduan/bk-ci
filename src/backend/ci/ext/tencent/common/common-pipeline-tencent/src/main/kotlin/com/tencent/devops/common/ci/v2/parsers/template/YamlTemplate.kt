@@ -134,7 +134,8 @@ class YamlTemplate<T>(
                 label = label,
                 triggerOn = triggerOn,
                 resources = resources,
-                notices = notices
+                notices = notices,
+                concurrency = concurrency
             )
         }
 

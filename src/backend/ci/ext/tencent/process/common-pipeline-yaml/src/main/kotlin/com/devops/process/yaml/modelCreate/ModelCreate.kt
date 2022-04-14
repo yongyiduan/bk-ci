@@ -47,6 +47,9 @@ import com.tencent.devops.process.engine.common.VMUtils
 import com.tencent.devops.process.pojo.classify.PipelineGroup
 import com.tencent.devops.process.pojo.classify.PipelineGroupCreate
 import com.tencent.devops.process.pojo.classify.PipelineLabelCreate
+import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
+import com.tencent.devops.process.pojo.setting.PipelineRunLockType
+import com.tencent.devops.process.pojo.setting.PipelineSetting
 import org.slf4j.LoggerFactory
 
 class ModelCreate constructor(
@@ -66,7 +69,7 @@ class ModelCreate constructor(
         event: ModelCreateEvent,
         yaml: ScriptBuildYaml,
         pipelineParams: List<BuildFormProperty>
-    ): Model {
+    ): PipelineModelAndSetting {
         // 流水线插件标签设置
         val labelList = preparePipelineLabels(event, yaml)
 
@@ -150,13 +153,24 @@ class ModelCreate constructor(
             )
         }
 
-        return Model(
-            name = modelName,
-            desc = "",
-            stages = stageList,
-            labels = labelList,
-            instanceFromTemplate = false,
-            pipelineCreator = event.userId
+        return PipelineModelAndSetting(
+            model = Model(
+                name = modelName,
+                desc = "",
+                stages = stageList,
+                labels = labelList,
+                instanceFromTemplate = false,
+                pipelineCreator = event.userId
+            ),
+            setting = PipelineSetting(
+                concurrencyGroup = yaml.concurrency?.group,
+                // Cancel-In-Progress入口先不放开给用户配置
+                concurrencyCancelInProgress = true,
+                runLockType = when {
+                    yaml.concurrency?.group != null -> PipelineRunLockType.SINGLE
+                    else -> PipelineRunLockType.MULTIPLE
+                }
+            )
         )
     }
 

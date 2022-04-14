@@ -25,21 +25,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.process.engine.interceptor
+package com.tencent.devops.common.ci.v2
 
-import com.tencent.devops.common.pipeline.Model
-import com.tencent.devops.common.pipeline.enums.StartType
-import com.tencent.devops.process.engine.pojo.PipelineInfo
-import com.tencent.devops.process.pojo.setting.PipelineSetting
+import com.fasterxml.jackson.annotation.JsonProperty
 
-/**
- *
- *
- * @version 1.0
- */
-data class InterceptData(
-    val pipelineInfo: PipelineInfo,
-    val model: Model?,
-    val startType: StartType,
-    val setting: PipelineSetting?
+data class Concurrency(
+    val group: String?,
+    @JsonProperty("cancel-in-progress")
+    val cancelInProgress: Boolean?
 )
