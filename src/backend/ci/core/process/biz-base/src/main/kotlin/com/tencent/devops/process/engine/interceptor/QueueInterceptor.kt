@@ -206,7 +206,7 @@ class QueueInterceptor @Autowired constructor(
             tasks.forEach { task ->
                 val taskId = task["taskId"]?.toString() ?: ""
                 logger.info("build($buildId) shutdown by $userId, taskId: $taskId, status: ${task["status"] ?: ""}")
-                buildLogPrinter.addRedLine(
+                buildLogPrinter.addYellowLine(
                     buildId = buildId,
                     message = "because concurrency cancel in progress with group($groupName), Run cancelled by $userId",
                     tag = taskId,
