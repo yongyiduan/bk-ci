@@ -30,9 +30,11 @@ package com.tencent.devops.process.engine.interceptor
 import com.tencent.devops.common.event.dispatcher.pipeline.PipelineEventDispatcher
 import com.tencent.devops.common.log.utils.BuildLogPrinter
 import com.tencent.devops.common.pipeline.enums.BuildStatus
+import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.process.constant.ProcessMessageCode.ERROR_PIPELINE_QUEUE_FULL
 import com.tencent.devops.process.constant.ProcessMessageCode.ERROR_PIPELINE_SUMMARY_NOT_FOUND
 import com.tencent.devops.process.constant.ProcessMessageCode.PIPELINE_SETTING_NOT_EXISTS
+import com.tencent.devops.process.engine.control.lock.BuildIdLock
 import com.tencent.devops.process.engine.pojo.Response
 import com.tencent.devops.process.engine.pojo.event.PipelineBuildCancelEvent
 import com.tencent.devops.process.engine.service.PipelineBuildDetailService
@@ -58,6 +60,7 @@ class QueueInterceptor @Autowired constructor(
     private val pipelineEventDispatcher: PipelineEventDispatcher,
     private val buildLogPrinter: BuildLogPrinter,
     private val pipelineTaskService: PipelineTaskService,
+    private val redisOperation: RedisOperation,
     private val pipelineRedisService: PipelineRedisService
 ) : PipelineInterceptor {
 
@@ -139,7 +142,7 @@ class QueueInterceptor @Autowired constructor(
                     if (buildInfo == null) return@forEach
                     cancelBuildPipeline(
                         projectId = projectId,
-                        pipelineId = pipelineId,
+                        pipelineId = buildInfo.pipelineId,
                         buildId = buildInfo.buildId,
                         userId = latestStartUser ?: task.pipelineInfo.creator,
                         groupName = concurrencyGroup
@@ -196,44 +199,50 @@ class QueueInterceptor @Autowired constructor(
         userId: String,
         groupName: String
     ) {
-        val tasks = pipelineTaskService.getRunningTask(projectId, buildId)
-        tasks.forEach { task ->
-            val taskId = task["taskId"]?.toString() ?: ""
-            logger.info("build($buildId) shutdown by $userId, taskId: $taskId, status: ${task["status"] ?: ""}")
-            buildLogPrinter.addRedLine(
-                buildId = buildId,
-                message = "because concurrency cancel in progress with group($groupName), Run cancelled by $userId",
-                tag = taskId,
-                jobId = task["containerId"]?.toString() ?: "",
-                executeCount = task["executeCount"] as? Int ?: 1
-            )
-        }
-        if (tasks.isEmpty()) {
-            buildLogPrinter.addRedLine(
-                buildId = buildId,
-                message = "$pipelineId] because concurrency cancel in progress with group($groupName)" +
-                    ", cancel all queue build",
-                tag = "QueueInterceptor",
-                jobId = "",
-                executeCount = 1
-            )
-        }
+        val redisLock = BuildIdLock(redisOperation = redisOperation, buildId = buildId)
         try {
-            pipelineRuntimeService.cancelBuild(
-                projectId = projectId,
-                pipelineId = pipelineId,
-                buildId = buildId,
-                userId = userId,
-                buildStatus = BuildStatus.CANCELED
-            )
-            buildDetailService.updateBuildCancelUser(
-                projectId = projectId,
-                buildId = buildId,
-                cancelUserId = userId
-            )
-            logger.info("Cancel the pipeline($pipelineId) of instance($buildId) by the user($userId)")
-        } catch (t: Throwable) {
-            logger.warn("Fail to shutdown the build($buildId) of pipeline($pipelineId)", t)
+            redisLock.lock()
+            val tasks = pipelineTaskService.getRunningTask(projectId, buildId)
+            tasks.forEach { task ->
+                val taskId = task["taskId"]?.toString() ?: ""
+                logger.info("build($buildId) shutdown by $userId, taskId: $taskId, status: ${task["status"] ?: ""}")
+                buildLogPrinter.addRedLine(
+                    buildId = buildId,
+                    message = "because concurrency cancel in progress with group($groupName), Run cancelled by $userId",
+                    tag = taskId,
+                    jobId = task["containerId"]?.toString() ?: "",
+                    executeCount = task["executeCount"] as? Int ?: 1
+                )
+            }
+            if (tasks.isEmpty()) {
+                buildLogPrinter.addRedLine(
+                    buildId = buildId,
+                    message = "$pipelineId] because concurrency cancel in progress with group($groupName)" +
+                        ", cancel all queue build",
+                    tag = "QueueInterceptor",
+                    jobId = "",
+                    executeCount = 1
+                )
+            }
+            try {
+                pipelineRuntimeService.cancelBuild(
+                    projectId = projectId,
+                    pipelineId = pipelineId,
+                    buildId = buildId,
+                    userId = userId,
+                    buildStatus = BuildStatus.CANCELED
+                )
+                buildDetailService.updateBuildCancelUser(
+                    projectId = projectId,
+                    buildId = buildId,
+                    cancelUserId = userId
+                )
+                logger.info("Cancel the pipeline($pipelineId) of instance($buildId) by the user($userId)")
+            } catch (t: Throwable) {
+                logger.warn("Fail to shutdown the build($buildId) of pipeline($pipelineId)", t)
+            }
+        } finally {
+            redisLock.unlock()
         }
     }
 }
