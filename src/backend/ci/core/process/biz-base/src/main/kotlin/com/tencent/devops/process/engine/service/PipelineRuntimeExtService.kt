@@ -120,20 +120,10 @@ class PipelineRuntimeExtService @Autowired constructor(
     }
 
     fun popAllConcurrencyGroupBuildInfo(
-        projectId: String,
-        concurrencyGroup: String,
-        oldStatus: BuildStatus,
-        newStatus: BuildStatus
-    ): List<BuildInfo> {
-        val buildInfoList = mutableListOf<BuildInfo>()
-        pipelineBuildDao.getBuildTasksByConcurrencyGroup(
-            dslContext = dslContext,
-            projectId = projectId,
-            concurrencyGroup = concurrencyGroup,
-            statusSet = oldStatus
-        ).map {
-            pipelineBuildDao.convert(it)
-        }.forEach { buildInfo ->
+        buildInfoList: List<BuildInfo?>
+    ) {
+        buildInfoList.forEach { buildInfo ->
+            if (buildInfo == null) return@forEach
             val redisLock = RedisLock(
                 redisOperation = redisOperation,
                 lockKey = "$nextBuildKey:${buildInfo.pipelineId}",
@@ -141,21 +131,17 @@ class PipelineRuntimeExtService @Autowired constructor(
             )
             try {
                 redisLock.lock()
-                if (buildInfo != null &&
-                    pipelineBuildDao.updateStatus(
-                        dslContext = dslContext,
-                        projectId = projectId,
-                        buildId = buildInfo.buildId,
-                        oldBuildStatus = oldStatus,
-                        newBuildStatus = newStatus
-                    )
-                ) {
-                    buildInfoList.add(buildInfo)
-                }
+                pipelineBuildDao.updateStatus(
+                    dslContext = dslContext,
+                    projectId = buildInfo.projectId,
+                    buildId = buildInfo.buildId,
+                    oldBuildStatus = BuildStatus.QUEUE,
+                    newBuildStatus = BuildStatus.UNEXEC
+                )
+
             } finally {
                 redisLock.unlock()
             }
         }
-        return buildInfoList
     }
 }

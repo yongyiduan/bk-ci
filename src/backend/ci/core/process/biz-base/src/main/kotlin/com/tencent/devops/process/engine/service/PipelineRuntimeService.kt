@@ -260,6 +260,21 @@ class PipelineRuntimeService @Autowired constructor(
         return pipelineBuildDao.convert(t)
     }
 
+    fun getBuildInfoListByConcurrencyGroup(
+        projectId: String,
+        concurrencyGroup: String,
+        status: BuildStatus
+    ): List<BuildInfo?> {
+        return pipelineBuildDao.getBuildTasksByConcurrencyGroup(
+            dslContext = dslContext,
+            projectId = projectId,
+            concurrencyGroup = concurrencyGroup,
+            statusSet = status
+        ).map {
+            pipelineBuildDao.convert(it)
+        }
+    }
+
     fun getBuildNoByByPair(buildIds: Set<String>, projectId: String?): MutableMap<String, String> {
         val result = mutableMapOf<String, String>()
         val buildInfoList = pipelineBuildDao.listBuildInfoByBuildIds(
@@ -821,7 +836,8 @@ class PipelineRuntimeService @Autowired constructor(
                             lastTimeBuildTaskRecords = lastTimeBuildTaskRecords,
                             container = container,
                             retryStartTaskId = context.retryStartTaskId
-                        )) {
+                        )
+                    ) {
 
                         logger.info("[$buildId|RETRY_SKIP_JOB|j(${container.id!!})|${container.name}")
                         context.containerSeq++

@@ -120,14 +120,23 @@ class QueueInterceptor @Autowired constructor(
                 Response(data = BuildStatus.RUNNING)
             !concurrencyGroup.isNullOrBlank() -> {
                 // cancel-in-progress: true时， 若有相同 group 的流水线正在执行，则取消正在执行的流水线，新来的触发开始执行
-                val oldStatus = if (setting.concurrencyCancelInProgress) BuildStatus.RUNNING else BuildStatus.QUEUE
-                val newStatus = if (setting.concurrencyCancelInProgress) BuildStatus.CANCELED else BuildStatus.UNEXEC
-                pipelineRuntimeExtService.popAllConcurrencyGroupBuildInfo(
-                    projectId = projectId,
-                    concurrencyGroup = concurrencyGroup,
-                    oldStatus = oldStatus,
-                    newStatus = newStatus
-                ).forEach { buildInfo ->
+                val buildPipelineList = if (setting.concurrencyCancelInProgress) {
+                    pipelineRuntimeService.getBuildInfoListByConcurrencyGroup(
+                        projectId = projectId,
+                        concurrencyGroup = concurrencyGroup,
+                        status = BuildStatus.RUNNING
+                    )
+                } else {
+                    pipelineRuntimeService.getBuildInfoListByConcurrencyGroup(
+                        projectId = projectId,
+                        concurrencyGroup = concurrencyGroup,
+                        status = BuildStatus.QUEUE
+                    ).apply {
+                        pipelineRuntimeExtService.popAllConcurrencyGroupBuildInfo(this)
+                    }
+                }
+                buildPipelineList.forEach { buildInfo ->
+                    if (buildInfo == null) return@forEach
                     cancelBuildPipeline(
                         projectId = projectId,
                         pipelineId = pipelineId,
