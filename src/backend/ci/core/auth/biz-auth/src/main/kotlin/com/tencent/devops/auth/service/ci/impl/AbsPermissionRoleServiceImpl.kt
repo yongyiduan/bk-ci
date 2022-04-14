@@ -29,7 +29,6 @@ package com.tencent.devops.auth.service.ci.impl
 
 import com.tencent.bk.sdk.iam.exception.IamException
 import com.tencent.devops.auth.constant.AuthMessageCode
-import com.tencent.devops.common.auth.api.pojo.DefaultGroupType
 import com.tencent.devops.auth.pojo.dto.GroupDTO
 import com.tencent.devops.auth.pojo.dto.ProjectRoleDTO
 import com.tencent.devops.auth.service.AuthCustomizePermissionService
@@ -40,6 +39,7 @@ import com.tencent.devops.auth.service.ci.PermissionRoleService
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.exception.ParamBlankException
 import com.tencent.devops.common.api.exception.RemoteServiceException
+import com.tencent.devops.common.auth.api.pojo.DefaultGroupType
 import com.tencent.devops.common.service.utils.MessageCodeUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -143,10 +143,11 @@ abstract class AbsPermissionRoleServiceImpl @Autowired constructor(
         permissionStrategy.forEach { resource, actions ->
             // 校验资源和action是否存在
             if (resourceService.getResource(resource) == null) {
-                AuthCustomizePermissionService.logger.info("createCustomizePermission $userId$roleId$resource not exist")
+                logger.info("createCustomizePermission $userId$roleId$resource not exist")
                 throw ErrorCodeException(
                     errorCode = AuthMessageCode.RESOURCE_NOT_EXSIT,
-                    defaultMessage = MessageCodeUtil.getCodeMessage(AuthMessageCode.RESOURCE_NOT_EXSIT, arrayOf(resource))
+                    defaultMessage = MessageCodeUtil.getCodeMessage(
+                        messageCode = AuthMessageCode.RESOURCE_NOT_EXSIT, params = arrayOf(resource))
                 )
             }
 

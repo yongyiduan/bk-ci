@@ -151,7 +151,6 @@ class AuthCoreConfiguration {
     @ConditionalOnMissingBean(name = ["permissionUrlService"])
     fun permissionUrlService() = EmptyPermissionUrlServiceImpl()
 
-
     @Bean
     @ConditionalOnMissingBean(ActionService::class)
     fun simpleActionService(
@@ -164,6 +163,6 @@ class AuthCoreConfiguration {
     @ConditionalOnMissingBean(BkResourceService::class)
     fun simpleResourceService(
         dslContext: DSLContext,
-        resourceDao: ResourceDao,
+        resourceDao: ResourceDao
     ) = SimpleBkResourceServiceImpl(dslContext, resourceDao)
 }

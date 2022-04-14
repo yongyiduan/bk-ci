@@ -27,8 +27,6 @@
 
 package com.tencent.devops.auth.service.action.impl
 
-import com.google.common.cache.CacheBuilder
-import com.google.common.cache.CacheLoader
 import com.tencent.devops.auth.constant.AuthMessageCode
 import com.tencent.devops.auth.dao.ActionDao
 import com.tencent.devops.auth.pojo.action.ActionInfo
@@ -37,17 +35,15 @@ import com.tencent.devops.auth.pojo.action.UpdateActionDTO
 import com.tencent.devops.auth.service.action.ActionService
 import com.tencent.devops.auth.service.action.BkResourceService
 import com.tencent.devops.common.api.exception.ErrorCodeException
-import com.tencent.devops.project.pojo.ProjectVO
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.concurrent.TimeUnit
 
 abstract class BKActionServiceImpl @Autowired constructor(
     open val dslContext: DSLContext,
     open val actionDao: ActionDao,
     open val resourceService: BkResourceService
-): ActionService {
+) : ActionService {
 
     override fun createAction(userId: String, action: CreateActionDTO): Boolean {
         logger.info("createAction $userId|$action")
@@ -130,7 +126,7 @@ abstract class BKActionServiceImpl @Autowired constructor(
 
     abstract fun extSystemCreate(userId: String, action: CreateActionDTO)
 
-    abstract fun extSystemUpdate(userId: String,actionId: String, action: UpdateActionDTO)
+    abstract fun extSystemUpdate(userId: String, actionId: String, action: UpdateActionDTO)
 
     companion object {
         val logger = LoggerFactory.getLogger(BKActionServiceImpl::class.java)

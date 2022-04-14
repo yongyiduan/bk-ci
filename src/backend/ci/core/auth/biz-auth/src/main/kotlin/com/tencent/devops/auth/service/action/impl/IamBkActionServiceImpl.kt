@@ -54,8 +54,10 @@ import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
 
+@Service
 class IamBkActionServiceImpl @Autowired constructor(
     override val dslContext: DSLContext,
     override val actionDao: ActionDao,
@@ -64,7 +66,7 @@ class IamBkActionServiceImpl @Autowired constructor(
     val systemService: SystemService,
     val iamActionService: IamActionService,
     val iamResourceService: IamResourceService
-): BKActionServiceImpl(dslContext, actionDao, resourceService) {
+) : BKActionServiceImpl(dslContext, actionDao, resourceService) {
 
     @Value("\${iam.system.callback:#{null}}")
     val iamSystemCallBack = "http://ci-auth.service.consul:21936"
@@ -189,27 +191,27 @@ class IamBkActionServiceImpl @Autowired constructor(
 
     /**
      * 示例：
-        [
-            {
-                "id":"pipeline_execute",
-                "name":"执行流水线",
-                "description":"执行流水线",
-                "name_en":"执行流水线",
-                "related_resource_types":[
-                    {
-                        "id":"pipeline",
-                        "system_id":"XXX",
-                        "related_instance_selections":[
-                            {
-                                "id":"pipeline_instance",
-                                "system_id":"XXX"
-                            }
-                        ]
-                    }
-                ],
-                "related_actions":["project_view","pipeline_view"]
-            }
-        ]
+     [
+     {
+     "id":"pipeline_execute",
+     "name":"执行流水线",
+     "description":"执行流水线",
+     "name_en":"执行流水线",
+     "related_resource_types":[
+     {
+     "id":"pipeline",
+     "system_id":"XXX",
+     "related_instance_selections":[
+     {
+     "id":"pipeline_instance",
+     "system_id":"XXX"
+     }
+     ]
+     }
+     ],
+     "related_actions":["project_view","pipeline_view"]
+     }
+     ]
      */
     private fun buildAction(action: CreateActionDTO): ActionDTO {
 
@@ -263,16 +265,17 @@ class IamBkActionServiceImpl @Autowired constructor(
         return iamCreateAction
     }
 
+    @Suppress("NestedBlockDepth")
     fun buildCreateRelation(
         action: CreateActionDTO,
         systemCreateRelationInfo: ResourceCreatorActionsDTO?
     ): ResourceCreatorActionsDTO {
-        var resourceCreatorActions= ResourceCreatorActionsDTO()
+        var resourceCreatorActions = ResourceCreatorActionsDTO()
         if (systemCreateRelationInfo == null) {
             // 默认最先创建project相关的新建关联
             resourceCreatorActions.mode = "system"
             val resourceCreateConfig = ResourceCreateConfigDTO()
-            val resourceAction= ResourceActionDTO()
+            val resourceAction = ResourceActionDTO()
             resourceAction.id = action.actionId
             resourceAction.required = false
             resourceCreateConfig.id = action.resourceId
@@ -287,8 +290,9 @@ class IamBkActionServiceImpl @Autowired constructor(
             }
 
             // 判断新action操作类型， 如果是create或者资源是project，直接追加到project（第一层）下的action
-            if (action.actionType == ActionTypeEnum.CREATE.type
-                || action.resourceId == AuthResourceType.PROJECT.value) {
+            if (action.actionType == ActionTypeEnum.CREATE.type ||
+                action.resourceId == AuthResourceType.PROJECT.value
+            ) {
                 val projectActions = projectConfig.actions
                 val newAction = ResourceActionDTO()
                 newAction.id = action.actionId

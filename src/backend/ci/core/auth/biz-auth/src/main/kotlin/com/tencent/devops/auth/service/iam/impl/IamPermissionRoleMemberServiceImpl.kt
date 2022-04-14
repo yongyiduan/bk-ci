@@ -58,13 +58,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.concurrent.TimeUnit
 
-class IamPermissionRoleMemberServiceImpl @Autowired constructor(
+open class IamPermissionRoleMemberServiceImpl @Autowired constructor(
     private val permissionGradeService: PermissionGradeService,
     private val groupService: AuthGroupService,
     private val iamCacheService: IamCacheService,
     private val groupMemberService: AuthGroupMemberService,
-    open val iamManagerService: ManagerService,
-): AbsPermissionRoleMemberImpl(
+    open val iamManagerService: ManagerService
+) : AbsPermissionRoleMemberImpl(
     permissionGradeService, groupService, iamCacheService, groupMemberService
 ) {
     private val projectMemberCache = CacheBuilder.newBuilder()
@@ -92,7 +92,14 @@ class IamPermissionRoleMemberServiceImpl @Autowired constructor(
         return
     }
 
-    override fun deleteRoleMember(executeUserId: String, projectId: String, roleId: Int, deleteUserId: String, type: ManagerScopesEnum, managerGroup: Boolean) {
+    override fun deleteRoleMember(
+        executeUserId: String,
+        projectId: String,
+        roleId: Int,
+        deleteUserId: String,
+        type: ManagerScopesEnum,
+        managerGroup: Boolean
+    ) {
         super.deleteRoleMember(executeUserId, projectId, roleId, deleteUserId, type, managerGroup)
 
         // 删除iam相关人员信息
@@ -156,7 +163,10 @@ class IamPermissionRoleMemberServiceImpl @Autowired constructor(
                     // TODO: 待iam接口提供此字段
                     expiredAt = System.currentTimeMillis(),
                     // TODO: 待iam接口提供此字段
-                    expiredStatus = ExpiredStatus.buildExpiredStatus(0, TimeUnit.DAYS.toMillis(EXPIRED_TIMEOUT_SIZE.toLong()))
+                    expiredStatus = ExpiredStatus.buildExpiredStatus(
+                        expiredTime = 0,
+                        expiredSize = TimeUnit.DAYS.toMillis(EXPIRED_TIMEOUT_SIZE.toLong())
+                    )
                 )
             )
         }
