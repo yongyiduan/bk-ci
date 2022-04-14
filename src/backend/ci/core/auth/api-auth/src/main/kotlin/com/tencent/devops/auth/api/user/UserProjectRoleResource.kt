@@ -138,6 +138,7 @@ interface UserProjectRoleResource {
         @ApiParam(name = "角色Id", required = true)
         @PathParam("roleId")
         roleId: Int,
+        @ApiParam(name = "权限信息", required = true)
         strategy: Map<String, List<String>>
     ): Result<Boolean>
 

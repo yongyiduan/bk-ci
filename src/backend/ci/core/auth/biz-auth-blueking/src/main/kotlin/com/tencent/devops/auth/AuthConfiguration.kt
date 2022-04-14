@@ -44,8 +44,10 @@ import com.tencent.devops.auth.service.ci.PermissionRoleService
 import com.tencent.devops.auth.service.ci.PermissionService
 import com.tencent.devops.auth.service.iam.IamCacheService
 import com.tencent.devops.auth.service.iam.PermissionGradeService
+import com.tencent.devops.auth.service.iam.PermissionGrantService
 import com.tencent.devops.auth.service.simple.SimpleAuthPermissionService
 import com.tencent.devops.auth.service.simple.SimplePermissionGraderServiceImpl
+import com.tencent.devops.auth.service.simple.SimplePermissionGrantServiceImpl
 import com.tencent.devops.auth.service.simple.SimplePermissionProjectServiceImpl
 import com.tencent.devops.auth.service.simple.SimplePermissionRoleMemberServiceImpl
 import com.tencent.devops.auth.service.simple.SimplePermissionRoleService
@@ -142,6 +144,10 @@ class AuthConfiguration {
     fun permissionGradeService(
         permissionProjectService: PermissionProjectService
     ) = SimplePermissionGraderServiceImpl(permissionProjectService)
+
+    @Bean
+    @ConditionalOnMissingBean(PermissionGrantService::class)
+    fun permissionGradeService() = SimplePermissionGrantServiceImpl()
 
     @Bean
     @ConditionalOnMissingBean

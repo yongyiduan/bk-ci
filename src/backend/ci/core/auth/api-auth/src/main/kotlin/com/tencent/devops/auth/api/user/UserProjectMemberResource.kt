@@ -73,7 +73,8 @@ interface UserProjectMemberResource {
         @ApiParam("添加用户集合", required = true)
         members: List<RoleMemberDTO>,
         @ApiParam(name = "超时天数", required = false)
-        expiredDay: Long
+        @QueryParam("expiredDay")
+        expiredDay: Long?
     ): Result<Boolean>
 
     @GET

@@ -49,7 +49,7 @@ class UserProjectMemberResourceImpl @Autowired constructor(
         roleId: Int,
         managerGroup: Boolean,
         members: List<RoleMemberDTO>,
-        expiredDay: Long
+        expiredDay: Long?
     ): Result<Boolean> {
         permissionRoleMemberService.createRoleMember(
             userId = userId,
@@ -58,7 +58,7 @@ class UserProjectMemberResourceImpl @Autowired constructor(
             members = members,
             managerGroup = managerGroup,
             checkAGradeManager = true,
-            expiredDay = expiredDay
+            expiredDay = expiredDay ?: 365
         )
         return Result(true)
     }

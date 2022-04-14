@@ -25,26 +25,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.auth.service.action.impl
+package com.tencent.devops.auth.service.simple
 
-import com.nhaarman.mockito_kotlin.mock
-import com.tencent.bk.sdk.iam.constants.ActionTypeEnum
-import com.tencent.bk.sdk.iam.dto.resource.ResourceCreatorActionsDTO
-import com.tencent.devops.auth.pojo.action.CreateActionDTO
-import com.tencent.devops.common.auth.api.AuthResourceType
-import org.junit.Test
+import com.tencent.devops.auth.pojo.dto.GrantInstanceDTO
+import com.tencent.devops.auth.service.iam.PermissionGrantService
+import org.springframework.beans.factory.annotation.Autowired
 
-class IamBkActionServiceImplTest {
-
-    @Test
-    fun buildCreateRelationTest() {
-        val action = CreateActionDTO(
-            actionId = "project_test",
-            resourceId = AuthResourceType.PROJECT.value,
-            actionEnglishName = "项目_测试action",
-            actionName = "project_test",
-            actionType = ActionTypeEnum.LIST.name,
-            desc = ""
-        )
+class SimplePermissionGrantServiceImpl @Autowired constructor(
+): PermissionGrantService {
+    override fun grantInstancePermission(
+        projectId: String,
+        grantInfo: GrantInstanceDTO,
+    ): Boolean {
+        TODO("Not yet implemented")
     }
 }

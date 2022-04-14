@@ -57,7 +57,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
 
-@Service
 class IamBkActionServiceImpl @Autowired constructor(
     override val dslContext: DSLContext,
     override val actionDao: ActionDao,
