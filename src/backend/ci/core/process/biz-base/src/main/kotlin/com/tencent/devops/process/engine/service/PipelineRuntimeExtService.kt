@@ -122,14 +122,15 @@ class PipelineRuntimeExtService @Autowired constructor(
     fun popAllConcurrencyGroupBuildInfo(
         projectId: String,
         concurrencyGroup: String,
-        buildStatus: BuildStatus
+        oldStatus: BuildStatus,
+        newStatus: BuildStatus
     ): List<BuildInfo> {
         val buildInfoList = mutableListOf<BuildInfo>()
         pipelineBuildDao.getBuildTasksByConcurrencyGroup(
             dslContext = dslContext,
             projectId = projectId,
             concurrencyGroup = concurrencyGroup,
-            statusSet = buildStatus
+            statusSet = oldStatus
         ).map {
             pipelineBuildDao.convert(it)
         }.forEach { buildInfo ->
@@ -145,8 +146,8 @@ class PipelineRuntimeExtService @Autowired constructor(
                         dslContext = dslContext,
                         projectId = projectId,
                         buildId = buildInfo.buildId,
-                        oldBuildStatus = buildStatus,
-                        newBuildStatus = BuildStatus.UNEXEC
+                        oldBuildStatus = oldStatus,
+                        newBuildStatus = newStatus
                     )
                 ) {
                     buildInfoList.add(buildInfo)
