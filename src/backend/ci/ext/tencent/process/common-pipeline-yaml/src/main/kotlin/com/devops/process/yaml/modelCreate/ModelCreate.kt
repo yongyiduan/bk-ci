@@ -164,7 +164,7 @@ class ModelCreate constructor(
             ),
             setting = PipelineSetting(
                 concurrencyGroup = yaml.concurrency?.group,
-                //Cancel-In-Progress入口先不放开给用户配置
+                // Cancel-In-Progress入口先不放开给用户配置
                 concurrencyCancelInProgress = true,
                 runLockType = when {
                     yaml.concurrency?.group != null -> PipelineRunLockType.SINGLE
