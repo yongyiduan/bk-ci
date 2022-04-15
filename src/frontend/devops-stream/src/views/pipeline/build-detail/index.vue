@@ -2,8 +2,8 @@
     <article class="build-detail-home">
         <section class="section-box build-detail-header">
             <bk-breadcrumb class="build-detail-crumb" separator-class="bk-icon icon-angle-right">
-                <bk-breadcrumb-item v-if="!menuPipelineId" :to="{ name: 'buildList', params: {} }">All pipelines</bk-breadcrumb-item>
-                <bk-breadcrumb-item :to="{ name: 'buildList', params: { pipelineId } }" @click.native="handleClickRoute">{{yml}}</bk-breadcrumb-item>
+                <bk-breadcrumb-item v-if="!menuPipelineId" :to="{ name: 'buildList', params: {}, query: $route.query }">All pipelines</bk-breadcrumb-item>
+                <bk-breadcrumb-item :to="{ name: 'buildList', params: { pipelineId }, query: $route.query }" @click.native="handleClickRoute">{{yml}}</bk-breadcrumb-item>
                 <bk-breadcrumb-item>
                     <span class="build-num">
                         # {{buildNum}}
