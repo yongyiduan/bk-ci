@@ -31,6 +31,7 @@ import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.devops.process.yaml.pojo.QualityElementInfo
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.ci.task.DockerRunDevCloudTask
 import com.tencent.devops.common.ci.task.GitCiCodeRepoTask
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudTask
@@ -50,6 +51,7 @@ import com.tencent.devops.process.pojo.classify.PipelineLabelCreate
 import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
 import com.tencent.devops.process.pojo.setting.PipelineRunLockType
 import com.tencent.devops.process.pojo.setting.PipelineSetting
+import com.tencent.devops.process.utils.PipelineVarUtil
 import org.slf4j.LoggerFactory
 
 class ModelCreate constructor(
@@ -163,7 +165,10 @@ class ModelCreate constructor(
                 pipelineCreator = event.userId
             ),
             setting = PipelineSetting(
-                concurrencyGroup = yaml.concurrency?.group,
+                concurrencyGroup = yaml.concurrency?.group?.let {
+                    val varMap = pipelineParams.associate { param -> param.id to param.defaultValue.toString() }
+                    EnvUtils.parseEnv(it, PipelineVarUtil.fillContextVarMap(varMap))
+                },
                 // Cancel-In-Progress入口先不放开给用户配置
                 concurrencyCancelInProgress = true,
                 runLockType = when {

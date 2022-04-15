@@ -121,15 +121,13 @@ class QueueInterceptor @Autowired constructor(
             // 如果最后一次构建被标记为refresh,则即便是串行也放行。因refresh的buildId都会被取消掉
             latestBuildId == null || pipelineRedisService.getBuildRestartValue(latestBuildId) != null ->
                 Response(data = BuildStatus.RUNNING)
-            !concurrencyGroup.isNullOrBlank() -> {
+            !concurrencyGroup.isNullOrBlank() && setting.concurrencyCancelInProgress -> {
                 // cancel-in-progress: true时， 若有相同 group 的流水线正在执行，则取消正在执行的流水线，新来的触发开始执行
-                val buildPipelineList = if (setting.concurrencyCancelInProgress) {
-                    pipelineRuntimeService.getBuildInfoListByConcurrencyGroup(
-                        projectId = projectId,
-                        concurrencyGroup = concurrencyGroup,
-                        status = BuildStatus.RUNNING
-                    )
-                } else {
+                val buildPipelineList = pipelineRuntimeService.getBuildInfoListByConcurrencyGroup(
+                    projectId = projectId,
+                    concurrencyGroup = concurrencyGroup,
+                    status = BuildStatus.RUNNING
+                ).plus(
                     pipelineRuntimeService.getBuildInfoListByConcurrencyGroup(
                         projectId = projectId,
                         concurrencyGroup = concurrencyGroup,
@@ -137,7 +135,8 @@ class QueueInterceptor @Autowired constructor(
                     ).apply {
                         pipelineRuntimeExtService.popAllConcurrencyGroupBuildInfo(this)
                     }
-                }
+                )
+
                 buildPipelineList.forEach { buildInfo ->
                     if (buildInfo == null) return@forEach
                     cancelBuildPipeline(
