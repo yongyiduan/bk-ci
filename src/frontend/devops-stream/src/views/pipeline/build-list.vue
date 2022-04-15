@@ -242,7 +242,7 @@
                 buildList: [],
                 compactPaging: {
                     limit: 10,
-                    current: 1,
+                    current: this.$route.query.page,
                     count: 0
                 },
                 filterData: {
@@ -303,8 +303,7 @@
                 handler () {
                     this.cleanFilterData()
                     this.initBuildData()
-                },
-                immediate: true
+                }
             },
             filterData: {
                 handler () {
@@ -315,6 +314,7 @@
         },
 
         created () {
+            this.initBuildData()
             this.loopGetList()
             this.setHtmlTitle()
         },
@@ -407,6 +407,7 @@
             },
 
             cleanFilterData () {
+                this.$router.push({ query: { page: 1 } })
                 this.compactPaging.current = 1
                 this.filterData = {
                     commitMsg: '',
@@ -420,7 +421,7 @@
 
             initBuildData () {
                 this.isLoading = true
-                this.getBuildData().catch((err) => {
+                return this.getBuildData().catch((err) => {
                     this.$bkMessage({ theme: 'error', message: err.message || err })
                 }).finally(() => {
                     this.isLoading = false
@@ -428,6 +429,11 @@
             },
 
             pageChange (page) {
+                this.$router.push({
+                    query: {
+                        page
+                    }
+                })
                 this.compactPaging.current = page
                 this.initBuildData()
             },
@@ -607,7 +613,8 @@
                     params: {
                         buildId: row.buildHistory.id,
                         pipelineId: row.pipelineId
-                    }
+                    },
+                    query: this.$route.query
                 })
             },
 

@@ -1,5 +1,5 @@
 import api from './ajax'
-import { ENVIRNMENT_PERFIX, TICKET_PERFIX, STREAM_PERFIX, DISPATCH_STREAM_PERFIX } from './perfix'
+import { ENVIRNMENT_PERFIX, TICKET_PERFIX, EXP_PERFIX, STREAM_PERFIX, DISPATCH_STREAM_PERFIX } from './perfix'
 
 export default {
     getThirdAgentZoneList (projectId, os) {
@@ -36,6 +36,26 @@ export default {
 
     deleteTicket (projectId, credentialId) {
         return api.delete(`${TICKET_PERFIX}/user/credentials/${projectId}/${credentialId}`)
+    },
+
+    getExpGroupList (projectId, params) {
+        return api.get(`${EXP_PERFIX}/user/groups/${projectId}/list`, { params })
+    },
+
+    createExpGroup (projectId, params) {
+        return api.post(`${EXP_PERFIX}/user/groups/${projectId}`, params)
+    },
+
+    modifyExpGroup (projectId, params, groupId) {
+        return api.put(`${EXP_PERFIX}/user/groups/${projectId}/${groupId}`, params)
+    },
+
+    deleteExpGroup (projectId, groupId) {
+        return api.delete(`${EXP_PERFIX}/user/groups/${projectId}/${groupId}`)
+    },
+
+    getOuterUserList (projectId) {
+        return api.get(`${EXP_PERFIX}/user/experiences/outer/list?projectId=${projectId}`)
     },
 
     saveSetting (projectId, params) {
