@@ -48,7 +48,7 @@
                         name: 'Password',
                         desc: 'Used for information that needs to be encrypted and saved in the Tencent CI, such as certificate passwords, fields that need to be encrypted in scripts, etc.',
                         content: [
-                            { id: 'v1', label: 'password', type: 'password', required: true, rules: [this.requireRule('password')], placeholder: 'Please enter the password' }
+                            { id: 'v1', label: 'password', type: 'text', required: true, rules: [this.requireRule('password')], placeholder: 'Please enter the password' }
                         ]
                     },
                     {
@@ -65,7 +65,7 @@
                         desc: 'Used for information that needs to be encrypted and saved in the Tencent CI, such as certificate passwords, fields that need to be encrypted in scripts, etc.',
                         content: [
                             { id: 'v1', label: 'username', type: 'text', placeholder: 'please enter user name' },
-                            { id: 'v2', label: 'password', type: 'password', required: true, rules: [this.requireRule('password')], placeholder: 'Please enter the password' }
+                            { id: 'v2', label: 'password', type: 'text', required: true, rules: [this.requireRule('password')], placeholder: 'Please enter the password' }
                         ]
                     },
                     {
@@ -73,7 +73,7 @@
                         name: 'AccessToken',
                         desc: 'An access token contains the security information of this login session, which is used to associate the Gitlab type code library',
                         content: [
-                            { id: 'v1', label: 'access_token', type: 'password', required: true, rules: [this.requireRule('access_token')], placeholder: 'Please enter AccessToken' }
+                            { id: 'v1', label: 'access_token', type: 'text', required: true, rules: [this.requireRule('access_token')], placeholder: 'Please enter AccessToken' }
                         ]
                     },
                     {
@@ -81,7 +81,7 @@
                         name: 'SecretKey',
                         desc: 'Used for information that needs to be encrypted and saved in the Tencent CI, such as certificate passwords, fields that need to be encrypted in scripts, etc.',
                         content: [
-                            { id: 'v1', label: 'secretKey', type: 'password', required: true, rules: [this.requireRule('secretKey')], placeholder: 'Please enter SecretKey' }
+                            { id: 'v1', label: 'secretKey', type: 'text', required: true, rules: [this.requireRule('secretKey')], placeholder: 'Please enter SecretKey' }
                         ]
                     },
                     {
@@ -90,7 +90,7 @@
                         desc: 'The key-value pair type used to set the key value, such as the user account password to be filled in by the bugly atom, api call, etc.',
                         content: [
                             { id: 'v1', label: 'appId', type: 'text', required: true, rules: [this.requireRule('appId')], placeholder: 'Please enter appId' },
-                            { id: 'v2', label: 'secretKey', type: 'password', required: true, rules: [this.requireRule('secretKey')], placeholder: 'Please enter SecretKey' }
+                            { id: 'v2', label: 'secretKey', type: 'text', required: true, rules: [this.requireRule('secretKey')], placeholder: 'Please enter SecretKey' }
                         ]
                     },
                     {
@@ -113,7 +113,7 @@
                                 ],
                                 placeholder: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center'
                             },
-                            { id: 'v2', label: 'passphrase', type: 'password', placeholder: 'Please enter the private key password' }
+                            { id: 'v2', label: 'passphrase', type: 'text', placeholder: 'Please enter the private key password' }
                         ]
                     },
                     {
@@ -121,7 +121,7 @@
                         name: 'SSH private key + private Token',
                         desc: 'Used to associate Git type code libraries using ssh',
                         content: [
-                            { id: 'v1', label: 'token', type: 'password', required: true, rules: [this.requireRule('token')], placeholder: 'Please enter token' },
+                            { id: 'v1', label: 'token', type: 'text', required: true, rules: [this.requireRule('token')], placeholder: 'Please enter token' },
                             {
                                 id: 'v2',
                                 label: 'privateKey',
@@ -137,7 +137,7 @@
                                 ],
                                 placeholder: 'SSH contains public and private keys, which are used to associate with SVN type code libraries. For SSH configuration instructions, please refer to the Blue Shield documentation center'
                             },
-                            { id: 'v3', label: 'passphrase', type: 'password', placeholder: 'Please enter the private key password' }
+                            { id: 'v3', label: 'passphrase', type: 'text', placeholder: 'Please enter the private key password' }
                         ]
                     },
                     {
@@ -145,9 +145,9 @@
                         name: 'User password+private token',
                         desc: 'Used to associate Git type code libraries using http',
                         content: [
-                            { id: 'v1', label: 'token', type: 'password', required: true, rules: [this.requireRule('token')], placeholder: 'Please enter token' },
+                            { id: 'v1', label: 'token', type: 'text', required: true, rules: [this.requireRule('token')], placeholder: 'Please enter token' },
                             { id: 'v2', label: 'username', type: 'text', required: true, rules: [this.requireRule('username')], placeholder: 'please enter user name' },
-                            { id: 'v3', label: 'password', type: 'password', required: true, rules: [this.requireRule('password')], placeholder: 'Please enter the password' }
+                            { id: 'v3', label: 'password', type: 'text', required: true, rules: [this.requireRule('password')], placeholder: 'Please enter the password' }
                         ]
                     }
                 ],
