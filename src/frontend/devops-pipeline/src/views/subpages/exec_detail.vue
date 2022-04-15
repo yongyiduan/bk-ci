@@ -215,28 +215,28 @@
             },
             panels () {
                 return [{
-                    name: 'executeDetail',
-                    label: this.$t('details.executeDetail'),
-                    component: 'bk-pipeline',
-                    className: 'exec-pipeline',
-                    bindData: {
-                        editable: false,
-                        isExecDetail: true,
-                        userName: this.$userInfo.username,
-                        cancelUserId: this.execDetail && this.execDetail.cancelUserId,
-                        pipeline: this.execDetail && this.execDetail.model,
-                        matchRules: this.curMatchRules
-                    },
-                    listeners: {
-                        click: this.handlePiplineClick,
-                        'stage-check': this.handleStageCheck,
-                        'stage-retry': this.handleRetry,
-                        'atom-quality-check': this.qualityCheck,
-                        'atom-review': this.reviewAtom,
-                        'atom-continue': this.handleContinue,
-                        'atom-exec': this.handleExec
-                    }
-                }, {
+                            name: 'executeDetail',
+                            label: this.$t('details.executeDetail'),
+                            component: 'bk-pipeline',
+                            className: 'exec-pipeline',
+                            bindData: {
+                                editable: false,
+                                isExecDetail: true,
+                                userName: this.$userInfo.username,
+                                cancelUserId: this.execDetail && this.execDetail.cancelUserId,
+                                pipeline: this.execDetail && this.execDetail.model,
+                                matchRules: this.curMatchRules
+                            },
+                            listeners: {
+                                click: this.handlePiplineClick,
+                                'stage-check': this.handleStageCheck,
+                                'stage-retry': this.handleRetry,
+                                'atom-quality-check': this.qualityCheck,
+                                'atom-review': this.reviewAtom,
+                                'atom-continue': this.handleContinue,
+                                'atom-exec': this.handleExec
+                            }
+                        }, {
                             name: 'partView',
                             label: this.$t('details.partView'),
                             className: '',

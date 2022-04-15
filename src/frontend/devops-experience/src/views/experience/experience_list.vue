@@ -292,7 +292,7 @@
             left: -3px;
             top: -3px;
             font-size: 36px;
-            color: $fontLigtherColor;
+            color: $fontLighterColor;
         }
         .operate-cell {
             display: flex;
@@ -309,7 +309,7 @@
             }
             .expired-text {
                 cursor: default;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
             }
         }
     }
