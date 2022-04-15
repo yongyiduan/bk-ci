@@ -69,7 +69,12 @@
                 <bk-button class="detail-button" @click="rebuild" :loading="isOperating" :disabled="!curPipeline.enabled || !permission">Re-build</bk-button>
             </div>
         </section>
-        <stages :stages="stageList" class="detail-stages" @refresh-stages="getPipelineBuildDetail"></stages>
+        <pipeline
+            class="detail-stages"
+            :editable="false"
+            :is-exec-detail="true"
+            :pipeline="{ stages: stageList }"
+        ></pipeline>
     </article>
 </template>
 
@@ -81,15 +86,14 @@
         timeFormatter,
         getbuildTypeIcon
     } from '@/utils'
-    import stages from '@/components/stages'
     import { getPipelineStatusClass, getPipelineStatusCircleIconCls } from '@/components/status'
     import register from '@/utils/websocket-register'
+    import Pipeline from '@/components/Pipeline'
 
     export default {
         components: {
-            stages
+            Pipeline
         },
-
         filters: {
             spendTimeFilter (val) {
                 return preciseDiff(val)

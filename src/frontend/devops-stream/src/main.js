@@ -16,11 +16,13 @@ import log from '@blueking/log'
 import VeeValidate from 'vee-validate'
 import VueCompositionAPI from '@vue/composition-api'
 import { bkMessage } from 'bk-magic-vue'
+import bkPipeline from 'bkui-pipeline'
 
 Vue.component('Icon', icon)
 Vue.use(log)
 Vue.use(VeeValidate)
 Vue.use(VueCompositionAPI)
+Vue.use(bkPipeline)
 
 Vue.prototype.$bkMessage = function (config) {
     config.ellipsisLine = config.ellipsisLine || 3
