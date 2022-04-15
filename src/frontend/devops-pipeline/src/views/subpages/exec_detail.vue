@@ -223,9 +223,11 @@
                                 editable: false,
                                 isExecDetail: true,
                                 userName: this.$userInfo.username,
+                                isLatestBuild: this.isLatestBuild,
                                 cancelUserId: this.execDetail && this.execDetail.cancelUserId,
                                 pipeline: this.execDetail && this.execDetail.model,
-                                matchRules: this.curMatchRules
+                                matchRules: this.curMatchRules,
+
                             },
                             listeners: {
                                 click: this.handlePiplineClick,
@@ -331,6 +333,10 @@
             },
             curMatchRules () {
                 return this.$route.path.indexOf('template') > 0 ? this.templateRuleList : this.isInstanceEditable ? this.templateRuleList.concat(this.ruleList) : this.ruleList
+            },
+            isLatestBuild () {
+                const { execDetail } = this
+                return execDetail && execDetail.buildNum === execDetail.latestBuildNum && execDetail.curVersion === execDetail.latestVersion
             }
         },
 
