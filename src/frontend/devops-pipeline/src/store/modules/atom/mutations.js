@@ -39,9 +39,7 @@ import {
     DELETE_STAGE,
     UPDATE_STAGE,
     ADD_STAGE,
-    CONTAINER_TYPE_SELECTION_VISIBLE,
-    SET_INSERT_STAGE_INDEX,
-    SET_INSERT_STAGE_ISFINALLY,
+    SET_INSERT_STAGE_STATE,
     UPDATE_ATOM,
     SET_PIPELINE_EDITING,
     SET_PIPELINE,
@@ -149,7 +147,9 @@ export default {
         return state
     },
     [SET_PIPELINE_EDITING]: (state, editing) => {
-        if (state.pipeline) Vue.set(state.pipeline, 'editing', editing)
+        if (state.pipeline && state.pipeline.editing !== editing) {
+            Vue.set(state.pipeline, 'editing', editing)
+        }
         return state
     },
     [SET_CONTAINER_DETAIL]: (state, { containerTypeList, containerModalMap }) => {
@@ -200,15 +200,7 @@ export default {
         })
         return state
     },
-    [CONTAINER_TYPE_SELECTION_VISIBLE]: (state, payload) => {
-        Object.assign(state, payload)
-        return state
-    },
-    [SET_INSERT_STAGE_INDEX]: (state, payload) => {
-        Object.assign(state, payload)
-        return state
-    },
-    [SET_INSERT_STAGE_ISFINALLY]: (state, payload) => {
+    [SET_INSERT_STAGE_STATE]: (state, payload) => {
         Object.assign(state, payload)
         return state
     },
@@ -247,6 +239,7 @@ export default {
         } else {
             const diffRes = diffAtomVersions(preVerEle, preVerAtomModal.props, atomModal.props, isChangeAtom)
             atomVersionChangedKeys = diffRes.atomVersionChangedKeys
+            console.log(atomModal)
             atom = {
                 id: `e-${hashID(32)}`,
                 '@type': atomModal.classType !== atomCode ? atomModal.classType : atomCode,
@@ -263,7 +256,12 @@ export default {
         this.atomVersionChangedCleanId = setTimeout(() => {
             state.atomVersionChangedKeys = []
         }, 5000)
-        container.elements.splice(atomIndex, 1, atom)
+        container.elements.splice(atomIndex, 1, {
+            ...atom,
+            os: atomModal.os,
+            buildLessRunFlag: atomModal.buildLessRunFlag,
+            logoUrl: atomModal.logoUrl
+        })
     },
     [UPDATE_ATOM]: (state, { atom, newParam }) => {
         for (const key in newParam) {
@@ -342,7 +340,8 @@ export default {
     },
     [INSERT_ATOM]: (state, { elements, insertIndex }) => {
         elements.splice(insertIndex, 0, {
-            data: {}
+            data: {},
+            isError: true
         })
     },
     [DELETE_ATOM]: (state, { elements, atomIndex }) => {
