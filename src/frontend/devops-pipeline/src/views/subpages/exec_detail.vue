@@ -96,7 +96,7 @@
 </template>
 
 <script>
-    import { mapState, mapActions } from 'vuex'
+    import { mapState, mapActions, mapGetters } from 'vuex'
     import webSocketMessage from '@/utils/webSocketMessage'
     import viewPart from '@/components/viewPart'
     import codeRecord from '@/components/codeRecord'
@@ -193,6 +193,9 @@
             ...mapState([
                 'fetchError'
             ]),
+            ...mapGetters('atom', [
+                'getRealSeqId'
+            ]),
             hooks () {
                 return this.extensionExecuteDetailTabsHooks
             },
@@ -223,11 +226,10 @@
                                 editable: false,
                                 isExecDetail: true,
                                 userName: this.$userInfo.username,
-                                isLatestBuild: this.isLatestBuild,
                                 cancelUserId: this.execDetail && this.execDetail.cancelUserId,
+                                isLatestBuild: this.isLatestBuild,
                                 pipeline: this.execDetail && this.execDetail.model,
-                                matchRules: this.curMatchRules,
-
+                                matchRules: this.curMatchRules
                             },
                             listeners: {
                                 click: this.handlePiplineClick,
@@ -236,7 +238,8 @@
                                 'atom-quality-check': this.qualityCheck,
                                 'atom-review': this.reviewAtom,
                                 'atom-continue': this.handleContinue,
-                                'atom-exec': this.handleExec
+                                'atom-exec': this.handleExec,
+                                'debug-container': this.debugDocker
                             }
                         }, {
                             name: 'partView',
@@ -450,6 +453,7 @@
                 await this.retryPipeline()
                 done()
             },
+
             async handleExec ({
                 stageIndex,
                 containerIndex,
@@ -540,6 +544,55 @@
                     })
                     this.retryTaskId = ''
                     this.skipTask = false
+                }
+            },
+            async debugDocker ({ stageIndex, containerIndex, container, isPubDevcloud, isDocker }) {
+                const vmSeqId = container.containerId || this.getRealSeqId(this.execDetail.model.stages, stageIndex, containerIndex)
+                const { projectId, pipelineId, buildNo: buildId } = this.$route.params
+                const url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                const { dispatchType = {}, dockerBuildVersion, buildEnv } = container
+                const tab = window.open('about:blank')
+                try {
+                    if (isDocker) {
+                        const res = await this.startDebugDocker({
+                            projectId: projectId,
+                            pipelineId: pipelineId,
+                            vmSeqId,
+                            imageCode: dispatchType.imageCode,
+                            imageVersion: dispatchType.imageVersion,
+                            imageName: dispatchType.value ? dispatchType.value : dockerBuildVersion,
+                            buildEnv,
+                            imageType: dispatchType.imageType || 'BKDEVOPS',
+                            credentialId: dispatchType.credentialId || ''
+                        })
+                        if (res === true) {
+                            tab.location = url
+                        }
+                    } else if (isPubDevcloud) {
+                        const buildIdStr = buildId ? `&buildId=${buildId}` : ''
+                        tab.location = `${url}&type=DEVCLOUD${buildIdStr}`
+                    }
+                } catch (err) {
+                    tab.close()
+                    if (err.code === 403) {
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                actionId: this.$permissionActionMap.edit,
+                                resourceId: this.$permissionResourceMap.pipeline,
+                                instanceId: [{
+                                    id: pipelineId,
+                                    name: pipelineId
+                                }],
+                                projectId
+                            }],
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&role_manager=pipeline:${pipelineId}`
+                        })
+                    } else {
+                        this.$showTips({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    }
                 }
             },
             switchTab (tabType = 'executeDetail') {
