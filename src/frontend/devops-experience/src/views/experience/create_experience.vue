@@ -88,7 +88,13 @@
                             >
                             </bk-date-picker>
                         </bk-form-item>
-                        <bk-form-item label="体验组" :required="true" label-width="190" property="experienceGroups">
+                        <bk-form-item label="体验范围" label-width="190" :required="true">
+                            <bk-radio-group v-model="experienceRange">
+                                <bk-radio value="public" class="mr20">公开体验</bk-radio>
+                                <bk-radio value="internals">内部体验组</bk-radio>
+                            </bk-radio-group>
+                        </bk-form-item>
+                        <bk-form-item v-show="showExperienceGroup" label="体验组" :required="true" label-width="190" property="experienceGroups">
                             <div class="bkdevop-checkbox-group">
                                 <bk-checkbox v-for="(col, index) in experienceGroup" :key="index" v-model="col.isChecked" @change="handleGroupChange" class="exp-group-item">
                                     {{ col.name }}
@@ -111,6 +117,7 @@
                             </span>
                         </bk-form-item>
                         <bk-form-item
+                            v-show="showExperienceGroup"
                             label="临时体验人员（内部）"
                             desc-type="icon"
                             desc-icon="icon-info-circle"
@@ -119,7 +126,7 @@
                             property="internal_list">
                             <bk-member-selector placeholder="请输入英文名，多个体验人员以英文逗号分隔" name="internalList" v-model="createReleaseForm.internal_list"></bk-member-selector>
                         </bk-form-item>
-                        <bk-form-item label="临时体验人员（外部）" label-width="190" property="external_list">
+                        <bk-form-item v-show="showExperienceGroup" label="临时体验人员（外部）" label-width="190" property="external_list">
                             <bk-select :disabled="false" v-model="createReleaseForm.external_list"
                                 ext-cls="select-custom"
                                 ext-popover-cls="select-popover-custom"
@@ -229,6 +236,7 @@
                     title: ''
                 },
                 query: {},
+                experienceRange: 'public',
                 createReleaseForm: {
                     name: '',
                     version_no: '',
@@ -309,6 +317,9 @@
             },
             submitText () {
                 return this.isEdit ? '更新体验' : '转体验'
+            },
+            showExperienceGroup () {
+                return this.experienceRange === 'internals'
             }
         },
         watch: {
@@ -339,6 +350,7 @@
             projectId (val) {
                 this.toExperienceList()
             }
+            
         },
         async created () {
             await this.requestGroupList()
@@ -364,7 +376,7 @@
                     const res = await this.$store.dispatch('experience/requestGroupList', {
                         projectId: this.projectId,
                         params: {
-                            returnPublic: true
+                            returnPublic: false
                         }
                     })
                     this.experienceGroup.splice(0, this.experienceGroup.length)
@@ -449,6 +461,9 @@
                     this.createReleaseForm.internal_list = res.innerUsers
                     this.createReleaseForm.enableWechatGroups = res.enableWechatGroups
                     this.createReleaseForm.experienceGroups = res.experienceGroups
+                    // 体验组如果为kygplomw,选中公开体验
+                    const publicGroup = this.createReleaseForm.experienceGroups.find(item => item.groupHashId === 'kygplomw')
+                    this.experienceRange = publicGroup ? 'public' : 'internals'
                     if (res.enableWechatGroups) {
                         this.createReleaseForm.wechatGroups = res.wechatGroups
                     }
@@ -685,6 +700,11 @@
                 localStorage.setItem('groupIdStr', this.groupIdStorage.sort().join(';'))
             },
             async submitFn () {
+                if (this.experienceRange === 'public') {
+                    this.createReleaseForm.experienceGroups = ['kygplomw']
+                    this.createReleaseForm.internal_list = []
+                    this.createReleaseForm.external_list = []
+                }
                 let message
                 const theme = 'error'
                 if (!this.createReleaseForm.desc || !this.createReleaseForm.name || !this.createReleaseForm.end_date || !this.createReleaseForm.versionTitle || !this.createReleaseForm.categoryId || !this.createReleaseForm.productOwner.length || !this.createReleaseForm.experienceGroups.length) {
@@ -701,14 +721,17 @@
                         theme
                     })
                 } else {
-                    const newExperienceGroups = []
-
-                    this.experienceGroup.forEach(item => {
-                        if (item.isChecked) {
-                            newExperienceGroups.push(item.groupHashId)
-                        }
-                    })
-                    this.createReleaseForm.experienceGroups = newExperienceGroups
+                    if (this.experienceRange === 'internals') {
+                        // 如果为内部体验组，取选中体验组id
+                        const newExperienceGroups = []
+    
+                        this.experienceGroup.forEach(item => {
+                            if (item.isChecked) {
+                                newExperienceGroups.push(item.groupHashId)
+                            }
+                        })
+                        this.createReleaseForm.experienceGroups = newExperienceGroups
+                    }
                     const params = {
                         name: this.createReleaseForm.name,
                         path: this.createReleaseForm.path,
