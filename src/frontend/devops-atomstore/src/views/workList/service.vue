@@ -70,7 +70,10 @@
                             v-if="props.row.serviceStatus === 'RELEASED' || (props.row.serviceStatus === 'GROUNDING_SUSPENSION' && props.row.releaseFlag)"
                             @click="offline(props.row)"
                         > {{ $t('store.下架') }} </span>
-                        <!-- <span @click="deleteService(props.row.serviceCode)" v-if="['INIT', 'GROUNDING_SUSPENSION', 'UNDERCARRIAGED'].includes(props.row.serviceStatus)"> {{ $t('store.删除') }} </span> -->
+                        <span class="delete-btn"
+                            v-if="!props.row.releaseFlag"
+                            @click="deleteService(props.row)"
+                        > {{ $t('store.删除') }} </span>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -451,14 +454,15 @@
                 this.offlineServiceData.form.serviceCode = row.serviceCode
             },
 
-            deleteService (serviceCode) {
+            deleteService (row) {
                 const confirmFn = () => {
                     this.isLoading = true
-                    this.$store.dispatch('store/requestDelService', serviceCode).then((res) => {
-                        this.requestList()
-                    }).catch((err) => {
-                        this.$bkMessage({ message: err.message || err, theme: 'error' })
-                    }).finally(() => (this.isLoading = false))
+                    this.$store.dispatch('store/requestDelService', row.serviceCode)
+                        .then((res) => {
+                            this.requestList()
+                        }).catch((err) => {
+                            this.$bkMessage({ message: err.message || err, theme: 'error' })
+                        }).finally(() => (this.isLoading = false))
                 }
                 this.$bkInfo({
                     title: this.$t('store.确认要删除？'),
