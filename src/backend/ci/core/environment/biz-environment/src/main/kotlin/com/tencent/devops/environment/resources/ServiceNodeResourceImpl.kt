@@ -30,6 +30,7 @@ package com.tencent.devops.environment.resources
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.service.prometheus.BkTimed
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.environment.api.ServiceNodeResource
 import com.tencent.devops.environment.pojo.NodeBaseInfo
@@ -45,10 +46,13 @@ class ServiceNodeResourceImpl @Autowired constructor(
     private val nodeService: NodeService,
     private val envService: EnvService
 ) : ServiceNodeResource {
+
+    @BkTimed
     override fun listNodeByNodeType(projectId: String, nodeType: NodeType): Result<List<NodeBaseInfo>> {
         return Result(nodeService.listByNodeType("", projectId, nodeType))
     }
 
+    @BkTimed
     override fun listRawByHashIds(
         userId: String,
         projectId: String,
@@ -62,6 +66,7 @@ class ServiceNodeResourceImpl @Autowired constructor(
         return Result(nodeService.listRawServerNodeByIds(userId, projectId, nodeHashIds))
     }
 
+    @BkTimed
     override fun listRawByEnvHashIds(
         userId: String,
         projectId: String,
@@ -75,10 +80,12 @@ class ServiceNodeResourceImpl @Autowired constructor(
         return Result(envService.listRawServerNodeByEnvHashIds(userId, projectId, envHashIds))
     }
 
+    @BkTimed
     override fun listUsableServerNodes(userId: String, projectId: String): Result<List<NodeWithPermission>> {
         return Result(nodeService.listUsableServerNodes(userId, projectId))
     }
 
+    @BkTimed
     override fun listByHashIds(
         userId: String,
         projectId: String,
@@ -87,10 +94,12 @@ class ServiceNodeResourceImpl @Autowired constructor(
         return Result(nodeService.listByHashIds(userId, projectId, nodeHashIds))
     }
 
+    @BkTimed
     override fun listNodeByType(userId: String, projectId: String, type: String): Result<List<NodeBaseInfo>> {
         return Result(nodeService.listByType(userId, projectId, type))
     }
 
+    @BkTimed
     override fun extListNodes(userId: String, projectId: String): Result<List<NodeWithPermission>> {
         return Result(NodeUtils.sortByDisplayName(nodeService.extListNodes(userId, projectId)))
     }

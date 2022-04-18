@@ -28,6 +28,7 @@
 package com.tencent.devops.environment.resources
 
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.service.prometheus.BkTimed
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.environment.api.BuildNodeResource
 import com.tencent.devops.environment.pojo.NodeBaseInfo
@@ -39,6 +40,7 @@ class BuildNodeResourceImpl @Autowired constructor(
     private val nodeService: NodeService
 ) : BuildNodeResource {
 
+    @BkTimed
     override fun get(
         userId: String,
         projectId: String,
