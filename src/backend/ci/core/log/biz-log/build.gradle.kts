@@ -30,7 +30,6 @@ dependencies {
     api(project(":core:log:model-log"))
     api(project(":core:process:api-process"))
     api(project(":core:common:common-service"))
-    api(project(":core:common:common-websocket"))
     api(project(":core:common:common-auth:common-auth-api"))
     api(project(":core:common:common-db"))
     api(project(":core:common:common-client"))
