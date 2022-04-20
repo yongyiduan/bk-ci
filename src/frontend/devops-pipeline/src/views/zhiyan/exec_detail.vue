@@ -42,11 +42,31 @@
         },
         computed: {
             ...mapState('atom', [
+                'execDetail',
+                'editingElementPos',
                 'isPropertyPanelVisible'
-            ])
+            ]),
+            showLog () {
+                const { editingElementPos, isPropertyPanelVisible, $route: { params } } = this
+                return typeof editingElementPos?.elementIndex !== 'undefined' && params?.buildNo && isPropertyPanelVisible
+            },
+            currentElement () {
+                try {
+                    const {
+                        editingElementPos: { stageIndex, containerIndex, elementIndex },
+                        execDetail: { model: { stages } }
+                    } = this
+
+                    const element = stages[stageIndex].containers[containerIndex].elements[elementIndex]
+
+                    return element
+                } catch (error) {
+                    return null
+                }
+            }
         },
         watch: {
-            async isPropertyPanelVisible (visible) {
+            async showLog (visible) {
                 await this.onPanelVisibleChange(visible)
             }
         },
@@ -55,15 +75,13 @@
         },
         methods: {
             async onPanelVisibleChange (visible) {
-                if (!visible) {
+                if (!visible || !this.currentElement?.status) {
                     return this.deleteExtraAction()
                 }
 
                 await this.$nextTick()
 
-                if (this.$refs.detail.showLog) {
-                    this.onElementLogShow(this.$refs.detail.currentElement)
-                }
+                this.onElementLogShow(this.currentElement)
             },
             onElementLogShow (element) {
                 const { atomCode } = element || {}
