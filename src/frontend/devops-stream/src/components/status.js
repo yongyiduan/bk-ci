@@ -6,7 +6,6 @@ export function getPipelineStatusClass (status, isSkip = false) {
         CANCELED: 'canceled',
         REVIEW_ABORT: 'canceled',
         TRY_FINALLY: 'canceled',
-        QUEUE_CACHE: 'canceled',
         UNEXEC: 'skip',
         SKIP: 'skip',
         FAILED: 'danger',
@@ -23,7 +22,8 @@ export function getPipelineStatusClass (status, isSkip = false) {
         PREPARE_ENV: 'running',
         QUEUE: 'running',
         LOOP_WAITING: 'running',
-        CALL_WAITING: 'running'
+        CALL_WAITING: 'running',
+        QUEUE_CACHE: 'running'
     }
     return isSkip ? 'skip' : statusMap[status]
 }
@@ -55,7 +55,6 @@ export function getPipelineStatusCircleIconCls (status) {
     const iconMap = {
         RUNNING: 'bk-icon icon-circle-2-1 executing',
         PREPARE_ENV: 'bk-icon icon-circle-2-1 executing',
-        QUEUE: 'bk-icon icon-circle-2-1 executing',
         LOOP_WAITING: 'bk-icon icon-circle-2-1 executing',
         CALL_WAITING: 'bk-icon icon-circle-2-1 executing',
         DEPENDENT_WAITING: 'bk-icon icon-clock',
@@ -70,7 +69,9 @@ export function getPipelineStatusCircleIconCls (status) {
         EXEC_TIMEOUT: 'bk-icon icon-close',
         SUCCEED: 'bk-icon icon-check-1',
         REVIEW_PROCESSED: 'stream-icon stream-flag',
-        STAGE_SUCCESS: 'stream-icon stream-flag'
+        STAGE_SUCCESS: 'stream-icon stream-flag',
+        QUEUE: 'stream-icon stream-hourglass executing',
+        QUEUE_CACHE: 'stream-icon stream-hourglass executing'
     }
     return [iconMap[status]]
 }

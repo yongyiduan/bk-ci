@@ -197,10 +197,26 @@ export function setCookie (cname, cvalue, domain) {
     document.cookie = `${cname}=${cvalue};domain=${domain}; path=/;expires=Fri, 31 Dec 2030 23:59:59 GMT`
 }
 
-export function deleteCookie (cname, domain) {
-    const date = new Date()
-    date.setTime(date.getTime() - 10000)
-    document.cookie = cname + '=0;' + 'domain=' + domain + '; expires=' + date.toGMTString() + '; path=/'
+export function deleteCookie (cname) {
+    const cookies = document.cookie.split('; ')
+    for (let index = 0; index < cookies.length; index++) {
+        const cookie = cookies[index]
+        const cookieKey = cookie.split(';')[0].split('=')[0]
+        if (cookieKey !== cname) {
+            continue
+        }
+        const hostArray = window.location.hostname.split('.')
+        while (hostArray.length > 0) {
+            const cookieBase = encodeURIComponent(cookieKey) + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=' + hostArray.join('.') + ' ;path='
+            const pathArray = location.pathname.split('/')
+            document.cookie = cookieBase + '/'
+            while (pathArray.length > 0) {
+                document.cookie = cookieBase + pathArray.join('/')
+                pathArray.pop()
+            }
+            hostArray.shift()
+        }
+    }
 }
 
 export function getCookie (key) {
