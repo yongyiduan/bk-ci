@@ -111,12 +111,10 @@ class StreamTriggerRequestService @Autowired constructor(
         val repoTriggerPipelineList = repoTriggerEventService.getTargetPipelines(
             eventCommon.gitProjectName
         )
-        if (repoTriggerPipelineList.isNotEmpty()) {
-            action.data.context.repoTrigger = RepoTrigger("", repoTriggerPipelineList)
-        }
 
         // 跨项目触发的逻辑不需要当前项目也可以使用
         if (repoTriggerPipelineList.isNotEmpty()) {
+            action.data.context.repoTrigger = RepoTrigger("", repoTriggerPipelineList)
             val requestEventId = gitRequestEventDao.saveGitRequest(dslContext, requestEvent)
             action.data.context.requestEventId = requestEventId
 
@@ -197,7 +195,7 @@ class StreamTriggerRequestService @Autowired constructor(
 
         // 判断本次mr/push提交是否需要删除流水线, fork不用
         // 远程触发不存在删除流水线的情况
-        if (action.data.context.repoTrigger != null) {
+        if (action.data.context.repoTrigger == null) {
             action.checkAndDeletePipeline(path2PipelineExists)
         }
 
