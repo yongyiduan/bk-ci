@@ -16,8 +16,10 @@
             <div v-if="showContent && releaseList.length">
                 <bk-table
                     :data="releaseList"
-                    style="cursor: pointer"
                     @row-click="toRowDetail"
+                    :pagination="pagination"
+                    @page-change="handlePageChange"
+                    @page-limit-change="handlePageLimitChange"
                 >
                     <bk-table-column label="文件名（版本号）" prop="name" min-width="150">
                         <template slot-scope="props">
@@ -74,6 +76,7 @@
                 curIndexItemUrl: '',
                 defaultCover: require('@/images/qrcode_app.png'),
                 releaseList: [],
+                totalList: [],
                 loading: {
                     isLoading: false,
                     title: ''
@@ -81,6 +84,11 @@
                 emptyInfo: {
                     title: '暂无体验',
                     desc: '您可以在新增体验中新增一个体验任务'
+                },
+                pagination: {
+                    current: 1,
+                    limit: 20,
+                    count: 0
                 }
             }
         },
@@ -113,18 +121,23 @@
                 loading.title = '数据加载中，请稍候'
 
                 try {
-                    this.requestList()
+                    this.totalList = await this.requestList()
+                    const start = 0
+                    const end = start + this.pagination.limit
+                    this.releaseList = this.totalList.slice(start, end)
                 } catch (err) {
                     this.$bkMessage({
                         message: err.message ? err.message : err,
                         theme: 'error'
                     })
                 } finally {
-                    setTimeout(() => {
-                        this.loading.isLoading = false
-                    }, 1000)
+                    this.showContent = true
+                    this.loading.isLoading = false
                 }
             },
+            /**
+             * 获取发布列表
+             */
             /**
              * 获取发布列表
              */
@@ -136,6 +149,7 @@
                             expired: this.getIsShowExpired
                         }
                     })
+                    
                     const platformLabelMap = {
                         ANDROID: 'Android',
                         IOS: 'iOS'
@@ -144,13 +158,13 @@
                         PIPELINE: '流水线',
                         WEB: '手动创建'
                     }
-                    this.releaseList = res.map(item => ({
+                    this.pagination.count = res.length
+                    return res.map(item => ({
                         ...item,
                         platformLabel: platformLabelMap[item.platform],
                         sourceLabel: sourceLabelMap[item.source],
                         formatExpireDate: this.localConvertTime(item.expireDate).split(' ')[0]
                     }))
-                    console.log(this.releaseList)
                 } catch (err) {
                     const message = err.message ? err.message : err
                     const theme = 'error'
@@ -159,9 +173,22 @@
                         message,
                         theme
                     })
+                    return []
                 }
-
-                this.showContent = true
+            },
+            handlePageChange (page) {
+                this.pagination.current = page
+                const start = (page - 1) * this.pagination.limit
+                const end = start + this.pagination.limit
+                
+                this.releaseList = this.totalList.slice(start, end)
+            },
+            handlePageLimitChange (limit) {
+                this.pagination.limit = limit
+                this.pagination.current = 1
+                const start = 0
+                const end = start + limit
+                this.releaseList = this.totalList.slice(start, end)
             },
             async requestUrl (row) {
                 this.curIndexItemUrl = ''
