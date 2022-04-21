@@ -218,17 +218,21 @@ object Runner {
     private fun BuildTask.parseCredentials(): BuildTask {
         with(this) {
             // 解析跨项目模板信息
-            val acrossInfo = TemplateAcrossInfoUtil.getAcrossInfo(buildVariable ?: return this, taskId)
+            val acrossTargetProjectId = TemplateAcrossInfoUtil.getAcrossInfo(
+                variables = buildVariable ?: return this,
+                taskId = taskId
+            )?.targetProjectId
             val parsedVariables = mutableMapOf<String, String>()
             buildVariable?.forEach { (key, value) ->
-                parsedVariables[key] = ReplacementUtils.replace(value, object : ReplacementUtils.KeyReplacement {
-                    override fun getReplacement(key: String, doubleCurlyBraces: Boolean): String? {
-                        return CredentialUtils.getCredentialContextValue(
-                            key = key,
-                            acrossProjectId = acrossInfo?.targetProjectId
-                        )
-                    }
-                })
+                parsedVariables[key] = if (value.contains("settings.")) {
+                    ReplacementUtils.replace(value, object : ReplacementUtils.KeyReplacement {
+                        override fun getReplacement(key: String, doubleCurlyBraces: Boolean): String? = try {
+                            CredentialUtils.getCredential(buildId, key, false, acrossTargetProjectId)[0]
+                        } catch (ignore: Exception) {
+                            CredentialUtils.getCredentialContextValue(key, acrossTargetProjectId)
+                        }
+                    })
+                } else value
             }
             return this.copy(buildVariable = parsedVariables)
         }
