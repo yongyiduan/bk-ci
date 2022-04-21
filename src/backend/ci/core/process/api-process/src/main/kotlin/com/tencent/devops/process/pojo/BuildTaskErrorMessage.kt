@@ -30,32 +30,10 @@ package com.tencent.devops.process.pojo
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
-@ApiModel("流水线模型-构建任务结果")
-data class BuildTaskResult(
-    @ApiModelProperty("任务ID", required = true)
-    val taskId: String,
-    @ApiModelProperty("插件ID", required = true)
-    val elementId: String,
-    @ApiModelProperty("容器Hash ID", required = true)
-    val containerId: String?,
-    @ApiModelProperty("是否执行成功", required = true)
-    val success: Boolean,
-    @ApiModelProperty("构建结果", required = true)
-    val buildResult: Map<String, String>,
-    @ApiModelProperty("错误原因", required = false)
-    val message: String? = null,
-    @ApiModelProperty("任务类型", required = false)
-    val type: String? = null,
-    @ApiModelProperty("错误类型", required = false)
-    val errorType: String? = null,
-    @ApiModelProperty("错误码标识", required = false)
-    val errorCode: Int? = null,
-    @ApiModelProperty("对接平台代码", required = false)
-    val platformCode: String? = null,
-    @ApiModelProperty("对接平台错误码", required = false)
-    val platformErrorCode: Int? = null,
-    @ApiModelProperty("插件监控数据", required = false)
-    val monitorData: Map<String, Any>? = null,
-    @ApiModelProperty("构建任务失败时用于通知的信息", required = false)
-    val buildTaskErrorMessage: BuildTaskErrorMessage? = null
+@ApiModel("流水线模型-构建任务失败时用于通知的信息")
+data class BuildTaskErrorMessage(
+    @ApiModelProperty("插件创建人", required = false)
+    var atomCreator: String?,
+    @ApiModelProperty("第三方服务助手信息", required = false)
+    var thirdPartyAssistant: String?
 )
