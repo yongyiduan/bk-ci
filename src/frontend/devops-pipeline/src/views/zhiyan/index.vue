@@ -71,6 +71,7 @@
         <router-view
             class="biz-content"
             v-bkloading="{ isLoading }"
+            :params-label="paramsLabel"
             :exec-params="execParams"
             :deploy-label="deployLabel"
             :deploy-types="deployTypes"
@@ -110,7 +111,8 @@
             const {
                 from = '交付流',
                 deploy_label: deployLabel = '部署详情',
-                deploy_type: deployType = ''
+                deploy_type: deployType = '',
+                params_label: paramsLabel = '设置'
             } = this.$route.query || {}
 
             const deployTypes = deployType ? deployType.split(',') : undefined
@@ -119,6 +121,7 @@
                 from,
                 deployLabel,
                 deployTypes,
+                paramsLabel,
                 execParams: {},
                 hasParamsButton: false,
                 breadCrumbPath: []

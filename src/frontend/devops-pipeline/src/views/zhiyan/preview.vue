@@ -20,6 +20,10 @@
             execParams: {
                 type: Object,
                 default: () => {}
+            },
+            paramsLabel: {
+                type: String,
+                default: '设置'
             }
         },
         data () {
@@ -85,7 +89,7 @@
                                 click: () => this.sendMessage('editParams', this.$refs.preview.paramValues)
                             }
 
-                        }, '设置')
+                        }, this.paramsLabel || '设置')
                     ])
                 })
 
