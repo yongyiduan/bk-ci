@@ -1,6 +1,6 @@
 <template>
     <section>
-        <div class="explain">{{ $t('store.说明：') }}<span class="explain-info">{{ $t('store.说明文案') }}</span></div>
+        <div class="explain">{{ $t('store.说明：') }}<span class="explain-info">{{ explainInfo }}</span></div>
         <bk-table :data="outputData" v-bkloading="{ isLoading: isLoading }">
             <bk-table-column :label="$t('store.参数名')" prop="name" show-overflow-tooltip></bk-table-column>
             <bk-table-column :label="$t('store.参数说明')" prop="desc" show-overflow-tooltip></bk-table-column>
@@ -12,13 +12,26 @@
     import api from '@/api'
 
     export default {
+        props: {
+            classifyCode: {
+                type: String,
+                default: ''
+            }
+        },
         data () {
             return {
                 outputData: [],
                 isLoading: false
             }
         },
-
+        computed: {
+            explainInfo () {
+                if (this.classifyCode === 'trigger') {
+                    return this.$t('store.触发器说明文案')
+                }
+                return this.$t('store.说明文案')
+            }
+        },
         created () {
             this.initOutputData()
         },

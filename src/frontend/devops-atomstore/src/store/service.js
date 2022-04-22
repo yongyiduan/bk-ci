@@ -263,7 +263,7 @@ export const actions = {
      * 删除扩展
      */
     requestDelService ({ commit }, serviceCode) {
-        return vue.$ajax.delete(`${prefix}/user/market/service/serviceCodes/${serviceCode}`)
+        return vue.$ajax.delete(`${prefix}/user/market/desk/service/${serviceCode}/delete`)
     },
 
     /**

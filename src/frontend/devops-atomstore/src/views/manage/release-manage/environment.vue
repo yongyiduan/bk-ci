@@ -2,7 +2,7 @@
     <article class="manage-environment">
         <header class="environment-head">
             <bk-button theme="primary" @click="addEnv">{{ $t('store.新增环境变量') }}</bk-button>
-            <bk-select v-model="envScope" class="head-item" :clearable="false">
+            <bk-select v-model="envScope" class="head-item">
                 <bk-option v-for="option in scopesList"
                     :key="option.id"
                     :id="option.id"
@@ -113,7 +113,7 @@
     export default {
         data () {
             return {
-                envScope: 'ALL',
+                envScope: '',
                 envName: '',
                 envList: [],
                 isLoading: false,
@@ -203,6 +203,10 @@
 
         methods: {
             editEnv (form) {
+                Object.assign(form, {
+                    option: 'update',
+                    variableId: form.id
+                })
                 form = JSON.parse(JSON.stringify(form))
                 Object.assign(this.addEnvObj, {
                     show: true,
@@ -220,6 +224,7 @@
                         varValue: '',
                         scope: 'ALL',
                         varDesc: '',
+                        option: 'create',
                         encryptFlag: false
                     }
                 })
@@ -228,6 +233,7 @@
             deleteEnv (row) {
                 this.deleteObj.show = true
                 this.deleteObj.name = row.varName
+                this.deleteObj.scope = row.scope
             },
 
             requestDelete () {
@@ -235,7 +241,8 @@
                 const data = {
                     storeType: this.storeType,
                     storeCode: this.storeCode,
-                    varNames: this.deleteObj.name
+                    varNames: this.deleteObj.name,
+                    scope: this.deleteObj.scope
                 }
                 api.deleteEnv(data).then((res) => {
                     this.getAllEnvList()
@@ -254,7 +261,8 @@
                 const data = {
                     storeType: this.storeType,
                     storeCode: this.storeCode,
-                    varName: row.varName
+                    varName: row.varName,
+                    scope: row.scope
                 }
                 api.getEnvChangeList(data).then((res) => {
                     this.envHistory.list = res || []
