@@ -121,10 +121,7 @@
                 loading.title = '数据加载中，请稍候'
 
                 try {
-                    this.totalList = await this.requestList()
-                    const start = 0
-                    const end = start + this.pagination.limit
-                    this.releaseList = this.totalList.slice(start, end)
+                    await this.requestList()
                 } catch (err) {
                     this.$bkMessage({
                         message: err.message ? err.message : err,
@@ -141,7 +138,7 @@
             /**
              * 获取发布列表
              */
-            async requestList () {
+            async requestList (reset = true) {
                 try {
                     const res = await this.$store.dispatch('experience/requestExpList', {
                         projectId: this.projectId,
@@ -158,13 +155,20 @@
                         PIPELINE: '流水线',
                         WEB: '手动创建'
                     }
-                    this.pagination.count = res.length
-                    return res.map(item => ({
+                    
+                    this.totalList = res.map(item => ({
                         ...item,
                         platformLabel: platformLabelMap[item.platform],
                         sourceLabel: sourceLabelMap[item.source],
                         formatExpireDate: this.localConvertTime(item.expireDate).split(' ')[0]
                     }))
+                    this.pagination.count = this.totalList.length
+                    const start = reset ? 0 : (this.pagination.current - 1) * this.pagination.limit
+                    const end = start + this.pagination.limit
+                    if (reset) {
+                        this.pagination.current = 1
+                    }
+                    this.releaseList = this.totalList.slice(start, end)
                 } catch (err) {
                     const message = err.message ? err.message : err
                     const theme = 'error'
@@ -259,7 +263,7 @@
                                     theme
                                 })
 
-                                this.requestList()
+                                this.requestList(false)
                             }
                         }
                     })
