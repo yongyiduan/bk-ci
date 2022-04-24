@@ -391,7 +391,8 @@
                 'pausePlugin'
             ]),
             ...mapActions('common', [
-                'requestInterceptAtom'
+                'requestInterceptAtom',
+                'startDebugDocker'
             ]),
             convertMStoStringByRule,
             handlePiplineClick (args) {
@@ -453,7 +454,7 @@
                 await this.retryPipeline()
                 done()
             },
-            
+
             async handleExec ({
                 stageIndex,
                 containerIndex,
@@ -477,7 +478,7 @@
                         isContinue,
                         element: atom
                     }
-                    
+
                     try {
                         await this.pausePlugin(postData)
                         this.requestPipelineExecDetail(this.routerParams)
