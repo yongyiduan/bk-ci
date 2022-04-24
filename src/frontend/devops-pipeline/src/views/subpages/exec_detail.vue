@@ -391,6 +391,7 @@
                 'pausePlugin'
             ]),
             ...mapActions('common', [
+                'startDebugDocker',
                 'requestInterceptAtom'
             ]),
             convertMStoStringByRule,
