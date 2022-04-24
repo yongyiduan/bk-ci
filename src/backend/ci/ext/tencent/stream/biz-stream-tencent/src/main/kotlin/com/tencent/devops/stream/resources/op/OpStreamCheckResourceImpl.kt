@@ -52,6 +52,10 @@ class OpStreamCheckResourceImpl @Autowired constructor(
 
     private val logger = LoggerFactory.getLogger(OpStreamCheckResource::class.java)
 
+    companion object {
+        private const val OFFSET_BOUND = 100000
+    }
+
     override fun checkBranches(gitProjectId: Long?, pipelineId: String?): Result<Boolean> {
         streamAsyncService.checkPipelineBranch(gitProjectId, pipelineId)
         return Result(true)
@@ -90,7 +94,7 @@ class OpStreamCheckResourceImpl @Autowired constructor(
                 }
             }
             offset += limit
-        } while (offset < 100000)
+        } while (offset < OFFSET_BOUND)
         val sb = StringBuilder("buildId,pipelineId,triggerUser,createTime\n")
         conflictList.forEach { conflict ->
             sb.append(
@@ -127,7 +131,7 @@ class OpStreamCheckResourceImpl @Autowired constructor(
                 }
             }
             offset += limit
-        } while (offset < 100000)
+        } while (offset < OFFSET_BOUND)
         return sb.toString()
     }
 }

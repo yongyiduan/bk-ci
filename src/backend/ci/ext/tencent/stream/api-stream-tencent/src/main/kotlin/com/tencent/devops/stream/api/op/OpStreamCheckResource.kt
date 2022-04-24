@@ -70,7 +70,7 @@ interface OpStreamCheckResource {
     @GET
     @Path("/includeKeyJobs")
     fun getTriggerAndYmlFileByYmlContent(
-        @ApiParam("构建数据失效时间", required = false)
+        @ApiParam("最近N天的数据", required = false)
         @QueryParam("buildDays")
         buildDays: Long?,
         @ApiParam("关键词", required = true)
