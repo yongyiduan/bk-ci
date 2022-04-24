@@ -34,6 +34,7 @@ import com.tencent.devops.model.stream.tables.records.TGitRequestEventBuildRecor
 import com.tencent.devops.process.yaml.v2.models.ScriptBuildYaml
 import com.tencent.devops.process.yaml.v2.utils.ScriptYmlUtils
 import com.tencent.devops.stream.api.op.OpStreamCheckResource
+import com.tencent.devops.stream.dao.GitPipelineResourceDao
 import com.tencent.devops.stream.dao.GitRequestEventBuildDao
 import com.tencent.devops.stream.service.StreamAsyncService
 import org.jooq.DSLContext
@@ -45,7 +46,8 @@ import org.springframework.beans.factory.annotation.Autowired
 class OpStreamCheckResourceImpl @Autowired constructor(
     private val streamAsyncService: StreamAsyncService,
     private val dslContext: DSLContext,
-    private val gitRequestEventBuildDao: GitRequestEventBuildDao
+    private val gitRequestEventBuildDao: GitRequestEventBuildDao,
+    private val gitPipelineResourceDao: GitPipelineResourceDao
 ) : OpStreamCheckResource {
 
     private val logger = LoggerFactory.getLogger(OpStreamCheckResource::class.java)
@@ -97,5 +99,35 @@ class OpStreamCheckResourceImpl @Autowired constructor(
             )
         }
         return Result(sb.toString())
+    }
+
+    override fun getTriggerAndYmlFileByYmlContent(buildDays: Long?, key: String): String {
+        val sb = StringBuilder("creator,filePath,pipelineId,createTime")
+        var offset = 0
+        do {
+            val limit = 100
+            val builds = gitRequestEventBuildDao.getBuildInLastDaysAndYmlContainKey(
+                dslContext = dslContext,
+                buildDays = buildDays ?: 1,
+                offset = offset,
+                limit = limit,
+                key = key
+            )
+            builds.forEach {
+                val pipelineById = gitPipelineResourceDao.getPipelineById(
+                    dslContext = dslContext,
+                    gitProjectId = it.gitProjectId,
+                    pipelineId = it.pipelineId
+                )
+                if (pipelineById != null) {
+                    sb.append(
+                        "${pipelineById.creator},${pipelineById.filePath}," +
+                            "${pipelineById.pipelineId},${pipelineById.createTime}\n"
+                    )
+                }
+            }
+            offset += limit
+        } while (offset < 100000)
+        return sb.toString()
     }
 }

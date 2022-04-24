@@ -65,4 +65,16 @@ interface OpStreamCheckResource {
         @QueryParam("buildDays")
         buildDays: Long?
     ): Result<String>
+
+    @ApiOperation("能检索yml内容中包含有某个关键字的yml文件及其负责人")
+    @GET
+    @Path("/includeKeyJobs")
+    fun getTriggerAndYmlFileByYmlContent(
+        @ApiParam("构建数据失效时间", required = false)
+        @QueryParam("buildDays")
+        buildDays: Long?,
+        @ApiParam("关键词", required = true)
+        @QueryParam("key")
+        key: String
+    ): String
 }

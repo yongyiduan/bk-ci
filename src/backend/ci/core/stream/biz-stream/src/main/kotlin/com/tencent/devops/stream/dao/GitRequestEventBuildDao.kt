@@ -753,4 +753,20 @@ class GitRequestEventBuildDao {
             return dsl.fetch().size
         }
     }
+
+    fun getBuildInLastDaysAndYmlContainKey(
+        dslContext: DSLContext,
+        buildDays: Long,
+        offset: Int,
+        limit: Int,
+        key: String
+    ): List<TGitRequestEventBuildRecord> {
+        with(TGitRequestEventBuild.T_GIT_REQUEST_EVENT_BUILD) {
+            return dslContext.selectFrom(this)
+                .where(CREATE_TIME.gt(LocalDateTime.now().minusDays(buildDays)))
+                .and(ORIGIN_YAML.like("%$key%"))
+                .limit(offset, limit)
+                .fetch()
+        }
+    }
 }
