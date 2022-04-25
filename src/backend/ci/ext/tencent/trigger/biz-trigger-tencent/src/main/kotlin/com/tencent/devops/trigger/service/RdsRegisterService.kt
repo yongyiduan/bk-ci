@@ -285,14 +285,17 @@ class RdsRegisterService @Autowired constructor(
             filterNames = filterNames
         )
 
-        val filter = on.filter.toMutableMap()
-        filter[webhookResult.resourceKey] = webhookResult.resourceValue
+        val originFilter = on.filter.toMutableMap()
+        originFilter[webhookResult.resourceKey] = webhookResult.resourceValue
+        logger.info("$projectId|$busId|$ruleId|origin filter: $originFilter")
+        val eventsourceHandler = SpringContextUtil.getBean(IEventSourceHandler::class.java, eventSource.name)
+        val finalFilter = eventsourceHandler.wrapFilter(originFilter)
+        logger.info("$projectId|$busId|$ruleId|final filter: $finalFilter")
 
-        logger.info("$projectId|$busId|$ruleId|filter conditions: $filter")
         val ruleExpressionList = eventRuleExpressions.map { ruleExpression ->
             val replaceExpression = ObjectReplaceEnvVarUtil.replaceEnvVar(
                 ruleExpression.expressions,
-                filter.map { (key, value) -> Pair(key, JsonUtil.toJson(value)) }.toMap()
+                finalFilter.map { (key, value) -> Pair(key, JsonUtil.toJson(value)) }.toMap()
             )
             JsonUtil.to(replaceExpression.toString(), object : TypeReference<List<Expression>>() {})
         }.flatten()

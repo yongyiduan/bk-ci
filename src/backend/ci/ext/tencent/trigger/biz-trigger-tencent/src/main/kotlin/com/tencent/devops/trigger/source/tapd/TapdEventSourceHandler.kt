@@ -31,14 +31,19 @@ import com.jayway.jsonpath.JsonPath
 import com.tencent.devops.trigger.constant.CloudEventExtensionKey
 import com.tencent.devops.trigger.constant.SourceType
 import com.tencent.devops.trigger.source.IEventSourceHandler
+import com.tencent.devops.trigger.source.tapd.api.TapdApi
 import io.cloudevents.CloudEvent
 import io.cloudevents.core.builder.CloudEventBuilder
+import okhttp3.Credentials
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.net.URI
 import java.nio.charset.StandardCharsets
 
 @Component(SourceType.TAPD)
-class TapdEventSourceHandler : IEventSourceHandler<Unit> {
+class TapdEventSourceHandler @Autowired constructor(
+    val tapdConfig: TapdConfig
+) : IEventSourceHandler<Unit> {
 
     override fun toCloudEvent(headers: Map<String, String>, payload: String): CloudEvent? {
         val ctx = JsonPath.parse(payload)
@@ -46,7 +51,7 @@ class TapdEventSourceHandler : IEventSourceHandler<Unit> {
             .withId(ctx.read<String>("$.event_id"))
             .withType(ctx.read<String>("$.event"))
             .withSource(URI.create(SourceType.TAPD))
-            .withData("application/json",payload.toByteArray(StandardCharsets.UTF_8))
+            .withData("application/json", payload.toByteArray(StandardCharsets.UTF_8))
             .withExtension(CloudEventExtensionKey.THIRD_ID, ctx.read<String>("$.workspace_id"))
             .build()
     }
@@ -54,4 +59,32 @@ class TapdEventSourceHandler : IEventSourceHandler<Unit> {
     override fun registerWebhook(webhookUrl: String, webhookRequestParam: Unit) = true
 
     override fun getWebhookRequestParam(webhookParamMap: Map<String, Any>) = Unit
+
+    @SuppressWarnings("ReturnCount")
+    override fun wrapFilter(filter: MutableMap<String, Any>): Map<String, Any> {
+        val workspaceId = filter["tapd_id"] ?: return filter
+        val type = when (filter["type"]) {
+            "story_create", "story_update", "story_delete" -> "story"
+            "bug_create", "bug_update", "bug_delete" -> "bug"
+            else -> return filter
+        }
+        if (filter.containsKey("new_status") || filter.containsKey("old_status")) {
+            val workflowStatusMap = TapdApi().getWorkflowStatusMap(
+                apiUrl = tapdConfig.apiUrl,
+                token = Credentials.basic(tapdConfig.clientId, tapdConfig.clientSecret),
+                workspaceId = workspaceId.toString(),
+                system = type
+            )
+            val statusValueMap = workflowStatusMap.map { (key, value) -> Pair(value, key) }.toMap()
+            if (filter.containsKey("new_status")) {
+                val newStatusKey = (filter["new_status"] as List<String>).map { statusValueMap[it] }.toList()
+                filter["new_status"] = newStatusKey
+            }
+            if (filter.containsKey("old_status")) {
+                val newStatusKey = (filter["old_status"] as List<String>).map { statusValueMap[it] }.toList()
+                filter["old_status"] = newStatusKey
+            }
+        }
+        return filter.toMap()
+    }
 }

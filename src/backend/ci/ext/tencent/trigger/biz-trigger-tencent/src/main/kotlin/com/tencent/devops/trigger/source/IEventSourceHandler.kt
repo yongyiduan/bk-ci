@@ -46,4 +46,9 @@ interface IEventSourceHandler<T> {
     }
 
     fun getWebhookRequestParam(webhookParamMap: Map<String, Any>): T
+
+    /**
+     * 对过滤条件进行包装，比如值转换
+     */
+    fun wrapFilter(filter: MutableMap<String, Any>): Map<String, Any> = filter
 }
