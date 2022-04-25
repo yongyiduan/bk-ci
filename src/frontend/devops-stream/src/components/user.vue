@@ -31,6 +31,11 @@
                         </span>
                     </li>
                     <li>
+                        <span class="user-menu-item" @click.stop="changeLanguage">
+                            Change Lang
+                        </span>
+                    </li>
+                    <li>
                         <span class="user-menu-item" @click.stop="logout">
                             Logout
                         </span>
@@ -40,7 +45,10 @@
         </div>
     </div>
 </template>
+
 <script>
+    import cookies from 'js-cookie'
+
     export default ({
         props: {
             user: {
@@ -71,6 +79,18 @@
             goToNotifications () {
                 this.$router.push({ name: 'notifications' })
                 this.hideUserInfo()
+            },
+
+            changeLanguage () {
+                let locale = 'zh-CN'
+                try {
+                    locale = this.$i18n.locale === 'en-US' ? 'zh-CN' : 'en-US'
+                } catch (e) {
+                    // catch
+                }
+                this.$i18n.locale = locale
+                cookies.set('stream_language', locale)
+                location.reload()
             },
 
             logout () {
