@@ -287,6 +287,7 @@ class RdsRegisterService @Autowired constructor(
 
         val originFilter = on.filter.toMutableMap()
         originFilter[webhookResult.resourceKey] = webhookResult.resourceValue
+        originFilter[TYPE_FILTER_NAME] = eventType.aliasName
         logger.info("$projectId|$busId|$ruleId|origin filter: $originFilter")
         val eventsourceHandler = SpringContextUtil.getBean(IEventSourceHandler::class.java, eventSource.name)
         val finalFilter = eventsourceHandler.wrapFilter(originFilter)
