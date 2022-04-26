@@ -171,7 +171,7 @@ class EngineVMBuildService @Autowired(required = false) constructor(
         // var表中获取环境变量，并对老版本变量进行兼容
         val variables = buildVariableService.getAllVariable(projectId, buildId)
 
-        var variablesWithType = buildVariableService.getAllVariableWithType(projectId, buildId)
+        var variablesWithType = buildVariableService.getAllVariableWithType(projectId, buildId).toMutableList()
         val sensitiveList = mutableListOf<String>()
         val model = containerBuildDetailService.getBuildModel(projectId, buildId)
         Preconditions.checkNotNull(model, NotFoundException("Build Model ($buildId) is not exist"))
@@ -207,7 +207,7 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                             val envList = mutableListOf<BuildEnv>()
                             val timeoutMills = transMinuteTimeoutToMills(c.jobControlOption?.timeout).second
                             val contextMap = pipelineContextService.getAllBuildContext(variables).toMutableMap()
-                            fillContainerContext(contextMap, c.customBuildEnv, c.matrixContext)
+
                             c.buildEnv?.forEach { env ->
                                 containerAppResource.getBuildEnv(
                                     name = env.key, version = env.value, os = c.baseOS.name.toLowerCase()
@@ -215,20 +215,25 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                             }
 
                             // 设置Job环境变量customBuildEnv到variablesWithType中
-                            pipelineBuildParamsService.formatCustomBuildEnv(
+                            // TODO 可以考虑将parsedValue加入formatCustomBuildEnv方法
+                            val parsedCustomEnv = pipelineBuildParamsService.formatCustomBuildEnv(
                                 buildId = buildId,
                                 vmSeqId = vmSeqId,
                                 containerHashId = c.containerHashId,
                                 executeCount = c.executeCount.toString(),
                                 customBuildEnv = c.customBuildEnv
                             )?.map { (key, value) ->
-                                BuildParameters(
+                                val parsedValue = value.parseValue(buildInfo.projectId, contextMap, sensitiveList)
+                                variablesWithType.add(BuildParameters(
                                     key = key,
-                                    value = value.parseValue(buildInfo.projectId, contextMap, sensitiveList),
+                                    value = parsedValue,
                                     valueType = BuildFormPropertyType.STRING,
                                     readOnly = true
-                                )
-                            }?.let { self -> variablesWithType = variablesWithType.plus(self) }
+                                ))
+                                key to parsedValue
+                            }?.toMap()
+                            // 追加env上下文和matrix上下文
+                            fillContainerContext(contextMap, parsedCustomEnv, c.matrixContext)
 
                             Triple(envList, contextMap, timeoutMills)
                         }
