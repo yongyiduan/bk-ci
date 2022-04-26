@@ -104,6 +104,7 @@ const val AND = "and" // 和
 const val OR = "or" // 或
 const val TIMETOSELECT = "timetoSelect" // 时必选
 const val API_ACCESS_TOKEN_PROPERTY = "access_token"
+const val TEMPLATE_ACROSS_INFO_ID = "devops_template_across_info_id"
 const val MASTER = "master" // 主干
 const val SYSTEM = "system" // 系统
 

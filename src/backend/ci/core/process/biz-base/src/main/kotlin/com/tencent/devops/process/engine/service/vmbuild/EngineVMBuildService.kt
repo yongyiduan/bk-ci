@@ -32,9 +32,11 @@ import com.tencent.devops.common.api.exception.OperationException
 import com.tencent.devops.common.api.pojo.ErrorCode
 import com.tencent.devops.common.api.pojo.ErrorInfo
 import com.tencent.devops.common.api.pojo.ErrorType
+import com.tencent.devops.common.api.util.DHUtil
 import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.ObjectReplaceEnvVarUtil
+import com.tencent.devops.common.api.util.ReplacementUtils
 import com.tencent.devops.common.api.util.SensitiveApiUtil
 import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.common.client.Client
@@ -88,10 +90,13 @@ import com.tencent.devops.process.utils.PIPELINE_VMSEQ_ID
 import com.tencent.devops.process.utils.PipelineVarUtil
 import com.tencent.devops.store.api.container.ServiceContainerAppResource
 import com.tencent.devops.store.pojo.app.BuildEnv
+import com.tencent.devops.ticket.api.ServiceCredentialResource
+import com.tencent.devops.ticket.utils.CredentialContextUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.util.Base64
 import java.util.concurrent.TimeUnit
 import javax.ws.rs.NotFoundException
 
@@ -167,6 +172,7 @@ class EngineVMBuildService @Autowired(required = false) constructor(
         val variables = buildVariableService.getAllVariable(projectId, buildId)
 
         var variablesWithType = buildVariableService.getAllVariableWithType(projectId, buildId)
+        val sensitiveList = mutableListOf<String>()
         val model = containerBuildDetailService.getBuildModel(projectId, buildId)
         Preconditions.checkNotNull(model, NotFoundException("Build Model ($buildId) is not exist"))
         var vmId = 1
@@ -215,10 +221,10 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                                 containerHashId = c.containerHashId,
                                 executeCount = c.executeCount.toString(),
                                 customBuildEnv = c.customBuildEnv
-                            )?.map { (t, u) ->
+                            )?.map { (key, value) ->
                                 BuildParameters(
-                                    key = t,
-                                    value = EnvUtils.parseEnv(u, contextMap),
+                                    key = key,
+                                    value = value.parseValue(buildInfo.projectId, contextMap, sensitiveList),
                                     valueType = BuildFormPropertyType.STRING,
                                     readOnly = true
                                 )
@@ -259,7 +265,8 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                         jobId = c.jobId,
                         variablesWithType = variablesWithType,
                         timeoutMills = timeoutMills,
-                        containerType = c.getClassType()
+                        containerType = c.getClassType(),
+                        sensitiveList = null
                     )
                 }
                 vmId++
@@ -894,5 +901,34 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                 )
             }
         }
+    }
+
+    private fun String.parseValue(
+        projectId: String,
+        context: MutableMap<String, String>,
+        sensitiveList: MutableList<String>
+    ): String {
+        return ReplacementUtils.replace(this, object : ReplacementUtils.KeyReplacement {
+            override fun getReplacement(key: String, doubleCurlyBraces: Boolean): String? {
+                val credentialKey = CredentialContextUtils.getCredentialKey(key)
+                // 如果不是凭据上下文则直接返回原value值
+                if (credentialKey == key) return null
+                val pair = DHUtil.initKey()
+                val encoder = Base64.getEncoder()
+                val credentialInfo = client.get(ServiceCredentialResource::class).get(
+                    projectId = projectId,
+                    credentialId = credentialKey,
+                    publicKey = encoder.encodeToString(pair.publicKey)
+                ).data ?: return null
+                return CredentialContextUtils.getCredentialValue(
+                    valueList = CredentialContextUtils.getDecodedCredentialList(credentialInfo, pair),
+                    type = credentialInfo.credentialType,
+                    key = key
+                )?.let {
+                    sensitiveList.add(it)
+                    it
+                }
+            }
+        }, context)
     }
 }
