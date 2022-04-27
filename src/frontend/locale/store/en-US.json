@@ -152,6 +152,7 @@
   "YAML片段": "YAML fragment",
   "YAMLV1": "YAML V1 fragment",
   "YAMLV2": "YAML fragment",
+  "触发器说明文案": "Accessed through the expression ${{ variable name }}",
   "点击申请成为协作者": "Click Apply to become a collaborator",
   "推荐使用": "Recommended Use",
   "YAML可用": "YAML is available",

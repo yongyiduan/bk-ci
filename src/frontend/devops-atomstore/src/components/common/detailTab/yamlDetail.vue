@@ -31,7 +31,6 @@
             },
             name: String,
             currentTab: String,
-            qualityData: Array,
             getDataFunc: {
                 type: Function,
                 default: null
