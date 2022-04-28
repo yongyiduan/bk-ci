@@ -45,8 +45,7 @@ import com.tencent.bkrepo.repository.pojo.metadata.UserMetadataSaveRequest
 import com.tencent.bkrepo.repository.pojo.node.NodeDetail
 import com.tencent.bkrepo.repository.pojo.node.NodeInfo
 import com.tencent.bkrepo.repository.pojo.node.NodeSizeInfo
-import com.tencent.bkrepo.repository.pojo.node.user.UserNodeCopyRequest
-import com.tencent.bkrepo.repository.pojo.node.user.UserNodeMoveRequest
+import com.tencent.bkrepo.repository.pojo.node.user.UserNodeMoveCopyRequest
 import com.tencent.bkrepo.repository.pojo.node.user.UserNodeRenameRequest
 import com.tencent.bkrepo.repository.pojo.project.UserProjectCreateRequest
 import com.tencent.bkrepo.repository.pojo.repo.RepoCreateRequest
@@ -547,13 +546,12 @@ class BkRepoClient constructor(
                     " toPath: $toPath"
         )
         val url = "${getGatewaytUrl()}/bkrepo/api/service/repository/api/node/move"
-        val requestData = UserNodeMoveRequest(
+        val requestData = UserNodeMoveCopyRequest(
             srcProjectId = projectId,
             srcRepoName = repoName,
             srcFullPath = fromPath,
             destProjectId = projectId,
             destRepoName = repoName,
-            destPath = toPath,
             destFullPath = toPath,
             overwrite = true
         )
@@ -592,14 +590,13 @@ class BkRepoClient constructor(
                     " toProject: $toProject, toRepo: $toRepo, toPath: $toPath"
         )
         val url = "${getGatewaytUrl()}/bkrepo/api/service/repository/api/node/copy"
-        val requestData = UserNodeCopyRequest(
+        val requestData = UserNodeMoveCopyRequest(
             srcProjectId = fromProject,
             srcRepoName = fromRepo,
             srcFullPath = fromPath,
             destProjectId = toProject,
             destRepoName = toRepo,
             destFullPath = toPath,
-            destPath = toPath,
             overwrite = true
         )
         val request = Request.Builder()
@@ -736,9 +733,9 @@ class BkRepoClient constructor(
             "matchBkRepoFile, userId: $userId, srcPath: $srcPath, projectId: $projectId," +
                     " pipelineId: $pipelineId, buildId: $buildId, isCustom: $isCustom"
         )
-        var repoName: String
-        var filePath: String
-        var fileName: String
+        val repoName: String
+        val filePath: String
+        val fileName: String
         if (isCustom) {
             val normalizedPath = "/${srcPath.removePrefix("./").removePrefix("/")}"
             repoName = "custom"
@@ -981,8 +978,7 @@ class BkRepoClient constructor(
             val responseContent = response.body()!!.string()
             if (!response.isSuccessful) {
                 logger.error(
-                    "create temporary token failed, requestBody: $requestBody, responseContent: " +
-                            "$responseContent"
+                    "create temporary token failed, requestBody: $requestBody, responseContent: $responseContent"
                 )
                 throw RemoteServiceException("create temporary token failed: $responseContent", response.code())
             }
@@ -1068,7 +1064,7 @@ class BkRepoClient constructor(
         )
         val projectRule = Rule.QueryRule("projectId", projectId, OperationType.EQ)
         val repoRule = Rule.QueryRule("repoName", repoNames, OperationType.IN)
-        var ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
+        val ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
         if (fileNames.isNotEmpty()) {
             val fileNameRule = Rule.NestedRule(fileNames.map {
                 Rule.QueryRule("name", it, OperationType.MATCH)
@@ -1081,7 +1077,7 @@ class BkRepoClient constructor(
             }.toMutableList())
             ruleList.add(metadataRule)
         }
-        var rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
+        val rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
 
         return query(userId, projectId, rule, page, pageSize)
     }
@@ -1103,7 +1099,7 @@ class BkRepoClient constructor(
         )
         val projectRule = Rule.QueryRule("projectId", projectId, OperationType.EQ)
         val repoRule = Rule.QueryRule("repoName", repoNames, OperationType.IN)
-        var ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
+        val ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
         if (filePaths.isNotEmpty()) {
             val filePathRule = Rule.NestedRule(filePaths.map {
                 Rule.QueryRule("path", it, OperationType.EQ)
@@ -1122,7 +1118,7 @@ class BkRepoClient constructor(
             }.toMutableList(), Rule.NestedRule.RelationType.AND)
             ruleList.add(metadataRule)
         }
-        var rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
+        val rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
 
         return query(userId, projectId, rule, page, pageSize)
     }
@@ -1149,7 +1145,7 @@ class BkRepoClient constructor(
         )
         val projectRule = Rule.QueryRule("projectId", projectId, OperationType.EQ)
         val repoRule = Rule.QueryRule("repoName", repoNames, OperationType.IN)
-        var ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
+        val ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
 
         if (pathNamePairs.size == 1) {
             ruleList.add(getPathNameAndRule(pathNamePairs[0].first, pathNamePairs[0].second))
@@ -1167,7 +1163,7 @@ class BkRepoClient constructor(
             }.toMutableList(), Rule.NestedRule.RelationType.AND)
             ruleList.add(metadataRule)
         }
-        var rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
+        val rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
 
         return query(userId, projectId, rule, page, pageSize)
     }
@@ -1185,7 +1181,7 @@ class BkRepoClient constructor(
         )
         val projectRule = Rule.QueryRule("projectId", projectId, OperationType.EQ)
         val repoRule = Rule.QueryRule("repoName", repoNames, OperationType.IN)
-        var ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
+        val ruleList = mutableListOf<Rule>(projectRule, repoRule, Rule.QueryRule("folder", false, OperationType.EQ))
         if (fullPathPatterns.isNotEmpty()) {
             val fullPathRule = Rule.NestedRule(fullPathPatterns.map {
                 Rule.QueryRule("fullPath", it, OperationType.MATCH)
@@ -1198,7 +1194,7 @@ class BkRepoClient constructor(
             }.toMutableList())
             ruleList.add(metadataRule)
         }
-        var rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
+        val rule = Rule.NestedRule(ruleList, Rule.NestedRule.RelationType.AND)
 
         return query(userId, projectId, rule, 0, 10000)
     }
