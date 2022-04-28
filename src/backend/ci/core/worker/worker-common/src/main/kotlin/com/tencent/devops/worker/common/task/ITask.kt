@@ -43,11 +43,11 @@ abstract class ITask {
 
     private val monitorData = HashMap<String, Any>()
 
+    private val taskErrorMessage = HashMap<String, String>()
+
     private var platformCode: String? = null
 
     private var platformErrorCode: Int? = null
-
-    private val taskErrorMessage = HashMap<String, String>()
 
     fun run(
         buildTask: BuildTask,
