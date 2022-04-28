@@ -815,7 +815,8 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                     params = arrayOf(
                         MessageCodeUtil.getMessageByLocale(errorType.typeName, errorType.name),
                         errorCode.toString()
-                    )
+                    ),
+                    checkUrlDecoder = true
                 )
                 val typeMessage = when (errorType) {
                     ErrorType.USER -> MessageCodeUtil.getCodeLanMessage(
@@ -835,7 +836,8 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                 val codeMessage = errorCode?.let {
                     MessageCodeUtil.getCodeLanMessage(
                         messageCode = errorCode.toString(),
-                        defaultMessage = ""
+                        defaultMessage = "",
+                        checkUrlDecoder = true
                     )
                 } ?: ""
                 buildLogPrinter.addRedLine(
