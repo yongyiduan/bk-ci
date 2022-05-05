@@ -60,24 +60,24 @@
             menuList () {
                 return [
                     {
-                        name: 'Dashboard',
+                        name: this.$t('dashboardNav'),
                         active: this.$route.name === 'dashboard',
                         routeName: 'dashboard'
                     },
                     {
-                        name: 'ChangeLog',
+                        name: this.$t('changeLog'),
                         active: false,
                         type: 'url',
                         url: 'https://iwiki.woa.com/pages/viewpage.action?pageId=481669842'
                     },
                     {
-                        name: 'Documentation',
+                        name: this.$t('documentation'),
                         active: false,
                         type: 'url',
                         url: 'https://iwiki.woa.com/x/pZMdK'
                     },
                     {
-                        name: 'Issue',
+                        name: this.$t('issue'),
                         active: false,
                         type: 'url',
                         url: 'http://tapd.oa.com/git_ci/prong/stories/stories_list'
