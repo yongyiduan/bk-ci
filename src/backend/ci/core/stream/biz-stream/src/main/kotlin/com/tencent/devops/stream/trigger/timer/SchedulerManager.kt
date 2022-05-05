@@ -38,6 +38,7 @@ import org.quartz.ObjectAlreadyExistsException
 import org.quartz.Scheduler
 import org.quartz.SchedulerException
 import org.quartz.TriggerBuilder.newTrigger
+import org.quartz.impl.matchers.GroupMatcher
 import org.slf4j.LoggerFactory
 import java.util.Date
 
@@ -114,6 +115,14 @@ abstract class SchedulerManager {
             logger.error("SchedulerManager.deleteJob fail! e:$ignored", ignored)
             false
         }
+    }
+
+    @Synchronized
+    fun getAllExecutingJobs(): List<JobKey> {
+        val allJobs = mutableListOf<JobKey>()
+        val jobKeys = getScheduler().getJobKeys(GroupMatcher.groupEquals(getJobGroup()))
+        allJobs.addAll(jobKeys)
+        return allJobs
     }
 
     /**
