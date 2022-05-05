@@ -29,8 +29,10 @@ package com.tencent.devops.stream.cron
 
 import com.tencent.devops.common.api.exception.ClientException
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.redis.RedisLock
 import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.stream.common.exception.ErrorCodeEnum
+import com.tencent.devops.stream.config.StreamSlaConfig
 import com.tencent.devops.stream.service.StreamOauthService
 import com.tencent.devops.stream.service.StreamScmService
 import com.tencent.devops.stream.trigger.timer.SchedulerManager
@@ -49,7 +51,8 @@ class StreamTimerClearJob @Autowired constructor(
     private val schedulerManager: SchedulerManager,
     private val streamScmService: StreamScmService,
     private val streamOauthService: StreamOauthService,
-    private val redisOperation: RedisOperation
+    private val redisOperation: RedisOperation,
+    private val streamSlaConfig: StreamSlaConfig
 ) {
 
     companion object {
@@ -60,6 +63,27 @@ class StreamTimerClearJob @Autowired constructor(
 
     @Scheduled(cron = "0 0 1 * * ?")
     fun streamTimerClear() {
+        // 增加逻辑判断：只在灰度环境执行
+        if (!streamSlaConfig.switch.toBoolean()) {
+            logger.info("switch is false , no start")
+            return
+        }
+        val redisLock = RedisLock(redisOperation, "stream:git:job:clear:unique", 60L)
+        try {
+            logger.info("streamTimerClearJob , streamTimerClear start")
+            val lockSuccess = redisLock.tryLock()
+            if (lockSuccess) {
+                doClear()
+                logger.info("streamTimerClear , clear finish")
+            } else {
+                logger.info("streamTimerClear is running")
+            }
+        } catch (e: Throwable) {
+            logger.error("streamTimerClear error:", e)
+        }
+    }
+
+    private fun doClear() {
         val allExecutingJobs = schedulerManager.getAllExecutingJobs()
         allExecutingJobs.forEach {
             // "JobKey.name = ${pipelineId}_${md5}_$projectId"
@@ -80,7 +104,8 @@ class StreamTimerClearJob @Autowired constructor(
                         val count = incrNotFoundCount(jobKeyName)
                         logger.info("getProjectInfo:$gitProjectId 404 Not Found,Jobkey:$jobKeyName,times:$count")
                         if (count >= maxNouFoundCount) {
-                            logger.info("clear timer,getProjectInfo 404 times:$count,JobKey:$jobKeyName")
+                            val crontabExpressions = timer.crontabExpressions
+                            logger.info("clear timer,404 times:$count,JobKey:$jobKeyName,JobCron:$crontabExpressions")
                             schedulerManager.deleteJob(jobKeyName)
                             streamTimerService.deleteTimer(pipelineId, timer.userId)
                         }
