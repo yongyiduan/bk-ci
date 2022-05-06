@@ -99,7 +99,12 @@
                 <bk-table-column label="Commit message">
                     <template slot-scope="props">
                         <section class="commit-message">
-                            <i :class="getIconClass(props.row.buildHistory.status)"></i>
+                            <i
+                                :class="getIconClass(props.row.buildHistory.status)"
+                                v-bk-tooltips="{
+                                    content: props.row.buildHistory.stageStatus && props.row.buildHistory.stageStatus[0] && props.row.buildHistory.stageStatus[0].showMsg
+                                }"
+                            ></i>
                             <p>
                                 <span class="message">{{ props.row.gitRequestEvent.buildTitle }}</span>
                                 <span class="info">{{ props.row.displayName }} #{{ props.row.buildHistory.buildNum }}：{{ props.row.reason }}</span>
@@ -485,7 +490,7 @@
             getPipelineBranchApi (query = {}) {
                 const params = {
                     page: 1,
-                    perPage: 100,
+                    pageSize: 100,
                     projectId: this.projectId,
                     ...query
                 }
@@ -520,7 +525,7 @@
             getBranchCommits (value, options, query = {}) {
                 const params = {
                     page: 1,
-                    perPage: 100,
+                    pageSize: 100,
                     projectId: this.projectId,
                     branch: this.formData.branch,
                     ...query
@@ -745,7 +750,7 @@
                 &.executing {
                     font-size: 14px;
                 }
-                &.icon-exclamation, &.icon-exclamation-triangle, &.icon-clock {
+                &.icon-exclamation, &.icon-exclamation-triangle, &.icon-clock, &.stream-reviewing-2 {
                     font-size: 24px;
                 }
                 &.running {
