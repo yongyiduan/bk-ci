@@ -28,7 +28,6 @@
 package com.tencent.devops.rds.repo
 
 import com.tencent.devops.rds.pojo.RdsRepoFile
-import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
 import com.tencent.devops.rds.pojo.RdsRepoInfo
 
 /**
@@ -51,19 +50,6 @@ interface RepoService {
     fun getRepoToken(
         repoId: String
     ): String
-
-    /**
-     * 获取仓库中保存的文件列表
-     * @param repoId 具体的仓库ID
-     * @param path 当前需要获取的文件列表的前置路径
-     * @param ref 附加参数，在git中可以为分支，commit
-     */
-    fun getFileTree(
-        repoId: String,
-        path: String? = null,
-        ref: String? = null,
-        token: String? = null
-    ): List<RdsRepoFileTreeInfo>
 
     /**
      * 获取仓库单个具体文件内容

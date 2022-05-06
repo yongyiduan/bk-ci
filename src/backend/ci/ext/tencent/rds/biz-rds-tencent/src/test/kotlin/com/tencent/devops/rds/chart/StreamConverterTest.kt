@@ -29,8 +29,8 @@ package com.tencent.devops.rds.chart
 
 import com.nhaarman.mockito_kotlin.mock
 import com.tencent.devops.common.api.util.YamlUtil
-import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
-import com.tencent.devops.common.ci.v2.utils.YamlCommonUtils
+import com.tencent.devops.process.yaml.modelCreate.utils.TXScriptYmlUtils
+import com.tencent.devops.process.yaml.v2.utils.YamlCommonUtils
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.utils.CommonUtils
@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets
 
 class StreamConverterTest {
 
-    private val streamConverter = StreamConverter(mock(), mock(), mock())
+    private val streamConverter = StreamConverter(mock())
     private val chartParser = ChartParser()
 
     @Test
@@ -55,7 +55,7 @@ class StreamConverterTest {
             println("------------------------   pre ------------------------   ")
             println(YamlCommonUtils.toYamlNotNull(pre))
             println("------------------------   nor ------------------------   ")
-            println(Yaml.marshal(ScriptYmlUtils.normalizeRdsYaml(yamlOb, it.name)))
+            println(Yaml.marshal(TXScriptYmlUtils.normalizeRdsYaml(yamlOb, it.name)))
         }
     }
 

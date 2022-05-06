@@ -27,11 +27,10 @@
 
 package com.tencent.devops.rds.chart
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.devops.common.api.exception.ErrorCodeException
-import com.tencent.devops.common.client.Client
 import com.tencent.devops.process.yaml.modelCreate.TXModelCreate
 import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
+import com.tencent.devops.process.yaml.modelCreate.utils.TXScriptYmlUtils
 import com.tencent.devops.process.yaml.v2.models.PreScriptBuildYaml
 import com.tencent.devops.process.yaml.v2.models.PreTemplateScriptBuildYaml
 import com.tencent.devops.process.yaml.v2.models.ScriptBuildYaml
@@ -39,7 +38,6 @@ import com.tencent.devops.process.yaml.v2.parsers.template.YamlTemplate
 import com.tencent.devops.process.yaml.v2.parsers.template.models.GetTemplateParam
 import com.tencent.devops.process.yaml.v2.utils.ScriptYmlUtils
 import com.tencent.devops.process.yaml.v2.utils.YamlCommonUtils
-import com.tencent.devops.rds.chart.stream.RdsTXInnerModelCreatorImpl
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.chart.stream.TemplateExtraParams
 import com.tencent.devops.rds.constants.Constants
@@ -55,9 +53,6 @@ import java.util.regex.Pattern
 
 @Service
 class StreamConverter @Autowired constructor(
-    private val client: Client,
-    private val objectMapper: ObjectMapper,
-    private val innerModelCreator: RdsTXInnerModelCreatorImpl,
     private val modelCreate: TXModelCreate
 ) {
 
@@ -115,7 +110,7 @@ class StreamConverter @Autowired constructor(
             repo = null
         ).replace()
 
-        return Pair(preYamlObject, ScriptYmlUtils.normalizeRdsYaml(preYamlObject, fileName))
+        return Pair(preYamlObject, TXScriptYmlUtils.normalizeRdsYaml(preYamlObject, fileName))
     }
 
     private fun getTemplate(

@@ -33,11 +33,9 @@ import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.pojo.RdsRepoFile
-import com.tencent.devops.rds.pojo.RdsRepoFileTreeInfo
 import com.tencent.devops.rds.pojo.RdsRepoInfo
 import com.tencent.devops.rds.utils.RetryUtils
 import com.tencent.devops.scm.api.ServiceGitCiResource
-import com.tencent.devops.scm.api.ServiceGitResource
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -66,28 +64,6 @@ class GitRepoServiceImpl @Autowired constructor(
             apiErrorCode = ApiErrorCodeEnum.GET_TOKEN_ERROR,
             action = {
                 client.getScm(ServiceGitCiResource::class).getToken(repoId).data!!.accessToken
-            }
-        )
-    }
-
-    override fun getFileTree(
-        repoId: String,
-        path: String?,
-        ref: String?,
-        token: String?
-    ): List<RdsRepoFileTreeInfo> {
-        val gitProjectId = repoId.toLong()
-        return retryFun(
-            log = "$gitProjectId get $path file tree error",
-            apiErrorCode = ApiErrorCodeEnum.GET_GIT_FILE_TREE_ERROR,
-            action = {
-                client.getScm(ServiceGitResource::class).getGitCIFileTree(
-                    gitProjectId = gitProjectId,
-                    path = path,
-                    token = token!!,
-                    ref = ref ?: CHART_REPO_BRANCH,
-                    recursive = null
-                ).data?.map { RdsRepoFileTreeInfo(fileName = it.name) } ?: emptyList()
             }
         )
     }
