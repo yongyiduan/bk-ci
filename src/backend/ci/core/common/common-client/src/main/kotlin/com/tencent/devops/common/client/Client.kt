@@ -36,7 +36,9 @@ import com.tencent.devops.common.api.exception.ClientException
 import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.ms.MicroServiceTarget
 import com.tencent.devops.common.client.pojo.enums.GatewayType
+import com.tencent.devops.common.service.BkTag
 import com.tencent.devops.common.service.config.CommonConfig
+import com.tencent.devops.common.service.utils.KubernetesUtils
 import com.tencent.devops.common.service.utils.SpringContextUtil
 import feign.Contract
 import feign.Feign
@@ -53,7 +55,7 @@ import feign.spring.SpringContract
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient
+import org.springframework.cloud.client.discovery.composite.CompositeDiscoveryClient
 import org.springframework.context.annotation.DependsOn
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.stereotype.Component
@@ -75,9 +77,10 @@ import kotlin.reflect.KClass
 @Component
 @DependsOn("springContextUtil")
 class Client @Autowired constructor(
-    private val consulClient: ConsulDiscoveryClient?,
+    private val compositeDiscoveryClient: CompositeDiscoveryClient?,
     private val clientErrorDecoder: ClientErrorDecoder,
     private val commonConfig: CommonConfig,
+    private val bkTag: BkTag,
     objectMapper: ObjectMapper
 ) {
 
@@ -143,14 +146,14 @@ class Client @Autowired constructor(
     private val jacksonDecoder = JacksonDecoder(objectMapper)
     private val jacksonEncoder = JacksonEncoder(objectMapper)
 
-    @Value("\${spring.cloud.consul.discovery.tags:#{null}}")
-    private val tag: String? = null
-
     @Value("\${spring.cloud.consul.discovery.service-name:#{null}}")
     private val assemblyServiceName: String? = null
 
     @Value("\${service-suffix:#{null}}")
     private val serviceSuffix: String? = null
+
+    @Value("\${colour.enabled:false}")
+    private val colour: Boolean = false
 
     fun <T : Any> get(clz: KClass<T>): T {
         return get(clz, "")
@@ -197,7 +200,15 @@ class Client @Autowired constructor(
                     throw e
                 }
             })
-            .target(MicroServiceTarget(findServiceName(clz), clz.java, consulClient!!, tag))
+            .target(
+                MicroServiceTarget(
+                    findServiceName(clz),
+                    clz.java,
+                    compositeDiscoveryClient!!,
+                    colour,
+                    bkTag
+                )
+            )
     }
 
     fun <T : Any> getExternalServiceWithoutRetry(serviceName: String, clz: KClass<T>): T {
@@ -219,7 +230,7 @@ class Client @Autowired constructor(
                     throw e
                 }
             })
-            .target(MicroServiceTarget(serviceName, clz.java, consulClient!!, tag))
+            .target(MicroServiceTarget(serviceName, clz.java, compositeDiscoveryClient!!, colour, bkTag))
     }
 
     /**
@@ -273,17 +284,31 @@ class Client @Autowired constructor(
             .decoder(jacksonDecoder)
             .contract(contract)
             .requestInterceptor(requestInterceptor)
-            .target(MicroServiceTarget(findServiceName(clz), clz.java, consulClient!!, tag))
+            .target(
+                MicroServiceTarget(
+                    findServiceName(clz),
+                    clz.java,
+                    compositeDiscoveryClient!!,
+                    colour,
+                    bkTag
+                )
+            )
     }
 
     fun getServiceUrl(clz: KClass<*>): String {
-        return MicroServiceTarget(findServiceName(clz), clz.java, consulClient!!, tag).url()
+        return MicroServiceTarget(
+            findServiceName(clz),
+            clz.java,
+            compositeDiscoveryClient!!,
+            colour,
+            bkTag
+        ).url()
     }
 
     private fun findServiceName(clz: KClass<*>): String {
         // 单体结构，不分微服务的方式
         if (!assemblyServiceName.isNullOrBlank()) {
-            return assemblyServiceName!!
+            return assemblyServiceName
         }
         val serviceName = interfaces.getOrPut(clz) {
             val serviceInterface = AnnotationUtils.findAnnotation(clz.java, ServiceInterface::class.java)
@@ -297,7 +322,7 @@ class Client @Autowired constructor(
             }
         }
 
-        return if (serviceSuffix.isNullOrBlank()) {
+        return if (serviceSuffix.isNullOrBlank() || KubernetesUtils.inContainer()) {
             serviceName
         } else {
             "$serviceName$serviceSuffix"

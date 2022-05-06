@@ -36,7 +36,7 @@
                 <span class="bk-form-help" v-if="isPublicResourceType">{{ $t('editPage.publicResTips') }}</span>
             </form-field>
 
-            <form-field :label="$t('editPage.image')" v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && !isLoadingImage" :required="true" :is-error="errors.has('buildImageVersion') || errors.has('buildResource')" :error-msg="$t('editPage.imageErrMgs')">
+            <form-field :label="$t('editPage.image')" v-if="showImagePublicTypeList.includes(buildResourceType)" :required="true" :is-error="errors.has('buildImageVersion') || errors.has('buildResource')" :error-msg="$t('editPage.imageErrMgs')">
                 <enum-input
                     name="imageType"
                     :list="imageTypeList"
@@ -65,7 +65,7 @@
 
             <form-field
                 :label="$t('editPage.assignResource')"
-                v-if="buildResourceType !== 'MACOS' && !isPublicResourceType && containerModalId && !['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType)"
+                v-if="buildResourceType !== 'MACOS' && !isPublicResourceType && containerModalId && !showImagePublicTypeList.includes(buildResourceType)"
                 :is-error="errors.has('buildResource')"
                 :error-msg="errors.first('buildResource')"
                 :desc="buildResourceType === 'THIRD_PARTY_AGENT_ENV' ? this.$t('editPage.thirdSlaveTips') : ''"
@@ -112,7 +112,7 @@
                 </form-field>
             </template>
 
-            <form-field :label="$t('editPage.imageTicket')" v-if="['DOCKER', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && buildImageType === 'THIRD'">
+            <form-field :label="$t('editPage.imageTicket')" v-if="(buildResourceType === 'DOCKER' || buildResourceType === 'KUBERNETES' || buildResourceType === 'PUBLIC_DEVCLOUD') && buildImageType === 'THIRD'">
                 <select-input v-bind="imageCredentialOption" :disabled="!editable" name="credentialId" :value="buildImageCreId" :handle-change="changeBuildResource"></select-input>
             </form-field>
 
@@ -234,7 +234,7 @@
         </div>
 
         <image-selector :is-show.sync="showImageSelector"
-            v-if="['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD'].includes(buildResourceType) && !isLoadingImage"
+            v-if="showImagePublicTypeList.includes(buildResourceType)"
             :code="buildImageCode"
             :build-resource-type="buildResourceType"
             @choose="choose"
@@ -290,6 +290,7 @@
         },
         data () {
             return {
+                showImagePublicTypeList: ['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD', 'KUBERNETES'],
                 showImageSelector: false,
                 isVersionLoading: false,
                 isLoadingMac: false,

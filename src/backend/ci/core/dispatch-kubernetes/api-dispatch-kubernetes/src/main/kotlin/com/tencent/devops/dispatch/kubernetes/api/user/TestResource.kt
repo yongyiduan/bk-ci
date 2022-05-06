@@ -23,32 +23,27 @@
  * NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
-package com.tencent.devops.common.client.consul
+package com.tencent.devops.dispatch.kubernetes.api.user
 
-object ConsulContent {
-    private val consulContent = ThreadLocal<String>()
+import com.tencent.devops.common.api.pojo.Result
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import javax.ws.rs.Consumes
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
 
-    fun getConsulContent(): String? {
-        return consulContent.get()
-    }
+@Api(tags = ["TEST"], description = "测试接口连通性")
+@Path("/user/test")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface TestResource {
 
-    fun setConsulContent(consulTag: String) {
-        consulContent.set(consulTag)
-    }
-
-    fun removeConsulContent() {
-        consulContent.remove()
-    }
-
-    fun <T> invokeByTag(tag: String?, action: () -> T): T {
-        try {
-            tag?.let { setConsulContent(it) }
-            return action()
-        } finally {
-            tag?.let { removeConsulContent() }
-        }
-    }
+    @ApiOperation("获取所有pod信息")
+    @GET
+    @Path("/getAllPods")
+    fun getAllPods(): Result<List<String>>?
 }
