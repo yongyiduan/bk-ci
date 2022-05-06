@@ -32,15 +32,20 @@ import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.container.Container
 import com.tencent.devops.common.pipeline.container.VMBuildContainer
+import com.tencent.devops.common.pipeline.matrix.DispatchInfo
+import com.tencent.devops.common.pipeline.matrix.MatrixConfig
 import com.tencent.devops.common.pipeline.matrix.MatrixConfig.Companion.MATRIX_CONTEXT_KEY_PREFIX
 import com.tencent.devops.common.pipeline.pojo.element.Element
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
 import com.tencent.devops.process.yaml.modelCreate.inner.TXInnerModelCreator
+import com.tencent.devops.process.yaml.modelCreate.pojo.RdsDispatchInfo
+import com.tencent.devops.process.yaml.modelCreate.pojo.enums.DispatchBizType
 import com.tencent.devops.process.yaml.modelCreate.utils.TXStreamDispatchUtils
 import com.tencent.devops.process.yaml.pojo.StreamDispatchInfo
 import com.tencent.devops.process.yaml.v2.models.Resources
 import com.tencent.devops.process.yaml.v2.models.job.Job
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 
@@ -66,15 +71,19 @@ class TXModelContainer @Autowired(required = false) constructor(
         buildTemplateAcrossInfo: BuildTemplateAcrossInfo?
     ) {
         val defaultImage = inner!!.defaultImage
-        val dispatchInfo = if (JsonUtil.toJson(job.runsOn).contains("\${{ $MATRIX_CONTEXT_KEY_PREFIX")) {
-            StreamDispatchInfo(
+        val containsMatrix = JsonUtil.toJson(job.runsOn).contains("\${{ $MATRIX_CONTEXT_KEY_PREFIX")
+        val dispatchInfo = if (containsMatrix) {
+            (inner as TXInnerModelCreator).getDispatchInfo(
                 name = "dispatchInfo_${job.id}",
                 job = job,
                 projectCode = projectCode,
                 defaultImage = defaultImage,
                 resources = resources
             )
-        } else null
+        } else {
+            null
+        }
+
         val vmContainer = VMBuildContainer(
             jobId = job.id,
             name = job.name ?: "Job-${jobIndex + 1}",
@@ -95,6 +104,10 @@ class TXModelContainer @Autowired(required = false) constructor(
                 job = job,
                 projectCode = projectCode,
                 defaultImage = defaultImage,
+                bizType = when (dispatchInfo) {
+                    is RdsDispatchInfo -> DispatchBizType.RDS
+                    else -> DispatchBizType.STREAM
+                },
                 resources = resources,
                 containsMatrix = dispatchInfo != null,
                 buildTemplateAcrossInfo = buildTemplateAcrossInfo

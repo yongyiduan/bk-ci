@@ -35,11 +35,10 @@ import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.Yaml
-import java.nio.charset.StandardCharsets
 import org.apache.commons.io.FileUtils
 import org.junit.Test
-
 import org.springframework.util.ResourceUtils
+import java.nio.charset.StandardCharsets
 
 class StreamConverterTest {
 

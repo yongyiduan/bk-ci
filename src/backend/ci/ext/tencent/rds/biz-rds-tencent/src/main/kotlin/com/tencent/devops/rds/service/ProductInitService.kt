@@ -45,11 +45,11 @@ import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
-import java.io.InputStream
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.io.InputStream
 
 @Service
 class ProductInitService @Autowired constructor(
@@ -218,9 +218,11 @@ class ProductInitService @Autowired constructor(
                     serviceName = serviceName,
                     originYaml = stream.originYaml,
                     parsedYaml = stream.parsedYaml,
-                    model = stream.pipelineModel.copy(name = RdsPipelineUtils.genBKPipelineName(
-                        filePath, projectName, serviceName
-                    ))
+                    model = stream.pipelineModel.copy(
+                        name = RdsPipelineUtils.genBKPipelineName(
+                            filePath, projectName, serviceName
+                        )
+                    )
                 )
             )
         } else {
@@ -237,9 +239,11 @@ class ProductInitService @Autowired constructor(
                     serviceName = serviceName,
                     originYaml = stream.originYaml,
                     parsedYaml = stream.parsedYaml,
-                    model = stream.pipelineModel.copy(name = RdsPipelineUtils.genBKPipelineName(
-                        filePath, projectName, serviceName
-                    ))
+                    model = stream.pipelineModel.copy(
+                        name = RdsPipelineUtils.genBKPipelineName(
+                            filePath, projectName, serviceName
+                        )
+                    )
                 )
             )
         }

@@ -38,13 +38,15 @@ data class PreResource(
         val projectList = mutableListOf<Project>()
         projects.forEach { projectMap ->
             projectMap.map { (k, v) ->
-                projectList.add(Project(
-                    id = k.toString(),
-                    tapdId = v.tapdId.toString(),
-                    bcsId = v.bcsId.toString(),
-                    repoUrl = v.repoUrl.toString(),
-                    services = v.services?.let { getServiceList(it) }
-                ))
+                projectList.add(
+                    Project(
+                        id = k.toString(),
+                        tapdId = v.tapdId.toString(),
+                        bcsId = v.bcsId.toString(),
+                        repoUrl = v.repoUrl.toString(),
+                        services = v.services?.let { getServiceList(it) }
+                    )
+                )
             }.toList()
         }
         return Resource(
@@ -59,10 +61,12 @@ data class PreResource(
         val serviceList = mutableListOf<Service>()
         services.forEach { serviceMap ->
             serviceMap.forEach { (k, v) ->
-                serviceList.add(Service(
-                    id = k.toString(),
-                    repoUrl = v.repoUrl.toString()
-                ))
+                serviceList.add(
+                    Service(
+                        id = k.toString(),
+                        repoUrl = v.repoUrl.toString()
+                    )
+                )
             }
         }
         return serviceList

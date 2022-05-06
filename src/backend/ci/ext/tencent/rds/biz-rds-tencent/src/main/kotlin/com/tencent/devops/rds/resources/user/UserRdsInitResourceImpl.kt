@@ -34,11 +34,11 @@ import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.service.ProductInitService
-import java.io.InputStream
-import java.nio.charset.Charset
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import java.io.InputStream
+import java.nio.charset.Charset
 
 @RestResource
 class UserRdsInitResourceImpl @Autowired constructor(

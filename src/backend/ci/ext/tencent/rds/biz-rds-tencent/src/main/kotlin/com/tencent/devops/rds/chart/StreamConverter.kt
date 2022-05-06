@@ -27,40 +27,39 @@
 
 package com.tencent.devops.rds.chart
 
-import com.devops.process.yaml.modelCreate.ModelCreate
-import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.devops.common.api.exception.ErrorCodeException
-import com.tencent.devops.common.ci.v2.PreScriptBuildYaml
-import com.tencent.devops.common.ci.v2.PreTemplateScriptBuildYaml
-import com.tencent.devops.common.ci.v2.ScriptBuildYaml
-import com.tencent.devops.common.ci.v2.parsers.template.YamlTemplate
-import com.tencent.devops.common.ci.v2.parsers.template.models.GetTemplateParam
-import com.tencent.devops.common.ci.v2.utils.ScriptYmlUtils
-import com.tencent.devops.common.ci.v2.utils.YamlCommonUtils
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.rds.chart.stream.InnerModelCreatorImpl
+import com.tencent.devops.process.yaml.modelCreate.TXModelCreate
+import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
+import com.tencent.devops.process.yaml.v2.models.PreScriptBuildYaml
+import com.tencent.devops.process.yaml.v2.models.PreTemplateScriptBuildYaml
+import com.tencent.devops.process.yaml.v2.models.ScriptBuildYaml
+import com.tencent.devops.process.yaml.v2.parsers.template.YamlTemplate
+import com.tencent.devops.process.yaml.v2.parsers.template.models.GetTemplateParam
+import com.tencent.devops.process.yaml.v2.utils.ScriptYmlUtils
+import com.tencent.devops.process.yaml.v2.utils.YamlCommonUtils
+import com.tencent.devops.rds.chart.stream.RdsTXInnerModelCreatorImpl
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.chart.stream.TemplateExtraParams
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
 import com.tencent.devops.rds.utils.Yaml
+import org.apache.commons.io.FileUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.util.regex.Pattern
-import org.apache.commons.io.FileUtils
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
 
 @Service
 class StreamConverter @Autowired constructor(
     private val client: Client,
     private val objectMapper: ObjectMapper,
-    private val innerModelCreator: InnerModelCreatorImpl
+    private val innerModelCreator: RdsTXInnerModelCreatorImpl,
+    private val modelCreate: TXModelCreate
 ) {
-
-    private val modelCreate = ModelCreate(client, objectMapper, innerModelCreator)
 
     fun buildModel(
         userId: String,
@@ -96,7 +95,7 @@ class StreamConverter @Autowired constructor(
         return StreamBuildResult(
             originYaml = pipelineYaml,
             parsedYaml = YamlCommonUtils.toYamlNotNull(preYamlObject),
-            pipelineModel = model
+            pipelineModel = model.model
         )
     }
 

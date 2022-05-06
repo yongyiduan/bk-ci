@@ -27,33 +27,26 @@
 
 package com.tencent.devops.rds.chart.stream
 
-import com.devops.process.yaml.modelCreate.inner.ModelCreateEvent
-import com.devops.process.yaml.modelCreate.inner.InnerModelCreator
-import com.tencent.devops.common.ci.image.BuildType
-import com.tencent.devops.common.ci.image.Credential
-import com.tencent.devops.common.ci.image.Pool
 import com.tencent.devops.common.ci.task.ServiceJobDevCloudInput
-import com.tencent.devops.common.ci.v2.Job
-import com.tencent.devops.common.ci.v2.Resources
-import com.tencent.devops.common.ci.v2.Step
-import com.tencent.devops.common.ci.v2.YamlTransferData
+import com.tencent.devops.common.pipeline.matrix.DispatchInfo
 import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
 import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
-import com.tencent.devops.common.pipeline.type.DispatchType
-import com.tencent.devops.common.pipeline.type.agent.AgentType
-import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentEnvDispatchType
-import com.tencent.devops.common.pipeline.type.devcloud.PublicDevCloudDispathcType
-import com.tencent.devops.common.pipeline.type.docker.ImageType
-import com.tencent.devops.common.pipeline.type.macos.MacOSDispatchType
-import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
+import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
+import com.tencent.devops.process.yaml.modelCreate.inner.TXInnerModelCreator
+import com.tencent.devops.process.yaml.modelCreate.pojo.RdsDispatchInfo
+import com.tencent.devops.process.yaml.v2.models.Resources
+import com.tencent.devops.process.yaml.v2.models.job.Job
+import com.tencent.devops.process.yaml.v2.models.step.Step
 import com.tencent.devops.rds.chart.ChartPipelineStartParams
 import com.tencent.devops.rds.constants.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 
+@Primary
 @Component
-class InnerModelCreatorImpl @Autowired constructor() : InnerModelCreator {
+class RdsTXInnerModelCreatorImpl @Autowired constructor() : TXInnerModelCreator {
 
     @Value("\${stream.marketRun.enable:#{false}}")
     private val marketRunTaskData: Boolean = false
@@ -84,14 +77,6 @@ class InnerModelCreatorImpl @Autowired constructor() : InnerModelCreator {
     override val defaultImage: String
         get() = defaultImageData
 
-    override fun getJobTemplateAcrossInfo(
-        yamlTransferData: YamlTransferData,
-        gitRequestEventId: Long,
-        gitProjectId: Long
-    ): Map<String, BuildTemplateAcrossInfo> {
-        return emptyMap()
-    }
-
     override fun getServiceJobDevCloudInput(
         image: String,
         imageName: String,
@@ -99,6 +84,22 @@ class InnerModelCreatorImpl @Autowired constructor() : InnerModelCreator {
         params: String
     ): ServiceJobDevCloudInput? {
         return null
+    }
+
+    override fun getDispatchInfo(
+        name: String,
+        job: Job,
+        projectCode: String,
+        defaultImage: String,
+        resources: Resources?
+    ): DispatchInfo? {
+        return RdsDispatchInfo(
+            name = "dispatchInfo_${job.id}",
+            job = job,
+            projectCode = projectCode,
+            defaultImage = defaultImage,
+            resources = resources
+        )
     }
 
     override fun makeCheckoutElement(
@@ -139,58 +140,6 @@ class InnerModelCreatorImpl @Autowired constructor() : InnerModelCreator {
             version = "1.*",
             data = data,
             additionalOptions = additionalOptions
-        )
-    }
-
-    // TODO: 先写普通版，后续看不同构建机和matrix怎么改
-    override fun getJobDispatchType(
-        job: Job,
-        projectCode: String,
-        defaultImage: String,
-        resources: Resources?,
-        containsMatrix: Boolean?,
-        buildTemplateAcrossInfo: BuildTemplateAcrossInfo?
-    ): DispatchType {
-        val poolName = job.runsOn.poolName
-        val workspace = job.runsOn.workspace
-
-        // 第三方构建机
-        if (job.runsOn.selfHosted == true) {
-            return ThirdPartyAgentEnvDispatchType(
-                envName = poolName,
-                workspace = workspace,
-                agentType = AgentType.NAME
-            )
-        }
-
-        // macos构建机
-        if (poolName.startsWith("macos")) {
-            return MacOSDispatchType(
-                macOSEvn = "Catalina10.15.4:12.2",
-                systemVersion = "Catalina10.15.4",
-                xcodeVersion = "12.2"
-            )
-        }
-
-        // TODO: 目前只做简单的镜像构建，后续看产品设计
-        // 公共docker构建机
-        val containerPool = Pool(
-            container = defaultImage,
-            credential = Credential(
-                user = "",
-                password = ""
-            ),
-            macOS = null,
-            third = null,
-            env = job.env,
-            buildType = BuildType.DEVCLOUD
-        )
-
-        return PublicDevCloudDispathcType(
-            //            image = JsonUtil.toJson(containerPool),
-            image = defaultImage,
-            imageType = ImageType.THIRD,
-            performanceConfigId = "0"
         )
     }
 

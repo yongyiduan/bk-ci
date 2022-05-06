@@ -36,10 +36,10 @@ import com.tencent.devops.rds.pojo.ProductCreateInfo
 import com.tencent.devops.rds.pojo.RdsProductInfo
 import com.tencent.devops.rds.pojo.yaml.Main
 import com.tencent.devops.rds.pojo.yaml.Resource
-import java.time.LocalDateTime
 import org.jooq.DSLContext
 import org.jooq.types.ULong
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 class RdsProductInfoDao {
@@ -95,12 +95,12 @@ class RdsProductInfoDao {
             val record = dslContext.selectFrom(this)
                 .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
                 .fetchAny() ?: return null
-                    return RdsProductInfo(
-                        productId = record.productId.toLong(),
-                        master = record.master,
-                        createTime = record.createTime.timestampmilli(),
-                        updateTime = record.updateTime.timestampmilli()
-                    )
+            return RdsProductInfo(
+                productId = record.productId.toLong(),
+                master = record.master,
+                createTime = record.createTime.timestampmilli(),
+                updateTime = record.updateTime.timestampmilli()
+            )
         }
     }
 }

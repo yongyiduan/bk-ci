@@ -96,7 +96,9 @@ class ModelContainer @Autowired(required = false) constructor(
             jobControlOption = getJobControlOption(
                 job = job, jobEnable = jobEnable, finalStage = finalStage
             ),
-            dispatchType = inner.getJobDispatchType(
+            dispatchType = StreamDispatchUtils.getDispatchType(
+                client = client,
+                objectMapper = objectMapper,
                 job = job,
                 projectCode = projectCode,
                 defaultImage = defaultImage,

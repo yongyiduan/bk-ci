@@ -36,16 +36,16 @@ import com.tencent.devops.rds.constants.Constants.CHART_RESOURCE_YAML_FILE
 import com.tencent.devops.rds.utils.CommonUtils
 import com.tencent.devops.rds.utils.DefaultPathUtils
 import com.tencent.devops.rds.utils.TarUtils
-import java.io.File
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
-import java.nio.file.Paths
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.util.FileCopyUtils
+import java.io.File
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
 
 @Component
 class ChartParser @Autowired constructor() {

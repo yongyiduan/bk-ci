@@ -48,6 +48,8 @@ import com.tencent.devops.process.pojo.TemplateAcrossInfoType
 import com.tencent.devops.process.service.BuildVariableService
 import com.tencent.devops.process.service.PipelineBuildTemplateAcrossInfoService
 import com.tencent.devops.process.util.CommonCredentialUtils
+import com.tencent.devops.process.yaml.modelCreate.pojo.RdsDispatchInfo
+import com.tencent.devops.process.yaml.modelCreate.pojo.enums.DispatchBizType
 import com.tencent.devops.ticket.pojo.enums.CredentialType
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -177,6 +179,24 @@ class DispatchTypeParserTxImpl @Autowired constructor(
                     job = customInfo.job,
                     projectCode = customInfo.projectCode,
                     defaultImage = customInfo.defaultImage,
+                    bizType = DispatchBizType.STREAM,
+                    resources = customInfo.resources,
+                    context = context,
+                    containsMatrix = true,
+                    buildTemplateAcrossInfo = buildTemplateAcrossInfo
+                ),
+                baseOS = TXStreamDispatchUtils.getBaseOs(customInfo.job, context),
+                buildEnv = TXStreamDispatchUtils.getBuildEnv(customInfo.job, context)
+            )
+            is RdsDispatchInfo -> SampleDispatchInfo(
+                name = customInfo.name,
+                dispatchType = TXStreamDispatchUtils.getDispatchType(
+                    client = client,
+                    objectMapper = objectMapper,
+                    job = customInfo.job,
+                    projectCode = customInfo.projectCode,
+                    defaultImage = customInfo.defaultImage,
+                    bizType = DispatchBizType.RDS,
                     resources = customInfo.resources,
                     context = context,
                     containsMatrix = true,

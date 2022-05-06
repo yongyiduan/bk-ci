@@ -42,9 +42,12 @@ import com.tencent.devops.common.pipeline.enums.VMBaseOS
 import com.tencent.devops.common.pipeline.type.DispatchType
 import com.tencent.devops.common.pipeline.type.agent.AgentType
 import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentEnvDispatchType
+import com.tencent.devops.common.pipeline.type.devcloud.PublicDevCloudDispathcType
+import com.tencent.devops.common.pipeline.type.docker.ImageType
 import com.tencent.devops.common.pipeline.type.gitci.GitCIDispatchType
 import com.tencent.devops.common.pipeline.type.macos.MacOSDispatchType
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
+import com.tencent.devops.process.yaml.modelCreate.pojo.enums.DispatchBizType
 import com.tencent.devops.process.yaml.v2.models.Resources
 import com.tencent.devops.process.yaml.v2.models.ResourcesPools
 import com.tencent.devops.process.yaml.v2.models.job.Container
@@ -103,6 +106,7 @@ object TXStreamDispatchUtils {
         job: Job,
         projectCode: String,
         defaultImage: String,
+        bizType: DispatchBizType,
         resources: Resources? = null,
         context: Map<String, String>? = null,
         containsMatrix: Boolean? = false,
@@ -134,6 +138,19 @@ object TXStreamDispatchUtils {
 
         // 公共docker构建机
         if (poolName == "docker") {
+
+            // 在构建机类型有差异的地方根据业务场景区分
+            when (bizType) {
+                DispatchBizType.RDS -> {
+                    return PublicDevCloudDispathcType(
+                        image = defaultImage,
+                        imageType = ImageType.THIRD,
+                        performanceConfigId = "0"
+                    )
+                }
+                else -> {}
+            }
+
             var containerPool = Pool(
                 container = defaultImage,
                 credential = Credential(
@@ -196,7 +213,14 @@ object TXStreamDispatchUtils {
         }
 
         if (containsMatrix == true) {
-            return GitCIDispatchType(defaultImage)
+            return when (bizType) {
+                DispatchBizType.RDS -> PublicDevCloudDispathcType(
+                    image = defaultImage,
+                    imageType = ImageType.THIRD,
+                    performanceConfigId = "0"
+                )
+                else -> GitCIDispatchType(defaultImage)
+            }
         } else {
             throw CustomException(Response.Status.NOT_FOUND, "公共构建资源池不存在，请检查yml配置.")
         }
