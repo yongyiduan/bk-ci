@@ -88,17 +88,17 @@
                 this.fitAddon.fit()
             },
             handleResize (size) {
-                this.$nextTick(() => {
-                    this.resizeUrl && this.$store.dispatch('common/resizeTerm', {
-                        resizeUrl: this.resizeUrl,
-                        params: {
-                            exec_id: this.execId,
-                            height: size.rows,
-                            width: size.cols
-                        }
-                    })
-                    !this.resizeUrl && this.terminalSocket.send(`__resize__:${size.rows},${size.cols}\n`)
-                })
+                // this.$nextTick(() => {
+                //     this.resizeUrl && this.$store.dispatch('common/resizeTerm', {
+                //         resizeUrl: this.resizeUrl,
+                //         params: {
+                //             exec_id: this.execId,
+                //             height: size.rows,
+                //             width: size.cols
+                //         }
+                //     })
+                //     !this.resizeUrl && this.terminalSocket.send(`__resize__:${size.rows},${size.cols}\n`)
+                // })
             }
         }
     }
