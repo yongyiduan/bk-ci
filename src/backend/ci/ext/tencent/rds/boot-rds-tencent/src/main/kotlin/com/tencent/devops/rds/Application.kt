@@ -29,9 +29,10 @@ package com.tencent.devops.rds
 
 import com.tencent.devops.common.service.MicroService
 import com.tencent.devops.common.service.MicroServiceApplication
+import org.springframework.context.annotation.ComponentScan
 
 @MicroService
-
+@ComponentScan("com.tencent.devops.rds", "com.tencent.devops.process.yaml")
 class Application
 
 fun main(args: Array<String>) {
