@@ -37,9 +37,11 @@ import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
+import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
+import com.tencent.devops.rds.pojo.ClientConfigYaml
 import com.tencent.devops.rds.pojo.ProductCreateInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
@@ -110,7 +112,15 @@ class ProductInitService @Autowired constructor(
             // 读取并解压缓存到本地磁盘
             val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
-            val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
+            // 读取用户配置文件，获取各类token
+            val clientConfigStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_CLIENT_CONFIG_YAML_FILE)
+            logger.info("RDS|init|clientConfig|clientConfigStr=$clientConfigStr")
+            val clientConfig = YamlUtil.getObjectMapper().readValue(
+                clientConfigStr,
+                ClientConfigYaml::class.java
+            )
+
+            val mainYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_MAIN_YAML_FILE)
             logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
             val mainYaml = YamlUtil.getObjectMapper().readValue(
                 mainYamlStr,
@@ -119,7 +129,7 @@ class ProductInitService @Autowired constructor(
             val mainObject = mainYaml.getMainObject()
             logger.info("RDS|init|MainFile|mainObject=$mainObject|mainYaml=$mainYaml")
 
-            val resourceYamlStr = chartParser.getCacheChartResourceFile(cachePath)
+            val resourceYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_RESOURCE_YAML_FILE)
             logger.info("RDS|ResourceFile|resourceYamlStr=$resourceYamlStr")
             val resourceYaml = YamlUtil.getObjectMapper().readValue(
                 resourceYamlStr,

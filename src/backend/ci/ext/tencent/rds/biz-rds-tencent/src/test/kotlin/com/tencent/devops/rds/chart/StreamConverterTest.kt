@@ -31,6 +31,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.process.yaml.modelCreate.utils.TXScriptYmlUtils
 import com.tencent.devops.process.yaml.v2.utils.YamlCommonUtils
+import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.utils.CommonUtils
@@ -62,7 +63,7 @@ class StreamConverterTest {
     @Test
     fun loadMainYaml() {
         val cachePath = ResourceUtils.getFile("classpath:buildModelTest").absolutePath
-        val mainYamlStr = chartParser.getCacheChartMainFile(cachePath)
+        val mainYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_MAIN_YAML_FILE)
         println(mainYamlStr!!)
         println("---")
         val yaml = org.yaml.snakeyaml.Yaml()
@@ -80,7 +81,7 @@ class StreamConverterTest {
     @Test
     fun loadResourceYaml() {
         val cachePath = ResourceUtils.getFile("classpath:buildModelTest").absolutePath
-        val resourceYamlStr = chartParser.getCacheChartResourceFile(cachePath)
+        val resourceYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_RESOURCE_YAML_FILE)
         println(resourceYamlStr!!)
         println("---")
         val yaml = org.yaml.snakeyaml.Yaml()

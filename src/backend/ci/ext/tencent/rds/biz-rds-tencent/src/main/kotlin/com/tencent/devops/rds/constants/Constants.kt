@@ -34,6 +34,8 @@ object Constants {
     const val CHART_MAIN_YAML_FILE = "main.yaml"
     // 指定的resource声明文件
     const val CHART_RESOURCE_YAML_FILE = "resource.yaml"
+    // 用户自己的配置文件
+    const val CHART_CLIENT_CONFIG_YAML_FILE = "client_config.yaml"
     // rds会保存的产品负责人的GIT TOKEN
     const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"
     // rds的chart包的格式
