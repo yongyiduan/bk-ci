@@ -38,6 +38,7 @@ object Versions {
     const val p4 = "2021.1.2163843"
     const val YamlSchema = "1.0.49"
     const val Xinge = "1.2.4.9"
+    const val Pulsar = "2.7.2"
     const val jsonRules = "1.0.14"
     const val cloudEvents = "2.3.0"
 }

@@ -39,6 +39,7 @@ import com.tencent.devops.common.pipeline.pojo.element.Element
 import com.tencent.devops.common.pipeline.type.BuildType
 import com.tencent.devops.common.pipeline.utils.PIPELINE_GIT_EVENT
 import com.tencent.devops.common.pipeline.utils.PIPELINE_GIT_TIME_TRIGGER_KIND
+import com.tencent.devops.process.bean.PipelineUrlBean
 import com.tencent.devops.process.engine.control.ControlUtils
 import com.tencent.devops.process.engine.service.PipelineBuildDetailService
 import com.tencent.devops.process.utils.PIPELINE_START_TYPE
@@ -50,7 +51,8 @@ import org.springframework.stereotype.Service
 @Suppress("ComplexMethod", "TooManyFunctions", "NestedBlockDepth", "LongParameterList")
 @Service
 class PipelineContextService @Autowired constructor(
-    private val pipelineBuildDetailService: PipelineBuildDetailService
+    private val pipelineBuildDetailService: PipelineBuildDetailService,
+    private val pipelineUrlBean: PipelineUrlBean
 ) {
     private val logger = LoggerFactory.getLogger(PipelineContextService::class.java)
 
@@ -71,7 +73,7 @@ class PipelineContextService @Autowired constructor(
                 if (stage.finally && stage.id?.let { it == stageId } == true) {
                     contextMap["ci.build_status"] = previousStageStatus.name
                     contextMap["ci.build_fail_tasknames"] = failTaskNameList.joinToString(",")
-                } else if (!stage.status.isNullOrBlank()) {
+                } else if (checkBuildStatus(stage.status)) {
                     previousStageStatus = BuildStatus.parse(stage.status)
                 }
                 stage.containers.forEach nextContainer@{ container ->
@@ -119,8 +121,9 @@ class PipelineContextService @Autowired constructor(
         return contextMap
     }
 
-    fun buildContextToNotice(
+    fun buildFinishContext(
         projectId: String,
+        pipelineId: String,
         buildId: String
     ): Map<String, String> {
         val modelDetail = pipelineBuildDetailService.get(projectId, buildId) ?: return emptyMap()
@@ -132,7 +135,7 @@ class PipelineContextService @Autowired constructor(
                 if (stage.finally) {
                     return@forEach
                 }
-                if (!stage.status.isNullOrBlank()) {
+                if (checkBuildStatus(stage.status)) {
                     previousStageStatus = BuildStatus.parse(stage.status)
                 }
                 stage.containers.forEach nextContainer@{ container ->
@@ -152,6 +155,13 @@ class PipelineContextService @Autowired constructor(
             }
             contextMap["ci.build_status"] = previousStageStatus.name
             contextMap["ci.build_fail_tasknames"] = failTaskNameList.joinToString(",")
+            contextMap["ci.build_url"] = pipelineUrlBean.genBuildDetailUrl(
+                projectCode = projectId,
+                pipelineId = pipelineId,
+                buildId = buildId,
+                position = null,
+                stageId = null
+            )
         } catch (ignore: Throwable) {
             logger.warn("BKSystemErrorMonitor|buildContextToNoticeFailed|", ignore)
         }
@@ -172,6 +182,9 @@ class PipelineContextService @Autowired constructor(
     fun getBuildVarName(contextName: String): String? {
         return PipelineVarUtil.fetchVarName(contextName)
     }
+
+    private fun checkBuildStatus(status: String?): Boolean =
+        status == BuildStatus.SUCCEED.name || status == BuildStatus.CANCELED.name || status == BuildStatus.FAILED.name
 
     private fun buildCiContext(
         varMap: MutableMap<String, String>,
