@@ -101,7 +101,7 @@ const mutations: MutationTree<RootState> = {
         Vue.set(state, 'isShowPreviewTips', false)
     },
     [TOGGLE_MODULE_LOADING]: (state: RootState, moduleLoading: boolean) => {
-    Vue.set(state, 'moduleLoading', moduleLoading)
+        Vue.set(state, 'moduleLoading', moduleLoading)
     },
     [TOGGLE_NOTICE_DIALOG]: (state: RootState, isShow: boolean) => {
         Vue.set(state, 'showNotice', isShow)
