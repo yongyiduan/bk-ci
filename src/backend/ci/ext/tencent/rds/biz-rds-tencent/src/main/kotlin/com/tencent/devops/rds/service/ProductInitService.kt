@@ -38,6 +38,7 @@ import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.constants.Constants
+import com.tencent.devops.rds.constants.Constants.CHART_INIT_YAML_FILE_STORAGE
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
@@ -47,11 +48,13 @@ import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
+import java.io.File
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.InputStream
+import java.nio.file.Paths
 
 @Service
 class ProductInitService @Autowired constructor(
@@ -140,6 +143,27 @@ class ProductInitService @Autowired constructor(
             val productId = resourceObject.productId
             val projectId = RdsPipelineUtils.genBKProjectCode(productId)
 
+            val initYamlFile = File(Paths.get(cachePath, Constants.CHART_INIT_YAML_FILE).toUri())
+            if (initYamlFile.exists()) {
+                logger.info("RDS|init|InitPipelineFile|initYamlStr=$mainYamlStr")
+                val streamBuildResult = streamConverter.buildModel(
+                    userId = userId,
+                    productId = productId,
+                    projectId = projectId,
+                    cachePath = cachePath,
+                    pipelineFile = initYamlFile
+                )
+                saveChartPipeline(
+                    userId = userId,
+                    productId = productId,
+                    filePath = CHART_INIT_YAML_FILE_STORAGE,
+                    projectName = null,
+                    serviceName = null,
+                    stream = streamBuildResult,
+                    initPipeline = true
+                )
+            }
+
             productInfoDao.updateProductChart(
                 dslContext = dslContext,
                 productId = productId,
@@ -204,9 +228,10 @@ class ProductInitService @Autowired constructor(
         userId: String,
         productId: Long,
         filePath: String,
-        projectName: String,
+        projectName: String?,
         serviceName: String?,
-        stream: StreamBuildResult
+        stream: StreamBuildResult,
+        initPipeline: Boolean? = false
     ) {
         val existsPipeline = chartPipeline.getProductPipelineByService(
             productId = productId,
@@ -233,7 +258,8 @@ class ProductInitService @Autowired constructor(
                             filePath, projectName, serviceName
                         )
                     )
-                )
+                ),
+                initPipeline = initPipeline
             )
         } else {
             // 更新已有流水线

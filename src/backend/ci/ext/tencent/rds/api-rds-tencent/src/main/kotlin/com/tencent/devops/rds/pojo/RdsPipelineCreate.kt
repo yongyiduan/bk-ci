@@ -38,7 +38,7 @@ data class RdsPipelineCreate(
     @ApiModelProperty("所在Chart相对路径")
     val filePath: String,
     @ApiModelProperty("所属项目名")
-    val projectName: String,
+    val projectName: String?,
     @ApiModelProperty("所属服务名")
     val serviceName: String?,
     @ApiModelProperty("CLI解析后的YAML内容")

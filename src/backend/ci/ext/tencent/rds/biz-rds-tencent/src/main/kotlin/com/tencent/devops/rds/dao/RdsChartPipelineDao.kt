@@ -41,7 +41,7 @@ class RdsChartPipelineDao {
     fun createPipeline(
         dslContext: DSLContext,
         pipeline: RdsChartPipelineInfo,
-        init: Boolean? = false
+        initPipeline: Boolean? = false
     ): Int {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             return dslContext.insertInto(
@@ -64,7 +64,7 @@ class RdsChartPipelineDao {
                 pipeline.serviceName,
                 pipeline.originYaml,
                 pipeline.parsedYaml,
-                init,
+                initPipeline,
                 LocalDateTime.now(),
                 LocalDateTime.now()
             ).execute()
@@ -79,7 +79,6 @@ class RdsChartPipelineDao {
             dslContext.update(this)
                 .set(ORIGIN_YAML, pipeline.originYaml)
                 .set(PARSED_YAML, pipeline.parsedYaml)
-                .set(FILE_PATH, pipeline.filePath)
                 .set(PROJECT_NAME, pipeline.projectName)
                 .set(SERVICE_NAME, pipeline.serviceName)
                 .set(UPDATE_TIME, LocalDateTime.now())
@@ -110,7 +109,7 @@ class RdsChartPipelineDao {
         dslContext: DSLContext,
         productId: Long,
         filePath: String,
-        projectName: String,
+        projectName: String?,
         serviceName: String?
     ): RdsChartPipelineInfo? {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {

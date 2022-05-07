@@ -88,9 +88,9 @@ class ChartParser @Autowired constructor() {
         cachePath: String,
         fileName: String
     ): String? {
-        val mainYamlFile = File(Paths.get(cachePath, fileName).toUri())
-        return if (mainYamlFile.exists()) {
-            FileUtils.readFileToString(mainYamlFile, StandardCharsets.UTF_8)
+        val yamlFile = File(Paths.get(cachePath, fileName).toUri())
+        return if (yamlFile.exists()) {
+            FileUtils.readFileToString(yamlFile, StandardCharsets.UTF_8)
         } else null
     }
 

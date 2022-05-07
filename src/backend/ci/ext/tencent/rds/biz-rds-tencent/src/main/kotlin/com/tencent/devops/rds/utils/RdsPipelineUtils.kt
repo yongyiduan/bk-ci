@@ -33,13 +33,13 @@ object RdsPipelineUtils {
 
     fun genBKPipelineName(
         fileName: String,
-        projectName: String,
+        projectName: String?,
         serviceName: String?
     ): String {
-        return if (serviceName.isNullOrBlank()) {
-            "【RDS】$projectName-$fileName"
-        } else {
-            "【RDS】$projectName-$serviceName-$fileName"
-        }
+        val sb = StringBuilder("[RDS] ")
+        if (!projectName.isNullOrBlank()) sb.append("$projectName-")
+        if (!serviceName.isNullOrBlank()) sb.append("$serviceName-")
+        sb.append(fileName)
+        return sb.toString()
     }
 }

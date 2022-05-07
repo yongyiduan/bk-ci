@@ -56,7 +56,8 @@ class ChartPipeline @Autowired constructor(
         userId: String,
         productId: Long,
         projectId: String,
-        pipeline: RdsPipelineCreate
+        pipeline: RdsPipelineCreate,
+        initPipeline: Boolean? = false
     ) {
         val result = try {
             client.get(ServicePipelineResource::class).create(
@@ -92,7 +93,8 @@ class ChartPipeline @Autowired constructor(
                 serviceName = pipeline.serviceName,
                 originYaml = pipeline.originYaml,
                 parsedYaml = pipeline.parsedYaml
-            )
+            ),
+            initPipeline = initPipeline
         )
     }
 
@@ -145,7 +147,7 @@ class ChartPipeline @Autowired constructor(
     fun getProductPipelineByService(
         productId: Long,
         filePath: String,
-        projectName: String,
+        projectName: String?,
         serviceName: String?
     ): RdsChartPipelineInfo? {
         return chartPipelineDao.getProductPipelineByService(
