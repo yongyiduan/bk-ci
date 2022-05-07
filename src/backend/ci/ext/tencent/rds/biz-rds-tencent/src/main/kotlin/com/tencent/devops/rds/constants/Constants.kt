@@ -40,4 +40,7 @@ object Constants {
     const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"
     // rds的chart包的格式
     const val CHART_PACKAGE_FORMAT = ".tgz"
+    // rds接收引擎构建启动和结束事件 TODO 改为SCS模式的广播队列
+    const val QUEUE_PIPELINE_BUILD_FINISH_RDS = "q.engine.pipeline.build.finish.rds"
+    const val QUEUE_PIPELINE_BUILD_START_RDS = "q.engine.pipeline.build.start.rds"
 }

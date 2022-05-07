@@ -40,7 +40,8 @@ class RdsChartPipelineDao {
 
     fun createPipeline(
         dslContext: DSLContext,
-        pipeline: RdsChartPipelineInfo
+        pipeline: RdsChartPipelineInfo,
+        init: Boolean? = false
     ): Int {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             return dslContext.insertInto(
@@ -52,6 +53,7 @@ class RdsChartPipelineDao {
                 SERVICE_NAME,
                 ORIGIN_YAML,
                 PARSED_YAML,
+                INIT_PIPELINE,
                 CREATE_TIME,
                 UPDATE_TIME
             ).values(
@@ -62,6 +64,7 @@ class RdsChartPipelineDao {
                 pipeline.serviceName,
                 pipeline.originYaml,
                 pipeline.parsedYaml,
+                init,
                 LocalDateTime.now(),
                 LocalDateTime.now()
             ).execute()

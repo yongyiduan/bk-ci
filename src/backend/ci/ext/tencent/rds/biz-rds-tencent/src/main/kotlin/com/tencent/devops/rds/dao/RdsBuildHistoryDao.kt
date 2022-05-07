@@ -27,6 +27,58 @@
  *
  */
 
-package com.tencent.devops.rds.event.listener
+package com.tencent.devops.rds.dao
 
-class PipelineListener
+import com.tencent.devops.common.pipeline.enums.BuildStatus
+import com.tencent.devops.model.rds.tables.TRdsBuildHistory
+import org.jooq.DSLContext
+import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
+
+@Repository
+class RdsBuildHistoryDao {
+
+    fun save(
+        dslContext: DSLContext,
+        buildId: String,
+        pipelineId: String,
+        projectId: String,
+        userId: String,
+        buildStatus: BuildStatus
+    ): Int {
+        with(TRdsBuildHistory.T_RDS_BUILD_HISTORY) {
+            return dslContext.insertInto(
+                this,
+                BUILD_ID,
+                PIPELINE_ID,
+                PROJECT_ID,
+                USER_ID,
+                STATUS,
+                START_TIME
+            ).values(
+                buildId,
+                pipelineId,
+                projectId,
+                userId,
+                buildStatus.ordinal,
+                LocalDateTime.now()
+            ).execute()
+        }
+    }
+
+    fun finish(
+        dslContext: DSLContext,
+        buildId: String,
+        buildStatus: BuildStatus,
+        errorInfo: String?
+    ) {
+        with(TRdsBuildHistory.T_RDS_BUILD_HISTORY) {
+            dslContext.update(this)
+                .set(STATUS, buildStatus.ordinal)
+                .set(END_TIME, LocalDateTime.now())
+                .set(ERROR_INFO, errorInfo)
+                .where(BUILD_ID.eq(buildId))
+                .execute()
+        }
+    }
+}
