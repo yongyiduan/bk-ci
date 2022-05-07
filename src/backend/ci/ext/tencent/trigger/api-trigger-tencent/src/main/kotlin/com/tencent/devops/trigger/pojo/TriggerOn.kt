@@ -29,6 +29,10 @@ package com.tencent.devops.trigger.pojo
 
 data class TriggerOn(
     val id: String,
+    val rules: List<TriggerOnRule>
+)
+
+data class TriggerOnRule(
     val filter: Map<String, Any>,
-    val action: TriggerAction
+    val action: List<TriggerAction>
 )

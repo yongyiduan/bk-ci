@@ -36,6 +36,7 @@ import com.tencent.devops.rds.pojo.yaml.Resource
 import com.tencent.devops.trigger.api.ServiceEventRegisterResource
 import com.tencent.devops.trigger.pojo.TriggerAction
 import com.tencent.devops.trigger.pojo.TriggerOn
+import com.tencent.devops.trigger.pojo.TriggerOnRule
 import com.tencent.devops.trigger.pojo.TriggerRegisterRequest
 import com.tencent.devops.trigger.pojo.TriggerResource
 import org.jooq.DSLContext
@@ -129,12 +130,16 @@ class EventBusService @Autowired constructor(
         return main.on.map { on ->
             TriggerOn(
                 id = on.id,
-                filter = on.filter,
-                action = TriggerAction(
-                    type = on.action.type,
-                    path = on.action.path,
-                    variables = on.action.with
-                )
+                rules = on.rules.map { rule ->
+                    TriggerOnRule(
+                        filter = rule.filter,
+                        action = rule.action.map { TriggerAction(
+                            type = it.type,
+                            path = it.path,
+                            variables = it.with
+                        ) }
+                    )
+                }.toList()
             )
         }.toList()
     }

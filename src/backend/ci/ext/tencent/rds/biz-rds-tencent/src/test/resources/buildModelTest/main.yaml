@@ -1,22 +1,35 @@
 init:
   stream_path: init.yml
 on:
-  mr:
-    filter:
-      target-branches: master
-    action:
-      type: stream
-      path: primary_ci.yaml
 
-  mr-approve:
-    filter:
-      target-branches: master
-    action:
-      type: stream
-      path: secondary_ci.yaml
+  mr:
+    - filter:
+        target-branches: [ 'master' ]
+        action: [ 'create' ]
+      action:
+        - type: stream
+          path: pre-merge.yaml
+        - type: stream
+          path: xxxx.yaml
+
+    - filter:
+        target-branches: [ 'master' ]
+        action: [ 'update' ]
+      action:
+        - type: stream
+          path: pre-push.yaml
+
+    - filter:
+        target-branches: [ 'master' ]
+        action: [ 'merged' ]
+      action:
+        - type: stream
+          path: commit.yaml
+
+
   push:
-    filter:
-      branches: [ 'feat/**' ]
-    action:
-      type: stream
-      path: primary_ci.yaml
+    - filter:
+        branches: [ 'trigger' ]
+      action:
+        - type: stream
+          path: primary_ci.yaml

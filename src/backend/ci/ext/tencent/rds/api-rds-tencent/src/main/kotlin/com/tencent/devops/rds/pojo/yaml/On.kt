@@ -29,6 +29,5 @@ package com.tencent.devops.rds.pojo.yaml
 
 data class On(
     val id: String,
-    val filter: Map<String, Any>,
-    val action: Action
+    val rules: List<OnRule>
 )

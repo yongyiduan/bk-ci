@@ -27,22 +27,7 @@
 
 package com.tencent.devops.rds.pojo.yaml
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
-data class PreMain(
-    val init: Init?,
-    @JsonProperty("on")
-    val on: Map<String, List<OnRule>>
-) {
-    fun getMainObject(): Main {
-        return Main(
-            init = init,
-            on = on.map { (k, v) ->
-                On(
-                    id = k,
-                    rules = v
-                )
-            }.toList()
-        )
-    }
-}
+data class OnRule(
+    val filter: Map<String, Any>,
+    val action: List<Action>
+)
