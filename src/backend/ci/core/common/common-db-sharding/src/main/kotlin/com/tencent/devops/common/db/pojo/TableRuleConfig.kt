@@ -25,24 +25,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.project.pojo
+package com.tencent.devops.common.db.pojo
 
-import com.tencent.devops.common.api.enums.SystemModuleEnum
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
-
-@ApiModel("数据库分片信息")
-data class DataBasePiecewiseInfo(
-    @ApiModelProperty("项目ID/项目CODE")
-    val projectId: String,
-    @ApiModelProperty("集群名称")
-    val clusterName: String,
-    @ApiModelProperty("微服务模块名称")
-    val moduleCode: SystemModuleEnum,
-    @ApiModelProperty("数据源名称")
-    val dataSourceName: String,
-    @ApiModelProperty("路由规则")
-    val routingRule: String,
-    @ApiModelProperty("数据源URL")
-    val dsUrl: String? = null
+data class TableRuleConfig(
+    val index: Int, // 序号
+    val name: String, // 表名
+    val shardingNum: Int = 1, // 分表数量
+    val broadcastFlag: Boolean? = null, // 是否为广播表
+    val databaseShardingStrategy: DatabaseShardingStrategyEnum? = null, // 分库策略
+    val tableShardingStrategy: TableShardingStrategyEnum? = null // 分表策略
 )
