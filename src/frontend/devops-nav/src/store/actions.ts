@@ -22,6 +22,7 @@ import {
     UPDATE_CURRENT_PAGE,
     SET_SERVICES,
     TOGGLE_PERMISSION_DIALOG,
+    TOGGLE_NOTICE_DIALOG,
     SET_CURRENT_NOTICE,
     SET_SERVICE_HOOKS,
     AUTH_API_URL_PREFIX,
@@ -139,6 +140,9 @@ const actions: ActionTree<RootState, any> = {
     },
     closePreviewTips ({ commit }: ActionContext<RootState, RootState>) {
         commit(CLOSE_PREVIEW_TIPS)
+    },
+    toggleNoticeDialog ({ commit }, payload) {
+        commit(TOGGLE_NOTICE_DIALOG, payload)
     },
     getAnnouncement () {
         return Request.get(`${PROJECT_API_URL_PREFIX}/user/notice/valid`)
