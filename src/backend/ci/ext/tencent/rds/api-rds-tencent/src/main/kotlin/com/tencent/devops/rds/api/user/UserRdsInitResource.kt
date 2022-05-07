@@ -30,6 +30,7 @@ package com.tencent.devops.rds.api.user
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID_DEFAULT_VALUE
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.rds.pojo.InitStatusResult
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -37,9 +38,11 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.glassfish.jersey.media.multipart.FormDataParam
 import java.io.InputStream
 import javax.ws.rs.Consumes
+import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
 import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
 
@@ -66,4 +69,16 @@ interface UserRdsInitResource {
         @FormDataParam("file")
         disposition: FormDataContentDisposition
     ): Result<Boolean>
+
+    @ApiOperation("获取初始化流水线执行状态")
+    @GET
+    @Path("/{productId}/status")
+    fun initStatus(
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("产品ID", required = false)
+        @PathParam("productId")
+        productId: Long
+    ): Result<InitStatusResult>
 }

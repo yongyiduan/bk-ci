@@ -58,7 +58,7 @@ class ChartPipeline @Autowired constructor(
         projectId: String,
         pipeline: RdsPipelineCreate,
         initPipeline: Boolean? = false
-    ) {
+    ): String {
         val result = try {
             client.get(ServicePipelineResource::class).create(
                 userId = userId,
@@ -96,6 +96,7 @@ class ChartPipeline @Autowired constructor(
             ),
             initPipeline = initPipeline
         )
+        return result.id
     }
 
     fun updateChartPipeline(

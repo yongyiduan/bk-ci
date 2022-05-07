@@ -31,12 +31,21 @@ package com.tencent.devops.rds.dao
 
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.model.rds.tables.TRdsBuildHistory
+import com.tencent.devops.model.rds.tables.records.TRdsBuildHistoryRecord
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
 class RdsBuildHistoryDao {
+
+    fun getHistoryByPipelineId(dslContext: DSLContext, pipelineId: String): List<TRdsBuildHistoryRecord> {
+        with(TRdsBuildHistory.T_RDS_BUILD_HISTORY) {
+            return dslContext.selectFrom(this)
+                .where(PIPELINE_ID.eq(pipelineId))
+                .fetch()
+        }
+    }
 
     fun save(
         dslContext: DSLContext,
@@ -47,37 +56,38 @@ class RdsBuildHistoryDao {
         buildStatus: BuildStatus
     ): Int {
         with(TRdsBuildHistory.T_RDS_BUILD_HISTORY) {
-            return dslContext.insertInto(
-                this,
-                BUILD_ID,
-                PIPELINE_ID,
-                PROJECT_ID,
-                USER_ID,
-                STATUS,
-                START_TIME
-            ).values(
-                buildId,
-                pipelineId,
-                projectId,
-                userId,
-                buildStatus.ordinal,
-                LocalDateTime.now()
-            ).execute()
+            return dslContext.insertInto(this)
+                .set(BUILD_ID, buildId)
+                .set(PIPELINE_ID, pipelineId)
+                .set(PROJECT_ID, projectId)
+                .set(USER_ID, userId)
+                .set(STATUS, buildStatus.ordinal)
+                .set(START_TIME, LocalDateTime.now())
+                .execute()
         }
     }
 
     fun finish(
         dslContext: DSLContext,
         buildId: String,
+        pipelineId: String,
+        projectId: String,
+        userId: String,
         buildStatus: BuildStatus,
         errorInfo: String?
     ) {
         with(TRdsBuildHistory.T_RDS_BUILD_HISTORY) {
-            dslContext.update(this)
+            dslContext.insertInto(this)
+                .set(BUILD_ID, buildId)
+                .set(PIPELINE_ID, pipelineId)
+                .set(PROJECT_ID, projectId)
+                .set(USER_ID, userId)
+                .set(STATUS, buildStatus.ordinal)
+                .set(START_TIME, LocalDateTime.now())
+                .onDuplicateKeyUpdate()
                 .set(STATUS, buildStatus.ordinal)
                 .set(END_TIME, LocalDateTime.now())
                 .set(ERROR_INFO, errorInfo)
-                .where(BUILD_ID.eq(buildId))
                 .execute()
         }
     }

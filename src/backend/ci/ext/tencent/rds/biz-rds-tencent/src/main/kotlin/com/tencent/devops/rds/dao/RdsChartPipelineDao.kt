@@ -83,6 +83,7 @@ class RdsChartPipelineDao {
                 .set(SERVICE_NAME, pipeline.serviceName)
                 .set(UPDATE_TIME, LocalDateTime.now())
                 .where(PIPELINE_ID.eq(pipeline.pipelineId))
+                .and(INIT_PIPELINE.eq(false))
                 .execute()
         }
     }
@@ -91,6 +92,7 @@ class RdsChartPipelineDao {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             return dslContext.selectFrom(this)
                 .where(PRODUCT_ID.eq(productId))
+                .and(INIT_PIPELINE.eq(false))
                 .fetch().map {
                     RdsChartPipelineInfo(
                         pipelineId = it.pipelineId,
@@ -102,6 +104,48 @@ class RdsChartPipelineDao {
                         parsedYaml = it.parsedYaml
                     )
                 }
+        }
+    }
+
+    fun getPipelineById(
+        dslContext: DSLContext,
+        pipelineId: String
+    ): RdsChartPipelineInfo? {
+        with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
+            val record = dslContext.selectFrom(this)
+                .where(PIPELINE_ID.eq(pipelineId))
+                .fetchAny()
+            return record?.let {
+                RdsChartPipelineInfo(
+                    pipelineId = it.pipelineId,
+                    productId = it.productId,
+                    filePath = it.filePath,
+                    projectName = it.projectName,
+                    serviceName = it.serviceName,
+                    originYaml = it.originYaml,
+                    parsedYaml = it.parsedYaml
+                )
+            }
+        }
+    }
+
+    fun getInitPipelines(dslContext: DSLContext, productId: Long): RdsChartPipelineInfo? {
+        with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
+            val record = dslContext.selectFrom(this)
+                .where(PRODUCT_ID.eq(productId))
+                .and(INIT_PIPELINE.eq(true))
+                .fetchAny()
+            return record?.let {
+                RdsChartPipelineInfo(
+                    pipelineId = it.pipelineId,
+                    productId = it.productId,
+                    filePath = it.filePath,
+                    projectName = it.projectName,
+                    serviceName = it.serviceName,
+                    originYaml = it.originYaml,
+                    parsedYaml = it.parsedYaml
+                )
+            }
         }
     }
 

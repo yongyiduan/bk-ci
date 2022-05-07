@@ -33,7 +33,9 @@ import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
+import com.tencent.devops.rds.pojo.InitStatusResult
 import com.tencent.devops.rds.service.ProductInitService
+import com.tencent.devops.rds.service.ProductPipelineService
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,8 +44,8 @@ import java.nio.charset.Charset
 
 @RestResource
 class UserRdsInitResourceImpl @Autowired constructor(
-    private val productInitService: ProductInitService
-
+    private val productInitService: ProductInitService,
+    private val productPipelineService: ProductPipelineService
 ) : UserRdsInitResource {
 
     companion object {
@@ -67,5 +69,9 @@ class UserRdsInitResourceImpl @Autowired constructor(
         }
 
         return Result(productInitService.initChart(userId, chartName, inputStream))
+    }
+
+    override fun initStatus(userId: String, productId: Long): Result<InitStatusResult> {
+        return Result(productPipelineService.getInitPipelineStatus(productId))
     }
 }

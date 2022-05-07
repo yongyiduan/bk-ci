@@ -29,8 +29,12 @@ package com.tencent.devops.rds.service
 
 import com.tencent.devops.common.api.constant.HTTP_500
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.common.client.Client
+import com.tencent.devops.common.pipeline.enums.ChannelCode
+import com.tencent.devops.common.pipeline.enums.StartType
+import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.project.api.service.ServiceProjectResource
 import com.tencent.devops.project.pojo.ProjectCreateInfo
 import com.tencent.devops.rds.chart.ChartParser
@@ -47,6 +51,7 @@ import com.tencent.devops.rds.pojo.ProductCreateInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
+import com.tencent.devops.rds.pojo.yaml.Resource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import java.io.File
 import org.jooq.DSLContext
@@ -153,7 +158,7 @@ class ProductInitService @Autowired constructor(
                     cachePath = cachePath,
                     pipelineFile = initYamlFile
                 )
-                saveChartPipeline(
+                val pipelineId = saveChartPipeline(
                     userId = userId,
                     productId = productId,
                     filePath = CHART_INIT_YAML_FILE_STORAGE,
@@ -161,6 +166,22 @@ class ProductInitService @Autowired constructor(
                     serviceName = null,
                     stream = streamBuildResult,
                     initPipeline = true
+                )
+                val (tapdIds, repoUrls) = resourceObject.getAllTapdIdsAndRepoUrls()
+                val (projects, services) = resourceObject.getAllProjectAndServiceNames()
+                logger.info("RDS|init|resourceInit|tapdIds=$tapdIds|repoUrls=repoUrls")
+                client.get(ServiceBuildResource::class).manualStartupNew(
+                    userId = userId,
+                    projectId = projectId,
+                    pipelineId = pipelineId,
+                    values = mapOf(
+                        "tapd_ids" to JsonUtil.toJson(tapdIds),
+                        "repo_urls" to JsonUtil.toJson(repoUrls),
+                        "projects" to JsonUtil.toJson(projects),
+                        "services" to JsonUtil.toJson(services)
+                    ),
+                    channelCode = ChannelCode.BS,
+                    startType = StartType.SERVICE
                 )
             }
 
@@ -232,7 +253,7 @@ class ProductInitService @Autowired constructor(
         serviceName: String?,
         stream: StreamBuildResult,
         initPipeline: Boolean? = false
-    ) {
+    ): String {
         val existsPipeline = chartPipeline.getProductPipelineByService(
             productId = productId,
             filePath = filePath,
@@ -240,7 +261,7 @@ class ProductInitService @Autowired constructor(
             serviceName = serviceName
         )
         // TODO: 提前创建流水线去生成质量红线
-        if (existsPipeline == null) {
+        return if (existsPipeline == null) {
             // 创建并保存流水线
             chartPipeline.createChartPipeline(
                 userId = userId,
@@ -282,6 +303,38 @@ class ProductInitService @Autowired constructor(
                     )
                 )
             )
+            existsPipeline.pipelineId
+        }
+    }
+
+    // 注意：内部定制方法，无法开源
+    private fun Resource.getAllTapdIdsAndRepoUrls(): Pair<List<String>, List<String>> {
+        with(this) {
+            val ids = mutableListOf<String>()
+            val urls = mutableListOf<String>()
+            this.projects.forEach { project ->
+                project.tapdId?.let { ids.add(it) }
+                project.repoUrl?.let { urls.add(it) }
+                project.services?.forEach { service ->
+                    service.repoUrl.let { urls.add(it) }
+                }
+            }
+            return Pair(ids, urls)
+        }
+    }
+
+    // 注意：内部定制方法，无法开源
+    private fun Resource.getAllProjectAndServiceNames(): Pair<List<String>, List<String>> {
+        with(this) {
+            val projects = mutableListOf<String>()
+            val services = mutableListOf<String>()
+            this.projects.forEach { project ->
+                projects.add(project.id)
+                project.services?.forEach { service ->
+                    services.add(service.id)
+                }
+            }
+            return Pair(projects, services)
         }
     }
 }
