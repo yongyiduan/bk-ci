@@ -29,7 +29,6 @@ package com.tencent.devops.trigger.service
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.node.MissingNode
-import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.ObjectReplaceEnvVarUtil
 import com.tencent.devops.common.service.utils.SpringContextUtil
@@ -164,31 +163,20 @@ class RdsRegisterService @Autowired constructor(
                         busId = busId,
                         name = "${result.id}:${result.resourceKey}:${eventType.aliasName}"
                     )?.ruleId ?: IdGeneratorUtil.getRuleId()
-                    eventBusRuleSet.add(
-                        getEventBusRule(
-                            projectId = projectId,
-                            userId = userId,
-                            busId = busId,
-                            ruleId = ruleId,
-                            eventType = eventType,
-                            eventSource = eventSource,
-                            on = on,
-                            webhookResult = result
-                        )
-                    )
-                    val pipelineKey = "${result.id}:${on.action.path}"
-                    val pipelineId = request.triggerPipelines[pipelineKey] ?: return@webhook
-                    val eventRuleTarget = getEventRuleTarget(
-                        sourceId = eventType.sourceId,
-                        eventTypeId = eventType.id!!,
-                        ruleId = ruleId,
+                    buildEventBusRule(
                         projectId = projectId,
-                        busId = busId,
                         userId = userId,
+                        busId = busId,
+                        ruleId = ruleId,
+                        eventType = eventType,
+                        eventSource = eventSource,
                         on = on,
-                        pipelineId = pipelineId
-                    ) ?: return@webhook
-                    ruleTargetSet.add(eventRuleTarget)
+                        webhookResult = result,
+                        resourceId = result.id,
+                        request = request,
+                        eventBusRuleSet = eventBusRuleSet,
+                        ruleTargetSet = ruleTargetSet
+                    )
                 }
             }
         }
@@ -265,7 +253,7 @@ class RdsRegisterService @Autowired constructor(
         return registerWebhookResults
     }
 
-    private fun getEventBusRule(
+    private fun buildEventBusRule(
         projectId: String,
         userId: String,
         busId: String,
@@ -273,44 +261,65 @@ class RdsRegisterService @Autowired constructor(
         eventType: EventType,
         eventSource: EventSource,
         on: TriggerOn,
-        webhookResult: RegisterWebhookResult
-    ): EventBusRule {
-        val filterNames = on.filter.keys.toMutableList()
-        filterNames.add(TYPE_FILTER_NAME)
-        filterNames.add(webhookResult.resourceKey)
-        val eventRuleExpressions = eventRuleExpressionDao.getByFilterNames(
-            dslContext = dslContext,
-            sourceId = eventType.sourceId,
-            eventTypeId = eventType.id!!,
-            filterNames = filterNames
-        )
-
-        val originFilter = on.filter.toMutableMap()
-        originFilter[webhookResult.resourceKey] = webhookResult.resourceValue
-        originFilter[TYPE_FILTER_NAME] = eventType.aliasName
-        logger.info("$projectId|$busId|$ruleId|origin filter: $originFilter")
-        val eventsourceHandler = SpringContextUtil.getBean(IEventSourceHandler::class.java, eventSource.name)
-        val finalFilter = eventsourceHandler.wrapFilter(originFilter)
-        logger.info("$projectId|$busId|$ruleId|final filter: $finalFilter")
-
-        val ruleExpressionList = eventRuleExpressions.map { ruleExpression ->
-            val replaceExpression = ObjectReplaceEnvVarUtil.replaceEnvVar(
-                ruleExpression.expressions,
-                finalFilter.map { (key, value) -> Pair(key, JsonUtil.toJson(value)) }.toMap()
+        webhookResult: RegisterWebhookResult,
+        resourceId: String,
+        request: TriggerRegisterRequest,
+        eventBusRuleSet: MutableSet<EventBusRule>,
+        ruleTargetSet: MutableSet<EventRuleTarget>
+    ) {
+        on.rules.forEach { rule ->
+            val filterNames = rule.filter.keys.toMutableList()
+            filterNames.add(TYPE_FILTER_NAME)
+            filterNames.add(webhookResult.resourceKey)
+            val eventRuleExpressions = eventRuleExpressionDao.getByFilterNames(
+                dslContext = dslContext,
+                sourceId = eventType.sourceId,
+                eventTypeId = eventType.id!!,
+                filterNames = filterNames
             )
-            JsonUtil.to(replaceExpression.toString(), object : TypeReference<List<Expression>>() {})
-        }.flatten()
-        return EventBusRule(
-            ruleId = ruleId,
-            busId = busId,
-            projectId = projectId,
-            name = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}",
-            source = eventSource.name,
-            type = eventType.name,
-            filterPattern = JsonUtil.toJson(AndExpression.builder().children(ruleExpressionList).build()),
-            creator = userId,
-            updater = userId
-        )
+
+            val originFilter = rule.filter.toMutableMap()
+            originFilter[webhookResult.resourceKey] = webhookResult.resourceValue
+            originFilter[TYPE_FILTER_NAME] = eventType.aliasName
+            logger.info("$projectId|$busId|$ruleId|origin filter: $originFilter")
+            val eventsourceHandler = SpringContextUtil.getBean(IEventSourceHandler::class.java, eventSource.name)
+            val finalFilter = eventsourceHandler.wrapFilter(originFilter)
+            logger.info("$projectId|$busId|$ruleId|final filter: $finalFilter")
+
+            val ruleExpressionList = eventRuleExpressions.map { ruleExpression ->
+                val replaceExpression = ObjectReplaceEnvVarUtil.replaceEnvVar(
+                    ruleExpression.expressions,
+                    finalFilter.map { (key, value) -> Pair(key, JsonUtil.toJson(value)) }.toMap()
+                )
+                JsonUtil.to(replaceExpression.toString(), object : TypeReference<List<Expression>>() {})
+            }.flatten()
+            eventBusRuleSet.add(
+                EventBusRule(
+                    ruleId = ruleId,
+                    busId = busId,
+                    projectId = projectId,
+                    name = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}",
+                    source = eventSource.name,
+                    type = eventType.name,
+                    filterPattern = JsonUtil.toJson(AndExpression.builder().children(ruleExpressionList).build()),
+                    creator = userId,
+                    updater = userId
+                )
+            )
+            rule.action.forEach action@{ action ->
+                val pipelineKey = "$resourceId:${action.path}"
+                val pipelineId = request.triggerPipelines[pipelineKey] ?: return@action
+                getEventRuleTarget(
+                    sourceId = eventType.sourceId,
+                    eventTypeId = eventType.id!!,
+                    ruleId = ruleId,
+                    projectId = projectId,
+                    busId = busId,
+                    userId = userId,
+                    pipelineId = pipelineId
+                )?.let { ruleTargetSet.add(it) }
+            }
+        }
     }
 
     private fun getEventRuleTarget(
@@ -320,7 +329,6 @@ class RdsRegisterService @Autowired constructor(
         projectId: String,
         busId: String,
         userId: String,
-        on: TriggerOn,
         pipelineId: String
     ): EventRuleTarget? {
         val eventTargetTemplate = eventTargetTemplateDao.getByTargetName(
@@ -336,16 +344,6 @@ class RdsRegisterService @Autowired constructor(
                 "pipelineId" to pipelineId
             )
         )
-        /*val targetParamList = JsonUtil.to(replaceTargetParams, object : TypeReference<MutableList<TargetParam>>() {})
-        if (!on.action.variables.isNullOrEmpty()) {
-            val customTargetParam = TargetParam(
-                resourceKey = "customParams",
-                form = TargetFormType.CONSTANT,
-                value = on.action.variables
-            )
-            targetParamList.add(customTargetParam)
-        }*/
-
         val targetId = eventRuleTargetDao.getByTargetName(
             dslContext = dslContext,
             projectId = projectId,
