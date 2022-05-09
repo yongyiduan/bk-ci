@@ -111,7 +111,7 @@ class ScheduleTriggerService @Autowired constructor(
             logger.warn("project ${streamTimerEvent.projectId} not enable ci no trigger schedule")
             return null
         }
-        if (!checkProjectIsExist(streamTimerEvent.projectId)) {
+        if (!checkProjectIsExist(streamTimerEvent.gitProjectId)) {
             streamTimerService.deleteTimer(streamTimerEvent.pipelineId, streamTimerEvent.userId)
             return null
         }
@@ -169,10 +169,10 @@ class ScheduleTriggerService @Autowired constructor(
         )
     }
 
-    private fun checkProjectIsExist(projectId: String): Boolean {
+    private fun checkProjectIsExist(gitProjectId: Long): Boolean {
         try {
             RetryUtils.clientRetry {
-                streamGitService.getProjectInfo(projectId)
+                streamGitService.getProjectInfo(gitProjectId.toString())
             }
             return true
         } catch (e: ErrorCodeException) {
