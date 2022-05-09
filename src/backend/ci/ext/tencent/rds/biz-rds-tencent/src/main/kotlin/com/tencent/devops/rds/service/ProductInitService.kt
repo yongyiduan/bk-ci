@@ -293,17 +293,19 @@ class ProductInitService @Autowired constructor(
 
         val projectId = RdsPipelineUtils.genBKProjectCode(productId)
 
-        val projectResult =
-            client.get(ServiceProjectResource::class).create(
-                userId = masterUserId,
-                projectCreateInfo = ProjectCreateInfo(
-                    projectName = productName,
-                    englishName = projectId,
-                    description = "RDS project with product id: $productId"
+        if (client.get(ServiceProjectResource::class).get(projectId).data == null) {
+            val projectResult =
+                client.get(ServiceProjectResource::class).create(
+                    userId = masterUserId,
+                    projectCreateInfo = ProjectCreateInfo(
+                        projectName = productName,
+                        englishName = projectId,
+                        description = "RDS project with product id: $productId"
+                    )
                 )
-            )
-        if (projectResult.isNotOk()) {
-            throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
+            if (projectResult.isNotOk()) {
+                throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
+            }
         }
 
         // 增加所有项目成员
