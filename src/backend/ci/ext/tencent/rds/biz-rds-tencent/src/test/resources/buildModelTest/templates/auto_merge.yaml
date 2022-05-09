@@ -6,16 +6,16 @@ variables:
   reviewer: ""
 
 steps:
-- name: "AutoMerge"
-  uses: "gfAutoMerge@1.*"
+  - name: "AutoMerge"
+    uses: "gfAutoMerge@1.*"
     with:
       url: "${| variables.codePath }}"
       mergeId: "${| variables.mrId }}"
       credential_id: "${| variables.accessToken }}"
-  
+
 notices:
-- type: wework-message
-  title: "MR auto merge  notice"
-  content: "MR auto merge  notice"
-  receivers:
-    - ${| ci.actor }}
+  - type: wework-message
+    title: "MR auto merge  notice"
+    content: "MR auto merge  notice"
+    receivers:
+      - ${| ci.actor }}

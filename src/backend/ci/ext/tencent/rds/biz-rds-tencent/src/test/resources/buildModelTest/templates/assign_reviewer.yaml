@@ -8,11 +8,11 @@ variables:
 steps:
 - name: "TGit MR Assign"
   uses: "MrAssign@1.*"
-    with:
-      codePath: "${| variables.codePath }}"
-      mrId: "${| variables.mrId }}"
-      accessToken: "${| variables.accessToken }}"
-      reviewer: "${| variables.reviewer }}"
+  with:
+    codePath: "${| variables.codePath }}"
+    mrId: "${| variables.mrId }}"
+    accessToken: "${| variables.accessToken }}"
+    reviewer: "${| variables.reviewer }}"
   
 notices:
 - type: wework-message

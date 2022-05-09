@@ -106,6 +106,8 @@ class ScheduleTriggerService @Autowired constructor(
             return null
         }
 
+
+
         val action = eventActionFactory.loadScheduleAction(
             setting = streamTriggerSetting,
             event = StreamScheduleEvent(
