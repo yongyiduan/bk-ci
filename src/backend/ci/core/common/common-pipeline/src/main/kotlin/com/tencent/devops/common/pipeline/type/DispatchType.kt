@@ -33,7 +33,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentEnvDispatchType
 import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentIDDispatchType
+import com.tencent.devops.common.pipeline.type.agent.ThirdPartyBcsDispatchType
 import com.tencent.devops.common.pipeline.type.agent.ThirdPartyDevCloudDispatchType
+import com.tencent.devops.common.pipeline.type.bcs.PublicBcsDispatchType
 import com.tencent.devops.common.pipeline.type.codecc.CodeCCDispatchType
 import com.tencent.devops.common.pipeline.type.docker.DockerDispatchType
 import com.tencent.devops.common.pipeline.type.exsi.ESXiDispatchType
@@ -50,7 +52,9 @@ import com.tencent.devops.common.pipeline.type.tstack.TStackDispatchType
     JsonSubTypes.Type(value = ThirdPartyAgentEnvDispatchType::class, name = "THIRD_PARTY_AGENT_ENV"),
     JsonSubTypes.Type(value = ThirdPartyDevCloudDispatchType::class, name = "THIRD_PARTY_DEVCLOUD"),
     JsonSubTypes.Type(value = CodeCCDispatchType::class, name = "CODECC"),
-    JsonSubTypes.Type(value = CodeCCDispatchType::class, name = "MACOS")
+    JsonSubTypes.Type(value = CodeCCDispatchType::class, name = "MACOS"),
+    JsonSubTypes.Type(value = ThirdPartyBcsDispatchType::class, name = "THIRD_PARTY_BCS"),
+    JsonSubTypes.Type(value = PublicBcsDispatchType::class, name = "PUBLIC_BCS"),
 )
 abstract class DispatchType(
     open var value: String,

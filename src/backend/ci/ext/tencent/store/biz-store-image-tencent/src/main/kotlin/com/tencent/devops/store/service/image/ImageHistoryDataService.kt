@@ -74,6 +74,9 @@ class ImageHistoryDataService @Autowired constructor(
             ImageAgentTypeEnum.KUBERNETES -> {
                 throw Exception("not support !")
             }
+            ImageAgentTypeEnum.PUBLIC_BCS -> {
+                throw Exception("not support !")
+            }
         }
         realImageNameTag = realImageNameTag.removePrefix("/")
         // 拆分repoName与tag

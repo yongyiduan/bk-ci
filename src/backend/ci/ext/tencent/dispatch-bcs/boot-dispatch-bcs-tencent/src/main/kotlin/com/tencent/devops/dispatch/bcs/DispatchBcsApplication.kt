@@ -24,32 +24,21 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package com.tencent.devops.dispatch.bcs
 
-package com.tencent.devops.dispatch.docker.service
+import com.tencent.devops.common.service.MicroService
+import com.tencent.devops.common.service.MicroServiceApplication
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.scheduling.annotation.EnableScheduling
 
-interface ExtDebugService {
-    fun startDebug(
-        userId: String,
-        projectId: String,
-        pipelineId: String,
-        buildId: String?,
-        vmSeqId: String
-    ): String?
+@MicroService
+@EnableScheduling
+@ComponentScan(
+    "com.tencent.devops.dispatch.bcs",
+    "com.tencent.devops.common.dispatch.sdk"
+)
+class DispatchDockerApplication
 
-    fun getWebsocketUrl(
-        userId: String,
-        projectId: String,
-        pipelineId: String,
-        buildId: String?,
-        vmSeqId: String,
-        containerId: String
-    ): String?
-
-    fun stopDebug(
-        userId: String,
-        projectId: String,
-        pipelineId: String,
-        vmSeqId: String,
-        containerName: String
-    ): Boolean
+fun main(args: Array<String>) {
+    MicroServiceApplication.run(DispatchDockerApplication::class, args)
 }
