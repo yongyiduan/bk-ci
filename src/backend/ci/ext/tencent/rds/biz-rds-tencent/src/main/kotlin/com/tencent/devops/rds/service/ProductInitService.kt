@@ -154,7 +154,10 @@ class ProductInitService @Autowired constructor(
 
             // 如果配置了初始化流水线并存在该流水线，则解析并执行，传入特定的resource参数
             mainObject.init?.streamPath?.let { streamPath ->
-                val initYamlFile = File(Paths.get(cachePath, Constants.CHART_TEMPLATE_DIR + File.separator + streamPath).toUri())
+                val initYamlFile = File(Paths.get(
+                    cachePath,
+                    Constants.CHART_TEMPLATE_DIR + File.separator + streamPath
+                ).toUri())
                 if (!initYamlFile.exists()) {
                     logger.warn("RDS|init|Init pipeline file not found: ${initYamlFile.canonicalPath}")
                     return@let
