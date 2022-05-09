@@ -73,7 +73,11 @@ class ProductInitService @Autowired constructor(
     private val eventBusService: EventBusService
 ) {
 
-    private val logger = LoggerFactory.getLogger(ProductInitService::class.java)
+    companion object {
+        private const val VARIABLE_PREFIX = "variables."
+        private val logger = LoggerFactory.getLogger(ProductInitService::class.java)
+    }
+
 
     fun createProduct(userId: String, productCreateInfo: ProductCreateInfo): Boolean {
         val productId = productCreateInfo.productId
@@ -175,10 +179,10 @@ class ProductInitService @Autowired constructor(
                     projectId = projectId,
                     pipelineId = pipelineId,
                     values = mapOf(
-                        "tapd_ids" to JsonUtil.toJson(tapdIds),
-                        "repo_urls" to JsonUtil.toJson(repoUrls),
-                        "projects" to JsonUtil.toJson(projects),
-                        "services" to JsonUtil.toJson(services)
+                        "${VARIABLE_PREFIX}tapd_ids" to JsonUtil.toJson(tapdIds),
+                        "${VARIABLE_PREFIX}repo_urls" to JsonUtil.toJson(repoUrls),
+                        "${VARIABLE_PREFIX}projects" to JsonUtil.toJson(projects),
+                        "${VARIABLE_PREFIX}services" to JsonUtil.toJson(services)
                     ),
                     channelCode = ChannelCode.BS,
                     startType = StartType.SERVICE
