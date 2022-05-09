@@ -1,7 +1,6 @@
 init:
   stream_path: init.yml
 on:
-
   mr:
     - filter:
         target-branches: [ 'master' ]

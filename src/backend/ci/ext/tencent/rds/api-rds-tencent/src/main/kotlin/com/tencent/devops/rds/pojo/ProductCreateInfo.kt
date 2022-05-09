@@ -35,7 +35,7 @@ data class ProductCreateInfo(
     @ApiModelProperty("RDS产品ID")
     val productId: Long,
     @ApiModelProperty("产品名称")
-    val productName: String,
+    val   : String,
     @ApiModelProperty("管理员")
     val master: String,
     @ApiModelProperty("用户成员")

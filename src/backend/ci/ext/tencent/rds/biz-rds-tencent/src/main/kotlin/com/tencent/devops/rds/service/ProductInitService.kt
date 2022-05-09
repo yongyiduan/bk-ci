@@ -152,8 +152,13 @@ class ProductInitService @Autowired constructor(
             val productId = resourceObject.productId
             val projectId = RdsPipelineUtils.genBKProjectCode(productId)
 
-            val initYamlFile = File(Paths.get(cachePath, Constants.CHART_INIT_YAML_FILE).toUri())
-            if (initYamlFile.exists()) {
+            // 如果配置了初始化流水线并存在该流水线，则解析并执行，传入特定的resource参数
+            mainObject.init?.streamPath?.let { streamPath ->
+                val initYamlFile = File(Paths.get(cachePath, Constants.CHART_TEMPLATE_DIR + File.separator + streamPath).toUri())
+                if (!initYamlFile.exists()) {
+                    logger.warn("RDS|init|Init pipeline file not found: ${initYamlFile.canonicalPath}")
+                    return@let
+                }
                 logger.info("RDS|init|InitPipelineFile|initYamlStr=$mainYamlStr")
                 val streamBuildResult = streamConverter.buildModel(
                     userId = userId,
@@ -178,6 +183,7 @@ class ProductInitService @Autowired constructor(
                     userId = userId,
                     projectId = projectId,
                     pipelineId = pipelineId,
+                    // 传入特定的resource参数
                     values = mapOf(
                         "${VARIABLE_PREFIX}tapd_ids" to JsonUtil.toJson(tapdIds),
                         "${VARIABLE_PREFIX}repo_urls" to JsonUtil.toJson(repoUrls),
