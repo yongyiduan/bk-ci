@@ -37,6 +37,7 @@ import com.tencent.devops.common.pipeline.enums.StartType
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.project.api.service.ServiceProjectResource
 import com.tencent.devops.project.pojo.ProjectCreateInfo
+import com.tencent.devops.project.pojo.ProjectCreateUserInfo
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
 import com.tencent.devops.rds.chart.StreamConverter
@@ -44,24 +45,30 @@ import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.constants.Constants.CHART_INIT_YAML_FILE_STORAGE
 import com.tencent.devops.rds.dao.RdsProductInfoDao
+import com.tencent.devops.rds.dao.RdsProductUserDao
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
+import com.tencent.devops.rds.pojo.ChartResources
 import com.tencent.devops.rds.pojo.ClientConfigYaml
-import com.tencent.devops.rds.pojo.ProductCreateInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
+import com.tencent.devops.rds.pojo.RdsYaml
+import com.tencent.devops.rds.pojo.enums.ProductStatus
+import com.tencent.devops.rds.pojo.enums.ProductUserType
+import com.tencent.devops.rds.pojo.yaml.Main
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.pojo.yaml.Resource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
-import java.io.File
+import com.tencent.devops.rds.utils.Yaml
+import org.apache.commons.io.FileUtils
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import org.apache.commons.io.FileUtils
 
 @Service
 class ProductInitService @Autowired constructor(
@@ -71,50 +78,13 @@ class ProductInitService @Autowired constructor(
     private val streamConverter: StreamConverter,
     private val chartPipeline: ChartPipeline,
     private val productInfoDao: RdsProductInfoDao,
-    private val productUserService: ProductUserService,
+    private val productUserDao: RdsProductUserDao,
     private val eventBusService: EventBusService
 ) {
 
     companion object {
         private const val VARIABLE_PREFIX = "variables."
         private val logger = LoggerFactory.getLogger(ProductInitService::class.java)
-    }
-
-
-    fun createProduct(userId: String, productCreateInfo: ProductCreateInfo): Boolean {
-        val productId = productCreateInfo.productId
-        val origin = productInfoDao.getProduct(dslContext, productId)
-        if (origin != null) {
-            throw ErrorCodeException(
-                errorCode = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.errorCode,
-                defaultMessage = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.formatErrorMessage,
-                params = arrayOf(productId.toString())
-            )
-        }
-        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
-        val projectResult =
-            client.get(ServiceProjectResource::class).create(
-                userId = userId,
-                projectCreateInfo = ProjectCreateInfo(
-                    projectName = productCreateInfo.productName,
-                    englishName = projectId,
-                    description = "RDS project with product id: $productId"
-                )
-            )
-        if (projectResult.isNotOk()) {
-            throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
-        }
-        productInfoDao.createProduct(dslContext, projectId, productCreateInfo)
-
-        // 增加所有项目成员
-        productUserService.saveProductMembers(
-            userId = userId,
-            productId = productId,
-            projectId = projectId,
-            members = productCreateInfo.members,
-            masterUserId = productCreateInfo.master
-        )
-        return true
     }
 
     fun initChart(
@@ -126,88 +96,23 @@ class ProductInitService @Autowired constructor(
             // 读取并解压缓存到本地磁盘
             val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
-            // 读取用户配置文件，获取各类token
-            val clientConfigStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_CLIENT_CONFIG_YAML_FILE)
-            logger.info("RDS|init|clientConfig|clientConfigStr=$clientConfigStr")
-            val clientConfig = YamlUtil.getObjectMapper().readValue(
-                clientConfigStr,
-                ClientConfigYaml::class.java
-            )
+            // 读取各类资源文件
+            val chartResources = readResources(cachePath)
+            val (_, _, mainObject, _, resourceObject) = chartResources
 
-            val mainYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_MAIN_YAML_FILE)
-            logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
-            val mainYaml = YamlUtil.getObjectMapper().readValue(
-                mainYamlStr,
-                PreMain::class.java
-            )
-            val mainObject = mainYaml.getMainObject()
-            logger.info("RDS|init|MainFile|mainObject=$mainObject|mainYaml=$mainYaml")
-
-            val resourceYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_RESOURCE_YAML_FILE)
-            logger.info("RDS|ResourceFile|resourceYamlStr=$resourceYamlStr")
-            val resourceYaml = YamlUtil.getObjectMapper().readValue(
-                resourceYamlStr,
-                PreResource::class.java
-            )
-            val resourceObject = resourceYaml.getResourceObject()
-            logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
             val productId = resourceObject.productId
-            val projectId = RdsPipelineUtils.genBKProjectCode(productId)
+
+            // 创建蓝盾项目以及添加人员
+            val projectId = createProduct(userId, chartResources)
 
             // 如果配置了初始化流水线并存在该流水线，则解析并执行，传入特定的resource参数
-            mainObject.init?.streamPath?.let { streamPath ->
-                val initYamlFile = File(Paths.get(
-                    cachePath,
-                    Constants.CHART_TEMPLATE_DIR + File.separator + streamPath
-                ).toUri())
-                if (!initYamlFile.exists()) {
-                    logger.warn("RDS|init|Init pipeline file not found: ${initYamlFile.canonicalPath}")
-                    return@let
-                }
-                logger.info("RDS|init|InitPipelineFile|" +
-                    "initYamlStr=${FileUtils.readFileToString(initYamlFile, StandardCharsets.UTF_8)}")
-                val streamBuildResult = streamConverter.buildModel(
-                    userId = userId,
-                    productId = productId,
-                    projectId = projectId,
-                    cachePath = cachePath,
-                    pipelineFile = initYamlFile
-                )
-                val pipelineId = saveChartPipeline(
-                    userId = userId,
-                    productId = productId,
-                    filePath = CHART_INIT_YAML_FILE_STORAGE,
-                    projectName = null,
-                    serviceName = null,
-                    stream = streamBuildResult,
-                    initPipeline = true
-                )
-                val (tapdIds, repoUrls) = resourceObject.getAllTapdIdsAndRepoUrls()
-                val (projects, services) = resourceObject.getAllProjectAndServiceNames()
-                logger.info("RDS|init|resourceInit|tapdIds=$tapdIds|repoUrls=repoUrls")
-                client.get(ServiceBuildResource::class).manualStartupNew(
-                    userId = userId,
-                    projectId = projectId,
-                    pipelineId = pipelineId,
-                    // 传入特定的resource参数
-                    values = mapOf(
-                        "${VARIABLE_PREFIX}tapd_ids" to JsonUtil.toJson(tapdIds),
-                        "${VARIABLE_PREFIX}repo_urls" to JsonUtil.toJson(repoUrls),
-                        "${VARIABLE_PREFIX}projects" to JsonUtil.toJson(projects),
-                        "${VARIABLE_PREFIX}services" to JsonUtil.toJson(services)
-                    ),
-                    channelCode = ChannelCode.BS,
-                    startType = StartType.SERVICE
-                )
-            }
-
-            productInfoDao.updateProductChart(
-                dslContext = dslContext,
+            runInitYaml(
+                mainObject = mainObject,
+                cachePath = cachePath,
+                userId = userId,
                 productId = productId,
-                mainYaml = mainYamlStr,
-                main = mainObject,
-                resourceYaml = resourceYamlStr,
-                resource = resourceObject
+                projectId = projectId,
+                resourceObject = resourceObject
             )
 
             // 每个流水线YAML文件与对应编排的映射
@@ -241,6 +146,7 @@ class ProductInitService @Autowired constructor(
                 }
             }
 
+            // 添加事件总线
             eventBusService.addEventBusWebhook(
                 userId = userId,
                 productId = productId,
@@ -259,6 +165,178 @@ class ProductInitService @Autowired constructor(
             )
         }
         return true
+    }
+
+    // 获取chart中各类配置数据
+    private fun readResources(cachePath: String): ChartResources {
+        // 读取用户配置文件，获取各类token
+        val clientConfigStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_CLIENT_CONFIG_YAML_FILE)
+        logger.info("RDS|init|clientConfig|clientConfigStr=$clientConfigStr")
+        val clientConfig = YamlUtil.getObjectMapper().readValue(
+            clientConfigStr,
+            ClientConfigYaml::class.java
+        )
+
+        val mainYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_MAIN_YAML_FILE)!!
+        logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
+        val mainYaml = YamlUtil.getObjectMapper().readValue(
+            mainYamlStr,
+            PreMain::class.java
+        )
+        val mainObject = mainYaml.getMainObject()
+        logger.info("RDS|init|MainFile|mainObject=$mainObject|mainYaml=$mainYaml")
+
+        val resourceYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_RESOURCE_YAML_FILE)!!
+        logger.info("RDS|ResourceFile|resourceYamlStr=$resourceYamlStr")
+        val resourceYaml = YamlUtil.getObjectMapper().readValue(
+            resourceYamlStr,
+            PreResource::class.java
+        )
+        val resourceObject = resourceYaml.getResourceObject()
+        logger.info("RDS|init|ResourceFile|resourceObject=$resourceObject|resourceYaml=$resourceYaml")
+
+        val rdsYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_RDS_YAML_FILE)
+        logger.info("RDS|RdsFile|rdsYamlStr=$rdsYamlStr")
+        val rdsYaml = YamlUtil.getObjectMapper().readValue(
+            rdsYamlStr,
+            RdsYaml::class.java
+        )
+
+        return ChartResources(clientConfig, mainYamlStr, mainObject, resourceYamlStr, resourceObject, rdsYaml)
+    }
+
+    private fun createProduct(masterUserId: String, chartResource: ChartResources): String {
+        val productId = chartResource.resourceObject.productId
+        val productName = chartResource.resourceObject.productName
+
+        val userMap = productUserDao.getProductUserList(dslContext, productId).associate { it.userId to it.type }
+        if (userMap[masterUserId] != ProductUserType.MASTER.name) {
+            throw ErrorCodeException(
+                errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
+                defaultMessage = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.formatErrorMessage,
+                params = arrayOf(productId.toString())
+            )
+        }
+
+        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
+
+        val projectResult =
+            client.get(ServiceProjectResource::class).create(
+                userId = masterUserId,
+                projectCreateInfo = ProjectCreateInfo(
+                    projectName = productName,
+                    englishName = projectId,
+                    description = "RDS project with product id: $productId"
+                )
+            )
+        if (projectResult.isNotOk()) {
+            throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
+        }
+        productInfoDao.createOrUpdateProduct(
+            dslContext = dslContext,
+            productId = productId,
+            productName = productName,
+            projectId = projectId,
+            chartName = chartResource.rdsYaml.code,
+            chartVersion = chartResource.rdsYaml.version,
+            mainYaml = chartResource.mainYamlStr,
+            mainParsed = Yaml.marshal(chartResource.mainObject),
+            resourceYaml = chartResource.resourceYamlStr,
+            resourceParsed = Yaml.marshal(chartResource.resourceObject),
+            revision = 1,
+            status = ProductStatus.INITIALIZING
+        )
+
+        // 增加所有项目成员
+        val managers = userMap.filter { it.value == ProductUserType.MASTER.name }.keys.toList()
+        client.get(ServiceProjectResource::class).createProjectUser(
+            projectId = projectId,
+            createInfo = ProjectCreateUserInfo(
+                createUserId = masterUserId,
+                roleName = "管理员",
+                roleId = 2,
+                userIds = managers
+            )
+        ).data?.let {
+            if (!it) {
+                throw RuntimeException("Create project $projectId managers $managers failed")
+            }
+        }
+
+        client.get(ServiceProjectResource::class).createProjectUser(
+            projectId = projectId,
+            createInfo = ProjectCreateUserInfo(
+                createUserId = masterUserId,
+                roleName = "CI管理员",
+                roleId = 9,
+                userIds = userMap.keys.toList()
+            )
+        ).data?.let {
+            if (!it) {
+                throw RuntimeException("Create project $projectId members ${userMap.keys.toList()} failed")
+            }
+        }
+
+        return projectId
+    }
+
+    private fun runInitYaml(
+        mainObject: Main,
+        cachePath: String,
+        userId: String,
+        productId: Long,
+        projectId: String,
+        resourceObject: Resource
+    ) {
+        mainObject.init?.streamPath?.let { streamPath ->
+            val initYamlFile = File(
+                Paths.get(
+                    cachePath,
+                    Constants.CHART_TEMPLATE_DIR + File.separator + streamPath
+                ).toUri()
+            )
+            if (!initYamlFile.exists()) {
+                logger.warn("RDS|init|Init pipeline file not found: ${initYamlFile.canonicalPath}")
+                return@let
+            }
+            logger.info(
+                "RDS|init|InitPipelineFile|" +
+                    "initYamlStr=${FileUtils.readFileToString(initYamlFile, StandardCharsets.UTF_8)}"
+            )
+            val streamBuildResult = streamConverter.buildModel(
+                userId = userId,
+                productId = productId,
+                projectId = projectId,
+                cachePath = cachePath,
+                pipelineFile = initYamlFile
+            )
+            val pipelineId = saveChartPipeline(
+                userId = userId,
+                productId = productId,
+                filePath = CHART_INIT_YAML_FILE_STORAGE,
+                projectName = null,
+                serviceName = null,
+                stream = streamBuildResult,
+                initPipeline = true
+            )
+            val (tapdIds, repoUrls) = resourceObject.getAllTapdIdsAndRepoUrls()
+            val (projects, services) = resourceObject.getAllProjectAndServiceNames()
+            logger.info("RDS|init|resourceInit|tapdIds=$tapdIds|repoUrls=repoUrls")
+            client.get(ServiceBuildResource::class).manualStartupNew(
+                userId = userId,
+                projectId = projectId,
+                pipelineId = pipelineId,
+                // 传入特定的resource参数
+                values = mapOf(
+                    "${VARIABLE_PREFIX}tapd_ids" to JsonUtil.toJson(tapdIds),
+                    "${VARIABLE_PREFIX}repo_urls" to JsonUtil.toJson(repoUrls),
+                    "${VARIABLE_PREFIX}projects" to JsonUtil.toJson(projects),
+                    "${VARIABLE_PREFIX}services" to JsonUtil.toJson(services)
+                ),
+                channelCode = ChannelCode.BS,
+                startType = StartType.SERVICE
+            )
+        }
     }
 
     private fun saveChartPipeline(

@@ -34,6 +34,8 @@ object Constants {
     const val CHART_MAIN_YAML_FILE = "main.yaml"
     // 指定的resource声明文件
     const val CHART_RESOURCE_YAML_FILE = "resource.yaml"
+    // 指定的chart声明文件
+    const val CHART_RDS_YAML_FILE = "RDS.yaml"
     // 指定的main入口文件保留路径
     const val CHART_INIT_YAML_FILE_STORAGE = "INIT_YAML"
     // 用户自己的配置文件

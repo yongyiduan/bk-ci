@@ -44,13 +44,13 @@ import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
 import com.tencent.devops.rds.utils.Yaml
 import org.apache.commons.io.FileUtils
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.util.regex.Pattern
-import org.slf4j.LoggerFactory
 
 @Service
 class StreamConverter @Autowired constructor(
@@ -82,8 +82,10 @@ class StreamConverter @Autowired constructor(
             pipelineYaml = pipelineYaml
         )
 
-        logger.debug("RDS|buildModel|parse yml[${pipelineFile.name}]|" +
-            "preYamlObject=\n$preYamlObject\nyamlObject=\n$yamlObject")
+        logger.debug(
+            "RDS|buildModel|parse yml[${pipelineFile.name}]|" +
+                "preYamlObject=\n$preYamlObject\nyamlObject=\n$yamlObject"
+        )
 
         val model = modelCreate.createPipelineModel(
             modelName = "",

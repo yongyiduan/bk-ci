@@ -133,11 +133,13 @@ class EventBusService @Autowired constructor(
                 rules = on.rules.map { rule ->
                     TriggerOnRule(
                         filter = rule.filter,
-                        action = rule.action.map { TriggerAction(
-                            type = it.type,
-                            path = it.path,
-                            variables = it.with
-                        ) }
+                        action = rule.action.map {
+                            TriggerAction(
+                                type = it.type,
+                                path = it.path,
+                                variables = it.with
+                            )
+                        }
                     )
                 }.toList()
             )

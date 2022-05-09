@@ -29,78 +29,80 @@
 
 package com.tencent.devops.rds.dao
 
-import com.tencent.devops.common.api.util.YamlUtil
-import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.model.rds.tables.TRdsProductInfo
-import com.tencent.devops.rds.pojo.ProductCreateInfo
-import com.tencent.devops.rds.pojo.RdsProductInfo
-import com.tencent.devops.rds.pojo.yaml.Main
-import com.tencent.devops.rds.pojo.yaml.Resource
+import com.tencent.devops.rds.pojo.enums.ProductStatus
 import org.jooq.DSLContext
 import org.jooq.types.ULong
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 
 @Repository
 class RdsProductInfoDao {
 
-    fun createProduct(
-        dslContext: DSLContext,
-        projectId: String,
-        productCreateInfo: ProductCreateInfo
-    ): Int {
-        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
-            return dslContext.insertInto(this)
-                .set(PRODUCT_ID, ULong.valueOf(productCreateInfo.productId))
-                .set(PRODUCT_NAME, productCreateInfo.productName)
-                .set(MASTER, productCreateInfo.master)
-                .set(PROJECT_ID, projectId)
-                .execute()
-        }
-    }
-
-    fun updateProductChart(
+    fun createOrUpdateProduct(
         dslContext: DSLContext,
         productId: Long,
-        mainYaml: String?,
-        main: Main?,
-        resourceYaml: String?,
-        resource: Resource?
-    ) {
+        productName: String,
+        projectId: String,
+        chartName: String,
+        chartVersion: String,
+        mainYaml: String,
+        mainParsed: String,
+        resourceYaml: String,
+        resourceParsed: String,
+        revision: Int,
+        status: ProductStatus
+    ): Int {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
-            dslContext.update(this)
+            return dslContext.insertInto(
+                this,
+                PRODUCT_ID,
+                PRODUCT_NAME,
+                PROJECT_ID,
+                CHART_NAME,
+                CHART_VERSION,
+                MAIN_YAML,
+                MAIN_PARSED,
+                RESOURCE_YAML,
+                RESOURCE_PARSED,
+                REVISION,
+                STATUS
+            ).values(
+                ULong.valueOf(productId),
+                productName,
+                projectId,
+                chartName,
+                chartVersion,
+                mainYaml,
+                mainParsed,
+                resourceYaml,
+                resourceParsed,
+                revision,
+                status.display
+            ).onDuplicateKeyUpdate()
+                .set(PRODUCT_NAME, productName)
+                .set(CHART_VERSION, chartVersion)
                 .set(MAIN_YAML, mainYaml)
-                .set(MAIN_PARSED, main?.let { YamlUtil.toYaml(it) })
+                .set(MAIN_PARSED, mainParsed)
                 .set(RESOURCE_YAML, resourceYaml)
-                .set(RESOURCE_PARSED, resource?.let { YamlUtil.toYaml(it) })
-                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .set(RESOURCE_PARSED, resourceParsed)
+                .set(REVISION, revision)
+                .set(STATUS, status.display)
                 .execute()
         }
     }
 
-    fun updateProductInfo(
+    fun updateProductStatus(
         dslContext: DSLContext,
-        productInfo: RdsProductInfo
-    ) {
+        productId: Long,
+        status: ProductStatus,
+        errorMsg: String?
+    ): Boolean {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
-            dslContext.update(this)
-                .set(UPDATE_TIME, LocalDateTime.now())
-                .where(PRODUCT_ID.eq(ULong.valueOf(productInfo.productId)))
-                .execute()
-        }
-    }
-
-    fun getProduct(dslContext: DSLContext, productId: Long): RdsProductInfo? {
-        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
-            val record = dslContext.selectFrom(this)
+            return dslContext.update(this)
+                .set(STATUS, status.display)
+                .set(ERR_MSG, errorMsg)
                 .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
-                .fetchAny() ?: return null
-            return RdsProductInfo(
-                productId = record.productId.toLong(),
-                master = record.master,
-                createTime = record.createTime.timestampmilli(),
-                updateTime = record.updateTime.timestampmilli()
-            )
+                .execute() > 0
         }
     }
 }

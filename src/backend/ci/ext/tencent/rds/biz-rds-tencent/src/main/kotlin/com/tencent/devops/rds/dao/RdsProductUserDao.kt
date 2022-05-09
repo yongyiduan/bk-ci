@@ -30,6 +30,8 @@
 package com.tencent.devops.rds.dao
 
 import com.tencent.devops.model.rds.tables.TRdsProductUser
+import com.tencent.devops.model.rds.tables.records.TRdsProductUserRecord
+import com.tencent.devops.rds.pojo.enums.ProductUserType
 import org.jooq.DSLContext
 import org.jooq.types.ULong
 import org.springframework.stereotype.Repository
@@ -40,12 +42,22 @@ class RdsProductUserDao {
     fun create(
         dslContext: DSLContext,
         productId: Long,
-        userId: String
+        userId: String,
+        userType: ProductUserType
     ) {
         with(TRdsProductUser.T_RDS_PRODUCT_USER) {
-            dslContext.insertInto(this)
-                .set(PRODUCT_ID, ULong.valueOf(productId))
-                .set(USER_ID, userId)
+            dslContext.insertInto(
+                this,
+                PRODUCT_ID,
+                USER_ID,
+                TYPE
+            ).values(
+                ULong.valueOf(productId),
+                userId,
+                userType.name
+            )
+                .onDuplicateKeyUpdate()
+                .set(TYPE, userType.name)
                 .execute()
         }
     }
@@ -53,13 +65,22 @@ class RdsProductUserDao {
     fun batchSave(
         dslContext: DSLContext,
         productId: Long,
-        userList: List<String>
+        userWithTypeMap: Map<String, ProductUserType>
     ) {
         with(TRdsProductUser.T_RDS_PRODUCT_USER) {
-            userList.forEach {
-                dslContext.insertInto(this)
-                    .set(PRODUCT_ID, ULong.valueOf(productId))
-                    .set(USER_ID, it)
+            userWithTypeMap.forEach { user, type ->
+                dslContext.insertInto(
+                    this,
+                    PRODUCT_ID,
+                    USER_ID,
+                    TYPE
+                ).values(
+                    ULong.valueOf(productId),
+                    user,
+                    type.name
+                )
+                    .onDuplicateKeyUpdate()
+                    .set(TYPE, type.name)
                     .execute()
             }
         }
@@ -77,6 +98,17 @@ class RdsProductUserDao {
                     .and(USER_ID.eq(it))
                     .execute()
             }
+        }
+    }
+
+    fun getProductUserList(
+        dslContext: DSLContext,
+        productId: Long
+    ): List<TRdsProductUserRecord> {
+        with(TRdsProductUser.T_RDS_PRODUCT_USER) {
+            return dslContext.selectFrom(this)
+                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .fetch()
         }
     }
 }

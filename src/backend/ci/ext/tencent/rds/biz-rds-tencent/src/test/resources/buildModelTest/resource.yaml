@@ -1,4 +1,5 @@
 product_id: 1
+product_name: test
 projects:
 - job:
     tapd_id: 00000

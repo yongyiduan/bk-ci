@@ -43,9 +43,9 @@ enum class CommonErrorCodeEnum(
         errorCode = "2130021",
         formatErrorMessage = "参数格式错误 %s"
     ),
-    PRODUCT_ALREADY_EXISTS(
+    PRODUCT_NOT_EXISTS(
         errorType = ErrorType.USER,
         errorCode = "2130022",
-        formatErrorMessage = "实践ID已存在: %s"
+        formatErrorMessage = "实践ID不存在: %s"
     )
 }

@@ -28,9 +28,9 @@
 package com.tencent.devops.rds.service
 
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.project.api.service.ServiceProjectResource
-import com.tencent.devops.project.pojo.ProjectCreateUserInfo
 import com.tencent.devops.rds.dao.RdsProductUserDao
+import com.tencent.devops.rds.pojo.ProductCreateInfo
+import com.tencent.devops.rds.pojo.enums.ProductUserType
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,6 +45,15 @@ class ProductUserService @Autowired constructor(
 
     private val logger = LoggerFactory.getLogger(ProductUserService::class.java)
 
+    fun createProduct(userId: String, productCreateInfo: ProductCreateInfo): Boolean {
+        val members = mutableMapOf(productCreateInfo.master to ProductUserType.MASTER)
+        if (!productCreateInfo.members.isNullOrEmpty()) {
+            members.putAll(productCreateInfo.members!!.associateWith { ProductUserType.NORMAL })
+        }
+        productUserDao.batchSave(dslContext, productId = productCreateInfo.productId, userWithTypeMap = members)
+        return true
+    }
+
     fun saveProductMembers(
         userId: String,
         productId: Long,
@@ -52,44 +61,24 @@ class ProductUserService @Autowired constructor(
         members: List<String>?,
         masterUserId: String?
     ): Boolean {
-        try {
-            val member = client.get(ServiceProjectResource::class).createProjectUser(
-                projectId = projectId,
-                createInfo = ProjectCreateUserInfo(
-                    createUserId = userId,
-                    roleName = "CI管理员",
-                    roleId = 9,
-                    userIds = members
-                )
-            )
-            val managerUsers = mutableListOf(userId)
-            val productUsers = mutableListOf<String>()
-            masterUserId?.let {
-                managerUsers.add(masterUserId)
-                productUsers.add(masterUserId)
-            }
-            val manager = client.get(ServiceProjectResource::class).createProjectUser(
-                projectId = projectId,
-                createInfo = ProjectCreateUserInfo(
-                    createUserId = userId,
-                    roleName = "管理员",
-                    roleId = 2,
-                    userIds = managerUsers
-                )
-            )
-            val success = member.data == true && manager.data == true
-            if (success) {
-                productUserDao.batchSave(
-                    dslContext = dslContext,
-                    productId = productId,
-                    userList = productUsers.plus(members ?: emptyList())
-                )
-            }
-            return success
-        } catch (t: Throwable) {
-            logger.error("RDS|saveProductMembers failed with: ", t)
+        val managerUsersMap = mutableMapOf(userId to ProductUserType.MASTER)
+        val productUsersMap = mutableMapOf(userId to ProductUserType.MASTER)
+        masterUserId?.let {
+            managerUsersMap[masterUserId] = ProductUserType.MASTER
+            productUsersMap[masterUserId] = ProductUserType.MASTER
         }
-        return false
+
+        if (!members.isNullOrEmpty()) {
+            productUsersMap.putAll(
+                members.associateWith { ProductUserType.NORMAL }
+            )
+            productUserDao.batchSave(
+                dslContext = dslContext,
+                productId = productId,
+                userWithTypeMap = productUsersMap
+            )
+        }
+        return true
     }
 
     fun deleteProductMembers(
