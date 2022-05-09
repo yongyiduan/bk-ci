@@ -27,6 +27,7 @@
 
 package com.tencent.devops.rds.pojo
 
+import com.tencent.devops.rds.pojo.enums.ProductStatus
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
@@ -34,8 +35,16 @@ import io.swagger.annotations.ApiModelProperty
 data class RdsProductInfo(
     @ApiModelProperty("RDS产品ID")
     val productId: Long,
-    @ApiModelProperty("创建人")
-    val master: String,
+    val productName: String,
+    val projectId: String,
+    val chartName: String,
+    val chartVersion: String,
+    val mainYaml: String,
+    val mainParsed: String,
+    val resourceYaml: String,
+    val resourceParsed: String,
+    val revision: Int,
+    val status: ProductStatus,
     @ApiModelProperty("开始时间", required = true)
     val createTime: Long,
     @ApiModelProperty("开始时间", required = true)

@@ -34,6 +34,7 @@ import com.tencent.devops.rds.pojo.enums.ProductStatus
 import org.jooq.DSLContext
 import org.jooq.types.ULong
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 @Repository
 class RdsProductInfoDao {
@@ -51,9 +52,10 @@ class RdsProductInfoDao {
         resourceParsed: String,
         revision: Int,
         status: ProductStatus
-    ): Int {
+    ): LocalDateTime {
+        val time = LocalDateTime.now()
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
-            return dslContext.insertInto(
+            dslContext.insertInto(
                 this,
                 PRODUCT_ID,
                 PRODUCT_NAME,
@@ -65,7 +67,9 @@ class RdsProductInfoDao {
                 RESOURCE_YAML,
                 RESOURCE_PARSED,
                 REVISION,
-                STATUS
+                STATUS,
+                CREATE_TIME,
+                UPDATE_TIME
             ).values(
                 ULong.valueOf(productId),
                 productName,
@@ -77,7 +81,9 @@ class RdsProductInfoDao {
                 resourceYaml,
                 resourceParsed,
                 revision,
-                status.display
+                status.display,
+                time,
+                time
             ).onDuplicateKeyUpdate()
                 .set(PRODUCT_NAME, productName)
                 .set(CHART_VERSION, chartVersion)
@@ -87,8 +93,10 @@ class RdsProductInfoDao {
                 .set(RESOURCE_PARSED, resourceParsed)
                 .set(REVISION, revision)
                 .set(STATUS, status.display)
+                .set(UPDATE_TIME, time)
                 .execute()
         }
+        return time
     }
 
     fun updateProductStatus(

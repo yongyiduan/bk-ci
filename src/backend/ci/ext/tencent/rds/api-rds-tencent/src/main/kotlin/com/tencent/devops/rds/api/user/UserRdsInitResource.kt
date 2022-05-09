@@ -31,6 +31,7 @@ import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID_DEFAULT_VALUE
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.rds.pojo.InitStatusResult
+import com.tencent.devops.rds.pojo.RdsProductStatusResult
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -68,7 +69,7 @@ interface UserRdsInitResource {
         inputStream: InputStream,
         @FormDataParam("file")
         disposition: FormDataContentDisposition
-    ): Result<Boolean>
+    ): Result<RdsProductStatusResult>
 
     @ApiOperation("获取初始化流水线执行状态")
     @GET

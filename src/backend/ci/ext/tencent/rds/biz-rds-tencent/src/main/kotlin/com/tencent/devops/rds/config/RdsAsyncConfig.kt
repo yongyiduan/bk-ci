@@ -25,23 +25,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.rds.utils
+package com.tencent.devops.rds.config
 
-object RdsPipelineUtils {
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.core.task.TaskExecutor
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
-    fun genBKProjectCode(productId: Long) = "rds-$productId"
+@Configuration
+@EnableAsync
+class RdsAsyncConfig {
 
-    fun genProductId(projectId: String) = projectId.removePrefix("rds-").toLong()
-
-    fun genBKPipelineName(
-        fileName: String,
-        projectName: String?,
-        serviceName: String?
-    ): String {
-        val sb = StringBuilder("[RDS] ")
-        if (!projectName.isNullOrBlank()) sb.append("$projectName-")
-        if (!serviceName.isNullOrBlank()) sb.append("$serviceName-")
-        sb.append(fileName)
-        return sb.toString()
+    @Bean
+    fun initExecutor(): TaskExecutor? {
+        val executor = ThreadPoolTaskExecutor()
+        executor.corePoolSize = 5 // 核心线程数
+        executor.maxPoolSize = 10 // 最大线程数
+        executor.setQueueCapacity(5) // 任务队列容量
+        return executor
     }
 }

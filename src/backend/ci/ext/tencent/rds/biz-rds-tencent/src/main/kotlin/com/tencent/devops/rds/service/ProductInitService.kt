@@ -31,6 +31,7 @@ import com.tencent.devops.common.api.constant.HTTP_500
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.YamlUtil
+import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.pipeline.enums.StartType
@@ -51,6 +52,8 @@ import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.pojo.ChartResources
 import com.tencent.devops.rds.pojo.ClientConfigYaml
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
+import com.tencent.devops.rds.pojo.RdsProductInfo
+import com.tencent.devops.rds.pojo.RdsProductStatusResult
 import com.tencent.devops.rds.pojo.RdsYaml
 import com.tencent.devops.rds.pojo.enums.ProductStatus
 import com.tencent.devops.rds.pojo.enums.ProductUserType
@@ -64,6 +67,7 @@ import org.apache.commons.io.FileUtils
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.InputStream
@@ -87,84 +91,153 @@ class ProductInitService @Autowired constructor(
         private val logger = LoggerFactory.getLogger(ProductInitService::class.java)
     }
 
-    fun initChart(
+    fun init(
         userId: String,
         chartName: String,
         inputStream: InputStream
-    ): Boolean {
+    ): RdsProductStatusResult {
+        // 非异步资源，错误需要返回给客户端
+        var cachePath: String
+        var chartResources: ChartResources
+        var productId: Long
+        var productInfo: RdsProductInfo
         try {
             // 读取并解压缓存到本地磁盘
-            val cachePath = chartParser.cacheChartDisk(chartName, inputStream)
+            cachePath = chartParser.cacheChartDisk(chartName, inputStream)
 
             // 读取各类资源文件
-            val chartResources = readResources(cachePath)
-            val (_, _, mainObject, _, resourceObject) = chartResources
+            chartResources = readResources(cachePath)
 
-            val productId = resourceObject.productId
+            productId = chartResources.resourceObject.productId
 
             // 创建蓝盾项目以及添加人员
-            val projectId = createProduct(userId, chartResources)
+            productInfo = createProduct(userId, chartResources)
 
-            // 如果配置了初始化流水线并存在该流水线，则解析并执行，传入特定的resource参数
-            runInitYaml(
-                mainObject = mainObject,
-                cachePath = cachePath,
-                userId = userId,
+            // 修改状态为初始化中
+            productInfoDao.updateProductStatus(
+                dslContext = dslContext,
                 productId = productId,
-                projectId = projectId,
-                resourceObject = resourceObject
+                status = ProductStatus.INITIALIZING,
+                errorMsg = null
             )
-
-            // 每个流水线YAML文件与对应编排的映射
-            val filePipelineMap = mutableMapOf<String, StreamBuildResult>()
-            chartParser.getCacheChartPipelineFiles(cachePath).forEach { file ->
-                try {
-                    // 生成未指定名称的流水线模型
-                    val streamBuildResult = streamConverter.buildModel(
-                        userId = userId,
-                        productId = productId,
-                        projectId = projectId,
-                        cachePath = cachePath,
-                        pipelineFile = file
-                    )
-                    logger.info("RDS|init|${file.name}|generate model: ${streamBuildResult.pipelineModel}")
-                    filePipelineMap[file.name] = streamBuildResult
-                } catch (ignore: Throwable) {
-                    logger.warn("RDS|init|${file.name}|generate model with error:", ignore)
-                }
+        } catch (e: Throwable) {
+            when (e) {
+                is ErrorCodeException -> throw e
             }
-
-            // 对每一个project下的每一个service分别创建对应流水线
-            filePipelineMap.forEach nextPipeline@{ (path, stream) ->
-                resourceObject.projects.forEach nextProject@{ project ->
-                    // 对于没有细分service的直接按project创建
-                    project.services?.forEach nextService@{ service ->
-                        saveChartPipeline(userId, productId, path, project.id, service.id, stream)
-                    } ?: run {
-                        saveChartPipeline(userId, productId, path, project.id, null, stream)
-                    }
-                }
-            }
-
-            // 添加事件总线
-            eventBusService.addEventBusWebhook(
-                userId = userId,
-                productId = productId,
-                projectId = projectId,
-                main = mainObject,
-                resource = resourceObject
-            )
-        } catch (e: ErrorCodeException) {
-            throw e
-        } catch (t: Throwable) {
-            logger.error("RDS|init error|userId=$userId|chartName=$chartName", t)
+            logger.error("RDS|init error|userId=$userId|chartName=$chartName", e)
             throw ErrorCodeException(
                 statusCode = HTTP_500,
                 errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
-                params = arrayOf(t.message ?: "")
+                params = arrayOf(e.message ?: "")
             )
         }
-        return true
+
+        // 异步资源，错误同步到数据库
+        initAsync(
+            userId = userId,
+            cachePath = cachePath,
+            chartResources = chartResources,
+            productId = productId,
+            projectId = productInfo.projectId
+        )
+
+        return RdsProductStatusResult(
+            productId = productInfo.productId,
+            productName = productInfo.productName,
+            lastUpdate = productInfo.updateTime,
+            status = ProductStatus.INITIALIZING.display,
+            revision = productInfo.revision,
+            notes = "your product ${productInfo.productName} is initializing"
+        )
+    }
+
+    @Async("initExecutor")
+    fun initAsync(
+        userId: String,
+        cachePath: String,
+        chartResources: ChartResources,
+        productId: Long,
+        projectId: String
+    ) {
+        // 抓总异常，执行失败后保存错误信息
+        try {
+            initChart(
+                userId = userId,
+                cachePath = cachePath,
+                chartResources = chartResources,
+                productId = productId,
+                projectId = projectId
+            )
+        } catch (e: Throwable) {
+            productInfoDao.updateProductStatus(
+                dslContext = dslContext,
+                productId = productId,
+                status = ProductStatus.FAILED,
+                errorMsg = e.message
+            )
+        }
+    }
+
+    private fun initChart(
+        userId: String,
+        cachePath: String,
+        chartResources: ChartResources,
+        productId: Long,
+        projectId: String
+    ) {
+        val (_, _, mainObject, _, resourceObject) = chartResources
+
+        // 如果配置了初始化流水线并存在该流水线，则解析并执行，传入特定的resource参数
+        runInitYaml(
+            mainObject = mainObject,
+            cachePath = cachePath,
+            userId = userId,
+            productId = productId,
+            projectId = projectId,
+            resourceObject = resourceObject
+        )
+
+        // 每个流水线YAML文件与对应编排的映射
+        val filePipelineMap = mutableMapOf<String, StreamBuildResult>()
+        chartParser.getCacheChartPipelineFiles(cachePath).forEach { file ->
+            try {
+                // 生成未指定名称的流水线模型
+                val streamBuildResult = streamConverter.buildModel(
+                    userId = userId,
+                    productId = productId,
+                    projectId = projectId,
+                    cachePath = cachePath,
+                    pipelineFile = file
+                )
+                logger.info("RDS|init|${file.name}|generate model: ${streamBuildResult.pipelineModel}")
+                filePipelineMap[file.name] = streamBuildResult
+            } catch (ignore: Throwable) {
+                logger.warn("RDS|init|${file.name}|generate model with error:", ignore)
+            }
+        }
+
+        // 对每一个project下的每一个service分别创建对应流水线
+        filePipelineMap.forEach nextPipeline@{ (path, stream) ->
+            resourceObject.projects.forEach nextProject@{ project ->
+                // 对于没有细分service的直接按project创建
+                project.services?.forEach nextService@{ service ->
+                    saveChartPipeline(userId, productId, path, project.id, service.id, stream)
+                } ?: run {
+                    saveChartPipeline(userId, productId, path, project.id, null, stream)
+                }
+            }
+        }
+
+        // 添加事件总线
+        eventBusService.addEventBusWebhook(
+            userId = userId,
+            productId = productId,
+            projectId = projectId,
+            main = mainObject,
+            resource = resourceObject
+        )
+
+        // init流水线会比这个过程慢，所以在那里修改状态即可
     }
 
     // 获取chart中各类配置数据
@@ -205,7 +278,7 @@ class ProductInitService @Autowired constructor(
         return ChartResources(clientConfig, mainYamlStr, mainObject, resourceYamlStr, resourceObject, rdsYaml)
     }
 
-    private fun createProduct(masterUserId: String, chartResource: ChartResources): String {
+    private fun createProduct(masterUserId: String, chartResource: ChartResources): RdsProductInfo {
         val productId = chartResource.resourceObject.productId
         val productName = chartResource.resourceObject.productName
 
@@ -232,20 +305,6 @@ class ProductInitService @Autowired constructor(
         if (projectResult.isNotOk()) {
             throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
         }
-        productInfoDao.createOrUpdateProduct(
-            dslContext = dslContext,
-            productId = productId,
-            productName = productName,
-            projectId = projectId,
-            chartName = chartResource.rdsYaml.code,
-            chartVersion = chartResource.rdsYaml.version,
-            mainYaml = chartResource.mainYamlStr,
-            mainParsed = Yaml.marshal(chartResource.mainObject),
-            resourceYaml = chartResource.resourceYamlStr,
-            resourceParsed = Yaml.marshal(chartResource.resourceObject),
-            revision = 1,
-            status = ProductStatus.INITIALIZING
-        )
 
         // 增加所有项目成员
         val managers = userMap.filter { it.value == ProductUserType.MASTER.name }.keys.toList()
@@ -277,7 +336,36 @@ class ProductInitService @Autowired constructor(
             }
         }
 
-        return projectId
+        val time = productInfoDao.createOrUpdateProduct(
+            dslContext = dslContext,
+            productId = productId,
+            productName = productName,
+            projectId = projectId,
+            chartName = chartResource.rdsYaml.code,
+            chartVersion = chartResource.rdsYaml.version,
+            mainYaml = chartResource.mainYamlStr,
+            mainParsed = Yaml.marshal(chartResource.mainObject),
+            resourceYaml = chartResource.resourceYamlStr,
+            resourceParsed = Yaml.marshal(chartResource.resourceObject),
+            revision = 1,
+            status = ProductStatus.INITIALIZING
+        )
+
+        return RdsProductInfo(
+            productId = productId,
+            productName = productName,
+            projectId = projectId,
+            chartName = chartResource.rdsYaml.code,
+            chartVersion = chartResource.rdsYaml.version,
+            mainYaml = "",
+            mainParsed = "",
+            resourceYaml = "",
+            resourceParsed = "",
+            revision = 1,
+            status = ProductStatus.INITIALIZING,
+            createTime = time.timestampmilli(),
+            updateTime = time.timestampmilli()
+        )
     }
 
     private fun runInitYaml(

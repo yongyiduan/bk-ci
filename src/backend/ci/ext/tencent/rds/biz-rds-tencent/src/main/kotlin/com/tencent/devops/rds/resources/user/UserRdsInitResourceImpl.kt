@@ -34,6 +34,7 @@ import com.tencent.devops.rds.api.user.UserRdsInitResource
 import com.tencent.devops.rds.constants.Constants
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.pojo.InitStatusResult
+import com.tencent.devops.rds.pojo.RdsProductStatusResult
 import com.tencent.devops.rds.service.ProductInitService
 import com.tencent.devops.rds.service.ProductPipelineService
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
@@ -57,7 +58,7 @@ class UserRdsInitResourceImpl @Autowired constructor(
         chartName: String,
         inputStream: InputStream,
         disposition: FormDataContentDisposition
-    ): Result<Boolean> {
+    ): Result<RdsProductStatusResult> {
         // 校验文件 TODO: 增加接收到的文件大小的校验
         val fileName = String(disposition.fileName.toByteArray(Charset.forName("ISO8859-1")), Charset.forName("UTF-8"))
         if (!fileName.endsWith(Constants.CHART_PACKAGE_FORMAT)) {
@@ -68,7 +69,7 @@ class UserRdsInitResourceImpl @Autowired constructor(
             )
         }
 
-        return Result(productInitService.initChart(userId, chartName, inputStream))
+        return Result(productInitService.init(userId, chartName, inputStream))
     }
 
     override fun initStatus(userId: String, productId: Long): Result<InitStatusResult> {

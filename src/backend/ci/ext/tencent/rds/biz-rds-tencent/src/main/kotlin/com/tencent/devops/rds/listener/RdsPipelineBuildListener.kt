@@ -30,9 +30,14 @@ package com.tencent.devops.rds.listener
 import com.tencent.devops.common.event.dispatcher.pipeline.mq.MQ
 import com.tencent.devops.common.event.pojo.pipeline.PipelineBuildFinishBroadCastEvent
 import com.tencent.devops.common.event.pojo.pipeline.PipelineBuildStartBroadCastEvent
+import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.rds.constants.Constants.QUEUE_PIPELINE_BUILD_FINISH_RDS
 import com.tencent.devops.rds.constants.Constants.QUEUE_PIPELINE_BUILD_START_RDS
+import com.tencent.devops.rds.dao.RdsProductInfoDao
+import com.tencent.devops.rds.pojo.enums.ProductStatus
 import com.tencent.devops.rds.service.ProductPipelineService
+import com.tencent.devops.rds.utils.RdsPipelineUtils
+import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.ExchangeTypes
 import org.springframework.amqp.rabbit.annotation.Exchange
@@ -44,7 +49,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class RdsPipelineBuildListener @Autowired constructor(
-    private val productPipelineService: ProductPipelineService
+    private val dslContext: DSLContext,
+    private val productPipelineService: ProductPipelineService,
+    private val productInfoDao: RdsProductInfoDao
 ) {
 
     companion object {
@@ -92,6 +99,26 @@ class RdsPipelineBuildListener @Autowired constructor(
     fun listenPipelineBuildFinishBroadCastEvent(buildFinishEvent: PipelineBuildFinishBroadCastEvent) {
         try {
             productPipelineService.doFinish(buildFinishEvent)
+            when (BuildStatus.valueOf(buildFinishEvent.status)) {
+                BuildStatus.SUCCEED -> {
+                    productInfoDao.updateProductStatus(
+                        dslContext = dslContext,
+                        productId = RdsPipelineUtils.genProductId(buildFinishEvent.projectId),
+                        status = ProductStatus.DEPLOYED,
+                        errorMsg = null
+                    )
+                }
+                else -> {
+                    // 启动失败时修改状态
+                    productInfoDao.updateProductStatus(
+                        dslContext = dslContext,
+                        productId = RdsPipelineUtils.genProductId(buildFinishEvent.projectId),
+                        status = ProductStatus.FAILED,
+                        errorMsg =
+                        "init pipeline ${buildFinishEvent.pipelineId} build ${buildFinishEvent.buildId} failed"
+                    )
+                }
+            }
         } catch (e: Throwable) {
             logger.error("Fail to listenPipelineBuildFinishBroadCastEvent(${buildFinishEvent.buildId})", e)
         }
