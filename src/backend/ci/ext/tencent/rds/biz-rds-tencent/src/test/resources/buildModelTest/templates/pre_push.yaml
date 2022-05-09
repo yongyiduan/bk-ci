@@ -1,0 +1,169 @@
+
+variables:
+  story_id: ""
+  releaseName: ""
+  chart: ""
+  chartVersion: ""
+
+stages:
+- name: Build
+ check-out: #Stage准出
+      gates: #声明质量红线
+      - template: gates/codecc.yaml
+  jobs:
+    name: "Codecc"
+    job_id_1:
+      name: "CodeCC"
+      steps:
+        - checkout: self
+          name: "代码拉取"
+        - uses: CodeccCheckAtomDebug@4.*
+          name: Coverity腾讯代码分析
+          with:
+            beAutoLang: true
+            checkerSetType: "openScan"
+            toolScanType: "1"
+
+    job_id_2:
+      name: "UT"
+      steps:
+        - checkout: self
+          name: "代码拉取"
+        - uses: covPreInfo@5.*
+          name: Coverage before
+          with:
+            codePath: "${| ci.workspace }}"
+            covProductId: ""
+            baseCommitEnv: ""
+            gitPullFromType: "BRANCH"
+            chooseConfigType: "pluginConfigFilter"
+            pathFilterType: "pathNoFilter"
+            fileSuffix: ".java"
+            baseCommitType: "plugSel"
+            baseCommitPlugSel: "lastcommit"
+            isReplay: false
+            haveCgiTest: 0
+            gitSubmodule: false
+            isPathCov: false
+            preMRCheck: false
+            epCheck: false
+            epMonthFlag: ""
+            gitMrNumber: ""
+            multiGitFlagSwitch: false
+        
+        - name: "Unit Test"
+          uses: "UnitTest@1.*"    
+          with:
+            filePath: "${| ci.workspace }}/unit_test.sh"
+
+        - name: "归档覆盖率报告"
+          uses: "UploadArtifactory@5.*"    
+          with:
+            filePath: "report.zip"
+            repoName: "pipeline"
+            isParentPipeline: false
+            downloadFiles: "[{\"path\":\"\",\"param\":\"\"}]"
+            metadata: "[{\"key\":\"\",\"value\":\"\"}]"
+
+        - name: "覆盖率-后置信息处理"
+          uses: "covParseData@5.*"
+          with:
+            codePath: "${| ci.workspace }}"
+            covProduct: ""
+            codeLanguage: "java"
+            fileTypeJava: "jacoco_xml"
+            fileFromType: "local"
+            filePath: "${| ci.workspace }}/JacocoXML.zip"
+            testFromType: "local"
+            testType: "unit_test"
+            fileTag: ""
+            multiGitFlagSwitch: false
+            needMerge: 1
+            needReport: "need"
+            needRobot: false
+            covRobotId: ""     
+    
+    job_id_3:
+      name: "Build"
+      steps:
+        - checkout: self
+          name: "代码拉取"
+        - uses: "GradleEnterprise@1.*"
+          name: "Build"
+          with: 
+            buildPath: "${| ci.workspace }}"
+            buildCommand: "./build.sh"
+            cacheType: "http"
+            tip: ""
+        - run: |
+            echo "构建并推送镜像"
+          name: "Docker Build --待改成用插件：'构建并推送镜像new'"
+
+        - uses: "makeHelmChart@1.*"
+          name: "Make helm chart"
+          with: 
+            chartPath: "${| ci.workspace }}"
+    
+    job_id_4:
+      name: "CheckStandard"
+      steps:
+        - checkout: self
+          name: "代码拉取"
+        - uses: "checkCommitMessage@1.*"
+          name: "Check commit message" 
+          with: 
+            baseCommitId: ""
+            targetCommitId: ""
+            codePath: ""
+            
+
+- name: Test
+ check-out: #Stage准出
+      gates: #声明质量红线
+      - template: gates/coverage.yaml
+  jobs:
+    job_id_5:
+      name: "部署特性环境"
+      steps:
+        - uses: "devcloud-deploy@1.*"
+          name: "更新特性环境"
+          with:
+            selectop: "create_namespace"
+            helm_op1: "update"
+            namespace: "${| jobs.job_id_1.steps.step_1.outputs.env_name }}"
+            zone: "IDC"
+            resourceType: "temporary"
+            repositoryType: "dev_res"
+            Chart: "${| variables.chart }}"
+            ChartVersion: "${| variables.chartVersion }}"
+            releaseName: "${| variables.releaseName }}"
+            yaml_string: ""          
+        - uses: "EnterPriseWechat@1.*"
+          name: "企业微信通知"
+          with:
+            title: ""
+            body: ""
+            receivers: ""
+    
+    job_id_6:
+      name: "Tapd状态流转"
+      steps:
+        - name: "覆盖率-质量红线"
+          uses: "covQuality@1.*"
+          with:
+            preMR: "false"
+            testType: "UNIT_TEST"
+            codeLanguage: "java"
+            pollTime: 20
+            defaultDifLinePct: 200
+            ignoreDifCover: "false"
+            totalLinePctRedLine: "50"
+            allPushNotification: 0
+            
+        - name: "tapd状态更新"
+          uses: "tapdStatusUpdate@1.*"
+          with:
+            username: ""
+            story_id_list: "${| variables.story_id }}"
+            story_original_state: "doing"
+            story_goal_state: "for test"

@@ -1,0 +1,5 @@
+name: MR审核
+
+steps:
+- run: echo xxxxx
+  name: 打印审核意见

@@ -1,6 +1,6 @@
 jobs:
   codecc:
-    name: CodeCC
+    name: CodeCC检查
     steps:
     - checkout: self
     - template: steps/codecc.yaml

@@ -1,5 +1,5 @@
 stages:
-  - name: CI
+  - name: 拉取代码并编译检查
     check-out:
       gates:
         - template: gates/coverage.yaml
@@ -7,4 +7,5 @@ stages:
     jobs:
       template:
         - name: jobs/build.yaml
+        - name: jobs/unit_test.yaml
         - name: jobs/codecc.yaml

@@ -1,16 +1,4 @@
 
 steps:
-- name: Start MySQL
-  uses: mysqlservice@1.*
-  id: mysqlservice
-  with:
-    imageName: mysql:5.7
-    port: 3306
-    mysqlPw: root
-    initCmd: select version();
-- name: "init MySQL"
-  env:
-    MYSQL_IP: ${|steps.mysqlservice.outputs.MYSQL_IP}}
-    MYSQL_PORT: ${|steps.mysqlservice.outputs.MYSQL_PORT}}
-    MYSQL_PWD: root
-  run: sh import_sql.sh
+- run: echo xxxx  
+  name: 编译前检查

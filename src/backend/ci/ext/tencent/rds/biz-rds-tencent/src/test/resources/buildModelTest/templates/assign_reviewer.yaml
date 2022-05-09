@@ -1,0 +1,23 @@
+
+variables:
+  codePath: ""
+  mrId: ""
+  accessToken: ""
+  reviewer: ""
+
+
+steps:
+- name: "TGit MR Assign"
+  uses: "MrAssign@1.*"
+    with:
+      codePath: "${| variables.codePath }}"
+      mrId: "${| variables.mrId }}"
+      accessToken: "${| variables.accessToken }}"
+      reviewer: "${| variables.reviewer }}"
+  
+notices:
+- type: wework-message
+  title: "TGit MR Assign notice"
+  content: "TGit MR Assign"
+  receivers:
+    - ${| ci.actor }}

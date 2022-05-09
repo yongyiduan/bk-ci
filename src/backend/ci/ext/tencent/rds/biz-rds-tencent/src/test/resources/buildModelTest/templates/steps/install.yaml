@@ -1,2 +1,3 @@
 steps:
-  - run: xxx
+- run: echo xxx
+  name: 安装仓库依赖

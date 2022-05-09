@@ -1,3 +1,5 @@
+name: DEV环境主干部署
+
 stages:
   - template: stages/ci.yaml
 

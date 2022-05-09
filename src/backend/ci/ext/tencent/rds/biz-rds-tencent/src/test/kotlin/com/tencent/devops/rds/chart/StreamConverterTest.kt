@@ -50,13 +50,14 @@ class StreamConverterTest {
     fun replaceTemplate() {
         val dir = ResourceUtils.getFile("classpath:buildModelTest/templates")
         val pipelines = dir.listFiles()?.toList()?.filter { it.isFile && CommonUtils.ciFile(it.name) } ?: emptyList()
-        pipelines.forEach {
-            val pipelineYaml = FileUtils.readFileToString(it, StandardCharsets.UTF_8)
-            val (yamlOb, pre) = streamConverter.replaceTemplate(dir.parent, it.name, pipelineYaml)
-            println("------------------------   pre ------------------------   ")
+        pipelines.forEach { yaml ->
+            println(">>>>>>>>>>>>>>>>>>>>>>>> $yaml <<<<<<<<<<<<<<<<<<<<<<<")
+            val pipelineYaml = FileUtils.readFileToString(yaml, StandardCharsets.UTF_8)
+            val (yamlOb, pre) = streamConverter.replaceTemplate(dir.parent, yaml.name, pipelineYaml)
+            println("------------------------ pre ------------------------   ")
             println(YamlCommonUtils.toYamlNotNull(pre))
-            println("------------------------   nor ------------------------   ")
-            println(Yaml.marshal(TXScriptYmlUtils.normalizeRdsYaml(yamlOb, it.name)))
+            println("------------------------ nor ------------------------   ")
+            println(Yaml.marshal(TXScriptYmlUtils.normalizeRdsYaml(yamlOb, yaml.name)))
         }
     }
 

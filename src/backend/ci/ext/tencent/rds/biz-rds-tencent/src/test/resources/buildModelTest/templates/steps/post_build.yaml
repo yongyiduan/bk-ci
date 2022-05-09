@@ -1,2 +1,3 @@
 steps:
-  - run: xxxx
+- run: echo xxx
+  name: 编译后处理

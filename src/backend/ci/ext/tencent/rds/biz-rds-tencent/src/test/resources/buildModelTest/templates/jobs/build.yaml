@@ -1,8 +1,9 @@
 jobs:
   build:
-    name: build
+    name: 编译
     steps:
     - checkout: self
+      name: 拉取仓库代码
     - template: steps/install.yaml
     - template: steps/pre_build.yaml
     - template: steps/build.yaml

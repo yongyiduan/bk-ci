@@ -6,7 +6,7 @@ parameters:
 gates:
   - name: 单元测试覆盖率
     rule:
-      - ngtestQuality.total_cover_rate >= 100
+      - ngtestQuality.total_cover_rate >= 80
     notify-on-fail:
       - type: wework-message
         receivers: ${| parameters.receivers }}

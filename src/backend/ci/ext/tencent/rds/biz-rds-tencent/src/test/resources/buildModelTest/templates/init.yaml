@@ -1,11 +1,36 @@
-steps:
-- uses: BCS@1.latest
-  with:
-    chart_path: ./ccc.yaml
-    parameters: true
-notices:
-- type: wework-message
-  title: this is a wework-message notice
-  content: this is a wework-message notice,content is hello.
-  receivers:
-    - ${| ci.actor }}
+name: Rds初始化
+
+variables:
+  tapd_ids: ""
+  repo_urls: ""
+  projects: ""
+
+jobs:
+  job_id_1:   
+    runs-on: docker
+    strategy:
+      matrix:
+        tapd_ids: ${| variables.tapd_ids }}
+    steps:
+      - run: |
+          echo "Tapd初始化 --依赖Tapd接口"
+  job_id_2:   
+    runs-on: docker
+    strategy:
+      matrix:
+        repo_urls: ${| variables.repo_urls }}
+    steps:
+      - uses: "prePush@1.*"
+        name: "Pre-Push相关流程注册"
+        with:
+          credential_id: "${| ci.token }}"
+          url: "${| matrix.repo_urls }}"
+
+  job_id_3:   
+    runs-on: docker
+    strategy:
+      matrix:
+        projects: ${| variables.projects }}
+    steps:
+      - run: |
+          echo "创建集成测试环境"

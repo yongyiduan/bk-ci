@@ -1,0 +1,48 @@
+variables:
+  projectName: ""
+  tapdId: ""
+  releaseName: ""
+  chart: ""
+  chartVersion: ""
+
+stages:
+- name: 前置处理
+  jobs:
+    name: "初始化参数"
+    job_id_1:
+      steps:
+        - uses: "createEnvName@1.*"
+          name: "获取特性环境名称"
+          id: "step_1"
+          with:
+            project_name: "${| variables.projectName }}"
+            tapd_id: "${| variables.tapdId }}"
+        - run: |
+            echo "获取lastgood信息"
+          name: "获取lastgood信息 --待定"
+
+- name: 环境创建
+  jobs:
+    name: "环境创建"
+    job_id_2:
+      steps:
+        - uses: "devcloud-deploy@1.*"
+          name: "创建特性环境"
+          with:
+            selectop: "create_namespace"
+            helm_op1: "update_create_helm"
+            namespace: "${| jobs.job_id_1.steps.step_1.outputs.env_name }}"
+            zone: "IDC"
+            resourceType: "temporary"
+            repositoryType: "dev_res"
+            Chart: "${| variables.chart }}"
+            ChartVersion: "${| variables.chartVersion }}"
+            releaseName: "${| variables.releaseName }}"
+            yaml_string: ""
+
+notices:
+- type: wework-message
+  title: "Create feature env  notice"
+  content: "Create feature env finished"
+  receivers:
+    - ${| ci.actor }}
