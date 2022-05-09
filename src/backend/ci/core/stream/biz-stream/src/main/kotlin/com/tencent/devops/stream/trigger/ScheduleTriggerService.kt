@@ -182,7 +182,6 @@ class ScheduleTriggerService @Autowired constructor(
             }
             return true
         }
-
     }
 
     private fun checkIsNotFound(e: ErrorCodeException): Boolean {
