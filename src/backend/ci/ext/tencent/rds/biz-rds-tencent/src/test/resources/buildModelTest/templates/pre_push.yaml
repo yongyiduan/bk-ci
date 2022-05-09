@@ -1,4 +1,3 @@
-
 variables:
   story_id: ""
   releaseName: ""
@@ -7,11 +6,10 @@ variables:
 
 stages:
 - name: Build
- check-out: #Stage准出
-      gates: #声明质量红线
+  check-out: #Stage准出
+    gates: #声明质量红线
       - template: gates/codecc.yaml
   jobs:
-    name: "Codecc"
     job_id_1:
       name: "CodeCC"
       steps:
@@ -23,7 +21,6 @@ stages:
             beAutoLang: true
             checkerSetType: "openScan"
             toolScanType: "1"
-
     job_id_2:
       name: "UT"
       steps:
@@ -50,21 +47,19 @@ stages:
             epMonthFlag: ""
             gitMrNumber: ""
             multiGitFlagSwitch: false
-        
+
         - name: "Unit Test"
-          uses: "UnitTest@1.*"    
+          uses: "UnitTest@1.*"
           with:
             filePath: "${| ci.workspace }}/unit_test.sh"
-
         - name: "归档覆盖率报告"
-          uses: "UploadArtifactory@5.*"    
+          uses: "UploadArtifactory@5.*"
           with:
             filePath: "report.zip"
             repoName: "pipeline"
             isParentPipeline: false
             downloadFiles: "[{\"path\":\"\",\"param\":\"\"}]"
             metadata: "[{\"key\":\"\",\"value\":\"\"}]"
-
         - name: "覆盖率-后置信息处理"
           uses: "covParseData@5.*"
           with:
@@ -81,8 +76,7 @@ stages:
             needMerge: 1
             needReport: "need"
             needRobot: false
-            covRobotId: ""     
-    
+            covRobotId: ""
     job_id_3:
       name: "Build"
       steps:
@@ -90,7 +84,7 @@ stages:
           name: "代码拉取"
         - uses: "GradleEnterprise@1.*"
           name: "Build"
-          with: 
+          with:
             buildPath: "${| ci.workspace }}"
             buildCommand: "./build.sh"
             cacheType: "http"
@@ -98,28 +92,25 @@ stages:
         - run: |
             echo "构建并推送镜像"
           name: "Docker Build --待改成用插件：'构建并推送镜像new'"
-
         - uses: "makeHelmChart@1.*"
           name: "Make helm chart"
-          with: 
+          with:
             chartPath: "${| ci.workspace }}"
-    
     job_id_4:
       name: "CheckStandard"
       steps:
         - checkout: self
           name: "代码拉取"
         - uses: "checkCommitMessage@1.*"
-          name: "Check commit message" 
-          with: 
+          name: "Check commit message"
+          with:
             baseCommitId: ""
             targetCommitId: ""
             codePath: ""
-            
 
 - name: Test
- check-out: #Stage准出
-      gates: #声明质量红线
+  check-out: #Stage准出
+    gates: #声明质量红线
       - template: gates/coverage.yaml
   jobs:
     job_id_5:
@@ -137,14 +128,13 @@ stages:
             Chart: "${| variables.chart }}"
             ChartVersion: "${| variables.chartVersion }}"
             releaseName: "${| variables.releaseName }}"
-            yaml_string: ""          
+            yaml_string: ""
         - uses: "EnterPriseWechat@1.*"
           name: "企业微信通知"
           with:
             title: ""
             body: ""
             receivers: ""
-    
     job_id_6:
       name: "Tapd状态流转"
       steps:
@@ -159,7 +149,6 @@ stages:
             ignoreDifCover: "false"
             totalLinePctRedLine: "50"
             allPushNotification: 0
-            
         - name: "tapd状态更新"
           uses: "tapdStatusUpdate@1.*"
           with:
