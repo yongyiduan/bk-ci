@@ -33,8 +33,8 @@ import com.tencent.devops.common.pipeline.pojo.BuildFormValue
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.process.api.user.UserBuildParametersResource
 import com.tencent.devops.process.engine.service.PipelineBuildParamsService
+import com.tencent.devops.process.pojo.BuildFormRepositoryValue
 import com.tencent.devops.repository.api.ServiceRepositoryResource
-import com.tencent.devops.repository.pojo.RepositoryInfo
 import com.tencent.devops.repository.pojo.enums.Permission
 import com.tencent.devops.store.pojo.app.BuildEnvParameters
 import org.slf4j.LoggerFactory
@@ -72,7 +72,7 @@ class UserBuildParametersResourceImpl @Autowired constructor(
                 page = page,
                 pageSize = pageSize,
                 aliasName = aliasName
-            ).map { BuildFormValue(it.aliasName, it.aliasName) }.toList()
+            ).map { BuildFormValue(it.aliasName, it.aliasName) }
         )
     }
 
@@ -107,7 +107,7 @@ class UserBuildParametersResourceImpl @Autowired constructor(
         aliasName: String?,
         page: Int?,
         pageSize: Int?
-    ): Result<List<RepositoryInfo>> {
+    ): Result<List<BuildFormRepositoryValue>> {
         return Result(
             listRepositoryInfo(
                 userId = userId,
@@ -116,7 +116,7 @@ class UserBuildParametersResourceImpl @Autowired constructor(
                 page = page,
                 pageSize = pageSize,
                 aliasName = aliasName
-            )
+            ).map { BuildFormRepositoryValue(id = it.repositoryHashId!!, name = it.aliasName) }
         )
     }
 }
