@@ -25,32 +25,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.artifactory.service.artifactory
+package com.tencent.devops.repository.pojo.github
 
-import com.tencent.devops.artifactory.client.JFrogApiService
-import com.tencent.devops.artifactory.service.CustomDirGsService
-import com.tencent.devops.artifactory.service.JFrogService
-import com.tencent.devops.artifactory.util.JFrogUtil
-import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
-import javax.ws.rs.NotFoundException
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Service
-class ArtifactoryCustomDirGsService @Autowired constructor(
-    private val jFrogApiService: JFrogApiService,
-    private val jFrogService: JFrogService
-) : CustomDirGsService {
-    override fun getDownloadUrl(projectId: String, fileName: String, userId: String): String {
-        logger.info("getDownloadUrl, projectId: $projectId, fileName: $fileName, userId: $userId")
-        val path = JFrogUtil.getCustomDirPath(projectId, fileName)
-        if (!jFrogService.exist(path)) {
-            throw NotFoundException("文件不存在")
-        }
-        return jFrogApiService.internalDownloadUrl(path, 3 * 24 * 3600, userId)
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(ArtifactoryCustomDirGsService::class.java)
-    }
-}
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class GithubRepoCommit(
+    val sha: String,
+    val url: String
+)
