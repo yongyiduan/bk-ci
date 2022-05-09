@@ -59,7 +59,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.InputStream
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import org.apache.commons.io.FileUtils
 
 @Service
 class ProductInitService @Autowired constructor(
@@ -162,7 +164,8 @@ class ProductInitService @Autowired constructor(
                     logger.warn("RDS|init|Init pipeline file not found: ${initYamlFile.canonicalPath}")
                     return@let
                 }
-                logger.info("RDS|init|InitPipelineFile|initYamlStr=$mainYamlStr")
+                logger.info("RDS|init|InitPipelineFile|" +
+                    "initYamlStr=${FileUtils.readFileToString(initYamlFile, StandardCharsets.UTF_8)}")
                 val streamBuildResult = streamConverter.buildModel(
                     userId = userId,
                     productId = productId,
