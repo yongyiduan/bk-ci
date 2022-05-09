@@ -27,18 +27,21 @@
 
 package com.tencent.devops.stream.trigger
 
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.common.service.prometheus.BkTimed
 import com.tencent.devops.process.pojo.BuildId
 import com.tencent.devops.process.yaml.v2.utils.YamlCommonUtils
+import com.tencent.devops.stream.common.exception.ErrorCodeEnum
 import com.tencent.devops.stream.dao.GitPipelineResourceDao
 import com.tencent.devops.stream.dao.GitRequestEventBuildDao
 import com.tencent.devops.stream.dao.GitRequestEventDao
 import com.tencent.devops.stream.dao.StreamBasicSettingDao
 import com.tencent.devops.stream.pojo.enums.TriggerReason
 import com.tencent.devops.stream.service.StreamBasicSettingService
+import com.tencent.devops.stream.service.StreamGitService
 import com.tencent.devops.stream.trigger.actions.EventActionFactory
 import com.tencent.devops.stream.trigger.actions.data.StreamTriggerPipeline
 import com.tencent.devops.stream.trigger.actions.data.StreamTriggerSetting
@@ -55,10 +58,12 @@ import com.tencent.devops.stream.trigger.parsers.triggerParameter.GitRequestEven
 import com.tencent.devops.stream.trigger.pojo.enums.StreamCommitCheckState
 import com.tencent.devops.stream.trigger.timer.pojo.event.StreamTimerBuildEvent
 import com.tencent.devops.stream.trigger.timer.service.StreamTimerService
+import com.tencent.devops.stream.util.RetryUtils
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import javax.ws.rs.core.Response
 
 @Service
 class ScheduleTriggerService @Autowired constructor(
@@ -68,6 +73,7 @@ class ScheduleTriggerService @Autowired constructor(
     private val streamYamlBuild: StreamYamlBuild,
     private val exHandler: StreamTriggerExceptionHandler,
     private val streamTimerService: StreamTimerService,
+    private val streamGitService: StreamGitService,
     private val streamBasicSettingService: StreamBasicSettingService,
     private val streamBasicSettingDao: StreamBasicSettingDao,
     private val gitRequestEventDao: GitRequestEventDao,
@@ -101,11 +107,14 @@ class ScheduleTriggerService @Autowired constructor(
                 homepage = it.homePage
             )
         }
-        if (streamTriggerSetting == null || streamTriggerSetting?.enableCi == false) {
+        if (streamTriggerSetting == null || streamTriggerSetting.enableCi == false) {
             logger.warn("project ${streamTimerEvent.projectId} not enable ci no trigger schedule")
             return null
         }
-
+        if (!checkProjectIsExist(streamTimerEvent.projectId)) {
+            streamTimerService.deleteTimer(streamTimerEvent.pipelineId, streamTimerEvent.userId)
+            return null
+        }
         val action = eventActionFactory.loadScheduleAction(
             setting = streamTriggerSetting,
             event = StreamScheduleEvent(
@@ -158,6 +167,28 @@ class ScheduleTriggerService @Autowired constructor(
             action = action,
             originYaml = streamTimerEvent.originYaml
         )
+    }
+
+    private fun checkProjectIsExist(projectId: String): Boolean {
+        try {
+            RetryUtils.clientRetry {
+                streamGitService.getProjectInfo(projectId)
+            }
+            return true
+        } catch (e: ErrorCodeException) {
+            // 只有明确404才删除,其他情况默认存在，以免服务异常导致误删
+            if (checkIsNotFound(e)) {
+                return false
+            }
+            return true
+        }
+
+    }
+
+    private fun checkIsNotFound(e: ErrorCodeException): Boolean {
+        val statusCodeNotFound = e.statusCode == Response.Status.NOT_FOUND.statusCode
+        val errorCodeNotFound = ErrorCodeEnum.PROJECT_NOT_FOUND.errorCode.toString() == e.errorCode
+        return statusCodeNotFound || errorCodeNotFound
     }
 
     fun handleTrigger(
