@@ -103,17 +103,17 @@ stages:
               pipeLineId: ""
               buildNo: true
               isContinue: false
-              srcPaths: "${{ matrix.service }}"
+              srcPaths: "${| matrix.service }}"
               destPath: ""
               rangeDownload: false
           - name: "docker build"
             uses: "DockerBuildAndPushImage@3.*"
             with:
               sourceMirrorTicketPair: []
-              targetImage: "${{ matrix.service }}"
+              targetImage: "${| matrix.service }}"
               targetImageName: ""
               targetTicketId: ""
-              targetImageTag: "${{ ci.build_id }}"
+              targetImageTag: "${| ci.build_id }}"
               dockerBuildDir: "."
               dockerFilePath: "Dockerfile"
               dockerBuildArgs: ""
@@ -124,7 +124,6 @@ stages:
         strategy:
           matrix:
             service: "${| variables.services }}"
-
           fast-kill: true
           max-parallel: 5
         depend-on:
