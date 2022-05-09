@@ -37,6 +37,7 @@ import com.tencent.devops.rds.dao.RdsBuildHistoryDao
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.pojo.InitStatusResult
+import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -83,8 +84,7 @@ class ProductPipelineService @Autowired constructor(
         )
     }
 
-    fun doFinish(buildFinishEvent: PipelineBuildFinishBroadCastEvent) {
-        val pipeline = chartPipelineDao.getPipelineById(dslContext, buildFinishEvent.pipelineId) ?: return
+    fun doFinish(buildFinishEvent: PipelineBuildFinishBroadCastEvent, pipeline: RdsChartPipelineInfo) {
         logger.info("RDS|BUILD_FINISH|buildFinishEvent=$buildFinishEvent")
         buildHistoryDao.finish(
             dslContext = dslContext,
