@@ -160,9 +160,9 @@ class RdsChartPipelineDao {
             val select = dslContext.selectFrom(this)
                 .where(
                     PRODUCT_ID.eq(productId)
-                        .and(PROJECT_NAME.eq(projectName))
                         .and(FILE_PATH.eq(filePath))
                 )
+            projectName?.let { select.and(PROJECT_NAME.eq(it)) }
             serviceName?.let { select.and(SERVICE_NAME.eq(it)) }
             return select.fetchAny()?.let {
                 RdsChartPipelineInfo(
