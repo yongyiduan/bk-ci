@@ -290,7 +290,7 @@
         },
         data () {
             return {
-                showImagePublicTypeList: ['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD', 'KUBERNETES'],
+                showImagePublicTypeList: ['DOCKER', 'IDC', 'PUBLIC_DEVCLOUD', 'KUBERNETES', 'PUBLIC_BCS'],
                 showImageSelector: false,
                 isVersionLoading: false,
                 isLoadingMac: false,
