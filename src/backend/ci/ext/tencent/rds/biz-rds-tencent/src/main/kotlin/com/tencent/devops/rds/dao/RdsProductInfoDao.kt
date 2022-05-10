@@ -155,14 +155,14 @@ class RdsProductInfoDao {
             .limit(limit)
             .fetch().map {
                 RdsProductStatus(
-                    it.get("PRODUCT_ID") as Long,
-                    it.get("PRODUCT_NAME") as String,
-                    it.get("CHART_NAME") as String,
-                    it.get("CHART_VERSION") as String,
-                    it.get("REVISION") as Int,
-                    ProductStatus.displayOf(it.get("STATUS") as String)!!,
-                    it.get("NOTES")?.toString(),
-                    it.get("UPDATE_TIME") as Long,
+                    productId = (it.get("PRODUCT_ID") as ULong).toLong(),
+                    productName = it.get("PRODUCT_NAME") as String,
+                    chartName = it.get("CHART_NAME") as String,
+                    chartVersion = it.get("CHART_VERSION") as String,
+                    revision = it.get("REVISION") as Int,
+                    status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
+                    notes = it.get("NOTES")?.toString(),
+                    updateTime = it.get("UPDATE_TIME") as Long,
                 )
             }
     }
@@ -186,14 +186,14 @@ class RdsProductInfoDao {
                 .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
                 .fetchAny()?.let {
                     RdsProductStatus(
-                        it.get("PRODUCT_ID") as Long,
-                        it.get("PRODUCT_NAME") as String,
-                        it.get("CHART_NAME") as String,
-                        it.get("CHART_VERSION") as String,
-                        it.get("REVISION") as Int,
-                        ProductStatus.displayOf(it.get("STATUS") as String)!!,
-                        it.get("NOTES")?.toString(),
-                        it.get("UPDATE_TIME") as Long,
+                        productId = (it.get("PRODUCT_ID") as ULong).toLong(),
+                        productName = it.get("PRODUCT_NAME") as String,
+                        chartName = it.get("CHART_NAME") as String,
+                        chartVersion = it.get("CHART_VERSION") as String,
+                        revision = it.get("REVISION") as Int,
+                        status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
+                        notes = it.get("NOTES")?.toString(),
+                        updateTime = it.get("UPDATE_TIME") as Long,
                     )
                 }
         }
