@@ -41,7 +41,7 @@ data class RdsProductStatus(
     val chartVersion: String,
     val revision: Int,
     val status: ProductStatus,
-    val errMsg: String?,
+    val notes: String?,
     val updateTime: Long
 )
 
@@ -52,6 +52,6 @@ fun RdsProductStatus.toRdsProductStatusResult() = RdsProductStatusResult(
     chartVersion = this.chartVersion,
     revision = this.revision,
     status = this.status.display,
-    notes = this.errMsg ?: "",
+    notes = this.notes ?: "",
     lastUpdate = this.updateTime
 )

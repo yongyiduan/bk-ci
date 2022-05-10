@@ -111,7 +111,7 @@ class RdsProductInfoDao {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             return dslContext.update(this)
                 .set(STATUS, status.display)
-                .set(ERR_MSG, errorMsg)
+                .set(NOTES, errorMsg)
                 .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
                 .execute() > 0
         }
@@ -146,7 +146,7 @@ class RdsProductInfoDao {
             infotable.CHART_VERSION,
             infotable.REVISION,
             infotable.STATUS,
-            infotable.ERR_MSG,
+            infotable.NOTES,
             infotable.UPDATE_TIME
         )
             .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
@@ -161,7 +161,7 @@ class RdsProductInfoDao {
                     it.get("CHART_VERSION") as String,
                     it.get("REVISION") as Int,
                     ProductStatus.displayOf(it.get("STATUS") as String)!!,
-                    it.get("ERR_MSG")?.toString(),
+                    it.get("NOTES")?.toString(),
                     it.get("UPDATE_TIME") as Long,
                 )
             }
@@ -179,7 +179,7 @@ class RdsProductInfoDao {
                 CHART_VERSION,
                 REVISION,
                 STATUS,
-                ERR_MSG,
+                NOTES,
                 UPDATE_TIME
             )
                 .from(this)
@@ -192,7 +192,7 @@ class RdsProductInfoDao {
                         it.get("CHART_VERSION") as String,
                         it.get("REVISION") as Int,
                         ProductStatus.displayOf(it.get("STATUS") as String)!!,
-                        it.get("ERR_MSG")?.toString(),
+                        it.get("NOTES")?.toString(),
                         it.get("UPDATE_TIME") as Long,
                     )
                 }
