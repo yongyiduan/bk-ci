@@ -29,6 +29,7 @@ package com.tencent.devops.rds.service
 
 import com.tencent.devops.common.api.constant.HTTP_500
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.common.api.util.timestamp
@@ -404,6 +405,18 @@ class ProductInitService @Autowired constructor(
         projectId: String,
         gitToken: String
     ) {
+        try {
+            client.get(ServiceCredentialResource::class).check(
+                projectId = projectId,
+                credentialId = Constants.RDS_GIT_TICKET,
+            )
+            return
+        } catch (exception: RemoteServiceException) {
+            if (exception.httpStatus != 404) {
+                throw exception
+            }
+        }
+
         try {
             val result = client.get(ServiceCredentialResource::class).create(
                 userId = masterUserId,
