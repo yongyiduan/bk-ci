@@ -92,7 +92,7 @@ class RdsTXInnerModelCreatorImpl @Autowired constructor() : TXInnerModelCreator 
         projectCode: String,
         defaultImage: String,
         resources: Resources?
-    ): DispatchInfo? {
+    ): DispatchInfo {
         return RdsDispatchInfo(
             name = "dispatchInfo_${job.id}",
             job = job,

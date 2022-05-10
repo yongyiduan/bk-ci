@@ -32,8 +32,6 @@ import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.container.Container
 import com.tencent.devops.common.pipeline.container.VMBuildContainer
-import com.tencent.devops.common.pipeline.matrix.DispatchInfo
-import com.tencent.devops.common.pipeline.matrix.MatrixConfig
 import com.tencent.devops.common.pipeline.matrix.MatrixConfig.Companion.MATRIX_CONTEXT_KEY_PREFIX
 import com.tencent.devops.common.pipeline.pojo.element.Element
 import com.tencent.devops.process.pojo.BuildTemplateAcrossInfo
@@ -41,11 +39,9 @@ import com.tencent.devops.process.yaml.modelCreate.inner.TXInnerModelCreator
 import com.tencent.devops.process.yaml.modelCreate.pojo.RdsDispatchInfo
 import com.tencent.devops.process.yaml.modelCreate.pojo.enums.DispatchBizType
 import com.tencent.devops.process.yaml.modelCreate.utils.TXStreamDispatchUtils
-import com.tencent.devops.process.yaml.pojo.StreamDispatchInfo
 import com.tencent.devops.process.yaml.v2.models.Resources
 import com.tencent.devops.process.yaml.v2.models.job.Job
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 
@@ -72,17 +68,13 @@ class TXModelContainer @Autowired(required = false) constructor(
     ) {
         val defaultImage = inner!!.defaultImage
         val containsMatrix = JsonUtil.toJson(job.runsOn).contains("\${{ $MATRIX_CONTEXT_KEY_PREFIX")
-        val dispatchInfo = if (containsMatrix) {
-            (inner as TXInnerModelCreator).getDispatchInfo(
-                name = "dispatchInfo_${job.id}",
-                job = job,
-                projectCode = projectCode,
-                defaultImage = defaultImage,
-                resources = resources
-            )
-        } else {
-            null
-        }
+        val dispatchInfo = (inner as TXInnerModelCreator).getDispatchInfo(
+            name = "dispatchInfo_${job.id}",
+            job = job,
+            projectCode = projectCode,
+            defaultImage = defaultImage,
+            resources = resources
+        )
 
         val vmContainer = VMBuildContainer(
             jobId = job.id,
@@ -109,12 +101,20 @@ class TXModelContainer @Autowired(required = false) constructor(
                     else -> DispatchBizType.STREAM
                 },
                 resources = resources,
-                containsMatrix = dispatchInfo != null,
+                containsMatrix = containsMatrix,
                 buildTemplateAcrossInfo = buildTemplateAcrossInfo
             ),
             matrixGroupFlag = job.strategy != null,
-            matrixControlOption = getMatrixControlOption(job, dispatchInfo)
+            matrixControlOption = getMatrixControlOption(
+                job,
+                if (containsMatrix) {
+                    dispatchInfo
+                } else {
+                    null
+                }
+            )
         )
+
         containerList.add(vmContainer)
     }
 }

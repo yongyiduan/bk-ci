@@ -66,5 +66,5 @@ interface TXInnerModelCreator : InnerModelCreator {
         projectCode: String,
         defaultImage: String,
         resources: Resources? = null
-    ): DispatchInfo?
+    ): DispatchInfo
 }
