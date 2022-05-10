@@ -30,4 +30,16 @@ package com.tencent.devops.rds.pojo.yaml
 data class Main(
     val init: Init?,
     val on: List<On>
-)
+) {
+    fun getPipelineYamlNames(): Set<String> {
+        val names = mutableSetOf<String>()
+        on.forEach { o ->
+            o.rules.forEach { r ->
+                r.action.forEach { a ->
+                    names.add(a.path)
+                }
+            }
+        }
+        return names
+    }
+}

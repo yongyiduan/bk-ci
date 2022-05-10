@@ -200,7 +200,12 @@ class ProductInitService @Autowired constructor(
 
         // 每个流水线YAML文件与对应编排的映射
         val filePipelineMap = mutableMapOf<String, StreamBuildResult>()
+        val actionPipelines = mainObject.getPipelineYamlNames()
         chartParser.getCacheChartPipelineFiles(cachePath).forEach { file ->
+            if (!actionPipelines.contains(file.name)) {
+                logger.warn("RDS|init|${file.name}|skip")
+                return@forEach
+            }
             try {
                 // 生成未指定名称的流水线模型
                 val streamBuildResult = streamConverter.buildModel(
