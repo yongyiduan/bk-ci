@@ -29,6 +29,7 @@
 
 package com.tencent.devops.rds.dao
 
+import com.tencent.devops.common.api.util.timestamp
 import com.tencent.devops.model.rds.tables.TRdsProductInfo
 import com.tencent.devops.model.rds.tables.TRdsProductUser
 import com.tencent.devops.rds.pojo.RdsProductDetail
@@ -162,7 +163,7 @@ class RdsProductInfoDao {
                     revision = it.get("REVISION") as Int,
                     status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
                     notes = it.get("NOTES")?.toString(),
-                    updateTime = it.get("UPDATE_TIME") as Long,
+                    updateTime = (it.get("UPDATE_TIME") as LocalDateTime).timestamp()
                 )
             }
     }
@@ -193,7 +194,7 @@ class RdsProductInfoDao {
                         revision = it.get("REVISION") as Int,
                         status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
                         notes = it.get("NOTES")?.toString(),
-                        updateTime = it.get("UPDATE_TIME") as Long,
+                        updateTime = (it.get("UPDATE_TIME") as LocalDateTime).timestamp()
                     )
                 }
         }
