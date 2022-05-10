@@ -329,56 +329,48 @@ input[disabled='disabled'] {
 }
 
 .market-check-group {
-    margin: 9px 0 14px;
-    .market-checkbox-li {
-        display: flex;
-        align-items: center;
-        padding: 5px 0;
-        cursor: pointer;
-        .market-checkbox {
-            display: inline-block;
-            height: 16px;
-            width: 16px;
-            margin-right: 10px;
-            background: $white;
-            border: 1px solid $fontLighterColor;
-            border-radius: 2px;
-            &.checked {
-                background: $primaryColor;
-                position: relative;
-                border: none;
-                &:after {
-                    content: '';
-                    position: absolute;
-                    right: 5px;
-                    top: 2px;
-                    border-bottom: 2px solid $white;
-                    border-right: 2px solid $white;
-                    display: inline-block;
-                    width: 4px;
-                    height: 8px;
-                    transform: rotate(45deg);
-                }
-            }
-        }
-        span {
-            user-select: none;
-            color: $fontLightBlack;
-            height: 16px;
-            line-height: 16px;
-            display: inline-block;
-        }
+  margin: 9px 0 14px;
+  .market-checkbox-li {
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+      cursor: pointer;
+      .market-checkbox {
+          display: inline-block;
+          height: 16px;
+          width: 16px;
+          margin-right: 10px;
+          background: $white;
+          border: 1px solid $fontLighterColor;
+          border-radius: 2px;
+          &.checked {
+              background: $primaryColor;
+              position: relative;
+              border: none;
+              &:after {
+                  content: '';
+                  position: absolute;
+                  right: 5px;
+                  top: 2px;
+                  border-bottom: 2px solid $white;
+                  border-right: 2px solid $white;
+                  display: inline-block;
+                  width: 4px;
+                  height: 8px;
+                  transform: rotate(45deg);
+              }
+          }
+      }
+      span {
+          user-select: none;
+          color: $fontLightBlack;
+          height: 16px;
+          line-height: 16px;
+          display: inline-block;
       }
     }
-    span {
-      user-select: none;
-      color: $fontLightBlack;
-      height: 16px;
-      line-height: 16px;
-      display: inline-block;
-    }
   }
-}
+    
 
 .g-input-search {
   margin: 20px 15px 0;
