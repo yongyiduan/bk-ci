@@ -63,6 +63,9 @@ import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.pojo.yaml.Resource
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.utils.Yaml
+import com.tencent.devops.ticket.api.ServiceCredentialResource
+import com.tencent.devops.ticket.pojo.CredentialCreate
+import com.tencent.devops.ticket.pojo.enums.CredentialType
 import org.apache.commons.io.FileUtils
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
@@ -113,10 +116,13 @@ class ProductInitService @Autowired constructor(
             // 创建蓝盾项目以及添加人员
             productInfo = createProduct(userId, chartResources)
 
+            // 添加各类凭证信息
+            createCred(userId, productInfo.projectId, chartResources.clientConfig.user.gitPrivateToken)
+
             // 修改状态为初始化中
             productInfoDao.updateProductStatus(
                 dslContext = dslContext,
-                productId = productId,
+                productId = chartResources.resourceObject.productId,
                 status = ProductStatus.INITIALIZING,
                 errorMsg = null
             )
@@ -391,6 +397,32 @@ class ProductInitService @Autowired constructor(
             createTime = time.timestamp(),
             updateTime = time.timestamp()
         )
+    }
+
+    private fun createCred(
+        masterUserId: String,
+        projectId: String,
+        gitToken: String
+    ) {
+        try {
+            val result = client.get(ServiceCredentialResource::class).create(
+                userId = masterUserId,
+                projectId = projectId,
+                credential = CredentialCreate(
+                    credentialId = Constants.RDS_GIT_TICKET,
+                    credentialName = "RDS使用的内置凭证，请勿修改",
+                    credentialType = CredentialType.ACCESSTOKEN,
+                    credentialRemark = "RDS使用的内置凭证，请勿修改",
+                    v1 = gitToken
+                )
+            ).data
+            if (result == null || !result) {
+                throw RuntimeException("创建结果为空或false")
+            }
+        } catch (e: Throwable) {
+            logger.error("create rds ticket error", e)
+            throw RuntimeException("创建RDS凭据失败 ${e.message}")
+        }
     }
 
     private fun runInitYaml(
