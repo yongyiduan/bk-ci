@@ -27,23 +27,12 @@
  *
  */
 
-package com.tencent.devops.rds.pojo.enums
+package com.tencent.devops.rds.pojo
 
-enum class ProductStatus(val display: String) {
-    INITIALIZING("initializing"),
-    DEPLOYED("deployed"),
-    FAILED("failed"),
-    UPGRADING("upgrading");
-
-    companion object {
-        fun displayOf(display: String): ProductStatus? {
-            return when (display) {
-                "initializing" -> ProductStatus.INITIALIZING
-                "deployed" -> ProductStatus.DEPLOYED
-                "failed" -> ProductStatus.FAILED
-                "upgrading" -> ProductStatus.UPGRADING
-                else -> null
-            }
-        }
-    }
-}
+/**
+ * product详情的返回
+ * @param resourceYaml resource yaml文本
+ */
+data class ProductDetailResp(
+    val resourceYaml: String?
+)

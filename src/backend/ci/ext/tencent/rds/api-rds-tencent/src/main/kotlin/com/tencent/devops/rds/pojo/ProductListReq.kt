@@ -27,23 +27,20 @@
  *
  */
 
-package com.tencent.devops.rds.pojo.enums
+package com.tencent.devops.rds.pojo
 
-enum class ProductStatus(val display: String) {
-    INITIALIZING("initializing"),
-    DEPLOYED("deployed"),
-    FAILED("failed"),
-    UPGRADING("upgrading");
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-    companion object {
-        fun displayOf(display: String): ProductStatus? {
-            return when (display) {
-                "initializing" -> ProductStatus.INITIALIZING
-                "deployed" -> ProductStatus.DEPLOYED
-                "failed" -> ProductStatus.FAILED
-                "upgrading" -> ProductStatus.UPGRADING
-                else -> null
-            }
-        }
-    }
-}
+/**
+ * 获取product列表的请求参数
+ * @param page 页码
+ * @param pageSize 每页大小
+ */
+@ApiModel("获取product列表的请求参数")
+data class ProductListReq(
+    @ApiModelProperty("页码")
+    val page: Int,
+    @ApiModelProperty("每页大小")
+    val pageSize: Int
+)
