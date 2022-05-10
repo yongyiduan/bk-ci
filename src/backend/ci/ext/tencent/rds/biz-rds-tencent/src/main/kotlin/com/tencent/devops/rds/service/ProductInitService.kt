@@ -31,7 +31,7 @@ import com.tencent.devops.common.api.constant.HTTP_500
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.YamlUtil
-import com.tencent.devops.common.api.util.timestampmilli
+import com.tencent.devops.common.api.util.timestamp
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.pipeline.enums.StartType
@@ -388,8 +388,8 @@ class ProductInitService @Autowired constructor(
             resourceParsed = "",
             revision = 1,
             status = ProductStatus.INITIALIZING,
-            createTime = time.timestampmilli(),
-            updateTime = time.timestampmilli()
+            createTime = time.timestamp(),
+            updateTime = time.timestamp()
         )
     }
 

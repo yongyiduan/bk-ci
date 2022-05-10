@@ -127,7 +127,7 @@ class RdsProductInfoDao {
 
         return dslContext.selectCount()
             .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
-            .where(userTable.USER_ID.eq(userId))
+            .where(userTable.USER_ID.eq(userId)).and(infotable.PRODUCT_ID.isNotNull)
             .fetchOne(0, Int::class.java)!!
     }
 
@@ -140,7 +140,9 @@ class RdsProductInfoDao {
         val userTable = TRdsProductUser.T_RDS_PRODUCT_USER
         val infotable = TRdsProductInfo.T_RDS_PRODUCT_INFO
 
-        return dslContext.select(
+        val result = mutableListOf<RdsProductStatus>()
+
+        val records = dslContext.select(
             infotable.PRODUCT_ID,
             infotable.PRODUCT_NAME,
             infotable.CHART_NAME,
@@ -154,18 +156,30 @@ class RdsProductInfoDao {
             .where(userTable.USER_ID.eq(userId))
             .offset(offset)
             .limit(limit)
-            .fetch().map {
+            .fetch()
+
+        if (records.isEmpty()) {
+            return result
+        }
+
+        records.forEach { record ->
+            // 可能存在 user表有 list表没有的情况
+            val productId = record.get("PRODUCT_ID") ?: return@forEach
+            result.add(
                 RdsProductStatus(
-                    productId = (it.get("PRODUCT_ID") as ULong).toLong(),
-                    productName = it.get("PRODUCT_NAME") as String,
-                    chartName = it.get("CHART_NAME") as String,
-                    chartVersion = it.get("CHART_VERSION") as String,
-                    revision = it.get("REVISION") as Int,
-                    status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
-                    notes = it.get("NOTES")?.toString(),
-                    updateTime = (it.get("UPDATE_TIME") as LocalDateTime).timestamp()
+                    productId = (productId as ULong).toLong(),
+                    productName = record.get("PRODUCT_NAME") as String,
+                    chartName = record.get("CHART_NAME") as String,
+                    chartVersion = record.get("CHART_VERSION") as String,
+                    revision = record.get("REVISION") as Int,
+                    status = ProductStatus.displayOf(record.get("STATUS") as String)!!,
+                    notes = record.get("NOTES")?.toString(),
+                    updateTime = (record.get("UPDATE_TIME") as LocalDateTime).timestamp()
                 )
-            }
+            )
+        }
+
+        return result
     }
 
     fun status(
