@@ -73,7 +73,6 @@ import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import kotlin.math.log
 
 @Service
 class ProductInitService @Autowired constructor(
@@ -234,7 +233,6 @@ class ProductInitService @Autowired constructor(
                     } catch (ignore: Throwable) {
                         logger.warn("RDS|init|$project|$service|$path|save pipeline error: ", ignore)
                     }
-
                 } ?: run {
                     try {
                         saveChartPipeline(userId, productId, path, project.id, null, stream)
@@ -312,7 +310,7 @@ class ProductInitService @Autowired constructor(
         val projectId = RdsPipelineUtils.genBKProjectCode(productId)
         val projectResult =
             client.get(ServiceProjectResource::class).get(englishName = projectId).data
-        if (projectResult == null){
+        if (projectResult == null) {
             val createResult =
                 client.get(ServiceProjectResource::class).create(
                     userId = masterUserId,
@@ -323,8 +321,10 @@ class ProductInitService @Autowired constructor(
                     )
                 )
             if (createResult.isNotOk()) {
-                throw RuntimeException("Create git ci project in devops failed," +
-                    " msg: ${createResult.message}")
+                throw RuntimeException(
+                    "Create git ci project in devops failed," +
+                        " msg: ${createResult.message}"
+                )
             }
         } else {
             logger.warn("RDS project($projectId) already exists.")
