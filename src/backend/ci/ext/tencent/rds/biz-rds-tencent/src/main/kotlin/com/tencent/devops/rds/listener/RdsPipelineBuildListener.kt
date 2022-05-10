@@ -33,6 +33,7 @@ import com.tencent.devops.common.event.pojo.pipeline.PipelineBuildStartBroadCast
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.rds.constants.Constants.QUEUE_PIPELINE_BUILD_FINISH_RDS
 import com.tencent.devops.rds.constants.Constants.QUEUE_PIPELINE_BUILD_START_RDS
+import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.pojo.enums.ProductStatus
 import com.tencent.devops.rds.service.ProductPipelineService
@@ -51,7 +52,8 @@ import org.springframework.stereotype.Service
 class RdsPipelineBuildListener @Autowired constructor(
     private val dslContext: DSLContext,
     private val productPipelineService: ProductPipelineService,
-    private val productInfoDao: RdsProductInfoDao
+    private val productInfoDao: RdsProductInfoDao,
+    private val chartPipelineDao: RdsChartPipelineDao
 ) {
 
     companion object {
@@ -98,7 +100,8 @@ class RdsPipelineBuildListener @Autowired constructor(
     )
     fun listenPipelineBuildFinishBroadCastEvent(buildFinishEvent: PipelineBuildFinishBroadCastEvent) {
         try {
-            productPipelineService.doFinish(buildFinishEvent)
+            val pipeline = chartPipelineDao.getPipelineById(dslContext, buildFinishEvent.pipelineId) ?: return
+            productPipelineService.doFinish(buildFinishEvent, pipeline)
             when (BuildStatus.valueOf(buildFinishEvent.status)) {
                 BuildStatus.SUCCEED -> {
                     productInfoDao.updateProductStatus(
