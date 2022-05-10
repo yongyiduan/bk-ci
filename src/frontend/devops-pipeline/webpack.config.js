@@ -46,8 +46,7 @@ module.exports = (env, argv) => {
     config.plugins = [
         ...config.plugins,
         new MonacoWebpackPlugin({
-            publicPath: '/pipeline/',
-            languages: ['bat', 'javascript', 'dockerfile', 'typescript', 'kotlin', 'rust', 'go', 'yaml', 'json', 'python', 'shell', 'powershell', 'markdown', 'lua', 'php']
+            publicPath: '/pipeline/'
         }),
         new webpack.DefinePlugin(constConfig),
         new HtmlWebpackPlugin({

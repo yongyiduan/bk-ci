@@ -28,14 +28,16 @@
         "uuid": "^8.1.0",
         "vee-validate": "^2.0.3",
         "vue": "2.6.12",
-        "vue-echarts": "^3.0.9",
         "vue-json-viewer": "^2.2.5",
         "vue-router": "^2.8.1",
         "vuedraggable": "^2.16.0",
         "vuex": "^2.4.0",
         "xterm": "^4.15.0",
         "xterm-addon-attach": "^0.6.0",
-        "xterm-addon-fit": "^0.5.0"
+        "xterm-addon-fit": "^0.5.0",
+        "echarts": "^5.3.2",
+        "@vue/composition-api": "^1.6.1",
+        "vue-echarts": "^6.0.2"
     },
     "devDependencies": {
         "@babel/core": "^7.15.8",
