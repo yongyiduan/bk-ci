@@ -180,7 +180,6 @@ class RdsRegisterService @Autowired constructor(
                 }
             }
         }
-        logger.info("eventBusRuleSet:$eventBusRuleSet, ruleTargetSet:$ruleTargetSet")
         dslContext.transaction { configuration ->
             val context = DSL.using(configuration)
             eventBusDao.create(
@@ -268,7 +267,7 @@ class RdsRegisterService @Autowired constructor(
         eventBusRuleSet: MutableSet<EventBusRule>,
         ruleTargetSet: MutableSet<EventRuleTarget>
     ) {
-        on.rules.forEach { rule ->
+        on.rules.forEachIndexed { index, rule ->
             val filterNames = rule.filter.keys.toMutableList()
             filterNames.add(TYPE_FILTER_NAME)
             filterNames.add(webhookResult.resourceKey)
@@ -299,7 +298,7 @@ class RdsRegisterService @Autowired constructor(
                     ruleId = ruleId,
                     busId = busId,
                     projectId = projectId,
-                    name = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}",
+                    name = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}:$index",
                     source = eventSource.name,
                     type = eventType.name,
                     filterPattern = JsonUtil.toJson(AndExpression.builder().children(ruleExpressionList).build()),
