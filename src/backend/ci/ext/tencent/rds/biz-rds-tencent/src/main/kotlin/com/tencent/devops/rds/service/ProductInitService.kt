@@ -73,6 +73,7 @@ import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
+import kotlin.math.log
 
 @Service
 class ProductInitService @Autowired constructor(
@@ -201,7 +202,12 @@ class ProductInitService @Autowired constructor(
 
         // 每个流水线YAML文件与对应编排的映射
         val filePipelineMap = mutableMapOf<String, StreamBuildResult>()
+        val actionPipelines = mainObject.getPipelineYamlNames()
         chartParser.getCacheChartPipelineFiles(cachePath).forEach { file ->
+            if (!actionPipelines.contains(file.name)) {
+                logger.warn("RDS|init|${file.name}|skip")
+                return@forEach
+            }
             try {
                 // 生成未指定名称的流水线模型
                 val streamBuildResult = streamConverter.buildModel(
@@ -223,9 +229,18 @@ class ProductInitService @Autowired constructor(
             resourceObject.projects.forEach nextProject@{ project ->
                 // 对于没有细分service的直接按project创建
                 project.services?.forEach nextService@{ service ->
-                    saveChartPipeline(userId, productId, path, project.id, service.id, stream)
+                    try {
+                        saveChartPipeline(userId, productId, path, project.id, service.id, stream)
+                    } catch (ignore: Throwable) {
+                        logger.warn("RDS|init|$project|$service|$path|save pipeline error: ", ignore)
+                    }
+
                 } ?: run {
-                    saveChartPipeline(userId, productId, path, project.id, null, stream)
+                    try {
+                        saveChartPipeline(userId, productId, path, project.id, null, stream)
+                    } catch (ignore: Throwable) {
+                        logger.warn("RDS|init|$project|$path|save pipeline error: ", ignore)
+                    }
                 }
             }
         }
@@ -284,7 +299,8 @@ class ProductInitService @Autowired constructor(
         val productId = chartResource.resourceObject.productId
         val productName = chartResource.resourceObject.productName
 
-        val userMap = productUserDao.getProductUserList(dslContext, productId).associate { it.userId to it.type }
+        val userMap = productUserDao.getProductUserList(dslContext, productId)
+            .associate { it.userId to it.type }
         if (userMap[masterUserId] != ProductUserType.MASTER.name) {
             throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
@@ -294,9 +310,10 @@ class ProductInitService @Autowired constructor(
         }
 
         val projectId = RdsPipelineUtils.genBKProjectCode(productId)
-
-        if (client.get(ServiceProjectResource::class).get(projectId).data == null) {
-            val projectResult =
+        val projectResult =
+            client.get(ServiceProjectResource::class).get(englishName = projectId).data
+        if (projectResult == null){
+            val createResult =
                 client.get(ServiceProjectResource::class).create(
                     userId = masterUserId,
                     projectCreateInfo = ProjectCreateInfo(
@@ -305,9 +322,12 @@ class ProductInitService @Autowired constructor(
                         description = "RDS project with product id: $productId"
                     )
                 )
-            if (projectResult.isNotOk()) {
-                throw RuntimeException("Create git ci project in devops failed, msg: ${projectResult.message}")
+            if (createResult.isNotOk()) {
+                throw RuntimeException("Create git ci project in devops failed," +
+                    " msg: ${createResult.message}")
             }
+        } else {
+            logger.warn("RDS project($projectId) already exists.")
         }
 
         // 增加所有项目成员
