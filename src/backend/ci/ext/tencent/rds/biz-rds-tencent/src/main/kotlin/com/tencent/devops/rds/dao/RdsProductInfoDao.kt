@@ -30,6 +30,9 @@
 package com.tencent.devops.rds.dao
 
 import com.tencent.devops.model.rds.tables.TRdsProductInfo
+import com.tencent.devops.model.rds.tables.TRdsProductUser
+import com.tencent.devops.rds.pojo.RdsProductDetail
+import com.tencent.devops.rds.pojo.RdsProductStatus
 import com.tencent.devops.rds.pojo.enums.ProductStatus
 import org.jooq.DSLContext
 import org.jooq.types.ULong
@@ -111,6 +114,108 @@ class RdsProductInfoDao {
                 .set(ERR_MSG, errorMsg)
                 .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
                 .execute() > 0
+        }
+    }
+
+    fun count(
+        dslContext: DSLContext,
+        userId: String
+    ): Int {
+        val userTable = TRdsProductUser.T_RDS_PRODUCT_USER
+        val infotable = TRdsProductInfo.T_RDS_PRODUCT_INFO
+
+        return dslContext.selectCount()
+            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
+            .where(userTable.USER_ID.eq(userId))
+            .fetchOne(0, Int::class.java)!!
+    }
+
+    fun listStatus(
+        dslContext: DSLContext,
+        userId: String,
+        offset: Int,
+        limit: Int
+    ): List<RdsProductStatus> {
+        val userTable = TRdsProductUser.T_RDS_PRODUCT_USER
+        val infotable = TRdsProductInfo.T_RDS_PRODUCT_INFO
+
+        return dslContext.select(
+            infotable.PRODUCT_ID,
+            infotable.PRODUCT_NAME,
+            infotable.CHART_NAME,
+            infotable.CHART_VERSION,
+            infotable.REVISION,
+            infotable.STATUS,
+            infotable.ERR_MSG,
+            infotable.UPDATE_TIME
+        )
+            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
+            .where(userTable.USER_ID.eq(userId))
+            .offset(offset)
+            .limit(limit)
+            .fetch().map {
+                RdsProductStatus(
+                    it.get("PRODUCT_ID") as Long,
+                    it.get("PRODUCT_NAME") as String,
+                    it.get("CHART_NAME") as String,
+                    it.get("CHART_VERSION") as String,
+                    it.get("REVISION") as Int,
+                    ProductStatus.displayOf(it.get("STATUS") as String)!!,
+                    it.get("ERR_MSG")?.toString(),
+                    it.get("UPDATE_TIME") as Long,
+                )
+            }
+    }
+
+    fun status(
+        dslContext: DSLContext,
+        productId: Long,
+    ): RdsProductStatus? {
+        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
+            return dslContext.select(
+                PRODUCT_ID,
+                PRODUCT_NAME,
+                CHART_NAME,
+                CHART_VERSION,
+                REVISION,
+                STATUS,
+                ERR_MSG,
+                UPDATE_TIME
+            )
+                .from(this)
+                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .fetchAny()?.let {
+                    RdsProductStatus(
+                        it.get("PRODUCT_ID") as Long,
+                        it.get("PRODUCT_NAME") as String,
+                        it.get("CHART_NAME") as String,
+                        it.get("CHART_VERSION") as String,
+                        it.get("REVISION") as Int,
+                        ProductStatus.displayOf(it.get("STATUS") as String)!!,
+                        it.get("ERR_MSG")?.toString(),
+                        it.get("UPDATE_TIME") as Long,
+                    )
+                }
+        }
+    }
+
+    fun get(
+        dslContext: DSLContext,
+        productId: Long,
+        resourceYaml: Boolean
+    ): RdsProductDetail {
+        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
+            val record = dslContext.selectFrom(this)
+                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .fetchAny()
+
+            return RdsProductDetail(
+                resourceYaml = if (!resourceYaml) {
+                    null
+                } else {
+                    record?.resourceYaml
+                }
+            )
         }
     }
 }

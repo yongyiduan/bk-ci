@@ -144,6 +144,8 @@ class ProductInitService @Autowired constructor(
         return RdsProductStatusResult(
             productId = productInfo.productId,
             productName = productInfo.productName,
+            chartName = productInfo.chartName,
+            chartVersion = productInfo.chartVersion,
             lastUpdate = productInfo.updateTime,
             status = ProductStatus.INITIALIZING.display,
             revision = productInfo.revision,

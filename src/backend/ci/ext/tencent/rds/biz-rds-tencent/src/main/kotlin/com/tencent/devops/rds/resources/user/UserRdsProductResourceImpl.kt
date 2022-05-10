@@ -27,23 +27,32 @@
  *
  */
 
-package com.tencent.devops.rds.pojo.enums
+package com.tencent.devops.rds.resources.user
 
-enum class ProductStatus(val display: String) {
-    INITIALIZING("initializing"),
-    DEPLOYED("deployed"),
-    FAILED("failed"),
-    UPGRADING("upgrading");
+import com.tencent.devops.common.api.pojo.Page
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.rds.api.user.UserRdsProductResource
+import com.tencent.devops.rds.pojo.ProductDetailReq
+import com.tencent.devops.rds.pojo.ProductDetailResp
+import com.tencent.devops.rds.pojo.ProductListReq
+import com.tencent.devops.rds.pojo.RdsProductStatusResult
+import com.tencent.devops.rds.service.ProductInfoService
+import org.springframework.beans.factory.annotation.Autowired
 
-    companion object {
-        fun displayOf(display: String): ProductStatus? {
-            return when (display) {
-                "initializing" -> ProductStatus.INITIALIZING
-                "deployed" -> ProductStatus.DEPLOYED
-                "failed" -> ProductStatus.FAILED
-                "upgrading" -> ProductStatus.UPGRADING
-                else -> null
-            }
-        }
+@RestResource
+class UserRdsProductResourceImpl @Autowired constructor(
+    private val productInfoService: ProductInfoService
+) : UserRdsProductResource {
+    override fun list(userId: String, req: ProductListReq): Result<Page<RdsProductStatusResult>> {
+        return Result(productInfoService.listStatus(userId, req))
+    }
+
+    override fun get(userId: String, productId: Long, detail: ProductDetailReq): Result<ProductDetailResp> {
+        return Result(productInfoService.detail(productId, detail))
+    }
+
+    override fun status(userId: String, productId: Long): Result<RdsProductStatusResult?> {
+        return Result(productInfoService.status(productId))
     }
 }

@@ -27,23 +27,31 @@
  *
  */
 
-package com.tencent.devops.rds.pojo.enums
+package com.tencent.devops.rds.pojo
 
-enum class ProductStatus(val display: String) {
-    INITIALIZING("initializing"),
-    DEPLOYED("deployed"),
-    FAILED("failed"),
-    UPGRADING("upgrading");
+import com.tencent.devops.rds.pojo.enums.ProductStatus
 
-    companion object {
-        fun displayOf(display: String): ProductStatus? {
-            return when (display) {
-                "initializing" -> ProductStatus.INITIALIZING
-                "deployed" -> ProductStatus.DEPLOYED
-                "failed" -> ProductStatus.FAILED
-                "upgrading" -> ProductStatus.UPGRADING
-                else -> null
-            }
-        }
-    }
-}
+/**
+ * Rds Product状态信息, biz专用
+ */
+data class RdsProductStatus(
+    val productId: Long,
+    val productName: String,
+    val chartName: String,
+    val chartVersion: String,
+    val revision: Int,
+    val status: ProductStatus,
+    val errMsg: String?,
+    val updateTime: Long
+)
+
+fun RdsProductStatus.toRdsProductStatusResult() = RdsProductStatusResult(
+    productId = this.productId,
+    productName = this.productName,
+    chartName = this.chartName,
+    chartVersion = this.chartVersion,
+    revision = this.revision,
+    status = this.status.display,
+    notes = this.errMsg ?: "",
+    lastUpdate = this.updateTime
+)
