@@ -28,7 +28,6 @@
     import wetestReport from '@/components/outputOption/wetest_report'
     import thirdPartyReport from '@/components/outputOption/thirdParty_report'
     import IframeReport from '@/components/outputOption/IframeReport'
-    import TrendTable from '@/components/trendData/TrendTable'
 
     export default {
         name: 'vertical-tab',
@@ -42,8 +41,7 @@
             codeCheck,
             wetestReport,
             thirdPartyReport,
-            IframeReport,
-            TrendTable
+            IframeReport
         },
         props: {
             tabs: {
