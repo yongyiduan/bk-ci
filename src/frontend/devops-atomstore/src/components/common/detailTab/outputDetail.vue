@@ -27,7 +27,6 @@
                 isLoading: false
             }
         },
-
         computed: {
             explainInfo () {
                 if (this.classifyCode === 'trigger') {

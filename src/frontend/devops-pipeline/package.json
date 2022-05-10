@@ -13,6 +13,7 @@
         "public:external": "cross-env NODE_ENV=external npm run public --"
     },
     "dependencies": {
+        "bkui-pipeline": "~0.1.20",
         "@blueking/log": "2.0.4",
         "@icon-cool/bk-icon-devops": "^0.2.1",
         "axios": "^0.21.1",
@@ -34,7 +35,10 @@
         "vuex": "^2.4.0",
         "xterm": "^4.15.0",
         "xterm-addon-attach": "^0.6.0",
-        "xterm-addon-fit": "^0.5.0"
+        "xterm-addon-fit": "^0.5.0",
+        "echarts": "^5.3.2",
+        "@vue/composition-api": "^1.6.1",
+        "vue-echarts": "^6.0.2"
     },
     "devDependencies": {
         "@babel/core": "^7.15.8",
