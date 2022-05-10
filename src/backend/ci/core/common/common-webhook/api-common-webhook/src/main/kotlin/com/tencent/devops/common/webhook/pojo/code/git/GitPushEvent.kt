@@ -45,7 +45,8 @@ data class GitPushEvent(
     val total_commits_count: Int,
     val operation_kind: String?,
     val action_kind: String?,
-    val push_options: Map<String, String>?
+    val push_options: Map<String, String>?,
+    val create_and_update: Boolean?
 ) : GitEvent() {
     companion object {
         const val classType = "push"
