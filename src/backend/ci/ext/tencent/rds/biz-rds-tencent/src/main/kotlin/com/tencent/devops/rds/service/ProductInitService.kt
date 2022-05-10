@@ -98,10 +98,10 @@ class ProductInitService @Autowired constructor(
         inputStream: InputStream
     ): RdsProductStatusResult {
         // 非异步资源，错误需要返回给客户端
-        var cachePath: String
-        var chartResources: ChartResources
-        var productId: Long
-        var productInfo: RdsProductInfo
+        val cachePath: String
+        val chartResources: ChartResources
+        val productId: Long
+        val productInfo: RdsProductInfo
         try {
             // 读取并解压缓存到本地磁盘
             cachePath = chartParser.cacheChartDisk(chartName, inputStream)
@@ -170,6 +170,7 @@ class ProductInitService @Autowired constructor(
                 projectId = projectId
             )
         } catch (e: Throwable) {
+            logger.error("RDS|initChart|failed with error: ", e)
             productInfoDao.updateProductStatus(
                 dslContext = dslContext,
                 productId = productId,
