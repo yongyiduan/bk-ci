@@ -410,7 +410,7 @@ class ProductInitService @Autowired constructor(
                 projectId = projectId,
                 credential = CredentialCreate(
                     credentialId = Constants.RDS_GIT_TICKET,
-                    credentialName = "RDS使用的内置凭证，请勿修改",
+                    credentialName = "RDS使用的内置凭证-请勿修改",
                     credentialType = CredentialType.ACCESSTOKEN,
                     credentialRemark = "RDS使用的内置凭证，请勿修改",
                     v1 = gitToken
