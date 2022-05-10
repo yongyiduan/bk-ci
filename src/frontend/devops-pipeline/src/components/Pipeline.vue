@@ -153,11 +153,11 @@
                 'isAddParallelStage',
                 'showStageReviewPanel'
             ]),
+            userName () {
+              return this.$userInfo && this.$userInfo.username ? this.$userInfo.username : ''
+            },
             routeParams () {
                 return this.$route.params
-            },
-            userName () {
-              return this.$userInfo && this.$userInfo.username ? this.$userInfo.username : '';
             },
             isStageShow: {
                 get () {
