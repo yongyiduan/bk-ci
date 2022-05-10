@@ -4592,15 +4592,6 @@ bk-magic-vue@2.4.4:
     highlight.js "^10.7.2"
     tinycolor2 "^1.4.1"
 
-bk-magic-vue@^2.3.10:
-  version "2.4.7"
-  resolved "https://mirrors.tencent.com/npm/bk-magic-vue/-/bk-magic-vue-2.4.7.tgz#2528a3c836c96b6ce91bfb459c1b64204a26259f"
-  integrity sha512-SGJPUiadWgchiJgRNCpPWNFA4k1WPkiHXmdmjUBMKvb3w/9vQMVrjns4fJenxhviATNQ/KGPx1R0rORywAib+w==
-  dependencies:
-    highlight.js "^10.7.2"
-    spark-md5 "^3.0.2"
-    tinycolor2 "^1.4.1"
-
 bluebird@^3.1.1, bluebird@^3.5.0, bluebird@^3.5.1, bluebird@^3.5.3, bluebird@^3.5.5:
   version "3.7.1"
   resolved "http://r.tnpm.oa.com/bluebird/download/bluebird-3.7.1.tgz#df70e302b471d7473489acf26a93d63b53f874de"
