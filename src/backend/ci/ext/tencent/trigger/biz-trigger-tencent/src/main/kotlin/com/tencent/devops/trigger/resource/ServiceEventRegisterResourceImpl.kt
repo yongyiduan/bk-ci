@@ -28,6 +28,7 @@
 package com.tencent.devops.trigger.resource
 
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.trigger.api.ServiceEventRegisterResource
 import com.tencent.devops.trigger.pojo.TriggerRegisterRequest
@@ -45,7 +46,7 @@ class ServiceEventRegisterResourceImpl @Autowired constructor(
     }
 
     override fun register(userId: String, projectId: String, request: TriggerRegisterRequest): Result<Boolean> {
-        logger.info("$projectId|$userId|$request started to register rds event bus")
+        logger.info("$projectId|$userId|${JsonUtil.toJson(request)} started to register rds event bus")
         rdsRegisterService.register(
             userId = userId,
             projectId = projectId,

@@ -180,6 +180,7 @@ class RdsRegisterService @Autowired constructor(
                 }
             }
         }
+        logger.info("eventBusRuleSet:$eventBusRuleSet, ruleTargetSet:$ruleTargetSet")
         dslContext.transaction { configuration ->
             val context = DSL.using(configuration)
             eventBusDao.create(
