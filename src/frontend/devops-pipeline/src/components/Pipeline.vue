@@ -13,7 +13,7 @@
                 <bk-pipeline
                     :key="pipeline.name"
                     :pipeline="pipeline"
-                    :user-name="$userInfo.username"
+                    :user-name="userName"
                     :editable="pipelineEditable"
                     :can-skip-element="canSkipElement"
                     :is-preview="isPreview"
@@ -155,6 +155,9 @@
             ]),
             routeParams () {
                 return this.$route.params
+            },
+            userName () {
+              return this.$userInfo && this.$userInfo.username ? this.$userInfo.username : '';
             },
             isStageShow: {
                 get () {
