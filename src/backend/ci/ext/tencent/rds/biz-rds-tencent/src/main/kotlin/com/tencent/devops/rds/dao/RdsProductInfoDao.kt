@@ -29,7 +29,11 @@
 
 package com.tencent.devops.rds.dao
 
+import com.tencent.devops.common.api.util.timestamp
 import com.tencent.devops.model.rds.tables.TRdsProductInfo
+import com.tencent.devops.model.rds.tables.TRdsProductUser
+import com.tencent.devops.rds.pojo.RdsProductDetail
+import com.tencent.devops.rds.pojo.RdsProductStatus
 import com.tencent.devops.rds.pojo.enums.ProductStatus
 import org.jooq.DSLContext
 import org.jooq.types.ULong
@@ -108,9 +112,111 @@ class RdsProductInfoDao {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             return dslContext.update(this)
                 .set(STATUS, status.display)
-                .set(ERR_MSG, errorMsg)
+                .set(NOTES, errorMsg)
                 .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
                 .execute() > 0
+        }
+    }
+
+    fun count(
+        dslContext: DSLContext,
+        userId: String
+    ): Int {
+        val userTable = TRdsProductUser.T_RDS_PRODUCT_USER
+        val infotable = TRdsProductInfo.T_RDS_PRODUCT_INFO
+
+        return dslContext.selectCount()
+            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
+            .where(userTable.USER_ID.eq(userId))
+            .fetchOne(0, Int::class.java)!!
+    }
+
+    fun listStatus(
+        dslContext: DSLContext,
+        userId: String,
+        offset: Int,
+        limit: Int
+    ): List<RdsProductStatus> {
+        val userTable = TRdsProductUser.T_RDS_PRODUCT_USER
+        val infotable = TRdsProductInfo.T_RDS_PRODUCT_INFO
+
+        return dslContext.select(
+            infotable.PRODUCT_ID,
+            infotable.PRODUCT_NAME,
+            infotable.CHART_NAME,
+            infotable.CHART_VERSION,
+            infotable.REVISION,
+            infotable.STATUS,
+            infotable.NOTES,
+            infotable.UPDATE_TIME
+        )
+            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
+            .where(userTable.USER_ID.eq(userId))
+            .offset(offset)
+            .limit(limit)
+            .fetch().map {
+                RdsProductStatus(
+                    productId = (it.get("PRODUCT_ID") as ULong).toLong(),
+                    productName = it.get("PRODUCT_NAME") as String,
+                    chartName = it.get("CHART_NAME") as String,
+                    chartVersion = it.get("CHART_VERSION") as String,
+                    revision = it.get("REVISION") as Int,
+                    status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
+                    notes = it.get("NOTES")?.toString(),
+                    updateTime = (it.get("UPDATE_TIME") as LocalDateTime).timestamp()
+                )
+            }
+    }
+
+    fun status(
+        dslContext: DSLContext,
+        productId: Long,
+    ): RdsProductStatus? {
+        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
+            return dslContext.select(
+                PRODUCT_ID,
+                PRODUCT_NAME,
+                CHART_NAME,
+                CHART_VERSION,
+                REVISION,
+                STATUS,
+                NOTES,
+                UPDATE_TIME
+            )
+                .from(this)
+                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .fetchAny()?.let {
+                    RdsProductStatus(
+                        productId = (it.get("PRODUCT_ID") as ULong).toLong(),
+                        productName = it.get("PRODUCT_NAME") as String,
+                        chartName = it.get("CHART_NAME") as String,
+                        chartVersion = it.get("CHART_VERSION") as String,
+                        revision = it.get("REVISION") as Int,
+                        status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
+                        notes = it.get("NOTES")?.toString(),
+                        updateTime = (it.get("UPDATE_TIME") as LocalDateTime).timestamp()
+                    )
+                }
+        }
+    }
+
+    fun get(
+        dslContext: DSLContext,
+        productId: Long,
+        resourceYaml: Boolean
+    ): RdsProductDetail {
+        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
+            val record = dslContext.selectFrom(this)
+                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .fetchAny()
+
+            return RdsProductDetail(
+                resourceYaml = if (!resourceYaml) {
+                    null
+                } else {
+                    record?.resourceYaml
+                }
+            )
         }
     }
 }

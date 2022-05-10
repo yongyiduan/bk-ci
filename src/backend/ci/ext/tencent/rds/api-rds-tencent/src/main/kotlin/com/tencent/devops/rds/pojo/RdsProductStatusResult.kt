@@ -32,6 +32,8 @@ package com.tencent.devops.rds.pojo
 data class RdsProductStatusResult(
     val productId: Long,
     val productName: String,
+    val chartName: String,
+    val chartVersion: String,
     val lastUpdate: Long,
     val status: String,
     val revision: Int,

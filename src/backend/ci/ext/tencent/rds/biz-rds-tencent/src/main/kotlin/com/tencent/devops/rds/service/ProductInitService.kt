@@ -73,7 +73,6 @@ import java.io.File
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import kotlin.math.log
 
 @Service
 class ProductInitService @Autowired constructor(
@@ -98,10 +97,10 @@ class ProductInitService @Autowired constructor(
         inputStream: InputStream
     ): RdsProductStatusResult {
         // 非异步资源，错误需要返回给客户端
-        var cachePath: String
-        var chartResources: ChartResources
-        var productId: Long
-        var productInfo: RdsProductInfo
+        val cachePath: String
+        val chartResources: ChartResources
+        val productId: Long
+        val productInfo: RdsProductInfo
         try {
             // 读取并解压缓存到本地磁盘
             cachePath = chartParser.cacheChartDisk(chartName, inputStream)
@@ -145,6 +144,8 @@ class ProductInitService @Autowired constructor(
         return RdsProductStatusResult(
             productId = productInfo.productId,
             productName = productInfo.productName,
+            chartName = productInfo.chartName,
+            chartVersion = productInfo.chartVersion,
             lastUpdate = productInfo.updateTime,
             status = ProductStatus.INITIALIZING.display,
             revision = productInfo.revision,
@@ -170,6 +171,7 @@ class ProductInitService @Autowired constructor(
                 projectId = projectId
             )
         } catch (e: Throwable) {
+            logger.error("RDS|initChart|failed with error: ", e)
             productInfoDao.updateProductStatus(
                 dslContext = dslContext,
                 productId = productId,
@@ -232,7 +234,6 @@ class ProductInitService @Autowired constructor(
                     } catch (ignore: Throwable) {
                         logger.warn("RDS|init|$project|$service|$path|save pipeline error: ", ignore)
                     }
-
                 } ?: run {
                     try {
                         saveChartPipeline(userId, productId, path, project.id, null, stream)
@@ -310,7 +311,7 @@ class ProductInitService @Autowired constructor(
         val projectId = RdsPipelineUtils.genBKProjectCode(productId)
         val projectResult =
             client.get(ServiceProjectResource::class).get(englishName = projectId).data
-        if (projectResult == null){
+        if (projectResult == null) {
             val createResult =
                 client.get(ServiceProjectResource::class).create(
                     userId = masterUserId,
@@ -321,8 +322,10 @@ class ProductInitService @Autowired constructor(
                     )
                 )
             if (createResult.isNotOk()) {
-                throw RuntimeException("Create git ci project in devops failed," +
-                    " msg: ${createResult.message}")
+                throw RuntimeException(
+                    "Create git ci project in devops failed," +
+                        " msg: ${createResult.message}"
+                )
             }
         } else {
             logger.warn("RDS project($projectId) already exists.")
