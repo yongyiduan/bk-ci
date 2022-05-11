@@ -67,29 +67,3 @@ fun GitPushEvent.isDeleteBranch(): Boolean {
     }
     return false
 }
-
-fun GitPushEvent.isCreateBranch(): Boolean {
-    // 工蜂web端创建分支
-    if (action_kind == TGitPushActionKind.CREATE_BRANCH.value) {
-        return true
-    }
-    // 发送到工蜂的客户端创建
-    if (action_kind == TGitPushActionKind.CLIENT_PUSH.value &&
-        operation_kind == TGitPushOperationKind.CREAT.value &&
-        before.filter { it != '0' }.isBlank()
-    ) {
-        return true
-    }
-    return false
-}
-
-fun GitPushEvent.isCreateBranchAndPushFile(): Boolean {
-    return this.isCreateBranch() &&
-            commits?.let { commits ->
-                commits.firstOrNull { commit ->
-                    !commit.added.isNullOrEmpty() ||
-                            !commit.removed.isNullOrEmpty() ||
-                            !commit.modified.isNullOrEmpty()
-                } != null
-            } ?: false
-}
