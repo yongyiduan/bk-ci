@@ -94,9 +94,8 @@
                 <i class="devops-icon icon-check-1" />
             </span>
         </div>
-    </div>
     
-</template>
+    </section></template>
 
 <script>
     import Logo from '@/components/Logo'

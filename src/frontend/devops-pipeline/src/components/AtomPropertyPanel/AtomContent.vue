@@ -343,7 +343,6 @@
                     atomCode,
                     version
                 })
-                console.log(atomMap, atomModal)
                 switch (true) {
                     case !isObject(atom) && !isObject(atomModal):
                         return null

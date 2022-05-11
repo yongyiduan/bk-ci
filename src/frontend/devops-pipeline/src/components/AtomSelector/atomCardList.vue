@@ -635,7 +635,7 @@
                 font-size: 50px;
                 line-height: 50px;
                 margin-right: 15px;
-                color: $fontLigtherColor;
+                color: $fontLighterColor;
                 .devops-icon {
                     fill: currentColor
                 }

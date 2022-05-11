@@ -277,7 +277,7 @@ export default {
         const { data: atomClassifyList } = await request.get(`${STORE_API_URL_PREFIX}/user/pipeline/atom/classify`)
         const [atomClassifyCodeList, atomClassifyMap] = getMapByKey(atomClassifyList, 'classifyCode')
         Object.assign(atomClassifyMap, {
-            'all': {
+            all: {
                 classifyCode: 'all',
                 classifyName: (window.pipelineVue.$i18n && window.pipelineVue.$i18n.t('storeMap.all')) || 'all'
             }

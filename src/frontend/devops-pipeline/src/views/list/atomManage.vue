@@ -380,7 +380,7 @@
                 }
             }
             
-            /deep/ .bk-table-body-wrapper .cursor-pointer {
+            ::v-deep .bk-table-body-wrapper .cursor-pointer {
                 cursor: pointer;
             }
             ::v-deep thead tr th:first-child div {
