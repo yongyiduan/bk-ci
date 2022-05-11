@@ -88,7 +88,7 @@
         position: relative;
         display: flex;
         align-items: center;
-        color: $fontLighterColor;
+        color: $fontLigtherColor;
         height: 100%;
         cursor: pointer;
 
