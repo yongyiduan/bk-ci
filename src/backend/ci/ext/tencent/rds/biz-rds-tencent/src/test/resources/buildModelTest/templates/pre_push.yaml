@@ -30,7 +30,7 @@ stages:
           - uses: covPreInfo@5.*
             name: Coverage before
             with:
-              codePath: "${| ci.workspace }}"
+              codePath: "${{ ci.workspace }}"
               gitPullFromType: "BRANCH"
               chooseConfigType: "pluginConfigFilter"
               pathFilterType: "pathNoFilter"
@@ -48,7 +48,7 @@ stages:
           - name: "Unit Test"
             uses: "UnitTest@1.*"
             with:
-              filePath: "${| ci.workspace }}/unit_test.sh"
+              filePath: "${{ ci.workspace }}/unit_test.sh"
           - name: "归档覆盖率报告"
             uses: "UploadArtifactory@5.*"
             with:
@@ -60,11 +60,11 @@ stages:
           - name: "覆盖率-后置信息处理"
             uses: "covParseData@5.*"
             with:
-              codePath: "${| ci.workspace }}"
+              codePath: "${{ ci.workspace }}"
               codeLanguage: "java"
               fileTypeJava: "jacoco_xml"
               fileFromType: "local"
-              filePath: "${| ci.workspace }}/JacocoXML.zip"
+              filePath: "${{ ci.workspace }}/JacocoXML.zip"
               testFromType: "local"
               testType: "unit_test"
               multiGitFlagSwitch: false
@@ -79,7 +79,7 @@ stages:
           - uses: "GradleEnterprise@1.*"
             name: "Build"
             with:
-              buildPath: "${| ci.workspace }}"
+              buildPath: "${{ ci.workspace }}"
               buildCommand: "./build.sh"
               cacheType: "http"
               tip: ""
@@ -103,17 +103,17 @@ stages:
               pipeLineId: ""
               buildNo: true
               isContinue: false
-              srcPaths: "${| matrix.service }}"
+              srcPaths: "${{ matrix.service }}"
               destPath: ""
               rangeDownload: false
           - name: "docker build"
             uses: "DockerBuildAndPushImage@3.*"
             with:
               sourceMirrorTicketPair: []
-              targetImage: "${| matrix.service }}"
+              targetImage: "${{ matrix.service }}"
               targetImageName: ""
               targetTicketId: ""
-              targetImageTag: "${| ci.build_id }}"
+              targetImageTag: "${{ ci.build_id }}"
               dockerBuildDir: "."
               dockerFilePath: "Dockerfile"
               dockerBuildArgs: ""
@@ -123,7 +123,7 @@ stages:
               sourceRepoItemsStr: []
         strategy:
           matrix:
-            service: "${| variables.services }}"
+            service: "${{ variables.services }}"
           fast-kill: true
           max-parallel: 5
         depend-on:
@@ -153,20 +153,20 @@ stages:
           - uses: "makeHelmChart@1.*"
             name: "Make helm chart"
             with:
-              chartPath: "${| ci.workspace }}"
+              chartPath: "${{ ci.workspace }}"
 
           - uses: "devcloud-deploy@1.*"
             name: "更新特性环境"
             with:
               selectop: "create_namespace"
               helm_op1: "update"
-              namespace: "${| jobs.job_id_1.steps.step_1.outputs.env_name }}"
+              namespace: "${{ jobs.job_id_1.steps.step_1.outputs.env_name }}"
               zone: "IDC"
               resourceType: "temporary"
               repositoryType: "dev_res"
-              Chart: "${| variables.chart }}"
-              ChartVersion: "${| variables.chartVersion }}"
-              releaseName: "${| variables.releaseName }}"
+              Chart: "${{ variables.chart }}"
+              ChartVersion: "${{ variables.chartVersion }}"
+              releaseName: "${{ variables.releaseName }}"
               yaml_string: ""
           - uses: "EnterPriseWechat@1.*"
             name: "企业微信通知"
@@ -192,6 +192,6 @@ stages:
             uses: "tapdStatusUpdate@1.*"
             with:
               username: ""
-              story_id_list: "${| variables.story_id }}"
+              story_id_list: "${{ variables.story_id }}"
               story_original_state: "doing"
               story_goal_state: "for test"

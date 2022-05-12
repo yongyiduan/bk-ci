@@ -135,26 +135,9 @@ class StreamConverter @Autowired constructor(
                     params = arrayOf(path.name)
                 )
             }
-            // 针对可能会与go template冲突的字段进行替换
-            val newContent = replaceTemplatePlaceholder(content)
-            return ScriptYmlUtils.formatYaml(newContent)
-        }
-    }
 
-    /**
-     * // TODO: 临时方案
-     * go template 使用 {{}} 会与现在的 stream的 ${{}} 产生冲突
-     * 目前方案是在 origin中使用 ${| }} 在这个函数中再换回 ${{}}
-     */
-    private fun replaceTemplatePlaceholder(content: String): String {
-        var newContent = content
-        val pattern = Pattern.compile("\\$\\{\\|([^{}]+?)}}")
-        val matcher = pattern.matcher(content)
-        while (matcher.find()) {
-            val value = matcher.group()
-            newContent = newContent.replace(matcher.group(), "\${{${value.removePrefix("\${|")}")
+            return ScriptYmlUtils.formatYaml(content)
         }
-        return newContent
     }
 
     private fun formatYaml(

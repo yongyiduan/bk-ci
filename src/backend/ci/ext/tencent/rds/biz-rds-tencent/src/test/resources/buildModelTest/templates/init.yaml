@@ -10,7 +10,7 @@ jobs:
     runs-on: docker
     strategy:
       matrix:
-        tapd_ids: ${| variables.tapd_ids }}
+        tapd_ids: ${{ variables.tapd_ids }}
     steps:
       - run: |
           echo "Tapd初始化 --依赖Tapd接口"
@@ -18,19 +18,19 @@ jobs:
     runs-on: docker
     strategy:
       matrix:
-        repo_urls: ${| variables.repo_urls }}
+        repo_urls: ${{ variables.repo_urls }}
     steps:
       - uses: "prePush@1.*"
         name: "Pre-Push相关流程注册"
         with:
-          credential_id: "${| ci.token }}"
-          url: "${| matrix.repo_urls }}"
+          credential_id: "${{ ci.token }}"
+          url: "${{ matrix.repo_urls }}"
 
   job_id_3:   
     runs-on: docker
     strategy:
       matrix:
-        projects: ${| variables.projects }}
+        projects: ${{ variables.projects }}
     steps:
       - run: |
           echo "创建集成测试环境"

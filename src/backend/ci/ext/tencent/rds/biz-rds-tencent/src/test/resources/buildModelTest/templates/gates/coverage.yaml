@@ -1,7 +1,7 @@
 parameters:
   - name: receivers
     type: array
-    default: [ "${| ci.actor }}" ]
+    default: [ "${{ ci.actor }}" ]
 
 gates:
   - name: 单元测试覆盖率
@@ -9,4 +9,4 @@ gates:
       - ngtestQuality.total_cover_rate >= 80
     notify-on-fail:
       - type: wework-message
-        receivers: ${| parameters.receivers }}
+        receivers: ${{ parameters.receivers }}

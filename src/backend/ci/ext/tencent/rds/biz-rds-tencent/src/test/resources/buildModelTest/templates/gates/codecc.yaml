@@ -1,7 +1,7 @@
 parameters:
   - name: receivers
     type: array
-    default: [ "${| ci.actor }}" ]
+    default: [ "${{ ci.actor }}" ]
 
 gates:
   - name: CodeCC
@@ -10,4 +10,4 @@ gates:
       - CodeccCheckAtomDebug.ccn_new_max_value <= 10 # 接入后新代码单函数圈复杂度最大值
     notify-on-fail:
       - type: wework-message
-        receivers: ${| parameters.receivers }}
+        receivers: ${{ parameters.receivers }}

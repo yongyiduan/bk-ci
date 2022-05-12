@@ -8,4 +8,4 @@ notices:
   title: this is a wework-message notice
   content: this is a wework-message notice,content is hello.
   receivers:
-    - ${| ci.actor }}
+    - ${{ ci.actor }}
