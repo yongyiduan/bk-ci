@@ -157,17 +157,10 @@ class RdsRegisterService @Autowired constructor(
                             busId = busId
                         )
                     )
-                    val ruleId = eventBusRuleDao.getByName(
-                        dslContext = dslContext,
-                        projectId = projectId,
-                        busId = busId,
-                        name = "${result.id}:${result.resourceKey}:${eventType.aliasName}"
-                    )?.ruleId ?: IdGeneratorUtil.getRuleId()
                     buildEventBusRule(
                         projectId = projectId,
                         userId = userId,
                         busId = busId,
-                        ruleId = ruleId,
                         eventType = eventType,
                         eventSource = eventSource,
                         on = on,
@@ -257,7 +250,6 @@ class RdsRegisterService @Autowired constructor(
         projectId: String,
         userId: String,
         busId: String,
-        ruleId: String,
         eventType: EventType,
         eventSource: EventSource,
         on: TriggerOn,
@@ -268,6 +260,13 @@ class RdsRegisterService @Autowired constructor(
         ruleTargetSet: MutableSet<EventRuleTarget>
     ) {
         on.rules.forEachIndexed { index, rule ->
+            val ruleName = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}:$index"
+            val ruleId = eventBusRuleDao.getByName(
+                dslContext = dslContext,
+                projectId = projectId,
+                busId = busId,
+                name = ruleName
+            )?.ruleId ?: IdGeneratorUtil.getRuleId()
             val filterNames = rule.filter.keys.toMutableList()
             filterNames.add(TYPE_FILTER_NAME)
             filterNames.add(webhookResult.resourceKey)
@@ -298,7 +297,7 @@ class RdsRegisterService @Autowired constructor(
                     ruleId = ruleId,
                     busId = busId,
                     projectId = projectId,
-                    name = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}:$index",
+                    name = ruleName,
                     source = eventSource.name,
                     type = eventType.name,
                     filterPattern = JsonUtil.toJson(AndExpression.builder().children(ruleExpressionList).build()),
