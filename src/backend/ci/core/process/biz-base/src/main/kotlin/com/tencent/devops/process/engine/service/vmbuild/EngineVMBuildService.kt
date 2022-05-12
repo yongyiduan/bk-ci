@@ -165,7 +165,6 @@ class EngineVMBuildService @Autowired(required = false) constructor(
         LOG.info("ENGINE|$buildId|BUILD_VM_START|j($vmSeqId)|vmName($vmName)")
         // var表中获取环境变量，并对老版本变量进行兼容
         val variables = buildVariableService.getAllVariable(projectId, buildId)
-
         val variablesWithType = buildVariableService.getAllVariableWithType(projectId, buildId).toMutableList()
         val model = containerBuildDetailService.getBuildModel(projectId, buildId)
         Preconditions.checkNotNull(model, NotFoundException("Build Model ($buildId) is not exist"))
@@ -208,7 +207,8 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                                 ).data?.let { self -> envList.add(self) }
                             }
 
-                            // 设置Job环境变量customBuildEnv到variablesWithType中
+                            // 设置Job环境变量customBuildEnv到variablesWithType和variables中
+                            // TODO 此处应收敛到variablesWithType或variables的其中一个
                             pipelineBuildParamsService.formatCustomBuildEnv(
                                 buildId = buildId,
                                 vmSeqId = vmSeqId,
@@ -216,9 +216,11 @@ class EngineVMBuildService @Autowired(required = false) constructor(
                                 executeCount = c.executeCount.toString(),
                                 customBuildEnv = c.customBuildEnv
                             )?.map { (t, u) ->
+                                val value = EnvUtils.parseEnv(u, contextMap)
+                                contextMap[t] = value
                                 BuildParameters(
                                     key = t,
-                                    value = EnvUtils.parseEnv(u, contextMap),
+                                    value = value,
                                     valueType = BuildFormPropertyType.STRING,
                                     readOnly = true
                                 )
