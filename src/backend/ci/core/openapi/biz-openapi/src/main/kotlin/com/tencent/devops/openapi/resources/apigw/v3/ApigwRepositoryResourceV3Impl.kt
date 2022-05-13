@@ -45,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired
 class ApigwRepositoryResourceV3Impl @Autowired constructor(private val client: Client) :
     ApigwRepositoryResourceV3 {
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "create"])
     override fun create(
         appCode: String?,
         apigwType: String?,
@@ -61,7 +61,7 @@ class ApigwRepositoryResourceV3Impl @Autowired constructor(private val client: C
         )
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun hasPermissionList(
         appCode: String?,
         apigwType: String?,
@@ -75,8 +75,9 @@ class ApigwRepositoryResourceV3Impl @Autowired constructor(private val client: C
         return client.get(ServiceRepositoryResource::class).hasPermissionList(
             userId = userId,
             projectId = projectId,
-            repositoryType = repositoryType,
-            permission = Permission.USE)
+            repositoryType = repositoryType?.name,
+            permission = Permission.USE
+        )
     }
 
     override fun delete(

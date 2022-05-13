@@ -20,10 +20,8 @@
                     </div>
                     <div class="form-group">
                         <form-field :label="$t('creator')">
-                            <staff-input :handle-change="handleChange"
-                                name="users"
-                                v-model="currentFilter.filterByCreator">
-                            </staff-input>
+                            <bk-member-selector v-model="currentFilter.filterByCreator">
+                            </bk-member-selector>
                         </form-field>
                     </div>
                     <div class="form-group"
@@ -50,13 +48,10 @@
 <script>
     import { mapGetters } from 'vuex'
     import FormField from '@/components/AtomPropertyPanel/FormField.vue'
-    // import UserInput from '@/components/atomFormField/UserInput/index.vue'
-    import StaffInput from '@/components/atomFormField/StaffInput/index.vue'
 
     export default {
         components: {
-            FormField,
-            StaffInput
+            FormField
         },
         props: {
             isDisabled: {
@@ -106,9 +101,6 @@
             this.init()
         },
         methods: {
-            handleChange (name, value) {
-                this.currentFilter.filterByCreator = value
-            },
             async init () {
                 if (Object.keys(this.selectedFilter).length > 0) {
                     Object.assign(this.currentFilter, this.selectedFilter)
@@ -137,6 +129,7 @@
                 })
                 labelIds = labels.join(',')
                 this.isDisabled = true
+                
                 await this.$emit('filter', {
                     projectId: this.projectId,
                     filterByLabels: labelIds,

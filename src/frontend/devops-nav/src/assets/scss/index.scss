@@ -3,25 +3,25 @@
 @import './icon/iconfont.css';
 @import './devopsSelect.scss';
 
-
 body,
 html,
 .devops-app {
-    height: 100%;
-    font-size: 14px;
-    font-family: Helvetica Neue,Arial,PingFang SC,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
-    color: $fontColor;
+  height: 100%;
+  font-size: 14px;
+  font-family: Helvetica Neue, Arial, PingFang SC, Hiragino Sans GB,
+    Microsoft Yahei, WenQuanYi Micro Hei, sans-serif;
+  color: $fontColor;
 }
 
 ::-webkit-scrollbar {
-    width: 9px;
-    height: 9px;
-    background-color: lighten(#a5a5a5, 80%);
+  width: 9px;
+  height: 9px;
+  background-color: lighten(#a5a5a5, 80%);
 }
 ::-webkit-scrollbar-thumb {
-    height: 8px;
-    border-radius: 20px;
-    background-color: #a5a5a5;
+  height: 8px;
+  border-radius: 20px;
+  background-color: #a5a5a5;
 }
 
 .devops-app {
@@ -50,8 +50,6 @@ html,
     }
 }
 
-
 .bk-message-icon {
-    min-width: 20px !important;
+  min-width: 20px !important;
 }
-

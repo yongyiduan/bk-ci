@@ -47,11 +47,11 @@
                 this.terminalSocket.onmessage = this.receiveFromTerminal
                 this.terminalSocket.onclose = this.closeTerminal
                 this.terminalSocket.onerror = this.errorTerminal
-                
+
                 const attachAddon = new AttachAddon(this.terminalSocket)
                 // Attach the socket to term
                 this.term.loadAddon(attachAddon)
-                
+
                 this.term.onResize(this.handleResize)
 
                 setTimeout(() => {

@@ -53,7 +53,7 @@ class ServiceRepositoryResourceImpl @Autowired constructor(
     private val repositoryService: RepositoryService
 ) : ServiceRepositoryResource {
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "create"])
     override fun create(userId: String, projectId: String, repository: Repository): Result<RepositoryId> {
         if (userId.isBlank()) {
             throw ParamBlankException("Invalid userId")
@@ -70,7 +70,7 @@ class ServiceRepositoryResourceImpl @Autowired constructor(
         return Result(RepositoryId(repositoryService.userCreate(userId, projectId, repository)))
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun list(projectId: String, repositoryType: ScmType?): Result<List<RepositoryInfoWithPermission>> {
         if (projectId.isBlank()) {
             throw ParamBlankException("Invalid projectId")
@@ -81,7 +81,7 @@ class ServiceRepositoryResourceImpl @Autowired constructor(
     /**
      * @param repositoryId 代表的是hashId或者代码库名，依赖repositoryType
      */
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun get(projectId: String, repositoryId: String, repositoryType: RepositoryType?): Result<Repository> {
         if (projectId.isBlank()) {
             throw ParamBlankException("Invalid projectId")
@@ -107,12 +107,15 @@ class ServiceRepositoryResourceImpl @Autowired constructor(
         return Result(data)
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun hasPermissionList(
         userId: String,
         projectId: String,
-        repositoryType: ScmType?,
-        permission: Permission
+        repositoryType: String?,
+        permission: Permission,
+        page: Int?,
+        pageSize: Int?,
+        aliasName: String?
     ): Result<Page<RepositoryInfo>> {
         if (userId.isBlank()) {
             throw ParamBlankException("Invalid userId")
@@ -127,19 +130,22 @@ class ServiceRepositoryResourceImpl @Autowired constructor(
             Permission.EDIT -> AuthPermission.EDIT
             Permission.USE -> AuthPermission.USE
         }
-        val limit = PageUtil.convertPageSizeToSQLLimit(0, 9999)
+        val pageNotNull = page ?: 0
+        val pageSizeNotNull = pageSize ?: 9999
+        val limit = PageUtil.convertPageSizeToSQLLimit(pageNotNull, pageSizeNotNull)
         val result = repositoryService.hasPermissionList(
             userId = userId,
             projectId = projectId,
             repositoryType = repositoryType,
             authPermission = bkAuthPermission,
             offset = limit.offset,
-            limit = limit.limit
+            limit = limit.limit,
+            aliasName = aliasName
         )
-        return Result(Page(0, 9999, result.count, result.records))
+        return Result(Page(pageNotNull, pageSizeNotNull, result.count, result.records))
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun listByProjects(projectIds: Set<String>, page: Int?, pageSize: Int?): Result<Page<RepositoryInfo>> {
         val pageNotNull = page ?: 0
         val pageSizeNotNull = pageSize ?: 20
@@ -148,7 +154,7 @@ class ServiceRepositoryResourceImpl @Autowired constructor(
         return Result(Page(pageNotNull, pageSizeNotNull, result.count, result.records))
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun listByProject(
         projectId: String,
         repositoryType: ScmType?,
@@ -190,7 +196,7 @@ class ServiceRepositoryResourceImpl @Autowired constructor(
         return Result(true)
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun listRepoByIds(
         repositoryIds: Set<String>
     ): Result<List<Repository>> {

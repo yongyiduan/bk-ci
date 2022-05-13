@@ -84,7 +84,7 @@ class UserRepositoryResourceImpl @Autowired constructor(
         return Result(repositoryService.hasAliasName(projectId, repositoryHashId, aliasName))
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "create"])
     override fun create(userId: String, projectId: String, repository: Repository): Result<RepositoryId> {
         if (userId.isBlank()) {
             throw ParamBlankException("Invalid userId")
@@ -101,7 +101,7 @@ class UserRepositoryResourceImpl @Autowired constructor(
         return Result(RepositoryId(repositoryService.userCreate(userId, projectId, repository)))
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun get(
         userId: String,
         projectId: String,
@@ -130,7 +130,7 @@ class UserRepositoryResourceImpl @Autowired constructor(
         return Result(true)
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun list(
         userId: String,
         projectId: String,
@@ -166,14 +166,15 @@ class UserRepositoryResourceImpl @Autowired constructor(
         )
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun hasPermissionList(
         userId: String,
         projectId: String,
-        repositoryType: ScmType?,
+        repositoryType: String?,
         permission: Permission,
         page: Int?,
-        pageSize: Int?
+        pageSize: Int?,
+        aliasName: String?
     ): Result<Page<RepositoryInfo>> {
         if (userId.isBlank()) {
             throw ParamBlankException("Invalid userId")
@@ -193,12 +194,13 @@ class UserRepositoryResourceImpl @Autowired constructor(
         val pageSizeNotNull = pageSize ?: PageSize
         val limit = PageUtil.convertPageSizeToSQLLimit(pageNotNull, pageSizeNotNull)
         val result = repositoryService.hasPermissionList(
-            userId,
-            projectId,
-            repositoryType,
-            bkAuthPermission,
-            limit.offset,
-            limit.limit
+            userId = userId,
+            projectId = projectId,
+            repositoryType = repositoryType,
+            authPermission = bkAuthPermission,
+            offset = limit.offset,
+            limit = limit.limit,
+            aliasName = aliasName
         )
         return Result(Page(pageNotNull, pageSizeNotNull, result.count, result.records))
     }
@@ -221,7 +223,7 @@ class UserRepositoryResourceImpl @Autowired constructor(
         return Result(commitService.getCommit(buildId))
     }
 
-    @BkTimed
+    @BkTimed(extraTags = ["operate", "get"])
     override fun fuzzySearchByAliasName(
         userId: String,
         projectId: String,
