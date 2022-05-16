@@ -48,7 +48,7 @@
         },
         data () {
             const { protocol } = location
-            const hostname = /woa.com/.test(window.name) ? window.name : 'zhiyan.woa.com'
+            const hostname = /zhiyan.([\w-_]+.)?woa.com$/.test(window.name) ? window.name : 'zhiyan.woa.com'
             const prefix = `${protocol}//${hostname}/cicd_static`
 
             return {
