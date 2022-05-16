@@ -86,11 +86,11 @@ export function actionCreator (mutation) {
  */
 export function PipelineEditActionCreator (mutation) {
     return ({ state, commit }, payload = {}) => {
-        if (!state.pipeline || state.pipeline?.editing) {
+        if (!state.pipeline) {
             commit(mutation, payload)
             return
         }
-        
+
         if (payload.container && payload.newParam) {
             if (compareParam(payload.newParam, payload.container)) {
                 commit(SET_PIPELINE_EDITING, true)
