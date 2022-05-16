@@ -26,7 +26,6 @@
                 :default-active="$route.name"
                 v-bind="navTheme"
                 :toggle-active="nav.toggle"
-                @select="() => {}"
             >
                 <bk-navigation-menu-item
                     v-for="item in nav.menu"

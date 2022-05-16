@@ -77,7 +77,6 @@
     export default {
         data () {
             return {
-                DOCS_URL_PREFIX,
                 imageDialogConf: {
                     isShow: false,
                     width: 640,
