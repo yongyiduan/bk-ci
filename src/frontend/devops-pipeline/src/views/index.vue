@@ -16,7 +16,6 @@
         methods: {
             ...mapActions('atom', [
                 'fetchContainers',
-                'fetchAtoms',
                 'fetchClassify',
                 'fetchStageTagList',
                 'fetchCommonSetting'
@@ -24,9 +23,6 @@
             fetchData () {
                 const projectCode = this.$route.params.projectId
                 this.fetchContainers({
-                    projectCode
-                })
-                this.fetchAtoms({
                     projectCode
                 })
                 this.fetchClassify()

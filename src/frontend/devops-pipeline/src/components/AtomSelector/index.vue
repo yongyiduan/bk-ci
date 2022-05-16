@@ -2,38 +2,93 @@
     <portal to="atom-selector-popup">
         <transition name="selector-slide">
             <div v-if="showAtomSelectorPopup" class="atom-selector-popup">
-                <bk-tab :active.sync="activeTab" class="atom-tab" type="unborder-card">
+                <header class="atom-selector-header">
+                    <h3>{{ $t('editPage.chooseAtom') }}<i @click="freshAtomList(searchKey)" class="devops-icon icon-refresh atom-fresh" :class="fetchingAtomList ? &quot;spin-icon&quot; : &quot;&quot;" /></h3>
+                    <bk-input class="atom-search-input" ref="searchStr" :clearable="true" :placeholder="$t('editPage.searchTips')" right-icon="icon-search" :value="searchKey" @input="handleClear" @enter="handleSearch"></bk-input>
+                </header>
+                <bk-tab v-if="!searchKey" class="atom-tab" size="small" ref="tab" :active.sync="classifyCode" type="unborder-card">
                     <bk-tab-panel
-                        v-for="(panel, index) in atomPanels"
-                        v-bind="panel"
-                        :key="index">
-                        <atom-search-input
-                            :tab-name="panel.name"
+                        ref="atomListDom"
+                        v-bkloading="{ isLoading: fetchingAtomList }"
+                        v-for="classify in classifyCodeList"
+                        :key="classify"
+                        :name="classify"
+                        @scroll.native.passive="scrollLoadMore(classify, $event)"
+                        :label="atomClassifyMap[classify].classifyName"
+                        render-directive="if"
+                        :class="[{ [getClassifyCls(classify)]: true }, 'tab-section']"
+                    >
+                        <atom-card v-for="(atom) in curTabList"
+                            :key="atom.atomCode"
+                            :atom="atom"
                             :container="container"
-                            :active-tab="activeTab" />
-                        <atom-card-list
-                            :tab-name="panel.name"
-                            :container="container"
-                            :active-tab="activeTab"
                             :element-index="elementIndex"
-                            :delete-reasons="deleteReasons"
-                            :atom-code="atomCode" />
+                            :atom-code="atomCode"
+                            :active-atom-code="activeAtomCode"
+                            @close="close"
+                            @click="activeAtom(atom.atomCode)"
+                            :class="{
+                                selected: atom.atomCode === atomCode,
+                                [getAtomClass(atom.atomCode)]: true
+                            }"
+                        ></atom-card>
+                        <div class="empty-atom-list" v-if="curTabList.length <= 0 && !fetchingAtomList">
+                            <empty-tips type="no-result"></empty-tips>
+                        </div>
                     </bk-tab-panel>
                 </bk-tab>
+                <section v-else class="search-result" ref="searchResult" v-bkloading="{ isLoading: fetchingAtomList }">
+                    <h3 v-if="installArr.length" class="search-title">{{ $t('newlist.installed') }}（{{installArr.length}}）</h3>
+                    <atom-card v-for="atom in installArr"
+                        :key="atom.atomCode"
+                        :disabled="atom.disabled"
+                        :atom="atom"
+                        :container="container"
+                        :element-index="elementIndex"
+                        :atom-code="atomCode"
+                        :active-atom-code="activeAtomCode"
+                        @close="close"
+                        @click="activeAtom(atom.atomCode)"
+                        :class="{
+                            selected: atom.atomCode === atomCode
+                        }"
+                    ></atom-card>
+
+                    <h3 v-if="uninstallArr.length" class="search-title gap-border">{{ $t('editPage.notInstall') }}（{{uninstallArr.length}}）</h3>
+                    <atom-card v-for="atom in uninstallArr"
+                        :key="atom.atomCode"
+                        :disabled="atom.disabled"
+                        :atom="atom"
+                        :container="container"
+                        :element-index="elementIndex"
+                        :atom-code="atomCode"
+                        :active-atom-code="activeAtomCode"
+                        @close="close"
+                        @click="activeAtom(atom.atomCode)"
+                        :class="{
+                            selected: atom.atomCode === atomCode
+                        }"
+                    ></atom-card>
+                    <div class="empty-atom-list" v-if="curTabList.length <= 0 && !fetchingAtomList">
+                        <empty-tips type="no-result"></empty-tips>
+                    </div>
+                </section>
             </div>
         </transition>
     </portal>
 </template>
 
 <script>
-    import { mapGetters, mapState, mapActions } from 'vuex'
-    import atomSearchInput from './atomSearchInput'
-    import atomCardList from './atomCardList'
+    import { mapGetters, mapActions, mapState } from 'vuex'
+    import atomCard from './atomCard'
+    import EmptyTips from '../common/empty'
+
+    const RD_STORE_CODE = 'rdStore'
 
     export default {
         components: {
-            atomSearchInput,
-            atomCardList
+            atomCard,
+            EmptyTips
         },
         props: {
             container: {
@@ -48,30 +103,29 @@
         },
         data () {
             return {
-                activeTab: 'projectAtom',
-                deleteReasons: [],
-                atomPanels: [
-                    { name: 'projectAtom', label: this.$t('editPage.projectAtom') },
-                    { name: 'storeAtom', label: this.$t('editPage.store') }
-                ]
+                searchKey: '',
+                classifyCode: 'all',
+                activeAtomCode: '',
+                curTabList: [],
+                installArr: [],
+                uninstallArr: [],
+                isThrottled: false
             }
         },
         computed: {
             ...mapGetters('atom', [
-                'getAtomCodeListByCategory',
                 'classifyCodeListByCategory',
                 'isTriggerContainer'
             ]),
             ...mapState('atom', [
                 'fetchingAtomList',
                 'showAtomSelectorPopup',
-                'isPropertyPanelVisible',
                 'atomClassifyMap',
-                'atomCodeList',
-                'storeAtomData',
                 'atomClassifyCodeList',
                 'atomMap',
-                'atomModalMap'
+                'atomList',
+                'fetchingAtomMoreLoading',
+                'isAtomPageOver'
             ]),
             atomCode () {
                 if (this.element) {
@@ -83,19 +137,178 @@
                     }
                 }
                 return null
+            },
+
+            category () {
+                return this.isTriggerContainer(this.container) ? 'TRIGGER' : 'TASK'
+            },
+
+            baseOS () {
+                return this.container.baseOS
+            },
+
+            projectCode () {
+                return this.$route.params.projectId
+            },
+
+            classifyId () {
+                return this.atomClassifyMap[this.classifyCode] && this.atomClassifyMap[this.classifyCode].id
+            },
+
+            classifyCodeList () {
+                const atomClassifyCodeList = this.classifyCodeListByCategory(this.category)
+                if (this.category !== 'TRIGGER') {
+                    atomClassifyCodeList.unshift('all')
+                    atomClassifyCodeList.push(RD_STORE_CODE)
+                }
+                return atomClassifyCodeList
+            },
+
+            firstClassify () {
+                return Array.isArray(this.classifyCodeList) ? this.classifyCodeList[0] : 'all'
             }
         },
-        created () {
-            this.initData()
+
+        watch: {
+            showAtomSelectorPopup: {
+                handler (visible) {
+                    const { atomCode, firstClassify, atomMap } = this
+                    if (visible) {
+                        this.classifyCode = atomMap[atomCode] ? atomMap[atomCode].classifyCode : firstClassify
+                        this.activeAtomCode = atomCode
+                        this.fetchClassify()
+                        this.fetchAtomList()
+                        setTimeout(() => {
+                            this.$refs.searchStr.focus()
+                        }, 0)
+                    } else {
+                        this.clearSearch()
+                    }
+                },
+                immediate: true
+            },
+
+            classifyCode: {
+                handler (val) {
+                    this.freshRequestAtomData()
+                    this.fetchAtomList()
+                }
+            },
+
+            atomList: {
+                handler (val) {
+                    this.curTabList = val
+                    if (this.searchKey) {
+                        this.uninstallArr = val.filter(item => (!item.defaultFlag && !item.installed && item.recommendFlag !== false))
+                        this.installArr = val.filter(item => (item.defaultFlag || (item.installed && item.recommendFlag === false)))
+                    }
+                },
+                immediate: true
+            }
         },
+
         methods: {
             ...mapActions('atom', [
-                'getDeleteReasons'
+                'toggleAtomSelectorPopup',
+                'setRequestAtomData',
+                'fetchAtoms',
+                'fetchClassify',
+                'setAtomPageOver',
+                'clearAtomData'
             ]),
-            initData () {
-                this.getDeleteReasons().then(({ data: res }) => {
-                    this.deleteReasons = res || []
+
+            /**
+             * 获取插件列表数据
+             */
+            fetchAtomList () {
+                if (!this.fetchingAtomMoreLoading && !this.isThrottled && !this.isAtomPageOver) {
+                    this.isThrottled = true
+                    this.timer = setTimeout(async () => {
+                        this.isThrottled = false
+                        const queryProjectAtomFlag = this.classifyCode !== 'rdStore' // 是否查询项目插件标识
+
+                        let jobType // job类型 => 触发器插件无需传jobType
+                        if (this.category === 'TRIGGER') {
+                            jobType = undefined
+                        } else {
+                            jobType = ['WINDOWS', 'MACOS', 'LINUX'].includes(this.baseOS) ? 'AGENT' : 'AGENT_LESS'
+                        }
+
+                        await this.fetchAtoms({
+                            projectCode: this.projectCode,
+                            category: this.category,
+                            classifyId: this.classifyId,
+                            os: this.baseOS,
+                            jobType: jobType,
+                            searchKey: this.searchKey,
+                            queryProjectAtomFlag
+                        })
+                    }, 300)
+                }
+            },
+
+            getClassifyCls (classifyCode) {
+                return `classify-${classifyCode}-cls`
+            },
+            getAtomClass (atomCode) {
+                return `atom-${atomCode}-cls`
+            },
+
+            activeAtom (code) {
+                this.activeAtomCode = code
+            },
+            handleSearch (value) {
+                this.searchKey = value.trim()
+                this.setAtomPageOver()
+                this.freshRequestAtomData()
+                this.fetchAtomList()
+            },
+
+            handleClear (str) {
+                if (str === '') {
+                    this.clearSearch()
+                    this.activeAtomCode = this.atomCode
+                }
+            },
+            freshRequestAtomData () {
+                this.setAtomPageOver()
+                this.setRequestAtomData({
+                    page: 1,
+                    pageSize: 50,
+                    recommendFlag: true,
+                    keyword: this.searchKey
                 })
+                this.clearAtomData()
+            },
+            clearSearch () {
+                const input = this.$refs.searchStr || {}
+                input.curValue = ''
+                this.searchKey = ''
+                this.setAtomPageOver()
+                this.freshRequestAtomData()
+                this.fetchAtomList()
+            },
+            close () {
+                this.toggleAtomSelectorPopup(false)
+                this.clearSearch()
+            },
+
+            freshAtomList (searchKey) {
+                if (this.fetchingAtomList) return
+                if (this.searchKey) {
+                    this.$refs.searchResult.scrollTo(0, 0)
+                } else {
+                    const curDom = this.$refs.atomListDom.find(item => item.name === this.classifyCode)
+                    !this.searchKey && curDom.$el.scrollTo(0, 0)
+                }
+                this.freshRequestAtomData()
+                this.fetchAtomList()
+            },
+
+            scrollLoadMore (classify, $event) {
+                const target = event.target
+                const bottomDis = target.scrollHeight - target.clientHeight - target.scrollTop
+                if (bottomDis <= 600) this.fetchAtomList()
             }
         }
     }

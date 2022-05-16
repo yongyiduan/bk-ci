@@ -36,6 +36,13 @@ export default {
         }
         return state.atomClassifyCodeList.filter(classifyCode => classifyCode !== 'trigger')
     },
+    getAtomDisabled: (state, getters) => (list, os, category) => {
+        list.forEach(atom => {
+            atom.disabled = getters.isAtomDisabled({ os, atom, category })
+        })
+        return list
+    },
+
     isAtomDisabled: state => ({ os, atom, category }) => {
         return (!os && atom.os.length > 0 && category !== 'TRIGGER') || (os && atom.os.length > 0 && !atom.os.includes(os)) || (os && atom.os.length === 0 && !atom.buildLessRunFlag) || false
     },
@@ -110,7 +117,7 @@ export default {
             if (pipelineSetting && !pipelineSetting.pipelineName) {
                 throw new Error(window.pipelineVue.$i18n && window.pipelineVue.$i18n.t('settings.emptyPipelineName'))
             }
-           
+
             if (pipelineSetting && pipelineSetting.buildNumRule && !/^[\w-{}() +?.:$"]{1,256}$/.test(pipelineSetting.buildNumRule)) {
                 throw new Error(window.pipelineVue.$i18n && window.pipelineVue.$i18n.t('settings.correctBuildNumber'))
             }

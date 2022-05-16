@@ -53,10 +53,7 @@ import {
     UPDATE_ATOM_OUTPUT,
     UPDATE_ATOM_OUTPUT_NAMESPACE,
     FETCHING_ATOM_LIST,
-    SET_STORE_DATA,
-    SET_UNRECOMMEND_STORE_DATA,
-    SET_UNRECOMMEND_PROJECT_DATA,
-    SET_UNRECOMMEND_ATOM_COUNT,
+    SET_REQUEST_ATOM_DATA,
     SET_STORE_LOADING,
     SET_STORE_SEARCH,
     FETCHING_ATOM_VERSION,
@@ -67,22 +64,19 @@ import {
     SET_DEFAULT_STAGE_TAG,
     TOGGLE_STAGE_REVIEW_PANEL,
     SET_IMPORTED_JSON,
+    SET_ATOMS,
+    SET_ATOMS_CLASSIFY,
     SET_EDIT_FROM,
-    SET_CUR_JOBTYPE,
-    SET_ATOM_CODE,
-    SET_PROJECT_ATOMS,
-    SET_STORE_ATOMS,
-    SET_PROJECT_UNRECOMMEN_ATOMS,
-    SET_STORE_UNRECOMMEN_ATOMS,
-    SET_PROJECT_DATA,
-    SET_CLASSIFY,
+    FETCHING_ATOM_MORE_LOADING,
+    SET_COMMEND_ATOM_COUNT,
+    SET_ATOM_PAGE_OVER,
+    CLEAR_ATOM_DATA,
     IS_RECOMMEND_MORE_LOADING,
     IS_UNRECOMMEND_MORE_LOADING,
     IS_PROJECT_PAGE_OVER,
-    IS_STORE_PAGE_OVER,
     IS_UNRECOMMEND_PROJECT_PAGE_OVER,
-    IS_UNRECOMMEND_STORE_PAGE_OVER,
-    SET_INNER_ACTIVE_NAME
+    IS_STORE_PAGE_OVER,
+    IS_UNRECOMMEND_STORE_PAGE_OVER
 } from './constants'
 import {
     getAtomModalKey,
@@ -198,76 +192,6 @@ export default {
             containerTypeList,
             containerModalMap
         })
-        return state
-    },
-    [SET_CLASSIFY]: (state, { atomClassifyCodeList, atomClassifyMap }) => {
-        Object.assign(state, {
-            atomClassifyCodeList,
-            atomClassifyMap
-        })
-        return state
-    },
-    [SET_ATOM_CODE]: (state, atomCode) => {
-        Object.assign(state, {
-            atomCode
-        })
-        return state
-    },
-    [SET_PROJECT_ATOMS]: (state, { projectRecommendAtomMap }) => {
-        Object.assign(state, {
-            projectRecommendAtomMap
-        })
-        return state
-    },
-    [SET_PROJECT_UNRECOMMEN_ATOMS]: (state, { projectUnRecommendAtomMap }) => {
-        Object.assign(state, {
-            projectUnRecommendAtomMap
-        })
-        return state
-    },
-    [SET_STORE_ATOMS]: (state, { storeRecommendAtomMap }) => {
-        Object.assign(state, {
-            storeRecommendAtomMap
-        })
-        return state
-    },
-    [SET_STORE_UNRECOMMEN_ATOMS]: (state, { storeUnRecommendAtomMap }) => {
-        Object.assign(state, {
-            storeUnRecommendAtomMap
-        })
-        return state
-    },
-    [SET_PROJECT_DATA]: (state, projectData) => {
-        Object.assign(state, {
-            projectData
-        })
-        return state
-    },
-    [SET_UNRECOMMEND_PROJECT_DATA]: (state, unRecommendProjectData) => {
-        Object.assign(state, {
-            unRecommendProjectData
-        })
-    },
-    [SET_STORE_DATA]: (state, storeData) => {
-        Object.assign(state, {
-            storeData
-        })
-        return state
-    },
-    [SET_UNRECOMMEND_STORE_DATA]: (state, unRecommendStoreData) => {
-        Object.assign(state, {
-            unRecommendStoreData
-        })
-        return state
-    },
-    [SET_UNRECOMMEND_ATOM_COUNT]: (state, unRecommendAtomCount) => {
-        Object.assign(state, {
-            unRecommendAtomCount
-        })
-        return state
-    },
-    [SET_INNER_ACTIVE_NAME]: (state, value) => {
-        state.innerActiveName = value
         return state
     },
     [FETCHING_ATOM_VERSION]: (state, fetchingAtmoVersion) => {
@@ -496,7 +420,44 @@ export default {
     [SET_IMPORTED_JSON]: (state, importedPipelineJson) => {
         state.importedPipelineJson = importedPipelineJson
     },
-    [SET_CUR_JOBTYPE]: (state, str) => {
-        state.curJobType = str
+    [SET_ATOMS_CLASSIFY]: (state, { atomClassifyMap, atomClassifyCodeList }) => {
+        Object.assign(state, {
+            atomClassifyCodeList,
+            atomClassifyMap
+        })
+        return state
+    },
+    [FETCHING_ATOM_MORE_LOADING]: (state, fetching) => {
+        Vue.set(state, 'fetchingAtomMoreLoading', fetching)
+        return state
+    },
+    [SET_ATOMS]: (state, { atomCodeList, atomMap, atomList }) => {
+        Object.assign(state, {
+            atomCodeList,
+            atomMap,
+            atomList
+        })
+        return state
+    },
+    [SET_REQUEST_ATOM_DATA]: (state, requestAtomData) => {
+        Object.assign(state, {
+            requestAtomData
+        })
+        return state
+    },
+    [SET_COMMEND_ATOM_COUNT]: (state, commendAtomCount) => {
+        Vue.set(state, 'commendAtomCount', commendAtomCount)
+        return state
+    },
+    [SET_ATOM_PAGE_OVER]: (state, isAtomPageOver) => {
+        Vue.set(state, 'isAtomPageOver', isAtomPageOver)
+        return isAtomPageOver
+    },
+    [CLEAR_ATOM_DATA]: (state) => {
+        state.atomList = []
+        state.atomMap = {}
+        state.atomCodeList = {}
+        state.fetchingAtomList = true
+        return state
     }
 }
