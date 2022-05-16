@@ -70,13 +70,7 @@ import {
     FETCHING_ATOM_MORE_LOADING,
     SET_COMMEND_ATOM_COUNT,
     SET_ATOM_PAGE_OVER,
-    CLEAR_ATOM_DATA,
-    IS_RECOMMEND_MORE_LOADING,
-    IS_UNRECOMMEND_MORE_LOADING,
-    IS_PROJECT_PAGE_OVER,
-    IS_UNRECOMMEND_PROJECT_PAGE_OVER,
-    IS_STORE_PAGE_OVER,
-    IS_UNRECOMMEND_STORE_PAGE_OVER
+    CLEAR_ATOM_DATA
 } from './constants'
 import {
     getAtomModalKey,
@@ -147,30 +141,6 @@ export default {
     },
     [FETCHING_ATOM_LIST]: (state, fetching) => {
         Vue.set(state, 'fetchingAtomList', fetching)
-        return state
-    },
-    [IS_RECOMMEND_MORE_LOADING]: (state, loading) => {
-        Vue.set(state, 'isRecommendMoreLoading', loading)
-        return state
-    },
-    [IS_UNRECOMMEND_MORE_LOADING]: (state, loading) => {
-        Vue.set(state, 'isUnRecommendMoreLoading', loading)
-        return state
-    },
-    [IS_PROJECT_PAGE_OVER]: (state, loading) => {
-        Vue.set(state, 'isProjectPageOver', loading)
-        return state
-    },
-    [IS_UNRECOMMEND_PROJECT_PAGE_OVER]: (state, loading) => {
-        Vue.set(state, 'isUnRecommendProjectPageOver', loading)
-        return state
-    },
-    [IS_STORE_PAGE_OVER]: (state, loading) => {
-        Vue.set(state, 'isStorePageOver', loading)
-        return state
-    },
-    [IS_UNRECOMMEND_STORE_PAGE_OVER]: (state, loading) => {
-        Vue.set(state, 'isUnRecommendStorePageOver', loading)
         return state
     },
     [SET_PIPELINE]: (state, pipeline = null) => {
