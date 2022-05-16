@@ -85,15 +85,17 @@
             async linkConsole () {
                 try {
                     const { projectId, pipelineId, buildId, vmSeqId, dispatchType } = this
-                    const res = await this.$store.dispatch('common/startDebugDocker', {
+                    let res = await this.$store.dispatch('common/startDebugDocker', {
                         projectId,
                         pipelineId,
                         buildId,
                         vmSeqId,
                         dispatchType
                     })
-                    this.url = res.replace('ws:', 'wss:')
-                    console.log(res, 22441)
+                    if (this.dispatchType === 'PUBLIC_BCS') {
+                        res = res + '?hide_banner=true'
+                    }
+                    this.url = res || ''
                 } catch (err) {
                     console.log(err)
                     this.connectError = true
