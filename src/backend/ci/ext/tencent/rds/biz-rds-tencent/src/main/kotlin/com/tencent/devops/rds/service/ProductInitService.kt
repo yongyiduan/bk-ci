@@ -42,6 +42,10 @@ import com.tencent.devops.project.pojo.ProjectCreateInfo
 import com.tencent.devops.project.pojo.ProjectCreateUserInfo
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
+import com.tencent.devops.rds.chart.ChartPipelineStartParams.RDS_PROJECTS
+import com.tencent.devops.rds.chart.ChartPipelineStartParams.RDS_REPO_URLS
+import com.tencent.devops.rds.chart.ChartPipelineStartParams.RDS_SERVICES
+import com.tencent.devops.rds.chart.ChartPipelineStartParams.RDS_TAPD_IDS
 import com.tencent.devops.rds.chart.StreamConverter
 import com.tencent.devops.rds.chart.stream.StreamBuildResult
 import com.tencent.devops.rds.constants.Constants
@@ -466,7 +470,8 @@ class ProductInitService @Autowired constructor(
                 productId = productId,
                 projectId = projectId,
                 cachePath = cachePath,
-                pipelineFile = initYamlFile
+                pipelineFile = initYamlFile,
+                init = true
             )
             val pipelineId = saveChartPipeline(
                 userId = userId,
@@ -486,10 +491,10 @@ class ProductInitService @Autowired constructor(
                 pipelineId = pipelineId,
                 // 传入特定的resource参数
                 values = mapOf(
-                    "${VARIABLE_PREFIX}tapd_ids" to JsonUtil.toJson(tapdIds),
-                    "${VARIABLE_PREFIX}repo_urls" to JsonUtil.toJson(repoUrls),
-                    "${VARIABLE_PREFIX}projects" to JsonUtil.toJson(projects),
-                    "${VARIABLE_PREFIX}services" to JsonUtil.toJson(services)
+                    "${VARIABLE_PREFIX}$RDS_TAPD_IDS" to JsonUtil.toJson(tapdIds),
+                    "${VARIABLE_PREFIX}$RDS_REPO_URLS" to JsonUtil.toJson(repoUrls),
+                    "${VARIABLE_PREFIX}$RDS_PROJECTS" to JsonUtil.toJson(projects),
+                    "${VARIABLE_PREFIX}$RDS_SERVICES" to JsonUtil.toJson(services)
                 ),
                 channelCode = ChannelCode.BS,
                 startType = StartType.SERVICE
