@@ -186,17 +186,37 @@ class RdsRegisterService @Autowired constructor(
                 )
             )
 
+            eventBusSourceDao.deleteByBusId(
+                dslContext = dslContext,
+                busId = busId,
+                projectId = projectId
+            )
             eventBusSourceDao.batchCreate(
                 dslContext = context,
                 eventBusSources = eventBusSourceSet.toList()
+            )
+            eventRouteDao.deleteByBusId(
+                dslContext = dslContext,
+                busId = busId,
+                projectId = projectId
             )
             eventRouteDao.batchCreate(
                 dslContext = dslContext,
                 eventRoutes = eventRouteSet.toList()
             )
+            eventBusRuleDao.deleteByBusId(
+                dslContext = dslContext,
+                busId = busId,
+                projectId = projectId
+            )
             eventBusRuleDao.batchCreate(
                 dslContext = context,
                 eventBusRules = eventBusRuleSet.toList()
+            )
+            eventRuleTargetDao.deleteByBusId(
+                dslContext = dslContext,
+                busId = busId,
+                projectId = projectId
             )
             eventRuleTargetDao.batchCreate(
                 dslContext = context,
@@ -261,12 +281,7 @@ class RdsRegisterService @Autowired constructor(
     ) {
         on.rules.forEachIndexed { index, rule ->
             val ruleName = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}:$index"
-            val ruleId = eventBusRuleDao.getByName(
-                dslContext = dslContext,
-                projectId = projectId,
-                busId = busId,
-                name = ruleName
-            )?.ruleId ?: IdGeneratorUtil.getRuleId()
+            val ruleId = IdGeneratorUtil.getRuleId()
             val filterNames = rule.filter.keys.toMutableList()
             filterNames.add(TYPE_FILTER_NAME)
             filterNames.add(webhookResult.resourceKey)
@@ -343,12 +358,7 @@ class RdsRegisterService @Autowired constructor(
                 "pipelineId" to pipelineId
             )
         )
-        val targetId = eventRuleTargetDao.getByTargetName(
-            dslContext = dslContext,
-            projectId = projectId,
-            ruleId = ruleId,
-            targetName = eventTargetTemplate.targetName
-        )?.targetId ?: IdGeneratorUtil.getTargetId()
+        val targetId = IdGeneratorUtil.getTargetId()
         return EventRuleTarget(
             targetId = targetId,
             ruleId = ruleId,
