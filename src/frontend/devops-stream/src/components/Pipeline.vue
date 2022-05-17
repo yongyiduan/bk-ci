@@ -74,10 +74,13 @@
         computed: {
             ...mapState(['projectId', 'permission', 'curPipeline'])
         },
-        mounted () {
-            this.autoOpenReview()
+        watch: {
+            pipeline (val) {
+                if (val.stages?.length > 0) {
+                    this.autoOpenReview()
+                }
+            }
         },
-
         methods: {
             ...mapActions([
                 'toggleStageReviewPanel',
@@ -121,14 +124,17 @@
                 const query = this.$route.query || {}
                 const checkIn = query.checkIn
                 const checkOut = query.checkOut
-                this.pipeline.stages.every(stage => {
-                    if (stage.id === checkIn) {
-                        return this.handleStageCheck('checkIn')
-                    } else if (stage.id === checkOut) {
-                        return this.handleStageCheck('checkOut')
+                const checkId = checkIn ?? checkOut
+                if (checkId) {
+                    const type = checkIn ? 'checkIn' : 'checkOut'
+                    const stageIndex = this.pipeline.stages.findIndex(stage => checkId === stage.id)
+                    if (stageIndex > -1) {
+                        this.handleStageCheck({
+                            type,
+                            stageIndex
+                        })
                     }
-                    return true
-                })
+                }
             },
 
             handleStageCheck ({ type, stageIndex }) {
