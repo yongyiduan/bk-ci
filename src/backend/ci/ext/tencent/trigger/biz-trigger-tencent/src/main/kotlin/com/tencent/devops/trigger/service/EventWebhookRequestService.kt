@@ -80,7 +80,7 @@ class EventWebhookRequestService @Autowired constructor(
                 payload = payload
             )
             logger.info(
-                "$projectId|$busId|toCloudEvent:${JsonUtil.toJson(cloudEvent)}"
+                "$projectId|$busId|toCloudEvent:${CloudEventJsonUtil.serializeAsString(cloudEvent)}"
             )
             handleWebhook(
                 projectId = projectId,
