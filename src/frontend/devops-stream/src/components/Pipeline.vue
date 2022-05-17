@@ -68,7 +68,8 @@
                 failedContainer: false,
                 isRetrying: false,
                 taskId: null,
-                editingElementPos: null
+                editingElementPos: null,
+                firstIn: true
             }
         },
         computed: {
@@ -76,7 +77,8 @@
         },
         watch: {
             pipeline (val) {
-                if (val.stages?.length > 0) {
+                if (val.stages?.length > 0 && this.firstIn) {
+                    this.firstIn = false
                     this.autoOpenReview()
                 }
             }
