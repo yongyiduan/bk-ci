@@ -8,10 +8,11 @@
             <span @click="currentTab = 'log'" :class="{ active: currentTab === 'log' }">{{ $t('execDetail.log') }}</span>
             <span @click="currentTab = 'setting'" :class="{ active: currentTab === 'setting' }">{{ $t('execDetail.setting') }}</span>
         </span>
-        <span slot="tool"
+        <span
+            slot="tool"
             v-if="currentTab === 'setting' && showDebugDockerBtn"
             class="head-tool"
-            @click="$refs.container.startDebug"
+            @click="handleDebug"
         >{{ $t('editPage.docker.debugConsole') }}</span>
         <template v-slot:content>
 
@@ -114,10 +115,15 @@
             showDebugDockerBtn () {
                 return this.checkShowDebugDockerBtn(this.currentJob, this.$route.name, this.execDetail)
             },
-
             executeCount () {
                 const executeCountList = this.pluginList.map((plugin) => plugin.executeCount || 1)
                 return Math.max(...executeCountList)
+            }
+        },
+        methods: {
+            handleDebug () {
+                debugger
+                this.$refs.container?.startDebug?.()
             }
         }
     }

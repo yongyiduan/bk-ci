@@ -4726,18 +4726,10 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
 
-bk-magic-vue@2.4.4:
-  version "2.4.4"
-  resolved "https://mirrors.tencent.com/npm/@tencent/bk-magic-vue/-/@tencent/bk-magic-vue-2.4.4.tgz#c9694ca03082b510cc430fac9a3ff7f17ee9f723"
-  integrity sha512-N1/UNaQxmNRAUgPxNZoUQ4tSLDSPr20ykyn9QmvWbgAjPCNrYrQxs93O3KvXpqjUG8sRJQBhx1EqLPB2jNpVOg==
-  dependencies:
-    highlight.js "^10.7.2"
-    tinycolor2 "^1.4.1"
-
-bk-magic-vue@^2.4.4:
+bk-magic-vue@2.4.8, bk-magic-vue@^2.4.4, bk-magic-vue@^2.4.8:
   version "2.4.8"
-  resolved "https://mirrors.tencent.com/npm/bk-magic-vue/-/bk-magic-vue-2.4.8.tgz#9b78fa16852a79224b3796c4a874142fc50fed05"
-  integrity sha512-zGEyU99T5TmtIX4fBZtS2ppE5Jaf1g1nw+i4cduOxCj8sgWX241RXpZexiN/sLUt5PuRD/rdJzbjTxhCX26Y4g==
+  resolved "https://mirrors.tencent.com/npm/@tencent/bk-magic-vue/-/@tencent/bk-magic-vue-2.4.8.tgz#a754c422a19e7f35017ee025f0ec52a7135cdc9f"
+  integrity sha512-6n3CJREHFJxClXGMQqNtpk9XegTIzF5ru+w+90F27J33sdMS4BnUsSRl7sMxTsEhdV+h4n46Fb98qccqE7onmg==
   dependencies:
     highlight.js "^10.7.2"
     spark-md5 "^3.0.2"
@@ -18956,7 +18948,7 @@ vue-echarts@^3.0.9:
     lodash "^4.17.10"
     resize-detector "^0.1.7"
 
-vue-echarts@^6.0.2:
+vue-echarts@^6.0.2, vue-echarts@^6.0.3:
   version "6.0.3"
   resolved "https://mirrors.tencent.com/npm/vue-echarts/-/vue-echarts-6.0.3.tgz#502eb33f6e41fd088831f720a96154bf0a5c4e72"
   integrity sha512-Nu+qb+szmBFCiVmNSZclquRx2lONGxfJXeppXODBYCl+KAdsP2TIaDwO2wfEFqU5jyxaL4b/qV7IYxswESTSFw==
