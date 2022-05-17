@@ -54,7 +54,7 @@ class TargetParamConverterTest {
             form = TargetFormType.ORIGINAL
         )
         Assert.assertEquals(
-            OriginalTargetParamConverter().convert(node = node!!, targetParam),
+            OriginalTargetParamConverter().convert(projectId = "001", node = node!!, targetParam = targetParam),
             Pair(targetParam.resourceKey, node.toString())
         )
     }
@@ -67,7 +67,7 @@ class TargetParamConverterTest {
             value = "$.data.ref"
         )
         Assert.assertEquals(
-            JsonPathTargetParamConverter().convert(node = node!!, targetParam),
+            JsonPathTargetParamConverter().convert(projectId = "001", node = node!!, targetParam = targetParam),
             Pair(targetParam.resourceKey, "refs/heads/merge_base_test")
         )
     }
@@ -90,9 +90,9 @@ class TargetParamConverterTest {
             template = template
         )
         Assert.assertEquals(
-            TemplateTargetParamConverter().convert(node!!, targetParam),
+            TemplateTargetParamConverter().convert(projectId = "001", node = node!!, targetParam = targetParam),
             Pair(
-                targetParam.resourceKey, JsonUtil.toJson(
+                targetParam.resourceKey, JsonUtil.toMap(
                     mapOf(
                         "BK_CI_BRANCH" to "refs/heads/merge_base_test",
                         "BK_CI_REPO_URL" to "http://git.code.tencent.com/mingshewhe/webhook_test.git"

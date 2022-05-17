@@ -73,6 +73,7 @@ class EventWebhookRequestService @Autowired constructor(
                     "sourceName:$sourceName,payload:$payload,headers:$headers"
             )
             val cloudEvent = toCloudEvent(
+                projectId = projectId,
                 sourceName = sourceName,
                 headers = headers,
                 payload = payload
@@ -94,6 +95,7 @@ class EventWebhookRequestService @Autowired constructor(
                 "start to handle event app webhook request,sourceName:$sourceName,payload:$payload,headers:$headers"
             )
             val cloudEvent = toCloudEvent(
+                projectId = null,
                 sourceName = sourceName,
                 headers = headers,
                 payload = payload
@@ -180,6 +182,7 @@ class EventWebhookRequestService @Autowired constructor(
     }
 
     private fun toCloudEvent(
+        projectId: String?,
         sourceName: String,
         headers: Map<String, String>,
         payload: String
@@ -191,6 +194,7 @@ class EventWebhookRequestService @Autowired constructor(
             null
         }
         return eventSourceHandler?.toCloudEvent(
+            projectId = projectId,
             headers = headers,
             payload = payload
         ) ?: HttpMessageFactory.createReader(headers, payload.toByteArray()).toEvent()

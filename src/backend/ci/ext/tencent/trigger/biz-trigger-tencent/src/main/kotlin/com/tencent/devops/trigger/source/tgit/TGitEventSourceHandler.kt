@@ -27,6 +27,8 @@
 
 package com.tencent.devops.trigger.source.tgit
 
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.jayway.jsonpath.JsonPath
 import com.tencent.devops.common.api.enums.ScmType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
@@ -34,6 +36,8 @@ import com.tencent.devops.repository.api.scm.ServiceScmResource
 import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.trigger.constant.SourceType
 import com.tencent.devops.trigger.source.IEventSourceHandler
+import com.tencent.devops.trigger.util.CredentialUtil
+import io.appform.jsonrules.utils.ComparisonUtils
 import io.cloudevents.CloudEvent
 import io.cloudevents.core.builder.CloudEventBuilder
 import org.slf4j.LoggerFactory
@@ -50,17 +54,75 @@ class TGitEventSourceHandler(
         private val logger = LoggerFactory.getLogger(TGitEventSourceHandler::class.java)
     }
 
-    override fun toCloudEvent(headers: Map<String, String>, payload: String): CloudEvent? {
+    override fun toCloudEvent(projectId: String?, headers: Map<String, String>, payload: String): CloudEvent? {
         val eventType = headers["X-Event"] ?: return null
         val secretToken = headers["X-Token"]
         val traceId = headers["X-TRACE-ID"]
+
+        val data = when (eventType) {
+            "Merge Request Hook" -> mrHookData(payload = payload, projectId = projectId)
+            else -> payload
+        }
+        if (eventType == "Merge Request Hook") {
+            mrHookData(payload, projectId)
+        }
 
         return CloudEventBuilder.v1()
             .withId(traceId)
             .withType(eventType)
             .withSource(URI.create(SourceType.TGIT))
-            .withData("application/json", payload.toByteArray(StandardCharsets.UTF_8))
+            .withData("application/json", data.toByteArray(StandardCharsets.UTF_8))
             .build()
+    }
+
+    private fun mrHookData(payload: String, projectId: String?): String {
+        try {
+            val ctx = JsonPath.using(ComparisonUtils.SUPPRESS_EXCEPTION_CONFIG).parse(payload)
+            val gitProjectId = ctx.read<String>("$.object_attributes.target_project_id")
+            val gitUrl = ctx.read<String>("$.object_attributes.target.http_url")
+            val mrId = ctx.read<Long>("$.object_attributes.id")
+            val token = CredentialUtil.getCredential(
+                client = client,
+                projectId = projectId!!,
+                credentialId = "RDS_PERSONAL_ACCESS_TOKEN"
+            )
+            val mrInfo = client.get(ServiceScmResource::class).getMrInfo(
+                projectName = gitProjectId,
+                url = gitUrl,
+                type = ScmType.CODE_GIT,
+                token = token,
+                mrId = mrId
+            ).data
+            val mrChangeInfo = client.get(ServiceScmResource::class).getMergeRequestChangeInfo(
+                projectName = gitProjectId,
+                url = gitUrl,
+                type = ScmType.CODE_GIT,
+                token = token,
+                mrId = mrId
+            ).data
+            val changeFiles = mrChangeInfo?.files?.map {
+                if (it.deletedFile) {
+                    it.oldPath
+                } else {
+                    it.newPath
+                }
+            } ?: emptyList()
+            val mapper = JsonUtil.getObjectMapper()
+            val rootNode = mapper.readTree(payload)
+            val objectAttributesNode = rootNode.get("object_attributes") as ObjectNode
+            objectAttributesNode.set<ObjectNode>(
+                "labels",
+                mapper.valueToTree(mrInfo?.labels ?: emptyList<String>())
+            )
+            objectAttributesNode.set<ObjectNode>(
+                "paths",
+                mapper.valueToTree(changeFiles)
+            )
+            return mapper.writeValueAsString(rootNode)
+        } catch (ignore: Throwable) {
+            logger.warn("Failed to convert merge request hook payload", ignore)
+        }
+        return payload
     }
 
     override fun registerWebhook(webhookUrl: String, webhookRequestParam: TGitWebhookRequestParam): Boolean {
