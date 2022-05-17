@@ -77,7 +77,6 @@
     export default {
         data () {
             return {
-                DOCS_URL_PREFIX,
                 imageDialogConf: {
                     isShow: false,
                     width: 640,
@@ -124,7 +123,7 @@
         },
         methods: {
             goIwiki () {
-                window.open(`${this.DOCS_URL_PREFIX}/x/Lozm`)
+                window.open(`${DOCS_URL_PREFIX}/x/Lozm`)
             },
             toImageDetail (item) {
                 localStorage.setItem('backRouterName', 'projectImage')
