@@ -11,7 +11,7 @@
         <span slot="tool"
             v-if="currentTab === 'setting' && showDebugDockerBtn"
             class="head-tool"
-            @click="$refs.container.startDebug"
+            @click="handleDebug"
         >{{ $t('editPage.docker.debugConsole') }}</span>
         <template v-slot:content>
 
@@ -118,6 +118,11 @@
             executeCount () {
                 const executeCountList = this.pluginList.map((plugin) => plugin.executeCount || 1)
                 return Math.max(...executeCountList)
+            }
+        },
+        methods: {
+            handleDebug () {
+                this.$refs.container?.startDebug?.()
             }
         }
     }
