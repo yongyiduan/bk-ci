@@ -327,21 +327,226 @@
         border-radius: 5px;
         top: 0;
         margin: 10px 0;
-        .atom-tab {
-            height: 100%;
-            .bk-tab-label-wrapper {
-                text-align: center;
+        &:before {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border: 1px solid $borderColor;
+            border-left-color: white;
+            border-bottom-color: white;
+            transform: rotate(45deg);
+            right: -6px;
+            top: 136px;
+        }
+        .not-recommend {
+            text-decoration: line-through;
+        }
+        .atom-selector-header {
+            position: relative;
+            height: 36px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin: 24px 21px 10px 21px;
+            .atom-fresh {
+                cursor: pointer;
+                display: inline-block;
+                font-size: 14px;
+                padding: 4px;
+                margin-left: 3px;
+                color: $primaryColor;
+                &.spin-icon {
+                    color: $fontLighterColor
+                }
+            }
+            > h3 {
+                font-size: 14px;
+                margin: 0;
+            }
+            .atom-search-input {
+                width: 200px;
             }
         }
-        .bk-tab-section {
-            padding: 0;
-            height: calc(100% - 50px);
-            .bk-tab-content {
-                height: 100%;
-                .atom-item-main {
-                    height: calc(100% - 62px);
+        .search-result {
+            height: calc(100% - 70px);
+            overflow-y: auto;
+            margin: 0 11px 0 21px;
+            padding-right: 10px;
+            padding-bottom: 10px;
+            .search-title {
+                line-height:16px;
+                font-weight:bold;
+                font-size: 12px;
+                margin: 9px 0;
+                &.gap-border {
+                    padding-top: 10px;
+                    border-top: 1px solid #ebf0f5;
                 }
             }
         }
+        .atom-tab {
+            height: calc(100% - 70px);
+            border: 0;
+            font-size: 12px;
+            color: $fontWeightColor;
+            font-weight: 500;
+            padding: 0 10px 10px 10px;
+            overflow: hidden;
+            div.bk-tab-section {
+                height: calc(100% - 42px);
+                overflow-y: hiden;
+                padding: 0;
+                .bk-tab-content {
+                    height: 100%;
+                    overflow: auto;
+                }
+            }
+            .bk-tab-header {
+                .bk-tab-label-wrapper {
+                    .bk-tab-label-list {
+                        .bk-tab-label-item {
+                            padding: 0 15px;
+                            min-width: auto;
+                            .bk-tab-label {
+                                font-size: 12px;
+                                &.active {
+                                    font-weight: bold;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .atom-item {
+            padding: 20px 20px 9px 20px;
+            height: 100px;
+            width: 100%;
+            &:hover,
+            &.active {
+                background: #E9F4FF;
+                .atom-info-content .atom-from,
+                .atom-operate > .atom-link {
+                    opacity: 1;
+                }
+            }
+
+            &:not(.active):hover {
+                background: #FAFBFD;
+            }
+            &.disabled {
+                .atom-info-content,
+                .atom-info-content .desc {
+                    color: $fontLighterColor;
+                }
+            }
+            .atom-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 50px;
+                line-height: 50px;
+                margin-right: 15px;
+                color: $fontLighterColor;
+                .devops-icon {
+                    fill: currentColor
+                }
+                > img {
+                    width: 100%;
+                    border-radius: 4px;
+                }
+            }
+            .atom-info-content {
+                flex: 1;
+                color: #4A4A4A;
+                font-weight: bold;
+                font-size: 14px;
+                padding-right: 10px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                .atom-name {
+                    display: flex;
+                    align-items: center;
+                    .allow-os-list {
+                        margin-left: 10px;
+                        .os-tag {
+                            color: $fontLighterColor;
+                            font-size: 14px;
+                            padding-right: 4px;
+                            vertical-align: top;
+                        }
+                    }
+                }
+                .desc {
+                    font-size: 12px;
+                    color: $fontWeightColor;
+                    display: -webkit-box;
+                    overflow: hidden;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                }
+                .atom-from {
+                    font-size: 12px;
+                    color: #C5C7D1;
+                    opacity: 0;
+                }
+            }
+            .atom-operate {
+                width: 60px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                position: relative;
+                button.select-atom-btn[disabled] {
+                    cursor: not-allowed !important;
+                    background-color: #fff;
+                    color: #c4c6cc;
+                }
+                .select-atom-btn.disabled {
+                    opacity: 0;
+                }
+                .select-atom-btn:hover {
+                    background-color: $primaryColor;
+                    color: white;
+                }
+                .atom-link {
+                    font-size: 12px;
+                    opacity: 0;
+                    color: $primaryColor;
+                    position: absolute;
+                    bottom: 0;
+                }
+            }
+        }
+    }
+
+    .empty-atom-list {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .atom-item-main {
+        display: flex;
+        height: 100%;
+    }
+
+    .selector-slide-enter-active, .selector-slide-leave-active {
+        transition: transform .2s linear, opacity .2s cubic-bezier(1, -0.05, .94, .17);
+    }
+
+    .selector-slide-enter {
+        -webkit-transform: translate3d(600px, 0, 0);
+        transform: translateX(600px);
+        opacity: 0;
+    }
+
+    .selector-slide-leave-active {
+        display: none;
     }
 </style>
