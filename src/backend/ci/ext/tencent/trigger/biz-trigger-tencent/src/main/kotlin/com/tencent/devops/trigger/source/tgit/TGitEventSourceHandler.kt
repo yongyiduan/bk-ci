@@ -78,7 +78,7 @@ class TGitEventSourceHandler(
     private fun mrHookData(payload: String, projectId: String?): String {
         try {
             val ctx = JsonPath.using(ComparisonUtils.SUPPRESS_EXCEPTION_CONFIG).parse(payload)
-            val gitProjectId = ctx.read<Long>("$.object_attributes.target_project_id").toString()
+            val gitProjectId = ctx.read<Int>("$.object_attributes.target_project_id").toString()
             val gitUrl = ctx.read<String>("$.object_attributes.target.http_url")
             val mrId = ctx.read<Long>("$.object_attributes.id")
             val token = CredentialUtil.getCredential(
