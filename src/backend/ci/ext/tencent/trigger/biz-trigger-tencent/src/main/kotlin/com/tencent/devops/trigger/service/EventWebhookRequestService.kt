@@ -29,6 +29,7 @@ package com.tencent.devops.trigger.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.service.utils.SpringContextUtil
 import com.tencent.devops.trigger.constant.CloudEventExtensionKey.THIRD_ID
 import com.tencent.devops.trigger.constant.EventBusMessageCode.SOURCE_NOT_SUPPORT
@@ -79,7 +80,7 @@ class EventWebhookRequestService @Autowired constructor(
                 payload = payload
             )
             logger.info(
-                "$projectId|$busId|toCloudEvent,source=${cloudEvent.source},type=${cloudEvent.type},id=${cloudEvent.id}"
+                "$projectId|$busId|toCloudEvent:${JsonUtil.toJson(cloudEvent)}"
             )
             handleWebhook(
                 projectId = projectId,

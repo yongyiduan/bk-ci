@@ -63,9 +63,6 @@ class TGitEventSourceHandler(
             "Merge Request Hook" -> mrHookData(payload = payload, projectId = projectId)
             else -> payload
         }
-        if (eventType == "Merge Request Hook") {
-            mrHookData(payload, projectId)
-        }
 
         return CloudEventBuilder.v1()
             .withId(traceId)
