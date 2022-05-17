@@ -122,7 +122,6 @@
         },
         methods: {
             handleDebug () {
-                debugger
                 this.$refs.container?.startDebug?.()
             }
         }
