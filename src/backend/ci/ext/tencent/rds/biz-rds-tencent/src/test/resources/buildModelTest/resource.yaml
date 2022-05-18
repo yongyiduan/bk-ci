@@ -1,14 +1,21 @@
 product_id: 1
 product_name: test
 projects:
-- job:
+  - job:
     tapd_id: 00000
     bcs_id: xxxxxx
     repo_url: github.com/XXXX/stream.git # 如果上一级repo填了，那这里可选
-- stream:
+  - stream:
     tapd_id: 00000
     services:
       - process:
           repo_url: github.com/aaa/b.git # 如果上一级repo填了，那这里可选
       - dispatch:
           repo_url: github.com/aaa/ccc.git
+
+tickets:
+  tgit:
+    accessToken: xxxxx
+  bkrepo:
+    username: xxx
+    accessToken: xxxxx

@@ -32,7 +32,6 @@ import com.tencent.devops.rds.pojo.yaml.Resource
 
 /**
  * init时上传的chart配置数据
- * @param clientConfig 用户各类凭据信息
  * @param mainYamlStr main.yaml 文件
  * @param mainObject main.yaml 对象
  * @param resourceYamlStr resource.yaml 文件
@@ -40,7 +39,6 @@ import com.tencent.devops.rds.pojo.yaml.Resource
  * @param rdsYaml RDS.yaml 对象
  */
 data class ChartResources(
-    val clientConfig: ClientConfigYaml,
     val mainYamlStr: String,
     val mainObject: Main,
     val resourceYamlStr: String,
