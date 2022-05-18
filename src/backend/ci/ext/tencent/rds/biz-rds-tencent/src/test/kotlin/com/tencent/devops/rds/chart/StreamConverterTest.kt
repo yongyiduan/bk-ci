@@ -84,7 +84,7 @@ class StreamConverterTest {
         val cachePath = ResourceUtils.getFile("classpath:buildModelTest").absolutePath
         val resourceYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_RESOURCE_YAML_FILE)
         println(resourceYamlStr!!)
-        println("---")
+        println("--3333-")
         val yaml = org.yaml.snakeyaml.Yaml()
         val obj = yaml.load(resourceYamlStr) as Any
         val formatResourceStr = YamlUtil.toYaml(obj)

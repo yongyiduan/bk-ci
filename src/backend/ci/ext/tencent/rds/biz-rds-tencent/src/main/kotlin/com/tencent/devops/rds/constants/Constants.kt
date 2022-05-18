@@ -30,22 +30,34 @@ package com.tencent.devops.rds.constants
 object Constants {
     // 保存chart模板文件的目录
     const val CHART_TEMPLATE_DIR = "templates"
+
     // 指定的main入口文件
     const val CHART_MAIN_YAML_FILE = "main.yaml"
+
     // 指定的resource声明文件
     const val CHART_RESOURCE_YAML_FILE = "resource.yaml"
+
     // 指定的chart声明文件
     const val CHART_RDS_YAML_FILE = "RDS.yaml"
+
     // 指定的main入口文件保留路径
     const val CHART_INIT_YAML_FILE_STORAGE = "INIT_YAML"
+
     // 用户自己的配置文件
     const val CHART_CLIENT_CONFIG_YAML_FILE = "client_config.yaml"
+
     // rds会保存的产品负责人的GIT TOKEN
     const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"
+
     // rds的chart包的格式
     const val CHART_PACKAGE_FORMAT = ".tgz"
+
     // rds需要的git凭证信息
     const val RDS_GIT_TICKET = "RDS_PERSONAL_ACCESS_TOKEN"
+
+    // rds需要的仓库凭据信息
+    const val RDS_BKREPO_TICKET = "RDS_BKREPO_ACCESS_TOKEN"
+
     // rds接收引擎构建启动和结束事件 TODO 改为SCS模式的广播队列
     const val QUEUE_PIPELINE_BUILD_FINISH_RDS = "q.engine.pipeline.build.finish.rds"
     const val QUEUE_PIPELINE_BUILD_START_RDS = "q.engine.pipeline.build.start.rds"

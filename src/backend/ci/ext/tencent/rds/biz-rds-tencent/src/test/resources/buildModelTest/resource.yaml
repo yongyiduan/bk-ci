@@ -1,13 +1,21 @@
-product_id: 1001
-product_name: rds-gray1
+product_id: 1
+product_name: test
 projects:
+  - job:
+    tapd_id: 00000
+    bcs_id: xxxxxx
+    repo_url: github.com/XXXX/stream.git # 如果上一级repo填了，那这里可选
   - stream:
-      tapd_id: 20428483
-      repo_url: http://git.woa.com/prod-ci-test/all-test.git
-  - ci:
-      tapd_id: 20428483
-      services:
-        - process:
-            repo_url: http://git.woa.com/test-ci-test/all-test.git
-        - dispatch:
-            repo_url: https://git.woa.com/gray-ci-test/all-test
+    tapd_id: 00000
+    services:
+      - process:
+          repo_url: github.com/aaa/b.git # 如果上一级repo填了，那这里可选
+      - dispatch:
+          repo_url: github.com/aaa/ccc.git
+
+tickets:
+  tgit:
+    accessToken: xxxxx
+  bkrepo:
+    username: xxx
+    accessToken: xxxxx

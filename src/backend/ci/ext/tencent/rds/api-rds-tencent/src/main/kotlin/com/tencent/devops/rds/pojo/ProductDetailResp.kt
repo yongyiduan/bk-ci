@@ -27,8 +27,6 @@
 
 package com.tencent.devops.rds.pojo
 
-import com.tencent.devops.rds.pojo.enums.ProductUserType
-
 /**
  * product详情的返回
  * @param resourceYaml resource yaml文本

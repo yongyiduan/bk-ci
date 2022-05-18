@@ -34,7 +34,8 @@ data class PreResource(
     val productId: Long,
     @JsonProperty("product_name")
     val productName: String,
-    val projects: List<Map<String, PreProject>>
+    val projects: List<Map<String, PreProject>>,
+    val tickets: Tickets
 ) {
     fun getResourceObject(): Resource {
         val projectList = mutableListOf<Project>()
@@ -54,7 +55,8 @@ data class PreResource(
         return Resource(
             productId = productId,
             productName = productName,
-            projects = projectList
+            projects = projectList,
+            tickets = tickets
         )
     }
 

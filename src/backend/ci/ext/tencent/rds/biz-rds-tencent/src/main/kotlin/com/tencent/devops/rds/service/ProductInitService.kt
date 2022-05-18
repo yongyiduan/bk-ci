@@ -55,7 +55,6 @@ import com.tencent.devops.rds.dao.RdsProductUserDao
 import com.tencent.devops.rds.exception.ApiErrorCodeEnum
 import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.pojo.ChartResources
-import com.tencent.devops.rds.pojo.ClientConfigYaml
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
 import com.tencent.devops.rds.pojo.RdsProductInfo
 import com.tencent.devops.rds.pojo.RdsProductStatusResult
@@ -66,6 +65,7 @@ import com.tencent.devops.rds.pojo.yaml.Main
 import com.tencent.devops.rds.pojo.yaml.PreMain
 import com.tencent.devops.rds.pojo.yaml.PreResource
 import com.tencent.devops.rds.pojo.yaml.Resource
+import com.tencent.devops.rds.pojo.yaml.Tickets
 import com.tencent.devops.rds.utils.RdsPipelineUtils
 import com.tencent.devops.rds.utils.Yaml
 import com.tencent.devops.ticket.api.ServiceCredentialResource
@@ -121,7 +121,7 @@ class ProductInitService @Autowired constructor(
             productInfo = createProduct(userId, chartResources)
 
             // 添加各类凭证信息
-            createCred(userId, productInfo.projectId, chartResources.clientConfig.user.gitPrivateToken)
+            createCred(userId, productInfo.projectId, chartResources.resourceObject.tickets)
 
             // 修改状态为初始化中
             productInfoDao.updateProductStatus(
@@ -198,7 +198,7 @@ class ProductInitService @Autowired constructor(
         productId: Long,
         projectId: String
     ) {
-        val (_, _, mainObject, _, resourceObject) = chartResources
+        val (_, mainObject, _, resourceObject) = chartResources
 
         // 如果配置了初始化流水线并存在该流水线，则解析并执行，传入特定的resource参数
         runInitYaml(
@@ -268,14 +268,6 @@ class ProductInitService @Autowired constructor(
 
     // 获取chart中各类配置数据
     private fun readResources(cachePath: String): ChartResources {
-        // 读取用户配置文件，获取各类token
-        val clientConfigStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_CLIENT_CONFIG_YAML_FILE)
-        logger.info("RDS|init|clientConfig|clientConfigStr=$clientConfigStr")
-        val clientConfig = YamlUtil.getObjectMapper().readValue(
-            clientConfigStr,
-            ClientConfigYaml::class.java
-        )
-
         val mainYamlStr = chartParser.getCacheChartFile(cachePath, Constants.CHART_MAIN_YAML_FILE)!!
         logger.info("RDS|init|MainFile|mainYamlStr=$mainYamlStr")
         val mainYaml = YamlUtil.getObjectMapper().readValue(
@@ -301,7 +293,7 @@ class ProductInitService @Autowired constructor(
             RdsYaml::class.java
         )
 
-        return ChartResources(clientConfig, mainYamlStr, mainObject, resourceYamlStr, resourceObject, rdsYaml)
+        return ChartResources(mainYamlStr, mainObject, resourceYamlStr, resourceObject, rdsYaml)
     }
 
     private fun createProduct(masterUserId: String, chartResource: ChartResources): RdsProductInfo {
@@ -406,31 +398,66 @@ class ProductInitService @Autowired constructor(
     private fun createCred(
         masterUserId: String,
         projectId: String,
-        gitToken: String
+        tickets: Tickets
     ) {
+        // 创建工蜂凭据
+        if (!checkTicketExist(projectId, Constants.RDS_GIT_TICKET)) {
+            createCred(
+                projectId, masterUserId,
+                CredentialCreate(
+                    credentialId = Constants.RDS_GIT_TICKET,
+                    credentialName = "RDS使用的内置凭证-TGIT-请勿修改",
+                    credentialType = CredentialType.ACCESSTOKEN,
+                    credentialRemark = "RDS使用的内置凭证，请勿修改",
+                    v1 = tickets.tGit.accessToken
+                )
+            )
+        }
+
+        // 创建bkrepo凭据
+        if (!checkTicketExist(projectId, Constants.RDS_BKREPO_TICKET)) {
+            createCred(
+                projectId, masterUserId,
+                CredentialCreate(
+                    credentialId = Constants.RDS_BKREPO_TICKET,
+                    credentialName = "RDS使用的内置凭证-BKREPO-请勿修改",
+                    credentialType = CredentialType.USERNAME_PASSWORD,
+                    credentialRemark = "RDS使用的内置凭证，请勿修改",
+                    v1 = tickets.bkRepo.username,
+                    v2 = tickets.bkRepo.accessToken
+                )
+            )
+        }
+    }
+
+    private fun checkTicketExist(
+        projectId: String,
+        credId: String
+    ): Boolean {
         try {
             client.get(ServiceCredentialResource::class).check(
                 projectId = projectId,
-                credentialId = Constants.RDS_GIT_TICKET,
+                credentialId = credId,
             )
-            return
+            return true
         } catch (exception: RemoteServiceException) {
             if (exception.httpStatus != 404) {
                 throw exception
             }
         }
+        return false
+    }
 
+    private fun createCred(
+        projectId: String,
+        masterUserId: String,
+        credCreate: CredentialCreate
+    ) {
         try {
             val result = client.get(ServiceCredentialResource::class).create(
                 userId = masterUserId,
                 projectId = projectId,
-                credential = CredentialCreate(
-                    credentialId = Constants.RDS_GIT_TICKET,
-                    credentialName = "RDS使用的内置凭证-请勿修改",
-                    credentialType = CredentialType.ACCESSTOKEN,
-                    credentialRemark = "RDS使用的内置凭证，请勿修改",
-                    v1 = gitToken
-                )
+                credential = credCreate
             ).data
             if (result == null || !result) {
                 throw RuntimeException("创建结果为空或false")

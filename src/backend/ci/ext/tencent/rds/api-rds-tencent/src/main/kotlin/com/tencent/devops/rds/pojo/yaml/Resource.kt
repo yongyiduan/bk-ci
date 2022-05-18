@@ -34,5 +34,6 @@ data class Resource(
     val productId: Long,
     @JsonProperty("product_name")
     val productName: String,
-    val projects: List<Project>
+    val projects: List<Project>,
+    val tickets: Tickets
 )

@@ -52,12 +52,14 @@ object ChartPipelineStartParams {
             RDS_CHECKOUT_REF
         )
         if (init) {
-            params.addAll(listOf(
-                RDS_TAPD_IDS,
-                RDS_REPO_URLS,
-                RDS_PROJECTS,
-                RDS_SERVICES
-            ))
+            params.addAll(
+                listOf(
+                    RDS_TAPD_IDS,
+                    RDS_REPO_URLS,
+                    RDS_PROJECTS,
+                    RDS_SERVICES
+                )
+            )
         }
         return params.map {
             BuildFormProperty(
