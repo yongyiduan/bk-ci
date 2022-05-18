@@ -186,7 +186,7 @@
                 return {
                     storeType: this.storeType,
                     storeCode: this.storeCode,
-                    scopes: this.envScope,
+                    scope: this.envScope,
                     varName: String(this.envName)
                 }
             }
