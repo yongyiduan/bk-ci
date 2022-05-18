@@ -45,7 +45,7 @@ class TapdEventSourceHandler @Autowired constructor(
     val tapdConfig: TapdConfig
 ) : IEventSourceHandler<Unit> {
 
-    override fun toCloudEvent(headers: Map<String, String>, payload: String): CloudEvent? {
+    override fun toCloudEvent(projectId: String?, headers: Map<String, String>, payload: String): CloudEvent? {
         val ctx = JsonPath.parse(payload)
         return CloudEventBuilder.v1()
             .withId(ctx.read<String>("$.event_id"))

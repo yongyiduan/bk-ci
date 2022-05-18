@@ -35,6 +35,7 @@ import io.cloudevents.CloudEvent
 interface IEventSourceHandler<T> {
 
     fun toCloudEvent(
+        projectId: String?,
         headers: Map<String, String>,
         payload: String
     ): CloudEvent?
