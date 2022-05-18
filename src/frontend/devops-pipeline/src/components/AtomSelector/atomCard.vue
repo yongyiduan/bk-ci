@@ -124,7 +124,6 @@
                 } else {
                     contxt = this.$t('editPage.noEnvUseTips')
                 }
-
                 return {
                     delay: 300,
                     disabled: !atom.disabled,
@@ -182,6 +181,7 @@
                 this.installAtom(param).then(() => {
                     this.$bkMessage({ message: this.$t('editPage.installSuc'), theme: 'success', extCls: 'install-tips' })
                     this.atom.installed = !this.atom.installed
+                    this.$emit('installAtomSuccess', this.atom)
                 }).catch((err) => {
                     this.$bkMessage({ message: err.message || err, theme: 'error' })
                 }).finally(() => {
