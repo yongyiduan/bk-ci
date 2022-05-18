@@ -50,7 +50,6 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import java.util.regex.Pattern
 
 @Service
 class StreamConverter @Autowired constructor(
@@ -66,7 +65,8 @@ class StreamConverter @Autowired constructor(
         productId: Long,
         projectId: String,
         cachePath: String,
-        pipelineFile: File
+        pipelineFile: File,
+        init: Boolean? = false
     ): StreamBuildResult {
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8).ifBlank {
             throw ErrorCodeException(
@@ -94,7 +94,7 @@ class StreamConverter @Autowired constructor(
                 projectCode = projectId
             ),
             yaml = yamlObject,
-            pipelineParams = ChartPipelineStartParams.emptyPipelineParams()
+            pipelineParams = ChartPipelineStartParams.emptyPipelineParams(init == true)
         )
 
         return StreamBuildResult(

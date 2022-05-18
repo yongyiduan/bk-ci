@@ -38,15 +38,28 @@ object ChartPipelineStartParams {
     const val RDS_CHECKOUT_REPOSITORY_URL = "RDS_CHECKOUT_REPOSITORY_URL"
     const val RDS_CHECKOUT_PULL_TYPE = "RDS_CHECKOUT_PULL_TYPE"
     const val RDS_CHECKOUT_REF = "RDS_CHECKOUT_REF"
+    const val RDS_TAPD_IDS = "RDS_TAPD_IDS"
+    const val RDS_REPO_URLS = "RDS_REPO_URLS"
+    const val RDS_PROJECTS = "RDS_PROJECTS"
+    const val RDS_SERVICES = "RDS_SERVICES"
 
     // TODO: 目前全是string后续再修改
     // 将上面的参数变为空的流水线参数
-    fun emptyPipelineParams(): List<BuildFormProperty> {
-        return listOf(
+    fun emptyPipelineParams(init: Boolean): List<BuildFormProperty> {
+        val params = mutableListOf(
             RDS_CHECKOUT_REPOSITORY_URL,
             RDS_CHECKOUT_PULL_TYPE,
             RDS_CHECKOUT_REF
-        ).map {
+        )
+        if (init) {
+            params.addAll(listOf(
+                RDS_TAPD_IDS,
+                RDS_REPO_URLS,
+                RDS_PROJECTS,
+                RDS_SERVICES
+            ))
+        }
+        return params.map {
             BuildFormProperty(
                 id = it,
                 required = true,

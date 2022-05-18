@@ -1,12 +1,12 @@
 name: Rds初始化
 
 variables:
-  tapd_ids: ""
-  repo_urls: ""
-  projects: ""
+  RDS_TAPD_IDS: ""
+  RDS_REPO_URLS: ""
+  RDS_PROJECTS: ""
 
 jobs:
-  job_id_1:   
+  job_id_1:
     runs-on: docker
     strategy:
       matrix:
@@ -14,7 +14,7 @@ jobs:
     steps:
       - run: |
           echo "Tapd初始化 --依赖Tapd接口"
-  job_id_2:   
+  job_id_2:
     runs-on: docker
     strategy:
       matrix:
@@ -26,7 +26,7 @@ jobs:
           credential_id: "${{ ci.token }}"
           url: "${{ matrix.repo_urls }}"
 
-  job_id_3:   
+  job_id_3:
     runs-on: docker
     strategy:
       matrix:
