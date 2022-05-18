@@ -31,5 +31,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class PreService(
     @JsonProperty("repo_url")
-    val repoUrl: Any
+    val repoUrl: String
 )

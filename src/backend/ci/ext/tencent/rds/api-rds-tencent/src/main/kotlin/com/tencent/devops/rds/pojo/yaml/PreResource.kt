@@ -34,7 +34,7 @@ data class PreResource(
     val productId: Long,
     @JsonProperty("product_name")
     val productName: String,
-    val projects: List<Map<Any, PreProject>>
+    val projects: List<Map<String, PreProject>>
 ) {
     fun getResourceObject(): Resource {
         val projectList = mutableListOf<Project>()
@@ -42,10 +42,10 @@ data class PreResource(
             projectMap.map { (k, v) ->
                 projectList.add(
                     Project(
-                        id = k.toString(),
-                        tapdId = v.tapdId.toString(),
-                        bcsId = v.bcsId.toString(),
-                        repoUrl = v.repoUrl.toString(),
+                        id = k,
+                        tapdId = v.tapdId,
+                        bcsId = v.bcsId,
+                        repoUrl = v.repoUrl,
                         services = v.services?.let { getServiceList(it) }
                     )
                 )
@@ -59,15 +59,15 @@ data class PreResource(
     }
 
     private fun getServiceList(
-        services: List<Map<Any, PreService>>
+        services: List<Map<String, PreService>>
     ): List<Service> {
         val serviceList = mutableListOf<Service>()
         services.forEach { serviceMap ->
             serviceMap.forEach { (k, v) ->
                 serviceList.add(
                     Service(
-                        id = k.toString(),
-                        repoUrl = v.repoUrl.toString()
+                        id = k,
+                        repoUrl = v.repoUrl
                     )
                 )
             }
