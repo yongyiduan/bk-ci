@@ -47,9 +47,9 @@ import com.tencent.devops.store.pojo.enums.ExtServiceStatusEnum
 import com.tencent.devops.store.pojo.enums.ServiceTypeEnum
 import com.tencent.devops.store.utils.VersionUtils
 import org.jooq.Condition
-import org.jooq.Record1
 import org.jooq.DSLContext
 import org.jooq.Record
+import org.jooq.Record2
 import org.jooq.Result
 import org.jooq.impl.DSL
 import org.slf4j.LoggerFactory
@@ -148,9 +148,12 @@ class ExtServiceDao {
         }
     }
 
-    fun getExtServiceIds(dslContext: DSLContext, serviceCode: String): Result<Record1<String>> {
+    fun getExtServiceIds(dslContext: DSLContext, serviceCode: String): Result<Record2<String, Boolean>> {
         with(TExtensionService.T_EXTENSION_SERVICE) {
-            return dslContext.select(ID).from(this).where(SERVICE_CODE.eq(serviceCode)).fetch()
+            return dslContext.select(ID.`as`("id"), LATEST_FLAG.`as`("latestFlag")).from(this)
+                .where(SERVICE_CODE.eq(serviceCode))
+                .and(LATEST_FLAG.eq(true))
+                .fetch()
         }
     }
 
