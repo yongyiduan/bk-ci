@@ -37,10 +37,10 @@
                         <span
                             class="text-ellipsis item-text"
                             v-bk-overflow-tips="{
-                                content: dir.filePath,
+                                content: dir.name,
                                 placement: 'right'
                             }"
-                        >{{ dir.filePath }}</span>
+                        >{{ dir.name }}</span>
                     </section>
                     <section
                         v-for="(pipeline) in dir.children"
@@ -121,8 +121,9 @@
     import register from '@/utils/websocket-register'
     import validateRule from '@/utils/validate-rule'
 
-    const getDefaultDir = (filePath, isShow = true) => ({
-        filePath,
+    const getDefaultDir = ({ path, name }, isShow = true) => ({
+        path,
+        name,
         children: [],
         isShow,
         isLoadEnd: false,
@@ -207,12 +208,12 @@
                 return pipelines.getPipelineDirList(this.projectId, {
                     pipelineId: this.$route.params.pipelineId
                 }).then((data) => {
-                    const allDirs = (data.allPath || []).map((path) => getDefaultDir(path))
-                    const ciDir = getDefaultDir('.ci/', false)
+                    const allDirs = (data.allPath || []).map((dir) => getDefaultDir(dir))
+                    const ciDir = getDefaultDir({ name: '.ci/', path: '.ci/' }, false)
                     this.dirList = [...allDirs, ciDir]
 
                     // 展开最外层和当前流水线目录
-                    const currentDir = allDirs.find((dir) => (dir.filePath === data.currentPath))
+                    const currentDir = allDirs.find((dir) => (dir.path === data.currentPath))
                     Promise.all([
                         this.chooseDir(ciDir),
                         this.chooseDir(currentDir)
@@ -265,7 +266,7 @@
             getPipelineList (dir) {
                 dir.isLoadingMore = true
                 const params = {
-                    filePath: dir.filePath,
+                    filePath: dir.path,
                     projectId: this.projectId,
                     page: dir.page,
                     pageSize: dir.pageSize
