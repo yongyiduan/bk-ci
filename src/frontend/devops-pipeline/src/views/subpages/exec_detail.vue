@@ -219,9 +219,6 @@
                     }
                 }))
             },
-            userName () {
-                return this.$userInfo && this.$userInfo.username ? this.$userInfo.username : ''
-            },
             panels () {
                 return [{
                             name: 'executeDetail',
