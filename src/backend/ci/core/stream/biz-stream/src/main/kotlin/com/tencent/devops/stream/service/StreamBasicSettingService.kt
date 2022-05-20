@@ -173,7 +173,7 @@ class StreamBasicSettingService @Autowired constructor(
                 )
             )
         }
-        logger.warn("init stream Conf: $gitProjectId  info: $projectInfo")
+        logger.warn("Init stream Conf: $gitProjectId  info: $projectInfo")
         throw RuntimeException("Create git ci project in devops failed, msg: get project info from git error")
     }
 
