@@ -262,9 +262,7 @@ const routes = [
     {
         path: '/pipeline/zhiyan/:projectId',
         component: pipelines,
-        children: [
-            zyPipelineRoute
-        ]
+        children: zyPipelineRoute
     }
 ]
 

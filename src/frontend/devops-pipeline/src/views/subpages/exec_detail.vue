@@ -199,6 +199,9 @@
             hooks () {
                 return this.extensionExecuteDetailTabsHooks
             },
+            userName () {
+                return this.$userInfo && this.$userInfo.username ? this.$userInfo.username : ''
+            },
             extensionTabs () {
                 return this.extensions.map(ext => ({
                     name: ext.serviceName,
