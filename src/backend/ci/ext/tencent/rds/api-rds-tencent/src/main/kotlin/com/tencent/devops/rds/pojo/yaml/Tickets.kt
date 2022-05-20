@@ -35,7 +35,8 @@ data class Tickets(
     @JsonProperty("tgit")
     val tGit: TGit,
     @JsonProperty("bkrepo")
-    val bkRepo: BkRepo
+    val bkRepo: BkRepo,
+    val image: Image
 )
 
 data class TGit(
@@ -43,6 +44,11 @@ data class TGit(
 )
 
 data class BkRepo(
+    val username: String,
+    val accessToken: String
+)
+
+data class Image(
     val username: String,
     val accessToken: String
 )

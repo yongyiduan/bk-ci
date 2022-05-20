@@ -58,6 +58,9 @@ object Constants {
     // rds需要的仓库凭据信息
     const val RDS_BKREPO_TICKET = "RDS_BKREPO_ACCESS_TOKEN"
 
+    // rds需要的镜像仓库凭据信息
+    const val RDS_IMAGE_TICKET = "RDS_IMAGE_ACCESS_TOKEN"
+
     // rds接收引擎构建启动和结束事件 TODO 改为SCS模式的广播队列
     const val QUEUE_PIPELINE_BUILD_FINISH_RDS = "q.engine.pipeline.build.finish.rds"
     const val QUEUE_PIPELINE_BUILD_START_RDS = "q.engine.pipeline.build.start.rds"

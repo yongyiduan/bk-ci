@@ -408,7 +408,7 @@ class ProductInitService @Autowired constructor(
                     credentialId = Constants.RDS_GIT_TICKET,
                     credentialName = "RDS使用的内置凭证-TGIT-请勿修改",
                     credentialType = CredentialType.ACCESSTOKEN,
-                    credentialRemark = "RDS使用的内置凭证，请勿修改",
+                    credentialRemark = "RDS使用的内置凭证，用于工蜂，请勿修改",
                     v1 = tickets.tGit.accessToken
                 )
             )
@@ -422,9 +422,24 @@ class ProductInitService @Autowired constructor(
                     credentialId = Constants.RDS_BKREPO_TICKET,
                     credentialName = "RDS使用的内置凭证-BKREPO-请勿修改",
                     credentialType = CredentialType.USERNAME_PASSWORD,
-                    credentialRemark = "RDS使用的内置凭证，请勿修改",
+                    credentialRemark = "RDS使用的内置凭证，用于制品库，请勿修改",
                     v1 = tickets.bkRepo.username,
                     v2 = tickets.bkRepo.accessToken
+                )
+            )
+        }
+
+        // 创建image凭据
+        if (!checkTicketExist(projectId, Constants.RDS_IMAGE_TICKET)) {
+            createCred(
+                projectId, masterUserId,
+                CredentialCreate(
+                    credentialId = Constants.RDS_IMAGE_TICKET,
+                    credentialName = "RDS使用的内置凭证-IMAGE-请勿修改",
+                    credentialType = CredentialType.USERNAME_PASSWORD,
+                    credentialRemark = "RDS使用的内置凭证，用于镜像仓库，请勿修改",
+                    v1 = tickets.image.username,
+                    v2 = tickets.image.accessToken
                 )
             )
         }
