@@ -359,7 +359,7 @@
                 const params = {
                     projectId: this.projectId,
                     page: 1,
-                    perPage: 100,
+                    pageSize: 100,
                     ...query
                 }
                 return new Promise((resolve) => {
