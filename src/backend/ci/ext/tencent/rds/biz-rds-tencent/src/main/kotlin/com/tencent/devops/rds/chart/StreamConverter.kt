@@ -94,7 +94,7 @@ class StreamConverter @Autowired constructor(
                 projectCode = projectId
             ),
             yaml = yamlObject,
-            pipelineParams = ChartPipelineStartParams.emptyPipelineParams(init == true)
+            pipelineParams = ChartPipelineStartParams.makePipelineParams(init == true, yamlObject.variables)
         )
 
         return StreamBuildResult(

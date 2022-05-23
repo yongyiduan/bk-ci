@@ -29,11 +29,13 @@ package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.pipeline.enums.BuildFormPropertyType
 import com.tencent.devops.common.pipeline.pojo.BuildFormProperty
+import com.tencent.devops.process.yaml.v2.models.Variable
 
 /**
  * 通过chart生成的流水线需要预置的启动参数
  */
 object ChartPipelineStartParams {
+    private const val VARIABLE_PREFIX = "variables."
     //  checkout参数需要的占位符
     const val RDS_CHECKOUT_REPOSITORY_URL = "RDS_CHECKOUT_REPOSITORY_URL"
     const val RDS_CHECKOUT_PULL_TYPE = "RDS_CHECKOUT_PULL_TYPE"
@@ -45,7 +47,7 @@ object ChartPipelineStartParams {
 
     // TODO: 目前全是string后续再修改
     // 将上面的参数变为空的流水线参数
-    fun emptyPipelineParams(init: Boolean): List<BuildFormProperty> {
+    fun makePipelineParams(init: Boolean, variables: Map<String, Variable>?): List<BuildFormProperty> {
         val params = mutableListOf(
             RDS_CHECKOUT_REPOSITORY_URL,
             RDS_CHECKOUT_PULL_TYPE,
@@ -61,7 +63,7 @@ object ChartPipelineStartParams {
                 )
             )
         }
-        return params.map {
+        val result = params.map {
             BuildFormProperty(
                 id = it,
                 required = true,
@@ -77,6 +79,40 @@ object ChartPipelineStartParams {
                 repoHashId = null,
                 relativePath = null
             )
+        }.toMutableList()
+
+        // 添加yaml中定义的变量
+        result.addAll(getBuildFormPropertyFromYmlVariable(variables))
+
+        return result
+    }
+
+    private fun getBuildFormPropertyFromYmlVariable(
+        variables: Map<String, Variable>?
+    ): List<BuildFormProperty> {
+        if (variables.isNullOrEmpty()) {
+            return emptyList()
         }
+        val buildFormProperties = mutableListOf<BuildFormProperty>()
+        variables.forEach { (key, variable) ->
+            buildFormProperties.add(
+                BuildFormProperty(
+                    id = VARIABLE_PREFIX + key,
+                    required = false,
+                    type = BuildFormPropertyType.STRING,
+                    defaultValue = variable.value ?: "",
+                    options = null,
+                    desc = null,
+                    repoHashId = null,
+                    relativePath = null,
+                    scmType = null,
+                    containerType = null,
+                    glob = null,
+                    properties = null,
+                    readOnly = variable.readonly
+                )
+            )
+        }
+        return buildFormProperties
     }
 }
