@@ -47,7 +47,7 @@ object Constants {
     const val CHART_CLIENT_CONFIG_YAML_FILE = "client_config.yaml"
 
     // rds会保存的产品负责人的GIT TOKEN
-    const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "RDS_PERSONAL_ACCESS_TOKEN"
+    const val RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN = "\${{ settings.RDS_PERSONAL_ACCESS_TOKEN.access_token }}"
 
     // rds的chart包的格式
     const val CHART_PACKAGE_FORMAT = ".tgz"

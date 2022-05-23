@@ -62,7 +62,7 @@ class RdsTXInnerModelCreatorImpl @Autowired constructor() : TXInnerModelCreator 
 
     companion object {
         //  checkout通过当前用户的token来拉取
-        private const val CHECKOUT_AUTH_TYPE = "TICKET"
+        private const val CHECKOUT_AUTH_TYPE = "PERSONAL_ACCESS_TOKEN"
     }
 
     override val marketRunTask: Boolean
