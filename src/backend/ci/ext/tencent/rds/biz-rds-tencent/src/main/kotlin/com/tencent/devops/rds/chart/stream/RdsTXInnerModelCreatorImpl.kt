@@ -123,7 +123,7 @@ class RdsTXInnerModelCreatorImpl @Autowired constructor() : TXInnerModelCreator 
         if (inputMap["authType"] == null) {
             inputMap["authType"] = CHECKOUT_AUTH_TYPE
             // 这里是rds创建好的ticket_id
-            inputMap["ticketId"] = Constants.RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN
+            inputMap["personalAccessToken"] = Constants.RDS_PRODUCT_USER_GIT_PRIVATE_TOKEN
         }
 
         // 拼装插件固定参数
