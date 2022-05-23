@@ -274,7 +274,6 @@ export default {
 
             // 查询不适用插件 category 不传
             if (isCommendAtomPageOver) {
-                category = undefined
                 fitOsFlag = false
                 queryFitAgentBuildLessAtomFlag = false
             }
@@ -286,7 +285,6 @@ export default {
                 fitOsFlag = undefined
                 jobType = 'AGENT'
             }
-            
             if (page === 1 && !isCommendAtomPageOver) {
                 commit(FETCHING_ATOM_LIST, true)
             } else {
