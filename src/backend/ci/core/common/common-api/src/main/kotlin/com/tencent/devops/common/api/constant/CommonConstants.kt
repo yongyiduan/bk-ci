@@ -103,8 +103,6 @@ const val DANG = "dang" // 当
 const val AND = "and" // 和
 const val OR = "or" // 或
 const val TIMETOSELECT = "timetoSelect" // 时必选
-const val API_ACCESS_TOKEN_PROPERTY = "access_token"
-const val TEMPLATE_ACROSS_INFO_ID = "devops_template_across_info_id"
 const val MASTER = "master" // 主干
 const val SYSTEM = "system" // 系统
 
@@ -122,3 +120,5 @@ const val KEY_DOCSLINK = "docsLink"
 const val KEY_DESCRIPTION = "description"
 const val KEY_WEIGHT = "weight"
 const val KEY_ALL = "all"
+const val API_ACCESS_TOKEN_PROPERTY = "access_token"
+const val TEMPLATE_ACROSS_INFO_ID = "devops_template_across_info_id"

@@ -44,8 +44,10 @@ import com.tencent.devops.prebuild.v2.component.PreCIYAMLValidator
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.process.pojo.BuildId
 import com.tencent.devops.process.yaml.modelCreate.ModelCreate
+import com.tencent.devops.process.yaml.modelCreate.inner.ExtraParam
 import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.tencent.devops.process.yaml.modelCreate.inner.PipelineInfo
+import com.tencent.devops.process.yaml.modelCreate.inner.PreCIData
 import com.tencent.devops.process.yaml.v2.models.PreTemplateScriptBuildYaml
 import com.tencent.devops.process.yaml.v2.models.Variable
 import com.tencent.devops.process.yaml.v2.parsers.template.YamlTemplate
@@ -104,10 +106,10 @@ class PreBuildV2Service @Autowired constructor(
         agentInfo: ThirdPartyAgentStaticInfo
     ): BuildId {
         // 1.校验yaml合法性
-        val (isPassed, _, errorMsg) = preCIYAMLValidator.validate(startUpReq.yaml)
+        /*val (isPassed, _, errorMsg) = preCIYAMLValidator.validate(startUpReq.yaml)
         if (!isPassed) {
             throw CustomException(Response.Status.BAD_REQUEST, "Invalid yaml: $errorMsg")
-        }
+        }*/
 
         // 2.标准化处理
         val scriptBuildYaml = ScriptYmlUtils.normalizePreCiYaml(
@@ -129,11 +131,23 @@ class PreBuildV2Service @Autowired constructor(
             pipelineId = createEmptyPipeline(userId, pipelineName)
         }
 
+        val preCIData = PreCIData(
+            agentId = agentInfo.agentId,
+            workspace = startUpReq.workspace,
+            userId = userId,
+            extraParam = ExtraParam(
+                codeccScanPath = startUpReq.extraParam?.codeccScanPath,
+                incrementFileList = startUpReq.extraParam?.incrementFileList,
+                ideVersion = startUpReq.extraParam?.ideVersion,
+                pluginVersion = startUpReq.extraParam?.pluginVersion
+            )
+        )
         val projectId = getUserProjectId(userId)
         val modelCreateEvent = ModelCreateEvent(
             userId = userId,
             projectCode = projectId,
             pipelineInfo = PipelineInfo(pipelineId),
+            preCIData = preCIData,
             gitData = null,
             streamData = null,
             changeSet = null,

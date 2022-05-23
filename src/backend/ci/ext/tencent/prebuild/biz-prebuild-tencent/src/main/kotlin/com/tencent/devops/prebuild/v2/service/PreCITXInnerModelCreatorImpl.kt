@@ -10,7 +10,7 @@ import com.tencent.devops.common.pipeline.pojo.element.ElementAdditionalOptions
 import com.tencent.devops.common.pipeline.pojo.element.market.MarketBuildAtomElement
 import com.tencent.devops.common.service.utils.SpringContextUtil
 import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
-import com.tencent.devops.process.yaml.modelCreate.inner.PreCIInfo
+import com.tencent.devops.process.yaml.modelCreate.inner.PreCIData
 import com.tencent.devops.process.yaml.modelCreate.inner.TXInnerModelCreator
 import com.tencent.devops.process.yaml.modelCreate.pojo.PreCIDispatchInfo
 import com.tencent.devops.process.yaml.v2.models.Resources
@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response
 
 @Primary
 @Component
-class PreCITXInnerModelCreatorImpl(private val preCIInfo: PreCIInfo) : TXInnerModelCreator {
+class PreCITXInnerModelCreatorImpl : TXInnerModelCreator {
     companion object {
         private val logger = LoggerFactory.getLogger(PreCITXInnerModelCreatorImpl::class.java)
         private const val REMOTE_SYNC_CODE_PLUGIN_ATOM_CODE = "syncCodeToRemote"
@@ -92,6 +92,7 @@ class PreCITXInnerModelCreatorImpl(private val preCIInfo: PreCIInfo) : TXInnerMo
     ): MarketBuildAtomElement? {
         val data = mutableMapOf<String, Any>()
         val atomCode = step.uses!!.split('@')[0]
+        val preCIData = event.preCIData!!
 
         // 若是"代码同步"插件标识
         if (atomCode.equals(LOCAL_SYNC_CODE_PLUGIN_ATOM_CODE, ignoreCase = true)) {
@@ -101,10 +102,10 @@ class PreCITXInnerModelCreatorImpl(private val preCIInfo: PreCIInfo) : TXInnerMo
             }
 
             // 安装"代码同步"插件
-            installMarketAtom(REMOTE_SYNC_CODE_PLUGIN_ATOM_CODE)
+            installMarketAtom(REMOTE_SYNC_CODE_PLUGIN_ATOM_CODE, preCIData)
             val input = step.with?.toMutableMap() ?: mutableMapOf()
-            input["agentId"] = input["agentId"] ?: preCIInfo.agentId
-            input["workspace"] = input["workspace"] ?: preCIInfo.workspace
+            input["agentId"] = input["agentId"] ?: preCIData.agentId
+            input["workspace"] = input["workspace"] ?: preCIData.workspace
             input["useDelete"] = input["useDelete"] ?: true
             input["syncGitRepository"] = input["syncGitRepository"] ?: false
             data["input"] = input
@@ -119,7 +120,7 @@ class PreCITXInnerModelCreatorImpl(private val preCIInfo: PreCIInfo) : TXInnerMo
             )
         } else {
             data["input"] = step.with ?: Any()
-            setWhitePath(atomCode, data, job)
+            setWhitePath(atomCode, data, job, preCIData)
 
             return MarketBuildAtomElement(
                 name = step.name ?: step.uses!!.split('@')[0],
@@ -135,33 +136,40 @@ class PreCITXInnerModelCreatorImpl(private val preCIInfo: PreCIInfo) : TXInnerMo
     /**
      * 设置白名单
      */
-    private fun setWhitePath(atomCode: String, data: MutableMap<String, Any>, job: Job) {
-        if (atomCode == CodeCCScanInContainerTask.atomCode && preCIInfo?.extraParam != null
+    private fun setWhitePath(
+        atomCode: String,
+        data: MutableMap<String, Any>,
+        job: Job,
+        preCIData: PreCIData
+    ) {
+        if (atomCode == CodeCCScanInContainerTask.atomCode && preCIData.extraParam != null
         ) {
             val input = (data["input"] as Map<*, *>).toMutableMap()
             val isRunOnDocker =
                 JobRunsOnType.DEV_CLOUD.type == job.runsOn.poolName || JobRunsOnType.DOCKER.type == job.runsOn.poolName
-            input["path"] = getWhitePathList(isRunOnDocker)
+            input["path"] = getWhitePathList(isRunOnDocker, preCIData)
         }
     }
 
     /**
      * 获取白名单列表
      */
-    private fun getWhitePathList(isRunOnDocker: Boolean = false): List<String> {
+    private fun getWhitePathList(
+        isRunOnDocker: Boolean = false,
+        data: PreCIData
+    ): List<String> {
         val whitePathList = mutableListOf<String>()
-        val info = preCIInfo
 
         // idea右键扫描
-        if (!(info.extraParam!!.codeccScanPath.isNullOrBlank())) {
-            whitePathList.add(info.extraParam!!.codeccScanPath!!)
+        if (!(data.extraParam?.codeccScanPath.isNullOrBlank())) {
+            whitePathList.add(data.extraParam!!.codeccScanPath!!)
         }
 
         // push/commit前扫描的文件路径
-        if (info.extraParam!!.incrementFileList != null &&
-                info.extraParam!!.incrementFileList!!.isNotEmpty()
+        if (data.extraParam?.incrementFileList != null &&
+                data.extraParam?.incrementFileList!!.isNotEmpty()
         ) {
-            whitePathList.addAll(info.extraParam!!.incrementFileList!!)
+            whitePathList.addAll(data.extraParam?.incrementFileList!!)
         }
 
         // 若不是容器中执行的，则无法进行本地路径替换
@@ -171,11 +179,11 @@ class PreCITXInnerModelCreatorImpl(private val preCIInfo: PreCIInfo) : TXInnerMo
 
         // 容器文件路径处理
         whitePathList.forEachIndexed { index, path ->
-            val filePath = path.removePrefix(info.workspace)
+            val filePath = path.removePrefix(data.workspace)
             // 路径开头不匹配则不替换
             if (filePath != path) {
                 // 兼容workspace可能带'/'的情况
-                if (info.workspace.last() == '/') {
+                if (data.workspace.last() == '/') {
                     whitePathList[index] = "/data/landun/workspace/$filePath"
                 } else {
                     whitePathList[index] = "/data/landun/workspace$filePath"
@@ -189,13 +197,16 @@ class PreCITXInnerModelCreatorImpl(private val preCIInfo: PreCIInfo) : TXInnerMo
     /**
      * 安装插件
      */
-    private fun installMarketAtom(atomCode: String) {
-        val projectCodes = ArrayList<String>().apply { add(preCIInfo.projectId) }
+    private fun installMarketAtom(
+        atomCode: String,
+        preCIData: PreCIData
+    ) {
+        val projectCodes = ArrayList<String>().apply { add(preCIData.projectId) }
 
         try {
             val request = InstallAtomReq(projectCodes, atomCode)
             val client = SpringContextUtil.getBean(Client::class.java)
-            client.get(ServiceMarketAtomResource::class).installAtom(preCIInfo.userId, channelCode, request)
+            client.get(ServiceMarketAtomResource::class).installAtom(preCIData.userId, channelCode, request)
         } catch (e: Throwable) {
             // 可能之前安装过，继续执行不中断
             logger.error("install atom($atomCode) failed, exception:", e)
