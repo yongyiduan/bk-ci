@@ -43,9 +43,11 @@ import com.tencent.devops.prebuild.service.CommonPreBuildService
 import com.tencent.devops.prebuild.v2.component.PreCIYAMLValidator
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.process.pojo.BuildId
-import com.tencent.devops.process.yaml.modelCreate.TXModelCreate
+import com.tencent.devops.process.yaml.modelCreate.ModelCreate
+import com.tencent.devops.process.yaml.modelCreate.inner.ExtraParam
 import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.tencent.devops.process.yaml.modelCreate.inner.PipelineInfo
+import com.tencent.devops.process.yaml.modelCreate.inner.PreCIInfo
 import com.tencent.devops.process.yaml.v2.models.PreTemplateScriptBuildYaml
 import com.tencent.devops.process.yaml.v2.models.Variable
 import com.tencent.devops.process.yaml.v2.parsers.template.YamlTemplate
@@ -64,7 +66,7 @@ class PreBuildV2Service @Autowired constructor(
     private val client: Client,
     private val dslContext: DSLContext,
     private val prebuildProjectDao: PrebuildProjectDao,
-    private val modelCreate: TXModelCreate
+    private val modelCreate: ModelCreate
 ) : CommonPreBuildService(client, dslContext, prebuildProjectDao) {
     companion object {
         private val logger = LoggerFactory.getLogger(PreBuildV2Service::class.java)
@@ -129,11 +131,23 @@ class PreBuildV2Service @Autowired constructor(
             pipelineId = createEmptyPipeline(userId, pipelineName)
         }
 
+        val preCIInfo = PreCIInfo(
+            agentId = agentInfo.agentId,
+            workspace = startUpReq.workspace,
+            userId = userId,
+            extraParam = ExtraParam(
+                codeccScanPath = startUpReq.extraParam?.codeccScanPath,
+                incrementFileList = startUpReq.extraParam?.incrementFileList,
+                ideVersion = startUpReq.extraParam?.ideVersion,
+                pluginVersion = startUpReq.extraParam?.pluginVersion
+            )
+        )
         val projectId = getUserProjectId(userId)
         val modelCreateEvent = ModelCreateEvent(
             userId = userId,
             projectCode = projectId,
             pipelineInfo = PipelineInfo(pipelineId),
+            preCIInfo = preCIInfo,
             gitData = null,
             streamData = null,
             changeSet = null,
