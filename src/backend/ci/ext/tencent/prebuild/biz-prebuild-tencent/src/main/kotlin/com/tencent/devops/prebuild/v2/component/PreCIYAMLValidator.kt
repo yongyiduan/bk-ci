@@ -36,7 +36,6 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import com.tencent.devops.common.api.exception.CustomException
 import com.tencent.devops.common.api.util.YamlUtil
 import com.tencent.devops.process.yaml.v2.models.PreScriptBuildYaml
-import com.tencent.devops.process.yaml.v2.models.PreTemplateScriptBuildYaml
 import com.tencent.devops.process.yaml.v2.models.YAME_META_DATA_JSON_FILTER
 import com.tencent.devops.process.yaml.v2.models.job.PreJob
 import com.tencent.devops.process.yaml.v2.models.job.RunsOn
@@ -89,7 +88,7 @@ class PreCIYAMLValidator {
         )
         mapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true)
         val schemaGenerator = JsonSchemaGenerator(mapper)
-        val schema = schemaGenerator.generateSchema(PreTemplateScriptBuildYaml::class.java)
+        val schema = schemaGenerator.generateSchema(PreScriptBuildYaml::class.java)
         with(schema) {
             `$schema` = "http://json-schema.org/draft-03/schema#"
         }
