@@ -5,7 +5,7 @@ object Versions {
     const val CommonIo = "2.7"
     const val CommonText = "1.9"
     const val Vmware = "5.1"
-    const val BouncyCastle = "1.70"
+    const val BouncyCastle = "1.46"
     const val Dom4j = "2.0.3"
     const val Compress = "1.21"
     const val MyBatis = "3.5.6"
@@ -45,4 +45,5 @@ object Versions {
     const val Turbo = "0.0.1"
     const val Pulsar = "2.7.2"
     const val JacksonDatatypeJsr = "2.11.4"
+    const val reflections = "0.10.2"
 }
