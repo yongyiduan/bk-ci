@@ -196,9 +196,6 @@
             buildNo () {
                 return this.$route.params.buildNo
             },
-            artifactoryUrl () {
-                return `${WEB_URL_PREFIX}/artifactory/${this.projectId}/?pipelineId=${this.pipelineId}&buildId=${this.buildNo}`
-            },
             isMof () {
                 return this.$store.state.curProject.deptName === '魔方工作室群'
             },
@@ -321,8 +318,9 @@
                     })
                 }
             },
-            gotoArtifactory () {
-                window.open(this.artifactoryUrl, '_blank')
+            gotoArtifactory (row) {
+                const url = `https://${window.BK_REPO_URL}/ui/${this.projectId}/generic?repoName=${row.artifactoryType.toLowerCase()}&path=${row.path}`
+                window.open(url, '_blank')
             },
             addClickListenr () {
                 document.addEventListener('mouseup', this.clickHandler)
