@@ -61,6 +61,7 @@ class TGitEventSourceHandler(
 
         val data = when (eventType) {
             "Merge Request Hook" -> mrHookData(payload = payload, projectId = projectId)
+            "Review Hook" -> reviewHookData(payload = payload, projectId = projectId)
             else -> payload
         }
 
@@ -118,6 +119,40 @@ class TGitEventSourceHandler(
             return mapper.writeValueAsString(rootNode)
         } catch (ignore: Throwable) {
             logger.warn("Failed to convert merge request hook payload", ignore)
+        }
+        return payload
+    }
+
+    private fun reviewHookData(payload: String, projectId: String?): String {
+        try {
+            val ctx = JsonPath.using(ComparisonUtils.SUPPRESS_EXCEPTION_CONFIG).parse(payload)
+            val reviewableType = ctx.read("$.reviewable_type", String::class.java)
+            if (reviewableType == "merge_request") {
+                val gitProjectId = ctx.read("$.project_id", String::class.java)
+                val gitUrl = ctx.read("$.repository.git_http_url", String::class.java)
+                val token = CredentialUtil.getCredential(
+                    client = client,
+                    projectId = projectId!!,
+                    credentialId = "RDS_PERSONAL_ACCESS_TOKEN"
+                )
+                val reviewableId = ctx.read("$.reviewable_id", Long::class.java)
+                val mrInfo = client.get(ServiceScmResource::class).getMrInfo(
+                    projectName = gitProjectId,
+                    url = gitUrl,
+                    type = ScmType.CODE_GIT,
+                    token = token,
+                    mrId = reviewableId
+                ).data
+                val mapper = JsonUtil.getObjectMapper()
+                val rootNode = mapper.readTree(payload) as ObjectNode
+                rootNode.set<ObjectNode>(
+                    "merge_request",
+                    mapper.valueToTree(mrInfo)
+                )
+                return mapper.writeValueAsString(rootNode)
+            }
+        } catch (ignore: Throwable) {
+            logger.warn("Failed to convert review hook payload", ignore)
         }
         return payload
     }
