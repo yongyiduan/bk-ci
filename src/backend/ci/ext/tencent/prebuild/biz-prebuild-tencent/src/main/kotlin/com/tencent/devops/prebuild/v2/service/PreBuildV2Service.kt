@@ -39,8 +39,9 @@ import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentIDDispatchTy
 import com.tencent.devops.environment.pojo.thirdPartyAgent.ThirdPartyAgentStaticInfo
 import com.tencent.devops.prebuild.dao.PrebuildProjectDao
 import com.tencent.devops.prebuild.pojo.StartUpReq
+import com.tencent.devops.prebuild.pojo.StreamCommonVariables
 import com.tencent.devops.prebuild.service.CommonPreBuildService
-import com.tencent.devops.prebuild.v2.component.PreCIYAMLValidator
+import com.tencent.devops.prebuild.v2.component.PreCIYAMLValidatorV2
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.process.pojo.BuildId
 import com.tencent.devops.process.yaml.modelCreate.ModelCreate
@@ -62,11 +63,11 @@ import javax.ws.rs.core.Response
 
 @Service
 class PreBuildV2Service @Autowired constructor(
-    private val preCIYAMLValidator: PreCIYAMLValidator,
     private val client: Client,
     private val dslContext: DSLContext,
     private val prebuildProjectDao: PrebuildProjectDao,
-    private val modelCreate: ModelCreate
+    private val modelCreate: ModelCreate,
+    private val preCIYAMLValidatorV2: PreCIYAMLValidatorV2
 ) : CommonPreBuildService(client, dslContext, prebuildProjectDao) {
     companion object {
         private val logger = LoggerFactory.getLogger(PreBuildV2Service::class.java)
@@ -81,12 +82,12 @@ class PreBuildV2Service @Autowired constructor(
      * @return web api result
      */
     fun checkYamlSchema(originYaml: String): Result<String> {
-        val (isPassed, ignore, errorMsg) = preCIYAMLValidator.validate(originYaml)
-
-        return if (isPassed) {
+        return try {
+            preCIYAMLValidatorV2.check(originYaml, null, true)
             Result("OK")
-        } else {
-            Result(1, "Invalid yaml: $errorMsg")
+        } catch (e: Exception) {
+            logger.error("Check yaml schema failed.", e)
+            Result(1, "Invalid yaml: ${e.message}")
         }
     }
 
@@ -159,7 +160,7 @@ class PreBuildV2Service @Autowired constructor(
             modelName = pipelineName,
             event = modelCreateEvent,
             yaml = scriptBuildYaml,
-            pipelineParams = getPipelineParams(scriptBuildYaml.variables)
+            pipelineParams = getPipelineParams(scriptBuildYaml.variables, userId, pipelineName)
         ).model
 
         // 若是本机构建，需后置填充调度信息
@@ -205,7 +206,7 @@ class PreBuildV2Service @Autowired constructor(
         }
 
         return getTemplateCntFromGit(
-            token = param.targetRepo?.credentials?.personalAccessToken,
+            personalToken = param.targetRepo?.credentials?.personalAccessToken,
             gitProjectId = param.targetRepo?.repository!!,
             ref = param.targetRepo?.ref,
             fileName = TEMPLATE_DIR + param.path
@@ -213,19 +214,26 @@ class PreBuildV2Service @Autowired constructor(
     }
 
     private fun getTemplateCntFromGit(
-        token: String?,
+        personalToken: String?,
         gitProjectId: String,
         fileName: String,
         ref: String?
     ): String {
         logger.info("getTemplateCntFromGit: [$gitProjectId|$fileName|$ref]")
         try {
+            var useAccessToken = false
+            var token = personalToken
+            if (token.isNullOrBlank()) {
+                token = getGitAccessToken(gitProjectId)
+                useAccessToken = true
+            }
+
             return client.getScm(ServiceGitCiResource::class).getGitCIFileContent(
                 gitProjectId = gitProjectId,
                 filePath = fileName,
-                token = token ?: "",
+                token = token,
                 ref = getTriggerBranch(ref),
-                useAccessToken = false
+                useAccessToken = useAccessToken
             ).data!!
         } catch (e: Throwable) {
             logger.error("get yaml template error from git, $gitProjectId", e)
@@ -241,16 +249,30 @@ class PreBuildV2Service @Autowired constructor(
         }
     }
 
+    private fun getGitAccessToken(gitProjectId: String): String {
+        val tokenObj = client.get(ServiceGitCiResource::class).getToken(gitProjectId)
+
+        return tokenObj.data!!.accessToken
+    }
+
     /**
      * 获取流水线参数
      */
-    private fun getPipelineParams(variables: Map<String, Variable>?): List<BuildFormProperty> {
+    private fun getPipelineParams(
+        variables: Map<String, Variable>?,
+        userId: String,
+        pipelineName: String
+    ): List<BuildFormProperty> {
         if (variables.isNullOrEmpty()) {
             return emptyList()
         }
 
         val retList = mutableListOf<BuildFormProperty>()
         val startParams = mutableMapOf<String, String>()
+        startParams[StreamCommonVariables.CI_PIPELINE_NAME] = pipelineName
+        startParams[StreamCommonVariables.CI_ACTOR] = userId
+        startParams[StreamCommonVariables.CI_BRANCH] = "PRECI_VIRTUAL_BRANCH"
+
         variables.forEach { (key, variable) ->
             startParams[VARIABLE_PREFIX + key] =
                 variable.copy(value = formatVariablesValue(variable.value, startParams)).value ?: ""
