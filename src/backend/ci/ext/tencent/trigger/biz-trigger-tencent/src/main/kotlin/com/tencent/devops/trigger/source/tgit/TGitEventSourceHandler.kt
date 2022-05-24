@@ -105,6 +105,13 @@ class TGitEventSourceHandler(
                     it.newPath
                 }
             } ?: emptyList()
+            val reviewers = client.get(ServiceScmResource::class).getMrReviewInfo(
+                projectName = gitProjectId,
+                url = gitUrl,
+                type = ScmType.CODE_GIT,
+                token = token,
+                mrId = mrId
+            ).data?.reviewers
             val mapper = JsonUtil.getObjectMapper()
             val rootNode = mapper.readTree(payload)
             val objectAttributesNode = rootNode.get("object_attributes") as ObjectNode
@@ -115,6 +122,10 @@ class TGitEventSourceHandler(
             objectAttributesNode.set<ObjectNode>(
                 "paths",
                 mapper.valueToTree(changeFiles)
+            )
+            objectAttributesNode.set<ObjectNode>(
+                "reviewers",
+                mapper.valueToTree(reviewers?.map { it.username } ?: emptyList<String>())
             )
             return mapper.writeValueAsString(rootNode)
         } catch (ignore: Throwable) {
