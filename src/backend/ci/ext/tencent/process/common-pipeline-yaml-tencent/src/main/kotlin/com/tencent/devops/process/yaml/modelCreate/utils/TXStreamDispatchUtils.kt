@@ -139,18 +139,6 @@ object TXStreamDispatchUtils {
         // 公共docker构建机
         if (poolName == "docker") {
 
-            // 在构建机类型有差异的地方根据业务场景区分
-            when (bizType) {
-                DispatchBizType.RDS -> {
-                    return PublicDevCloudDispathcType(
-                        image = defaultImage,
-                        imageType = ImageType.THIRD,
-                        performanceConfigId = "0"
-                    )
-                }
-                else -> {}
-            }
-
             var containerPool = Pool(
                 container = defaultImage,
                 credential = Credential(
@@ -207,6 +195,19 @@ object TXStreamDispatchUtils {
                         buildType = BuildType.DOCKER_VM
                     )
                 }
+            }
+
+            // 在构建机类型有差异的地方根据业务场景区分
+            when (bizType) {
+                DispatchBizType.RDS -> {
+                    return PublicDevCloudDispathcType(
+                        image = containerPool.container,
+                        credentialId = containerPool.credential?.credentialId,
+                        imageType = ImageType.THIRD,
+                        performanceConfigId = "0"
+                    )
+                }
+                else -> {}
             }
 
             return GitCIDispatchType(objectMapper.writeValueAsString(containerPool))
