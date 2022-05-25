@@ -29,7 +29,7 @@
                 </bk-select>
             </bk-form-item>
             <bk-form-item :label="$t('description')" property="remark">
-                <bk-input type="textarea" v-model="formData.remark" :placeholder="descPlaceholder"></bk-input>
+                <bk-input type="textarea" v-model="formData.remark" :placeholder="$t('descriptionPlaceholder')"></bk-input>
             </bk-form-item>
             <bk-form-item>
                 <bk-button ext-cls="mr5" theme="primary" title="Submit" @click.stop.prevent="submitData" :loading="isLoading">{{$t('submit')}}</bk-button>
