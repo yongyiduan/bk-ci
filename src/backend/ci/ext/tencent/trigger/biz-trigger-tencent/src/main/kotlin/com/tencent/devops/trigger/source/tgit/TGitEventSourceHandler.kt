@@ -34,6 +34,7 @@ import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.repository.api.scm.ServiceGitResource
 import com.tencent.devops.repository.api.scm.ServiceScmResource
+import com.tencent.devops.repository.pojo.enums.TokenTypeEnum
 import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.trigger.constant.SourceType
 import com.tencent.devops.trigger.source.IEventSourceHandler
@@ -116,6 +117,7 @@ class TGitEventSourceHandler(
             ).data
             val tapd = client.get(ServiceGitResource::class).getTapdWorkItems(
                 accessToken = token,
+                tokenType = TokenTypeEnum.PRIVATE_KEY,
                 gitProjectId = gitProjectId,
                 type = "mr",
                 iid = iid
