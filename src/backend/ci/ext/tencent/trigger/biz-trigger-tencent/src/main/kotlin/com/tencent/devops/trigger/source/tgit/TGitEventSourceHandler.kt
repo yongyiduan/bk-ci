@@ -32,6 +32,7 @@ import com.jayway.jsonpath.JsonPath
 import com.tencent.devops.common.api.enums.ScmType
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
+import com.tencent.devops.repository.api.scm.ServiceGitResource
 import com.tencent.devops.repository.api.scm.ServiceScmResource
 import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.trigger.constant.SourceType
@@ -79,6 +80,7 @@ class TGitEventSourceHandler(
             val gitProjectId = ctx.read("$.object_attributes.target_project_id", String::class.java)
             val gitUrl = ctx.read("$.object_attributes.target.http_url", String::class.java)
             val mrId = ctx.read("$.object_attributes.id", Long::class.java)
+            val iid = ctx.read("$.object_attributes.iid", Long::class.java)
             val token = CredentialUtil.getCredential(
                 client = client,
                 projectId = projectId!!,
@@ -105,13 +107,19 @@ class TGitEventSourceHandler(
                     it.newPath
                 }
             } ?: emptyList()
-            val reviewers = client.get(ServiceScmResource::class).getMrReviewInfo(
+            val review = client.get(ServiceScmResource::class).getMrReviewInfo(
                 projectName = gitProjectId,
                 url = gitUrl,
                 type = ScmType.CODE_GIT,
                 token = token,
                 mrId = mrId
-            ).data?.reviewers
+            ).data
+            val tapd = client.get(ServiceGitResource::class).getTapdWorkItems(
+                accessToken = token,
+                gitProjectId = gitProjectId,
+                type = "mr",
+                iid = iid
+            ).data
             val mapper = JsonUtil.getObjectMapper()
             val rootNode = mapper.readTree(payload)
             val objectAttributesNode = rootNode.get("object_attributes") as ObjectNode
@@ -124,8 +132,12 @@ class TGitEventSourceHandler(
                 mapper.valueToTree(changeFiles)
             )
             objectAttributesNode.set<ObjectNode>(
-                "reviewers",
-                mapper.valueToTree(reviewers?.map { it.username } ?: emptyList<String>())
+                "review",
+                mapper.valueToTree(review)
+            )
+            objectAttributesNode.set<ObjectNode>(
+                "tapd",
+                mapper.valueToTree(tapd)
             )
             return mapper.writeValueAsString(rootNode)
         } catch (ignore: Throwable) {
