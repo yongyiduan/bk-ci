@@ -27,10 +27,10 @@
 
 package com.tencent.devops.rds.chart.stream
 
-import com.tencent.devops.common.pipeline.Model
+import com.tencent.devops.process.yaml.v2.models.ScriptBuildYaml
 
 data class StreamBuildResult(
     val originYaml: String,
     val parsedYaml: String,
-    val pipelineModel: Model
+    val yamlObject: ScriptBuildYaml
 )

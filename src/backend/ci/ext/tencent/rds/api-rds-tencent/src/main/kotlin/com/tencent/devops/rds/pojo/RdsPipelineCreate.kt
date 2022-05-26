@@ -27,7 +27,7 @@
 
 package com.tencent.devops.rds.pojo
 
-import com.tencent.devops.common.pipeline.Model
+import com.tencent.devops.process.yaml.v2.models.ScriptBuildYaml
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
@@ -46,5 +46,5 @@ data class RdsPipelineCreate(
     @ApiModelProperty("模板解析后的YAML内容")
     val parsedYaml: String,
     @ApiModelProperty("通过stream转换的流水线编排")
-    val model: Model
+    val yamlObject: ScriptBuildYaml
 )

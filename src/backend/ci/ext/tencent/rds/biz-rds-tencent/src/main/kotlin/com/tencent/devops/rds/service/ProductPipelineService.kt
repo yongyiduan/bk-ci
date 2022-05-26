@@ -47,7 +47,7 @@ import org.springframework.stereotype.Service
 class ProductPipelineService @Autowired constructor(
     private val dslContext: DSLContext,
     private val buildHistoryDao: RdsBuildHistoryDao,
-    private val chartPipelineDao: RdsChartPipelineDao,
+    private val chartPipelineDao: RdsChartPipelineDao
 ) {
 
     private val logger = LoggerFactory.getLogger(ProductPipelineService::class.java)

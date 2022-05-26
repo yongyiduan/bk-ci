@@ -182,7 +182,7 @@ class RdsProductInfoDao {
 
     fun status(
         dslContext: DSLContext,
-        productId: Long,
+        productId: Long
     ): RdsProductStatus? {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             return dslContext.select(

@@ -29,13 +29,19 @@ package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.client.Client
+import com.tencent.devops.common.pipeline.Model
+import com.tencent.devops.common.pipeline.container.Stage
+import com.tencent.devops.common.pipeline.container.TriggerContainer
 import com.tencent.devops.common.pipeline.enums.ChannelCode
+import com.tencent.devops.common.pipeline.pojo.element.trigger.ManualTriggerElement
 import com.tencent.devops.process.api.service.ServicePipelineResource
+import com.tencent.devops.process.engine.common.VMUtils
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
 import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import com.tencent.devops.rds.pojo.RdsPipelineCreate
+import com.tencent.devops.rds.utils.RdsPipelineUtils
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,13 +52,14 @@ class ChartPipeline @Autowired constructor(
     private val client: Client,
     private val dslContext: DSLContext,
     private val chartPipelineDao: RdsChartPipelineDao,
+    private val streamConverter: StreamConverter,
     private val productInfoDao: RdsProductInfoDao
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(ChartPipeline::class.java)
     }
 
-    fun createChartPipeline(
+    fun createDefaultPipeline(
         userId: String,
         productId: Long,
         projectId: String,
@@ -63,10 +70,33 @@ class ChartPipeline @Autowired constructor(
             client.get(ServicePipelineResource::class).create(
                 userId = userId,
                 projectId = projectId,
-                pipeline = pipeline.model,
+                pipeline = Model(
+                    name = RdsPipelineUtils.genBKPipelineName(
+                        pipeline.filePath, pipeline.projectName, pipeline.serviceName
+                    ),
+                    desc = "",
+                    stages = listOf(
+                        Stage(
+                            id = VMUtils.genStageId(1),
+                            name = VMUtils.genStageId(1),
+                            containers = listOf(
+                                TriggerContainer(
+                                    id = "0",
+                                    name = "构建触发",
+                                    elements = listOf(
+                                        ManualTriggerElement(
+                                            name = "手动触发",
+                                            id = "T-1-1-1"
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
                 channelCode = ChannelCode.BS
             ).data ?: run {
-                logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.model}")
+                logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.yamlObject}")
                 throw ErrorCodeException(
                     errorCode = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.errorCode,
                     defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage,
@@ -74,7 +104,7 @@ class ChartPipeline @Autowired constructor(
                 )
             }
         } catch (t: Throwable) {
-            logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.model}", t)
+            logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.yamlObject}", t)
             throw ErrorCodeException(
                 errorCode = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.errorCode,
                 defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage,
@@ -104,21 +134,34 @@ class ChartPipeline @Autowired constructor(
         pipelineId: String,
         productId: Long,
         projectId: String,
-        pipeline: RdsPipelineCreate
+        pipeline: RdsPipelineCreate,
+        initPipeline: Boolean? = false
     ) {
         try {
+            val model = streamConverter.getYamlModel(
+                userId = userId,
+                productId = productId,
+                projectId = projectId,
+                pipelineId = pipelineId,
+                pipelineName = RdsPipelineUtils.genBKPipelineName(
+                    pipeline.filePath, pipeline.projectName, pipeline.serviceName
+                ),
+                yamlObject = pipeline.yamlObject,
+                init = initPipeline
+            )
+
             val success = client.get(ServicePipelineResource::class).edit(
                 userId = userId,
                 projectId = projectId,
                 pipelineId = pipelineId,
-                pipeline = pipeline.model,
+                pipeline = model,
                 channelCode = ChannelCode.BS
             ).data
             if (success != true) {
-                logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.model}")
+                logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.yamlObject}")
             }
         } catch (t: Throwable) {
-            logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.model}", t)
+            logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.yamlObject}", t)
             throw ErrorCodeException(
                 errorCode = ChartErrorCodeEnum.UPDATE_CHART_PIPELINE_ERROR.errorCode,
                 defaultMessage = ChartErrorCodeEnum.UPDATE_CHART_PIPELINE_ERROR.formatErrorMessage,

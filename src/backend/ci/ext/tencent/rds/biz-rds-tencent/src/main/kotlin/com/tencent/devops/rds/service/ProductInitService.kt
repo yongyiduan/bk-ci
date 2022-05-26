@@ -220,14 +220,13 @@ class ProductInitService @Autowired constructor(
             }
             try {
                 // 生成未指定名称的流水线模型
-                val streamBuildResult = streamConverter.buildModel(
+                val streamBuildResult = streamConverter.parseTemplate(
                     userId = userId,
                     productId = productId,
                     projectId = projectId,
                     cachePath = cachePath,
                     pipelineFile = file
                 )
-                logger.info("RDS|init|${file.name}|generate model: ${streamBuildResult.pipelineModel}")
                 filePipelineMap[file.name] = streamBuildResult
             } catch (ignore: Throwable) {
                 logger.warn("RDS|init|${file.name}|generate model with error:", ignore)
@@ -452,7 +451,7 @@ class ProductInitService @Autowired constructor(
         try {
             client.get(ServiceCredentialResource::class).check(
                 projectId = projectId,
-                credentialId = credId,
+                credentialId = credId
             )
             return true
         } catch (exception: RemoteServiceException) {
@@ -506,7 +505,7 @@ class ProductInitService @Autowired constructor(
                 "RDS|init|InitPipelineFile|" +
                     "initYamlStr=${FileUtils.readFileToString(initYamlFile, StandardCharsets.UTF_8)}"
             )
-            val streamBuildResult = streamConverter.buildModel(
+            val streamBuildResult = streamConverter.parseTemplate(
                 userId = userId,
                 productId = productId,
                 projectId = projectId,
@@ -558,10 +557,8 @@ class ProductInitService @Autowired constructor(
             projectName = projectName,
             serviceName = serviceName
         )
-        // TODO: 提前创建流水线去生成质量红线
-        return if (existsPipeline == null) {
-            // 创建并保存流水线
-            chartPipeline.createChartPipeline(
+        val pipelineId = existsPipeline?.pipelineId
+            ?: chartPipeline.createDefaultPipeline( // 创建默认流水线
                 userId = userId,
                 productId = productId,
                 projectId = RdsPipelineUtils.genBKProjectCode(productId),
@@ -572,37 +569,29 @@ class ProductInitService @Autowired constructor(
                     serviceName = serviceName,
                     originYaml = stream.originYaml,
                     parsedYaml = stream.parsedYaml,
-                    model = stream.pipelineModel.copy(
-                        name = RdsPipelineUtils.genBKPipelineName(
-                            filePath, projectName, serviceName
-                        )
-                    )
+                    yamlObject = stream.yamlObject
                 ),
                 initPipeline = initPipeline
             )
-        } else {
-            // 更新已有流水线
-            chartPipeline.updateChartPipeline(
-                userId = userId,
+        // TODO: 根据pipelineId提前创建流水线去生成质量红线
+
+        // 更新已有流水线
+        chartPipeline.updateChartPipeline(
+            userId = userId,
+            productId = productId,
+            projectId = RdsPipelineUtils.genBKProjectCode(productId),
+            pipelineId = pipelineId,
+            pipeline = RdsPipelineCreate(
                 productId = productId,
-                projectId = RdsPipelineUtils.genBKProjectCode(productId),
-                pipelineId = existsPipeline.pipelineId,
-                pipeline = RdsPipelineCreate(
-                    productId = productId,
-                    filePath = filePath,
-                    projectName = projectName,
-                    serviceName = serviceName,
-                    originYaml = stream.originYaml,
-                    parsedYaml = stream.parsedYaml,
-                    model = stream.pipelineModel.copy(
-                        name = RdsPipelineUtils.genBKPipelineName(
-                            filePath, projectName, serviceName
-                        )
-                    )
-                )
+                filePath = filePath,
+                projectName = projectName,
+                serviceName = serviceName,
+                originYaml = stream.originYaml,
+                parsedYaml = stream.parsedYaml,
+                yamlObject = stream.yamlObject
             )
-            existsPipeline.pipelineId
-        }
+        )
+        return pipelineId
     }
 
     // 注意：内部定制方法，无法开源

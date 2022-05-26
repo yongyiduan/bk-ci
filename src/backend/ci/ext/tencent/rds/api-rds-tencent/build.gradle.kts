@@ -31,4 +31,5 @@ dependencies {
     api(project(":core:common:common-event"))
     api(project(":ext:tencent:common:common-pipeline-tencent"))
     api(project(":core:common:common-webhook:api-common-webhook"))
+    api(project(":ext:tencent:process:common-pipeline-yaml-tencent"))
 }

@@ -28,8 +28,10 @@
 package com.tencent.devops.rds.chart
 
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.process.yaml.modelCreate.TXModelCreate
 import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
+import com.tencent.devops.process.yaml.modelCreate.inner.PipelineInfo
 import com.tencent.devops.process.yaml.modelCreate.utils.TXScriptYmlUtils
 import com.tencent.devops.process.yaml.v2.models.PreScriptBuildYaml
 import com.tencent.devops.process.yaml.v2.models.PreTemplateScriptBuildYaml
@@ -60,7 +62,7 @@ class StreamConverter @Autowired constructor(
         private val logger = LoggerFactory.getLogger(StreamConverter::class.java)
     }
 
-    fun buildModel(
+    fun parseTemplate(
         userId: String,
         productId: Long,
         projectId: String,
@@ -87,21 +89,35 @@ class StreamConverter @Autowired constructor(
                 "preYamlObject=\n$preYamlObject\nyamlObject=\n$yamlObject"
         )
 
+        return StreamBuildResult(
+            originYaml = pipelineYaml,
+            parsedYaml = YamlCommonUtils.toYamlNotNull(preYamlObject),
+            yamlObject = yamlObject
+        )
+    }
+
+    fun getYamlModel(
+        userId: String,
+        productId: Long,
+        projectId: String,
+        pipelineId: String,
+        pipelineName: String,
+        yamlObject: ScriptBuildYaml,
+        init: Boolean? = false
+    ): Model {
+
         val model = modelCreate.createPipelineModel(
-            modelName = "",
+            modelName = pipelineName,
             event = ModelCreateEvent(
                 userId,
-                projectCode = projectId
+                projectCode = projectId,
+                pipelineInfo = PipelineInfo(pipelineId)
             ),
             yaml = yamlObject,
             pipelineParams = ChartPipelineStartParams.makePipelineParams(init == true, yamlObject.variables)
         )
 
-        return StreamBuildResult(
-            originYaml = pipelineYaml,
-            parsedYaml = YamlCommonUtils.toYamlNotNull(preYamlObject),
-            pipelineModel = model.model
-        )
+        return model.model
     }
 
     fun replaceTemplate(
