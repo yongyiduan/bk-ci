@@ -112,8 +112,8 @@
                             v-for="(chart, index) in codeccOptions[item.tool_name_en].charts" :key="index">
                             <chart class="chart-wrapper"
                                 v-if="chart.enable !== false"
-                                :options="processOptions(chart, item)"
-                                auto-resize>
+                                :option="processOptions(chart, item)"
+                                autoresize>
                             </chart>
                             <empty v-if="chart.enable === false" :is-code-check="true"
                                 :empty-title="chart.title">
@@ -189,13 +189,16 @@
 </template>
 
 <script>
-    import ECharts from 'vue-echarts/components/ECharts.vue'
-    import 'echarts/lib/chart/line'
-    import 'echarts/lib/chart/bar'
-    import 'echarts/lib/chart/pie'
-    import 'echarts/lib/component/tooltip'
-    import 'echarts/lib/component/title'
-    import 'echarts/lib/component/legend'
+    import { use } from 'echarts/core'
+    import VChart from 'vue-echarts'
+    import { CanvasRenderer } from 'echarts/renderers'
+    import { LineChart, BarChart, PieChart, } from 'echarts/charts'
+    import {
+        GridComponent,
+        TooltipComponent,
+        TitleComponent,
+        LegendComponent
+    } from 'echarts/components'
     import empty from '@/components/common/empty'
     import emptyTips from '@/components/devops/emptyTips'
     import {
@@ -207,9 +210,20 @@
     import codeccOptions from '@/utils/codecc-options'
     import { mapGetters, mapState } from 'vuex'
 
+    use([
+        CanvasRenderer,
+        LineChart,
+        BarChart,
+        PieChart,
+        GridComponent,
+        TitleComponent,
+        TooltipComponent,
+        LegendComponent
+    ])
+
     export default {
         components: {
-            chart: ECharts,
+            chart: VChart,
             empty,
             emptyTips
         },
