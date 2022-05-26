@@ -589,7 +589,8 @@ class ProductInitService @Autowired constructor(
                 originYaml = stream.originYaml,
                 parsedYaml = stream.parsedYaml,
                 yamlObject = stream.yamlObject
-            )
+            ),
+            initPipeline = initPipeline
         )
         return pipelineId
     }
