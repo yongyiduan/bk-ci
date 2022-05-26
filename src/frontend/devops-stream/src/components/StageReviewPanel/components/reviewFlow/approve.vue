@@ -146,6 +146,9 @@
         margin: 25px 0 32px;
         /deep/ .bk-step {
             max-width: 367.56px;
+            ::v-deep .stream-2 {
+                font-family: 'stream' !important;
+            }
         }
         /deep/ .bk-devops-icon {
             font-family: 'bk-devops' !important;
