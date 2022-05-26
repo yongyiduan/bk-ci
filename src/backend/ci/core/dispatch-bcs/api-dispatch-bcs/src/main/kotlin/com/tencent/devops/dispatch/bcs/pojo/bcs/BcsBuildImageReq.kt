@@ -25,37 +25,38 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.dispatch.docker.common
+package com.tencent.devops.dispatch.bcs.pojo.bcs
 
-object Constants {
-    /**
-     * Redis Key
-     */
-    const val DOCKER_IP_COUNT_KEY_PREFIX = "dispatch_docker_ip_count_"
+import com.fasterxml.jackson.annotation.JsonProperty
 
-    /**
-     * Docker构建高配资源白名单Key
-     */
-    const val DOCKER_RESOURCE_WHITE_LIST_KEY_PREFIX = "docker_resource_white_list_"
+data class BcsBuildImageReq(
+    @JsonProperty("image_name")
+    val imageName: String,
+    @JsonProperty("image_version")
+    val imageVersion: String,
+    val model: String = "commit",
+    val registry: Registry,
+    val auths: List<Auth>,
+    @JsonProperty("build_args")
+    val buildArgs: Map<String, Any>,
+    val labels: Map<String, String>,
+    @JsonProperty("work_path")
+    val workPath: String,
+    @JsonProperty("docker_file")
+    val dockerFile: String,
+    @JsonProperty("pod_name")
+    val podName: String,
+    @JsonProperty("container_name")
+    val containerName: String
+)
 
-    /**
-     * 无编译环境新方案白名单Key
-     */
-    const val BUILD_LESS_WHITE_LIST_KEY_PREFIX = "dispatchdocker:buildless_whitelist"
+data class Registry(
+    val host: String,
+    val username: String,
+    val password: String
+)
 
-    /**
-     * 拉代码优化工蜂项目ID白名单Key
-     */
-    const val QPC_WHITE_LIST_KEY_PREFIX = "dispatchdocker:qpc_white_list"
-
-    /**
-     * docker路由Key
-     */
-    const val DOCKER_ROUTING_KEY_PREFIX = "dispatchdocker:docker_routing"
-
-    const val DOCKERHOST_STARTUP_URI = "/api/docker/build/start"
-    const val DOCKERHOST_AGENTLESS_STARTUP_URI = "/api/docker-agentless/build/start"
-    const val BUILD_LESS_STARTUP_URI = "/api/service/build/start"
-    const val BUILD_LESS_END_URI = "/api/service/build/end"
-    const val DOCKERHOST_END_URI = "/api/docker/build/end"
-}
+data class Auth(
+    val host: String,
+    val token: String
+)

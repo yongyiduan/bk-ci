@@ -64,7 +64,7 @@ class BcsJobClient @Autowired constructor(
     ): BcsResult<BcsTaskResp> {
         val url = "$bcsApiUrl/api/v1/devops/job/${job.name}"
         val body = JsonUtil.toJson(job)
-        logger.info("createJob request url: $url, body: $body")
+        logger.info("create bcs jobContainer request url: $url, body: $body")
         val request = clientCommon.baseRequest(userId, url).post(
             RequestBody.create(
                 MediaType.parse("application/json; charset=utf-8"),
@@ -72,6 +72,7 @@ class BcsJobClient @Autowired constructor(
             )
         ).build()
         val responseBody = OkhttpUtils.doHttp(request).body()!!.string()
+        logger.info("create bcs jobContainer response: $responseBody")
         return JsonUtil.getObjectMapper().readValue(responseBody)
     }
 
