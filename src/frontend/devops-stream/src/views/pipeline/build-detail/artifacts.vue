@@ -4,23 +4,23 @@
             :outer-border="false"
             :header-border="false"
             :header-cell-style="{ background: '#f1f2f3' }"
-            empty-text="No artifacts yet"
+            :empty-text="$t('pipeline.noArtifacts')"
         >
-            <bk-table-column label="Name" width="220" prop="name" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="Path" show-overflow-tooltip>
+            <bk-table-column :label="$t('name')" width="220" prop="name" show-overflow-tooltip></bk-table-column>
+            <bk-table-column :label="$t('pipeline.path')" show-overflow-tooltip>
                 <template slot-scope="props">
                     <span v-if="props.row.artifactoryType === 'PIPELINE'">{{ props.row.name }}</span>
                     <span v-else>{{ props.row.fullName }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column label="Size" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
-            <bk-table-column label="Operation" width="300">
+            <bk-table-column :label="$t('operation')" width="300">
                 <template slot-scope="props">
                     <bk-button text
                         @click="downLoadFile(props.row)"
                         :disabled="!hasPermission"
-                        v-bk-tooltips="{ content: 'You do not have the permission to download components of the pipeline, and you cannot download', disabled: hasPermission }"
-                    >Download</bk-button>
+                        v-bk-tooltips="{ content: $t('pipeline.downloadFailTips'), disabled: hasPermission }"
+                    >{{$t('pipeline.download')}}</bk-button>
                     <bk-popover v-if="props.row.isApkOrIpa" theme="light" trigger="click" placement="top">
                         <bk-button
                             class="ml5"
@@ -28,18 +28,18 @@
                             @click="requestArtifactExternalUrl(props.row)"
                             :disabled="!hasPermission"
                         >
-                            QRCode
+                            {{$t('pipeline.qrCode')}}
                         </bk-button>
                         <div slot="content" v-bkloading="{ isLoading: fetchingUrl }">
                             <qr-code v-if="hasPermission" class="qrcode-view" :text="qrCodeUrl" :size="100"></qr-code>
-                            <p v-else>You do not have the permission to download components of the pipeline and you cannot download</p>
+                            <p v-else>{{$t('pipeline.downloadFailTips')}}</p>
                         </div>
                     </bk-popover>
                     <bk-button
                         text
                         class="ml5"
                         @click="goToRepo(props.row)"
-                    >Location</bk-button>
+                    >{{$t('pipeline.location')}}</bk-button>
                 </template>
             </bk-table-column>
         </bk-table>

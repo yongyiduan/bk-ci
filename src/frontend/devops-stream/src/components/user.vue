@@ -26,13 +26,18 @@
                 <ul>
                     <li v-if="$route.hash">
                         <span class="user-menu-item" @click.stop="goToNotifications">
-                            Notifications
+                            {{$t('notifications')}}
                             <span v-if="messageNum > 0" class="user-hint" />
                         </span>
                     </li>
                     <li>
+                        <span class="user-menu-item" @click.stop="changeLanguage">
+                            {{$t('changeLang')}}
+                        </span>
+                    </li>
+                    <li>
                         <span class="user-menu-item" @click.stop="logout">
-                            Logout
+                            {{$t('logout')}}
                         </span>
                     </li>
                 </ul>
@@ -40,7 +45,10 @@
         </div>
     </div>
 </template>
+
 <script>
+    import cookies from 'js-cookie'
+
     export default ({
         props: {
             user: {
@@ -71,6 +79,18 @@
             goToNotifications () {
                 this.$router.push({ name: 'notifications' })
                 this.hideUserInfo()
+            },
+
+            changeLanguage () {
+                let locale = 'zh-CN'
+                try {
+                    locale = this.$i18n.locale === 'en-US' ? 'zh-CN' : 'en-US'
+                } catch (e) {
+                    // catch
+                }
+                this.$i18n.locale = locale
+                cookies.set('stream_language', locale)
+                location.reload()
             },
 
             logout () {
