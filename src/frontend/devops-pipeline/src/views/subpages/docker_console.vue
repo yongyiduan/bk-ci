@@ -51,10 +51,10 @@
         },
         computed: {
             isLoading () {
-                return !this.url
+                return !this.url || this.isExiting
             },
             loadingTitle () {
-                return !this.isExiting ? this.$t('editPage.docker.loadingTitle') : 'exiting'
+                return !this.isExiting ? this.$t('editPage.docker.loadingTitle') : this.$t('editPage.docker.exiting')
             },
             projectId () {
                 return this.$route.params.projectId
@@ -108,6 +108,7 @@
                 navConfirm({ title: this.$t('editPage.docker.confirmStop'), content })
                     .then(async () => {
                         try {
+                            this.isExiting = true
                             const { projectId, pipelineId, vmSeqId, dispatchType } = this
                             await this.$store.dispatch('common/stopDebugDocker', { projectId, pipelineId, vmSeqId, dispatchType })
                             this.$router.push({

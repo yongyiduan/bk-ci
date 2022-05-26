@@ -242,13 +242,11 @@ export const actions = {
         }
     },
     startDebugDocker: async ({ commit }, data) => {
-        console.log(data, 49987)
         return request.post('dispatch-docker/api/user/docker/debug/start/', data).then(response => {
             return response.data
         })
     },
     stopDebugDocker: async ({ commit }, { projectId, pipelineId, vmSeqId, dispatchType }) => {
-        console.log('stop')
         return request.post(`dispatch-docker/api/user/docker/debug/stop/projects/${projectId}/pipelines/${pipelineId}/vmseqs/${vmSeqId}?dispatchType=${dispatchType}`).then(response => {
             return response.data
         })
