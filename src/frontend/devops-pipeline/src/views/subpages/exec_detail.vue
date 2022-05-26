@@ -549,13 +549,14 @@
                     this.skipTask = false
                 }
             },
-            async debugDocker ({ stageIndex, containerIndex, container, isPubDevcloud, isDocker }) {
+            async debugDocker ({ stageIndex, containerIndex, container }) {
                 const vmSeqId = container.containerId || this.getRealSeqId(this.execDetail.model.stages, stageIndex, containerIndex)
                 const { projectId, pipelineId, buildNo: buildId } = this.$route.params
+                const buildResourceType = container.dispatchType?.buildType
                 const buildIdStr = buildId ? `&buildId=${buildId}` : ''
 
                 const tab = window.open('about:blank')
-                const url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&dispatchType=${this.buildResourceType}&vmSeqId=${vmSeqId}${buildIdStr}`
+                const url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&dispatchType=${buildResourceType}&vmSeqId=${vmSeqId}${buildIdStr}`
                 tab.location = url
             },
             switchTab (tabType = 'executeDetail') {

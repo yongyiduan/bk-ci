@@ -311,8 +311,7 @@
                     stageIndex: this.stageIndex,
                     containerIndex: this.containerIndex,
                     containerGroupIndex: this.containerGroupIndex,
-                    container: this.container,
-                    dispatchType: this.buildResourceType
+                    container: this.container
                 })
             }
         }
