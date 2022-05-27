@@ -29,9 +29,7 @@
                         <span v-if="row.artifactoryType === 'PIPELINE'">{{ $t('details.pipelineRepo') }}</span>
                     </div>
                     <div class="table-part-item part-item-handler">
-                        <span @click.stop="gotoArtifactory" class="handler-btn" v-bk-tooltips="$t('editPage.atomForm.toArtifactory')">
-                            {{ $t('locate') }}
-                        </span>
+                        <i @click.stop="gotoArtifactory(row)" class="devops-icon icon-position-shape handler-btn" :title="$t('editPage.atomForm.toArtifactory')"></i>
                         <span class="handler-btn" v-if="hasPermission" v-bk-tooltips="$t('download')"
                             @click="requestUrl(row, 'download')">
                             {{$t('download')}}
@@ -196,9 +194,6 @@
             buildNo () {
                 return this.$route.params.buildNo
             },
-            artifactoryUrl () {
-                return `${WEB_URL_PREFIX}/artifactory/${this.projectId}/?pipelineId=${this.pipelineId}&buildId=${this.buildNo}`
-            },
             isMof () {
                 return this.$store.state.curProject.deptName === '魔方工作室群'
             },
@@ -320,9 +315,6 @@
                         item.display = false
                     })
                 }
-            },
-            gotoArtifactory () {
-                window.open(this.artifactoryUrl, '_blank')
             },
             addClickListenr () {
                 document.addEventListener('mouseup', this.clickHandler)
@@ -447,6 +439,14 @@
                         theme
                     })
                 }
+            },
+
+            /**
+             * 查看仓库
+             */
+            gotoArtifactory (row) {
+                const url = `https://${window.BK_REPO_URL_PREFIX}/ui/${this.projectId}/generic?repoName=${row.artifactoryType.toLowerCase()}&path=${row.path}`
+                window.open(url, '_blank')
             }
         }
     }
