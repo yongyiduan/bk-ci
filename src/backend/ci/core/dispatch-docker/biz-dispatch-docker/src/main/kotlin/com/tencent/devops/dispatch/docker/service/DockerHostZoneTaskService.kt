@@ -84,7 +84,6 @@ class DockerHostZoneTaskService @Autowired constructor(
 
     fun create(userId: String, specialDockerHostVOs: List<SpecialDockerHostVO>): Boolean {
         logger.info("$userId create specialDockerHost: $specialDockerHostVOs")
-
         try {
             specialDockerHostVOs.forEach { specialDockerHostVO ->
                 val history = pipelineDockerHostDao.getHost(
