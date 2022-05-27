@@ -19,8 +19,8 @@ import {
     UPDATE_CURRENT_PAGE,
     TOGGLE_PERMISSION_DIALOG,
     SET_SERVICE_HOOKS,
-    TOGGLE_NOTICE_DIALOG,
-    SET_CURRENT_NOTICE
+    SET_CURRENT_NOTICE,
+    TOGGLE_NOTICE_DIALOG
 } from './constants'
 
 const mutations: MutationTree<RootState> = {
