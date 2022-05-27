@@ -319,7 +319,7 @@
                 }
             },
             gotoArtifactory (row) {
-                const url = `https://${window.BK_REPO_URL}/ui/${this.projectId}/generic?repoName=${row.artifactoryType.toLowerCase()}&path=${row.path}`
+                const url = `https://${window.BK_REPO_URL_PREFIX}/ui/${this.projectId}/generic?repoName=${row.artifactoryType.toLowerCase()}&path=${row.path}`
                 window.open(url, '_blank')
             },
             addClickListenr () {
