@@ -1,7 +1,7 @@
 version: "v2.0"
 name: "前端部署Test"
 variables:
-  modules: "nav,pipeline,vs,ticket,codelib,quality,turbo,atomstore,environment,experience"
+  modules: "nav,pipeline,vs,ticket,codelib,quality,turbo,atomstore,environment,experience,metrics"
   ips: "11.185.145.49"
   # 9.134.78.69,10.123.135.151,9.66.32.218
   #
