@@ -106,7 +106,7 @@ class RdsPipelineBuildListener @Autowired constructor(
                 BuildStatus.SUCCEED -> {
                     productInfoDao.updateProductStatus(
                         dslContext = dslContext,
-                        productId = RdsPipelineUtils.genProductId(buildFinishEvent.projectId),
+                        productCode = RdsPipelineUtils.genProductCode(buildFinishEvent.projectId),
                         status = ProductStatus.DEPLOYED,
                         errorMsg = null
                     )
@@ -115,7 +115,7 @@ class RdsPipelineBuildListener @Autowired constructor(
                     // 启动失败时修改状态
                     productInfoDao.updateProductStatus(
                         dslContext = dslContext,
-                        productId = RdsPipelineUtils.genProductId(buildFinishEvent.projectId),
+                        productCode = RdsPipelineUtils.genProductCode(buildFinishEvent.projectId),
                         status = ProductStatus.FAILED,
                         errorMsg =
                         "init pipeline ${buildFinishEvent.pipelineId} build ${buildFinishEvent.buildId} failed"

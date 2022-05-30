@@ -33,7 +33,7 @@ data class Service(
 ) {
     fun getServiceResource(): MutableMap<String, String?> {
         val map = mutableMapOf<String, String?>()
-        map["repo_url"] = repoUrl
+        map["repoUrl"] = repoUrl
         return map
     }
 }

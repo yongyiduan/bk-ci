@@ -27,13 +27,9 @@
 
 package com.tencent.devops.rds.pojo.yaml
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class PreResource(
-    @JsonProperty("product_id")
-    val productId: Long,
-    @JsonProperty("product_name")
-    val productName: String,
+    val productCode: String,
+    val displayName: String,
     val projects: List<Map<String, PreProject>>,
     val tickets: Tickets
 ) {
@@ -53,8 +49,8 @@ data class PreResource(
             }.toList()
         }
         return Resource(
-            productId = productId,
-            productName = productName,
+            productCode = productCode,
+            displayName = displayName,
             projects = projectList,
             tickets = tickets
         )

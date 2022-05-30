@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel("初始化执行结果")
 data class InitStatusResult(
     @ApiModelProperty("RDS产品ID")
-    val productId: Long,
+    val productCode: String,
     @ApiModelProperty("执行状态")
     val status: String,
     @ApiModelProperty("错误信息")

@@ -73,13 +73,13 @@ interface UserRdsInitResource {
 
     @ApiOperation("获取初始化流水线执行状态")
     @GET
-    @Path("/{productId}/status")
+    @Path("/{productCode}/status")
     fun initStatus(
         @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
         @ApiParam("产品ID", required = false)
-        @PathParam("productId")
-        productId: Long
+        @PathParam("productCode")
+        productCode: String
     ): Result<InitStatusResult>
 }

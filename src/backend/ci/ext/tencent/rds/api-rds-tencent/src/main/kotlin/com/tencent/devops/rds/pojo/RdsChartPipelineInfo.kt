@@ -35,7 +35,7 @@ data class RdsChartPipelineInfo(
     @ApiModelProperty("对应流水线ID")
     val pipelineId: String,
     @ApiModelProperty("自定义ID")
-    val productId: Long,
+    val productCode: String,
     @ApiModelProperty("所在Chart相对路径")
     val filePath: String,
     @ApiModelProperty("所属项目名")

@@ -52,21 +52,21 @@ class OpRdsProductResourceImpl @Autowired constructor(
 
     override fun addMembers(
         userId: String,
-        productId: Long,
+        productCode: String,
         members: List<String>
     ): Result<Boolean> {
         logger.info("RDS|addMembers|userId=$userId|members: $members")
         productUserService.saveProductMembers(
             userId = userId,
-            productId = productId,
-            projectId = RdsPipelineUtils.genBKProjectCode(productId),
+            productCode = productCode,
+            projectId = RdsPipelineUtils.genBKProjectCode(productCode),
             members = members,
             masterUserId = null
         )
         return Result(true)
     }
 
-    override fun deleteMembers(userId: String, productId: Long, members: List<String>): Result<Boolean> {
+    override fun deleteMembers(userId: String, productCode: String, members: List<String>): Result<Boolean> {
         logger.info("RDS|deleteMembers|userId=$userId|members: $members")
 
         return Result(true)

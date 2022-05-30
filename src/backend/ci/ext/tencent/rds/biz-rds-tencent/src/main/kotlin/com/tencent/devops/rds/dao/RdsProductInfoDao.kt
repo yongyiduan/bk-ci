@@ -34,7 +34,6 @@ import com.tencent.devops.rds.pojo.RdsProductDetail
 import com.tencent.devops.rds.pojo.RdsProductStatus
 import com.tencent.devops.rds.pojo.enums.ProductStatus
 import org.jooq.DSLContext
-import org.jooq.types.ULong
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -43,7 +42,7 @@ class RdsProductInfoDao {
 
     fun createOrUpdateProduct(
         dslContext: DSLContext,
-        productId: Long,
+        productCode: String,
         productName: String,
         projectId: String,
         chartName: String,
@@ -59,8 +58,8 @@ class RdsProductInfoDao {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             dslContext.insertInto(
                 this,
-                PRODUCT_ID,
-                PRODUCT_NAME,
+                PRODUCT_CODE,
+                DISPLAY_NAME,
                 PROJECT_ID,
                 CHART_NAME,
                 CHART_VERSION,
@@ -73,7 +72,7 @@ class RdsProductInfoDao {
                 CREATE_TIME,
                 UPDATE_TIME
             ).values(
-                ULong.valueOf(productId),
+                productCode,
                 productName,
                 projectId,
                 chartName,
@@ -87,7 +86,7 @@ class RdsProductInfoDao {
                 time,
                 time
             ).onDuplicateKeyUpdate()
-                .set(PRODUCT_NAME, productName)
+                .set(DISPLAY_NAME, productName)
                 .set(CHART_VERSION, chartVersion)
                 .set(MAIN_YAML, mainYaml)
                 .set(MAIN_PARSED, mainParsed)
@@ -103,7 +102,7 @@ class RdsProductInfoDao {
 
     fun updateProductStatus(
         dslContext: DSLContext,
-        productId: Long,
+        productCode: String,
         status: ProductStatus,
         errorMsg: String?
     ): Boolean {
@@ -111,7 +110,7 @@ class RdsProductInfoDao {
             return dslContext.update(this)
                 .set(STATUS, status.display)
                 .set(NOTES, errorMsg)
-                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .where(PRODUCT_CODE.eq(productCode))
                 .execute() > 0
         }
     }
@@ -124,8 +123,8 @@ class RdsProductInfoDao {
         val infotable = TRdsProductInfo.T_RDS_PRODUCT_INFO
 
         return dslContext.selectCount()
-            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
-            .where(userTable.USER_ID.eq(userId)).and(infotable.PRODUCT_ID.isNotNull)
+            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_CODE.eq(infotable.PRODUCT_CODE)))
+            .where(userTable.USER_ID.eq(userId)).and(infotable.PRODUCT_CODE.isNotNull)
             .fetchOne(0, Int::class.java)!!
     }
 
@@ -141,8 +140,8 @@ class RdsProductInfoDao {
         val result = mutableListOf<RdsProductStatus>()
 
         val records = dslContext.select(
-            infotable.PRODUCT_ID,
-            infotable.PRODUCT_NAME,
+            infotable.PRODUCT_CODE,
+            infotable.DISPLAY_NAME,
             infotable.CHART_NAME,
             infotable.CHART_VERSION,
             infotable.REVISION,
@@ -150,7 +149,7 @@ class RdsProductInfoDao {
             infotable.NOTES,
             infotable.UPDATE_TIME
         )
-            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_ID.eq(infotable.PRODUCT_ID)))
+            .from(userTable.leftJoin(infotable).on(userTable.PRODUCT_CODE.eq(infotable.PRODUCT_CODE)))
             .where(userTable.USER_ID.eq(userId))
             .offset(offset)
             .limit(limit)
@@ -162,17 +161,17 @@ class RdsProductInfoDao {
 
         records.forEach { record ->
             // 可能存在 user表有 list表没有的情况
-            val productId = record.get("PRODUCT_ID") ?: return@forEach
+            val productCode = record.get(infotable.PRODUCT_CODE.name) ?: return@forEach
             result.add(
                 RdsProductStatus(
-                    productId = (productId as ULong).toLong(),
-                    productName = record.get("PRODUCT_NAME") as String,
-                    chartName = record.get("CHART_NAME") as String,
-                    chartVersion = record.get("CHART_VERSION") as String,
-                    revision = record.get("REVISION") as Int,
-                    status = ProductStatus.displayOf(record.get("STATUS") as String)!!,
-                    notes = record.get("NOTES")?.toString(),
-                    updateTime = (record.get("UPDATE_TIME") as LocalDateTime).timestamp()
+                    productCode = productCode as String,
+                    productName = record.get(infotable.PRODUCT_CODE.name) as String,
+                    chartName = record.get(infotable.CHART_NAME.name) as String,
+                    chartVersion = record.get(infotable.CHART_VERSION.name) as String,
+                    revision = record.get(infotable.REVISION.name) as Int,
+                    status = ProductStatus.displayOf(record.get(infotable.STATUS.name) as String)!!,
+                    notes = record.get(infotable.NOTES.name)?.toString(),
+                    updateTime = (record.get(infotable.UPDATE_TIME.name) as LocalDateTime).timestamp()
                 )
             )
         }
@@ -182,31 +181,30 @@ class RdsProductInfoDao {
 
     fun status(
         dslContext: DSLContext,
-        productId: Long
+        productCode: String
     ): RdsProductStatus? {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             return dslContext.select(
-                PRODUCT_ID,
-                PRODUCT_NAME,
+                PRODUCT_CODE,
+                DISPLAY_NAME,
                 CHART_NAME,
                 CHART_VERSION,
                 REVISION,
                 STATUS,
                 NOTES,
                 UPDATE_TIME
-            )
-                .from(this)
-                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+            ).from(this)
+                .where(PRODUCT_CODE.eq(productCode))
                 .fetchAny()?.let {
                     RdsProductStatus(
-                        productId = (it.get("PRODUCT_ID") as ULong).toLong(),
-                        productName = it.get("PRODUCT_NAME") as String,
-                        chartName = it.get("CHART_NAME") as String,
-                        chartVersion = it.get("CHART_VERSION") as String,
-                        revision = it.get("REVISION") as Int,
-                        status = ProductStatus.displayOf(it.get("STATUS") as String)!!,
-                        notes = it.get("NOTES")?.toString(),
-                        updateTime = (it.get("UPDATE_TIME") as LocalDateTime).timestamp()
+                        productCode = it.get(PRODUCT_CODE.name) as String,
+                        productName = it.get(DISPLAY_NAME.name) as String,
+                        chartName = it.get(CHART_NAME.name) as String,
+                        chartVersion = it.get(CHART_VERSION.name) as String,
+                        revision = it.get(REVISION.name) as Int,
+                        status = ProductStatus.displayOf(it.get(STATUS.name) as String)!!,
+                        notes = it.get(NOTES.name)?.toString(),
+                        updateTime = (it.get(UPDATE_TIME.name) as LocalDateTime).timestamp()
                     )
                 }
         }
@@ -214,12 +212,12 @@ class RdsProductInfoDao {
 
     fun get(
         dslContext: DSLContext,
-        productId: Long,
+        productCode: String,
         resourceYaml: Boolean
     ): RdsProductDetail {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             val record = dslContext.selectFrom(this)
-                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .where(PRODUCT_CODE.eq(productCode))
                 .fetchAny()
 
             return RdsProductDetail(

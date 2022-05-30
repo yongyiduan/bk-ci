@@ -33,7 +33,7 @@ import com.tencent.devops.rds.pojo.enums.ProductStatus
  * Rds Product信息, biz专用
  */
 data class RdsProductInfo(
-    val productId: Long,
+    val productCode: String,
     val productName: String,
     val projectId: String,
     val chartName: String,

@@ -1,5 +1,5 @@
 init:
-  stream_path: init.yml
+  streamPath: init.yml
 on:
   mr:
     - filter:

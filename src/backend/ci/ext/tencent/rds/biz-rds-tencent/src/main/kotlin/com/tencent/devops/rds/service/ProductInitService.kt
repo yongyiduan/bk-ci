@@ -106,7 +106,7 @@ class ProductInitService @Autowired constructor(
         // 非异步资源，错误需要返回给客户端
         val cachePath: String
         val chartResources: ChartResources
-        val productId: Long
+        val productCode: String
         val productInfo: RdsProductInfo
         try {
             // 读取并解压缓存到本地磁盘
@@ -115,7 +115,7 @@ class ProductInitService @Autowired constructor(
             // 读取各类资源文件
             chartResources = readResources(cachePath)
 
-            productId = chartResources.resourceObject.productId
+            productCode = chartResources.resourceObject.productCode
 
             // 创建蓝盾项目以及添加人员
             productInfo = createProduct(userId, chartResources)
@@ -126,7 +126,7 @@ class ProductInitService @Autowired constructor(
             // 修改状态为初始化中
             productInfoDao.updateProductStatus(
                 dslContext = dslContext,
-                productId = chartResources.resourceObject.productId,
+                productCode = chartResources.resourceObject.productCode,
                 status = ProductStatus.INITIALIZING,
                 errorMsg = null
             )
@@ -147,12 +147,12 @@ class ProductInitService @Autowired constructor(
             userId = userId,
             cachePath = cachePath,
             chartResources = chartResources,
-            productId = productId,
+            productCode = productCode,
             projectId = productInfo.projectId
         )
 
         return RdsProductStatusResult(
-            productId = productInfo.productId,
+            productCode = productInfo.productCode,
             productName = productInfo.productName,
             chartName = productInfo.chartName,
             chartVersion = productInfo.chartVersion,
@@ -168,7 +168,7 @@ class ProductInitService @Autowired constructor(
         userId: String,
         cachePath: String,
         chartResources: ChartResources,
-        productId: Long,
+        productCode: String,
         projectId: String
     ) {
         // 抓总异常，执行失败后保存错误信息
@@ -177,14 +177,14 @@ class ProductInitService @Autowired constructor(
                 userId = userId,
                 cachePath = cachePath,
                 chartResources = chartResources,
-                productId = productId,
+                productCode = productCode,
                 projectId = projectId
             )
         } catch (e: Throwable) {
             logger.error("RDS|initChart|failed with error: ", e)
             productInfoDao.updateProductStatus(
                 dslContext = dslContext,
-                productId = productId,
+                productCode = productCode,
                 status = ProductStatus.FAILED,
                 errorMsg = e.message
             )
@@ -195,7 +195,7 @@ class ProductInitService @Autowired constructor(
         userId: String,
         cachePath: String,
         chartResources: ChartResources,
-        productId: Long,
+        productCode: String,
         projectId: String
     ) {
         val (_, mainObject, _, resourceObject) = chartResources
@@ -205,7 +205,7 @@ class ProductInitService @Autowired constructor(
             mainObject = mainObject,
             cachePath = cachePath,
             userId = userId,
-            productId = productId,
+            productCode = productCode,
             projectId = projectId,
             resourceObject = resourceObject
         )
@@ -222,7 +222,7 @@ class ProductInitService @Autowired constructor(
                 // 生成未指定名称的流水线模型
                 val streamBuildResult = streamConverter.parseTemplate(
                     userId = userId,
-                    productId = productId,
+                    productCode = productCode,
                     projectId = projectId,
                     cachePath = cachePath,
                     pipelineFile = file
@@ -239,13 +239,13 @@ class ProductInitService @Autowired constructor(
                 // 对于没有细分service的直接按project创建
                 project.services?.forEach nextService@{ service ->
                     try {
-                        saveChartPipeline(userId, productId, path, project.id, service.id, stream)
+                        saveChartPipeline(userId, productCode, path, project.id, service.id, stream)
                     } catch (ignore: Throwable) {
                         logger.warn("RDS|init|$project|$service|$path|save pipeline error: ", ignore)
                     }
                 } ?: run {
                     try {
-                        saveChartPipeline(userId, productId, path, project.id, null, stream)
+                        saveChartPipeline(userId, productCode, path, project.id, null, stream)
                     } catch (ignore: Throwable) {
                         logger.warn("RDS|init|$project|$path|save pipeline error: ", ignore)
                     }
@@ -256,7 +256,7 @@ class ProductInitService @Autowired constructor(
         // 添加事件总线
         eventBusService.addEventBusWebhook(
             userId = userId,
-            productId = productId,
+            productCode = productCode,
             projectId = projectId,
             main = mainObject,
             resource = resourceObject
@@ -296,20 +296,20 @@ class ProductInitService @Autowired constructor(
     }
 
     private fun createProduct(masterUserId: String, chartResource: ChartResources): RdsProductInfo {
-        val productId = chartResource.resourceObject.productId
-        val productName = chartResource.resourceObject.productName
+        val productCode = chartResource.resourceObject.productCode
+        val productName = chartResource.resourceObject.displayName
 
-        val userMap = productUserDao.getProductUserList(dslContext, productId)
+        val userMap = productUserDao.getProductUserList(dslContext, productCode)
             .associate { it.userId to it.type }
         if (userMap[masterUserId] != ProductUserType.MASTER.name) {
             throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
                 defaultMessage = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.formatErrorMessage,
-                params = arrayOf(productId.toString())
+                params = arrayOf(productCode.toString())
             )
         }
 
-        val projectId = RdsPipelineUtils.genBKProjectCode(productId)
+        val projectId = RdsPipelineUtils.genBKProjectCode(productCode)
         val projectResult =
             client.get(ServiceProjectResource::class).get(englishName = projectId).data
         if (projectResult == null) {
@@ -319,7 +319,7 @@ class ProductInitService @Autowired constructor(
                     projectCreateInfo = ProjectCreateInfo(
                         projectName = productName,
                         englishName = projectId,
-                        description = "RDS project with product id: $productId"
+                        description = "RDS project with product id: $productCode"
                     )
                 )
             if (createResult.isNotOk()) {
@@ -364,7 +364,7 @@ class ProductInitService @Autowired constructor(
 
         val time = productInfoDao.createOrUpdateProduct(
             dslContext = dslContext,
-            productId = productId,
+            productCode = productCode,
             productName = productName,
             projectId = projectId,
             chartName = chartResource.rdsYaml.code,
@@ -378,7 +378,7 @@ class ProductInitService @Autowired constructor(
         )
 
         return RdsProductInfo(
-            productId = productId,
+            productCode = productCode,
             productName = productName,
             projectId = projectId,
             chartName = chartResource.rdsYaml.code,
@@ -486,7 +486,7 @@ class ProductInitService @Autowired constructor(
         mainObject: Main,
         cachePath: String,
         userId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         resourceObject: Resource
     ) {
@@ -507,7 +507,7 @@ class ProductInitService @Autowired constructor(
             )
             val streamBuildResult = streamConverter.parseTemplate(
                 userId = userId,
-                productId = productId,
+                productCode = productCode,
                 projectId = projectId,
                 cachePath = cachePath,
                 pipelineFile = initYamlFile,
@@ -515,7 +515,7 @@ class ProductInitService @Autowired constructor(
             )
             val pipelineId = saveChartPipeline(
                 userId = userId,
-                productId = productId,
+                productCode = productCode,
                 filePath = CHART_INIT_YAML_FILE_STORAGE,
                 projectName = null,
                 serviceName = null,
@@ -544,7 +544,7 @@ class ProductInitService @Autowired constructor(
 
     private fun saveChartPipeline(
         userId: String,
-        productId: Long,
+        productCode: String,
         filePath: String,
         projectName: String?,
         serviceName: String?,
@@ -552,18 +552,18 @@ class ProductInitService @Autowired constructor(
         initPipeline: Boolean? = false
     ): String {
         val existsPipeline = chartPipeline.getProductPipelineByService(
-            productId = productId,
+            productCode = productCode,
             filePath = filePath,
             projectName = projectName,
             serviceName = serviceName
         )
         val pipelineId = existsPipeline?.pipelineId
-            ?: chartPipeline.createDefaultPipeline( // 创建默认流水线
+            ?: chartPipeline.createDefaultPipeline(
                 userId = userId,
-                productId = productId,
-                projectId = RdsPipelineUtils.genBKProjectCode(productId),
+                productCode = productCode,
+                projectId = RdsPipelineUtils.genBKProjectCode(productCode),
                 pipeline = RdsPipelineCreate(
-                    productId = productId,
+                    productCode = productCode,
                     filePath = filePath,
                     projectName = projectName,
                     serviceName = serviceName,
@@ -573,16 +573,15 @@ class ProductInitService @Autowired constructor(
                 ),
                 initPipeline = initPipeline
             )
-        // TODO: 根据pipelineId提前创建流水线去生成质量红线
 
         // 更新已有流水线
         chartPipeline.updateChartPipeline(
             userId = userId,
-            productId = productId,
-            projectId = RdsPipelineUtils.genBKProjectCode(productId),
+            productCode = productCode,
+            projectId = RdsPipelineUtils.genBKProjectCode(productCode),
             pipelineId = pipelineId,
             pipeline = RdsPipelineCreate(
-                productId = productId,
+                productCode = productCode,
                 filePath = filePath,
                 projectName = projectName,
                 serviceName = serviceName,

@@ -45,7 +45,7 @@ class RdsChartPipelineDao {
             return dslContext.insertInto(
                 this,
                 PIPELINE_ID,
-                PRODUCT_ID,
+                PRODUCT_CODE,
                 FILE_PATH,
                 PROJECT_NAME,
                 SERVICE_NAME,
@@ -56,7 +56,7 @@ class RdsChartPipelineDao {
                 UPDATE_TIME
             ).values(
                 pipeline.pipelineId,
-                pipeline.productId,
+                pipeline.productCode,
                 pipeline.filePath,
                 pipeline.projectName,
                 pipeline.serviceName,
@@ -86,15 +86,15 @@ class RdsChartPipelineDao {
         }
     }
 
-    fun getChartPipelines(dslContext: DSLContext, productId: Long): List<RdsChartPipelineInfo> {
+    fun getChartPipelines(dslContext: DSLContext, productCode: String): List<RdsChartPipelineInfo> {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             return dslContext.selectFrom(this)
-                .where(PRODUCT_ID.eq(productId))
+                .where(PRODUCT_CODE.eq(productCode))
                 .and(INIT_PIPELINE.eq(false))
                 .fetch().map {
                     RdsChartPipelineInfo(
                         pipelineId = it.pipelineId,
-                        productId = it.productId,
+                        productCode = it.productCode,
                         filePath = it.filePath,
                         projectName = it.projectName,
                         serviceName = it.serviceName,
@@ -116,7 +116,7 @@ class RdsChartPipelineDao {
             return record?.let {
                 RdsChartPipelineInfo(
                     pipelineId = it.pipelineId,
-                    productId = it.productId,
+                    productCode = it.productCode,
                     filePath = it.filePath,
                     projectName = it.projectName,
                     serviceName = it.serviceName,
@@ -127,16 +127,16 @@ class RdsChartPipelineDao {
         }
     }
 
-    fun getInitPipelines(dslContext: DSLContext, productId: Long): RdsChartPipelineInfo? {
+    fun getInitPipelines(dslContext: DSLContext, productCode: String): RdsChartPipelineInfo? {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             val record = dslContext.selectFrom(this)
-                .where(PRODUCT_ID.eq(productId))
+                .where(PRODUCT_CODE.eq(productCode))
                 .and(INIT_PIPELINE.eq(true))
                 .fetchAny()
             return record?.let {
                 RdsChartPipelineInfo(
                     pipelineId = it.pipelineId,
-                    productId = it.productId,
+                    productCode = it.productCode,
                     filePath = it.filePath,
                     projectName = it.projectName,
                     serviceName = it.serviceName,
@@ -149,7 +149,7 @@ class RdsChartPipelineDao {
 
     fun getProductPipelineByService(
         dslContext: DSLContext,
-        productId: Long,
+        productCode: String,
         filePath: String,
         projectName: String?,
         serviceName: String?
@@ -157,7 +157,7 @@ class RdsChartPipelineDao {
         with(TRdsChartPipeline.T_RDS_CHART_PIPELINE) {
             val select = dslContext.selectFrom(this)
                 .where(
-                    PRODUCT_ID.eq(productId)
+                    PRODUCT_CODE.eq(productCode)
                         .and(FILE_PATH.eq(filePath))
                 )
             projectName?.let { select.and(PROJECT_NAME.eq(it)) }
@@ -165,7 +165,7 @@ class RdsChartPipelineDao {
             return select.fetchAny()?.let {
                 RdsChartPipelineInfo(
                     pipelineId = it.pipelineId,
-                    productId = it.productId,
+                    productCode = it.productCode,
                     filePath = it.filePath,
                     projectName = it.projectName,
                     serviceName = it.serviceName,

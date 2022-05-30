@@ -64,7 +64,7 @@ class StreamConverter @Autowired constructor(
 
     fun parseTemplate(
         userId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         cachePath: String,
         pipelineFile: File,
@@ -98,7 +98,7 @@ class StreamConverter @Autowired constructor(
 
     fun getYamlModel(
         userId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         pipelineId: String,
         pipelineName: String,

@@ -31,7 +31,6 @@ import com.tencent.devops.model.rds.tables.TRdsProductUser
 import com.tencent.devops.model.rds.tables.records.TRdsProductUserRecord
 import com.tencent.devops.rds.pojo.enums.ProductUserType
 import org.jooq.DSLContext
-import org.jooq.types.ULong
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -39,18 +38,18 @@ class RdsProductUserDao {
 
     fun create(
         dslContext: DSLContext,
-        productId: Long,
+        productCode: String,
         userId: String,
         userType: ProductUserType
     ) {
         with(TRdsProductUser.T_RDS_PRODUCT_USER) {
             dslContext.insertInto(
                 this,
-                PRODUCT_ID,
+                PRODUCT_CODE,
                 USER_ID,
                 TYPE
             ).values(
-                ULong.valueOf(productId),
+                productCode,
                 userId,
                 userType.name
             )
@@ -62,18 +61,18 @@ class RdsProductUserDao {
 
     fun batchSave(
         dslContext: DSLContext,
-        productId: Long,
+        productCode: String,
         userWithTypeMap: Map<String, ProductUserType>
     ) {
         with(TRdsProductUser.T_RDS_PRODUCT_USER) {
             userWithTypeMap.forEach { user, type ->
                 dslContext.insertInto(
                     this,
-                    PRODUCT_ID,
+                    PRODUCT_CODE,
                     USER_ID,
                     TYPE
                 ).values(
-                    ULong.valueOf(productId),
+                    productCode,
                     user,
                     type.name
                 )
@@ -86,13 +85,13 @@ class RdsProductUserDao {
 
     fun batchDelete(
         dslContext: DSLContext,
-        productId: Long,
+        productCode: String,
         userList: List<String>
     ) {
         with(TRdsProductUser.T_RDS_PRODUCT_USER) {
             userList.forEach {
                 dslContext.deleteFrom(this)
-                    .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                    .where(PRODUCT_CODE.eq(productCode))
                     .and(USER_ID.eq(it))
                     .execute()
             }
@@ -101,11 +100,11 @@ class RdsProductUserDao {
 
     fun getProductUserList(
         dslContext: DSLContext,
-        productId: Long
+        productCode: String
     ): List<TRdsProductUserRecord> {
         with(TRdsProductUser.T_RDS_PRODUCT_USER) {
             return dslContext.selectFrom(this)
-                .where(PRODUCT_ID.eq(ULong.valueOf(productId)))
+                .where(PRODUCT_CODE.eq(productCode))
                 .fetch()
         }
     }

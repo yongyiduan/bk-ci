@@ -46,11 +46,11 @@ class UserRdsProductResourceImpl @Autowired constructor(
         return Result(productInfoService.listStatus(userId, req))
     }
 
-    override fun get(userId: String, productId: Long, detail: ProductDetailReq): Result<ProductDetailResp> {
-        return Result(productInfoService.detail(productId, detail))
+    override fun get(userId: String, productCode: String, detail: ProductDetailReq): Result<ProductDetailResp> {
+        return Result(productInfoService.detail(productCode, detail))
     }
 
-    override fun status(userId: String, productId: Long): Result<RdsProductStatusResult?> {
-        return Result(productInfoService.status(productId))
+    override fun status(userId: String, productCode: String): Result<RdsProductStatusResult?> {
+        return Result(productInfoService.status(productCode))
     }
 }

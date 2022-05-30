@@ -55,14 +55,14 @@ class EventBusService @Autowired constructor(
 
     fun addEventBusWebhook(
         userId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         main: Main,
         resource: Resource
     ): Boolean {
         val triggerOns = generateTriggerOn(main)
         val triggerResources = generateTriggerResource(resource)
-        val triggerPipelines = chartPipelineDao.getChartPipelines(dslContext, productId).associate { pipeline ->
+        val triggerPipelines = chartPipelineDao.getChartPipelines(dslContext, productCode).associate { pipeline ->
             if (pipeline.serviceName.isNullOrBlank()) {
                 "${pipeline.projectName}:${pipeline.filePath}" to pipeline.pipelineId
             } else {

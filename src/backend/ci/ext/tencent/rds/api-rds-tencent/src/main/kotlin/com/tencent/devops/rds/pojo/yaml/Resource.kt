@@ -27,13 +27,9 @@
 
 package com.tencent.devops.rds.pojo.yaml
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class Resource(
-    @JsonProperty("product_id")
-    val productId: Long,
-    @JsonProperty("product_name")
-    val productName: String,
+    val productCode: String,
+    val displayName: String,
     val projects: List<Project>,
     val tickets: Tickets
 )

@@ -27,9 +27,6 @@
 
 package com.tencent.devops.rds.pojo.yaml
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class Init(
-    @JsonProperty("stream_path")
     val streamPath: String
 )

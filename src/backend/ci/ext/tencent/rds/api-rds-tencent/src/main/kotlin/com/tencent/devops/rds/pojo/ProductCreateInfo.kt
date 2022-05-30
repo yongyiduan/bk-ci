@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel("产品-新增模型")
 data class ProductCreateInfo(
     @ApiModelProperty("RDS产品ID")
-    val productId: Long,
+    val productCode: String,
     @ApiModelProperty("管理员")
     val master: String,
     @ApiModelProperty("用户成员")

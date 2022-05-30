@@ -33,7 +33,7 @@ import com.tencent.devops.rds.pojo.enums.ProductStatus
  * Rds Product状态信息, biz专用
  */
 data class RdsProductStatus(
-    val productId: Long,
+    val productCode: String,
     val productName: String,
     val chartName: String,
     val chartVersion: String,
@@ -44,7 +44,7 @@ data class RdsProductStatus(
 )
 
 fun RdsProductStatus.toRdsProductStatusResult() = RdsProductStatusResult(
-    productId = this.productId,
+    productCode = this.productCode,
     productName = this.productName,
     chartName = this.chartName,
     chartVersion = this.chartVersion,

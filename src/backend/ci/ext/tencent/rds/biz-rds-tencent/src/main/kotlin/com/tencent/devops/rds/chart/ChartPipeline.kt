@@ -61,7 +61,7 @@ class ChartPipeline @Autowired constructor(
 
     fun createDefaultPipeline(
         userId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         pipeline: RdsPipelineCreate,
         initPipeline: Boolean? = false
@@ -117,7 +117,7 @@ class ChartPipeline @Autowired constructor(
             dslContext = dslContext,
             pipeline = RdsChartPipelineInfo(
                 pipelineId = result.id,
-                productId = productId,
+                productCode = productCode,
                 filePath = pipeline.filePath,
                 projectName = pipeline.projectName,
                 serviceName = pipeline.serviceName,
@@ -132,7 +132,7 @@ class ChartPipeline @Autowired constructor(
     fun updateChartPipeline(
         userId: String,
         pipelineId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         pipeline: RdsPipelineCreate,
         initPipeline: Boolean? = false
@@ -140,7 +140,7 @@ class ChartPipeline @Autowired constructor(
         try {
             val model = streamConverter.getYamlModel(
                 userId = userId,
-                productId = productId,
+                productCode = productCode,
                 projectId = projectId,
                 pipelineId = pipelineId,
                 pipelineName = RdsPipelineUtils.genBKPipelineName(
@@ -174,7 +174,7 @@ class ChartPipeline @Autowired constructor(
             dslContext = dslContext,
             pipeline = RdsChartPipelineInfo(
                 pipelineId = pipelineId,
-                productId = productId,
+                productCode = productCode,
                 filePath = pipeline.filePath,
                 projectName = pipeline.projectName,
                 serviceName = pipeline.serviceName,
@@ -184,19 +184,19 @@ class ChartPipeline @Autowired constructor(
         )
     }
 
-    fun getProductPipelines(productId: Long): List<RdsChartPipelineInfo> {
-        return chartPipelineDao.getChartPipelines(dslContext, productId)
+    fun getProductPipelines(productCode: String): List<RdsChartPipelineInfo> {
+        return chartPipelineDao.getChartPipelines(dslContext, productCode)
     }
 
     fun getProductPipelineByService(
-        productId: Long,
+        productCode: String,
         filePath: String,
         projectName: String?,
         serviceName: String?
     ): RdsChartPipelineInfo? {
         return chartPipelineDao.getProductPipelineByService(
             dslContext = dslContext,
-            productId = productId,
+            productCode = productCode,
             filePath = filePath,
             projectName = projectName,
             serviceName = serviceName

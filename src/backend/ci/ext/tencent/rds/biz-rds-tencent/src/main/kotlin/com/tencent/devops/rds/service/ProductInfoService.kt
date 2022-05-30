@@ -74,14 +74,14 @@ class ProductInfoService @Autowired constructor(
         )
     }
 
-    fun status(productId: Long): RdsProductStatusResult? {
-        return productInfoDao.status(dslContext, productId)?.toRdsProductStatusResult()
+    fun status(productCode: String): RdsProductStatusResult? {
+        return productInfoDao.status(dslContext, productCode)?.toRdsProductStatusResult()
     }
 
-    fun detail(productId: Long, req: ProductDetailReq): ProductDetailResp {
-        val record = productInfoDao.get(dslContext, productId, req.resource)
+    fun detail(productCode: String, req: ProductDetailReq): ProductDetailResp {
+        val record = productInfoDao.get(dslContext, productCode, req.resource)
         val users = if (req.users) {
-            productUserDao.getProductUserList(dslContext, productId).map {
+            productUserDao.getProductUserList(dslContext, productCode).map {
                 ProductUser(
                     name = it.userId,
                     type = it.type

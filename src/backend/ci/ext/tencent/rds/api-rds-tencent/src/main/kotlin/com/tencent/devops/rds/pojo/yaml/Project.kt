@@ -27,23 +27,18 @@
 
 package com.tencent.devops.rds.pojo.yaml
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class Project(
     val id: String,
-    @JsonProperty("tapd_id")
     val tapdId: String?,
-    @JsonProperty("bcs_id")
     val bcsId: String?,
-    @JsonProperty("repo_url")
     val repoUrl: String?,
     val services: List<Service>?
 ) {
     fun getProjectResource(): MutableMap<String, String?> {
         val map = mutableMapOf<String, String?>()
-        tapdId?.let { map["tapd_id"] = it }
-        bcsId?.let { map["bcs_id"] = it }
-        repoUrl?.let { map["repo_url"] = it }
+        tapdId?.let { map["tapdId"] = it }
+        bcsId?.let { map["bcsId"] = it }
+        repoUrl?.let { map["repoUrl"] = it }
         return map
     }
 }

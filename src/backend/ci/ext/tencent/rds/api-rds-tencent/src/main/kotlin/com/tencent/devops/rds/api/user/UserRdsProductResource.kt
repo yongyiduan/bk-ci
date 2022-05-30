@@ -66,25 +66,25 @@ interface UserRdsProductResource {
 
     @ApiOperation("获取product详情")
     @POST
-    @Path("/{productId}")
+    @Path("/{productCode}")
     fun get(
         @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
-        @PathParam("productId")
-        productId: Long,
+        @PathParam("productCode")
+        productCode: String,
         @ApiParam("详情请求信息", required = true)
         detail: ProductDetailReq
     ): Result<ProductDetailResp>
 
     @ApiOperation("获取product状态")
     @GET
-    @Path("/{productId}/status")
+    @Path("/{productCode}/status")
     fun status(
         @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
-        @PathParam("productId")
-        productId: Long
+        @PathParam("productCode")
+        productCode: String
     ): Result<RdsProductStatusResult?>
 }

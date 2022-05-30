@@ -50,13 +50,13 @@ class ProductUserService @Autowired constructor(
         if (!productCreateInfo.members.isNullOrEmpty()) {
             members.putAll(productCreateInfo.members!!.associateWith { ProductUserType.NORMAL })
         }
-        productUserDao.batchSave(dslContext, productId = productCreateInfo.productId, userWithTypeMap = members)
+        productUserDao.batchSave(dslContext, productCode = productCreateInfo.productCode, userWithTypeMap = members)
         return true
     }
 
     fun saveProductMembers(
         userId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         members: List<String>?,
         masterUserId: String?
@@ -74,7 +74,7 @@ class ProductUserService @Autowired constructor(
             )
             productUserDao.batchSave(
                 dslContext = dslContext,
-                productId = productId,
+                productCode = productCode,
                 userWithTypeMap = productUsersMap
             )
         }
@@ -83,7 +83,7 @@ class ProductUserService @Autowired constructor(
 
     fun deleteProductMembers(
         userId: String,
-        productId: Long,
+        productCode: String,
         projectId: String,
         members: List<String>
     ): Boolean {
@@ -98,7 +98,7 @@ class ProductUserService @Autowired constructor(
 //                    userIds = members
 //                )
 //            )
-            productUserDao.batchDelete(dslContext, productId, members)
+            productUserDao.batchDelete(dslContext, productCode, members)
             return true
         } catch (t: Throwable) {
             logger.error("RDS|saveProductMembers failed with: ", t)

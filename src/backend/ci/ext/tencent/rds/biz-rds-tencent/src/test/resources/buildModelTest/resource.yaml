@@ -1,17 +1,17 @@
-product_id: 1
-product_name: test
+productCode: 1
+displayName: test
 projects:
   - job:
-      tapd_id: xxxxxx
-      bcs_id: xxxxxx
-      repo_url: github.com/XXXX/stream.git # 如果上一级repo填了，那这里可选
+      tapdId: xxxxxx
+      bcsId: xxxxxx
+      repoUrl: github.com/XXXX/stream.git # 如果上一级repo填了，那这里可选
   - stream:
-      tapd_id: xxxxx
+      tapdId: xxxxx
       services:
         - process:
-            repo_url: github.com/aaa/b.git # 如果上一级repo填了，那这里可选
+            repoUrl: github.com/aaa/b.git # 如果上一级repo填了，那这里可选
         - dispatch:
-            repo_url: github.com/aaa/ccc.git
+            repoUrl: github.com/aaa/ccc.git
 
 tickets:
   tgit:

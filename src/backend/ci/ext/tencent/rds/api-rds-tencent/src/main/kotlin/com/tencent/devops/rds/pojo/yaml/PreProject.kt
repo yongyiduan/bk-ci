@@ -27,14 +27,9 @@
 
 package com.tencent.devops.rds.pojo.yaml
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class PreProject(
-    @JsonProperty("tapd_id")
     val tapdId: String?,
-    @JsonProperty("bcs_id")
     val bcsId: String?,
-    @JsonProperty("repo_url")
     val repoUrl: String?,
     val services: List<Map<String, PreService>>?
 )

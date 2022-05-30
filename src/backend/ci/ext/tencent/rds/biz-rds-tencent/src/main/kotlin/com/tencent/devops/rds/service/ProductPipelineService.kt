@@ -52,8 +52,8 @@ class ProductPipelineService @Autowired constructor(
 
     private val logger = LoggerFactory.getLogger(ProductPipelineService::class.java)
 
-    fun getInitPipelineStatus(productId: Long): InitStatusResult {
-        val initPipeline = chartPipelineDao.getInitPipelines(dslContext, productId) ?: throw ErrorCodeException(
+    fun getInitPipelineStatus(productCode: String): InitStatusResult {
+        val initPipeline = chartPipelineDao.getInitPipelines(dslContext, productCode) ?: throw ErrorCodeException(
             statusCode = HTTP_404,
             errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
             params = arrayOf("未找到初始化流水线")
@@ -65,7 +65,7 @@ class ProductPipelineService @Autowired constructor(
             params = arrayOf("初始化流水线数据错误")
         )
         return InitStatusResult(
-            productId = productId,
+            productCode = productCode,
             status = BuildStatus.values()[history.first().status].statusName,
             errorInfo = history.first().errorInfo
         )

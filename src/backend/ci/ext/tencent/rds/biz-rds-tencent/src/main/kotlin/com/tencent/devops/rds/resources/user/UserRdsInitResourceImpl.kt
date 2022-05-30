@@ -72,7 +72,7 @@ class UserRdsInitResourceImpl @Autowired constructor(
         return Result(productInitService.init(userId, chartName, inputStream))
     }
 
-    override fun initStatus(userId: String, productId: Long): Result<InitStatusResult> {
-        return Result(productPipelineService.getInitPipelineStatus(productId))
+    override fun initStatus(userId: String, productCode: String): Result<InitStatusResult> {
+        return Result(productPipelineService.getInitPipelineStatus(productCode))
     }
 }
