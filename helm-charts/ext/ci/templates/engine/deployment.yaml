@@ -3,7 +3,7 @@
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
-  name: {{ include "common.names.fullname" . }}-engine
+  name: {{ include "bkci.names.fullname" . }}-engine
   labels: {{- include "bkci.labels.standard" . | nindent 4 }}
     {{- if .Values.commonLabels }}
       {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
@@ -69,8 +69,19 @@ spec:
               value: engine
             - name: NAMESPACE
               value: {{ .Release.Namespace }}
-            - name: SERVICE_PREFIX
-              value: {{ include "common.names.fullname" . }}
+            - name: RELEASE_NAME
+              value: {{ .Release.Name }}
+            - name: CHART_NAME
+              value: {{ .Chart.Name }}
+            - name: MULTI_CLUSTER
+              value: {{ .Values.multiCluster.enabled | quote }}
+            - name: DEFAULT_NAMESPACE
+              value: {{ .Values.multiCluster.defaultNamespace }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
           workingDir: /data/workspace/engine
           livenessProbe:
             httpGet:
@@ -90,4 +101,12 @@ spec:
             timeoutSeconds: 10
             failureThreshold: 5
             successThreshold: 1
+          volumeMounts:
+          - mountPath: /data/workspace/engine/jvm
+            name: log-volume
+            subPathExpr: bkci/jvm/$(POD_NAME)
+      volumes:
+      - hostPath:
+          path: /data
+        name: log-volume
 {{- end -}}

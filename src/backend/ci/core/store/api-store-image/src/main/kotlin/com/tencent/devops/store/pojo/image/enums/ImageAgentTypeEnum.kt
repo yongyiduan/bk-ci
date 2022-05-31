@@ -39,6 +39,10 @@ enum class ImageAgentTypeEnum(val type: Int) {
     companion object {
 
         fun getImageAgentType(name: String): ImageAgentTypeEnum? {
+            if (name.equals(KUBERNETES.name, ignoreCase = true)) {
+                return DOCKER
+            }
+
             if (name.toLowerCase() == PUBLIC_BCS.name.toLowerCase()) {
                 return DOCKER
             }
