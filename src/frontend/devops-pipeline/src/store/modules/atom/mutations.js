@@ -70,7 +70,8 @@ import {
     FETCHING_ATOM_MORE_LOADING,
     SET_COMMEND_ATOM_COUNT,
     SET_ATOM_PAGE_OVER,
-    CLEAR_ATOM_DATA
+    CLEAR_ATOM_DATA,
+    SET_COMMEND_ATOM_PAGE_OVER
 } from './constants'
 import {
     getAtomModalKey,
@@ -426,8 +427,13 @@ export default {
     [CLEAR_ATOM_DATA]: (state) => {
         state.atomList = []
         state.atomMap = {}
-        state.atomCodeList = {}
+        state.atomCodeList = []
         state.fetchingAtomList = true
+        state.isCommendAtomPageOver = false
+        return state
+    },
+    [SET_COMMEND_ATOM_PAGE_OVER]: (state, payload) => {
+        state.isCommendAtomPageOver = payload
         return state
     }
 }

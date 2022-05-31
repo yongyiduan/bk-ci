@@ -64,7 +64,6 @@ import com.tencent.devops.store.pojo.atom.enums.AtomStatusEnum
 import com.tencent.devops.store.pojo.common.ATOM_POST_ENTRY_PARAM
 import com.tencent.devops.store.pojo.common.KEY_TARGET
 import com.tencent.devops.store.pojo.common.enums.BuildHostTypeEnum
-import com.tencent.devops.worker.common.ATOM_CREATOR
 import com.tencent.devops.worker.common.CI_TOKEN_CONTEXT
 import com.tencent.devops.worker.common.CommonEnv
 import com.tencent.devops.worker.common.JAVA_PATH_ENV
@@ -141,7 +140,7 @@ open class MarketAtomTask : ITask() {
                 errorType = ErrorType.SYSTEM,
                 errorCode = ErrorCode.SYSTEM_WORKER_LOADING_ERROR
             )
-        addTaskErrorMessage(ATOM_CREATOR, atomData.creator)
+
         // val atomWorkspace = File("${workspace.absolutePath}/${atomCode}_${buildTask.taskId}_data")
         val atomTmpSpace = Files.createTempDirectory("${atomCode}_${buildTask.taskId}_data").toFile()
         buildTask.elementVersion = atomData.version
@@ -163,9 +162,7 @@ open class MarketAtomTask : ITask() {
                 context = buildTask.buildVariable,
                 acrossProjectId = acrossInfo?.targetProjectId
             )
-        }.toMap()
-            .plus(buildTask.buildVariable ?: emptyMap())
-            .plus(getContainerVariables(buildTask, buildVariables, workspacePath))
+        }.toMap().plus(buildTask.buildVariable ?: emptyMap())
 
         // 解析输入输出字段模板
         val props = JsonUtil.toMutableMap(atomData.props!!)
@@ -176,7 +173,7 @@ open class MarketAtomTask : ITask() {
         val inputParams = map["input"]?.let { input ->
             parseInputParams(
                 inputMap = input as Map<String, Any>,
-                variables = variables,
+                variables = variables.plus(getContainerVariables(buildTask, buildVariables, workspacePath)),
                 acrossInfo = acrossInfo
             )
         } ?: emptyMap()
@@ -252,7 +249,7 @@ open class MarketAtomTask : ITask() {
             val buildEnvs = buildVariables.buildEnvs
             if (!preCmd.isNullOrBlank()) {
                 val preCmds = mutableListOf<String>()
-                if (preCmd.contains(Regex("^\\s*\\[[\\w\\s\\S\\W]*\\]\\s*$"))) {
+                if (preCmd.contains(Regex("^\\s*\\[[\\w\\s\\S\\W]*]\\s*$"))) {
                     preCmds.addAll(JsonUtil.to(preCmd))
                 } else {
                     preCmds.add(preCmd)
