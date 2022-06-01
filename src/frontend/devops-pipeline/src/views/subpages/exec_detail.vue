@@ -394,6 +394,7 @@
                 'pausePlugin'
             ]),
             ...mapActions('common', [
+                'startDebugDocker',
                 'requestInterceptAtom'
             ]),
             convertMStoStringByRule,
@@ -549,15 +550,54 @@
                     this.skipTask = false
                 }
             },
-            async debugDocker ({ stageIndex, containerIndex, container }) {
+            async debugDocker ({ stageIndex, containerIndex, container, isPubDevcloud, isDocker }) {
                 const vmSeqId = container.containerId || this.getRealSeqId(this.execDetail.model.stages, stageIndex, containerIndex)
                 const { projectId, pipelineId, buildNo: buildId } = this.$route.params
-                const buildResourceType = container.dispatchType?.buildType
-                const buildIdStr = buildId ? `&buildId=${buildId}` : ''
-
+                const url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&vmSeqId=${vmSeqId}`
+                const { dispatchType = {}, dockerBuildVersion, buildEnv } = container
                 const tab = window.open('about:blank')
-                const url = `${WEB_URL_PREFIX}/pipeline/${projectId}/dockerConsole/?pipelineId=${pipelineId}&dispatchType=${buildResourceType}&vmSeqId=${vmSeqId}${buildIdStr}`
-                tab.location = url
+                try {
+                    if (isDocker) {
+                        const res = await this.startDebugDocker({
+                            projectId: projectId,
+                            pipelineId: pipelineId,
+                            vmSeqId,
+                            imageCode: dispatchType.imageCode,
+                            imageVersion: dispatchType.imageVersion,
+                            imageName: dispatchType.value ? dispatchType.value : dockerBuildVersion,
+                            buildEnv,
+                            imageType: dispatchType.imageType || 'BKDEVOPS',
+                            credentialId: dispatchType.credentialId || ''
+                        })
+                        if (res === true) {
+                            tab.location = url
+                        }
+                    } else if (isPubDevcloud) {
+                        const buildIdStr = buildId ? `&buildId=${buildId}` : ''
+                        tab.location = `${url}&type=DEVCLOUD${buildIdStr}`
+                    }
+                } catch (err) {
+                    tab.close()
+                    if (err.code === 403) {
+                        this.$showAskPermissionDialog({
+                            noPermissionList: [{
+                                actionId: this.$permissionActionMap.edit,
+                                resourceId: this.$permissionResourceMap.pipeline,
+                                instanceId: [{
+                                    id: pipelineId,
+                                    name: pipelineId
+                                }],
+                                projectId
+                            }],
+                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&role_manager=pipeline:${pipelineId}`
+                        })
+                    } else {
+                        this.$showTips({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    }
+                }
             },
             switchTab (tabType = 'executeDetail') {
                 this.$router.push({
