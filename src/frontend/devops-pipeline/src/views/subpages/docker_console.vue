@@ -9,7 +9,7 @@
                 <p class="debug-tips" v-show="isRunning">{{ $t('editPage.docker.fromRunningTips') }}</p>
             </div>
             <div class="container">
-                <my-terminal v-if="!isLoading" :url="url" :resize-url="resizeUrl" :exec-id="execId" :console-type="dispatchType"></my-terminal>
+                <my-terminal v-if="!isLoading" :url="url" :resize-url="resizeUrl" :exec-id="execId" :console-type="realDispatchType"></my-terminal>
             </div>
             <div class="footer"></div>
         </section>
@@ -47,7 +47,7 @@
                     desc: this.$t('editPage.docker.failDesc')
                 },
                 containerName: '',
-                dispatchType: ''
+                realDispatchType: ''
             }
         },
         computed: {
@@ -68,6 +68,9 @@
             },
             vmSeqId () {
                 return this.$route.query.vmSeqId
+            },
+            dispatchType () {
+                return this.$route.query.dispatchType
             }
         },
         async created () {
@@ -82,16 +85,17 @@
         methods: {
             async linkConsole () {
                 try {
-                    const { projectId, pipelineId, buildId, vmSeqId } = this
+                    const { projectId, pipelineId, buildId, vmSeqId, dispatchType } = this
                     const res = await this.$store.dispatch('common/startDebugDocker', {
                         projectId,
                         pipelineId,
                         buildId,
-                        vmSeqId
+                        vmSeqId,
+                        dispatchType
                     })
                     let { websocketUrl } = res
-                    this.dispatchType = res.dispatchType
-                    if (this.dispatchType === 'PUBLIC_BCS') {
+                    this.realDispatchType = res.dispatchType || this.dispatchType
+                    if (this.realDispatchType === 'PUBLIC_BCS') {
                         websocketUrl = websocketUrl + '?hide_banner=true'
                     }
                     this.url = websocketUrl
@@ -108,8 +112,8 @@
                     .then(async () => {
                         try {
                             this.isExiting = true
-                            const { projectId, pipelineId, vmSeqId } = this
-                            await this.$store.dispatch('common/stopDebugDocker', { projectId, pipelineId, vmSeqId })
+                            const { projectId, pipelineId, vmSeqId, realDispatchType } = this
+                            await this.$store.dispatch('common/stopDebugDocker', { projectId, pipelineId, vmSeqId, dispatchType: realDispatchType })
                             this.$router.push({
                                 name: 'pipelinesEdit',
                                 params: {
