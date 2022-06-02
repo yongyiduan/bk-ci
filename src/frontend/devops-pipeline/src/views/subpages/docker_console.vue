@@ -9,7 +9,7 @@
                 <p class="debug-tips" v-show="isRunning">{{ $t('editPage.docker.fromRunningTips') }}</p>
             </div>
             <div class="container">
-                <my-terminal v-if="!isLoading" :url="url" :resize-url="resizeUrl" :exec-id="execId" :console-type="dispatchType"></my-terminal>
+                <my-terminal v-if="!isLoading" :url="url" :resize-url="resizeUrl" :exec-id="execId" :console-type="realDispatchType"></my-terminal>
             </div>
             <div class="footer"></div>
         </section>
@@ -46,7 +46,8 @@
                     title: this.$t('editPage.docker.failTitle'),
                     desc: this.$t('editPage.docker.failDesc')
                 },
-                containerName: ''
+                containerName: '',
+                realDispatchType: ''
             }
         },
         computed: {
@@ -85,17 +86,19 @@
             async linkConsole () {
                 try {
                     const { projectId, pipelineId, buildId, vmSeqId, dispatchType } = this
-                    let res = await this.$store.dispatch('common/startDebugDocker', {
+                    const res = await this.$store.dispatch('common/startDebugDocker', {
                         projectId,
                         pipelineId,
                         buildId,
                         vmSeqId,
                         dispatchType
                     })
-                    if (this.dispatchType === 'PUBLIC_BCS') {
-                        res = res + '?hide_banner=true'
+                    let { websocketUrl } = res
+                    this.realDispatchType = res.dispatchType || this.dispatchType
+                    if (this.realDispatchType === 'PUBLIC_BCS') {
+                        websocketUrl = websocketUrl + '?hide_banner=true'
                     }
-                    this.url = res || ''
+                    this.url = websocketUrl
                 } catch (err) {
                     console.log(err)
                     this.connectError = true
@@ -109,8 +112,8 @@
                     .then(async () => {
                         try {
                             this.isExiting = true
-                            const { projectId, pipelineId, vmSeqId, dispatchType } = this
-                            await this.$store.dispatch('common/stopDebugDocker', { projectId, pipelineId, vmSeqId, dispatchType })
+                            const { projectId, pipelineId, vmSeqId, realDispatchType } = this
+                            await this.$store.dispatch('common/stopDebugDocker', { projectId, pipelineId, vmSeqId, dispatchType: realDispatchType })
                             this.$router.push({
                                 name: 'pipelinesEdit',
                                 params: {
