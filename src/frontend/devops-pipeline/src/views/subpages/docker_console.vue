@@ -46,7 +46,8 @@
                     title: this.$t('editPage.docker.failTitle'),
                     desc: this.$t('editPage.docker.failDesc')
                 },
-                containerName: ''
+                containerName: '',
+                dispatchType: ''
             }
         },
         computed: {
@@ -67,9 +68,6 @@
             },
             vmSeqId () {
                 return this.$route.query.vmSeqId
-            },
-            dispatchType () {
-                return this.$route.query.dispatchType
             }
         },
         async created () {
@@ -84,18 +82,19 @@
         methods: {
             async linkConsole () {
                 try {
-                    const { projectId, pipelineId, buildId, vmSeqId, dispatchType } = this
-                    let res = await this.$store.dispatch('common/startDebugDocker', {
+                    const { projectId, pipelineId, buildId, vmSeqId } = this
+                    const res = await this.$store.dispatch('common/startDebugDocker', {
                         projectId,
                         pipelineId,
                         buildId,
-                        vmSeqId,
-                        dispatchType
+                        vmSeqId
                     })
+                    let { websocketUrl } = res
+                    this.dispatchType = res.dispatchType
                     if (this.dispatchType === 'PUBLIC_BCS') {
-                        res = res + '?hide_banner=true'
+                        websocketUrl = websocketUrl + '?hide_banner=true'
                     }
-                    this.url = res || ''
+                    this.url = websocketUrl
                 } catch (err) {
                     console.log(err)
                     this.connectError = true
@@ -109,8 +108,8 @@
                     .then(async () => {
                         try {
                             this.isExiting = true
-                            const { projectId, pipelineId, vmSeqId, dispatchType } = this
-                            await this.$store.dispatch('common/stopDebugDocker', { projectId, pipelineId, vmSeqId, dispatchType })
+                            const { projectId, pipelineId, vmSeqId } = this
+                            await this.$store.dispatch('common/stopDebugDocker', { projectId, pipelineId, vmSeqId })
                             this.$router.push({
                                 name: 'pipelinesEdit',
                                 params: {

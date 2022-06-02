@@ -708,7 +708,7 @@
                 const vmSeqId = this.isDetailPage ? (this.container.containerId || realSeqId) : realSeqId
                 const tab = window.open('about:blank')
                 const buildIdStr = this.buildId ? `&buildId=${this.buildId}` : ''
-                const url = `${WEB_URL_PREFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&dispatchType=${this.buildResourceType}&vmSeqId=${vmSeqId}${buildIdStr}`
+                const url = `${WEB_URL_PREFIX}/pipeline/${this.projectId}/dockerConsole/?pipelineId=${this.pipelineId}&vmSeqId=${vmSeqId}${buildIdStr}`
                 tab.location = url
             },
             handleNfsSwitchChange (name, value) {
