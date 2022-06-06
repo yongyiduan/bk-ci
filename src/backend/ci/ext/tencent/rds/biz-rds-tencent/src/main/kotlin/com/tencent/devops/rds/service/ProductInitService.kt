@@ -436,7 +436,7 @@ class ProductInitService @Autowired constructor(
             val createResult =
                 client.get(ServiceTxProjectResource::class).getOrCreateRdsProject(
                     userId = masterUserId,
-                    productCode = productCode,
+                    projectId = projectId,
                     projectName = productName
                 )
             if (createResult.isNotOk() || createResult.data == null) {
