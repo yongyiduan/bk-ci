@@ -319,16 +319,15 @@ class ProjectLocalService @Autowired constructor(
         return ProjectUtils.packagingBean(userProjectRecord!!, setOf())
     }
 
-    fun getOrCreateRdsProject(userId: String, productCode: String, projectName: String): ProjectVO {
-        val projectCode = "RDS_$productCode"
-        var userProjectRecord = projectDao.getByEnglishName(dslContext, projectCode)
+    fun getOrCreateRdsProject(userId: String, projectId: String, projectName: String): ProjectVO {
+        var userProjectRecord = projectDao.getByEnglishName(dslContext, projectId)
         if (userProjectRecord != null) {
             return ProjectUtils.packagingBean(userProjectRecord, setOf())
         }
 
         val projectCreateInfo = ProjectCreateInfo(
             projectName = projectName,
-            englishName = projectCode,
+            englishName = projectId,
             projectType = ProjectTypeEnum.SUPPORT_PRODUCT.index,
             description = "RDS project for $userId",
             bgId = 0L,
@@ -353,7 +352,7 @@ class ProjectLocalService @Autowired constructor(
                 projectCreateInfo = projectCreateInfo,
                 accessToken = null,
                 createExt = createExt,
-                projectId = projectCode,
+                projectId = projectId,
                 channel = ProjectChannelCode.BS
             )
             success = true
@@ -363,7 +362,7 @@ class ProjectLocalService @Autowired constructor(
         } finally {
             jmxApi.execute(PROJECT_CREATE, System.currentTimeMillis() - startEpoch, success)
         }
-        userProjectRecord = projectDao.getByEnglishName(dslContext, projectCode)
+        userProjectRecord = projectDao.getByEnglishName(dslContext, projectId)
         return ProjectUtils.packagingBean(userProjectRecord!!, setOf())
     }
 
