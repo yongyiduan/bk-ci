@@ -5,6 +5,7 @@
             :editable="false"
             :is-exec-detail="true"
             :match-rules="[]"
+            :user-name="userName"
             :pipeline="pipeline"
             @click="handlePipelineClick"
             @stage-check="handleStageCheck"
@@ -73,7 +74,10 @@
             }
         },
         computed: {
-            ...mapState(['projectId', 'permission', 'curPipeline'])
+            ...mapState(['projectId', 'permission', 'curPipeline', 'user']),
+            userName () {
+                return this.user && this.user.username ? this.user.username : 'unknow'
+            }
         },
         watch: {
             pipeline (val) {
