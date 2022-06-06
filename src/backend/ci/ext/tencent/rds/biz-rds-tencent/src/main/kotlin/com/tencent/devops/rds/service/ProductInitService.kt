@@ -38,6 +38,7 @@ import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.pipeline.enums.StartType
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.project.api.service.ServiceProjectResource
+import com.tencent.devops.project.api.service.service.ServiceTxProjectResource
 import com.tencent.devops.project.pojo.ProjectCreateInfo
 import com.tencent.devops.project.pojo.ProjectCreateUserInfo
 import com.tencent.devops.rds.chart.ChartParser
@@ -314,18 +315,15 @@ class ProductInitService @Autowired constructor(
             client.get(ServiceProjectResource::class).get(englishName = projectId).data
         if (projectResult == null) {
             val createResult =
-                client.get(ServiceProjectResource::class).create(
+                client.get(ServiceTxProjectResource::class).getOrCreateRdsProject(
                     userId = masterUserId,
-                    projectCreateInfo = ProjectCreateInfo(
-                        projectName = productName,
-                        englishName = projectId,
-                        description = "RDS project with product id: $productCode"
-                    )
+                    productCode = productCode,
+                    projectName = productName
                 )
-            if (createResult.isNotOk()) {
+            if (createResult.isNotOk() || createResult.data == null) {
                 throw RuntimeException(
                     "Create git ci project in devops failed," +
-                        " msg: ${createResult.message}"
+                        " msg: ${createResult.message}, projectVO: ${createResult.data}"
                 )
             }
         } else {
