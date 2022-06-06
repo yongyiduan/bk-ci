@@ -122,7 +122,7 @@ class ProductInitService @Autowired constructor(
 
             // 检查是否init过，init只能进行一次
             if (!isUpgrade) {
-                if (productInfoDao.get(dslContext, productCode, false) == null) {
+                if (productInfoDao.get(dslContext, productCode, false) != null) {
                     throw ErrorCodeException(
                         errorCode = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.errorCode,
                         defaultMessage = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.formatErrorMessage
