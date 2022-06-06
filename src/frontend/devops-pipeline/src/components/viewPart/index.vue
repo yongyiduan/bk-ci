@@ -316,6 +316,10 @@
                     })
                 }
             },
+            gotoArtifactory (row) {
+                const url = `https://${window.BK_REPO_URL_PREFIX}/ui/${this.projectId}/generic?repoName=${row.artifactoryType.toLowerCase()}&path=${row.path}`
+                window.open(url, '_blank')
+            },
             addClickListenr () {
                 document.addEventListener('mouseup', this.clickHandler)
             },
@@ -439,14 +443,6 @@
                         theme
                     })
                 }
-            },
-
-            /**
-             * 查看仓库
-             */
-            gotoArtifactory (row) {
-                const url = `https://${window.BK_REPO_URL_PREFIX}/ui/${this.projectId}/generic?repoName=${row.artifactoryType.toLowerCase()}&path=${row.path}`
-                window.open(url, '_blank')
             }
         }
     }
