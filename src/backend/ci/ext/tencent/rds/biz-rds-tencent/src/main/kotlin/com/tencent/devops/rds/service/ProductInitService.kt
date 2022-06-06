@@ -155,8 +155,7 @@ class ProductInitService @Autowired constructor(
             throw ErrorCodeException(
                 statusCode = HTTP_500,
                 errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
-                defaultMessage = ApiErrorCodeEnum.UNKNOWN_ERROR.formatErrorMessage,
-                params = arrayOf(e.message ?: "")
+                defaultMessage = ApiErrorCodeEnum.UNKNOWN_ERROR.formatErrorMessage.format(arrayOf(e.message ?: ""))
             )
         }
 
