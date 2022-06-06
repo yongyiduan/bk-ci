@@ -71,7 +71,7 @@ class UserRdsProductResourceImpl @Autowired constructor(
             )
         }
 
-        return Result(productInitService.init(userId, chartName, inputStream))
+        return Result(productInitService.initProduct(userId, chartName, inputStream))
     }
 
     override fun upgrade(
@@ -96,7 +96,7 @@ class UserRdsProductResourceImpl @Autowired constructor(
             )
         }
 
-        return Result(productInitService.init(userId, chartName, inputStream, true))
+        return Result(productInitService.upgradeProduct(userId, chartName, inputStream))
     }
 
     override fun list(userId: String, req: ProductListReq): Result<Page<RdsProductStatusResult>> {

@@ -99,14 +99,13 @@ class ProductInitService @Autowired constructor(
         private val logger = LoggerFactory.getLogger(ProductInitService::class.java)
     }
 
-    fun init(
+    fun initProduct(
         userId: String,
         chartName: String,
-        inputStream: InputStream,
-        // TODO: 目前为止 upgrade 和 init 的功能完全相同只是产品设计区分，所以这里只是区分展示，未来需要通过函数区分
-        isUpgrade: Boolean = false
+        inputStream: InputStream
     ): RdsProductStatusResult {
         // 非异步资源，错误需要返回给客户端
+        val status = ProductStatus.INITIALIZING
         val cachePath: String
         val chartResources: ChartResources
         val productCode: String
@@ -121,14 +120,17 @@ class ProductInitService @Autowired constructor(
             productCode = chartResources.resourceObject.productCode
 
             // 检查是否init过，init只能进行一次
-            if (!isUpgrade) {
-                if (productInfoDao.get(dslContext, productCode, false) == null) {
-                    throw ErrorCodeException(errorCode = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.errorCode)
-                }
+            if (productInfoDao.get(dslContext, productCode, false) == null) {
+                throw ErrorCodeException(errorCode = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.errorCode)
             }
 
             // 创建蓝盾项目以及添加人员
-            productInfo = createProduct(userId, chartResources, isUpgrade)
+            createBKProject(
+                masterUserId = userId,
+                productCode = productCode,
+                productName = chartResources.resourceObject.displayName
+            )
+            productInfo = createProduct(userId, chartResources, status)
 
             // 添加各类凭证信息
             createCred(userId, productInfo.projectId, chartResources.resourceObject.tickets)
@@ -137,11 +139,7 @@ class ProductInitService @Autowired constructor(
             productInfoDao.updateProductStatus(
                 dslContext = dslContext,
                 productCode = chartResources.resourceObject.productCode,
-                status = if (isUpgrade) {
-                    ProductStatus.UPGRADING
-                } else {
-                    ProductStatus.INITIALIZING
-                },
+                status = status,
                 errorMsg = null
             )
         } catch (e: Throwable) {
@@ -171,17 +169,75 @@ class ProductInitService @Autowired constructor(
             chartName = productInfo.chartName,
             chartVersion = productInfo.chartVersion,
             lastUpdate = productInfo.updateTime,
-            status = if (isUpgrade) {
-                ProductStatus.UPGRADING.display
-            } else {
-                ProductStatus.INITIALIZING.display
-            },
+            status = status.display,
             revision = productInfo.revision,
-            notes = if (isUpgrade) {
-                "your product ${productInfo.productName} is upgrading"
-            } else {
-                "your product ${productInfo.productName} is initializing"
+            notes = "your product ${productInfo.productName} is initializing"
+        )
+    }
+
+    fun upgradeProduct(
+        userId: String,
+        chartName: String,
+        inputStream: InputStream
+    ): RdsProductStatusResult {
+        val status = ProductStatus.UPGRADING
+        // 非异步资源，错误需要返回给客户端
+        val cachePath: String
+        val chartResources: ChartResources
+        val productCode: String
+        val productInfo: RdsProductInfo
+        try {
+            // 读取并解压缓存到本地磁盘
+            cachePath = chartParser.cacheChartDisk(chartName, inputStream)
+
+            // 读取各类资源文件
+            chartResources = readResources(cachePath)
+
+            productCode = chartResources.resourceObject.productCode
+
+            // 创建蓝盾项目以及添加人员
+            productInfo = createProduct(userId, chartResources, status)
+
+            // 添加各类凭证信息
+            createCred(userId, productInfo.projectId, chartResources.resourceObject.tickets)
+
+            // 修改状态为初始化中
+            productInfoDao.updateProductStatus(
+                dslContext = dslContext,
+                productCode = chartResources.resourceObject.productCode,
+                status = status,
+                errorMsg = null
+            )
+        } catch (e: Throwable) {
+            when (e) {
+                is ErrorCodeException -> throw e
             }
+            logger.error("RDS|init error|userId=$userId|chartName=$chartName", e)
+            throw ErrorCodeException(
+                statusCode = HTTP_500,
+                errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
+                params = arrayOf(e.message ?: "")
+            )
+        }
+
+        // 异步资源，错误同步到数据库
+        initAsync(
+            userId = userId,
+            cachePath = cachePath,
+            chartResources = chartResources,
+            productCode = productCode,
+            projectId = productInfo.projectId
+        )
+
+        return RdsProductStatusResult(
+            productCode = productInfo.productCode,
+            productName = productInfo.productName,
+            chartName = productInfo.chartName,
+            chartVersion = productInfo.chartVersion,
+            lastUpdate = productInfo.updateTime,
+            status = ProductStatus.UPGRADING.display,
+            revision = productInfo.revision,
+            notes = "your product ${productInfo.productName} is upgrading"
         )
     }
 
@@ -320,18 +376,53 @@ class ProductInitService @Autowired constructor(
     private fun createProduct(
         masterUserId: String,
         chartResource: ChartResources,
-        isUpgrade: Boolean
+        status: ProductStatus
     ): RdsProductInfo {
         val productCode = chartResource.resourceObject.productCode
         val productName = chartResource.resourceObject.displayName
 
+        val projectId = createBKProject(productCode, masterUserId, productName)
+
+        val time = productInfoDao.createOrUpdateProduct(
+            dslContext = dslContext,
+            productCode = productCode,
+            productName = productName,
+            projectId = projectId,
+            chartName = chartResource.rdsYaml.code,
+            chartVersion = chartResource.rdsYaml.version,
+            mainYaml = chartResource.mainYamlStr,
+            mainParsed = Yaml.marshal(chartResource.mainObject),
+            resourceYaml = chartResource.resourceYamlStr,
+            resourceParsed = Yaml.marshal(chartResource.resourceObject),
+            revision = 1,
+            status = status
+        )
+
+        return RdsProductInfo(
+            productCode = productCode,
+            productName = productName,
+            projectId = projectId,
+            chartName = chartResource.rdsYaml.code,
+            chartVersion = chartResource.rdsYaml.version,
+            mainYaml = "",
+            mainParsed = "",
+            resourceYaml = "",
+            resourceParsed = "",
+            revision = 1,
+            status = status,
+            createTime = time.timestamp(),
+            updateTime = time.timestamp()
+        )
+    }
+
+    private fun createBKProject(masterUserId: String, productCode: String, productName: String): String {
         val userMap = productUserDao.getProductUserList(dslContext, productCode)
             .associate { it.userId to it.type }
         if (userMap[masterUserId] != ProductUserType.MASTER.name) {
             throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
                 defaultMessage = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.formatErrorMessage,
-                params = arrayOf(productCode.toString())
+                params = arrayOf(productCode)
             )
         }
 
@@ -384,45 +475,7 @@ class ProductInitService @Autowired constructor(
                 throw RuntimeException("Create project $projectId members ${userMap.keys.toList()} failed")
             }
         }
-
-        val time = productInfoDao.createOrUpdateProduct(
-            dslContext = dslContext,
-            productCode = productCode,
-            productName = productName,
-            projectId = projectId,
-            chartName = chartResource.rdsYaml.code,
-            chartVersion = chartResource.rdsYaml.version,
-            mainYaml = chartResource.mainYamlStr,
-            mainParsed = Yaml.marshal(chartResource.mainObject),
-            resourceYaml = chartResource.resourceYamlStr,
-            resourceParsed = Yaml.marshal(chartResource.resourceObject),
-            revision = 1,
-            status = if (isUpgrade) {
-                ProductStatus.UPGRADING
-            } else {
-                ProductStatus.INITIALIZING
-            }
-        )
-
-        return RdsProductInfo(
-            productCode = productCode,
-            productName = productName,
-            projectId = projectId,
-            chartName = chartResource.rdsYaml.code,
-            chartVersion = chartResource.rdsYaml.version,
-            mainYaml = "",
-            mainParsed = "",
-            resourceYaml = "",
-            resourceParsed = "",
-            revision = 1,
-            status = if (isUpgrade) {
-                ProductStatus.UPGRADING
-            } else {
-                ProductStatus.INITIALIZING
-            },
-            createTime = time.timestamp(),
-            updateTime = time.timestamp()
-        )
+        return projectId
     }
 
     private fun createCred(
