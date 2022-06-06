@@ -15,7 +15,6 @@
     "dependencies": {
         "@blueking/log": "2.0.4",
         "@icon-cool/bk-icon-devops": "^0.2.1",
-        "@tencent/bk-magic-vue": "2.4.9",
         "@vue/composition-api": "^1.6.1",
         "axios": "^0.27.2",
         "bk-magic-vue": "2.4.9",
