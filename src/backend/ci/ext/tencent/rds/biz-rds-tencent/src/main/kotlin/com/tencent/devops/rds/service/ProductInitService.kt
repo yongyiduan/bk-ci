@@ -102,7 +102,9 @@ class ProductInitService @Autowired constructor(
     fun init(
         userId: String,
         chartName: String,
-        inputStream: InputStream
+        inputStream: InputStream,
+        // TODO: 目前为止 upgrade 和 init 的功能完全相同只是产品设计区分，所以这里只是区分展示，未来需要通过函数区分
+        isUpgrade: Boolean = false
     ): RdsProductStatusResult {
         // 非异步资源，错误需要返回给客户端
         val cachePath: String
@@ -118,8 +120,15 @@ class ProductInitService @Autowired constructor(
 
             productCode = chartResources.resourceObject.productCode
 
+            // 检查是否init过，init只能进行一次
+            if (!isUpgrade) {
+                if (productInfoDao.get(dslContext, productCode, false) == null) {
+                    throw ErrorCodeException(errorCode = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.errorCode)
+                }
+            }
+
             // 创建蓝盾项目以及添加人员
-            productInfo = createProduct(userId, chartResources)
+            productInfo = createProduct(userId, chartResources, isUpgrade)
 
             // 添加各类凭证信息
             createCred(userId, productInfo.projectId, chartResources.resourceObject.tickets)
@@ -128,7 +137,11 @@ class ProductInitService @Autowired constructor(
             productInfoDao.updateProductStatus(
                 dslContext = dslContext,
                 productCode = chartResources.resourceObject.productCode,
-                status = ProductStatus.INITIALIZING,
+                status = if (isUpgrade) {
+                    ProductStatus.UPGRADING
+                } else {
+                    ProductStatus.INITIALIZING
+                },
                 errorMsg = null
             )
         } catch (e: Throwable) {
@@ -158,9 +171,17 @@ class ProductInitService @Autowired constructor(
             chartName = productInfo.chartName,
             chartVersion = productInfo.chartVersion,
             lastUpdate = productInfo.updateTime,
-            status = ProductStatus.INITIALIZING.display,
+            status = if (isUpgrade) {
+                ProductStatus.UPGRADING.display
+            } else {
+                ProductStatus.INITIALIZING.display
+            },
             revision = productInfo.revision,
-            notes = "your product ${productInfo.productName} is initializing"
+            notes = if (isUpgrade) {
+                "your product ${productInfo.productName} is upgrading"
+            } else {
+                "your product ${productInfo.productName} is initializing"
+            }
         )
     }
 
@@ -296,7 +317,11 @@ class ProductInitService @Autowired constructor(
         return ChartResources(mainYamlStr, mainObject, resourceYamlStr, resourceObject, rdsYaml)
     }
 
-    private fun createProduct(masterUserId: String, chartResource: ChartResources): RdsProductInfo {
+    private fun createProduct(
+        masterUserId: String,
+        chartResource: ChartResources,
+        isUpgrade: Boolean
+    ): RdsProductInfo {
         val productCode = chartResource.resourceObject.productCode
         val productName = chartResource.resourceObject.displayName
 
@@ -372,7 +397,11 @@ class ProductInitService @Autowired constructor(
             resourceYaml = chartResource.resourceYamlStr,
             resourceParsed = Yaml.marshal(chartResource.resourceObject),
             revision = 1,
-            status = ProductStatus.INITIALIZING
+            status = if (isUpgrade) {
+                ProductStatus.UPGRADING
+            } else {
+                ProductStatus.INITIALIZING
+            }
         )
 
         return RdsProductInfo(
@@ -386,7 +415,11 @@ class ProductInitService @Autowired constructor(
             resourceYaml = "",
             resourceParsed = "",
             revision = 1,
-            status = ProductStatus.INITIALIZING,
+            status = if (isUpgrade) {
+                ProductStatus.UPGRADING
+            } else {
+                ProductStatus.INITIALIZING
+            },
             createTime = time.timestamp(),
             updateTime = time.timestamp()
         )

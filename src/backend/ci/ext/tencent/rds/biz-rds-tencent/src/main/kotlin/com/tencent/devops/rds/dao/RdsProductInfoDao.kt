@@ -214,17 +214,19 @@ class RdsProductInfoDao {
         dslContext: DSLContext,
         productCode: String,
         resourceYaml: Boolean
-    ): RdsProductDetail {
+    ): RdsProductDetail? {
         with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
             val record = dslContext.selectFrom(this)
                 .where(PRODUCT_CODE.eq(productCode))
-                .fetchAny()
+                .fetchAny() ?: return null
 
             return RdsProductDetail(
+                chartName = record.chartName,
+                chartVersion = record.chartVersion,
                 resourceYaml = if (!resourceYaml) {
                     null
                 } else {
-                    record?.resourceYaml
+                    record.resourceYaml
                 }
             )
         }

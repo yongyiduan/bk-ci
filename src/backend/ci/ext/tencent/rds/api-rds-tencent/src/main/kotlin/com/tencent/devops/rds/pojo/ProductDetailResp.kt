@@ -32,8 +32,14 @@ package com.tencent.devops.rds.pojo
  * @param resourceYaml resource yaml文本
  */
 data class ProductDetailResp(
+    val chart: ChartInfo?,
     val resourceYaml: String?,
     val users: List<ProductUser>?
+)
+
+data class ChartInfo(
+    val chartName: String,
+    val chartVersion: String
 )
 
 data class ProductUser(

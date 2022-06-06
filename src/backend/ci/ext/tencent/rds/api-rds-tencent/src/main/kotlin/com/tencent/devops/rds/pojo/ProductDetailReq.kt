@@ -29,9 +29,12 @@ package com.tencent.devops.rds.pojo
 
 /**
  * product 资源的详情请求
- * @param resource 返回 resource信息
+ * @param info 返回 product 信息
+ * @param resource 返回 resource
+ * @param users 返回 users
  */
 data class ProductDetailReq(
+    val info: Boolean,
     val resource: Boolean,
     val users: Boolean
 )

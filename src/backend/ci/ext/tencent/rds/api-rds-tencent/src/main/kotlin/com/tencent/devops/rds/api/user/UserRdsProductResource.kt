@@ -38,6 +38,9 @@ import com.tencent.devops.rds.pojo.RdsProductStatusResult
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
+import org.glassfish.jersey.media.multipart.FormDataParam
+import java.io.InputStream
 import javax.ws.rs.Consumes
 import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
@@ -52,6 +55,42 @@ import javax.ws.rs.core.MediaType
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 interface UserRdsProductResource {
+
+    @ApiOperation("初始化RDS产品chart")
+    @POST
+    @Path("/init")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    fun init(
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("chart名称", required = false)
+        @FormDataParam("chartName")
+        chartName: String,
+        @ApiParam("cli替换后的压缩包chart", required = true)
+        @FormDataParam("file")
+        inputStream: InputStream,
+        @FormDataParam("file")
+        disposition: FormDataContentDisposition
+    ): Result<RdsProductStatusResult>
+
+    @ApiOperation("升级RDS产品chart")
+    @POST
+    @Path("/upgrade")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    fun upgrade(
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("chart名称", required = false)
+        @FormDataParam("chartName")
+        chartName: String,
+        @ApiParam("cli替换后的压缩包chart", required = true)
+        @FormDataParam("file")
+        inputStream: InputStream,
+        @FormDataParam("file")
+        disposition: FormDataContentDisposition
+    ): Result<RdsProductStatusResult>
 
     @ApiOperation("获取product状态列表")
     @POST

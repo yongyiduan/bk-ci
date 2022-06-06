@@ -27,21 +27,78 @@
 
 package com.tencent.devops.rds.resources.user
 
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.rds.api.user.UserRdsProductResource
+import com.tencent.devops.rds.constants.Constants
+import com.tencent.devops.rds.exception.CommonErrorCodeEnum
 import com.tencent.devops.rds.pojo.ProductDetailReq
 import com.tencent.devops.rds.pojo.ProductDetailResp
 import com.tencent.devops.rds.pojo.ProductListReq
 import com.tencent.devops.rds.pojo.RdsProductStatusResult
 import com.tencent.devops.rds.service.ProductInfoService
+import com.tencent.devops.rds.service.ProductInitService
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.springframework.beans.factory.annotation.Autowired
+import java.io.InputStream
+import java.nio.charset.Charset
 
 @RestResource
 class UserRdsProductResourceImpl @Autowired constructor(
+    private val productInitService: ProductInitService,
     private val productInfoService: ProductInfoService
 ) : UserRdsProductResource {
+    override fun init(
+        userId: String,
+        chartName: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition
+    ): Result<RdsProductStatusResult> {
+        // 校验文件 TODO: 增加接收到的文件大小的校验
+        val fileName = String(
+            disposition.fileName.toByteArray(
+                Charset.forName("ISO8859-1")
+            ),
+            Charset.forName("UTF-8")
+        )
+        if (!fileName.endsWith(Constants.CHART_PACKAGE_FORMAT)) {
+            throw ErrorCodeException(
+                errorCode = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.errorCode,
+                defaultMessage = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.formatErrorMessage,
+                params = arrayOf("文件类型错误")
+            )
+        }
+
+        return Result(productInitService.init(userId, chartName, inputStream))
+    }
+
+    override fun upgrade(
+        userId: String,
+        chartName: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition
+    ): Result<RdsProductStatusResult> {
+        // TODO: 目前为止 upgrade 和 init 的功能完全相同只是产品设计区分，所以代码保持完全一致即可
+        // 校验文件 TODO: 增加接收到的文件大小的校验
+        val fileName = String(
+            disposition.fileName.toByteArray(
+                Charset.forName("ISO8859-1")
+            ),
+            Charset.forName("UTF-8")
+        )
+        if (!fileName.endsWith(Constants.CHART_PACKAGE_FORMAT)) {
+            throw ErrorCodeException(
+                errorCode = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.errorCode,
+                defaultMessage = CommonErrorCodeEnum.PARAMS_FORMAT_ERROR.formatErrorMessage,
+                params = arrayOf("文件类型错误")
+            )
+        }
+
+        return Result(productInitService.init(userId, chartName, inputStream, true))
+    }
+
     override fun list(userId: String, req: ProductListReq): Result<Page<RdsProductStatusResult>> {
         return Result(productInfoService.listStatus(userId, req))
     }
