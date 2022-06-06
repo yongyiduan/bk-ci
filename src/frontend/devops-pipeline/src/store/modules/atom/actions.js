@@ -260,7 +260,7 @@ export default {
             let pageSize = requestAtomData.pageSize || 50
             let queryFitAgentBuildLessAtomFlag
             const curOs = os
-            
+
             if (keyword) {
                 // 关键字查询 => 搜索研发商店插件数据 (全局搜索 => 无操作系统、无编译环境限制)
                 pageSize = 100
@@ -324,7 +324,7 @@ export default {
                     commit(SET_COMMEND_ATOM_COUNT, count)
                     commit(SET_COMMEND_ATOM_PAGE_OVER, atomCodeList.length === count)
                 }
-                
+
                 let isAtomPageOver = false
                 if (category === 'TRIGGER') {
                     isAtomPageOver = atomList.length === count
@@ -529,12 +529,8 @@ export default {
     },
 
     // 获取项目下已安装的插件列表
-    getInstallAtomList ({ commit }, { projectCode, name }) {
-        return request.get(`${STORE_API_URL_PREFIX}/user/pipeline/atom/projectCodes/${projectCode}/installedAtoms/list?page=1&pageSize=15`, {
-            params: {
-                name
-            }
-        })
+    getInstallAtomList ({ commit }, { projectCode, page, pageSize, classifyCode }) {
+        return request.get(`${STORE_API_URL_PREFIX}/user/pipeline/atom/projectCodes/${projectCode}/installedAtoms/list?page=${page}&pageSize=${pageSize}&classifyCode=${classifyCode}`)
     },
 
     // 获取已安装的插件详情
