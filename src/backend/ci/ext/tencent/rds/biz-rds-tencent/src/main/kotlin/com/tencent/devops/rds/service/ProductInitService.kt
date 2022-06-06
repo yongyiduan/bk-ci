@@ -123,7 +123,10 @@ class ProductInitService @Autowired constructor(
             // 检查是否init过，init只能进行一次
             if (!isUpgrade) {
                 if (productInfoDao.get(dslContext, productCode, false) == null) {
-                    throw ErrorCodeException(errorCode = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.errorCode)
+                    throw ErrorCodeException(
+                        errorCode = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.errorCode,
+                        defaultMessage = ApiErrorCodeEnum.PRODUCT_REPEAT_ERROR.formatErrorMessage
+                    )
                 }
             }
 
@@ -152,6 +155,7 @@ class ProductInitService @Autowired constructor(
             throw ErrorCodeException(
                 statusCode = HTTP_500,
                 errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
+                defaultMessage = ApiErrorCodeEnum.UNKNOWN_ERROR.formatErrorMessage,
                 params = arrayOf(e.message ?: "")
             )
         }
@@ -331,7 +335,7 @@ class ProductInitService @Autowired constructor(
             throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
                 defaultMessage = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.formatErrorMessage,
-                params = arrayOf(productCode.toString())
+                params = arrayOf(productCode)
             )
         }
 
