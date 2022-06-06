@@ -31,6 +31,7 @@ import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.util.PageUtil
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.dao.RdsProductUserDao
+import com.tencent.devops.rds.pojo.ChartInfo
 import com.tencent.devops.rds.pojo.ProductDetailReq
 import com.tencent.devops.rds.pojo.ProductDetailResp
 import com.tencent.devops.rds.pojo.ProductListReq
@@ -91,7 +92,12 @@ class ProductInfoService @Autowired constructor(
             null
         }
         return ProductDetailResp(
-            resourceYaml = record.resourceYaml,
+            chart = if (req.info && record != null) {
+                ChartInfo(record.chartName, record.chartVersion)
+            } else {
+                null
+            },
+            resourceYaml = record?.resourceYaml,
             users = users
         )
     }

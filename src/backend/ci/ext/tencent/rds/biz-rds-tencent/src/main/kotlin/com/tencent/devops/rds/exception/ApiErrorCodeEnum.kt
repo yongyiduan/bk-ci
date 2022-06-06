@@ -59,4 +59,9 @@ enum class ApiErrorCodeEnum(
         errorCode = "2130006",
         formatErrorMessage = "未知异常 %s"
     ),
+    PRODUCT_REPEAT_ERROR(
+        errorType = ErrorType.USER,
+        errorCode = "2130007",
+        formatErrorMessage = "product init操作不可重复进行"
+    )
 }

@@ -27,16 +27,11 @@
 
 package com.tencent.devops.rds.service
 
-import com.tencent.devops.common.api.constant.HTTP_404
-import com.tencent.devops.common.api.constant.HTTP_500
-import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.event.pojo.pipeline.PipelineBuildFinishBroadCastEvent
 import com.tencent.devops.common.event.pojo.pipeline.PipelineBuildStartBroadCastEvent
 import com.tencent.devops.common.pipeline.enums.BuildStatus
 import com.tencent.devops.rds.dao.RdsBuildHistoryDao
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
-import com.tencent.devops.rds.exception.ApiErrorCodeEnum
-import com.tencent.devops.rds.pojo.InitStatusResult
 import com.tencent.devops.rds.pojo.RdsChartPipelineInfo
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
@@ -51,25 +46,6 @@ class ProductPipelineService @Autowired constructor(
 ) {
 
     private val logger = LoggerFactory.getLogger(ProductPipelineService::class.java)
-
-    fun getInitPipelineStatus(productCode: String): InitStatusResult {
-        val initPipeline = chartPipelineDao.getInitPipelines(dslContext, productCode) ?: throw ErrorCodeException(
-            statusCode = HTTP_404,
-            errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
-            params = arrayOf("未找到初始化流水线")
-        )
-        val history = buildHistoryDao.getHistoryByPipelineId(dslContext, initPipeline.pipelineId)
-        if (history.size != 1) throw ErrorCodeException(
-            statusCode = HTTP_500,
-            errorCode = ApiErrorCodeEnum.UNKNOWN_ERROR.errorCode,
-            params = arrayOf("初始化流水线数据错误")
-        )
-        return InitStatusResult(
-            productCode = productCode,
-            status = BuildStatus.values()[history.first().status].statusName,
-            errorInfo = history.first().errorInfo
-        )
-    }
 
     fun doStart(buildStartEvent: PipelineBuildStartBroadCastEvent) {
         val pipeline = chartPipelineDao.getPipelineById(dslContext, buildStartEvent.pipelineId) ?: return

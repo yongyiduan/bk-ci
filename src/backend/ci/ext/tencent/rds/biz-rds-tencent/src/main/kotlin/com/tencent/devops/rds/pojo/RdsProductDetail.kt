@@ -31,5 +31,7 @@ package com.tencent.devops.rds.pojo
  * Rds Product详情, biz专用
  */
 data class RdsProductDetail(
+    val chartName: String,
+    val chartVersion: String,
     val resourceYaml: String?
 )
