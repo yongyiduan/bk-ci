@@ -345,7 +345,7 @@ class ProjectLocalService @Autowired constructor(
         try {
             val createExt = ProjectCreateExtInfo(
                 needValidate = false,
-                needAuth = false
+                needAuth = true
             )
             projectService.create(
                 userId = userId,
