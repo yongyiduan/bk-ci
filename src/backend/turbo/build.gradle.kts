@@ -36,6 +36,9 @@ allprojects {
 				entry("spring-cloud-openfeign-core")
                 entry("spring-cloud-starter-openfeign")
 			}
+            dependencySet("io.micrometer:${Versions.micrometerVersion}") {
+                entry("micrometer-registry-prometheus")
+            }
 		}
 
 		configurations.forEach {
