@@ -25,28 +25,21 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.sign.service
+package com.tencent.devops.common.log.pojo
 
-import com.tencent.devops.sign.api.pojo.IpaSignInfo
-import java.io.File
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-interface MobileProvisionService {
-
-    companion object {
-        const val TEAM_IDENTIFIER_KEY = "com.apple.developer.team-identifier"
-        const val KEYCHAIN_ACCESS_GROUPS_KEY = "keychain-access-groups"
-    }
-
-    fun downloadMobileProvision(
-        mobileProvisionDir: File,
-        projectId: String,
-        mobileProvisionId: String
-    ): File
-
-    fun handleEntitlement(
-        entitlementFile: File,
-        keyChainGroupsList: List<String>?
-    )
-
-    fun downloadWildcardMobileProvision(mobileProvisionDir: File, ipaSignInfo: IpaSignInfo): File?
-}
+/**
+ *
+ * Powered By Tencent
+ */
+@ApiModel("日志行号查询模型")
+data class QueryLogLineNum(
+    @ApiModelProperty("构建ID", required = true)
+    val buildId: String,
+    @ApiModelProperty("是否结束", required = true)
+    var finished: Boolean,
+    @ApiModelProperty("日志存储状态", required = false)
+    var lastLineNum: Long
+)
