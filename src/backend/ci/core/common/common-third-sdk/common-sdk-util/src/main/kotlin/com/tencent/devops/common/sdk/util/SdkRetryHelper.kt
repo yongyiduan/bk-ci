@@ -25,34 +25,44 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.repository.resources
+package com.tencent.devops.common.sdk.util
 
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.repository.api.ExternalRepoResource
-import com.tencent.devops.repository.service.scm.IGitOauthService
-import com.tencent.devops.repository.tapd.service.ITapdOauthService
-import org.springframework.beans.factory.annotation.Autowired
-import javax.ws.rs.core.Response
-import javax.ws.rs.core.UriBuilder
+import org.slf4j.LoggerFactory
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
-@RestResource
-class ExternalRepoResourceImpl @Autowired constructor(
-    private val gitOauthService: IGitOauthService,
-    private val tapdService: ITapdOauthService
-) : ExternalRepoResource {
-    override fun gitCallback(code: String, state: String): Response {
-        val gitOauthCallback = gitOauthService.gitCallback(code, state)
-        return Response.temporaryRedirect(UriBuilder.fromUri(gitOauthCallback.redirectUrl).build()).build()
+class SdkRetryHelper(
+    // 最大重试次数
+    private val maxAttempts: Int = 3,
+    // 重试等待时间(ms),默认睡眠500ms
+    private val retryWaitTime: Long = 500
+) {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(SdkRetryHelper::class.java)
     }
 
-    override fun tapdCallback(code: String, state: String, resource: String): Response {
-        val uri = UriBuilder.fromUri(
-            tapdService.callbackUrl(
-                code = code,
-                state = state,
-                resource = resource
-            )
-        ).build()
-        return Response.temporaryRedirect(uri).build()
+    fun <T> execute(action: () -> T): T {
+        var attempt = 1
+        while (attempt <= maxAttempts) {
+            try {
+                return action()
+            } catch (e: UnknownHostException) {
+                logger.error(e.message)
+            } catch (e: ConnectException) {
+                logger.error(e.message)
+            } catch (e: SocketTimeoutException) {
+                if (e.message == "connect timed out" || e.message == "timeout") {
+                    logger.error(e.message)
+                } else {
+                    throw e
+                }
+            }
+            logger.info("Attempting $attempt|Waiting ${retryWaitTime}ms before trying again")
+            Thread.sleep(retryWaitTime)
+            attempt++
+        }
+        return action()
     }
 }

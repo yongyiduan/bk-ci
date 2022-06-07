@@ -25,34 +25,43 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.repository.resources
+package com.tencent.devops.common.sdk.github
 
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.repository.api.ExternalRepoResource
-import com.tencent.devops.repository.service.scm.IGitOauthService
-import com.tencent.devops.repository.tapd.service.ITapdOauthService
-import org.springframework.beans.factory.annotation.Autowired
-import javax.ws.rs.core.Response
-import javax.ws.rs.core.UriBuilder
+import com.tencent.devops.common.sdk.util.SdkHttpUtil
+import okhttp3.Credentials
+import org.slf4j.LoggerFactory
 
-@RestResource
-class ExternalRepoResourceImpl @Autowired constructor(
-    private val gitOauthService: IGitOauthService,
-    private val tapdService: ITapdOauthService
-) : ExternalRepoResource {
-    override fun gitCallback(code: String, state: String): Response {
-        val gitOauthCallback = gitOauthService.gitCallback(code, state)
-        return Response.temporaryRedirect(UriBuilder.fromUri(gitOauthCallback.redirectUrl).build()).build()
+open class DefaultGithubClient(
+    // github服务域名
+    open val serverUrl: String,
+    // github接口地址
+    open val apiUrl: String
+) : GithubClient {
+    companion object {
+        private val logger = LoggerFactory.getLogger(DefaultGithubClient::class.java)
     }
 
-    override fun tapdCallback(code: String, state: String, resource: String): Response {
-        val uri = UriBuilder.fromUri(
-            tapdService.callbackUrl(
-                code = code,
-                state = state,
-                resource = resource
-            )
-        ).build()
-        return Response.temporaryRedirect(uri).build()
+    override fun <T> execute(oauthToken: String, request: GithubRequest<T>): T {
+        val headers = mutableMapOf(
+            "Authorization" to "token  $oauthToken",
+            "Accept" to "application/vnd.github.v3+json"
+        )
+        return SdkHttpUtil.execute(
+            apiUrl = apiUrl,
+            systemHeaders = headers,
+            request = request
+        )
+    }
+
+    override fun <T> execute(username: String, token: String, request: GithubRequest<T>): T {
+        val headers = mutableMapOf(
+            "Authorization" to Credentials.basic(username, token),
+            "Accept" to "application/vnd.github.v3+json"
+        )
+        return SdkHttpUtil.execute(
+            apiUrl = apiUrl,
+            systemHeaders = headers,
+            request = request
+        )
     }
 }

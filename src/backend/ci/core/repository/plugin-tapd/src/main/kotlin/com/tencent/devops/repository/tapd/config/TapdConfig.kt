@@ -25,34 +25,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.repository.resources
+package com.tencent.devops.repository.tapd.config
 
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.repository.api.ExternalRepoResource
-import com.tencent.devops.repository.service.scm.IGitOauthService
-import com.tencent.devops.repository.tapd.service.ITapdOauthService
-import org.springframework.beans.factory.annotation.Autowired
-import javax.ws.rs.core.Response
-import javax.ws.rs.core.UriBuilder
+import com.tencent.devops.common.sdk.tapd.AutoRetryTapdClient
+import com.tencent.devops.common.sdk.tapd.DefaultTapdClient
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-@RestResource
-class ExternalRepoResourceImpl @Autowired constructor(
-    private val gitOauthService: IGitOauthService,
-    private val tapdService: ITapdOauthService
-) : ExternalRepoResource {
-    override fun gitCallback(code: String, state: String): Response {
-        val gitOauthCallback = gitOauthService.gitCallback(code, state)
-        return Response.temporaryRedirect(UriBuilder.fromUri(gitOauthCallback.redirectUrl).build()).build()
+@Configuration
+@EnableConfigurationProperties(TapdProperties::class)
+class TapdConfig {
+
+    @Bean
+    fun defaultTapdClient(properties: TapdProperties): DefaultTapdClient {
+        return with(properties) {
+            DefaultTapdClient(
+                serverUrl = serverUrl,
+                apiUrl = apiUrl,
+                clientId = clientId,
+                clientSecret
+            )
+        }
     }
 
-    override fun tapdCallback(code: String, state: String, resource: String): Response {
-        val uri = UriBuilder.fromUri(
-            tapdService.callbackUrl(
-                code = code,
-                state = state,
-                resource = resource
+    @Bean
+    fun autoRetryTapdClient(properties: TapdProperties): AutoRetryTapdClient {
+        return with(properties) {
+            AutoRetryTapdClient(
+                serverUrl = serverUrl,
+                apiUrl = apiUrl,
+                clientId = clientId,
+                clientSecret
             )
-        ).build()
-        return Response.temporaryRedirect(uri).build()
+        }
     }
 }
