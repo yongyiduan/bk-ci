@@ -132,7 +132,7 @@ class ProductInitService @Autowired constructor(
                 productCode = productCode,
                 productName = chartResources.resourceObject.displayName
             )
-            productInfo = createProduct(userId, chartResources, status)
+            productInfo = saveProductInfo(chartResources, status)
 
             // 添加各类凭证信息
             createCred(userId, productInfo.projectId, chartResources.resourceObject.tickets)
@@ -198,7 +198,7 @@ class ProductInitService @Autowired constructor(
             productCode = chartResources.resourceObject.productCode
 
             // 创建蓝盾项目以及添加人员
-            productInfo = createProduct(userId, chartResources, status)
+            productInfo = saveProductInfo(chartResources, status)
 
             // 添加各类凭证信息
             createCred(userId, productInfo.projectId, chartResources.resourceObject.tickets)
@@ -375,15 +375,14 @@ class ProductInitService @Autowired constructor(
         return ChartResources(mainYamlStr, mainObject, resourceYamlStr, resourceObject, rdsYaml)
     }
 
-    private fun createProduct(
-        masterUserId: String,
+    private fun saveProductInfo(
         chartResource: ChartResources,
         status: ProductStatus
     ): RdsProductInfo {
         val productCode = chartResource.resourceObject.productCode
         val productName = chartResource.resourceObject.displayName
 
-        val projectId = createBKProject(productCode, masterUserId, productName)
+        val projectId = RdsPipelineUtils.genBKProjectCode(productCode)
 
         val time = productInfoDao.createOrUpdateProduct(
             dslContext = dslContext,
