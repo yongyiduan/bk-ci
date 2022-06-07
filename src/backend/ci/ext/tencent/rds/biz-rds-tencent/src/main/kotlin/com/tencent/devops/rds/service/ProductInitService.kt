@@ -419,6 +419,13 @@ class ProductInitService @Autowired constructor(
 
     private fun createBKProject(masterUserId: String, productCode: String, productName: String): String {
         val userList = productUserDao.getProductUserList(dslContext, productCode)
+        if (userList.isEmpty()) {
+            throw ErrorCodeException(
+                errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
+                defaultMessage = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.formatErrorMessage,
+                params = arrayOf(productCode)
+            )
+        }
         val userMap = userList.associate { it.userId to it.type }
         logger.info("RDS|createBKProject|productCode=$productCode|userMap=$userMap")
         if (userMap[masterUserId] != ProductUserType.MASTER.name) {

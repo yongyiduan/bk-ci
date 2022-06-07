@@ -48,6 +48,11 @@ enum class CommonErrorCodeEnum(
         errorCode = "2130022",
         formatErrorMessage = "非管理员无法操作: %s"
     ),
+    PRODUCT_NOT_EXISTS(
+        errorType = ErrorType.USER,
+        errorCode = "2130022",
+        formatErrorMessage = "实践ID不存在: %s"
+    ),
     INIT_PROJECT_ERROR(
         errorType = ErrorType.USER,
         errorCode = "2130023",
