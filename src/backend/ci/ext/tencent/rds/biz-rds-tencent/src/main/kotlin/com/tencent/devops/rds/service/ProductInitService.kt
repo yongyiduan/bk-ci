@@ -39,7 +39,6 @@ import com.tencent.devops.common.pipeline.enums.StartType
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.project.api.service.ServiceProjectResource
 import com.tencent.devops.project.api.service.service.ServiceTxProjectResource
-import com.tencent.devops.project.pojo.ProjectCreateInfo
 import com.tencent.devops.project.pojo.ProjectCreateUserInfo
 import com.tencent.devops.rds.chart.ChartParser
 import com.tencent.devops.rds.chart.ChartPipeline
@@ -421,11 +420,12 @@ class ProductInitService @Autowired constructor(
     private fun createBKProject(masterUserId: String, productCode: String, productName: String): String {
         val userMap = productUserDao.getProductUserList(dslContext, productCode)
             .associate { it.userId to it.type }
+        logger.info("RDS|createBKProject|productCode=$productCode|userMap=$userMap")
         if (userMap[masterUserId] != ProductUserType.MASTER.name) {
             throw ErrorCodeException(
-                errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
-                defaultMessage = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.formatErrorMessage,
-                params = arrayOf(productCode)
+                errorCode = CommonErrorCodeEnum.PRODUCT_PERMISSION_INVALID.errorCode,
+                defaultMessage = CommonErrorCodeEnum.PRODUCT_PERMISSION_INVALID.formatErrorMessage,
+                params = arrayOf(masterUserId)
             )
         }
 
@@ -440,9 +440,10 @@ class ProductInitService @Autowired constructor(
                     projectName = productName
                 )
             if (createResult.isNotOk() || createResult.data == null) {
-                throw RuntimeException(
-                    "Create git ci project in devops failed," +
-                        " msg: ${createResult.message}, projectVO: ${createResult.data}"
+                throw ErrorCodeException(
+                    errorCode = CommonErrorCodeEnum.INIT_PROJECT_ERROR.errorCode,
+                    defaultMessage = CommonErrorCodeEnum.INIT_PROJECT_ERROR.formatErrorMessage,
+                    params = arrayOf(createResult.message ?: createResult.code.toString())
                 )
             }
         } else {

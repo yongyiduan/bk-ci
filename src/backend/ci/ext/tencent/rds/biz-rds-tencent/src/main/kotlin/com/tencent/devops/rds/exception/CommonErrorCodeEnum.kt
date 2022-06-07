@@ -43,9 +43,14 @@ enum class CommonErrorCodeEnum(
         errorCode = "2130021",
         formatErrorMessage = "参数格式错误 %s"
     ),
-    PRODUCT_NOT_EXISTS(
+    PRODUCT_PERMISSION_INVALID(
         errorType = ErrorType.USER,
         errorCode = "2130022",
-        formatErrorMessage = "实践ID不存在: %s"
+        formatErrorMessage = "非管理员无法操作: %s"
+    ),
+    INIT_PROJECT_ERROR(
+        errorType = ErrorType.USER,
+        errorCode = "2130023",
+        formatErrorMessage = "初始化蓝盾项目失败: %s"
     )
 }
