@@ -205,10 +205,12 @@ class StreamYamlTrigger @Autowired constructor(
     }
 
     private fun needUpdateLastBuildBranch(action: BaseAction): Boolean {
-        val isNoChange = action.getChangeSet().isNullOrEmpty()
-        val changeSet = action.getChangeSet()!!.toSet()
-        val triggerYamlFilepath = action.data.context.pipeline!!.filePath
-        return !isNoChange && changeSet.contains(triggerYamlFilepath)
+        return action.data.context.pipeline!!.pipelineId.isBlank() ||
+            (
+                !action.getChangeSet().isNullOrEmpty() &&
+                    action.getChangeSet()!!.toSet()
+                        .contains(action.data.context.pipeline!!.filePath)
+                )
     }
 
     @Throws(StreamTriggerBaseException::class, ErrorCodeException::class)
