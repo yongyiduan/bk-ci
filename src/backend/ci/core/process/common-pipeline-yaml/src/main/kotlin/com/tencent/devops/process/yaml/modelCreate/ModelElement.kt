@@ -27,7 +27,6 @@
 
 package com.tencent.devops.process.yaml.modelCreate
 
-import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.NameAndValue
 import com.tencent.devops.common.pipeline.enums.BuildScriptType
@@ -124,7 +123,7 @@ class ModelElement @Autowired(required = false) constructor(
             val data = mutableMapOf<String, Any>()
             data["input"] = mapOf(
                 "script" to step.run,
-                "additionalOptions" to JsonUtil.toJson(step.runAdditionalOptions ?: emptyMap<String, String>())
+                "shell" to (step.runAdditionalOptions?.get("shell") ?: "")
             )
             MarketBuildAtomElement(
                 id = step.taskId,
