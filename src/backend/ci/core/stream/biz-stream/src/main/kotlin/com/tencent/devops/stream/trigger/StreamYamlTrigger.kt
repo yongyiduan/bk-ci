@@ -101,6 +101,7 @@ class StreamYamlTrigger @Autowired constructor(
             )
             streamYamlBaseBuild.createNewPipeLine(pipeline = pipeline, action = action)
         } else if (needUpdateLastBuildBranch(action)) {
+            logger.info("file change update lastUpdateBranch:pipelineId$pipeline,branch $action.data.eventCommon.branch")
             action.updateLastBranch(
                 pipelineId = pipeline.pipelineId,
                 branch = action.data.eventCommon.branch

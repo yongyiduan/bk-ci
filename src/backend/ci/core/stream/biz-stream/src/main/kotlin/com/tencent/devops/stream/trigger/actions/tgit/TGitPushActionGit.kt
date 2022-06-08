@@ -463,6 +463,7 @@ class TGitPushActionGit(
                 pipelineId = pipelineId,
                 branch = branch
             )
+            logger.info("updateLastBranch: pipelineId $pipelineId,branch $branch")
         } catch (e: Exception) {
             logger.info("updateLastBranch fail,pipelineId:$pipelineId,branch:$branch,")
         }

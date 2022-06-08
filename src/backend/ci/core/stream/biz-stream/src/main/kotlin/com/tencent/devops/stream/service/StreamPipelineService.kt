@@ -297,6 +297,7 @@ class StreamPipelineService @Autowired constructor(
                 pipelineId = pipeline.pipelineId,
                 userId = userId
             )
+            logger.info("new pipeline: $pipeline")
         }
         processClient.saveSetting(
             userId = userId,
@@ -355,6 +356,7 @@ class StreamPipelineService @Autowired constructor(
                     updateLastModifyUser = true
                 )
             }
+            logger.info("itPipelineResourceDao.updatePipelineLastBranch,pipelineId = $realPipeline,branch:${file.branch}")
             gitPipelineResourceDao.updatePipelineLastBranch(
                 dslContext = dslContext,
                 pipelineId = realPipeline.pipelineId,
