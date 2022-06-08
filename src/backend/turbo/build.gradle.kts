@@ -35,6 +35,7 @@ allprojects {
 			dependencySet("org.springframework.cloud:${Versions.springFeign}") {
 				entry("spring-cloud-openfeign-core")
                 entry("spring-cloud-starter-openfeign")
+                entry("spring-cloud-starter-loadbalancer")
 			}
             dependencySet("io.micrometer:${Versions.micrometerVersion}") {
                 entry("micrometer-registry-prometheus")
