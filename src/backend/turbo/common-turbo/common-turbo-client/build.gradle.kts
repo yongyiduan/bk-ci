@@ -4,7 +4,6 @@ dependencies {
     api(project(":common-turbo:common-turbo-util"))
     api("org.springframework.cloud:spring-cloud-starter-consul-discovery")
     api("org.springframework.cloud:spring-cloud-starter-openfeign")
-    api("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     api("io.github.openfeign:feign-jackson")
     api("io.github.openfeign:feign-jaxrs")
     api("io.github.openfeign:feign-okhttp")
