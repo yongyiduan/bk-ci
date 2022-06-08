@@ -128,7 +128,7 @@ class ProductInitService @Autowired constructor(
 
             // 创建蓝盾项目以及添加人员
             createBKProject(
-                masterUserId = userId,
+                userId = userId,
                 productCode = productCode,
                 productName = chartResources.resourceObject.displayName
             )
@@ -416,22 +416,19 @@ class ProductInitService @Autowired constructor(
         )
     }
 
-    private fun createBKProject(masterUserId: String, productCode: String, productName: String): String {
-        val userList = productUserDao.getProductUserList(dslContext, productCode)
-        if (userList.isEmpty()) {
-            throw ErrorCodeException(
+    private fun createBKProject(userId: String, productCode: String, productName: String): String {
+        val userRecord = productUserDao.getProductUser(dslContext, productCode, userId)
+            ?: throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.errorCode,
                 defaultMessage = CommonErrorCodeEnum.PRODUCT_NOT_EXISTS.formatErrorMessage,
                 params = arrayOf(productCode)
             )
-        }
-        val userMap = userList.associate { it.userId to it.type }
-        logger.info("RDS|createBKProject|productCode=$productCode|userMap=$userMap")
-        if (userMap[masterUserId] != ProductUserType.MASTER.name) {
+        logger.info("RDS|createBKProject|productCode=$productCode|userRecord=$userRecord")
+        if (userRecord.type != ProductUserType.MASTER.name) {
             throw ErrorCodeException(
                 errorCode = CommonErrorCodeEnum.PRODUCT_PERMISSION_INVALID.errorCode,
                 defaultMessage = CommonErrorCodeEnum.PRODUCT_PERMISSION_INVALID.formatErrorMessage,
-                params = arrayOf(masterUserId)
+                params = arrayOf(userId)
             )
         }
 
@@ -441,7 +438,7 @@ class ProductInitService @Autowired constructor(
         if (projectResult == null) {
             val createResult =
                 client.get(ServiceTxProjectResource::class).getOrCreateRdsProject(
-                    userId = masterUserId,
+                    userId = userId,
                     projectId = projectId,
                     projectName = productName
                 )
@@ -461,7 +458,7 @@ class ProductInitService @Autowired constructor(
         client.get(ServiceProjectResource::class).createProjectUser(
             projectId = projectId,
             createInfo = ProjectCreateUserInfo(
-                createUserId = masterUserId,
+                createUserId = userId,
                 roleName = "管理员",
                 roleId = 2,
                 userIds = managers
@@ -475,7 +472,7 @@ class ProductInitService @Autowired constructor(
         client.get(ServiceProjectResource::class).createProjectUser(
             projectId = projectId,
             createInfo = ProjectCreateUserInfo(
-                createUserId = masterUserId,
+                createUserId = userId,
                 roleName = "CI管理员",
                 roleId = 9,
                 userIds = userMap.keys.toList()
