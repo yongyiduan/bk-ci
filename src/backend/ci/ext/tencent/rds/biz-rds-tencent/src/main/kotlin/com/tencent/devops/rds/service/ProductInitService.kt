@@ -425,7 +425,7 @@ class ProductInitService @Autowired constructor(
 
         val projectId = RdsPipelineUtils.genBKProjectCode(productCode)
 
-        val revision = productInfoDao.getRevision(dslContext, productCode)!!
+        val revision = productInfoDao.getRevision(dslContext, productCode)!! + 1
 
         val time = productInfoDao.updateProduct(
             dslContext = dslContext,
