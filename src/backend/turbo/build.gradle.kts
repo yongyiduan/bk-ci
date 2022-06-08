@@ -40,9 +40,5 @@ allprojects {
                 entry("micrometer-registry-prometheus")
             }
 		}
-
-		configurations.forEach {
-            it.exclude("io.springfox", "springfox-boot-starter")
-		}
 	}
 }
