@@ -453,8 +453,17 @@ class ProductInitService @Autowired constructor(
             logger.warn("RDS project($projectId) already exists.")
         }
 
+        val userList = productUserDao.getProductUserList(dslContext, productCode)
         // 增加所有项目成员
-        val managers = userMap.filter { it.value == ProductUserType.MASTER.name }.keys.toList()
+        val managers = mutableListOf<String>()
+        val members = mutableListOf<String>()
+        userList.forEach {
+            if (it.type == ProductUserType.MASTER.name) {
+                managers.add(it.userId)
+            } else {
+                members.add(it.userId)
+            }
+        }
         client.get(ServiceProjectResource::class).createProjectUser(
             projectId = projectId,
             createInfo = ProjectCreateUserInfo(
@@ -475,11 +484,11 @@ class ProductInitService @Autowired constructor(
                 createUserId = userId,
                 roleName = "CI管理员",
                 roleId = 9,
-                userIds = userMap.keys.toList()
+                userIds = members
             )
         ).data?.let {
             if (!it) {
-                throw RuntimeException("Create project $projectId members ${userMap.keys.toList()} failed")
+                throw RuntimeException("Create project $projectId members $members failed")
             }
         }
         return projectId
