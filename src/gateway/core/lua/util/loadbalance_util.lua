@@ -20,6 +20,17 @@ _M = {}
 function _M:getTarget(devops_tag, service_name, cache_tail, ns_config)
     local in_container = ngx.var.namespace ~= '' and ngx.var.namespace ~= nil
 
+    -- 不走容器化的服务
+    local no_container = false
+    for index, value in ipairs(no_container_svr) do
+        if value == service_name then
+            no_container = true
+        end
+    end
+    if no_container and string.find(devops_tag, '^kubernetes-') then
+        devops_tag = string.sub(devops_tag, 12)
+    end
+
     -- 转发到容器环境里
     if not in_container and string.find(devops_tag, '^kubernetes-') then
         return config.kubernetes.domain .. "/ms/" .. service_name
