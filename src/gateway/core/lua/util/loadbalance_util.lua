@@ -45,9 +45,11 @@ function _M:getTarget(devops_tag, service_name, cache_tail, ns_config)
                 timeout = 2000 -- 2 sec
             }
             -- 先查询当前ns下的服务
-            local devops_ns = string.sub(devops_tag, 12) -- 去掉 "kubernetes-" 头部
+            if string.find(devops_tag, '^kubernetes-') then
+                devops_tag = string.sub(devops_tag, 12) -- 去掉 "kubernetes-" 头部
+            end
             local prefix = service_name .. '-' .. ngx.var.chart_name .. '-' .. service_name
-            local domain = prefix .. '.' .. devops_ns .. '.svc.cluster.local'
+            local domain = prefix .. '.' .. devops_tag .. '.svc.cluster.local'
             local records = dns:query(domain, {qtype = dns.TYPE_A})
             -- 兜底策略
             if ngx.var.default_namespace ~= '' and ngx.var.default_namespace ~= nil and not records then
