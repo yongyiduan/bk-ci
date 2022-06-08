@@ -124,6 +124,7 @@ class GitPipelineResourceDao {
                 .set(LAST_UPDATE_BRANCH, branch)
                 .set(UPDATE_TIME, LocalDateTime.now())
                 .where(PIPELINE_ID.eq(pipelineId))
+                .execute()
         }
     }
 
