@@ -108,4 +108,17 @@ class RdsProductUserDao {
                 .fetch()
         }
     }
+
+    fun getProductUser(
+        dslContext: DSLContext,
+        productCode: String,
+        userId: String
+    ): TRdsProductUserRecord? {
+        with(TRdsProductUser.T_RDS_PRODUCT_USER) {
+            return dslContext.selectFrom(this)
+                .where(PRODUCT_CODE.eq(productCode))
+                .and(USER_ID.eq(userId))
+                .fetchAny()
+        }
+    }
 }
