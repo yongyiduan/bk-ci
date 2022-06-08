@@ -198,7 +198,7 @@ class ProductInitService @Autowired constructor(
             productCode = chartResources.resourceObject.productCode
 
             // 创建蓝盾项目以及添加人员
-            productInfo = saveProductInfo(chartResources, status)
+            productInfo = updateProductInfo(chartResources, status)
 
             // 添加各类凭证信息
             createCred(userId, productInfo.projectId, chartResources.resourceObject.tickets)
@@ -384,7 +384,7 @@ class ProductInitService @Autowired constructor(
 
         val projectId = RdsPipelineUtils.genBKProjectCode(productCode)
 
-        val time = productInfoDao.createOrUpdateProduct(
+        val time = productInfoDao.createProduct(
             dslContext = dslContext,
             productCode = productCode,
             productName = productName,
@@ -410,6 +410,47 @@ class ProductInitService @Autowired constructor(
             resourceYaml = "",
             resourceParsed = "",
             revision = 1,
+            status = status,
+            createTime = time.timestamp(),
+            updateTime = time.timestamp()
+        )
+    }
+
+    private fun updateProductInfo(
+        chartResource: ChartResources,
+        status: ProductStatus
+    ): RdsProductInfo {
+        val productCode = chartResource.resourceObject.productCode
+        val productName = chartResource.resourceObject.displayName
+
+        val projectId = RdsPipelineUtils.genBKProjectCode(productCode)
+
+        val revision = productInfoDao.getRevision(dslContext, productCode)!!
+
+        val time = productInfoDao.updateProduct(
+            dslContext = dslContext,
+            productCode = productCode,
+            productName = productName,
+            chartVersion = chartResource.rdsYaml.version,
+            mainYaml = chartResource.mainYamlStr,
+            mainParsed = Yaml.marshal(chartResource.mainObject),
+            resourceYaml = chartResource.resourceYamlStr,
+            resourceParsed = Yaml.marshal(chartResource.resourceObject),
+            revision = revision,
+            status = status
+        )
+
+        return RdsProductInfo(
+            productCode = productCode,
+            productName = productName,
+            projectId = projectId,
+            chartName = chartResource.rdsYaml.code,
+            chartVersion = chartResource.rdsYaml.version,
+            mainYaml = "",
+            mainParsed = "",
+            resourceYaml = "",
+            resourceParsed = "",
+            revision = revision,
             status = status,
             createTime = time.timestamp(),
             updateTime = time.timestamp()

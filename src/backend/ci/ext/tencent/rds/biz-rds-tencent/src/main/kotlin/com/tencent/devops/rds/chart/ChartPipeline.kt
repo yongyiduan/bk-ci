@@ -99,16 +99,16 @@ class ChartPipeline @Autowired constructor(
                 logger.warn("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.yamlObject}")
                 throw ErrorCodeException(
                     errorCode = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.errorCode,
-                    defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage,
-                    params = arrayOf(pipeline.filePath)
+                    defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage
+                        .format(pipeline.filePath)
                 )
             }
         } catch (t: Throwable) {
             logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.yamlObject}", t)
             throw ErrorCodeException(
                 errorCode = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.errorCode,
-                defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage,
-                params = arrayOf(pipeline.filePath)
+                defaultMessage = ChartErrorCodeEnum.CREATE_CHART_PIPELINE_ERROR.formatErrorMessage
+                    .format(pipeline.filePath)
             )
         }
 
@@ -164,8 +164,8 @@ class ChartPipeline @Autowired constructor(
             logger.error("RDS|PIPELINE_CREATE_ERROR|pipeline=$pipeline|model=${pipeline.yamlObject}", t)
             throw ErrorCodeException(
                 errorCode = ChartErrorCodeEnum.UPDATE_CHART_PIPELINE_ERROR.errorCode,
-                defaultMessage = ChartErrorCodeEnum.UPDATE_CHART_PIPELINE_ERROR.formatErrorMessage,
-                params = arrayOf(pipeline.filePath)
+                defaultMessage = ChartErrorCodeEnum.UPDATE_CHART_PIPELINE_ERROR.formatErrorMessage
+                    .format(pipeline.filePath)
             )
         }
 

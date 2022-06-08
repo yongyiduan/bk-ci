@@ -73,8 +73,8 @@ class StreamConverter @Autowired constructor(
         val pipelineYaml = FileUtils.readFileToString(pipelineFile, StandardCharsets.UTF_8).ifBlank {
             throw ErrorCodeException(
                 errorCode = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.errorCode,
-                defaultMessage = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.formatErrorMessage,
-                params = arrayOf(pipelineFile.name)
+                defaultMessage = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.formatErrorMessage
+                    .format(pipelineFile.name)
             )
         }
 
@@ -147,8 +147,7 @@ class StreamConverter @Autowired constructor(
             val content = FileUtils.readFileToString(path, StandardCharsets.UTF_8).ifBlank {
                 throw ErrorCodeException(
                     errorCode = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.errorCode,
-                    defaultMessage = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.formatErrorMessage,
-                    params = arrayOf(path.name)
+                    defaultMessage = ChartErrorCodeEnum.READ_CHART_FILE_BLANK_ERROR.formatErrorMessage.format(path.name)
                 )
             }
 

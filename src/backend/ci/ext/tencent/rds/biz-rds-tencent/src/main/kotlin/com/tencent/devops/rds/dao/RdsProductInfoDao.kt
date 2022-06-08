@@ -40,7 +40,7 @@ import java.time.LocalDateTime
 @Repository
 class RdsProductInfoDao {
 
-    fun createOrUpdateProduct(
+    fun createProduct(
         dslContext: DSLContext,
         productCode: String,
         productName: String,
@@ -85,7 +85,26 @@ class RdsProductInfoDao {
                 status.display,
                 time,
                 time
-            ).onDuplicateKeyUpdate()
+            )
+        }
+        return time
+    }
+
+    fun updateProduct(
+        dslContext: DSLContext,
+        productCode: String,
+        productName: String,
+        chartVersion: String,
+        mainYaml: String,
+        mainParsed: String,
+        resourceYaml: String,
+        resourceParsed: String,
+        revision: Int,
+        status: ProductStatus
+    ): LocalDateTime {
+        val time = LocalDateTime.now()
+        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
+            dslContext.update(this)
                 .set(DISPLAY_NAME, productName)
                 .set(CHART_VERSION, chartVersion)
                 .set(MAIN_YAML, mainYaml)
@@ -95,6 +114,7 @@ class RdsProductInfoDao {
                 .set(REVISION, revision)
                 .set(STATUS, status.display)
                 .set(UPDATE_TIME, time)
+                .where(PRODUCT_CODE.eq(productCode))
                 .execute()
         }
         return time
@@ -229,6 +249,17 @@ class RdsProductInfoDao {
                     record.resourceYaml
                 }
             )
+        }
+    }
+
+    fun getRevision(
+        dslContext: DSLContext,
+        productCode: String
+    ): Int? {
+        with(TRdsProductInfo.T_RDS_PRODUCT_INFO) {
+            return dslContext.select(REVISION).from(this)
+                .where(PRODUCT_CODE.eq(productCode))
+                .fetchAny()?.value1()
         }
     }
 }
