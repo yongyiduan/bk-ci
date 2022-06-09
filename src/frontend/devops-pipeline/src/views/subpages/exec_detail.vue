@@ -39,6 +39,7 @@
                     :key="panel.name"
                 >
                     <div :class="panel.className" style="height: 100%">
+                        {{ panel.component }}
                         <component :is="panel.component" v-bind="panel.bindData" v-on="panel.listeners"></component>
                     </div>
                 </bk-tab-panel>
@@ -171,7 +172,8 @@
                             text: this.$t('applyPermission')
                         }
                     ]
-                }
+                },
+                element: {}
             }
         },
 
@@ -415,7 +417,33 @@
                     }
                 })
             },
-            async qualityCheck ({ elementId, action }, done) {
+            getRelativeRuleHashId (rules) {
+                const result = []
+                rules.map(rule => {
+                    if (rule.taskId === this.element.atomCode && rule.ruleList.every(rule => !rule.gatewayId)) {
+                        result.push(rule)
+                    } else if (rule.taskId === this.element.atomCode
+                        && rule.ruleList.some(val => this.element.name.indexOf(val.gatewayId) > -1)) {
+                        const temp = {
+                            ...rule,
+                            ruleList: rule.ruleList.filter(item => this.element.name.indexOf(item.gatewayId) > -1)
+                        }
+                        return result.push(temp)
+                    }
+                    return false
+                })
+
+                const hashIds = []
+                result.forEach(item => {
+                    item.ruleList.forEach(rule => {
+                        hashIds.push(rule.ruleHashId)
+                    })
+                })
+
+                return hashIds
+            },
+            
+            async qualityCheck ({ elementId, action, stageIndex, containerIndex, elementIndex }, done) {
                 try {
                     const data = {
                         projectId: this.routerParams.projectId,
@@ -424,6 +452,9 @@
                         elementId,
                         action
                     }
+                    this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].elements[elementIndex - 1]
+                    data.ruleIds = this.getRelativeRuleHashId(this.curMatchRules)
+                    
                     const res = await this.reviewExcuteAtom(data)
                     if (res) {
                         this.$showTips({
