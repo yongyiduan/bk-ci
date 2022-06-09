@@ -27,8 +27,11 @@
 
 package com.tencent.devops.trigger.pojo
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class TriggerAction(
     val type: String,
     val path: String,
-    val variables: Map<String, Any>?
+    val variables: Map<String, Any>? = null
 )

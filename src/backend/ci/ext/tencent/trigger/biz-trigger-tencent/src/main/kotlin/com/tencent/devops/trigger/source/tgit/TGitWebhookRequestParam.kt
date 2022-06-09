@@ -27,10 +27,7 @@
 
 package com.tencent.devops.trigger.source.tgit
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 data class TGitWebhookRequestParam(
-    @JsonProperty("repo_url")
     val repoUrl: String,
     val token: String,
     val event: String
