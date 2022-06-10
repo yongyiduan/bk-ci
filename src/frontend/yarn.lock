@@ -4726,10 +4726,10 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
 
-bk-magic-vue@2.4.8, bk-magic-vue@^2.4.4, bk-magic-vue@^2.4.8:
-  version "2.4.8"
-  resolved "https://mirrors.tencent.com/npm/@tencent/bk-magic-vue/-/@tencent/bk-magic-vue-2.4.8.tgz#a754c422a19e7f35017ee025f0ec52a7135cdc9f"
-  integrity sha512-6n3CJREHFJxClXGMQqNtpk9XegTIzF5ru+w+90F27J33sdMS4BnUsSRl7sMxTsEhdV+h4n46Fb98qccqE7onmg==
+bk-magic-vue@2.4.9:
+  version "2.4.9"
+  resolved "https://mirrors.tencent.com/npm/@tencent/bk-magic-vue/-/@tencent/bk-magic-vue-2.4.9.tgz#c26d8057ebe47811b029a98cc4a02b11f40e8dd9"
+  integrity sha512-FfIdDwH4ON8yle/a7ObpW6QfOayR7gA0VYcaS4YFe+qVxoIUKRzq2SWG/KJMTxVsm2+8YypOGl9VZ8U/5JmoQg==
   dependencies:
     highlight.js "^10.7.2"
     spark-md5 "^3.0.2"
