@@ -77,7 +77,6 @@ allprojects {
                 entry("jersey-media-json-jackson")
             }
             dependency("org.glassfish.jersey.inject:jersey-hk2:${Versions.Jersey}")
-            dependency("com.github.xingePush:xinge:${Versions.Xinge}")
             dependencySet("io.swagger:${Versions.Swagger}") {
                 entry("swagger-annotations")
                 entry("swagger-jersey2-jaxrs")

@@ -55,6 +55,16 @@ enum class ImageAgentTypeEnum(val type: Int) {
             return null
         }
 
+        fun getImageAgentType(type: Int): String {
+            return when (type) {
+                0 -> DOCKER.name
+                1 -> IDC.name
+                2 -> PUBLIC_DEVCLOUD.name
+                3 -> KUBERNETES.name
+                else -> DOCKER.name
+            }
+        }
+
         fun getAllAgentTypes(): MutableList<ImageAgentTypeEnum> {
             return mutableListOf(
                 DOCKER,
