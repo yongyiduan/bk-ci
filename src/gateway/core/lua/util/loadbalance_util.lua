@@ -102,10 +102,11 @@ function _M:getTarget(devops_tag, service_name, cache_tail, ns_config)
 
         if records.errcode then
             if records.errcode == 3 then
-                ngx.log(ngx.ERR, "DNS error code #" .. records.errcode .. ": ", records.errstr)
+                ngx.log(ngx.ERR, "DNS error code #" .. records.errcode .. ": ", records.errstr, " , query_subdomain : ",
+                        query_subdomain)
                 return nil
             else
-                ngx.log(ngx.ERR, "DNS error #" .. records.errcode .. ": ", err)
+                ngx.log(ngx.ERR, "DNS error #" .. records.errcode .. ": ", err, " , query_subdomain : ", query_subdomain)
                 return nil
             end
         end

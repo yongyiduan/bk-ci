@@ -30,6 +30,7 @@ function _M:get_tag(ns_config)
 
     -- 根据header强制路由tag
     if ngx.var.http_x_gateway_tag ~= nil then
+        self:set_header(ngx.var.http_x_gateway_tag)
         return ngx.var.http_x_gateway_tag
     end
 
