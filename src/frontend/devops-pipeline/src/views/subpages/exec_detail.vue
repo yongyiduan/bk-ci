@@ -39,7 +39,6 @@
                     :key="panel.name"
                 >
                     <div :class="panel.className" style="height: 100%">
-                        {{ panel.component }}
                         <component :is="panel.component" v-bind="panel.bindData" v-on="panel.listeners"></component>
                     </div>
                 </bk-tab-panel>
@@ -443,7 +442,7 @@
                 return hashIds
             },
             
-            async qualityCheck ({ elementId, action, stageIndex, containerIndex, elementIndex }, done) {
+            async qualityCheck ({ elementId, action, stageIndex, containerIndex, containerGroupIndex, atomIndex }, done) {
                 try {
                     const data = {
                         projectId: this.routerParams.projectId,
@@ -452,7 +451,11 @@
                         elementId,
                         action
                     }
-                    this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].elements[elementIndex - 1]
+                    if (containerGroupIndex !== undefined) {
+                        this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].groupContainers[containerGroupIndex].elements[atomIndex - 1]
+                    } else {
+                        this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].elements[atomIndex - 1]
+                    }
                     data.ruleIds = this.getRelativeRuleHashId(this.curMatchRules)
                     
                     const res = await this.reviewExcuteAtom(data)
