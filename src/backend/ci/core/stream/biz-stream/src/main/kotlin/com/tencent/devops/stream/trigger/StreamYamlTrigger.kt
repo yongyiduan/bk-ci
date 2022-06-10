@@ -101,7 +101,9 @@ class StreamYamlTrigger @Autowired constructor(
                 creator = action.data.getUserId(),
                 lastUpdateBranch = action.data.eventCommon.branch
             )
-            streamYamlBaseBuild.createNewPipeLine(pipeline = pipeline, action = action)
+            streamYamlBaseBuild.createNewPipeLine(pipeline = pipeline, projectCode = action.getProjectCode())
+            // 新建流水线放
+            action.data.context.pipeline = pipeline
         } else if (needUpdateLastBuildBranch(action)) {
             logger.info("file change update lastUpdateBranch:pipelineId$pipeline,branch $action.data.eventCommon.branch")
             action.updateLastBranch(
@@ -304,15 +306,5 @@ class StreamYamlTrigger @Autowired constructor(
         action: BaseAction
     ): Boolean {
         return action.data.context.pipeline!!.pipelineId.isBlank() || action is GitBaseAction
-    }
-
-    // 看是否使用stream 开启人的id
-    private fun getOauthUser(userId: String, isEnableUser: Boolean, gitProjectId: Long): String {
-        return if (isEnableUser) {
-            val setting = streamBasicSettingService.getStreamBasicSettingAndCheck(gitProjectId)
-            setting.enableUserId
-        } else {
-            userId
-        }
     }
 }
