@@ -71,7 +71,7 @@ class SmsServiceImpl @Autowired constructor(
     override fun sendMqMsg(message: SmsNotifyMessage) {
         logger.info("sms channel has been closed , message is $message")
         return
-        // 短信渠道下架: http://tapd.woa.com/20357512/prong/stories/view/1020357512875151529
+        // 短信渠道下架
         // 后续容器化之后 , 不会再有这份代码
         // rabbitTemplate.convertAndSend(EXCHANGE_NOTIFY, ROUTE_SMS, message)
     }
