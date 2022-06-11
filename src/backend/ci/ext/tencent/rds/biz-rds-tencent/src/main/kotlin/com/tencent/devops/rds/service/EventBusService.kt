@@ -61,7 +61,7 @@ class EventBusService @Autowired constructor(
         resource: Resource
     ): Boolean {
         val triggerOns = generateTriggerOn(main)
-        val triggerResources = generateTriggerResource(resource)
+        val triggerResources = generateTriggerResource(productCode, resource)
         val triggerPipelines = chartPipelineDao.getChartPipelines(dslContext, productCode).associate { pipeline ->
             if (pipeline.serviceName.isNullOrBlank()) {
                 "${pipeline.projectName}:${pipeline.filePath}" to pipeline.pipelineId
@@ -99,6 +99,7 @@ class EventBusService @Autowired constructor(
     }
 
     private fun generateTriggerResource(
+        productCode: String,
         resource: Resource
     ): List<TriggerResource> {
         val triggerResources = mutableListOf<TriggerResource>()
@@ -107,7 +108,9 @@ class EventBusService @Autowired constructor(
                 val map = service.getServiceResource()
                 triggerResources.add(
                     TriggerResource(
-                        id = "${project.id}:${service.id}",
+                        productCode = productCode,
+                        projectName = project.id,
+                        serviceName = service.id,
                         resources = map
                     )
                 )
@@ -115,7 +118,9 @@ class EventBusService @Autowired constructor(
                 val map = project.getProjectResource()
                 triggerResources.add(
                     TriggerResource(
-                        id = project.id,
+                        productCode = productCode,
+                        projectName = project.id,
+                        serviceName = null,
                         resources = map
                     )
                 )

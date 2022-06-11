@@ -45,7 +45,7 @@ class PipelineEventTargetInvoker @Autowired constructor(
         private val logger = LoggerFactory.getLogger(PipelineEventTargetInvoker::class.java)
     }
 
-    override fun invoke(targetRequestParam: PipelineRequestParam) {
+    override fun invoke(targetRequestParam: PipelineRequestParam, runtimeVariables: Map<String, String>) {
         with(targetRequestParam) {
             try {
                 logger.info(
@@ -55,7 +55,7 @@ class PipelineEventTargetInvoker @Autowired constructor(
                     userId = userId,
                     projectId = projectId,
                     pipelineId = pipelineId,
-                    params = values,
+                    params = values.plus(runtimeVariables),
                     channelCode = channelCode
                 ).data
                 logger.info("$projectId|$pipelineId|$buildId|Success to invoke [pipeline] event target")

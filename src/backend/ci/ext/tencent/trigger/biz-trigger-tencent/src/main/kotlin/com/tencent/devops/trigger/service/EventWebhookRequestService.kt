@@ -27,6 +27,7 @@
 
 package com.tencent.devops.trigger.service
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.util.JsonUtil
@@ -231,7 +232,10 @@ class EventWebhookRequestService @Autowired constructor(
                 ruleId = ruleId,
                 targetName = target.targetName,
                 pushRetryStrategy = target.pushRetryStrategy,
-                targetParamMap = targetParamMap
+                targetParamMap = targetParamMap,
+                runtimeVariables = target.runtimeVariables?.let {
+                    JsonUtil.to(it, object : TypeReference<Map<String, String>>() {})
+                } ?: emptyMap()
             )
         }.toList()
         targetRunEvents.forEach { event ->

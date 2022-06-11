@@ -28,7 +28,9 @@
 package com.tencent.devops.trigger.pojo
 
 data class RegisterWebhookResult(
-    val id: String,
+    val productCode: String,
+    val projectName: String?,
+    val serviceName: String?,
     val resourceKey: String,
     val resourceValue: String
 )

@@ -29,9 +29,9 @@ package com.tencent.devops.trigger.target
 
 interface IEventTargetInvoker<T> {
 
-    fun invoke(targetRequestParam: T)
+    fun invoke(targetRequestParam: T, runtimeVariables: Map<String, String> = mapOf())
 
-    fun invoke(taskParamMap: Map<String, Any>) {
+    fun invoke(taskParamMap: Map<String, Any>, runtimeVariables: Map<String, String> = mapOf()) {
         invoke(getTargetRequestParam(taskParamMap))
     }
 

@@ -164,9 +164,8 @@ class RdsRegisterService @Autowired constructor(
                         eventType = eventType,
                         eventSource = eventSource,
                         on = on,
+                        triggerPipelines = request.triggerPipelines,
                         webhookResult = result,
-                        resourceId = result.id,
-                        request = request,
                         eventBusRuleSet = eventBusRuleSet,
                         ruleTargetSet = ruleTargetSet
                     )
@@ -253,7 +252,9 @@ class RdsRegisterService @Autowired constructor(
             if (eventsourceHandler.registerWebhook(webhookUrl, webhookParamMap.plus(propName to propValue))) {
                 registerWebhookResults.add(
                     RegisterWebhookResult(
-                        id = resource.id,
+                        productCode = resource.productCode,
+                        projectName = resource.projectName,
+                        serviceName = resource.serviceName,
                         resourceKey = propName,
                         resourceValue = propValue
                     )
@@ -273,14 +274,18 @@ class RdsRegisterService @Autowired constructor(
         eventType: EventType,
         eventSource: EventSource,
         on: TriggerOn,
+        triggerPipelines: Map<String, String>,
         webhookResult: RegisterWebhookResult,
-        resourceId: String,
-        request: TriggerRegisterRequest,
         eventBusRuleSet: MutableSet<EventBusRule>,
         ruleTargetSet: MutableSet<EventRuleTarget>
     ) {
+        val webhookResultKey = if (webhookResult.serviceName != null) {
+            "${webhookResult.projectName}:${webhookResult.serviceName}"
+        } else {
+            "${webhookResult.projectName}"
+        }
         on.rules.forEachIndexed { index, rule ->
-            val ruleName = "${webhookResult.id}:${webhookResult.resourceKey}:${eventType.aliasName}:$index"
+            val ruleName = "${webhookResultKey}:${webhookResult.resourceKey}:${eventType.aliasName}:$index"
             val ruleId = IdGeneratorUtil.getRuleId()
             val filterNames = rule.filter.keys.toMutableList()
             filterNames.add(TYPE_FILTER_NAME)
@@ -321,8 +326,16 @@ class RdsRegisterService @Autowired constructor(
                 )
             )
             rule.action.forEach action@{ action ->
-                val pipelineKey = "$resourceId:${action.path}"
-                val pipelineId = request.triggerPipelines[pipelineKey] ?: return@action
+                val pipelineKey =  "$webhookResultKey:${action.path}"
+                val pipelineId = triggerPipelines[pipelineKey] ?: return@action
+
+                val runtimeVariables = mutableMapOf("productCode" to webhookResult.productCode)
+                webhookResult.projectName?.let { runtimeVariables["projectName"] = it }
+                webhookResult.serviceName?.let { runtimeVariables["serviceName"] = it }
+                action.variables?.let {
+                    runtimeVariables.putAll(it.map { (key, value) -> key to value.toString() })
+                }
+
                 getEventRuleTarget(
                     sourceId = eventType.sourceId,
                     eventTypeId = eventType.id!!,
@@ -330,7 +343,8 @@ class RdsRegisterService @Autowired constructor(
                     projectId = projectId,
                     busId = busId,
                     userId = userId,
-                    pipelineId = pipelineId
+                    pipelineId = pipelineId,
+                    runtimeVariables = runtimeVariables
                 )?.let { ruleTargetSet.add(it) }
             }
         }
@@ -343,7 +357,8 @@ class RdsRegisterService @Autowired constructor(
         projectId: String,
         busId: String,
         userId: String,
-        pipelineId: String
+        pipelineId: String,
+        runtimeVariables: Map<String, String>
     ): EventRuleTarget? {
         val eventTargetTemplate = eventTargetTemplateDao.getByTargetName(
             dslContext = dslContext,
@@ -367,6 +382,7 @@ class RdsRegisterService @Autowired constructor(
             targetName = eventTargetTemplate.targetName,
             pushRetryStrategy = eventTargetTemplate.pushRetryStrategy,
             targetParams = JsonUtil.toJson(replaceTargetParams),
+            runtimeVariables = JsonUtil.toJson(runtimeVariables),
             creator = userId,
             updater = userId
         )

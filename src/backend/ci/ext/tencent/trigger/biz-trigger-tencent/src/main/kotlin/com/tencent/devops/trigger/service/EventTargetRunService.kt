@@ -49,7 +49,10 @@ class EventTargetRunService {
                 targetRequestParamMap["ruleId"] = ruleId
                 targetRequestParamMap.putAll(targetParamMap)
 
-                SpringContextUtil.getBean(IEventTargetInvoker::class.java, targetName).invoke(targetRequestParamMap)
+                SpringContextUtil.getBean(IEventTargetInvoker::class.java, targetName).invoke(
+                    taskParamMap = targetRequestParamMap,
+                    runtimeVariables = runtimeVariables ?: emptyMap()
+                )
             } catch (ignore: Throwable) {
                 logger.warn("$projectId|$ruleId|Fail to invoke the target [$targetName]", ignore)
             }

@@ -39,7 +39,8 @@ data class EventTargetRunEvent(
     val ruleId: String,
     val targetName: String,
     val pushRetryStrategy: String,
-    val targetParamMap: Map<String, Any>
+    val targetParamMap: Map<String, Any>,
+    val runtimeVariables: Map<String, String>
 ) : IEventTriggerEvent(
     projectId = projectId
 )
