@@ -64,7 +64,7 @@
     }
 
     .stream-content {
-        height: calc(100% - 61px);
+        height: calc(100% - 60px);
         overflow: auto;
     }
 </style>
