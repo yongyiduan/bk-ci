@@ -58,13 +58,13 @@ object Constants {
     // rds预置变量：displayName
     const val RDS_PRODUCT_DISPLAY_NAME = "RDS_PRODUCT_DISPLAY_NAME"
 
-    // rds预置变量：helm名称
+    // rds预置变量：helm注册名称
     const val RDS_HELM_REGISTRY = "RDS_HELM_REGISTRY"
 
-    // rds预置变量：helm
+    // rds预置变量：helm values chart地址
     const val RDS_HELM_VALUES_URL = "RDS_HELM_VALUES_URL"
 
-    // rds预置变量：displayName
+    // rds预置变量：容器注册地址
     const val RDS_DOCKER_REGISTRY = "RDS_DOCKER_REGISTRY"
 
     // rds需要的git凭证信息
