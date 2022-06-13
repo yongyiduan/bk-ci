@@ -28,5 +28,8 @@
 package com.tencent.devops.rds.pojo.yaml
 
 data class PreService(
-    val repoUrl: String
+    val repoUrl: String,
+    val helmRegistry: String?,
+    val dockerRegistry: String?,
+    val helmValuesUrl: String?
 )

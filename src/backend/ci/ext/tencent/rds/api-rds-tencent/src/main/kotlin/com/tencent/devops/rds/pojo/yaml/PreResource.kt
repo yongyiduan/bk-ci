@@ -43,6 +43,9 @@ data class PreResource(
                         tapdId = v.tapdId,
                         bcsId = v.bcsId,
                         repoUrl = v.repoUrl,
+                        helmRegistry = v.helmRegistry,
+                        dockerRegistry = v.dockerRegistry,
+                        helmValuesUrl = v.helmValuesUrl,
                         services = v.services?.let { getServiceList(it) }
                     )
                 )
@@ -65,7 +68,10 @@ data class PreResource(
                 serviceList.add(
                     Service(
                         id = k,
-                        repoUrl = v.repoUrl
+                        repoUrl = v.repoUrl,
+                        helmRegistry = v.helmRegistry,
+                        dockerRegistry = v.dockerRegistry,
+                        helmValuesUrl = v.helmValuesUrl
                     )
                 )
             }

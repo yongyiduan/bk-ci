@@ -319,13 +319,35 @@ class ProductInitService @Autowired constructor(
                 // 对于没有细分service的直接按project创建
                 project.services?.forEach nextService@{ service ->
                     try {
-                        saveChartPipeline(userId, productCode, path, project.id, service.id, stream)
+                        saveChartPipeline(
+                            userId = userId,
+                            productCode = productCode,
+                            displayName = chartResources.resourceObject.displayName,
+                            filePath = path,
+                            projectName = project.id,
+                            serviceName = service.id,
+                            stream = stream,
+                            helmRegistry = service.helmRegistry ?: project.helmRegistry,
+                            dockerRegistry = service.dockerRegistry ?: project.dockerRegistry,
+                            helmValuesUrl = service.helmValuesUrl ?: project.helmValuesUrl
+                        )
                     } catch (ignore: Throwable) {
                         logger.warn("RDS|init|$project|$service|$path|save pipeline error: ", ignore)
                     }
                 } ?: run {
                     try {
-                        saveChartPipeline(userId, productCode, path, project.id, null, stream)
+                        saveChartPipeline(
+                            userId = userId,
+                            productCode = productCode,
+                            displayName = chartResources.resourceObject.displayName,
+                            filePath = path,
+                            projectName = project.id,
+                            serviceName = null,
+                            stream = stream,
+                            helmRegistry = project.helmRegistry,
+                            dockerRegistry = project.dockerRegistry,
+                            helmValuesUrl = project.helmValuesUrl
+                        )
                     } catch (ignore: Throwable) {
                         logger.warn("RDS|init|$project|$path|save pipeline error: ", ignore)
                     }
@@ -657,11 +679,15 @@ class ProductInitService @Autowired constructor(
             val pipelineId = saveChartPipeline(
                 userId = userId,
                 productCode = productCode,
+                displayName = resourceObject.displayName,
                 filePath = CHART_INIT_YAML_FILE_STORAGE,
                 projectName = null,
                 serviceName = null,
                 stream = streamBuildResult,
-                initPipeline = true
+                initPipeline = true,
+                helmRegistry = null,
+                dockerRegistry = null,
+                helmValuesUrl = null
             )
             val (tapdIds, repoUrls) = resourceObject.getAllTapdIdsAndRepoUrls()
             val (projects, services) = resourceObject.getAllProjectAndServiceNames()
@@ -686,10 +712,14 @@ class ProductInitService @Autowired constructor(
     private fun saveChartPipeline(
         userId: String,
         productCode: String,
+        displayName: String,
         filePath: String,
         projectName: String?,
         serviceName: String?,
         stream: StreamBuildResult,
+        helmRegistry: String?,
+        dockerRegistry: String?,
+        helmValuesUrl: String?,
         initPipeline: Boolean? = false
     ): String {
         val existsPipeline = chartPipeline.getProductPipelineByService(
@@ -719,6 +749,7 @@ class ProductInitService @Autowired constructor(
         chartPipeline.updateChartPipeline(
             userId = userId,
             productCode = productCode,
+            displayName = displayName,
             projectId = RdsPipelineUtils.genBKProjectCode(productCode),
             pipelineId = pipelineId,
             pipeline = RdsPipelineCreate(
@@ -730,6 +761,9 @@ class ProductInitService @Autowired constructor(
                 parsedYaml = stream.parsedYaml,
                 yamlObject = stream.yamlObject
             ),
+            helmRegistry = helmRegistry,
+            dockerRegistry = dockerRegistry,
+            helmValuesUrl = helmValuesUrl,
             initPipeline = initPipeline
         )
         return pipelineId

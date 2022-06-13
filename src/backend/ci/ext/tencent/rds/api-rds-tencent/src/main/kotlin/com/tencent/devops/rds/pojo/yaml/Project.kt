@@ -32,6 +32,9 @@ data class Project(
     val tapdId: String?,
     val bcsId: String?,
     val repoUrl: String?,
+    val helmRegistry: String?,
+    val dockerRegistry: String?,
+    val helmValuesUrl: String?,
     val services: List<Service>?
 ) {
     fun getProjectResource(): MutableMap<String, String?> {

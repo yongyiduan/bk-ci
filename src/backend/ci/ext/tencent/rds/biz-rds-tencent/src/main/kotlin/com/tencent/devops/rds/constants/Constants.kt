@@ -52,6 +52,21 @@ object Constants {
     // rds的chart包的格式
     const val CHART_PACKAGE_FORMAT = ".tgz"
 
+    // rds预置变量：productCode
+    const val RDS_PRODUCT_CODE = "RDS_PRODUCT_CODE"
+
+    // rds预置变量：displayName
+    const val RDS_PRODUCT_DISPLAY_NAME = "RDS_PRODUCT_DISPLAY_NAME"
+
+    // rds预置变量：helm名称
+    const val RDS_HELM_REGISTRY = "RDS_HELM_REGISTRY"
+
+    // rds预置变量：helm
+    const val RDS_HELM_VALUES_URL = "RDS_HELM_VALUES_URL"
+
+    // rds预置变量：displayName
+    const val RDS_DOCKER_REGISTRY = "RDS_DOCKER_REGISTRY"
+
     // rds需要的git凭证信息
     const val RDS_GIT_TICKET = "RDS_PERSONAL_ACCESS_TOKEN"
 

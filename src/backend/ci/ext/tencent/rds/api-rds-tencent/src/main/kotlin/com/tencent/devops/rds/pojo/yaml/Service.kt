@@ -29,7 +29,10 @@ package com.tencent.devops.rds.pojo.yaml
 
 data class Service(
     val id: String,
-    val repoUrl: String
+    val repoUrl: String,
+    val helmRegistry: String?,
+    val dockerRegistry: String?,
+    val helmValuesUrl: String?
 ) {
     fun getServiceResource(): MutableMap<String, String?> {
         val map = mutableMapOf<String, String?>()

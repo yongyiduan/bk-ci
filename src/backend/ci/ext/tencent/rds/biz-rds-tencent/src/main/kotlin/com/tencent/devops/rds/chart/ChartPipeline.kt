@@ -32,10 +32,17 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.container.Stage
 import com.tencent.devops.common.pipeline.container.TriggerContainer
+import com.tencent.devops.common.pipeline.enums.BuildFormPropertyType
 import com.tencent.devops.common.pipeline.enums.ChannelCode
+import com.tencent.devops.common.pipeline.pojo.BuildFormProperty
 import com.tencent.devops.common.pipeline.pojo.element.trigger.ManualTriggerElement
 import com.tencent.devops.process.api.service.ServicePipelineResource
 import com.tencent.devops.process.engine.common.VMUtils
+import com.tencent.devops.rds.constants.Constants.RDS_DOCKER_REGISTRY
+import com.tencent.devops.rds.constants.Constants.RDS_HELM_REGISTRY
+import com.tencent.devops.rds.constants.Constants.RDS_HELM_VALUES_URL
+import com.tencent.devops.rds.constants.Constants.RDS_PRODUCT_CODE
+import com.tencent.devops.rds.constants.Constants.RDS_PRODUCT_DISPLAY_NAME
 import com.tencent.devops.rds.dao.RdsChartPipelineDao
 import com.tencent.devops.rds.dao.RdsProductInfoDao
 import com.tencent.devops.rds.exception.ChartErrorCodeEnum
@@ -133,10 +140,51 @@ class ChartPipeline @Autowired constructor(
         userId: String,
         pipelineId: String,
         productCode: String,
+        displayName: String,
         projectId: String,
         pipeline: RdsPipelineCreate,
+        helmRegistry: String?,
+        dockerRegistry: String?,
+        helmValuesUrl: String?,
         initPipeline: Boolean? = false
     ) {
+        val startParams = mutableListOf<BuildFormProperty>()
+        startParams.add(
+            BuildFormProperty(
+                RDS_PRODUCT_CODE, false, BuildFormPropertyType.STRING, productCode, null, null,
+                null, null, null, null, null, null
+            )
+        )
+        startParams.add(
+            BuildFormProperty(
+                RDS_PRODUCT_DISPLAY_NAME, false, BuildFormPropertyType.STRING, displayName, null, null,
+                null, null, null, null, null, null
+            )
+        )
+        helmRegistry?.let {
+            startParams.add(
+                BuildFormProperty(
+                    RDS_HELM_REGISTRY, false, BuildFormPropertyType.STRING, it, null, null,
+                    null, null, null, null, null, null
+                )
+            )
+        }
+        helmValuesUrl?.let {
+            startParams.add(
+                BuildFormProperty(
+                    RDS_HELM_VALUES_URL, false, BuildFormPropertyType.STRING, it, null, null,
+                    null, null, null, null, null, null
+                )
+            )
+        }
+        dockerRegistry?.let {
+            startParams.add(
+                BuildFormProperty(
+                    RDS_DOCKER_REGISTRY, false, BuildFormPropertyType.STRING, it, null, null,
+                    null, null, null, null, null, null
+                )
+            )
+        }
         try {
             val model = streamConverter.getYamlModel(
                 userId = userId,
@@ -149,6 +197,9 @@ class ChartPipeline @Autowired constructor(
                 yamlObject = pipeline.yamlObject,
                 init = initPipeline
             )
+
+            val triggerContainer = model.stages[0].containers[0] as TriggerContainer
+            triggerContainer.params = triggerContainer.params.plus(startParams)
 
             val success = client.get(ServicePipelineResource::class).edit(
                 userId = userId,

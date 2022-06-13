@@ -31,5 +31,8 @@ data class PreProject(
     val tapdId: String?,
     val bcsId: String?,
     val repoUrl: String?,
+    val helmRegistry: String?,
+    val dockerRegistry: String?,
+    val helmValuesUrl: String?,
     val services: List<Map<String, PreService>>?
 )
