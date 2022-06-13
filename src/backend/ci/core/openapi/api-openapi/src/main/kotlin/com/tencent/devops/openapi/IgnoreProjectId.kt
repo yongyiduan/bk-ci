@@ -27,12 +27,8 @@
 
 package com.tencent.devops.openapi
 
-import com.tencent.devops.common.web.validation.BkFieldValidator
-import javax.validation.Constraint
-
 @Target(AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
-@Constraint(validatedBy = [BkFieldValidator::class])
 @Suppress("LongParameterList")
 annotation class IgnoreProjectId(
     val ignore: Boolean = true // 是否忽略项目ID
