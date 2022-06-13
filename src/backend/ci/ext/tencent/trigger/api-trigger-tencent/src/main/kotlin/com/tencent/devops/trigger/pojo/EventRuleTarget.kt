@@ -46,7 +46,7 @@ data class EventRuleTarget(
     @ApiModelProperty("事件目标参数")
     val targetParams: String,
     @ApiModelProperty("运行时参数")
-    val runtimeVariables: String?,
+    val runtimeVariables: String? = null,
     @ApiModelProperty("事件目标描述")
     val desc: String? = null,
     @ApiModelProperty("创建时间", required = false)
