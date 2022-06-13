@@ -329,13 +329,6 @@ class RdsRegisterService @Autowired constructor(
                 val pipelineKey =  "$webhookResultKey:${action.path}"
                 val pipelineId = triggerPipelines[pipelineKey] ?: return@action
 
-                val runtimeVariables = mutableMapOf("productCode" to webhookResult.productCode)
-                webhookResult.projectName?.let { runtimeVariables["projectName"] = it }
-                webhookResult.serviceName?.let { runtimeVariables["serviceName"] = it }
-                action.variables?.let {
-                    runtimeVariables.putAll(it.map { (key, value) -> key to value.toString() })
-                }
-
                 getEventRuleTarget(
                     sourceId = eventType.sourceId,
                     eventTypeId = eventType.id!!,
@@ -343,8 +336,7 @@ class RdsRegisterService @Autowired constructor(
                     projectId = projectId,
                     busId = busId,
                     userId = userId,
-                    pipelineId = pipelineId,
-                    runtimeVariables = runtimeVariables
+                    pipelineId = pipelineId
                 )?.let { ruleTargetSet.add(it) }
             }
         }
@@ -357,8 +349,7 @@ class RdsRegisterService @Autowired constructor(
         projectId: String,
         busId: String,
         userId: String,
-        pipelineId: String,
-        runtimeVariables: Map<String, String>
+        pipelineId: String
     ): EventRuleTarget? {
         val eventTargetTemplate = eventTargetTemplateDao.getByTargetName(
             dslContext = dslContext,
@@ -382,7 +373,6 @@ class RdsRegisterService @Autowired constructor(
             targetName = eventTargetTemplate.targetName,
             pushRetryStrategy = eventTargetTemplate.pushRetryStrategy,
             targetParams = JsonUtil.toJson(replaceTargetParams),
-            runtimeVariables = JsonUtil.toJson(runtimeVariables),
             creator = userId,
             updater = userId
         )
