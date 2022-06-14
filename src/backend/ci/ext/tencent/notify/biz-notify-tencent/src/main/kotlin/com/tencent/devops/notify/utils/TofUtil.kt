@@ -36,7 +36,7 @@ object TofUtil {
                 "paasId" to version4Systems["paas-id"]!!,
                 "token" to version4Systems["token"]!!,
                 "host" to version4Systems["host"]!!,
-                "sys-id" to version4Systems["passId"]!! // 兼容数据库
+                "sys-id" to version4Systems["paas-id"]!! // 兼容数据库
             )
         }
         // 最后处理蓝盾tof3
