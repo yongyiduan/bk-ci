@@ -99,7 +99,9 @@ end
 
 -- 设置tag到http请求头
 function _M:set_header(tag)
-    ngx.header["X-GATEWAY-TAG"] = tag
+    if ngx.var.http_x_gateway_tag == nil then
+        ngx.header["X-GATEWAY-TAG"] = tag
+    end
     ngx.var.route_tag = tag
 end
 
