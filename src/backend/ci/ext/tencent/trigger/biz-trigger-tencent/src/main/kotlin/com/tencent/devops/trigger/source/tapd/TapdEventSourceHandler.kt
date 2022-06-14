@@ -62,7 +62,7 @@ class TapdEventSourceHandler @Autowired constructor(
 
     @SuppressWarnings("ReturnCount")
     override fun wrapFilter(filter: MutableMap<String, Any>): Map<String, Any> {
-        val workspaceId = filter["tapd_id"] ?: return filter
+        val workspaceId = filter["tapdId"] ?: return filter
         val type = when (filter["type"]) {
             "story_create", "story_update", "story_delete" -> "story"
             "bug_create", "bug_update", "bug_delete" -> "bug"
