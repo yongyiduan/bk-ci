@@ -29,9 +29,9 @@ package com.tencent.devops.rds.utils
 
 object RdsPipelineUtils {
 
-    fun genBKProjectCode(productCode: String) = "RDS_$productCode"
+    fun genBKProjectCode(productCode: String) = "rds_$productCode"
 
-    fun genProductCode(projectId: String) = projectId.removePrefix("RDS_")
+    fun genProductCode(projectId: String) = projectId.removePrefix("rds_")
 
     fun genBKPipelineName(
         fileName: String,
