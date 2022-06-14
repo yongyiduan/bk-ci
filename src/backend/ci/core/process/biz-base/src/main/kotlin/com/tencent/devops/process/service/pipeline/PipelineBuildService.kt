@@ -28,6 +28,7 @@
 package com.tencent.devops.process.service.pipeline
 
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.util.EnvUtils
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.container.TriggerContainer
 import com.tencent.devops.common.pipeline.enums.BuildFormPropertyType
@@ -72,6 +73,7 @@ import com.tencent.devops.process.utils.PIPELINE_UPDATE_USER
 import com.tencent.devops.process.utils.PIPELINE_VERSION
 import com.tencent.devops.process.utils.PROJECT_NAME
 import com.tencent.devops.process.utils.PROJECT_NAME_CHINESE
+import com.tencent.devops.process.utils.PipelineVarUtil
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.ws.rs.core.Response
@@ -145,23 +147,6 @@ class PipelineBuildService(
             }
             val setting = pipelineRepositoryService.getSetting(projectId, pipelineId)
 
-            val interceptResult = pipelineInterceptorChain.filter(
-                InterceptData(
-                    pipelineInfo = pipeline,
-                    model = model,
-                    startType = startType,
-                    setting = setting
-                )
-            )
-            if (interceptResult.isNotOk()) {
-                // 发送排队失败的事件
-                throw ErrorCodeException(
-                    statusCode = Response.Status.NOT_FOUND.statusCode,
-                    errorCode = interceptResult.status.toString(),
-                    defaultMessage = "Pipeline start failed: [${interceptResult.message}]"
-                )
-            }
-
             val userName = when (startType) {
                 StartType.PIPELINE -> pipelineParamMap[PIPELINE_START_PIPELINE_USER_ID]?.value ?: userId
                 StartType.WEB_HOOK -> pipelineParamMap[PIPELINE_START_WEBHOOK_USER_ID]?.value ?: userId
@@ -221,6 +206,31 @@ class PipelineBuildService(
             pipelineParamMap[BUILD_NO]?.let { buildNoParam -> originStartParams.add(buildNoParam) }
             pipelineParamMap[PIPELINE_BUILD_MSG]?.let { buildMsgParam -> originStartParams.add(buildMsgParam) }
             pipelineParamMap[PIPELINE_RETRY_COUNT]?.let { retryCountParam -> originStartParams.add(retryCountParam) }
+
+            setting?.apply {
+                // #6987 修复stream的并发执行判断问题 在判断并发时再替换上下文
+                concurrencyGroup?.let {
+                    val varMap = paramsWithType.associate { param -> param.key to param.value.toString() }
+                    concurrencyGroup = EnvUtils.parseEnv(concurrencyGroup, PipelineVarUtil.fillContextVarMap(varMap))
+                }
+            }
+
+            val interceptResult = pipelineInterceptorChain.filter(
+                InterceptData(
+                    pipelineInfo = readyToBuildPipelineInfo,
+                    model = model,
+                    startType = startType,
+                    setting = setting
+                )
+            )
+            if (interceptResult.isNotOk()) {
+                // 发送排队失败的事件
+                throw ErrorCodeException(
+                    statusCode = Response.Status.NOT_FOUND.statusCode,
+                    errorCode = interceptResult.status.toString(),
+                    defaultMessage = "Pipeline start failed: [${interceptResult.message}]"
+                )
+            }
 
             return pipelineRuntimeService.startBuild(
                 pipelineInfo = pipeline,
