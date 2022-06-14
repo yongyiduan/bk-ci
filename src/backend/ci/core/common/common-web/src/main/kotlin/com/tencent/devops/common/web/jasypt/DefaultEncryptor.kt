@@ -40,7 +40,3 @@ class DefaultEncryptor(private val key: String) : StringEncryptor {
         return AESUtil.encrypt(key, message)
     }
 }
-
-fun main() {
-    println(DefaultEncryptor("rAFOey00bcuMNMrt").encrypt("yIiqp9MMV3i28xQXXPQh2C5LVavRXnLe"))
-}
