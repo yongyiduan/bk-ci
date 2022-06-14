@@ -48,7 +48,7 @@ class TOFConfiguration {
         return optionSystems
     }
 
-    fun setVersion4System(version4Systems: Map<String, String>) {
+    fun setVersion4Systems(version4Systems: Map<String, String>) {
         this.version4Systems = version4Systems
     }
 
