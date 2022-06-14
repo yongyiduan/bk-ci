@@ -48,6 +48,10 @@ class TOFConfiguration {
         return optionSystems
     }
 
+    fun setVersion4System(version4Systems: Map<String, String>) {
+        this.version4Systems = version4Systems
+    }
+
     fun getVersion4Systems(): Map<String, String>? {
         return version4Systems
     }
