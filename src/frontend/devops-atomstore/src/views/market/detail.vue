@@ -134,7 +134,8 @@
                 'requestImage',
                 'getUserApprovalInfo',
                 'requestImageCategorys',
-                'getAtomYamlV2'
+                'getAtomYamlV2',
+                'requestService'
             ]),
 
             getDetail () {
@@ -206,6 +207,21 @@
                     const currentCategory = categorys.find((x) => (x.categoryCode === res.category))
                     const setting = currentCategory.settings || {}
                     detail.needInstallToProject = setting.needInstallToProject
+                    this.setDetail(detail)
+                })
+            },
+
+            getServiceDetail () {
+                const serviceCode = this.detailCode
+
+                return Promise.all([
+                    this.requestService({ serviceCode }),
+                    this.requestAtomStatistic({ storeCode: serviceCode, storeType: 'SERVICE' })
+                ]).then(([serviceDetail = {}, serviceStatic = {}]) => {
+                    const detail = serviceDetail || {}
+                    detail.downloads = serviceStatic.downloads || 0
+                    detail.detailId = serviceDetail.serviceId
+                    detail.name = serviceDetail.serviceName
                     this.setDetail(detail)
                 })
             },
