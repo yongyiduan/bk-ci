@@ -73,7 +73,7 @@ class TOF4Service @Autowired constructor(
         }
 
         val requestBody = RequestBody.create(MediaType.parse(CONTENT_TYPE), body)
-        val headers = generateHeaders(tofConfig["passId"]!!, tofConfig["token"]!!)
+        val headers = generateHeaders(tofConfig["paasId"]!!, tofConfig["token"]!!)
         if (headers == null) {
             logger.error(String.format("TOF error, generate signature failure, url: %s", url))
             return TOFResult("TOF error, generate signature failure")
@@ -123,7 +123,7 @@ class TOF4Service @Autowired constructor(
         postData: EmailNotifyPost,
         tofConfig: Map<String, String>
     ): TOFResult {
-        val headers = generateHeaders(tofConfig["passId"]!!, tofConfig["token"]!!)
+        val headers = generateHeaders(tofConfig["paasId"]!!, tofConfig["token"]!!)
         if (headers == null) {
             logger.error(String.format("TOF error, generate signature failure, url: %s", url))
             return TOFResult("TOF error, generate signature failure")
@@ -203,7 +203,7 @@ class TOF4Service @Autowired constructor(
      * 生成TOF请求头
      * @return TOF请求头对象
      */
-    private fun generateHeaders(tofPassId: String, tofToken: String): Headers? {
+    private fun generateHeaders(tofPaasId: String, tofToken: String): Headers? {
         val timestamp = System.currentTimeMillis().toString().substring(0, 10)
         val nonce = random.nextInt().toString()
         val signData = String.format("%s%s%s%s", timestamp, tofToken, nonce, timestamp)
@@ -217,7 +217,7 @@ class TOF4Service @Autowired constructor(
 
         val headerMap = HashMap<String, String>()
         headerMap.apply {
-            put("x-rio-paasid", tofPassId)
+            put("x-rio-paasid", tofPaasId)
             put("x-rio-signature", signature)
             put("x-rio-timestamp", timestamp)
             put("x-rio-nonce", nonce)
