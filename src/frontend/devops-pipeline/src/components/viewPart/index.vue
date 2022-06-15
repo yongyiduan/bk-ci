@@ -319,7 +319,10 @@
                 }
             },
             gotoArtifactory (row) {
-                const url = `https://${window.BK_REPO_URL_PREFIX}/ui/${this.projectId}/generic?repoName=${row.artifactoryType.toLowerCase()}&path=${row.path}`
+                let repoName = row.artifactoryType
+                if (repoName === 'PIPELINE') repoName = 'pipeline'
+                if (repoName === 'CUSTOM_DIR') repoName = 'custom'
+                const url = `https://${window.BK_REPO_URL_PREFIX}/ui/${this.projectId}/generic?repoName=${repoName}&path=${row.path}`
                 window.open(url, '_blank')
             },
             addClickListenr () {
