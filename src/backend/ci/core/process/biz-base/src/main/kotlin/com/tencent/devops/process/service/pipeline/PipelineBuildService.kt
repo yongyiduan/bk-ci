@@ -210,7 +210,7 @@ class PipelineBuildService(
             setting?.apply {
                 // #6987 修复stream的并发执行判断问题 在判断并发时再替换上下文
                 concurrencyGroup?.let {
-                    val varMap = pipelineParamMap.map { param -> param.key to param.value.toString() }.toMap()
+                    val varMap = pipelineParamMap.map { param -> param.key to param.value.value.toString() }.toMap()
                     concurrencyGroup = EnvUtils.parseEnv(concurrencyGroup, PipelineVarUtil.fillContextVarMap(varMap))
                 }
             }
