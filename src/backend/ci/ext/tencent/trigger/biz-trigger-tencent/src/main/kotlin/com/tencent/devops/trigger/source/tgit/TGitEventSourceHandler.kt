@@ -115,13 +115,6 @@ class TGitEventSourceHandler(
                 token = token,
                 mrId = mrId
             ).data
-            val tapd = client.get(ServiceGitResource::class).getTapdWorkItems(
-                accessToken = token,
-                tokenType = TokenTypeEnum.PRIVATE_KEY,
-                gitProjectId = gitProjectId,
-                type = "mr",
-                iid = iid
-            ).data
             val mapper = JsonUtil.getObjectMapper()
             val rootNode = mapper.readTree(payload)
             val objectAttributesNode = rootNode.get("object_attributes") as ObjectNode
@@ -136,10 +129,6 @@ class TGitEventSourceHandler(
             objectAttributesNode.set<ObjectNode>(
                 "review",
                 mapper.valueToTree(review)
-            )
-            objectAttributesNode.set<ObjectNode>(
-                "tapd",
-                mapper.valueToTree(tapd)
             )
             return mapper.writeValueAsString(rootNode)
         } catch (ignore: Throwable) {
