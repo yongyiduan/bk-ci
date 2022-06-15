@@ -61,7 +61,6 @@ Vue.use(VeeValidate, {
 })
 VeeValidate.Validator.localize(validDictionary)
 ExtendsCustomRules(VeeValidate.Validator.extend)
-console.log(BkPipeline)
 Vue.use(BkPipeline, {
     i18n
 })
@@ -78,7 +77,7 @@ Vue.prototype.$bkMessage = function (config) {
 /* eslint-disable */
 // 扩展字符串，判断是否为蓝盾变量格式
 String.prototype.isBkVar = function () {
-    return /^\$\{{2}([\w\_\.-]+)\}{2}$/g.test(this) || /^\$\{([\w\_\.-]+)\}$/g.test(this)
+    return /\$\{{2}([\w\_\.-]+)\}{2}/g.test(this) || /\$\{([\w\_\.-]+)\}/g.test(this)
 }
 /* eslint-disable */
 
