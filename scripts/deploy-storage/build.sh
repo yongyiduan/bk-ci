@@ -2,7 +2,7 @@
 # 用途：编译构建bkrepo项目
 
 # 安全模式
-set -euo pipefail 
+set -euo pipefail
 
 # 通用脚本框架变量
 PROGRAM=$(basename "$0")
@@ -12,11 +12,13 @@ TEST=0
 
 cd $(dirname $0)
 WORKING_DIR=$(pwd)
-ROOT_DIR=${WORKING_DIR%/*}
-BACKEND_DIR=$ROOT_DIR/src/backend
-FRONTEND_DIR=$ROOT_DIR/src/frontend
-GATEWAY_DIR=$ROOT_DIR/src/gateway
-TEMPLATES_DIR=$ROOT_DIR/support-files/templates
+ROOT_DIR=${WORKING_DIR%/*/*}
+BACKEND_DIR=$ROOT_DIR/src/backend/storage/core
+# FRONTEND_DIR=$ROOT_DIR/src/frontend
+# GATEWAY_DIR=$ROOT_DIR/src/gateway
+TEMPLATES_DIR=$ROOT_DIR/support-files/storage/templates
+
+CMD_BKREPO_SLIM=$ROOT_DIR/scripts/bk-ci-slim.sh
 
 usage () {
     cat <<EOF
@@ -73,25 +75,25 @@ tmp_dir=$ROOT_DIR/tmp
 # 执行退出时自动清理tmp目录
 trap 'rm -rf $tmp_dir' EXIT TERM
 
-log "编译frontend..."
-yarn --cwd $FRONTEND_DIR install
-yarn --cwd $FRONTEND_DIR run public
+#log "编译frontend..."
+#yarn --cwd $FRONTEND_DIR install
+#yarn --cwd $FRONTEND_DIR run public
 
 log "编译backend..."
 if [[ $TEST -eq 1 ]]; then
-  $BACKEND_DIR/gradlew -p $BACKEND_DIR
+  $BACKEND_DIR/gradlew -p $BACKEND_DIR build
 else
-  $BACKEND_DIR/gradlew -p $BACKEND_DIR -x test
+  $BACKEND_DIR/gradlew -p $BACKEND_DIR build -x test
 fi
 
-log "拷贝frontend..."
-cp -rf $FRONTEND_DIR/frontend $tmp_dir
+#log "拷贝frontend..."
+#cp -rf $FRONTEND_DIR/frontend $tmp_dir
 
 log "拷贝backend..."
 mkdir -p $tmp_dir/backend
 for file in $BACKEND_DIR/release/boot-*.jar; do
   service_name=$(basename $file | awk -F'[-.]' '{print $2}')
-  cp $file $tmp_dir/backend/boot-$service_name.jar
+  $CMD_BKREPO_SLIM $service_name $file $tmp_dir/backend/
 done
 
 log "拷贝templates..."
@@ -100,13 +102,13 @@ cp -rf $TEMPLATES_DIR $tmp_dir
 log "拷贝scripts..."
 cp -rf $WORKING_DIR $tmp_dir
 
-log "拷贝gateway..."
-cp -rf $GATEWAY_DIR $tmp_dir
+#log "拷贝gateway..."
+#cp -rf $GATEWAY_DIR $tmp_dir
 
-log "打包bkrepo.tar.gz..."
+log "打包bkrepo-slim.tar.gz..."
 # 创建bin目录
 mkdir -p $ROOT_DIR/bin
 cd $tmp_dir
-tar -zcf $ROOT_DIR/bin/bkrepo.tar.gz *
+tar -zcf $ROOT_DIR/bin/bkrepo-slim.tar.gz *
 
-log "Success! 文件保存到$ROOT_DIR/bin/bkrepo.tar.gz"
+log "Success! 文件保存到$ROOT_DIR/bin/bkrepo-slim.tar.gz"
