@@ -25,33 +25,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.auth.api.pojo
+package com.tencent.devops.openapi.api.apigw.pojo
 
-import com.tencent.devops.common.api.util.JsonUtil
-import org.junit.jupiter.api.Test
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-class BkResourceUserResponseTest {
-
-    @Test
-    fun showJson() {
-        val bk = BkResourceUserResponse(
-            code = 3,
-            data = listOf(
-                BkResourceUserResponse.Data(
-                    actionId = "3", principals = listOf(
-                        BkResourceUserResponse.Principal(
-                            principalId = "p1", principalType = "type"
-                        )
-                    ), resourceType = "t", resourceId =
-                    listOf(
-                        BkResourceUserResponse.ResourceId(
-                            resourceId = "r11",
-                            resourceType = "t2"
-                        )
-                    )
-                )
-            ), requestId = "323", result = true, message = "dd"
-        )
-        println(JsonUtil.toJson(bk))
-    }
-}
+@ApiModel
+data class BlackListInfo(
+    @ApiModelProperty("disable:冻结; enable:解冻")
+    val method: String,
+    @ApiModelProperty("员工英文名称")
+    val username: String
+)

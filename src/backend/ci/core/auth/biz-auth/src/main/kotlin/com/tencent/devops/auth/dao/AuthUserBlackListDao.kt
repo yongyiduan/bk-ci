@@ -25,33 +25,53 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.auth.api.pojo
+package com.tencent.devops.auth.dao
 
-import com.tencent.devops.common.api.util.JsonUtil
-import org.junit.jupiter.api.Test
+import com.tencent.devops.model.auth.tables.TAuthUserBlacklist
+import com.tencent.devops.model.auth.tables.records.TAuthUserBlacklistRecord
+import org.jooq.DSLContext
+import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 
-class BkResourceUserResponseTest {
+@Component
+class AuthUserBlackListDao {
 
-    @Test
-    fun showJson() {
-        val bk = BkResourceUserResponse(
-            code = 3,
-            data = listOf(
-                BkResourceUserResponse.Data(
-                    actionId = "3", principals = listOf(
-                        BkResourceUserResponse.Principal(
-                            principalId = "p1", principalType = "type"
-                        )
-                    ), resourceType = "t", resourceId =
-                    listOf(
-                        BkResourceUserResponse.ResourceId(
-                            resourceId = "r11",
-                            resourceType = "t2"
-                        )
-                    )
-                )
-            ), requestId = "323", result = true, message = "dd"
-        )
-        println(JsonUtil.toJson(bk))
+    fun create(
+        dslContext: DSLContext,
+        userId: String,
+        remark: String
+    ): Int {
+        with(TAuthUserBlacklist.T_AUTH_USER_BLACKLIST) {
+            return dslContext.insertInto(
+                this,
+                USER_ID,
+                REMARK,
+                STATUS,
+                CREATE_TIME
+            ).values(
+                userId,
+                remark,
+                true,
+                LocalDateTime.now()
+            ).execute()
+        }
+    }
+
+    fun get(
+        dslContext: DSLContext,
+        userId: String
+    ): TAuthUserBlacklistRecord? {
+        with(TAuthUserBlacklist.T_AUTH_USER_BLACKLIST) {
+            return dslContext.selectFrom(this).where(USER_ID.eq(userId).and(STATUS.eq(true))).fetchAny()
+        }
+    }
+
+    fun delete(
+        dslContext: DSLContext,
+        userId: String
+    ): Int {
+        with(TAuthUserBlacklist.T_AUTH_USER_BLACKLIST) {
+            return dslContext.update(this).set(STATUS, false).where(USER_ID.eq(userId).and(STATUS.eq(true))).execute()
+        }
     }
 }

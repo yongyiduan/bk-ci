@@ -85,7 +85,7 @@ class V2BuildParametersCompatibilityTransformerTest {
         assertEquals(2, map.size)
         Assert.assertNull(map["illegalStartParam"]) // 非启动参数被过滤
         assertNotNull(map[PipelineVarUtil.oldVarToNewVar("repoName")]) // 旧参数被转换为新参数
-        Assert.assertNull(map["repoName"]) // 旧参数被转换为新参数，如上
+        Assertions.assertNull(map["repoName"]) // 旧参数被转换为新参数，如上
         assertNotNull(map[PIPELINE_WEBHOOK_BRANCH]) // 新参数仍然存在，并且值变为传入的值替换默认值
         assertEquals("master", map[PIPELINE_WEBHOOK_BRANCH]!!.value) // 并且值变为传入的值替换默认值
         Assert.assertNull(map["hookBranch"]) // 旧参数被转换为新参数，如上

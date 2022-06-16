@@ -25,33 +25,46 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.auth.api.pojo
+package com.tencent.devops.auth.api.service
 
-import com.tencent.devops.common.api.util.JsonUtil
-import org.junit.jupiter.api.Test
+import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_USER_ID
+import com.tencent.devops.common.api.pojo.Result
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import javax.ws.rs.Consumes
+import javax.ws.rs.DELETE
+import javax.ws.rs.HeaderParam
+import javax.ws.rs.POST
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
+import javax.ws.rs.core.MediaType
 
-class BkResourceUserResponseTest {
+@Api(tags = ["AUTH_USER_BLACKLIST"], description = "黑名单用户")
+@Path("/service/user/blacklist")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface ServiceUserBlackListResource {
 
-    @Test
-    fun showJson() {
-        val bk = BkResourceUserResponse(
-            code = 3,
-            data = listOf(
-                BkResourceUserResponse.Data(
-                    actionId = "3", principals = listOf(
-                        BkResourceUserResponse.Principal(
-                            principalId = "p1", principalType = "type"
-                        )
-                    ), resourceType = "t", resourceId =
-                    listOf(
-                        BkResourceUserResponse.ResourceId(
-                            resourceId = "r11",
-                            resourceType = "t2"
-                        )
-                    )
-                )
-            ), requestId = "323", result = true, message = "dd"
-        )
-        println(JsonUtil.toJson(bk))
-    }
+    @POST
+    @Path("/")
+    @ApiOperation("添加黑名单用户")
+    fun createBlackListUser(
+        @HeaderParam(AUTH_HEADER_DEVOPS_USER_ID)
+        @ApiParam("待拉黑用户Id")
+        userId: String,
+        @QueryParam("remark")
+        @ApiParam("拉黑原因")
+        remark: String?
+    ): Result<Boolean>
+
+    @DELETE
+    @Path("/")
+    @ApiOperation("移出黑名单用户")
+    fun removeBlackListUser(
+        @QueryParam(AUTH_HEADER_DEVOPS_USER_ID)
+        @ApiParam("待移出用户Id")
+        removeUserId: String
+    ): Result<Boolean>
 }

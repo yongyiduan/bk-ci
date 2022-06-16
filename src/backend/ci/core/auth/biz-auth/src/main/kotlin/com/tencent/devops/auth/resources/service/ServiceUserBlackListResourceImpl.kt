@@ -25,33 +25,27 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.auth.api.pojo
+package com.tencent.devops.auth.resources.service
 
-import com.tencent.devops.common.api.util.JsonUtil
-import org.junit.jupiter.api.Test
+import com.tencent.devops.auth.api.service.ServiceUserBlackListResource
+import com.tencent.devops.auth.service.AuthUserBlackListService
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import org.springframework.beans.factory.annotation.Autowired
 
-class BkResourceUserResponseTest {
+@RestResource
+class ServiceUserBlackListResourceImpl @Autowired constructor(
+    val authUserBlackListService: AuthUserBlackListService
+) : ServiceUserBlackListResource {
 
-    @Test
-    fun showJson() {
-        val bk = BkResourceUserResponse(
-            code = 3,
-            data = listOf(
-                BkResourceUserResponse.Data(
-                    actionId = "3", principals = listOf(
-                        BkResourceUserResponse.Principal(
-                            principalId = "p1", principalType = "type"
-                        )
-                    ), resourceType = "t", resourceId =
-                    listOf(
-                        BkResourceUserResponse.ResourceId(
-                            resourceId = "r11",
-                            resourceType = "t2"
-                        )
-                    )
-                )
-            ), requestId = "323", result = true, message = "dd"
-        )
-        println(JsonUtil.toJson(bk))
+    override fun createBlackListUser(userId: String, remark: String?): Result<Boolean> {
+        return Result(authUserBlackListService.createBlackListUser(userId, remark))
+    }
+
+    /**
+     * 因有过滤器会处理userId相关的请求，若为黑名单内用户使用userId传参请求会被拦截
+     */
+    override fun removeBlackListUser(removeUserId: String): Result<Boolean> {
+        return Result(authUserBlackListService.removeBlackListUser(removeUserId))
     }
 }
