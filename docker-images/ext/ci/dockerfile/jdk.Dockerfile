@@ -1,4 +1,4 @@
-FROM mirrors.tencent.com/tjdk/tencentkona8-tlinux:latest
+FROM mirrors.tencent.com/tjdk/tencentkona8-tlinux:332
 
 LABEL maintainer="Tencent BlueKing Devops"
 
