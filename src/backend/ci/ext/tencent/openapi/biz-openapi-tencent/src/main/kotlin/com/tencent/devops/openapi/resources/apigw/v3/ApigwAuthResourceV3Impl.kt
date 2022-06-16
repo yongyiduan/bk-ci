@@ -107,7 +107,6 @@ class ApigwAuthResourceV3Impl @Autowired constructor(
             } else {
                 WesecResult(false, -1, "server execute not OK")
             }
-
         } catch (e: Exception) {
             logger.warn("blackList execute fail: $e")
             return WesecResult(
