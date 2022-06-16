@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 @RestResource
 class ApigwAuthResourceV3Impl @Autowired constructor(
     val client: Client,
-    val tokenCheckService: ClientTokenService,
+    val tokenCheckService: ClientTokenService
 ) : ApigwAuthResourceV3 {
     override fun batchCreateGroup(
         appCode: String?,

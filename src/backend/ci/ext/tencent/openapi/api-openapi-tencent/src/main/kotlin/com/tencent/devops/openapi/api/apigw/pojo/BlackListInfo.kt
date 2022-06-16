@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
 @ApiModel
-data class BlackListInfo (
+data class BlackListInfo(
     @ApiModelProperty("disable:冻结; enable:解冻")
     val method: String,
     @ApiModelProperty("员工英文名称")
