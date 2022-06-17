@@ -85,4 +85,16 @@ interface ApigwAuthResourceV3 {
         apigwType: String?,
         blackList: BlackListInfo
     ): WesecResult
+
+    @ApiOperation("黑名单列表")
+    @GET
+    @Path("/blackList/")
+    fun blackListUser(
+        @ApiParam(value = "appCode", required = true, defaultValue = AUTH_HEADER_DEVOPS_APP_CODE_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_DEVOPS_APP_CODE)
+        appCode: String?,
+        @ApiParam(value = "apigw Type", required = true)
+        @PathParam("apigwType")
+        apigwType: String?
+    ): WesecResult
 }

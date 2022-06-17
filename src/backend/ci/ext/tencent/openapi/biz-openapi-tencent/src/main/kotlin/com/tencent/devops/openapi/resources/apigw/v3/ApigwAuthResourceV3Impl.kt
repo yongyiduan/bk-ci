@@ -117,6 +117,25 @@ class ApigwAuthResourceV3Impl @Autowired constructor(
         }
     }
 
+    override fun blackListUser(appCode: String?, apigwType: String?): WesecResult {
+        try {
+            val blackList = client.get(ServiceUserBlackListResource::class).blackList()
+            return WesecResult(
+                result = true,
+                code = 0,
+                message = "",
+                data = blackList.data
+            )
+        } catch (e: Exception) {
+            logger.warn("blackList list fail: $e")
+            return WesecResult(
+                result = false,
+                code = -1,
+                message = "server fail: ${e.message}"
+            )
+        }
+    }
+
     companion object {
         val logger = LoggerFactory.getLogger(ApigwAuthResourceV3Impl::class.java)
     }
