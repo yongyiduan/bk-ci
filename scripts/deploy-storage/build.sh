@@ -15,8 +15,8 @@ WORKING_DIR=$(pwd)
 ROOT_DIR=${WORKING_DIR%/*/*}
 BACKEND_DIR=$ROOT_DIR/src/backend/storage/core
 # FRONTEND_DIR=$ROOT_DIR/src/frontend
-# GATEWAY_DIR=$ROOT_DIR/src/gateway
-TEMPLATES_DIR=$ROOT_DIR/support-files/storage/templates
+GATEWAY_DIR=$ROOT_DIR/src/gateway/storage/
+TEMPLATES_DIR=$ROOT_DIR/support-files/storage/
 
 CMD_BKREPO_SLIM=$ROOT_DIR/scripts/bk-ci-slim.sh
 
@@ -50,8 +50,7 @@ warning () {
 }
 
 # 解析命令行参数，长短混合模式
-(( $# == 0 )) && usage_and_exit 1
-while (( $# > 0 )); do 
+while (( $# > 0 )); do
     case "$1" in
         -t | --test )
             TEST=1
@@ -97,13 +96,16 @@ for file in $BACKEND_DIR/release/boot-*.jar; do
 done
 
 log "拷贝templates..."
-cp -rf $TEMPLATES_DIR $tmp_dir
+mkdir $tmp_dir/support-files
+cp -rf $TEMPLATES_DIR $tmp_dir/support-files
 
 log "拷贝scripts..."
-cp -rf $WORKING_DIR $tmp_dir
+mkdir $tmp_dir/scripts
+cp -rf $WORKING_DIR/ $tmp_dir/scripts
 
-#log "拷贝gateway..."
-#cp -rf $GATEWAY_DIR $tmp_dir
+log "拷贝gateway..."
+mkdir $tmp_dir/gateway
+cp -rf $GATEWAY_DIR $tmp_dir/gateway
 
 log "打包bkrepo-slim.tar.gz..."
 # 创建bin目录

@@ -221,7 +221,7 @@ jobs:
         id: create-artifact
         run: |
           cd scripts/deploy-storage
-          ./build.sh .
+          ./build.sh
 
       - uses: actions/upload-artifact@v1
         with:
