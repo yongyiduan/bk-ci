@@ -39,10 +39,11 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
+@Suppress("MagicNumber")
 @Component
 @ConditionalOnProperty(prefix = "log.storage", name = ["type"], havingValue = "lucene")
 class IndexCleanJobLuceneImpl @Autowired constructor(
-    private val storageProperties: StorageProperties,
+    storageProperties: StorageProperties,
     private val luceneClient: LuceneClient
 ) : IndexCleanJob {
 
@@ -56,8 +57,8 @@ class IndexCleanJobLuceneImpl @Autowired constructor(
         logger.info("Start to clean index")
         try {
             deleteLuceneIndexes()
-        } catch (t: Throwable) {
-            logger.warn("Fail to clean the index", t)
+        } catch (ignore: Throwable) {
+            logger.warn("Fail to clean the index", ignore)
         }
     }
 

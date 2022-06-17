@@ -34,11 +34,12 @@ import com.tencent.devops.log.client.LogClient
 import com.tencent.devops.log.configuration.StorageProperties
 import com.tencent.devops.log.cron.IndexCleanJob
 import com.tencent.devops.log.util.IndexNameUtils.LOG_INDEX_PREFIX
-import org.elasticsearch.client.indices.CloseIndexRequest
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest
-import org.elasticsearch.client.indices.GetIndexRequest
+import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest
 import org.elasticsearch.client.RequestOptions
 import org.elasticsearch.client.RestHighLevelClient
+import org.elasticsearch.client.indices.GetIndexRequest
+import org.elasticsearch.common.settings.Settings
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -47,16 +48,19 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
+@Suppress("MagicNumber")
 @Component
 @ConditionalOnProperty(prefix = "log.storage", name = ["type"], havingValue = "elasticsearch")
 class IndexCleanJobESImpl @Autowired constructor(
-    private val storageProperties: StorageProperties,
+    storageProperties: StorageProperties,
     private val client: LogClient,
     private val redisOperation: RedisOperation
 ) : IndexCleanJob {
 
-    private var closeIndexInDay = storageProperties.closeInDay ?: Int.MAX_VALUE
+    private var coldIndexInDay = storageProperties.coldInDay ?: Int.MAX_VALUE
     private var deleteIndexInDay = storageProperties.deleteInDay ?: Int.MAX_VALUE
+    private var makeIndexColdKey = storageProperties.makeColdKey ?: "routing.allocation.include.tag"
+    private var makeIndexColdValue = storageProperties.makeColdValue ?: "cold"
 
     /**
      * 2 am every day
@@ -70,27 +74,27 @@ class IndexCleanJobESImpl @Autowired constructor(
                 logger.info("The other process is processing clean job, ignore")
                 return
             }
-            closeESIndexes()
+            makeColdESIndexes()
             deleteESIndexes()
-        } catch (t: Throwable) {
-            logger.warn("Fail to clean the index", t)
+        } catch (ignore: Throwable) {
+            logger.warn("Fail to clean the index", ignore)
         } finally {
             redisLock.unlock()
         }
     }
 
     override fun updateExpireIndexDay(expired: Int) {
-        logger.warn("Update the expire index day from $expired to ${this.closeIndexInDay}")
+        logger.warn("Update the expire index day from $expired to ${this.coldIndexInDay}")
         if (expired <= 10) {
             logger.warn("The expired is illegal")
             throw OperationException("Expired is illegal")
         }
-        this.closeIndexInDay = expired
+        this.coldIndexInDay = expired
     }
 
-    override fun getExpireIndexDay() = closeIndexInDay
+    override fun getExpireIndexDay() = coldIndexInDay
 
-    private fun closeESIndexes() {
+    private fun makeColdESIndexes() {
         client.getActiveClients().forEach { c ->
             val response = c.restClient
                 .indices()
@@ -102,20 +106,23 @@ class IndexCleanJobESImpl @Autowired constructor(
             }
 
             val deathLine = LocalDateTime.now()
-                .minus(closeIndexInDay.toLong(), ChronoUnit.DAYS)
+                .minus(coldIndexInDay.toLong(), ChronoUnit.DAYS)
             logger.info("Get the death line - ($deathLine)")
             indexNames.forEach { index ->
                 if (expire(deathLine, index)) {
-                    closeESIndex(c.restClient, index)
+                    makeColdESIndex(c.restClient, index)
                 }
             }
         }
     }
 
-    private fun closeESIndex(c: RestHighLevelClient, index: String) {
+    private fun makeColdESIndex(c: RestHighLevelClient, index: String) {
         logger.info("[$index] Start to close ES index")
-        val resp = c.indices()
-            .close(CloseIndexRequest(index), RequestOptions.DEFAULT)
+        val request = UpdateSettingsRequest(index).settings(
+            Settings.builder()
+                .put(makeIndexColdKey, makeIndexColdValue)
+        )
+        val resp = c.indices().putSettings(request, RequestOptions.DEFAULT)
         logger.info("Get the close es response - ${resp.isAcknowledged}")
     }
 
