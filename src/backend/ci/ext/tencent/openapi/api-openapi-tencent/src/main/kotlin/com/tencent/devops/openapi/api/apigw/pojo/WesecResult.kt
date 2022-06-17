@@ -37,5 +37,7 @@ data class WesecResult(
     @ApiModelProperty("0为成功;其它为失败")
     val code: Int,
     @ApiModelProperty("失败原因")
-    val message: String?
+    val message: String?,
+    @ApiModelProperty("数据")
+    val data: Any? = null
 )
