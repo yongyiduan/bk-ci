@@ -39,5 +39,5 @@ data class WesecResult(
     @ApiModelProperty("失败原因")
     val message: String?,
     @ApiModelProperty("数据")
-    val data: Any?= null
+    val data: Any? = null
 )
