@@ -209,7 +209,7 @@ class PipelineBuildService(
 
             // #6987 修复stream的并发执行判断问题 在判断并发时再替换上下文
             setting?.concurrencyGroup?.let {
-                val varMap = pipelineParamMap.map { param -> param.key to param.value.value.toString() }.toMap()
+                val varMap = pipelineParamMap.values.associate { param -> param.key to param.value.toString() }
                 setting.concurrencyGroup = EnvUtils.parseEnv(it, PipelineVarUtil.fillContextVarMap(varMap))
                 logger.info("[$pipelineId]|Concurrency Group is ${setting.concurrencyGroup}")
             }
