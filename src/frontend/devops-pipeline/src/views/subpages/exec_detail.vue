@@ -450,11 +450,18 @@
                         elementId,
                         action
                     }
+
+                    let elementIndex = 0
                     if (containerGroupIndex !== undefined) {
-                        this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].groupContainers[containerGroupIndex].elements[atomIndex - 1]
+                        const curAtom = this.execDetail.model.stages[stageIndex].containers[containerIndex].groupContainers[containerGroupIndex].elements[atomIndex]
+                        curAtom.atomCode === 'qualityGateInTask' ? elementIndex = atomIndex + 1 : elementIndex = atomIndex - 1
+                        this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].groupContainers[containerGroupIndex].elements[elementIndex]
                     } else {
-                        this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].elements[atomIndex - 1]
+                        const curAtom = this.execDetail.model.stages[stageIndex].containers[containerIndex].elements[atomIndex]
+                        curAtom.atomCode === 'qualityGateInTask' ? elementIndex = atomIndex + 1 : elementIndex = atomIndex - 1
+                        this.element = this.execDetail.model.stages[stageIndex].containers[containerIndex].elements[elementIndex]
                     }
+
                     data.ruleIds = this.getRelativeRuleHashId(this.curMatchRules)
 
                     const res = await this.reviewExcuteAtom(data)
