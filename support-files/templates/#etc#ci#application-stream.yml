@@ -31,3 +31,7 @@ cron:
 # stream 运行时的默认镜像
 container:
   defaultImage: bkci/ci:latest
+
+gateway:
+  url: __BK_CI_HOST__
+  reportPrefix: __BK_CI_STREAM_REPORT_PREFIX__
