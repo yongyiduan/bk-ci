@@ -3,18 +3,53 @@ import {
   ref,
   onMounted,
   watch,
+  h,
 } from 'vue';
 import http from '@/http/api';
 import {
   sharedProps,
 } from '../common/props-type';
+import {
+  useRouter
+} from 'vue-router';
 
 const props = defineProps(sharedProps);
 const isLoading = ref(false);
+const router = useRouter()
 const columns = [
   {
     label: 'Pipeline',
     field: 'pipelineName',
+    render ({ cell, row }) {
+      return h(
+        'span',
+        {
+          style: {
+            cursor: 'pointer',
+            color: '#3a84ff',
+          },
+          onClick () {
+            const projectId = row.projectId
+            const pipelineId = row.pipelineId
+            const buildId = row.buildId
+            http.getPipelineType({
+              projectId,
+              pipelineId
+            }).then(res => {
+              if (res.channelCode === 'BS') {
+                window.open(`${window.WEB_URL_PREFIX}/pipeline/${projectId}/${pipelineId}/detail/${buildId}`, '_blank')
+              }
+              window.open(`${window.STREAM_URL_PREFIX}/pipeline/${pipelineId}/detail/${buildId}/?page=1#/${projectId.split('_')[1]}`, '_blank')
+            })
+          },
+        },
+        [
+          cell,
+          ' #',
+          row.buildNum
+        ]
+      );
+    },
   },
   {
     label: 'Branch',
@@ -30,7 +65,7 @@ const columns = [
   },
   {
     label: 'Error Type',
-    field: 'errorType',
+    field: 'errorTypeName',
   },
   {
     label: 'Error Code',
@@ -47,6 +82,10 @@ const pagination = ref({
   count: 0,
   limit: 20,
 });
+
+const goToPipelineDetail = (row) => {
+  console.log(row, arguments);
+}
 
 const handlePageChange = (current) => {
   pagination.value.current = current;
@@ -98,7 +137,8 @@ onMounted(getData);
       :data="tableData"
       :pagination="pagination"
       @page-value-change="handlePageChange"
-      @page-limit-change="handlePageLimitChange">
+      @page-limit-change="handlePageLimitChange"
+    >
     </bk-table>
   </bk-loading>
 </template>

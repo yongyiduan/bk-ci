@@ -6,13 +6,17 @@ import ErrorTable from './children/error-table.vue';
 import {
   ref,
 } from 'vue';
+import {
+  useRoute,
+} from 'vue-router';
 
+const route = useRoute();
 const status = ref({
   pipelineIds: [],
   pipelineLabelIds: [],
-  startTime: '',
-  endTime: '',
-  errorTypes: [],
+  startTime: <string>route.query.time || '',
+  endTime: <string>route.query.time || '',
+  errorTypes: <number[]>[],
 });
 
 const handleFilterChange = (newStatus) => {
@@ -20,6 +24,12 @@ const handleFilterChange = (newStatus) => {
     ...status.value,
     ...newStatus,
   };
+};
+
+if (route.query.errorType) {
+  handleFilterChange({
+    errorTypes: [Number(route.query.errorType)]
+  })
 };
 </script>
 
@@ -32,6 +42,7 @@ const handleFilterChange = (newStatus) => {
     />
     <error-doughnut
       :status="status"
+      @change="handleFilterChange"
     />
     <error-table
       :status="status"

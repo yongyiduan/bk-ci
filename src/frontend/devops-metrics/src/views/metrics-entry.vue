@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import {
+  useRoute,
+} from 'vue-router';
+
+const route = useRoute()
 const navList = [
   {
     name: 'Overview',
@@ -12,8 +17,9 @@ const navList = [
   },
   {
     name: 'Plugin trend',
-    router: 'PluginFailAnalysis',
+    router: 'PluginRunAnalysis',
     icon: 'metrics-plugin-trend',
+    meta: ['PluginFailAnalysis']
   },
 ];
 </script>
@@ -27,7 +33,7 @@ const navList = [
           v-for="nav in navList"
           :key="nav.name"
           :to="{ name: nav.router }"
-          class="nav-item"
+          :class="{ 'nav-item': true, 'router-link-active': nav.meta && nav.meta.includes(String(route.name)) }"
         >
           <i :class="[nav.icon, 'metrics-icon']"></i>
           {{ nav.name }}

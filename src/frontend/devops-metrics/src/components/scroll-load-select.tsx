@@ -2,6 +2,7 @@ import {
   defineComponent,
   ref,
   toRefs,
+  watch,
   onMounted,
 } from 'vue';
 
@@ -86,6 +87,7 @@ export default defineComponent({
       pageData.value.keyword = '';
       pageData.value.page = 1;
       isLoadEnd.value = false;
+      list.value = []
       getList();
     };
 
@@ -98,6 +100,7 @@ export default defineComponent({
       pageData.value.keyword = keyword;
       pageData.value.page = 1;
       isLoadEnd.value = false;
+      list.value = [];
       getList();
     };
 
@@ -116,6 +119,7 @@ export default defineComponent({
     return () => (
       <bk-select
         { ...selectProps }
+        modelValue={selectValue.value}
         onScrollEnd={getList}
         onChange={handleChange}
         onToggle={handleToggle}

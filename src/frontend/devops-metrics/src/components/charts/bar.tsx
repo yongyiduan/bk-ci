@@ -11,7 +11,8 @@ import BKChart from '@blueking/bkcharts';
 export interface IData {
   label: string,
   list: Array<string | number>,
-  backgroundColor?: string
+  backgroundColor?: string,
+  borderColor?: string
 }
 
 export default defineComponent({
@@ -21,7 +22,9 @@ export default defineComponent({
     title: String,
   },
 
-  setup(props) {
+  emits: ['point-click'],
+
+  setup(props, { emit }) {
     const canvasRef = ref(null);
     let chart;
 
@@ -38,6 +41,7 @@ export default defineComponent({
           datasets: data.map(item => ({
             label: item.label,
             backgroundColor: item.backgroundColor || 'rgba(43, 124, 255,0.3)',
+            borderColor: item.borderColor || 'rgba(43, 124, 255,0.3)',
             borderSkipped: 'bottom',
             borderWidth: 1,
             data: [...item.list],
@@ -48,6 +52,7 @@ export default defineComponent({
           responsive: true,
           plugins: {
             tooltip: {
+              bodySpacing: 10,
               mode: 'x',
               intersect: false,
               enableItemActive: true,
@@ -86,6 +91,11 @@ export default defineComponent({
               },
             },
           },
+          onClick (_, datasets) {
+            if (datasets.length > 0) {
+              emit('point-click', datasets)
+            }
+          }
         },
       });
     };

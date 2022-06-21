@@ -38,12 +38,12 @@ const clearStatus = () => {
     />
     <scroll-load-select
       class="mr8 w240"
-      id-key="errorCode"
-      name-key="errorMsg"
+      id-key="errorType"
+      name-key="errorName"
       placeholder="Error type"
       :multiple="true"
-      :api-method="http.getErrorCodeList"
-      :select-value="status.pipelineLabelIds"
+      :api-method="http.getErrorTypeList"
+      :select-value="status.errorTypes"
       @change="(errorTypes) => handleChange({ errorTypes })"
     />
     <scroll-load-select
@@ -63,11 +63,13 @@ const clearStatus = () => {
       placeholder="Plugin"
       :multiple="true"
       :api-method="http.getProjectPluginList"
-      :select-value="status.pipelineLabelIds"
+      :select-value="status.atomCodes"
       @change="(atomCodes) => handleChange({ atomCodes })"
     />
     <bk-date-picker
       class="mr16 w240"
+      type="daterange"
+      :model-value="[status.startTime, status.endTime]"
       @change="handleTimeChange"
     />
     <bk-button @click="clearStatus">Reset</bk-button>

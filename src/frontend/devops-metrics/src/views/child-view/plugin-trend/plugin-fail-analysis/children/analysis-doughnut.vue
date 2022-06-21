@@ -23,7 +23,7 @@ const getData = () => {
     .getErrorCodeStatisticsInfo(props.status)
     .then((errorList) => {
       errorList?.forEach((errorItem) => {
-        errorData.value.labels.push(errorItem.errorCodeInfo?.errorCode);
+        errorData.value.labels.push(errorItem.errorCodeInfo?.errorTypeName);
         errorData.value.list.push(errorItem.errorCount);
       });
     })
@@ -33,8 +33,11 @@ const getData = () => {
 };
 
 watch(
-  () => props.status,
-  getData,
+  () => props.status, () => {
+    errorData.value.list = []
+    errorData.value.labels = []
+    getData()
+  }
 );
 onMounted(getData);
 </script>

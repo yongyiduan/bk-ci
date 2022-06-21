@@ -22,7 +22,9 @@ export default defineComponent({
     titles: Array,
   },
 
-  setup(props) {
+  emits: ['point-click'],
+
+  setup(props, { emit }) {
     const canvasRef = ref(null);
     let chart;
 
@@ -55,6 +57,7 @@ export default defineComponent({
           responsive: true,
           plugins: {
             tooltip: {
+              bodySpacing: 10,
               mode: 'x',
               intersect: false,
               enableItemActive: true,
@@ -140,6 +143,11 @@ export default defineComponent({
               },
             },
           },
+          onClick (_, datasets) {
+            if (datasets.length > 0) {
+              emit('point-click', datasets)
+            }
+          }
         },
       });
     };
