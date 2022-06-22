@@ -25,20 +25,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.event.pojo.measure
+package com.tencent.devops.quality.config
 
-import com.tencent.devops.common.event.annotation.Event
 import com.tencent.devops.common.event.dispatcher.pipeline.mq.MQ
-import io.swagger.annotations.ApiModelProperty
+import org.springframework.amqp.core.Binding
+import org.springframework.amqp.core.BindingBuilder
+import org.springframework.amqp.core.DirectExchange
+import org.springframework.amqp.core.Queue
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-@Event(exchange = MQ.EXCHANGE_QUALITY_DAILY_FANOUT, routeKey = MQ.ROUTE_QUALITY_DAILY_FANOUT)
-data class QualityReportEvent(
-    @ApiModelProperty("统计时间")
-    val statisticsTime: String,
-    @ApiModelProperty("项目ID")
-    val projectId: String,
-    @ApiModelProperty("红线拦截次数")
-    val interceptedCount: Int,
-    @ApiModelProperty("红线执行总次数")
-    val totalCount: Int
-)
+@Configuration
+class QualityMQConfig {
+
+    @Bean
+    fun qualityDailyQueue() = Queue(MQ.QUEUE_QUALITY_DAILY_EVENT)
+
+    @Bean
+    fun qualityDailyExchange(): DirectExchange {
+        val directExchange = DirectExchange(MQ.EXCHANGE_QUALITY_DAILY_FANOUT, true, false)
+        directExchange.isDelayed = true
+        return directExchange
+    }
+
+    @Bean
+    fun qualityQueueBind(
+        @Autowired qualityDailyQueue: Queue,
+        @Autowired qualityDailyExchange: DirectExchange
+    ): Binding {
+        return BindingBuilder.bind(qualityDailyQueue).to(qualityDailyExchange).with(MQ.ROUTE_QUALITY_DAILY_FANOUT)
+    }
+}
