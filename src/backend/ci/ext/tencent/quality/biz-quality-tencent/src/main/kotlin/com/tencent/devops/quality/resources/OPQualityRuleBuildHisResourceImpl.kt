@@ -57,11 +57,13 @@ class OPQualityRuleBuildHisResourceImpl @Autowired constructor(
     override fun dailyReport(): Result<Int> {
         val startTime = LocalDateTime.now().minusDays(1)
         val endTime = LocalDateTime.now()
+        logger.info("QUALITY_REPORT|time: $startTime, $endTime")
         val result = historyDao.batchDailyTotalCount(
             dslContext = dslContext,
             startTime = startTime,
             endTime = endTime
         )
+        logger.info("QUALITY_REPORT|daoResult: $result")
         result.forEach {
             val interceptCount = historyDao.countIntercept(
                 dslContext = dslContext,
@@ -71,6 +73,7 @@ class OPQualityRuleBuildHisResourceImpl @Autowired constructor(
                 startTime = startTime,
                 endTime = endTime
             )
+            logger.info("QUALITY_REPORT|quality daily report: ${it.value1()}, ${it.value2()}, $interceptCount")
             qualityDailyDispatch.dispatch(
                 QualityReportEvent(
                     statisticsTime = endTime.format(DateTimeFormatter.ISO_DATE),
@@ -80,7 +83,7 @@ class OPQualityRuleBuildHisResourceImpl @Autowired constructor(
                 )
             )
         }
-        logger.info("finish to send quality daily data.")
+        logger.info("QUALITY_REPORT|finish to send quality daily data.")
         return Result(0)
     }
 }
