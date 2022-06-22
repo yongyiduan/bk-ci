@@ -68,8 +68,8 @@
             vmSeqId () {
                 return this.$route.query.vmSeqId
             },
-            cmd () {
-                return this.$route.query.cmd
+            dispatchType () {
+                return this.$route.query.dispatchType
             }
         },
         async created () {
@@ -83,22 +83,23 @@
         },
         methods: {
             linkConsole () {
-                const { projectId, pipelineId, buildId, vmSeqId, cmd } = this
+                const { projectId, pipelineId, buildId, vmSeqId, dispatchType } = this
                 pipelines.startDebugDocker(
                     {
                         projectId,
                         pipelineId,
                         buildId,
                         vmSeqId,
-                        cmd
-                    }
-                ).then((res) => {
-                    this.url = res
-                }).catch((err) => {
-                    console.log(err)
-                    this.connectError = true
-                    err.message && (this.config.desc = err.message)
-                })
+                        dispatchType
+                    })
+                    .then((res) => {
+                        this.url = res.websocketUrl || ''
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                        this.connectError = true
+                        this.config.desc = err.message || this.$t('editPage.docker.failDesc')
+                    })
             },
             async stopDebug () {
                 const content = this.$t('pipeline.stopDebugTips')
@@ -109,7 +110,7 @@
                     confirmLoading: true,
                     confirmFn: async () => {
                         try {
-                            await pipelines.stopDebugDocker(this.projectId, this.pipelineId, this.vmSeqId)
+                            await pipelines.stopDebugDocker(this.projectId, this.pipelineId, this.vmSeqId, this.dispatchType)
                             this.$router.push({
                                 name: 'pipelineDetail',
                                 params: {
