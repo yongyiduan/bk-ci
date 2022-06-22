@@ -28,16 +28,59 @@
 package com.tencent.devops.quality.resources
 
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.event.pojo.measure.QualityReportEvent
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.quality.api.op.OPQualityRuleBuildHisResource
+import com.tencent.devops.quality.config.QualityDailyDispatch
+import com.tencent.devops.quality.dao.HistoryDao
 import com.tencent.devops.quality.service.OPQualityRuleBuildHisService
+import org.jooq.DSLContext
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RestResource
 class OPQualityRuleBuildHisResourceImpl @Autowired constructor(
-    private val opQualityRuleBuildHisService: OPQualityRuleBuildHisService
+    private val opQualityRuleBuildHisService: OPQualityRuleBuildHisService,
+    private val historyDao: HistoryDao,
+    private val dslContext: DSLContext,
+    private val qualityDailyDispatch: QualityDailyDispatch
 ) : OPQualityRuleBuildHisResource {
+
+    private val logger = LoggerFactory.getLogger(OPQualityRuleBuildHisResourceImpl::class.java)
+
     override fun updateStatus(): Result<Int> {
         return Result(opQualityRuleBuildHisService.updateRuleBuildHisStatus())
+    }
+
+    override fun dailyReport(): Result<Int> {
+        val startTime = LocalDateTime.now().minusDays(1)
+        val endTime = LocalDateTime.now()
+        val result = historyDao.batchDailyTotalCount(
+            dslContext = dslContext,
+            startTime = startTime,
+            endTime = endTime
+        )
+        result.forEach {
+            val interceptCount = historyDao.countIntercept(
+                dslContext = dslContext,
+                projectId = it.value1(),
+                pipelineId = null,
+                ruleId = null,
+                startTime = startTime,
+                endTime = endTime
+            )
+            qualityDailyDispatch.dispatch(
+                QualityReportEvent(
+                    statisticsTime = endTime.format(DateTimeFormatter.ISO_DATE),
+                    projectId = it.value1(),
+                    interceptedCount = interceptCount.toInt(),
+                    totalCount = it.value2()
+                )
+            )
+        }
+        logger.info("finish to send quality daily data.")
+        return Result(0)
     }
 }
