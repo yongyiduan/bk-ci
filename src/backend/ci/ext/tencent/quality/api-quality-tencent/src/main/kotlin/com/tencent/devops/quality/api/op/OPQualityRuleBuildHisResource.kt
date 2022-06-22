@@ -46,4 +46,9 @@ interface OPQualityRuleBuildHisResource {
     @Path("/updateStatus")
     @GET
     fun updateStatus(): Result<Int>
+
+    @ApiOperation("触发红线上报")
+    @Path("/daily/report")
+    @GET
+    fun dailyReport(): Result<Int>
 }
