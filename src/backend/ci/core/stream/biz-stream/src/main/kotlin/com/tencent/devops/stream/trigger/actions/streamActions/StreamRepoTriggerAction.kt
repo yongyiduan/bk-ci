@@ -5,6 +5,7 @@ import com.tencent.devops.process.yaml.v2.models.RepositoryHook
 import com.tencent.devops.process.yaml.v2.models.Variable
 import com.tencent.devops.process.yaml.v2.models.on.TriggerOn
 import com.tencent.devops.scm.enums.GitAccessLevelEnum
+import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.stream.pojo.enums.TriggerReason
 import com.tencent.devops.stream.trigger.actions.BaseAction
 import com.tencent.devops.stream.trigger.actions.data.ActionData
@@ -17,6 +18,7 @@ import com.tencent.devops.stream.trigger.git.pojo.ApiRequestRetryInfo
 import com.tencent.devops.stream.trigger.git.pojo.StreamGitCred
 import com.tencent.devops.stream.trigger.git.pojo.tgit.TGitCred
 import com.tencent.devops.stream.trigger.git.service.StreamGitApiService
+import com.tencent.devops.stream.trigger.parsers.StreamTriggerCache
 import com.tencent.devops.stream.trigger.parsers.triggerMatch.TriggerResult
 import com.tencent.devops.stream.trigger.pojo.CheckType
 import com.tencent.devops.stream.trigger.pojo.YamlPathListEntry
@@ -29,7 +31,8 @@ import org.slf4j.LoggerFactory
 class StreamRepoTriggerAction(
     // 可能会包含stream action事件类似删除
     private val baseAction: BaseAction,
-    private val client: Client
+    private val client: Client,
+    private val streamTriggerCache: StreamTriggerCache
 ) : BaseAction {
 
     companion object {
@@ -232,5 +235,13 @@ class StreamRepoTriggerAction(
             gitProjectId = this.data.eventCommon.gitProjectId
         ).accessLevel >= 40
         return Pair(check, userInfo.username)
+    }
+
+    override fun getProjectName(): String? {
+        return streamTriggerCache.getAndSaveRequestGitProjectInfo(
+            gitProjectKey = this.data.getGitProjectId(),
+            action = this,
+            getProjectInfo = api::getGitProjectInfo
+        )?.gitHttpUrl?.let { GitUtils.getProjectName(it) }
     }
 }
