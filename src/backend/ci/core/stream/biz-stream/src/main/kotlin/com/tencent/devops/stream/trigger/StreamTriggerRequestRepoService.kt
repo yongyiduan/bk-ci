@@ -108,7 +108,7 @@ class StreamTriggerRequestRepoService @Autowired constructor(
             action.data.context.pipeline = gitProjectPipeline
             exHandler.handle(action) {
                 // 使用跨项目触发的action
-                triggerPerPipeline(StreamRepoTriggerAction(action, client))
+                triggerPerPipeline(StreamRepoTriggerAction(action, client, streamTriggerCache))
             }
         }
 

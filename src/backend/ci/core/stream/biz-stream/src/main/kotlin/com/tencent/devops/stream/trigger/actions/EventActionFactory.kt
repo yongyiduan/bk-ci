@@ -62,6 +62,7 @@ import com.tencent.devops.stream.trigger.actions.tgit.TGitTagPushActionGit
 import com.tencent.devops.stream.trigger.git.service.TGitApiService
 import com.tencent.devops.stream.trigger.parsers.MergeConflictCheck
 import com.tencent.devops.stream.trigger.parsers.PipelineDelete
+import com.tencent.devops.stream.trigger.parsers.StreamTriggerCache
 import com.tencent.devops.stream.trigger.service.DeleteEventService
 import com.tencent.devops.stream.trigger.service.GitCheckService
 import com.tencent.devops.stream.trigger.service.StreamEventService
@@ -88,7 +89,8 @@ class EventActionFactory @Autowired constructor(
     private val gitCheckService: GitCheckService,
     private val mrConflictCheck: MergeConflictCheck,
     private val streamGitConfig: StreamGitConfig,
-    private val streamTriggerTokenService: StreamTriggerTokenService
+    private val streamTriggerTokenService: StreamTriggerTokenService,
+    private val streamTriggerCache: StreamTriggerCache
 ) {
 
     companion object {
@@ -126,7 +128,7 @@ class EventActionFactory @Autowired constructor(
             action.data.setting = actionSetting
         }
         return if (actionContext.repoTrigger != null) {
-            StreamRepoTriggerAction(action, client)
+            StreamRepoTriggerAction(action, client, streamTriggerCache)
         } else action
     }
 
