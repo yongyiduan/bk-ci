@@ -5,7 +5,6 @@ import com.tencent.devops.process.yaml.v2.models.RepositoryHook
 import com.tencent.devops.process.yaml.v2.models.Variable
 import com.tencent.devops.process.yaml.v2.models.on.TriggerOn
 import com.tencent.devops.scm.enums.GitAccessLevelEnum
-import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.stream.pojo.enums.TriggerReason
 import com.tencent.devops.stream.trigger.actions.BaseAction
 import com.tencent.devops.stream.trigger.actions.data.ActionData
