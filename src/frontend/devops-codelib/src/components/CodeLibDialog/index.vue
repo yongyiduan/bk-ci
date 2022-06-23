@@ -166,7 +166,6 @@
                 saving: true,
                 urlErrMsg: '',
                 hasValidate: false,
-                selectComBindData: {},
                 placeholders: {
                     url: {
                         SVN: this.$t('codelib.svnUrlPlaceholder'),
@@ -346,6 +345,17 @@
             },
             portPlaceholder () {
                 return this.placeholders.port[this.codelibConfig.label]
+            },
+            selectComBindData () {
+                const bindData = {
+                    searchable: true,
+                    clearable: false,
+                    placeholder: this.$t('codelib.codelibUrlPlaceholder')
+                }
+                if (this.isGit) {
+                    bindData.remoteMethod = this.handleSearchCodeLib
+                }
+                return bindData
             }
         },
 
@@ -395,17 +405,6 @@
                 if (!val) {
                     this.setTemplateCodelib()
                 }
-            }
-        },
-
-        created () {
-            this.selectComBindData = {
-                searchable: true,
-                clearable: false,
-                placeholder: this.$t('codelib.codelibUrlPlaceholder')
-            }
-            if (this.isGit) {
-                this.selectComBindData.remoteMethod = this.handleSearchCodeLib
             }
         },
 
