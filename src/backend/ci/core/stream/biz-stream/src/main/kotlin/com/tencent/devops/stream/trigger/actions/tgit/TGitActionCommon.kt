@@ -83,7 +83,7 @@ object TGitActionCommon {
         }
         val startParam = if (isMatch) {
             WebhookStartParamsRegistrar.getService(element = element).getStartParams(
-                projectId = action.data.setting.projectCode ?: "",
+                projectId = action.data.eventCommon.gitProjectId,
                 element = element,
                 repo = repository,
                 matcher = matcher,
