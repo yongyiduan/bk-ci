@@ -56,7 +56,8 @@ object TGitActionCommon {
 
         val matcher = TriggerBuilder.buildGitWebHookMatcher(gitEvent)
         val repository = if (action.data.context.repoTrigger != null) {
-            val projectName = action.getProjectName() ?: GitUtils.getProjectName(action.data.setting.gitHttpUrl)
+            val projectName = action.data.eventCommon.gitProjectName
+                ?: GitUtils.getProjectName(action.data.setting.gitHttpUrl)
             CodeGitRepository(
                 aliasName = projectName,
                 url = action.data.setting.gitHttpUrl,

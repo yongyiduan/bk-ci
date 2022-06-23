@@ -148,9 +148,4 @@ interface BaseAction {
         pipelineId: String,
         branch: String
     )
-
-    /**
-     *  获取的是触发所在项目的projectName 比如
-     */
-    fun getProjectName(): String? = GitUtils.getProjectName(data.setting.gitHttpUrl)
 }

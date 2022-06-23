@@ -238,12 +238,4 @@ class StreamRepoTriggerAction(
         ).accessLevel >= 40
         return Pair(check, userInfo.username)
     }
-
-    override fun getProjectName(): String? {
-        return streamTriggerCache.getAndSaveRequestGitProjectInfo(
-            gitProjectKey = this.data.eventCommon.gitProjectId,
-            action = this,
-            getProjectInfo = api::getGitProjectInfo
-        )?.gitHttpUrl?.let { GitUtils.getProjectName(it) }
-    }
 }
