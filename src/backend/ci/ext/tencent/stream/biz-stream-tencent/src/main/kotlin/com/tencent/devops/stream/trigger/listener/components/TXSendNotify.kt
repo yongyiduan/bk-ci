@@ -47,7 +47,7 @@ class TXSendNotify @Autowired constructor(
         val chatIds = replaceVar(notice.chatId, noticeVariables)?.toMutableSet()
         val title = replaceVar(notice.title, noticeVariables)
         val content = replaceVar(notice.content, noticeVariables)
-        val projectName = action.getProjectName() ?: GitCommonUtils.getRepoName(
+        val projectName = action.data.eventCommon.gitProjectName ?: GitCommonUtils.getRepoName(
             action.data.setting.gitHttpUrl,
             action.data.setting.name
         )
