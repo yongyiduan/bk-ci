@@ -241,7 +241,7 @@ class StreamRepoTriggerAction(
 
     override fun getProjectName(): String? {
         return streamTriggerCache.getAndSaveRequestGitProjectInfo(
-            gitProjectKey = this.data.getGitProjectId(),
+            gitProjectKey = this.data.eventCommon.gitProjectId,
             action = this,
             getProjectInfo = api::getGitProjectInfo
         )?.gitHttpUrl?.let { GitUtils.getProjectName(it) }
