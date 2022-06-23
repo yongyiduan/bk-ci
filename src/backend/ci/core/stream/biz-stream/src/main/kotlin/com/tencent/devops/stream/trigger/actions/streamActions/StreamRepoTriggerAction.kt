@@ -5,7 +5,6 @@ import com.tencent.devops.process.yaml.v2.models.RepositoryHook
 import com.tencent.devops.process.yaml.v2.models.Variable
 import com.tencent.devops.process.yaml.v2.models.on.TriggerOn
 import com.tencent.devops.scm.enums.GitAccessLevelEnum
-import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.stream.pojo.enums.TriggerReason
 import com.tencent.devops.stream.trigger.actions.BaseAction
 import com.tencent.devops.stream.trigger.actions.data.ActionData
@@ -237,13 +236,5 @@ class StreamRepoTriggerAction(
             gitProjectId = this.data.eventCommon.gitProjectId
         ).accessLevel >= 40
         return Pair(check, userInfo.username)
-    }
-
-    override fun getProjectName(): String? {
-        return streamTriggerCache.getAndSaveRequestGitProjectInfo(
-            gitProjectKey = this.data.eventCommon.gitProjectId,
-            action = this,
-            getProjectInfo = api::getGitProjectInfo
-        )?.gitHttpUrl?.let { GitUtils.getProjectName(it) }
     }
 }
