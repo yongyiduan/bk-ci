@@ -259,7 +259,8 @@ class ScheduleTriggerService @Autowired constructor(
             yaml = yamlReplaceResult.normalYaml,
             gitBuildId = gitBuildId,
             onlySavePipeline = false,
-            yamlTransferData = yamlReplaceResult.yamlTransferData
+            yamlTransferData = yamlReplaceResult.yamlTransferData,
+            manualInputs = null
         )
     }
 }
