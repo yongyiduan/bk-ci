@@ -696,10 +696,10 @@ class PipelineInfoFacadeService @Autowired constructor(
         }
         setting.pipelineId = pipelineResult.pipelineId // fix 用户端可能不传入pipelineId的问题，或者传错的问题
         pipelineSettingFacadeService.saveSetting(
-            userId,
-            setting,
-            false,
-            pipelineResult.version,
+            userId = userId,
+            setting = setting,
+            checkPermission = false,
+            version = pipelineResult.version,
             dispatchPipelineUpdateEvent = false
         )
         return pipelineResult
