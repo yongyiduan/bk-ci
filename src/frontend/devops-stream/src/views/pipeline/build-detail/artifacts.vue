@@ -13,7 +13,7 @@
                     <span v-else>{{ props.row.fullName }}</span>
                 </template>
             </bk-table-column>
-            <bk-table-column label="Size" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
+            <bk-table-column :label="$t('pipeline.size')" width="150" prop="size" :formatter="sizeFormatter" show-overflow-tooltip></bk-table-column>
             <bk-table-column :label="$t('operation')" width="300">
                 <template slot-scope="props">
                     <bk-button text
