@@ -5,7 +5,7 @@
     >
         <section v-if="showDebugBtn" class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
             <span @click="startDebug">
-                Web Console
+                {{$t('pipeline.webConsle')}}
             </span>
         </section>
         <job-log :plugin-list="pluginList"

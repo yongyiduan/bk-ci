@@ -24,7 +24,7 @@
         </ul>
         <!-- <bk-exception class="exception-wrap-item exception-part card-useages" type="empty" scene="part" v-else>No Data</bk-exception> -->
         <div v-else style="height: 150px; padding: 7px 24px">
-            {{pool.desc || 'No description'}}
+            {{pool.desc || $t('noDesc')}}
         </div>
         <div v-if="editable" class="operate-btns">
             <bk-button @click="addAgent" class="card-button">{{$t('setting.agent.addAgent')}}</bk-button>
