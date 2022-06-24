@@ -48,6 +48,7 @@
     "createTime": "创建时间",
     "updateTime": "更新时间",
     "time": "时间",
+    "noDesc": "暂无描述",
     "pipeline": {
         "pipeline": "流水线",
         "allPipelines": "所有流水线",

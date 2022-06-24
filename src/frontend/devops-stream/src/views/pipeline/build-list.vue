@@ -247,7 +247,7 @@
                 buildList: [],
                 compactPaging: {
                     limit: 10,
-                    current: this.$route.query.page,
+                    current: +this.$route.query.page || 1,
                     count: 0
                 },
                 filterData: {

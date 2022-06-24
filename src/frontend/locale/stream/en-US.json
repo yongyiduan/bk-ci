@@ -48,6 +48,7 @@
     "createTime": "Create time",
     "updateTime": "Update time",
     "time": "Time",
+    "noDesc": "No description",
     "pipeline": {
         "pipeline": "Pipeline",
         "allPipelines": "All pipelines",

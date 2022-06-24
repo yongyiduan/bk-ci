@@ -129,7 +129,7 @@
 
 <style lang="postcss" scoped>
     .stream-header {
-        height: 61px;
+        height: 60px;
         padding: 0 20px 0 10px;
         background: #182132;
         /* border-bottom: 1px solid #dde4eb; */

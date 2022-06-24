@@ -5,6 +5,7 @@
             :editable="false"
             :is-exec-detail="true"
             :match-rules="[]"
+            :user-name="userName"
             :pipeline="pipeline"
             @click="handlePipelineClick"
             @stage-check="handleStageCheck"
@@ -68,16 +69,24 @@
                 failedContainer: false,
                 isRetrying: false,
                 taskId: null,
-                editingElementPos: null
+                editingElementPos: null,
+                firstIn: true
             }
         },
         computed: {
-            ...mapState(['projectId', 'permission', 'curPipeline'])
+            ...mapState(['projectId', 'permission', 'curPipeline', 'user']),
+            userName () {
+                return this.user && this.user.username ? this.user.username : 'unknow'
+            }
         },
-        mounted () {
-            this.autoOpenReview()
+        watch: {
+            pipeline (val) {
+                if (val.stages?.length > 0 && this.firstIn) {
+                    this.firstIn = false
+                    this.autoOpenReview()
+                }
+            }
         },
-
         methods: {
             ...mapActions([
                 'toggleStageReviewPanel',
@@ -121,14 +130,17 @@
                 const query = this.$route.query || {}
                 const checkIn = query.checkIn
                 const checkOut = query.checkOut
-                this.pipeline.stages.every(stage => {
-                    if (stage.id === checkIn) {
-                        return this.handleStageCheck('checkIn')
-                    } else if (stage.id === checkOut) {
-                        return this.handleStageCheck('checkOut')
+                const checkId = checkIn ?? checkOut
+                if (checkId) {
+                    const type = checkIn ? 'checkIn' : 'checkOut'
+                    const stageIndex = this.pipeline.stages.findIndex(stage => checkId === stage.id)
+                    if (stageIndex > -1) {
+                        this.handleStageCheck({
+                            type,
+                            stageIndex
+                        })
                     }
-                    return true
-                })
+                }
             },
 
             handleStageCheck ({ type, stageIndex }) {

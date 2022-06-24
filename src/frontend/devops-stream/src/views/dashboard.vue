@@ -225,6 +225,7 @@
                     web_url: item.webUrl
                 }).then(res => {
                     this.updateList()
+                    this.getRecentProjects()
                     this.$bkMessage({
                         theme: 'success',
                         message: 'EnableCI successfully'
