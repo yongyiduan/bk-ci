@@ -8,6 +8,7 @@ import VueRouter from 'vue-router'
 import websocket from '@/utils/websocket'
 Vue.use(VueRouter)
 
+const homePage = () => import(/* webpackChunkName: 'home' */'@/views/home')
 const dashboard = () => import(/* webpackChunkName: 'dashboard' */'@/views/dashboard')
 const main = () => import(/* webpackChunkName: 'entry' */'@/views/index')
 const projectIndex = () => import(/* webpackChunkName: 'entry' */'@/views/project-index')
@@ -40,6 +41,11 @@ const routes = [
             exception: exception
         },
         children: [
+            {
+                path: 'home',
+                name: 'home',
+                component: homePage
+            },
             {
                 path: 'dashboard',
                 name: 'dashboard',

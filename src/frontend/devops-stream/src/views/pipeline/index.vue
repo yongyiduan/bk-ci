@@ -120,6 +120,7 @@
     import { debounce } from '@/utils'
     import register from '@/utils/websocket-register'
     import validateRule from '@/utils/validate-rule'
+    import LINK_CONFIG from '@/conf/link-config.js'
 
     const getDefaultDir = ({ path, name }, isShow = true) => ({
         path,
@@ -161,7 +162,8 @@
                     trigger: 'blur'
                 },
                 checkYaml: validateRule.checkYaml,
-                activeDirList: []
+                activeDirList: [],
+                LINK_CONFIG
             }
         },
 

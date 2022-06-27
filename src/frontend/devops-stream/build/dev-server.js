@@ -78,7 +78,7 @@ app.use(bodyParser.urlencoded({
 const staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-const localHostName = 'local-stream.woa.com'
+const localHostName = 'local-stream.com'
 
 const url = `https://${localHostName}:${port}`
 
