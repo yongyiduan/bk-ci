@@ -19,6 +19,7 @@ _M = {}
 -- 获取目标ip:port
 function _M:getTarget(devops_tag, service_name, cache_tail, ns_config)
     local in_container = ngx.var.namespace ~= '' and ngx.var.namespace ~= nil
+    local gateway_project = ngx.var.project
 
     -- 不走容器化的服务
     local no_container = false
@@ -33,7 +34,13 @@ function _M:getTarget(devops_tag, service_name, cache_tail, ns_config)
 
     -- 转发到容器环境里
     if not in_container and string.find(devops_tag, '^kubernetes-') then
-        return config.kubernetes.domain .. "/ms/" .. service_name
+        local kubernetes_domain = nil
+        if gateway_project == 'codecc' then
+            kubernetes_domain = config.kubernetes.codecc.domain
+        else
+            kubernetes_domain = config.kubernetes.domain
+        end
+        return kubernetes_domain .. "/ms/" .. service_name
     end
 
     -- 容器环境
@@ -48,7 +55,13 @@ function _M:getTarget(devops_tag, service_name, cache_tail, ns_config)
             if string.find(devops_tag, '^kubernetes-') then
                 devops_tag = string.sub(devops_tag, 12) -- 去掉 "kubernetes-" 头部
             end
-            local prefix = service_name .. '-' .. ngx.var.chart_name .. '-' .. service_name
+            local prefix = nil
+            if gateway_project == 'codecc' then
+                prefix = 'bk-codecc-' .. service_name
+                devops_tag = 'ieg-bkdevops-codecc-' .. devops_tag
+            else
+                prefix = service_name .. '-' .. ngx.var.chart_name .. '-' .. service_name
+            end
             local domain = prefix .. '.' .. devops_tag .. '.svc.cluster.local'
             local records = dns:query(domain, {qtype = dns.TYPE_A})
             -- 兜底策略
