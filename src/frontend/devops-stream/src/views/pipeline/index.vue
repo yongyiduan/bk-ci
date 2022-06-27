@@ -77,7 +77,7 @@
                     </bk-compose-form-item>
                 </bk-form-item>
                 <bk-form-item label="YAML" :rules="[requireRule('Yaml'), checkYaml]" ref="codeSection" :required="true" property="content" error-display-type="normal">
-                    <bk-link theme="primary" href="https://iwiki.woa.com/x/OPBUL" target="_blank" class="yaml-examples">{{$t('pipeline.yamlExample')}}</bk-link>
+                    <bk-link theme="primary" :href="LINK_CONFIG.YAML_EXAMPLE" target="_blank" class="yaml-examples">{{$t('pipeline.yamlExample')}}</bk-link>
                     <code-section @blur="$refs.codeSection.validate('blur')"
                         @focus="$refs.codeSection.clearValidator()"
                         :code.sync="yamlData.content"
@@ -407,7 +407,6 @@
     .pipelines-home {
         display: flex;
         padding: 25px;
-        height: calc(100vh - 60px);
     }
     .nav-title {
         justify-content: space-between;

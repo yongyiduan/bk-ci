@@ -20,7 +20,7 @@
                             <a href="/dashboard" class="button big black" data-proofer-ignore="">
                                 在 Stream 上运行一个 "Hello World"
                             </a>
-                            <a href="https://iwiki.woa.com/x/pZMdK" target="_blank" class="button big " data-proofer-ignore="">
+                            <a :href="LINK_CONFIG.STREAM" target="_blank" class="button big " data-proofer-ignore="">
                                 了解更多特性
                             </a>
                         </div>
@@ -50,7 +50,7 @@
                                 最直接与开发者打交道的就是 YAML 语法，我们在调研了 Azure Pipelines / Gitlab CI / Travis CI / Circle CI 等行业主流 CI YAML语法后最终决定：Stream 语法将100%兼容 GitHub Actions ！
                             </p>
                             <div class="hero-cta" style="margin-top: 20px;">
-                                <a href="https://iwiki.woa.com/x/4FPpK" target="_blank" class="button big black" data-proofer-ignore="">
+                                <a :href="LINK_CONFIG.YAML_SCHEMA" target="_blank" class="button big black" data-proofer-ignore="">
                                     点击查阅完整 YAML 语法
                                 </a>
                             </div>
@@ -141,8 +141,14 @@
     import uiJpg from '@/images/home/ui.jpg'
     import codeGif from '@/images/home/code.gif'
     import codeJpg from '@/images/home/code.jpg'
-    
+    import LINK_CONFIG from '@/conf/link-config.js'
+
     export default {
+        data () {
+            return {
+                LINK_CONFIG
+            }
+        },
         mounted () {
             this.initAnimaShow()
             this.initGifAnimaShow()

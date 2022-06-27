@@ -9,7 +9,7 @@
         <main class="add-agent-body">
             <h3 class="agent-tips">
                 <span>{{$t('setting.agent.importAgentTips')}}</span>
-                <bk-link theme="primary" href="https://iwiki.woa.com/x/2ebDKw" target="_blank">{{$t('setting.agent.linkTips')}}</bk-link>
+                <bk-link theme="primary" :href="LINK_CONFIG.SELF_HOSTED_AGENT" target="_blank">{{$t('setting.agent.linkTips')}}</bk-link>
             </h3>
 
             <section class="agent-filter">
@@ -68,6 +68,7 @@
 <script>
     import { setting } from '@/http'
     import { mapState } from 'vuex'
+    import linkConfig from '../../../conf/link-config'
 
     export default {
         data () {
@@ -98,7 +99,8 @@
                 },
                 isLoading: false,
                 isRefresh: false,
-                isAdding: false
+                isAdding: false,
+                linkConfig
             }
         },
 
@@ -122,7 +124,7 @@
                         <span class="mb10">2. Create a folder, such as D:\\data\\landun</span>
                         <span class="mb10">3. Extract the installer to D:\\data\\landun</span>
                         <span class="mb10">4. Execute install.bat by administrator</span>
-                        <span class="mb10">5. In order to read user environment, please change the setup user from system to the login user, such as tencent\\zhangsan<a href="https://iwiki.woa.com/x/ZNMrAg" target="_blank">Learn more</a></span>
+                        <span class="mb10">5. In order to read user environment, please change the setup user from system to the login user, such as tencent\\zhangsan<a href="${this.linkConfig.WINDOWS_AGENT}" target="_blank">Learn more</a></span>
                     </p>
                 `
                 return this.machine.system === 'WINDOWS' ? windowHtml : unixHtml

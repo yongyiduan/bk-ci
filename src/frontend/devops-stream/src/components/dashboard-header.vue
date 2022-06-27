@@ -2,21 +2,9 @@
     <header class="stream-header">
         <span class="header-info">
             <img class="ci-name" src="./../images/logo.svg" height="48" @click="goToHome" />
-
-            <template v-if="$route.hash && !showMenu">
-                <icon name="git" size="18" class="gray-icon"></icon>
-                <span class="git-project-path" @click="goToCode">{{ projectInfo.path_with_namespace }}</span>
-                <icon
-                    name="setting"
-                    size="18"
-                    :class="computedIconClass"
-                    @click.native="goToSetting"
-                    v-bk-tooltips="{ content: $t('exception.permissionDeny'), disabled: permission }"
-                ></icon>
-            </template>
         </span>
 
-        <div class="navigation-header" v-if="showMenu">
+        <div class="navigation-header">
             <ol class="header-nav">
                 <li v-for="item in menuList" :key="item.name" @click="clickMenu(item)" class="header-nav-item" :class="{ 'item-active': item.active }">
                     {{item.name}}
@@ -26,7 +14,7 @@
         </div>
 
         <section class="user-info">
-            <a v-if="!showMenu" class="docs-link" href="https://iwiki.woa.com/x/pZMdK" target="_blank"><icon name="helper" class="gray-icon" size="20"></icon></a>
+            <toggle-language></toggle-language>
             <user
                 class="user-info"
                 :user="user"
@@ -40,17 +28,17 @@
     import { mapActions, mapState } from 'vuex'
     import { common } from '@/http'
     import user from './user'
+    import toggleLanguage from './toggle-language.vue'
+    import LINK_CONFIG from '@/conf/link-config.js'
 
     export default ({
         name: 'StreamHeader',
         components: {
-            user
+            user,
+            toggleLanguage
         },
         computed: {
             ...mapState(['exceptionInfo', 'projectInfo', 'projectId', 'user', 'permission', 'messageNum']),
-            showMenu () {
-                return this.$route.name === 'home' || this.$route.name === 'dashboard'
-            },
             computedIconClass () {
                 const name = this.$route.name
                 const settingPages = ['setting', 'basicSetting', 'credentialList', 'agentPools', 'addAgent', 'agentList', 'agentDetail', 'poolSettings']
@@ -68,19 +56,19 @@
                         name: this.$t('changeLog'),
                         active: false,
                         type: 'url',
-                        url: 'https://iwiki.woa.com/pages/viewpage.action?pageId=481669842'
+                        url: LINK_CONFIG.CHANGE_LOG
                     },
                     {
                         name: this.$t('documentation'),
                         active: false,
                         type: 'url',
-                        url: 'https://iwiki.woa.com/x/pZMdK'
+                        url: LINK_CONFIG.STREAM
                     },
                     {
                         name: this.$t('issue'),
                         active: false,
                         type: 'url',
-                        url: 'http://tapd.oa.com/git_ci/prong/stories/stories_list'
+                        url: LINK_CONFIG.ISSUE
                     }
                 ]
             }
@@ -120,7 +108,7 @@
             goToHome () {
                 this.setExceptionInfo({ type: 200 })
                 this.$router.push({
-                    name: this.$route.name === 'dashboard' ? 'home' : 'dashboard'
+                    name: 'dashboard'
                 })
             }
         }

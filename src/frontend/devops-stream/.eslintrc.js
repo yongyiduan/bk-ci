@@ -36,7 +36,8 @@ module.exports = {
         ROUTER_TAG: false,
         BKUI_HOST: false,
         BKREPO_HOST: false,
-        DEPLOY_ENVIRONMENT: false
+        DEPLOY_ENVIRONMENT: false,
+        DEVOPS_HOST: false
     },
     // add your custom rules hered
     rules: {

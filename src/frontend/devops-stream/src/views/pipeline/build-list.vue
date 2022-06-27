@@ -439,7 +439,7 @@
                         page
                     }
                 })
-                this.compactPaging.current = page
+                this.compactPaging.current = +page
                 this.initBuildData()
             },
 
