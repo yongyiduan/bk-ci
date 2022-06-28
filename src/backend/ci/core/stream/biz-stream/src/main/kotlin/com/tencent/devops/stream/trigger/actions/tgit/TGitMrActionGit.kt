@@ -27,6 +27,7 @@
 
 package com.tencent.devops.stream.trigger.actions.tgit
 
+import com.tencent.devops.common.api.enums.ScmType
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.webhook.enums.code.tgit.TGitMergeActionKind
 import com.tencent.devops.common.webhook.enums.code.tgit.TGitMergeExtensionActionKind
@@ -42,6 +43,7 @@ import com.tencent.devops.scm.utils.code.git.GitUtils
 import com.tencent.devops.stream.pojo.GitRequestEvent
 import com.tencent.devops.stream.pojo.enums.TriggerReason
 import com.tencent.devops.stream.trigger.actions.BaseAction
+import com.tencent.devops.stream.trigger.actions.GitActionCommon
 import com.tencent.devops.stream.trigger.actions.GitBaseAction
 import com.tencent.devops.stream.trigger.actions.data.ActionData
 import com.tencent.devops.stream.trigger.actions.data.ActionMetaData
@@ -86,7 +88,7 @@ class TGitMrActionGit(
     override val metaData: ActionMetaData = ActionMetaData(streamObjectKind = StreamObjectKind.MERGE_REQUEST)
 
     override lateinit var data: ActionData
-    fun event() = data.event as GitMergeRequestEvent
+    override fun event() = data.event as GitMergeRequestEvent
 
     override val mrIId: String
         get() = event().object_attributes.iid.toString()
@@ -122,6 +124,7 @@ class TGitMrActionGit(
         val event = event()
         this.data.eventCommon = EventCommonData(
             gitProjectId = event.object_attributes.target_project_id.toString(),
+            scmType = ScmType.CODE_TGIT,
             sourceGitProjectId = event.object_attributes.source_project_id.toString(),
             branch = if (event.object_attributes.action == TGitMergeActionKind.MERGE.value) {
                 event.object_attributes.target_branch
@@ -132,7 +135,7 @@ class TGitMrActionGit(
                 commitId = event.object_attributes.last_commit.id,
                 commitMsg = event.object_attributes.last_commit.message,
                 commitAuthorName = event.object_attributes.last_commit.author.name,
-                commitTimeStamp = TGitActionCommon.getCommitTimeStamp(event.object_attributes.last_commit.timestamp)
+                commitTimeStamp = GitActionCommon.getCommitTimeStamp(event.object_attributes.last_commit.timestamp)
             ),
             userId = event.user.username,
             gitProjectName = GitUtils.getProjectName(event.object_attributes.target.http_url)
@@ -195,10 +198,10 @@ class TGitMrActionGit(
     override fun getYamlPathList(): List<YamlPathListEntry> {
         val event = event()
         // 获取目标分支的文件列表
-        val targetBranchYamlPathList = TGitActionCommon.getYamlPathList(
+        val targetBranchYamlPathList = GitActionCommon.getYamlPathList(
             action = this,
-            gitProjectId = data.getGitProjectId(),
-            ref = TGitActionCommon.getTriggerBranch(event.object_attributes.target_branch)
+            gitProjectId = getGitProjectIdOrName(),
+            ref = GitActionCommon.getTriggerBranch(event.object_attributes.target_branch)
         ).toSet()
 
         // 已经merged的直接返回目标分支的文件列表即可
@@ -207,7 +210,7 @@ class TGitMrActionGit(
         }
 
         // 获取源分支文件列表
-        val sourceBranchYamlPathList = TGitActionCommon.getYamlPathList(
+        val sourceBranchYamlPathList = GitActionCommon.getYamlPathList(
             this,
             event.object_attributes.source_project_id.toString(),
             ref = data.eventCommon.commit.commitId,
@@ -238,7 +241,7 @@ class TGitMrActionGit(
             return Pair(
                 data.eventCommon.branch, api.getFileContent(
                     cred = this.getGitCred(),
-                    gitProjectId = data.getGitProjectId(),
+                    gitProjectId = getGitProjectIdOrName(),
                     fileName = fileName,
                     ref = data.eventCommon.branch,
                     retry = ApiRequestRetryInfo(true)
@@ -447,13 +450,13 @@ class TGitMrActionGit(
         val mrAction = event.getActionValue() ?: false
         val isMatch = TriggerMatcher.isMrMatch(
             triggerOn = triggerOn,
-            sourceBranch = TGitActionCommon.getTriggerBranch(event.object_attributes.source_branch),
-            targetBranch = TGitActionCommon.getTriggerBranch(event.object_attributes.target_branch),
+            sourceBranch = GitActionCommon.getTriggerBranch(event.object_attributes.source_branch),
+            targetBranch = GitActionCommon.getTriggerBranch(event.object_attributes.target_branch),
             changeSet = getChangeSet(),
             userId = data.getUserId(),
             mrAction = mrAction
         )
-        val params = TGitActionCommon.getStartParams(
+        val params = GitActionCommon.getStartParams(
             action = this,
             triggerOn = triggerOn
         )
@@ -466,7 +469,7 @@ class TGitMrActionGit(
     }
 
     override fun getWebHookStartParam(triggerOn: TriggerOn): Map<String, String> {
-        return TGitActionCommon.getStartParams(
+        return GitActionCommon.getStartParams(
             action = this,
             triggerOn = triggerOn
         )
