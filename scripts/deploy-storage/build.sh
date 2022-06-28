@@ -14,9 +14,9 @@ cd $(dirname $0)
 WORKING_DIR=$(pwd)
 ROOT_DIR=${WORKING_DIR%/*/*}
 BACKEND_DIR=$ROOT_DIR/src/backend/storage/core
-# FRONTEND_DIR=$ROOT_DIR/src/frontend
-GATEWAY_DIR=$ROOT_DIR/src/gateway/storage/
-TEMPLATES_DIR=$ROOT_DIR/support-files/storage/
+FRONTEND_DIR=$ROOT_DIR/src/frontend/devops-repo
+GATEWAY_DIR=$ROOT_DIR/src/gateway/storage
+TEMPLATES_DIR=$ROOT_DIR/support-files/storage
 
 CMD_BKREPO_SLIM=$ROOT_DIR/scripts/bk-ci-slim.sh
 
@@ -74,9 +74,9 @@ tmp_dir=$ROOT_DIR/tmp
 # 执行退出时自动清理tmp目录
 trap 'rm -rf $tmp_dir' EXIT TERM
 
-#log "编译frontend..."
-#yarn --cwd $FRONTEND_DIR install
-#yarn --cwd $FRONTEND_DIR run public
+log "编译frontend..."
+yarn --cwd $FRONTEND_DIR install
+yarn --cwd $FRONTEND_DIR public
 
 log "编译backend..."
 if [[ $TEST -eq 1 ]]; then
@@ -85,8 +85,9 @@ else
   $BACKEND_DIR/gradlew -p $BACKEND_DIR build -x test
 fi
 
-#log "拷贝frontend..."
-#cp -rf $FRONTEND_DIR/frontend $tmp_dir
+log "拷贝frontend..."
+mkdir -p $tmp_dir/frontend/ui
+cp -rf $FRONTEND_DIR/dist/* $tmp_dir/frontend/ui
 
 log "拷贝backend..."
 mkdir -p $tmp_dir/backend
@@ -97,15 +98,15 @@ done
 
 log "拷贝templates..."
 mkdir $tmp_dir/support-files
-cp -rf $TEMPLATES_DIR $tmp_dir/support-files
+cp -rf $TEMPLATES_DIR/* $tmp_dir/support-files
 
 log "拷贝scripts..."
 mkdir $tmp_dir/scripts
-cp -rf $WORKING_DIR/ $tmp_dir/scripts
+cp -rf $WORKING_DIR/* $tmp_dir/scripts
 
 log "拷贝gateway..."
 mkdir $tmp_dir/gateway
-cp -rf $GATEWAY_DIR $tmp_dir/gateway
+cp -rf $GATEWAY_DIR/* $tmp_dir/gateway
 
 log "打包bkrepo-slim.tar.gz..."
 # 创建bin目录
