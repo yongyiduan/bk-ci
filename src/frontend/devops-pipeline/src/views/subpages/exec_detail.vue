@@ -344,6 +344,9 @@
             isLatestBuild () {
                 const { execDetail } = this
                 return execDetail && execDetail.buildNum === execDetail.latestBuildNum && execDetail.curVersion === execDetail.latestVersion
+            },
+            projectId () {
+                return this.$route.params.projectId
             }
         },
 
@@ -363,10 +366,14 @@
                     this.isLoading = false
                     this.hasNoPermission = true
                 }
+            },
+            pipeline (val) {
+                if (val && val.instanceFromTemplate) this.requestMatchTemplateRules(val.templateId)
             }
         },
 
         mounted () {
+            this.requestPipeline(this.$route.params)
             this.requestPipelineExecDetail(this.routerParams)
             this.requestInterceptAtom({
                 projectId: this.routerParams.projectId,
@@ -406,7 +413,8 @@
                 'setPipelineDetail',
                 'getInitLog',
                 'getAfterLog',
-                'pausePlugin'
+                'pausePlugin',
+                'requestPipeline'
             ]),
             ...mapActions('common', [
                 'requestInterceptAtom'
@@ -621,6 +629,12 @@
                         ...this.routerParams,
                         type: tabType
                     }
+                })
+            },
+            requestMatchTemplateRules (templateId) {
+                this.$store.dispatch('common/requestMatchTemplateRuleList', {
+                    projectId: this.projectId,
+                    templateId
                 })
             }
         }
