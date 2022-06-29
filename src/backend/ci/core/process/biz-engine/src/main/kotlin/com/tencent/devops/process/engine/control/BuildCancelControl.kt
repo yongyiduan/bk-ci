@@ -128,11 +128,12 @@ class BuildCancelControl @Autowired constructor(
             )
 
             // 排队的则不再获取Pending Stage，防止Final Stage被执行
-            val pendingStage: PipelineBuildStage? = if (buildInfo.isReadyToRun()) {
-                null
-            } else {
-                pipelineStageService.getPendingStage(event.projectId, buildId)
-            }
+            val pendingStage: PipelineBuildStage? =
+                if (buildInfo.status.isReadyToRun() || buildInfo.status.isNeverRun()) {
+                    null
+                } else {
+                    pipelineStageService.getPendingStage(event.projectId, buildId)
+                }
 
             if (pendingStage != null) {
                 pendingStage.dispatchEvent(event)
@@ -195,7 +196,7 @@ class BuildCancelControl @Autowired constructor(
         val executeCount: Int by lazy { buildVariableService.getBuildExecuteCount(projectId, buildId) }
         val stages = model.stages
         stages.forEachIndexed nextStage@{ index, stage ->
-            if (stage.status == null) { // 未启动的忽略
+            if (stage.status == null || index == 0) { // Trigger 和 未启动的忽略
                 return@nextStage
             }
 
