@@ -165,7 +165,6 @@ open class MarketAtomTask : ITask() {
             )
         }.toMap().plus(buildTask.buildVariable ?: emptyMap())
 
-        logger.info("variables=$variables")
         // 解析输入输出字段模板
         val props = JsonUtil.toMutableMap(atomData.props!!)
         val inputTemplate = props["input"]?.let { it as Map<String, Map<String, Any>> } ?: mutableMapOf()
@@ -249,7 +248,7 @@ open class MarketAtomTask : ITask() {
             }
 
             // #7023 找回重构导致的逻辑丢失： runtime 覆盖 system 环境变量
-//            systemEnvVariables.forEach { runtimeVariables.putIfAbsent(it.key, it.value) }
+            systemEnvVariables.forEach { runtimeVariables.putIfAbsent(it.key, it.value) }
 
             val preCmd = atomData.preCmd
             val buildEnvs = buildVariables.buildEnvs
