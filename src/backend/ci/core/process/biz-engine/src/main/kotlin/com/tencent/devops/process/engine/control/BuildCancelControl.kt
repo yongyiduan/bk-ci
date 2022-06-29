@@ -127,7 +127,13 @@ class BuildCancelControl @Autowired constructor(
                 cancelUser = event.userId
             )
 
-            val pendingStage = pipelineStageService.getPendingStage(event.projectId, buildId)
+            // 排队的则不再获取Pending Stage，防止Final Stage被执行
+            val pendingStage: PipelineBuildStage? = if (buildInfo.isReadyToRun()) {
+                null
+            } else {
+                pipelineStageService.getPendingStage(event.projectId, buildId)
+            }
+
             if (pendingStage != null) {
                 pendingStage.dispatchEvent(event)
             } else {
@@ -279,7 +285,8 @@ class BuildCancelControl @Autowired constructor(
                     executeCount = executeCount
                 )
                 // 释放互斥锁
-                unlockMutexGroup(variables = variables, container = container,
+                unlockMutexGroup(
+                    variables = variables, container = container,
                     buildId = event.buildId, projectId = event.projectId, stageId = stageId
                 )
                 // 构建机关机
