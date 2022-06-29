@@ -1,20 +1,14 @@
 <template>
     <section>
         <router-view class="stream-main" :name="childRouteName"></router-view>
-        <login></login>
     </section>
 </template>
 
 <script>
     import { mapState } from 'vuex'
-    import Login from '@/components/login.vue'
 
     export default {
         name: 'App',
-
-        components: {
-            Login
-        },
 
         computed: {
             ...mapState(['exceptionInfo']),
