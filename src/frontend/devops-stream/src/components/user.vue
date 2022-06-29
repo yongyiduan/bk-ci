@@ -8,7 +8,6 @@
             @click.stop="toggleUserInfo"
         >
             {{ user.username }}
-            <span v-if="messageNum > 0" class="user-header-hint" />
             <bk-icon type="down-shape" />
         </div>
         <div
@@ -24,12 +23,6 @@
             </p>
             <slot name="menu">
                 <ul>
-                    <li v-if="$route.hash">
-                        <span class="user-menu-item" @click.stop="goToNotifications">
-                            {{$t('notifications')}}
-                            <span v-if="messageNum > 0" class="user-hint" />
-                        </span>
-                    </li>
                     <li>
                         <span class="user-menu-item" @click.stop="changeLanguage">
                             {{$t('changeLang')}}
@@ -54,10 +47,6 @@
             user: {
                 type: Object,
                 required: true
-            },
-            messageNum: {
-                type: Number,
-                default: 0
             }
         },
 
@@ -74,11 +63,6 @@
 
             hideUserInfo () {
                 this.show = false
-            },
-            
-            goToNotifications () {
-                this.$router.push({ name: 'notifications' })
-                this.hideUserInfo()
             },
 
             changeLanguage () {
@@ -189,15 +173,6 @@
                         &:hover {
                             color: $primaryColor;
                         }
-                    }
-                    .user-hint {
-                        display: inline-block;
-                        width: 6px;
-                        height: 6px;
-                        border-radius: 50%;
-                        background-color: red;
-                        position: relative;
-                        top: -2px;
                     }
                 }
             }
