@@ -222,7 +222,6 @@ open class MarketAtomTask : ITask() {
                 JAVA_PATH_ENV to getJavaFile().absolutePath
             )
         ).toMutableMap()
-        logger.info("runtimeVariables=$runtimeVariables")
 
         var error: Throwable? = null
         try {
@@ -250,9 +249,7 @@ open class MarketAtomTask : ITask() {
             }
 
             // #7023 找回重构导致的逻辑丢失： runtime 覆盖 system 环境变量
-            systemEnvVariables.forEach { runtimeVariables.putIfAbsent(it.key, it.value) }
-
-            logger.info("runtimeVariables_add_system=$runtimeVariables")
+//            systemEnvVariables.forEach { runtimeVariables.putIfAbsent(it.key, it.value) }
 
             val preCmd = atomData.preCmd
             val buildEnvs = buildVariables.buildEnvs
