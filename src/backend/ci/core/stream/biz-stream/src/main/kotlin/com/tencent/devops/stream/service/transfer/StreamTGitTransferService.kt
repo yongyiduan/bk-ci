@@ -58,9 +58,7 @@ import com.tencent.devops.stream.service.StreamGitTransferService
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
 
-@Service
 class StreamTGitTransferService @Autowired constructor(
     private val dslContext: DSLContext,
     private val client: Client,
@@ -279,7 +277,7 @@ class StreamTGitTransferService @Autowired constructor(
             page = page,
             pageSize = pageSize,
             owned = false,
-            minAccessLevel = com.tencent.devops.scm.enums.GitAccessLevelEnum.DEVELOPER,
+            minAccessLevel = GitAccessLevelEnum.DEVELOPER,
             tokenType = TokenTypeEnum.OAUTH
         ).data?.ifEmpty { null }?.map {
             StreamGitGroup(it)
