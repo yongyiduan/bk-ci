@@ -283,7 +283,7 @@ class StreamYamlBuild @Autowired constructor(
                 )
             )
         ),
-        setting = PipelineSetting()
+        setting = PipelineSetting(cleanVariablesWhenRetry = true)
     )
 
     @SuppressWarnings("LongParameterList")
