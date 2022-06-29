@@ -33,21 +33,19 @@ package com.tencent.bkrepo.oci.artifact.resolver
 
 import com.tencent.bkrepo.common.api.util.Preconditions
 import com.tencent.bkrepo.common.artifact.api.ArtifactInfo
+import com.tencent.bkrepo.common.artifact.repository.context.ArtifactContextHolder
 import com.tencent.bkrepo.common.artifact.resolve.path.ArtifactInfoResolver
 import com.tencent.bkrepo.common.artifact.resolve.path.Resolver
 import com.tencent.bkrepo.oci.constant.USER_API_PREFIX
 import com.tencent.bkrepo.oci.pojo.artifact.OciManifestArtifactInfo
 import com.tencent.bkrepo.oci.pojo.digest.OciDigest
-import org.springframework.beans.factory.annotation.Value
-import javax.servlet.http.HttpServletRequest
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerMapping
+import javax.servlet.http.HttpServletRequest
 
 @Component
 @Resolver(OciManifestArtifactInfo::class)
 class OciManifestArtifactInfoResolver : ArtifactInfoResolver {
-    @Value("\${auth.security.enablePrefix:false}")
-    var enablePrefix: Boolean = false
 
     override fun resolve(
         projectId: String,
@@ -55,10 +53,7 @@ class OciManifestArtifactInfoResolver : ArtifactInfoResolver {
         artifactUri: String,
         request: HttpServletRequest
     ): ArtifactInfo {
-        var requestUrl = request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString()
-        if (enablePrefix) {
-            requestUrl = requestUrl.removePrefix("/oci")
-        }
+        val requestUrl = ArtifactContextHolder.getUrlPath(this.javaClass.name)!!
         return when {
             requestUrl.contains(MANIFEST_CONTENT_PREFIX) -> {
                 val artifactUrl = requestUrl.removePrefix("$USER_API_PREFIX/manifest/$projectId/$repoName/")

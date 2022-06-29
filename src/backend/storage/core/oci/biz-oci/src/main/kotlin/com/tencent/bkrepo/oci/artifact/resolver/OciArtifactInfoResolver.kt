@@ -34,19 +34,16 @@ package com.tencent.bkrepo.oci.artifact.resolver
 import com.tencent.bkrepo.common.api.constant.StringPool
 import com.tencent.bkrepo.common.api.util.Preconditions
 import com.tencent.bkrepo.common.artifact.api.ArtifactInfo
+import com.tencent.bkrepo.common.artifact.repository.context.ArtifactContextHolder
 import com.tencent.bkrepo.common.artifact.resolve.path.ArtifactInfoResolver
 import com.tencent.bkrepo.common.artifact.resolve.path.Resolver
 import com.tencent.bkrepo.oci.pojo.artifact.OciArtifactInfo
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.HandlerMapping
 import javax.servlet.http.HttpServletRequest
 
 @Component
 @Resolver(OciArtifactInfo::class)
 class OciArtifactInfoResolver : ArtifactInfoResolver {
-    @Value("\${auth.security.enablePrefix:false}")
-    var enablePrefix: Boolean = false
 
     override fun resolve(
         projectId: String,
@@ -54,10 +51,7 @@ class OciArtifactInfoResolver : ArtifactInfoResolver {
         artifactUri: String,
         request: HttpServletRequest
     ): ArtifactInfo {
-        var requestURL = request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString()
-        if (enablePrefix) {
-            requestURL = requestURL.removePrefix("/oci")
-        }
+        val requestURL = ArtifactContextHolder.getUrlPath(this.javaClass.name)!!
         val packageName = requestURL.replaceAfterLast("/blobs", StringPool.EMPTY).removeSuffix("/blobs")
             .removePrefix("/v2/$projectId/$repoName/")
         Preconditions.checkNotBlank(packageName, "packageName")

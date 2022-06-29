@@ -16,6 +16,8 @@ spring:
     allow-bean-definition-overriding: true
 
 logging:
+  config: classpath:logback-config.xml
+  path: /data/logs
   level:
     com.tencent: DEBUG
 

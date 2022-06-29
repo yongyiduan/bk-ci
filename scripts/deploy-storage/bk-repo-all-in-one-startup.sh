@@ -2,7 +2,11 @@
 
 ##启动mongodb
 echo "启动mongodb..."
-mongod --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork
+MONGO_DATA_PATH=$BK_REPO_MONGO_PATH/lib/mongo
+MONGO_LOG_PATH=$BK_REPO_MONGO_PATH/log/mongodb
+mkdir -p $MONGO_DATA_PATH
+mkdir -p $MONGO_LOG_PATH
+mongod --dbpath $MONGO_DATA_PATH --logpath $MONGO_LOG_PATH/mongod.log --fork
 ##初始化mongodb
 echo "初始化mongodb..."
 mongo mongodb://127.0.0.1:27017/bkrepo /data/workspace/support-files/sql/init-data.js
@@ -34,16 +38,17 @@ source $BK_REPO_HOME/backend/assembly/service.env
 java -server \
      -Dsun.jnu.encoding=UTF-8 \
      -Dfile.encoding=UTF-8 \
-     -Xloggc:$BK_REPO_LOGS_DIR/gc.log \
+     -Xloggc:$BK_REPO_LOGS_DIR/bkrepo/gc.log \
      -XX:+PrintTenuringDistribution \
      -XX:+PrintGCDetails \
      -XX:+PrintGCDateStamps \
      -XX:+HeapDumpOnOutOfMemoryError \
      -XX:HeapDumpPath=oom.hprof \
-     -XX:ErrorFile=$BK_REPO_LOGS_DIR/error_sys.log \
+     -XX:ErrorFile=$BK_REPO_LOGS_DIR/bkrepo/error_sys.log \
      -Dspring.profiles.active=$BK_REPO_PROFILE \
-     -Dservice.prefix=$BK_REPO_SERVICE_PREFIX \
      -Doci.domain=BK_REPO_DOCKER_HOST \
      -Doci.authUrl=http://$BK_REPO_DOCKER_HOST/v2/auth \
+     -Dlogging.path=$BK_REPO_LOGS_DIR/bkrepo \
+     -Dstorage.filesystem.path=$BK_REPO_DATA_PATH \
      $BK_REPO_JVM_OPTION \
      $MAIN_CLASS
