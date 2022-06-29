@@ -136,7 +136,11 @@ class BuildCancelControl @Autowired constructor(
                 }
 
             if (pendingStage != null) {
-                pendingStage.dispatchEvent(event)
+                if (pendingStage.status.isPause()) { // 处于审核暂停的Stage需要走取消Stage逻辑
+                    pipelineStageService.cancelStageBySystem(event.userId, pendingStage, timeout = false)
+                } else {
+                    pendingStage.dispatchEvent(event)
+                }
             } else {
                 sendBuildFinishEvent(event)
             }
