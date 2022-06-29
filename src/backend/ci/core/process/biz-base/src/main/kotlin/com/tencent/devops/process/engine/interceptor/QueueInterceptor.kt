@@ -136,7 +136,7 @@ class QueueInterceptor @Autowired constructor(
                 val buildInfo = pipelineRuntimeExtService.popNextQueueBuildInfo(
                     projectId = projectId,
                     pipelineId = pipelineId,
-                    buildStatus = BuildStatus.CANCELED
+                    buildStatus = BuildStatus.UNEXEC
                 )
                 if (buildInfo != null) {
                     buildLogPrinter.addRedLine(
