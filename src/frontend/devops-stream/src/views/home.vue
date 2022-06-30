@@ -1,5 +1,6 @@
 <template>
     <section>
+        <dashboard-header></dashboard-header>
         <div id="modal-root"></div>
         <section class="hero">
             <div class="hero--content">
@@ -142,8 +143,12 @@
     import codeGif from '@/images/home/code.gif'
     import codeJpg from '@/images/home/code.jpg'
     import LINK_CONFIG from '@/conf/link-config.js'
+    import DashboardHeader from '@/components/dashboard-header.vue'
 
     export default {
+        components: {
+            DashboardHeader
+        },
         data () {
             return {
                 LINK_CONFIG
