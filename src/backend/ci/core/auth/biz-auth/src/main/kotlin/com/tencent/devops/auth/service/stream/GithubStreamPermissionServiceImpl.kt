@@ -36,11 +36,9 @@ import com.tencent.devops.project.constant.ProjectMessageCode
 import com.tencent.devops.repository.api.github.ServiceGithubPermissionResource
 import com.tencent.devops.stream.api.service.ServiceStreamBasicSettingResource
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import sun.misc.MessageUtils
 import java.util.concurrent.TimeUnit
 
-class GithubStreamPermissionServiceImpl @Autowired constructor(
+class GithubStreamPermissionServiceImpl constructor(
     val client: Client
 ) : StreamPermissionServiceImpl() {
 
@@ -85,7 +83,7 @@ class GithubStreamPermissionServiceImpl @Autowired constructor(
         // 是否是项目成员
         val checkProjectMember = checkProjectMemeber(projectCode, userId, authUser)
         if (!checkProjectMember) {
-            return Pair(false,false)
+            return Pair(false, false)
         }
         val projectExecute = checkProjectExecutePermission(projectCode, userId, authUser)
         return Pair(checkProjectMember, projectExecute)
@@ -119,7 +117,7 @@ class GithubStreamPermissionServiceImpl @Autowired constructor(
         return projectAuthUser
     }
 
-    private fun projectMemberKey(projectCode: String, userId: String) : String {
+    private fun projectMemberKey(projectCode: String, userId: String): String {
         return projectCode + userId
     }
 

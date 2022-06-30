@@ -27,8 +27,6 @@
 
 package com.tencent.devops.auth
 
-import com.tencent.devops.auth.service.SampleAuthPermissionProjectService
-import com.tencent.devops.auth.service.SampleAuthPermissionService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.tencent.bk.sdk.iam.config.IamConfiguration
 import com.tencent.bk.sdk.iam.helper.AuthHelper
@@ -42,6 +40,8 @@ import com.tencent.devops.auth.service.BkPermissionProjectService
 import com.tencent.devops.auth.service.BkPermissionService
 import com.tencent.devops.auth.service.DeptService
 import com.tencent.devops.auth.service.LocalManagerService
+import com.tencent.devops.auth.service.SampleAuthPermissionProjectService
+import com.tencent.devops.auth.service.SampleAuthPermissionService
 import com.tencent.devops.auth.service.SimpleLocalManagerServiceImpl
 import com.tencent.devops.auth.service.iam.IamCacheService
 import com.tencent.devops.auth.service.iam.PermissionRoleMemberService
@@ -152,7 +152,7 @@ class AuthConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "auth", name = ["idProvider"], havingValue = "github")
-    fun githubStreamPermissionService() = GithubStreamPermissionServiceImpl()
+    fun githubStreamPermissionService(client: Client) = GithubStreamPermissionServiceImpl(client)
 
     @Bean
     @ConditionalOnProperty(prefix = "auth", name = ["idProvider"], havingValue = "github")
