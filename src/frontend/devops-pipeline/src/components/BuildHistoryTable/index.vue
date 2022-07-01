@@ -124,8 +124,8 @@
                             <span :title="artifactory.name" class="artifact-name">{{ artifactory.name }}</span>
                             <span class="artifact-size">{{ artifactory.size }}</span>
                         </p>
-                        <i class="devops-icon icon-download download-link history-text-link" @click.stop="downloadFile(artifactory)" />
-                        <Logo class="icon-copy" name="copy" size="12" v-if="artifactory.artifactoryType === 'PIPELINE'" @click.stop.native="copyToCustom(artifactory)"></Logo>
+                        <i class="devops-icon icon-download download-link history-text-link" v-bk-tooltips="{ content: $t('download') }" @click.stop="downloadFile(artifactory)" />
+                        <Logo class="icon-copy" name="copy" size="12" v-bk-tooltips="{ content: $t('history.copyToCustomArtifactory') }" v-if="artifactory.artifactoryType === 'PIPELINE'" @click.stop.native="copyToCustom(artifactory)"></Logo>
                     </li>
                     <footer v-if="needShowAll" @click.stop="showAllArtifactory" class="history-text-link">{{ $t('history.showAll') }}</footer>
                 </ul>
@@ -457,7 +457,7 @@
             showAllArtifactory () {
                 this.isShowAll = true
             },
-            async downloadFile ({ artifactoryType, path }, key = 'download') {
+            async downloadFile ({ artifactoryType, path, name }, key = 'download') {
                 try {
                     const { projectId } = this.$route.params
                     const isDevnet = await this.$store.dispatch('common/requestDevnetGateway')
@@ -493,7 +493,7 @@
                         params
                     })
                     if (res) {
-                        message = this.$t('saveSuc')
+                        message = this.$t('history.copySuc', [artifactory.name])
                         theme = 'success'
                     }
                 } catch (err) {
