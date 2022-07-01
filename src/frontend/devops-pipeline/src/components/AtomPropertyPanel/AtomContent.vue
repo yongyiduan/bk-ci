@@ -247,7 +247,7 @@
             ...mapState('atom', [
                 'globalEnvs',
                 'atomClassifyCodeList',
-                'projectRecommendAtomMap',
+                'atomMap',
                 'atomModalMap',
                 'fetchingAtmoModal',
                 'atomVersionList',
@@ -336,8 +336,8 @@
                 return this.element.version || this.getDefaultVersion(this.atomCode || this.selectAtomCode)
             },
             atom () {
-                const { projectRecommendAtomMap, atomCode, element, getDefaultVersion, getAtomModal } = this
-                const atom = projectRecommendAtomMap[atomCode]
+                const { atomMap, atomCode, element, getDefaultVersion, getAtomModal } = this
+                const atom = atomMap[atomCode]
                 const version = element.version || getDefaultVersion(atomCode || this.selectAtomCode)
                 const atomModal = getAtomModal({
                     atomCode,

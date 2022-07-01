@@ -25,7 +25,7 @@ import { jobConst, buildEnvMap } from '@/utils/pipelineConst'
 export default {
     getAtomCodeListByCategory: state => category => {
         return state.atomCodeList.filter(atomCode => {
-            const atom = state.projectRecommendAtomMap[atomCode]
+            const atom = state.atomMap[atomCode]
             return atom.category === category
         })
     },
@@ -54,7 +54,7 @@ export default {
     },
     getDefaultVersion: state => (atomCode, aaa) => {
         try {
-            const atom = state.projectRecommendAtomMap[atomCode]
+            const atom = state.atomMap[atomCode]
             return atom.defaultVersion || '1.*'
         } catch (error) {
             return '1.*'
@@ -306,14 +306,5 @@ export default {
     getPlatformList: state => platformList,
     getAtomModalKey: state => getAtomModalKey,
     isNewAtomTemplate: state => isNewAtomTemplate,
-    atomVersionChangedKeys: state => state.atomVersionChangedKeys,
-    getProjectRecommendAtomMap: state => state.projectRecommendAtomMap,
-    getProjectUnRecommendAtomMap: state => state.projectUnRecommendAtomMap,
-    getStoreRecommendAtomMap: state => state.storeRecommendAtomMap,
-    getStoreUnRecommendAtomMap: state => state.storeUnRecommendAtomMap,
-    getAtomClassifyMap: state => state.atomClassifyMap,
-    innerActiveName: state => state.innerActiveName,
-    projectAtomKeyWord: state => state.projectData.keyword,
-    storeAtomKeyWord: state => state.storeData.keyword,
-    getAtomCode: state => state.atomCode
+    atomVersionChangedKeys: state => state.atomVersionChangedKeys
 }
