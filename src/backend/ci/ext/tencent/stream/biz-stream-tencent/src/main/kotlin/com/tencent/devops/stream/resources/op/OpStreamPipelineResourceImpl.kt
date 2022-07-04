@@ -36,6 +36,7 @@ import com.tencent.devops.process.api.service.ServicePipelineResource
 import com.tencent.devops.stream.api.op.OpStreamPipelineResource
 import com.tencent.devops.stream.dao.GitPipelineResourceDao
 import com.tencent.devops.stream.dao.GitRequestEventBuildDao
+import com.tencent.devops.stream.dao.StreamPipelineSetting
 import com.tencent.devops.stream.service.StreamPipelineBranchService
 import com.tencent.devops.stream.trigger.service.StreamEventService
 import org.jooq.DSLContext
@@ -52,7 +53,8 @@ class OpStreamPipelineResourceImpl @Autowired constructor(
     private val pipelineResourceDao: GitPipelineResourceDao,
     private val streamPipelineBranchService: StreamPipelineBranchService,
     private val streamEventService: StreamEventService,
-    private val gitRequestEventBuildDao: GitRequestEventBuildDao
+    private val gitRequestEventBuildDao: GitRequestEventBuildDao,
+    private val streamPipelineSetting: StreamPipelineSetting
 ) : OpStreamPipelineResource {
 
     private val logger = LoggerFactory.getLogger(OpStreamPipelineResourceImpl::class.java)
@@ -89,5 +91,19 @@ class OpStreamPipelineResourceImpl @Autowired constructor(
         )
         logger.info("listJobIdConflict: \n$pipelineId2Yaml")
         return Result(pipelineId2Yaml.size)
+    }
+
+    override fun addPipelineSetting(
+        projectId: String,
+        pipelineId: String,
+        maxConRunningQueueSize: Int
+    ): Result<String> {
+        streamPipelineSetting.saveOrUpdate(
+            dslContext = dslContext,
+            projectId = projectId,
+            pipelineId = pipelineId,
+            maxConRunningQueueSize = maxConRunningQueueSize
+        )
+        return Result("add while list pipelineSetting success,maxConRunningQueueSize:$maxConRunningQueueSize");
     }
 }
