@@ -234,7 +234,8 @@ class QueueInterceptor @Autowired constructor(
                 logger.info("build($buildId) shutdown by $userId, taskId: $taskId, status: ${task["status"] ?: ""}")
                 buildLogPrinter.addYellowLine(
                     buildId = buildId,
-                    message = "because concurrency cancel in progress with group($groupName), Run cancelled by $userId",
+                    message = "[concurrency]Canceling since a higher priority waiting request for " +
+                            "group($groupName) exists",
                     tag = taskId,
                     jobId = task["containerId"]?.toString() ?: "",
                     executeCount = task["executeCount"] as? Int ?: 1
@@ -243,8 +244,8 @@ class QueueInterceptor @Autowired constructor(
             if (tasks.isEmpty()) {
                 buildLogPrinter.addRedLine(
                     buildId = buildId,
-                    message = "$pipelineId] because concurrency cancel in progress with group($groupName)" +
-                            ", cancel all queue build",
+                    message = "[concurrency]Canceling all since a higher priority waiting request for " +
+                            "group($groupName) exists",
                     tag = "QueueInterceptor",
                     jobId = "",
                     executeCount = 1
