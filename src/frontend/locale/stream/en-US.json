@@ -49,6 +49,8 @@
     "updateTime": "Update time",
     "time": "Time",
     "noDesc": "No description",
+    "signIn": "Sign in",
+    "signInGithub": "SIGN IN WITH GITHUB",
     "header": {
         "pipelines": "Pipelines",
         "metrics": "Metrics",
