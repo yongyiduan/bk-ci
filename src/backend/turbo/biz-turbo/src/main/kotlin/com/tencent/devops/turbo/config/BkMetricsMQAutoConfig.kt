@@ -1,7 +1,6 @@
-package com.tencent.devops.common.web.mq
+package com.tencent.devops.turbo.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.amqp.rabbit.annotation.EnableRabbit
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
@@ -9,44 +8,44 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
-import org.springframework.core.Ordered
 
+
+/**
+ * 蓝盾度量MQ
+ */
 @Configuration
-@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @AutoConfigureBefore(RabbitAutoConfiguration::class)
-@EnableRabbit
-class RabbitMQAutoConfiguration {
+@ConditionalOnProperty(prefix = "rabbitmq.bkMetrics", name = ["addresses", "virtual-host", "username", "password"])
+class BkMetricsMQAutoConfig {
 
-    @Bean(name = ["rabbitConnectionFactory"])
-    @Primary
-    fun rabbitConnectionFactory(
-        @Value("\${spring.rabbitmq.username:#{null}}") userName: String,
-        @Value("\${spring.rabbitmq.password:#{null}}") passWord: String,
-        @Value("\${spring.rabbitmq.virtual-host:#{null}}") vHost: String,
-        @Value("\${spring.rabbitmq.addresses:#{null}}") address: String
-    ) : ConnectionFactory {
+    @Bean(name = ["bkMetricsConnectionFactory"])
+    fun bkMetricsConnectionFactory(
+        @Value("\${rabbitmq.bkMetrics.username:#{null}}") userName: String,
+        @Value("\${rabbitmq.bkMetrics.password:#{null}}") passWord: String,
+        @Value("\${rabbitmq.bkMetrics.virtual-host:#{null}}") vHost: String,
+        @Value("\${rabbitmq.bkMetrics.addresses:#{null}}") address: String,
+    ): ConnectionFactory {
         val connectionFactory = CachingConnectionFactory()
         connectionFactory.username = userName
         connectionFactory.setPassword(passWord)
         connectionFactory.virtualHost = vHost
         connectionFactory.setAddresses(address)
+
         return connectionFactory
     }
 
     @Bean
     fun messageConverter(objectMapper: ObjectMapper) = Jackson2JsonMessageConverter(objectMapper)
 
-    @Bean
-    @Primary
-    fun rabbitTemplate(
-        @Qualifier("rabbitConnectionFactory") connectionFactory: ConnectionFactory,
-        objectMapper: ObjectMapper,
-    ): RabbitTemplate {
+    @Bean(name= ["bkMetricsRabbitTemplate"])
+    fun bkMetricsRabbitTemplate(
+        @Qualifier("bkMetricsConnectionFactory") connectionFactory: ConnectionFactory,
+        objectMapper: ObjectMapper
+    ) : RabbitTemplate {
         val rabbitTemplate = RabbitTemplate(connectionFactory)
         rabbitTemplate.messageConverter = messageConverter(objectMapper)
         return rabbitTemplate
