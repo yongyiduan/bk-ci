@@ -30,6 +30,7 @@ package com.tencent.devops.process.yaml.modelCreate
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.pojo.BuildFormProperty
 import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
+import com.tencent.devops.process.yaml.modelCreate.inner.InnerModelCreator
 import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
 import com.tencent.devops.process.yaml.v2.models.ScriptBuildYaml
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,9 +41,10 @@ import org.springframework.stereotype.Component
 @Component
 class TXModelCreate @Autowired constructor(
     client: Client,
-    modelStage: ModelStage
+    modelStage: ModelStage,
+    innerModelCreator: InnerModelCreator
 ) : ModelCreate(
-    client, modelStage
+    client, modelStage, innerModelCreator
 ) {
     override fun createPipelineModel(
         modelName: String,
