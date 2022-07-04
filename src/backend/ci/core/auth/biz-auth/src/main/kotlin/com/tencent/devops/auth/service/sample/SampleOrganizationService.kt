@@ -24,18 +24,18 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.tencent.devops.auth.service
 
-import com.tencent.devops.auth.service.iam.PermissionExtService
+package com.tencent.devops.auth.service.sample
 
-class EmptyPermissionExtServiceImpl : PermissionExtService {
-    override fun resourceCreateRelation(
-        userId: String,
-        projectCode: String,
-        resourceType: String,
-        resourceCode: String,
-        resourceName: String
-    ): Boolean {
-        return true
+import com.tencent.devops.auth.pojo.OrganizationEntity
+import com.tencent.devops.auth.service.OrganizationService
+
+class SampleOrganizationService : OrganizationService {
+    override fun getParentOrganizationInfo(organizationId: String, level: Int): List<OrganizationEntity>? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getOrganizationInfo(organizationId: String, level: Int): OrganizationEntity? {
+        TODO("Not yet implemented")
     }
 }
