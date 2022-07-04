@@ -941,7 +941,11 @@ class PipelineContainerService @Autowired constructor(
                 atomElement.executeCount = context.executeCount
                 buildLogPrinter.addLine(
                     buildId = context.buildId,
-                    message = "触发人(trigger user): ${context.triggerUser}, 执行人(start user): ${context.userId}",
+                    message = "触发人(trigger user): ${context.triggerUser}, 执行人(start user): ${context.userId} ${
+                        printSourceIp(
+                            context.sourceIp
+                        )
+                    }",
                     tag = context.firstTaskId,
                     jobId = container.id,
                     executeCount = context.executeCount
@@ -949,5 +953,10 @@ class PipelineContainerService @Autowired constructor(
                 return
             }
         }
+    }
+
+    private fun printSourceIp(ip: String?): String {
+        if (ip != null) return "sourceIp : $ip"
+        return ""
     }
 }

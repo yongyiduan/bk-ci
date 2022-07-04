@@ -689,7 +689,10 @@ interface ServiceBuildResource {
         buildNo: Int? = null,
         @ApiParam("启动类型", required = false)
         @QueryParam("startType")
-        startType: StartType
+        startType: StartType,
+        @ApiParam("sourceIp", required = false)
+        @QueryParam("sourceIp")
+        sourceIp: String? = null
     ): Result<BuildId>
 
     @ApiOperation("取消并发起新构建")

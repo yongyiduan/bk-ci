@@ -450,7 +450,7 @@ class PipelineBuildFacadeService(
 
             logger.info(
                 "ENGINE|$buildId|RETRY_PIPELINE_ORIGIN|taskId=$taskId|$pipelineId|" +
-                    "retryCount=$retryCount|fc=$failedContainer|skip=$skipFailedTask"
+                        "retryCount=$retryCount|fc=$failedContainer|skip=$skipFailedTask"
             )
 
             paramMap[PIPELINE_RETRY_COUNT] = BuildParameters(PIPELINE_RETRY_COUNT, retryCount)
@@ -484,7 +484,8 @@ class PipelineBuildFacadeService(
         isMobile: Boolean = false,
         startByMessage: String? = null,
         buildNo: Int? = null,
-        frequencyLimit: Boolean = true
+        frequencyLimit: Boolean = true,
+        sourceIp: String? = null
     ): String {
         logger.info("Manual build start with value [$values][$buildNo]")
         if (checkPermission) {
@@ -558,7 +559,8 @@ class PipelineBuildFacadeService(
                 model = model,
                 frequencyLimit = frequencyLimit,
                 buildNo = buildNo,
-                startValues = values
+                startValues = values,
+                sourceIp = sourceIp
             )
         } finally {
             logger.info("[$pipelineId]|$userId|It take(${System.currentTimeMillis() - startEpoch})ms to start pipeline")
