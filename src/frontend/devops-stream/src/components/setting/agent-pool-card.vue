@@ -22,7 +22,6 @@
                 <bk-progress :theme="getTheme(usage.val)" :percent="usage.val" :show-text="false"></bk-progress>
             </li>
         </ul>
-        <!-- <bk-exception class="exception-wrap-item exception-part card-useages" type="empty" scene="part" v-else>No Data</bk-exception> -->
         <div v-else style="height: 150px; padding: 7px 24px">
             {{pool.desc || $t('noDesc')}}
         </div>

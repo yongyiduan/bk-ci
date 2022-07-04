@@ -91,15 +91,14 @@
                         buildId,
                         vmSeqId,
                         dispatchType
-                    })
-                    .then((res) => {
-                        this.url = res.websocketUrl || ''
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                        this.connectError = true
-                        this.config.desc = err.message || this.$t('editPage.docker.failDesc')
-                    })
+                    }
+                ).then((res) => {
+                    this.url = res.websocketUrl || ''
+                }).catch((err) => {
+                    console.log(err)
+                    this.connectError = true
+                    this.config.desc = err.message || this.$t('editPage.docker.failDesc')
+                })
             },
             async stopDebug () {
                 const content = this.$t('pipeline.stopDebugTips')

@@ -3,17 +3,11 @@
         :title="job.name"
         :status="job.status"
     >
-        <section v-if="showDebugBtn" class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
-            <bk-popover placement="bottom" ref="consoleRef" ext-cls="console-menu-wrapper">
-                <span>
-                    {{$t('pipeline.webConsle')}}
-                </span>
-                <ul class="console-ul-list" slot="content">
-                    <li @click="startDebug('/bin/sh')"><span>{{$t('pipeline.viaSh')}}</span></li>
-                    <li @click="startDebug('/bin/bash')"><span>{{$t('pipeline.viaBash')}}</span></li>
-                </ul>
-            </bk-popover>
-        </section>
+        <!-- <section v-if="showDebugBtn" class="web-console" :style="{ right: executeCount > 1 ? '390px' : '280px' }">
+            <span>
+                {{$t('pipeline.webConsle')}}
+            </span>
+        </section> -->
         <job-log :plugin-list="pluginList"
             :build-id="$route.params.buildId"
             :down-load-link="downLoadJobLink"
