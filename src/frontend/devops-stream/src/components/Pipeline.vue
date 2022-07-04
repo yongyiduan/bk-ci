@@ -29,7 +29,7 @@
         </bk-dialog>
         <template v-if="editingElementPos != null">
             <plugin-log
-                v-if="Number.isInteger(editingElementPos.pluginIndex)"
+                v-if="Number.isInteger(editingElementPos.pluginIndex) || Number.isInteger(editingElementPos.matrixIndex)"
                 v-bind="editingElementPos"
                 @close="closeLog"
             />
