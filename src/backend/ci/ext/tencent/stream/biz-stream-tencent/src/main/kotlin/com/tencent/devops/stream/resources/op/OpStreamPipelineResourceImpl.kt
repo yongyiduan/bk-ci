@@ -104,6 +104,6 @@ class OpStreamPipelineResourceImpl @Autowired constructor(
             pipelineId = pipelineId,
             maxConRunningQueueSize = maxConRunningQueueSize
         )
-        return Result("add while list pipelineSetting success,maxConRunningQueueSize:$maxConRunningQueueSize");
+        return Result("add while list pipelineSetting success,maxConRunningQueueSize:$maxConRunningQueueSize")
     }
 }
