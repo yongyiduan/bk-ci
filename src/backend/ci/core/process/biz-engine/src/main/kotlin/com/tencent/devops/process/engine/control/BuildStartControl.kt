@@ -249,7 +249,7 @@ class BuildStartControl @Autowired constructor(
     ): Boolean {
         var checkStart = true
         val concurrencyGroup = buildInfo.concurrencyGroup ?: return true
-        ConcurrencyGroupLock(redisOperation, concurrencyGroup).use { groupLock ->
+        ConcurrencyGroupLock(redisOperation, projectId, concurrencyGroup).use { groupLock ->
             groupLock.lock()
             if (buildInfo.status != BuildStatus.QUEUE_CACHE) {
                 // 只有最新进来排队的构建才能QUEUE -> QUEUE_CACHE
