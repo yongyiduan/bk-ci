@@ -24,44 +24,16 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.tencent.devops.notify.pojo
 
-import com.tencent.devops.common.api.util.AESUtil
-import org.slf4j.LoggerFactory
+package com.tencent.devops.stream.trigger.pojo
 
-/**
- * TOF4秘钥信息
- */
-class TOF4SecurityInfo {
-    var enable: Boolean = false
-    var token: String = ""
-    var passId: String = ""
+open class YamlContent(
+    open val ref: String,
+    open val content: String
+)
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(TOF4SecurityInfo::class.java)
-
-        fun get(message: BaseMessage, encryptKey: String?): TOF4SecurityInfo {
-            if (message.v2ExtInfo.isNullOrBlank()) {
-                return TOF4SecurityInfo()
-            }
-
-            if (encryptKey.isNullOrBlank()) {
-                logger.error("TOF error, decrypt notify v2 extension, encrypt key can not be empty")
-                return TOF4SecurityInfo()
-            }
-
-            return try {
-                val securityArr = AESUtil.decrypt(encryptKey!!, message.v2ExtInfo)
-                    .split(":")
-                TOF4SecurityInfo().apply {
-                    enable = true
-                    passId = securityArr[0]
-                    token = securityArr[1]
-                }
-            } catch (e: Exception) {
-                logger.error("TOF error, decrypt notify v2 extension info fail", e)
-                TOF4SecurityInfo()
-            }
-        }
-    }
-}
+data class MrYamlInfo(
+    override val ref: String,
+    override val content: String,
+    val blobId: String?
+) : YamlContent(ref, content)
