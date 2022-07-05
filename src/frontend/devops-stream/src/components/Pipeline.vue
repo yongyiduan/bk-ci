@@ -55,14 +55,15 @@
             stageReviewPanel,
             pluginLog,
             jobLog
-
         },
+
         props: {
             pipeline: {
                 type: Object,
                 required: true
             }
         },
+
         data () {
             return {
                 showRetryStageDialog: false,
@@ -73,6 +74,7 @@
                 firstIn: true
             }
         },
+
         computed: {
             ...mapState(['projectId', 'permission', 'curPipeline', 'user']),
             userName () {
@@ -84,11 +86,9 @@
                 if (val.stages?.length > 0 && this.firstIn) {
                     this.firstIn = false
                     this.autoOpenReview()
+                    this.autoOpenLog()
                 }
             }
-        },
-        mounted () {
-            this.autoOpenLog()
         },
         methods: {
             ...mapActions([
