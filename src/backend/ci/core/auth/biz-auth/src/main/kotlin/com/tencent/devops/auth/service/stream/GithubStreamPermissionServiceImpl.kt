@@ -66,14 +66,13 @@ class GithubStreamPermissionServiceImpl constructor(
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .build<String, Boolean?>()
 
-    override fun isPublicProject(projectCode: String): Boolean {
+    override fun isPublicProject(projectCode: String, userId: String?): Boolean {
         if (publicProjectCache.getIfPresent(projectCode) != null) {
             return publicProjectCache.getIfPresent(projectCode)!!
         }
 
-        val authUser = getProjectAuthUser(projectCode)
         val publicProject = client.get(ServiceGithubPermissionResource::class)
-            .isPublicProject(authUser, projectCode).data
+            .isPublicProject(userId!!, projectCode).data
         publicProjectCache.put(projectCode, publicProject!!)
         return publicProject
     }
