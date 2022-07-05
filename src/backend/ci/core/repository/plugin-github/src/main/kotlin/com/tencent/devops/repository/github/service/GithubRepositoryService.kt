@@ -40,6 +40,7 @@ import com.tencent.devops.common.sdk.github.request.ListRepositoriesRequest
 import com.tencent.devops.common.sdk.github.request.ListRepositoryCollaboratorsRequest
 import com.tencent.devops.common.sdk.github.request.SearchRepositoriesRequest
 import com.tencent.devops.common.sdk.github.response.CreateOrUpdateFileContentsResponse
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -111,9 +112,14 @@ class GithubRepositoryService @Autowired constructor(
         token: String,
         request: SearchRepositoriesRequest
     ): List<GithubRepo> {
+        logger.info("searchRepositories: $request")
         return defaultGithubClient.execute(
             oauthToken = token,
             request = request
         ).items
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(GithubRepositoryService::class.java)
     }
 }

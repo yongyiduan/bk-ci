@@ -45,9 +45,8 @@ data class SearchRepositoriesRequest(
     @JsonProperty("per_page")
     var perPage: Int = 30,
     var page: Int = 1,
+    val terms: MutableList<String> = mutableListOf()
 ) : GithubRequest<SearchRepositoriesResponse>() {
-
-    private val terms = mutableListOf<String>()
 
     val q: String
         get() = terms.joinToString(" ")

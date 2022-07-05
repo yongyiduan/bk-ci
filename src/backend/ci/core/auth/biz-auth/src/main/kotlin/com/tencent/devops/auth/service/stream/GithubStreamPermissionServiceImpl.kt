@@ -103,7 +103,7 @@ class GithubStreamPermissionServiceImpl constructor(
             return projectAuthUserCache.getIfPresent(projectCode)!!
         }
         // TODO: userID如何获取
-        val projectInfo = client.get(ServiceStreamBasicSettingResource::class).getStreamConf("", projectCode).data
+        val projectInfo = client.get(ServiceStreamBasicSettingResource::class).getStreamConf(projectCode).data
         if (projectInfo == null) {
             logger.warn("$projectCode not exist")
             throw ErrorCodeException(
