@@ -148,6 +148,7 @@ import com.tencent.devops.process.utils.PIPELINE_BUILD_REMARK
 import com.tencent.devops.process.utils.PIPELINE_BUILD_URL
 import com.tencent.devops.process.utils.PIPELINE_RETRY_BUILD_ID
 import com.tencent.devops.process.utils.PIPELINE_RETRY_COUNT
+import com.tencent.devops.process.utils.PIPELINE_START_TASK_ID
 import com.tencent.devops.process.utils.PIPELINE_START_TYPE
 import com.tencent.devops.process.utils.PIPELINE_VERSION
 import org.jooq.DSLContext
@@ -706,8 +707,7 @@ class PipelineRuntimeService @Autowired constructor(
         setting: PipelineSetting?,
         buildNo: Int? = null,
         buildNumRule: String? = null,
-        acquire: Boolean? = false,
-        sourceIp: String? = null
+        acquire: Boolean? = false
     ): String {
         val now = LocalDateTime.now()
         val startParamMap = pipelineParamMap.values.associate { it.key to it.value.toString() }
@@ -720,7 +720,7 @@ class PipelineRuntimeService @Autowired constructor(
             projectId, pipelineId, buildId, null, null, false
         )
         val projectName = projectCacheService.getProjectName(projectId) ?: ""
-        val context = StartBuildContext.init(projectId, pipelineId, buildId, startParamMap, sourceIp)
+        val context = StartBuildContext.init(projectId, pipelineId, buildId, startParamMap)
 
         val updateTaskExistsRecord: MutableList<TPipelineBuildTaskRecord> = mutableListOf()
         val defaultStageTagId by lazy { stageTagService.getDefaultStageTag().data?.id }
@@ -925,6 +925,8 @@ class PipelineRuntimeService @Autowired constructor(
                         originStartParams.add(buildParameters)
                     }
                 }
+                pipelineParamMap[PIPELINE_START_TASK_ID] =
+                    BuildParameters(PIPELINE_START_TASK_ID, context.firstTaskId, readOnly = true)
 
                 if (buildHistoryRecord != null) {
                     if (context.actionType.isRetry() && context.retryStartTaskId.isNullOrBlank()) {
