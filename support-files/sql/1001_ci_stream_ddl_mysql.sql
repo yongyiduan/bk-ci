@@ -186,7 +186,6 @@ CREATE TABLE IF NOT EXISTS `T_GIT_USER_MESSAGE` (
 -- ----------------------------
 -- Table structure for T_GIT_WEB_STARTER_YAML
 -- ----------------------------
-
 CREATE TABLE IF NOT EXISTS `T_GIT_WEB_STARTER_YAML` (
     `NAME` varchar(32) NOT NULL,
     `DESCRIPTION` text,
