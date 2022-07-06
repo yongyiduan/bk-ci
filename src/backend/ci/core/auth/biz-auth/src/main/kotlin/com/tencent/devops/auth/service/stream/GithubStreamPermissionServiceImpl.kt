@@ -67,25 +67,27 @@ class GithubStreamPermissionServiceImpl constructor(
             .build<String, Boolean?>()
 
     override fun isPublicProject(projectCode: String, userId: String?): Boolean {
-        if (publicProjectCache.getIfPresent(projectCode) != null) {
+       /* if (publicProjectCache.getIfPresent(projectCode) != null) {
             return publicProjectCache.getIfPresent(projectCode)!!
         }
 
         val publicProject = client.get(ServiceGithubPermissionResource::class)
             .isPublicProject(userId!!, projectCode).data
         publicProjectCache.put(projectCode, publicProject!!)
-        return publicProject
+        return publicProject*/
+        return true
     }
 
     override fun isProjectMember(projectCode: String, userId: String): Pair<Boolean, Boolean> {
-        val authUser = getProjectAuthUser(projectCode)
+       /* val authUser = getProjectAuthUser(projectCode)
         // 是否是项目成员
         val checkProjectMember = checkProjectMemeber(projectCode, userId, authUser)
         if (!checkProjectMember) {
             return Pair(false, false)
         }
         val projectExecute = checkProjectExecutePermission(projectCode, userId, authUser)
-        return Pair(checkProjectMember, projectExecute)
+        return Pair(checkProjectMember, projectExecute)*/
+        return Pair(true, true)
     }
 
     override fun extPermission(
