@@ -250,7 +250,7 @@ class StreamGithubTransferService @Autowired constructor(
                     content = Base64.getEncoder().encodeToString(content.toByteArray()),
                     path = filePath,
                     branch = branch
-                ).also { logger.info("createNewFile|request=$it") }
+                ).also { logger.info("createNewFile|userId=$userId|gitProjectId=$gitProjectId|request=$streamCreateFile|") }
             },
             userId = userId
         )
