@@ -15,12 +15,13 @@
                             name="pipelineName"
                             id="pipelineName"
                             v-model.trim="currentFilter.filterByPipelineName"
+                            @keyup.enter="filterCommit"
                             :placeholder="$t('newlist.filterByNameTips')"
                             :class="{
                                 'is-danger': errors.has('pipelineName'),
                                 'input-text': true
                             }"
-                            @keyup.enter="filterCommit"
+
                         />
                         <p :class="errors.has('pipelineName') ? 'error-tips' : 'normal-tips'">{{errors.first("pipelineName")}}</p>
                     </div>
