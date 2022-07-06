@@ -41,6 +41,7 @@ import com.tencent.devops.process.yaml.v2.models.Resources
 import com.tencent.devops.process.yaml.v2.models.job.Job
 import com.tencent.devops.stream.dao.GitCIServicesConfDao
 import com.tencent.devops.stream.dao.StreamBasicSettingDao
+import com.tencent.devops.stream.dao.StreamPipelineSetting
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Primary
@@ -51,9 +52,10 @@ import org.springframework.stereotype.Component
 class StreamTXInnerModelCreatorImpl @Autowired constructor(
     private val dslContext: DSLContext,
     private val streamBasicSettingDao: StreamBasicSettingDao,
-    private val gitServicesConfDao: GitCIServicesConfDao
+    private val gitServicesConfDao: GitCIServicesConfDao,
+    private val streamPipelineSetting: StreamPipelineSetting
 ) : TXInnerModelCreator, InnerModelCreatorImpl(
-    dslContext, streamBasicSettingDao
+    dslContext, streamBasicSettingDao, streamPipelineSetting
 ) {
 
     override fun getServiceJobDevCloudInput(

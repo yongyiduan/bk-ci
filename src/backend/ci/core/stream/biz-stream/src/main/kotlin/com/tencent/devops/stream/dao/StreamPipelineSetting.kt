@@ -25,36 +25,43 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.process.yaml.modelCreate
+package com.tencent.devops.stream.dao
 
-import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.pipeline.pojo.BuildFormProperty
-import com.tencent.devops.process.pojo.setting.PipelineModelAndSetting
-import com.tencent.devops.process.yaml.modelCreate.inner.InnerModelCreator
-import com.tencent.devops.process.yaml.modelCreate.inner.ModelCreateEvent
-import com.tencent.devops.process.yaml.v2.models.ScriptBuildYaml
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Primary
-import org.springframework.stereotype.Component
+import com.tencent.devops.model.stream.tables.TStreamPipelineSetting
+import com.tencent.devops.model.stream.tables.records.TStreamPipelineSettingRecord
+import org.jooq.DSLContext
+import org.springframework.stereotype.Repository
 
-@Primary
-@Component
-class TXModelCreate @Autowired constructor(
-    client: Client,
-    modelStage: ModelStage,
-    innerModelCreator: InnerModelCreator
-) : ModelCreate(
-    client, modelStage, innerModelCreator
-) {
-    override fun createPipelineModel(
-        modelName: String,
-        event: ModelCreateEvent,
-        yaml: ScriptBuildYaml,
-        pipelineParams: List<BuildFormProperty>
-    ): PipelineModelAndSetting {
-        // 预安装插件市场的插件
-        modelStage.inner?.preInstallMarketAtom(client, event)
+@Repository
+class StreamPipelineSetting {
 
-        return super.createPipelineModel(modelName, event, yaml, pipelineParams)
+    fun saveOrUpdate(
+        dslContext: DSLContext,
+        projectId: String,
+        pipelineId: String,
+        maxConRunningQueueSize: Int
+    ) {
+        with(TStreamPipelineSetting.T_STREAM_PIPELINE_SETTING) {
+            dslContext.insertInto(
+                this,
+                PROJECT_ID,
+                PIPELINE_ID,
+                MAX_CON_RUNNING_QUEUE_SIZE
+            ).values(
+                projectId,
+                pipelineId,
+                maxConRunningQueueSize
+            ).onDuplicateKeyUpdate().set(MAX_CON_RUNNING_QUEUE_SIZE, maxConRunningQueueSize).execute()
+        }
+    }
+
+    fun getPipeLineSetting(
+        dslContext: DSLContext,
+        projectId: String,
+        pipelineId: String
+    ): TStreamPipelineSettingRecord? {
+        return with(TStreamPipelineSetting.T_STREAM_PIPELINE_SETTING) {
+            dslContext.selectFrom(this).where(PROJECT_ID.eq(projectId)).and(PIPELINE_ID.eq(pipelineId)).fetchAny()
+        }
     }
 }
