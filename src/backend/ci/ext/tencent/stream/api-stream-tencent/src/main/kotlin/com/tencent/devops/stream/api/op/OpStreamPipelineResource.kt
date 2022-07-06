@@ -71,7 +71,7 @@ interface OpStreamPipelineResource {
         endTime: Long?
     ): Result<Int>
 
-    @ApiOperation("删除在Stream中已经删除但未被删除的流水线")
+    @ApiOperation("新增或者更新蓝盾测白名单配置")
     @POST
     @Path("/addPipelineSetting")
     fun addPipelineSetting(
