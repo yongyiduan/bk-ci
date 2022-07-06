@@ -112,7 +112,7 @@ class StreamGithubTransferService @Autowired constructor(
             StreamGitProjectInfoWithProject(
                 gitProjectId = it.id,
                 name = it.name,
-                homepage = it.homepage,
+                homepage = it.htmlUrl,
                 gitHttpUrl = it.cloneUrl,
                 gitHttpsUrl = it.cloneUrl,
                 gitSshUrl = it.sshUrl,
