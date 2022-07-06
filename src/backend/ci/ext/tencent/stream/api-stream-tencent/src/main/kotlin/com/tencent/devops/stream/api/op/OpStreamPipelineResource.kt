@@ -70,4 +70,19 @@ interface OpStreamPipelineResource {
         @QueryParam("endTime")
         endTime: Long?
     ): Result<Int>
+
+    @ApiOperation("删除在Stream中已经删除但未被删除的流水线")
+    @POST
+    @Path("/addPipelineSetting")
+    fun addPipelineSetting(
+        @ApiParam(value = "蓝盾项目ID", required = true)
+        @QueryParam("projectId")
+        projectId: String,
+        @ApiParam(value = "流水线ID", required = true)
+        @QueryParam("pipelineId")
+        pipelineId: String,
+        @ApiParam(value = "流水线设置-最大并发数量-默认值", required = true)
+        @QueryParam("maxConRunningQueueSize")
+        maxConRunningQueueSize: Int
+    ): Result<String>
 }
