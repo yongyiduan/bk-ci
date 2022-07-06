@@ -5,6 +5,7 @@
         :model="pipelineSetting"
         :rules="formRule"
         form-type="vertical"
+        :label-width="300"
     >
         <bk-form-item :label="$t('settings.parallelSetting')">
             <bk-radio-group :value="pipelineSetting.runLockType" @change="handleLockTypeChange">
@@ -171,6 +172,9 @@
 
 <style lang="scss">
     .bkdevops-running-lock-setting-tab {
+        .bk-label {
+            font-weight: 900;
+        }
         .single-lock-sub-form {
             margin: 0 0 10px 20px;
         }

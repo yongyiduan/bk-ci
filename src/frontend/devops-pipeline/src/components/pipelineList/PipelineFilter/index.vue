@@ -10,15 +10,19 @@
                 <div>
                     <div class="form-group">
                         <label for="pipelineName" class="filter-label">{{ $t('pipelineName') }}：</label>
-                        <input type="text" class="bk-form-input input-text" name="pipelineName" id="pipelineName" :placeholder="$t('newlist.filterByNameTips')"
+                        <bk-input
                             v-validate.initial="'max:40'"
+                            name="pipelineName"
+                            id="pipelineName"
+                            v-model.trim="currentFilter.filterByPipelineName"
+                            :placeholder="$t('newlist.filterByNameTips')"
                             :class="{
-                                'is-danger': errors.has('pipelineName')
+                                'is-danger': errors.has('pipelineName'),
+                                'input-text': true
                             }"
-                            v-model="currentFilter.filterByPipelineName"
                             @keyup.enter="filterCommit">
-                        <p :class="errors.has('pipelineName') ? 'error-tips' : 'normal-tips'">{{errors.first("pipelineName")}}</p>
-                    </div>
+                            <p :class="errors.has('pipelineName') ? 'error-tips' : 'normal-tips'">{{errors.first("pipelineName")}}</p>
+                        </bk-input></div>
                     <div class="form-group">
                         <form-field :label="$t('creator')">
                             <bk-member-selector v-model="currentFilter.filterByCreator">
@@ -130,7 +134,7 @@
                 })
                 labelIds = labels.join(',')
                 this.isDisabled = true
-                
+
                 await this.$emit('filter', {
                     projectId: this.projectId,
                     filterByLabels: labelIds,
