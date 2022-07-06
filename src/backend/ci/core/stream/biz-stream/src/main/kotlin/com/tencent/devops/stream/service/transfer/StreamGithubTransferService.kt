@@ -59,6 +59,7 @@ import com.tencent.devops.stream.pojo.enums.StreamProjectsOrder
 import com.tencent.devops.stream.pojo.enums.StreamSortAscOrDesc
 import com.tencent.devops.stream.service.StreamGitTransferService
 import org.jooq.DSLContext
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import java.util.Base64
@@ -68,6 +69,9 @@ class StreamGithubTransferService @Autowired constructor(
     private val client: Client,
     private val streamBasicSettingDao: StreamBasicSettingDao
 ) : StreamGitTransferService {
+    companion object {
+        private val logger = LoggerFactory.getLogger(StreamGithubTransferService::class.java)
+    }
 
     // github 组织白名单列表
     @Value("\${github.orgWhite:}")
@@ -246,7 +250,7 @@ class StreamGithubTransferService @Autowired constructor(
                     content = Base64.getEncoder().encodeToString(content.toByteArray()),
                     path = filePath,
                     branch = branch
-                )
+                ).also { logger.info("createNewFile|request=$it") }
             },
             userId = userId
         )
