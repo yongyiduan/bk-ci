@@ -20,9 +20,10 @@
                                 'is-danger': errors.has('pipelineName'),
                                 'input-text': true
                             }"
-                            @keyup.enter="filterCommit">
-                            <p :class="errors.has('pipelineName') ? 'error-tips' : 'normal-tips'">{{errors.first("pipelineName")}}</p>
-                        </bk-input></div>
+                            @keyup.enter="filterCommit"
+                        />
+                        <p :class="errors.has('pipelineName') ? 'error-tips' : 'normal-tips'">{{errors.first("pipelineName")}}</p>
+                    </div>
                     <div class="form-group">
                         <form-field :label="$t('creator')">
                             <bk-member-selector v-model="currentFilter.filterByCreator">
