@@ -46,7 +46,7 @@ class TXModelCreate @Autowired(required = false) constructor(
     inner: TXInnerModelCreator?
 ) : ModelCreate(
     client, modelStage, inner
-){
+) {
     override fun createPipelineModel(
         modelName: String,
         event: ModelCreateEvent,
