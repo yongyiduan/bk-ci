@@ -360,7 +360,7 @@ class GithubApiService @Autowired constructor(
     }
 
     override fun addCommitCheck(request: CommitCheckRequest, retry: ApiRequestRetryInfo) {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
     }
 
     // 以下非StreamGitApiService接口实现
