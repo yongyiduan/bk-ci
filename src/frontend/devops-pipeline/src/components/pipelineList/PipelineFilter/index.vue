@@ -14,14 +14,14 @@
                             v-validate.initial="'max:40'"
                             name="pipelineName"
                             id="pipelineName"
-                            v-model.trim="currentFilter.filterByPipelineName"
-                            @enter="filterCommit"
                             :placeholder="$t('newlist.filterByNameTips')"
                             :class="{
                                 'is-danger': errors.has('pipelineName'),
                                 'input-text': true
                             }"
                             clearable
+                            v-model.trim="currentFilter.filterByPipelineName"
+                            @enter="filterCommit"
                         />
                         <p :class="errors.has('pipelineName') ? 'error-tips' : 'normal-tips'">{{errors.first("pipelineName")}}</p>
                     </div>
