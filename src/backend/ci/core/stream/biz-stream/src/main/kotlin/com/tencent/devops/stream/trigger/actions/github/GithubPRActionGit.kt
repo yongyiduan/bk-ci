@@ -30,17 +30,13 @@ package com.tencent.devops.stream.trigger.actions.github
 import com.tencent.devops.common.api.enums.ScmType
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.webhook.enums.code.github.GithubPrEventAction
-import com.tencent.devops.common.webhook.enums.code.tgit.TGitMergeActionKind
-import com.tencent.devops.common.webhook.enums.code.tgit.TGitMergeExtensionActionKind
-import com.tencent.devops.common.webhook.pojo.code.git.GitMergeRequestEvent
-import com.tencent.devops.common.webhook.pojo.code.git.isMrForkEvent
-import com.tencent.devops.common.webhook.pojo.code.git.isMrMergeEvent
 import com.tencent.devops.common.webhook.pojo.code.github.GithubPullRequestEvent
 import com.tencent.devops.common.webhook.pojo.code.github.isPrForkEvent
 import com.tencent.devops.common.webhook.pojo.code.github.isPrForkNotMergeEvent
 import com.tencent.devops.process.yaml.v2.enums.StreamMrEventAction
 import com.tencent.devops.process.yaml.v2.enums.StreamObjectKind
 import com.tencent.devops.process.yaml.v2.models.on.TriggerOn
+import com.tencent.devops.stream.dao.StreamBasicSettingDao
 import com.tencent.devops.stream.pojo.GitRequestEvent
 import com.tencent.devops.stream.pojo.enums.TriggerReason
 import com.tencent.devops.stream.trigger.actions.BaseAction
@@ -51,8 +47,8 @@ import com.tencent.devops.stream.trigger.actions.data.ActionMetaData
 import com.tencent.devops.stream.trigger.actions.data.EventCommonData
 import com.tencent.devops.stream.trigger.actions.data.EventCommonDataCommit
 import com.tencent.devops.stream.trigger.actions.data.StreamTriggerPipeline
+import com.tencent.devops.stream.trigger.actions.data.StreamTriggerSetting
 import com.tencent.devops.stream.trigger.actions.streamActions.StreamMrAction
-import com.tencent.devops.stream.trigger.actions.tgit.TGitMrActionGit
 import com.tencent.devops.stream.trigger.exception.CommitCheck
 import com.tencent.devops.stream.trigger.exception.StreamTriggerException
 import com.tencent.devops.stream.trigger.git.pojo.ApiRequestRetryInfo
@@ -74,6 +70,7 @@ import com.tencent.devops.stream.trigger.pojo.enums.StreamCommitCheckState
 import com.tencent.devops.stream.trigger.service.GitCheckService
 import com.tencent.devops.stream.trigger.service.StreamTriggerTokenService
 import com.tencent.devops.stream.util.StreamCommonUtils
+import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import java.util.Base64
 
@@ -83,7 +80,9 @@ class GithubPRActionGit(
     private val pipelineDelete: PipelineDelete,
     private val gitCheckService: GitCheckService,
     private val streamTriggerTokenService: StreamTriggerTokenService,
-    private val streamTriggerCache: StreamTriggerCache
+    private val streamTriggerCache: StreamTriggerCache,
+    private val basicSettingDao: StreamBasicSettingDao,
+    private val dslContext: DSLContext
 ) : GithubActionGit(apiService, gitCheckService, streamTriggerCache), StreamMrAction {
 
     companion object {
@@ -107,6 +106,8 @@ class GithubPRActionGit(
         )
     }
 
+    override fun getMrId() = event().pullRequest.number.toLong()
+
     override val api: GithubApiService
         get() = apiService
 
@@ -122,6 +123,18 @@ class GithubPRActionGit(
     }
 
     override fun init(): BaseAction? {
+        if (data.isSettingInitialized) {
+            return initCommonData()
+        }
+        val setting = basicSettingDao.getSetting(dslContext, event().pullRequest.base.repo.id.toLong())
+        if (null == setting || !setting.enableCi) {
+            logger.info(
+                "git ci is not enabled, but it has repo trigger , " +
+                    "git project id: ${event().pullRequest.base.repo.id.toLong()}"
+            )
+            return null
+        }
+        data.setting = StreamTriggerSetting(setting)
         return initCommonData()
     }
 
@@ -131,7 +144,7 @@ class GithubPRActionGit(
             cred = if (event.isPrForkEvent()) {
                 getForkGitCred()
             } else {
-                getGitCred()
+                GithubCred(event.sender.login)
             }, gitProjectId = getGitProjectIdOrName(event.pullRequest.head.repo.id.toString()),
             sha = event.pullRequest.head.sha,
             retry = ApiRequestRetryInfo(retry = true)
@@ -197,7 +210,7 @@ class GithubPRActionGit(
         val gitMrChangeInfo = apiService.getMrChangeInfo(
             cred = this.getGitCred(),
             gitProjectId = getGitProjectIdOrName(data.eventCommon.gitProjectId),
-            mrId = event().pullRequest.id.toString(),
+            mrId = getMrId().toString(),
             retry = ApiRequestRetryInfo(retry = true)
         )
         gitMrChangeInfo?.files?.forEach { file ->
@@ -269,7 +282,7 @@ class GithubPRActionGit(
             ref = event.pullRequest.base.ref,
             retry = ApiRequestRetryInfo(true)
         )
-
+        logger.debug("targetFile=$targetFile")
         if (!getChangeSet()!!.contains(fileName)) {
             return if (targetFile?.content.isNullOrBlank()) {
                 logger.warn(
@@ -281,7 +294,7 @@ class GithubPRActionGit(
                     event.pullRequest.base.ref, ""
                 )
             } else {
-                val c = String(Base64.getDecoder().decode(targetFile!!.content))
+                val c = targetFile!!.getDecodedContentAsString()
                 if (c.isBlank()) {
                     logger.warn(
                         "${data.getGitProjectId()} mr request ${data.context.requestEventId}" +
@@ -313,7 +326,7 @@ class GithubPRActionGit(
             )
             Pair(event.pullRequest.head.sha, "")
         } else {
-            val c = String(Base64.getDecoder().decode(sourceFile!!.content))
+            val c = sourceFile!!.getDecodedContentAsString()
             if (c.isBlank()) {
                 logger.warn(
                     "${data.getGitProjectId()} mr request ${data.context.requestEventId}" +
@@ -369,10 +382,10 @@ class GithubPRActionGit(
         // 获取mr请求的变更文件列表，用来给后面判断
         val changeSet = mutableSetOf<String>()
         apiService.getMrChangeInfo(
-            cred = (this.data.context.repoTrigger?.repoTriggerCred ?: getGitCred()) as TGitCred,
+            cred = (this.data.context.repoTrigger?.repoTriggerCred ?: getGitCred()) as GithubCred,
             // 获取mr信息的project Id和事件强关联，不一定是流水线所处库
             gitProjectId = getGitProjectIdOrName(data.eventCommon.gitProjectId),
-            mrId = event().pullRequest.id.toString(),
+            mrId = getMrId().toString(),
             retry = ApiRequestRetryInfo(true)
         )?.files?.forEach {
             if (it.deletedFile) {
@@ -398,6 +411,7 @@ class GithubPRActionGit(
         retry: ApiRequestRetryInfo
     ): GithubFileInfo? {
         return try {
+            logger.info("getFileInfo|[$gitProjectId][$fileName][$ref]")
             apiService.getFileInfo(
                 cred = cred,
                 gitProjectId = gitProjectId,

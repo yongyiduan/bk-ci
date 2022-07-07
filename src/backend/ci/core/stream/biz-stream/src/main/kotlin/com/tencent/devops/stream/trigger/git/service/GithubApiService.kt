@@ -230,12 +230,11 @@ class GithubApiService @Autowired constructor(
             log = "$gitProjectId get $path file tree error",
             apiErrorCode = ErrorCodeEnum.GET_GIT_FILE_TREE_ERROR
         ) {
-            // TODO 无法使用path搜索
             client.get(ServiceGithubDatabaseResource::class).getTree(
                 userId = cred.getUserId(),
                 request = GetTreeRequest(
                     id = gitProjectId.toLong(),
-                    treeSha = ref!!,
+                    treeSha = "${ref!!}:$path",
                     recursive = recursive.toString()
                 )
             )
@@ -361,7 +360,7 @@ class GithubApiService @Autowired constructor(
     }
 
     override fun addCommitCheck(request: CommitCheckRequest, retry: ApiRequestRetryInfo) {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
     }
 
     // 以下非StreamGitApiService接口实现
