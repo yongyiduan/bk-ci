@@ -46,9 +46,11 @@ import com.tencent.devops.ticket.service.StreamCredentialPermissionServiceImpl
 import com.tencent.devops.ticket.service.V3CertPermissionService
 import com.tencent.devops.ticket.service.V3CredentialPermissionService
 import org.jooq.DSLContext
+import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.boot.autoconfigure.AutoConfigureOrder
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
+import org.springframework.boot.autoconfigure.jersey.JerseyAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
@@ -56,7 +58,7 @@ import org.springframework.core.Ordered
 @Suppress("ALL")
 @Configuration
 @ConditionalOnWebApplication
-@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
+@AutoConfigureBefore(JerseyAutoConfiguration::class)
 class TicketPermConfiguration {
 
     @Bean
