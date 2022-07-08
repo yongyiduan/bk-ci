@@ -33,7 +33,6 @@ import com.tencent.devops.common.auth.code.TicketAuthServiceCode
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.client.ClientTokenService
 import com.tencent.devops.common.redis.RedisOperation
-import com.tencent.devops.common.web.WebAutoConfiguration
 import com.tencent.devops.ticket.dao.CertDao
 import com.tencent.devops.ticket.dao.CredentialDao
 import com.tencent.devops.ticket.service.BluekingCertPermissionService
@@ -47,16 +46,17 @@ import com.tencent.devops.ticket.service.StreamCredentialPermissionServiceImpl
 import com.tencent.devops.ticket.service.V3CertPermissionService
 import com.tencent.devops.ticket.service.V3CredentialPermissionService
 import org.jooq.DSLContext
-import org.springframework.boot.autoconfigure.AutoConfigureBefore
+import org.springframework.boot.autoconfigure.AutoConfigureOrder
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.Ordered
 
 @Suppress("ALL")
 @Configuration
 @ConditionalOnWebApplication
-@AutoConfigureBefore(WebAutoConfiguration::class)
+@AutoConfigureOrder(Ordered.LOWEST_PRECEDENCE)
 class TicketPermConfiguration {
 
     @Bean
@@ -99,8 +99,8 @@ class TicketPermConfiguration {
         authResourceApi = authResourceApi,
         authPermissionApi = authPermissionApi,
         ticketAuthServiceCode = ticketAuthServiceCode,
-        client = client,
-        redisOperation = redisOperation
+            client = client,
+            redisOperation = redisOperation
     )
 
     @Bean
@@ -119,8 +119,8 @@ class TicketPermConfiguration {
         authResourceApi = authResourceApi,
         authPermissionApi = authPermissionApi,
         ticketAuthServiceCode = ticketAuthServiceCode,
-        client = client,
-        redisOperation = redisOperation
+            client = client,
+            redisOperation = redisOperation
     )
 
     @Bean
