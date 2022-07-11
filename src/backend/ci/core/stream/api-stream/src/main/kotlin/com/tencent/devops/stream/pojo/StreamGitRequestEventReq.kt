@@ -176,7 +176,7 @@ data class StreamGitRequestEventReq(
             }
             is GithubPushEvent -> {
                 val event = gitRequestEvent.gitEvent as GithubPushEvent
-                when {
+                when{
                     event.ref.startsWith("refs/heads/") -> {
                         if (deleteBranch) {
                             buildTitle = "Branch $branch deleted by $userId"
