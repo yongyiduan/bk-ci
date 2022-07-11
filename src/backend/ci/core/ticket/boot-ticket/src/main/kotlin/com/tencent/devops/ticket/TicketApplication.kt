@@ -32,7 +32,7 @@ import com.tencent.devops.common.service.MicroServiceApplication
 import org.springframework.context.annotation.ComponentScan
 
 @MicroService
-@ComponentScan("com.tencent.devops.ticket")
+@ComponentScan("com.tencent.devops.ticket.config")
 class TicketApplication
 
 fun main(args: Array<String>) {
