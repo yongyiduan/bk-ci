@@ -93,6 +93,8 @@ class TGitMrActionGit(
     override val mrIId: String
         get() = event().object_attributes.iid.toString()
 
+    override fun checkMrForkAction() = event().isMrForkEvent()
+
     override fun addMrComment(body: MrCommentBody) {
         apiService.addMrComment(
             cred = getGitCred(),
@@ -265,7 +267,7 @@ class TGitMrActionGit(
         if (event.isMrMergeEvent()) {
             return Pair(
                 data.eventCommon.branch,
-                    api.getFileContent(
+                api.getFileContent(
                     cred = this.getGitCred(),
                     gitProjectId = getGitProjectIdOrName(),
                     fileName = fileName,

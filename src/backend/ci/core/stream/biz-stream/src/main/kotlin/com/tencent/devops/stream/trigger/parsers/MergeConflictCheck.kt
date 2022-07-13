@@ -77,6 +77,7 @@ class MergeConflictCheck @Autowired constructor(
         path2PipelineExists: Map<String, StreamTriggerPipeline>
     ): Boolean {
         val projectId = action.data.eventCommon.gitProjectId
+        val mrRequestId = action.event().object_attributes.id.toString()
 
         val mrInfo = action.api.getMrInfo(
             gitProjectId = action.getGitProjectIdOrName(projectId),
@@ -145,8 +146,7 @@ class MergeConflictCheck @Autowired constructor(
         var isFinish: Boolean
         var isTrigger: Boolean
         val projectId = action.data.eventCommon.gitProjectId
-        val event = action.event() as GitMergeRequestEvent
-        val mrRequestId = event.object_attributes.id.toString()
+        val mrRequestId = action.event().object_attributes.id.toString()
         val mrInfo = try {
             action.api.getMrInfo(
                 gitProjectId = action.getGitProjectIdOrName(projectId),
