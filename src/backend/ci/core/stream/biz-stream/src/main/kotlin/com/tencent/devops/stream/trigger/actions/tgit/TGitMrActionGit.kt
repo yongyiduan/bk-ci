@@ -267,7 +267,7 @@ class TGitMrActionGit(
         if (event.isMrMergeEvent()) {
             return Pair(
                 data.eventCommon.branch,
-                api.getFileContent(
+                    api.getFileContent(
                     cred = this.getGitCred(),
                     gitProjectId = getGitProjectIdOrName(),
                     fileName = fileName,
