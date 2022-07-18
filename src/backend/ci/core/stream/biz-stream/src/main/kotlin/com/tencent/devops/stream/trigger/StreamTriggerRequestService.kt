@@ -212,13 +212,12 @@ class StreamTriggerRequestService @Autowired constructor(
         action: BaseAction,
         path2PipelineExists: Map<String, StreamTriggerPipeline>
     ): Boolean {
-        logger.info("|${action.data.context.requestEventId}|matchAndTriggerPipeline|action|${action.format()}")
-
         action.data.context.defaultBranch = streamTriggerCache.getAndSaveRequestGitProjectInfo(
             gitProjectKey = action.data.getGitProjectId(),
             action = action,
             getProjectInfo = action.api::getGitProjectInfo
         )!!.defaultBranch
+        logger.info("|${action.data.context.requestEventId}|matchAndTriggerPipeline|action|${action.format()}")
 
         // 判断本次mr/push提交是否需要删除流水线, fork不用
         // 远程触发不存在删除流水线的情况

@@ -27,6 +27,8 @@
 
 package com.tencent.devops.stream.trigger.parsers
 
+import com.tencent.devops.common.api.constant.HTTP_404
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.redis.RedisLock
@@ -158,18 +160,27 @@ class PipelineDelete @Autowired constructor(
         gitProjectId: String,
         filePath: String
     ): Boolean {
-        val fileList = action.api.getFileTree(
-            cred = action.getGitCred(),
-            gitProjectId = action.getGitProjectIdOrName(gitProjectId),
-            path = if (filePath.contains("/")) {
-                filePath.substring(0, filePath.lastIndexOf("/"))
-            } else {
-                filePath
-            },
-            ref = action.data.context.defaultBranch,
-            recursive = true,
-            retry = ApiRequestRetryInfo(true)
-        )
+        val fileList = try {
+            action.api.getFileTree(
+                cred = action.getGitCred(),
+                gitProjectId = action.getGitProjectIdOrName(gitProjectId),
+                path = if (filePath.contains("/")) {
+                    filePath.substring(0, filePath.lastIndexOf("/"))
+                } else {
+                    filePath
+                },
+                ref = action.data.context.defaultBranch,
+                recursive = true,
+                retry = ApiRequestRetryInfo(true)
+            )
+        } catch (error: ErrorCodeException) {
+            if (error.statusCode == HTTP_404){
+                logger.info("checkFileEmpty get file 404, .ci/ may be delete")
+                listOf()
+            }else{
+                throw error
+            }
+        }
 
         fileList.forEach {
             if (it.name == filePath.substring(filePath.lastIndexOf("/") + 1)) {
