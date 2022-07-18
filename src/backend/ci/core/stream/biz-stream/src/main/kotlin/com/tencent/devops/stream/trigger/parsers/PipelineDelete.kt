@@ -27,9 +27,6 @@
 
 package com.tencent.devops.stream.trigger.parsers
 
-import com.tencent.devops.common.api.constant.HTTP_404
-import com.tencent.devops.common.api.exception.ErrorCodeException
-import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.redis.RedisLock
@@ -115,15 +112,16 @@ class PipelineDelete @Autowired constructor(
 
             repoTriggerEventService.deleteRepoTriggerEvent(pipelineId)
 
-            val isFileEmpty = if (null != filePath) {
-                checkFileEmpty(
-                    action,
-                    gitProjectId = gitProjectId,
-                    filePath = filePath
-                )
-            } else {
-                true
-            }
+            val isFileEmpty =
+                if (null != filePath && action.data.eventCommon.branch != action.data.context.defaultBranch) {
+                    checkFileEmpty(
+                        action,
+                        gitProjectId = gitProjectId,
+                        filePath = filePath
+                    )
+                } else {
+                    true
+                }
             if (isFileEmpty &&
                 !streamPipelineBranchService.hasBranchExist(gitProjectId.toLong(), pipelineId)
             ) {
@@ -174,13 +172,9 @@ class PipelineDelete @Autowired constructor(
                 recursive = true,
                 retry = ApiRequestRetryInfo(true)
             )
-        } catch (error: RemoteServiceException) {
-            if (error.httpStatus == HTTP_404){
-                logger.info("checkFileEmpty get file 404, .ci/ may be delete")
-                listOf()
-            }else{
-                throw error
-            }
+        } catch (ignored: Throwable) {
+            logger.info("checkFileEmpty get file error , .ci/ may be delete ${ignored.message}")
+            listOf()
         }
 
         fileList.forEach {
