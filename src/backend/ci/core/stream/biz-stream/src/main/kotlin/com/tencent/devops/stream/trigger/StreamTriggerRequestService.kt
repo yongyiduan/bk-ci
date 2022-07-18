@@ -214,17 +214,17 @@ class StreamTriggerRequestService @Autowired constructor(
     ): Boolean {
         logger.info("|${action.data.context.requestEventId}|matchAndTriggerPipeline|action|${action.format()}")
 
-        // 判断本次mr/push提交是否需要删除流水线, fork不用
-        // 远程触发不存在删除流水线的情况
-        if (action.data.context.repoTrigger == null) {
-            action.checkAndDeletePipeline(path2PipelineExists)
-        }
-
         action.data.context.defaultBranch = streamTriggerCache.getAndSaveRequestGitProjectInfo(
             gitProjectKey = action.data.getGitProjectId(),
             action = action,
             getProjectInfo = action.api::getGitProjectInfo
         )!!.defaultBranch
+
+        // 判断本次mr/push提交是否需要删除流水线, fork不用
+        // 远程触发不存在删除流水线的情况
+        if (action.data.context.repoTrigger == null) {
+            action.checkAndDeletePipeline(path2PipelineExists)
+        }
 
         // 获取yaml文件列表，同时会拿到Mr的changeSet
         val yamlPathList = action.getYamlPathList()

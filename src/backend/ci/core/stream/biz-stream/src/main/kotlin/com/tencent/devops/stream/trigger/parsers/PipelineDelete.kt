@@ -166,7 +166,7 @@ class PipelineDelete @Autowired constructor(
             } else {
                 filePath
             },
-            ref = "",
+            ref = action.data.context.defaultBranch,
             recursive = true,
             retry = ApiRequestRetryInfo(true)
         )
