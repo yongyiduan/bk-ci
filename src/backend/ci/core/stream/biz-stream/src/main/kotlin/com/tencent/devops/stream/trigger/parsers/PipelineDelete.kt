@@ -29,6 +29,7 @@ package com.tencent.devops.stream.trigger.parsers
 
 import com.tencent.devops.common.api.constant.HTTP_404
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.common.api.exception.RemoteServiceException
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.redis.RedisLock
@@ -173,8 +174,8 @@ class PipelineDelete @Autowired constructor(
                 recursive = true,
                 retry = ApiRequestRetryInfo(true)
             )
-        } catch (error: ErrorCodeException) {
-            if (error.statusCode == HTTP_404){
+        } catch (error: RemoteServiceException) {
+            if (error.httpStatus == HTTP_404){
                 logger.info("checkFileEmpty get file 404, .ci/ may be delete")
                 listOf()
             }else{
