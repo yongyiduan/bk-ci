@@ -97,10 +97,8 @@ abstract class BaseManualTriggerService @Autowired constructor(
                 enableMrBlock = it.enableMrBlock,
                 name = it.name,
                 enableMrComment = it.enableMrComment,
-                homepage = it.homePage,
-                triggerReviewSetting = JsonUtil.toOrNull(
-                    it.triggerReviewSetting,
-                    object : TypeReference<TriggerReviewSetting>() {}) ?: TriggerReviewSetting()
+                homepage = it.homepage,
+                triggerReviewSetting = it.triggerReviewSetting
             )
         } ?: throw CustomException(Response.Status.FORBIDDEN, message = TriggerReason.CI_DISABLED.detail)
 

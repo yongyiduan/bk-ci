@@ -173,7 +173,7 @@ class PipelineDelete @Autowired constructor(
                 retry = ApiRequestRetryInfo(true)
             )
         } catch (ignored: Throwable) {
-            logger.info("checkFileEmpty get file error , .ci/ may be delete $ignored")
+            logger.info("checkFileEmpty get file error , .ci/ may be delete ${ignored.message}")
             listOf()
         }
 
