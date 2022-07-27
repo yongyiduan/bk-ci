@@ -78,6 +78,10 @@ class StreamGithubTransferService @Autowired constructor(
     @Value("\${github.orgWhite:}")
     private var githubOrgWhite: String = ""
 
+    companion object {
+        private val logger = LoggerFactory.getLogger(StreamGithubTransferService::class.java)
+    }
+
     // gitProjectId在github中必须为项目名字
     override fun getGitProjectCache(
         gitProjectId: String,
@@ -178,6 +182,7 @@ class StreamGithubTransferService @Autowired constructor(
                 val filterGithubRepos = githubRepos.filter {
                     isGithubOrgWhite(it) && search(search, it)
                 }.map { StreamProjectGitInfo(it) }
+                logger.info("githubRepos size:${githubRepos.size}, filterGithubRepos:${filterGithubRepos.size}")
                 val remainSize = pageSize - repos.size
                 if (filterGithubRepos.size <= remainSize) {
                     repos.addAll(filterGithubRepos)
