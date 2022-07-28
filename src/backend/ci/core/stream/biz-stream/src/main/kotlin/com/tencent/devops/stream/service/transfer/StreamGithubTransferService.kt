@@ -72,16 +72,12 @@ class StreamGithubTransferService @Autowired constructor(
 ) : StreamGitTransferService {
     companion object {
         private val logger = LoggerFactory.getLogger(StreamGithubTransferService::class.java)
+        private const val DEFAULT_GITHUB_PER_PAGE = 100
     }
 
     // github 组织白名单列表
     @Value("\${github.orgWhite:}")
     private var githubOrgWhite: String = ""
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(StreamGithubTransferService::class.java)
-        private const val DEFAULT_GITHUB_PER_PAGE = 100
-    }
 
     // gitProjectId在github中必须为项目名字
     override fun getGitProjectCache(
