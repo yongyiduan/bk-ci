@@ -25,30 +25,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.service.gray
+package com.tencent.devops.common.expression.context
 
-import com.tencent.devops.common.redis.RedisOperation
+import com.fasterxml.jackson.databind.JsonNode
 
-class MacOSGray {
-    companion object {
-        const val repoGrayRedisKey = "project:setting:macosGray"
-    }
+abstract class PipelineContextData(val type: Int) {
 
-    fun addGrayProject(projectId: String, redisOperation: RedisOperation) {
-        redisOperation.addSetValue(getRepoGrayRedisKey(), projectId) // 添加项目为灰度项目
-    }
+    abstract fun clone(): PipelineContextData
 
-    fun removeGrayProject(projectId: String, redisOperation: RedisOperation) {
-        redisOperation.removeSetMember(getRepoGrayRedisKey(), projectId) // 取消项目为灰度项目
-    }
+    abstract fun toJson(): JsonNode
 
-    fun isGray(projectId: String, redisOperation: RedisOperation): Boolean {
-        return redisOperation.isMember(getRepoGrayRedisKey(), projectId)
-//        return grayProjectSet(redisOperation).contains(projectId)
-    }
-
-    fun grayProjectSet(redisOperation: RedisOperation) =
-        (redisOperation.getSetMembers(repoGrayRedisKey) ?: emptySet()).filter { !it.isBlank() }.toSet()
-
-    fun getRepoGrayRedisKey() = repoGrayRedisKey
+    abstract fun fetchValue(): Any
 }

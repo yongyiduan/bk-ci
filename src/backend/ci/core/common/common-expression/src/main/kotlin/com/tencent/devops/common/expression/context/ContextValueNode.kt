@@ -25,13 +25,23 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.expression.pipeline.contextData
+package com.tencent.devops.common.expression.context
 
-import com.fasterxml.jackson.databind.JsonNode
+import com.tencent.devops.common.expression.ExecutionContext
+import com.tencent.devops.common.expression.expression.sdk.EvaluationContext
+import com.tencent.devops.common.expression.expression.sdk.NamedValue
+import com.tencent.devops.common.expression.expression.sdk.ResultMemory
 
-abstract class PipelineContextData(val type: Int) {
+class ContextValueNode : NamedValue() {
+    override fun evaluateCore(context: EvaluationContext): Pair<ResultMemory?, Any?> {
+        return Pair(null, (context.state as ExecutionContext).expressionValues[name])
+    }
 
-    abstract fun clone(): PipelineContextData
+    override fun createNode(): NamedValue {
+        return ContextValueNode()
+    }
 
-    abstract fun toJson(): JsonNode
+    override fun subNameValueEvaluateCore(context: EvaluationContext): Any {
+        return (context.state as ExecutionContext).expressionValues[name] ?: name
+    }
 }

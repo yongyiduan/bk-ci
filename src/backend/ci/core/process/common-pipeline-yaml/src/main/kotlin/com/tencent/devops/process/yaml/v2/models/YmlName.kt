@@ -25,19 +25,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.expression.pipeline.contextData
+package com.tencent.devops.process.yaml.v2.models
 
-object PipelineContextDataType {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
 
-    const val STRING = 0
-
-    const val ARRAY = 1
-
-    const val DICTIONARY = 2
-
-    const val BOOLEAN = 3
-
-    const val NUMBER = 4
-
-    const val CASE_SENSITIVE_DICTIONARY = 5
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class YmlName(
+    val name: String?
+)

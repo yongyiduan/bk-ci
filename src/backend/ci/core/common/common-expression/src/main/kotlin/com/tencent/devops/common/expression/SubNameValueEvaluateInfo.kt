@@ -25,34 +25,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.expression.pipeline.contextData
+package com.tencent.devops.common.expression
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.DoubleNode
-import com.fasterxml.jackson.databind.node.IntNode
-import com.fasterxml.jackson.databind.node.LongNode
-import com.tencent.devops.common.expression.expression.sdk.INumber
-import kotlin.math.floor
+/**
+ * @param enableSubNameValueEvaluate 开启部分计算功能，方便一些变量的替换
+ * @param hasOtherNameValue 标记是否使用了不在部分计算外的变量进行了计算
+ * @param distinguishTypes 在完全计算后，对区分的类型加单引号用来区分
+ */
+data class SubNameValueEvaluateInfo(
+    val enableSubNameValueEvaluate: Boolean = true,
+    var hasOtherNameValue: Boolean = false,
+    val distinguishTypes: Set<DistinguishType>?
+)
 
-class NumberContextData(val value: Double) : PipelineContextData(PipelineContextDataType.NUMBER), INumber {
-    override fun getNumber() = value
-
-    override fun clone(): PipelineContextData = NumberContextData(value)
-
-    override fun toJson(): JsonNode {
-        if (value.isNaN() || value == Double.POSITIVE_INFINITY || value == Double.NEGATIVE_INFINITY) {
-            return DoubleNode(value)
-        }
-
-        val floored = floor(value)
-        return if (value == floored && value <= Int.MAX_VALUE && value >= Int.MIN_VALUE) {
-            val flooredInt = floored.toInt()
-            IntNode(flooredInt)
-        } else if (value == floored && value <= Long.MAX_VALUE && value >= Long.MIN_VALUE) {
-            val flooredInt = floored.toLong()
-            LongNode(flooredInt)
-        } else {
-            DoubleNode(value)
-        }
-    }
+enum class DistinguishType {
+    ARRAY, BOOL, STRING, DICT, NUMBER
 }
