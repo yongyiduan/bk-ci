@@ -58,6 +58,7 @@ import com.tencent.devops.process.yaml.v2.models.job.PreJob
 import com.tencent.devops.process.yaml.v2.models.job.RunsOn
 import com.tencent.devops.process.yaml.v2.models.job.Service
 import com.tencent.devops.process.yaml.v2.models.on.DeleteRule
+import com.tencent.devops.process.yaml.v2.models.on.EnableType
 import com.tencent.devops.process.yaml.v2.models.on.IssueRule
 import com.tencent.devops.process.yaml.v2.models.on.MrRule
 import com.tencent.devops.process.yaml.v2.models.on.NoteRule
@@ -156,7 +157,6 @@ object ScriptYmlUtils {
     }
 
     fun parseVariableValue(value: String?, settingMap: Map<String, String?>): String? {
-
         if (value == null || value.isEmpty()) {
             return ""
         }
@@ -531,7 +531,9 @@ object ScriptYmlUtils {
                 issue = issueRule(repoPreTriggerOn),
                 review = reviewRule(repoPreTriggerOn),
                 note = noteRule(repoPreTriggerOn),
-                repoHook = repoHookRule(repositoryHook)
+                repoHook = repoHookRule(repositoryHook),
+                manual = manualRule(repoPreTriggerOn),
+                openapi = openapiRule(repoPreTriggerOn)
             )
         }
         logger.warn("repo hook has none effective TriggerOn in ($repositoryHookList)")
@@ -567,7 +569,9 @@ object ScriptYmlUtils {
             delete = deleteRule(preTriggerOn),
             issue = issueRule(preTriggerOn),
             review = reviewRule(preTriggerOn),
-            note = noteRule(preTriggerOn)
+            note = noteRule(preTriggerOn),
+            manual = manualRule(preTriggerOn),
+            openapi = openapiRule(preTriggerOn)
         )
     }
 
@@ -598,6 +602,34 @@ object ScriptYmlUtils {
                 )
             }
         }
+    }
+
+    private fun manualRule(
+        preTriggerOn: PreTriggerOn
+    ): String? {
+        if (preTriggerOn.manual == null) {
+            return null
+        }
+
+        if (preTriggerOn.manual != EnableType.TRUE.value && preTriggerOn.manual != EnableType.FALSE.value) {
+            throw YamlFormatException("not allow manual type ${preTriggerOn.manual}")
+        }
+
+        return preTriggerOn.manual
+    }
+
+    private fun openapiRule(
+        preTriggerOn: PreTriggerOn
+    ): String? {
+        if (preTriggerOn.openapi == null) {
+            return null
+        }
+
+        if (preTriggerOn.openapi != EnableType.TRUE.value || preTriggerOn.openapi != EnableType.FALSE.value) {
+            throw YamlFormatException("not allow openapi type ${preTriggerOn.openapi}")
+        }
+
+        return preTriggerOn.openapi
     }
 
     private fun noteRule(
