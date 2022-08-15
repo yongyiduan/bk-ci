@@ -11,6 +11,7 @@ import com.tencent.devops.stream.trigger.exception.StreamTriggerException
 import com.tencent.devops.stream.trigger.git.pojo.StreamGitCred
 import com.tencent.devops.stream.trigger.git.service.StreamGitApiService
 import com.tencent.devops.stream.trigger.parsers.triggerMatch.TriggerResult
+import com.tencent.devops.stream.trigger.pojo.YamlContent
 import com.tencent.devops.stream.trigger.pojo.YamlPathListEntry
 import com.tencent.devops.stream.trigger.pojo.enums.StreamCommitCheckState
 
@@ -41,6 +42,13 @@ interface BaseAction {
      * @param gitProjectId git项目唯一标识，为空时取action的执行项目
      */
     fun getProjectCode(gitProjectId: String? = null): String
+
+    /**
+     *  由于API接口所需参数不同,所以区分
+     *  TGIT -> 接口需要 git project id
+     *  Github -> 接口需要 git project name
+     */
+    fun getGitProjectIdOrName(gitProjectId: String? = null): String
 
     /**
      * 获取调用当前git平台信息的cred，可能会请求Git api,所以放到action
@@ -90,9 +98,8 @@ interface BaseAction {
     /**
      * 获取yaml文件具体内容
      * @param fileName 文件名称
-     * @return <ref,yaml>
      */
-    fun getYamlContent(fileName: String): Pair<String, String>
+    fun getYamlContent(fileName: String): YamlContent
 
     /**
      * 获取本次触发变更的文件列表

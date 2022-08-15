@@ -196,7 +196,7 @@ class SendNotify @Autowired constructor(
                     build = build,
                     isMr = action.metaData.isStreamMr(),
                     requestId = requestId,
-                    openUser = build.userId,
+                    openUser = action.data.eventCommon.userId,
                     buildTime = build.totalTime,
                     gitUrl = streamGitConfig.gitUrl!!,
                     streamUrl = streamGitConfig.streamUrl!!,
@@ -237,7 +237,7 @@ class SendNotify @Autowired constructor(
                 return true
             }
             else -> {
-                logger.error("buidld: $buildId , ifField: $ifField is error!")
+                logger.warn("SendNotify|checkStatus|buildId|$buildId|ifField|$ifField")
                 false
             }
         }
@@ -278,7 +278,7 @@ class SendNotify @Autowired constructor(
                 StreamNotifyType.RTX_GROUP
             }
             else -> {
-                logger.error("buidld: $buildId , type: $type is error!")
+                logger.warn("SendNotify|getNoticeType|buidld|$buildId|type|$type")
                 null
             }
         }

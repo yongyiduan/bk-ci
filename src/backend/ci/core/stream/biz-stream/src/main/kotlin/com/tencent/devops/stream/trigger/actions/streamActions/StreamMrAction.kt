@@ -38,9 +38,24 @@ interface StreamMrAction : BaseAction {
     val mrIId: String
 
     /**
+     * 判断是否是fork仓库触发的
+     */
+    fun checkMrForkAction(): Boolean
+
+    /**
      * 为合并请求添加评论
      */
     fun addMrComment(
         body: MrCommentBody
     )
+
+    /**
+     * 检查mr触发时的权限校验(检查白名单)
+     */
+    fun checkMrForkReview(): Boolean
+
+    /**
+     * 获取 mr/pr 页面上的id
+     */
+    fun getMrId(): Long
 }

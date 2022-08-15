@@ -42,13 +42,18 @@ import com.tencent.devops.stream.trigger.actions.data.EventCommonData
 import com.tencent.devops.stream.trigger.actions.data.EventCommonDataCommit
 import com.tencent.devops.stream.trigger.actions.data.StreamTriggerPipeline
 import com.tencent.devops.stream.trigger.actions.streamActions.data.StreamScheduleEvent
-import com.tencent.devops.stream.trigger.actions.tgit.TGitActionCommon
+import com.tencent.devops.stream.trigger.actions.GitActionCommon
 import com.tencent.devops.stream.trigger.git.pojo.ApiRequestRetryInfo
 import com.tencent.devops.stream.trigger.git.pojo.StreamGitCred
+import com.tencent.devops.stream.trigger.git.pojo.github.GithubCred
 import com.tencent.devops.stream.trigger.git.pojo.tgit.TGitCred
+import com.tencent.devops.stream.trigger.git.service.GithubApiService
 import com.tencent.devops.stream.trigger.git.service.StreamGitApiService
+import com.tencent.devops.stream.trigger.git.service.TGitApiService
+import com.tencent.devops.stream.trigger.parsers.triggerMatch.TriggerBody
 import com.tencent.devops.stream.trigger.parsers.triggerMatch.TriggerResult
 import com.tencent.devops.stream.trigger.parsers.triggerParameter.GitRequestEventHandle
+import com.tencent.devops.stream.trigger.pojo.YamlContent
 import com.tencent.devops.stream.trigger.pojo.YamlPathListEntry
 import com.tencent.devops.stream.trigger.pojo.enums.StreamCommitCheckState
 import com.tencent.devops.stream.trigger.pojo.enums.toGitState
@@ -81,23 +86,34 @@ class StreamScheduleAction(
             commit = EventCommonDataCommit(
                 commitId = event.commitId,
                 commitMsg = event.commitMsg,
-                commitTimeStamp = TGitActionCommon.getCommitTimeStamp(null),
+                commitTimeStamp = GitActionCommon.getCommitTimeStamp(null),
                 commitAuthorName = event.commitAuthor
             ),
-            gitProjectName = null
+            gitProjectName = null,
+            scmType = null
         )
         return this
     }
 
     override fun getProjectCode(gitProjectId: String?) = if (gitProjectId != null) {
-        GitCommonUtils.getCiProjectId(gitProjectId.toLong())
+        GitCommonUtils.getCiProjectId(
+            gitProjectId.toLong(),
+            streamGitConfig.getScmType()
+        )
     } else {
         event().projectCode
     }
 
+    override fun getGitProjectIdOrName(gitProjectId: String?) = gitProjectId ?: data.eventCommon.gitProjectId
+
     override fun getGitCred(personToken: String?): StreamGitCred {
         return when (streamGitConfig.getScmType()) {
             ScmType.CODE_GIT -> TGitCred(
+                userId = event().userId,
+                accessToken = personToken,
+                useAccessToken = personToken == null
+            )
+            ScmType.GITHUB -> GithubCred(
                 userId = event().userId,
                 accessToken = personToken,
                 useAccessToken = personToken == null
@@ -126,12 +142,12 @@ class StreamScheduleAction(
         return emptyList()
     }
 
-    override fun getYamlContent(fileName: String): Pair<String, String> {
-        return Pair(
-            data.eventCommon.branch,
-            api.getFileContent(
+    override fun getYamlContent(fileName: String): YamlContent {
+        return YamlContent(
+            ref = data.eventCommon.branch,
+            content = api.getFileContent(
                 cred = this.getGitCred(),
-                gitProjectId = data.getGitProjectId(),
+                gitProjectId = getGitProjectIdOrName(),
                 fileName = fileName,
                 ref = data.eventCommon.branch,
                 retry = ApiRequestRetryInfo(true)
@@ -145,7 +161,7 @@ class StreamScheduleAction(
 
     override fun isMatch(triggerOn: TriggerOn): TriggerResult {
         return TriggerResult(
-            trigger = true,
+            trigger = TriggerBody(true),
             startParams = emptyMap(),
             timeTrigger = false,
             deleteTrigger = false
@@ -185,7 +201,8 @@ class StreamScheduleAction(
             targetUrl = targetUrl,
             description = description,
             mrId = null,
-            reportData = reportData
+            reportData = reportData,
+            addCommitCheck = api::addCommitCheck
         )
     }
 
