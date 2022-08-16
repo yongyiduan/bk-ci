@@ -16,7 +16,7 @@ const notifications = () => import(/* webpackChunkName: 'notifications' */'@/vie
 const pipeline = () => import(/* webpackChunkName: 'pipelines' */'@/views/pipeline/index.vue')
 const buildList = () => import(/* webpackChunkName: 'pipelines' */'@/views/pipeline/build-list.vue')
 const pipelineDetail = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/index.vue')
-const buildArtifacts = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/artifacts')
+const buildArtifacts = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/artifacts.vue')
 const buildDetail = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/detail.vue')
 const buildReports = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/reports.vue')
 const buildConfig = () => import(/* webpackChunkName: 'buildDetail' */'@/views/pipeline/build-detail/config.vue')
