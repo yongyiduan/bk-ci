@@ -37,8 +37,6 @@ import com.tencent.devops.process.pojo.setting.PipelineSetting
 
 object StreamPipelineUtils {
 
-    fun genGitProjectCode(gitProjectId: Long) = "git_$gitProjectId"
-
     fun genStreamV2BuildUrl(
         homePage: String,
         gitProjectId: String,

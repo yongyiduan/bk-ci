@@ -119,7 +119,7 @@ class StreamYamlTrigger @Autowired constructor(
         }
 
         // 这里判断，各类注册事件如果修改blobId肯定不同，相同的肯定注册过了，所以只要不触发git就直接跳过
-        if (triggerEvent != null && !triggerEvent.second.trigger) {
+        if (triggerEvent != null && !triggerEvent.second.trigger.trigger) {
             logger.info(
                 "${buildPipeline.pipelineId}| use trigger cache" +
                     "Matcher is false, return, gitProjectId: ${action.data.getGitProjectId()}, " +
@@ -206,7 +206,7 @@ class StreamYamlTrigger @Autowired constructor(
         // 拼接插件时会需要传入GIT仓库信息需要提前刷新下状态，只有url或者名称不对才更新
         val gitProjectInfo = action.api.getGitProjectInfo(
             action.getGitCred(),
-            action.data.getGitProjectId(),
+            action.getGitProjectIdOrName(),
             ApiRequestRetryInfo(true)
         )!!
         action.data.setting = action.data.setting.copy(gitHttpUrl = gitProjectInfo.gitHttpUrl)
@@ -224,7 +224,8 @@ class StreamYamlTrigger @Autowired constructor(
         } else {
             triggerMatcher.isMatch(action)
         }
-        val (isTrigger, _, isTiming, isDelete, repoHookName) = tr
+        val (isTriggerBody, _, isTiming, isDelete, repoHookName) = tr
+        val (isTrigger, notTriggerReason) = isTriggerBody
         logger.info(
             "StreamYamlTrigger|triggerBuild|pipelineId|" +
                 "${pipeline.pipelineId}|Match return|isTrigger=$isTrigger|" +
@@ -239,7 +240,11 @@ class StreamYamlTrigger @Autowired constructor(
                     "Matcher is false|gitProjectId|${action.data.getGitProjectId()}|" +
                     "eventId|${action.data.context.requestEventId}"
             )
-            throw StreamTriggerException(action, TriggerReason.TRIGGER_NOT_MATCH)
+            throw StreamTriggerException(
+                action = action,
+                triggerReason = TriggerReason.TRIGGER_NOT_MATCH,
+                reasonParams = listOf(notTriggerReason ?: "")
+            )
         }
 
         // 替换yaml模板
