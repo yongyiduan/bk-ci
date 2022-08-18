@@ -79,6 +79,7 @@ import com.tencent.devops.store.pojo.atom.UpdateAtomInfo
 import com.tencent.devops.store.pojo.atom.enums.AtomPackageSourceTypeEnum
 import com.tencent.devops.store.pojo.atom.enums.AtomStatusEnum
 import com.tencent.devops.store.pojo.common.ATOM_POST_VERSION_TEST_FLAG_KEY_PREFIX
+import com.tencent.devops.store.pojo.common.ATOM_UPLOAD_ID_KEY_PREFIX
 import com.tencent.devops.store.pojo.common.KEY_CODE_SRC
 import com.tencent.devops.store.pojo.common.KEY_CONFIG
 import com.tencent.devops.store.pojo.common.KEY_EXECUTION
@@ -350,7 +351,11 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
         if (validateResult.isNotOk()) {
             return Result(validateResult.status, validateResult.message, null)
         }
-        var atomId = UUIDUtil.generate()
+        var atomId = if (atomPackageSourceType == AtomPackageSourceTypeEnum.UPLOAD) {
+            redisOperation.get("$ATOM_UPLOAD_ID_KEY_PREFIX:$atomCode:$version")
+        } else {
+            UUIDUtil.generate()
+        }
 
         // 解析quality.json
         val getAtomQualityResult = getAtomQualityConfig(
