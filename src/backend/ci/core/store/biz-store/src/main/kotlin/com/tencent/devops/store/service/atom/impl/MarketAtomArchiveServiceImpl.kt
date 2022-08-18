@@ -141,6 +141,7 @@ class MarketAtomArchiveServiceImpl : MarketAtomArchiveService {
         val taskJsonStr = getFileStr(projectCode, atomCode, version, TASK_JSON_NAME)
         val getAtomConfResult = marketAtomCommonService.parseBaseTaskJson(
             taskJsonStr = taskJsonStr,
+            projectCode = projectCode,
             atomCode = atomCode,
             version = version,
             userId = userId
@@ -148,10 +149,6 @@ class MarketAtomArchiveServiceImpl : MarketAtomArchiveService {
         return if (getAtomConfResult.errorCode != "0") {
             MessageCodeUtil.generateResponseDataObject(getAtomConfResult.errorCode, getAtomConfResult.errorParams)
         } else {
-            val atomEnvRequests = getAtomConfResult.atomEnvRequests!!
-            atomEnvRequests.forEach { atomEnvRequest ->
-                atomEnvRequest.pkgPath = "$projectCode/$atomCode/$version/${atomEnvRequest.pkgPath}"
-            }
             Result(getAtomConfResult)
         }
     }
@@ -171,6 +168,7 @@ class MarketAtomArchiveServiceImpl : MarketAtomArchiveService {
         val taskJsonStr = getFileStr(projectCode, atomCode, version, TASK_JSON_NAME)
         val getAtomConfResult = marketAtomCommonService.parseBaseTaskJson(
             taskJsonStr = taskJsonStr,
+            projectCode = projectCode,
             atomCode = atomCode,
             version = version,
             userId = userId
