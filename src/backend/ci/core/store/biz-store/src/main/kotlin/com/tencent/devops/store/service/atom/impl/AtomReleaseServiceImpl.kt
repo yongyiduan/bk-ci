@@ -57,6 +57,7 @@ import com.tencent.devops.quality.api.v2.pojo.enums.IndicatorType
 import com.tencent.devops.quality.api.v2.pojo.op.IndicatorUpdate
 import com.tencent.devops.quality.api.v2.pojo.op.QualityMetaData
 import com.tencent.devops.store.constant.StoreMessageCode
+import com.tencent.devops.store.constant.StoreMessageCode.USER_UPLOAD_PACKAGE_INVALID
 import com.tencent.devops.store.dao.atom.AtomDao
 import com.tencent.devops.store.dao.atom.AtomLabelRelDao
 import com.tencent.devops.store.dao.atom.MarketAtomDao
@@ -353,6 +354,7 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
         }
         var atomId = if (atomPackageSourceType == AtomPackageSourceTypeEnum.UPLOAD) {
             redisOperation.get("$ATOM_UPLOAD_ID_KEY_PREFIX:$atomCode:$version")
+                ?: throw  ErrorCodeException(errorCode = USER_UPLOAD_PACKAGE_INVALID)
         } else {
             UUIDUtil.generate()
         }
