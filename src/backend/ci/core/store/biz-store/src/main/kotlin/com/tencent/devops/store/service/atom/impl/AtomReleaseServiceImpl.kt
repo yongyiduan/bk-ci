@@ -780,7 +780,10 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
             atomRecord = atomRecord,
             atomRequest = marketAtomUpdateRequest
         )
-        marketAtomEnvInfoDao.addMarketAtomEnvInfo(context, atomId, atomEnvRequests)
+        val atomPackageSourceType = getAtomPackageSourceType(atomRecord.atomCode)
+        if (atomPackageSourceType != AtomPackageSourceTypeEnum.REPO) {
+            marketAtomEnvInfoDao.addMarketAtomEnvInfo(context, atomId, atomEnvRequests)
+        }
         marketAtomVersionLogDao.addMarketAtomVersion(
             dslContext = context,
             userId = userId,
