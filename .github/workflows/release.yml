@@ -131,36 +131,36 @@ jobs:
           asset_name: bkci-slim.tar.gz
           asset_content_type: application/gzip
 
-      - name: download codecc
-        uses: actions/download-artifact@v1
-        with:
-          name: codecc
-          path: ./
+      # - name: download codecc
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: codecc
+      #     path: ./
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bkcodecc-slim.tar.gz
-          asset_name: bkcodecc-slim.tar.gz
-          asset_content_type: application/gzip
-      - name: download bkrepo
-        uses: actions/download-artifact@v1
-        with:
-          name: bkrepo
-          path: ./
+      # - name: Upload Release Asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./bkcodecc-slim.tar.gz
+      #     asset_name: bkcodecc-slim.tar.gz
+      #     asset_content_type: application/gzip
+      # - name: download bkrepo
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: bkrepo
+      #     path: ./
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bkrepo-slim.tar.gz
-          asset_name: bkrepo-slim.tar.gz
-          asset_content_type: application/gzip
+      # - name: Upload Release Asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./bkrepo-slim.tar.gz
+      #     asset_name: bkrepo-slim.tar.gz
+      #     asset_content_type: application/gzip
 
       ############################## 以下为云原生相关 ################################
       - name: Gradle Build Backend Service -- CLOUD NATIVE
