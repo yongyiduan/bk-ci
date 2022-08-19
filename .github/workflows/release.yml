@@ -212,15 +212,17 @@ jobs:
         run: |
           version="$(basename $GITHUB_REF)"
           helm package . --version $version --app-version $version
-          mkdir -p release
-          mv bk-ci-$version.tgz release/
-      
-      - name: Release Helm Chart -- CLOUD NATIVE
-        uses: helm/chart-releaser-action@v1.4.0
-        with:
-          charts_dir: helm-charts/core/ci/release
+          mv bk-ci-$version.tgz bk-ci-charts.tgz
+
+      - name: Upload Helm Chart -- CLOUD NATIVE
+        uses: actions/upload-release-asset@v1
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: helm-charts/core/ci/bk-ci-charts.tgz
+          asset_name: bk-ci-charts.tgz
+          asset_content_type: application/gzip
 
   codecc:
     name: Build CodeCC
