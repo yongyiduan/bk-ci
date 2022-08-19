@@ -192,13 +192,15 @@ jobs:
       - name: Setup Python -- CLOUD NATIVE
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.6.8'
+          cache: 'pip'
 
       - name: Generate Helm Chart -- CLOUD NATIVE
         working-directory: helm-charts/core/ci
         run: |
           version="$(basename $GITHUB_REF)"
-          pip3 install humps
+          echo 'python build'
+          pip install humps
           ./build_chart.py ${{ secrets.DOCKER_IMAGE_REGISTRY }} $version $version
 
       - name: Install Helm -- CLOUD NATIVE
