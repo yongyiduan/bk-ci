@@ -110,16 +110,16 @@ jobs:
       #     echo "::set-output name=version::$version"
       #     ci_ms_wip="sign,monitoring" ci_pkg_dir=/dev/shm/ci ./scripts/packager-ci.sh "$version" bkci-slim.tar.gz
 
-      # # - name: Create Release
-      #   id: create_release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: ${{ github.ref }}
-      #     release_name: bk-ci ${{ github.ref }}
-      #     draft: true
-      #     prerelease: true
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: bk-ci ${{ github.ref }}
+          draft: true
+          prerelease: true
 
       # - name: Upload Release Asset
       #   uses: actions/upload-release-asset@v1
