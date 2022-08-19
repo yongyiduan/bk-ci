@@ -199,7 +199,7 @@ jobs:
         run: |
           version="$(basename $GITHUB_REF)"
           echo 'python build'
-          pip install humps
+          pip install pyhumps
           python build_chart.py ${{ secrets.DOCKER_IMAGE_REGISTRY }} $version $version
 
       - name: Install Helm -- CLOUD NATIVE
