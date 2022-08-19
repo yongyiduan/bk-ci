@@ -213,7 +213,7 @@ jobs:
           version="$(basename $GITHUB_REF)"
           helm package . --version $version --app-version $version
           mkdir -p release
-          mv bk-ci-$release.tgz release
+          mv bk-ci-$version.tgz release/
       
       - name: Release Helm Chart -- CLOUD NATIVE
         uses: helm/chart-releaser-action@v1.4.0
