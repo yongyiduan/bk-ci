@@ -638,14 +638,17 @@ class PipelineBuildFacadeService(
     }
 
     /**
-     * 定时触发
+     * 代码库回调钩子触发
      */
     fun webhookTriggerPipelineBuild(
         userId: String,
         projectId: String,
         pipelineId: String,
         parameters: Map<String, Any> = emptyMap(),
-        checkPermission: Boolean = true
+        checkPermission: Boolean = true,
+        startType: StartType = StartType.WEB_HOOK,
+        startValues: Map<String, String>? = null,
+        userParameters: List<BuildParameters>? = null
     ): String? {
 
         if (checkPermission) {

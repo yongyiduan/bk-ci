@@ -32,6 +32,7 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.trigger.constant.TargetType
 import com.tencent.devops.trigger.target.IEventTargetInvoker
 import com.tencent.devops.process.api.service.ServiceWebhookBuildResource
+import com.tencent.devops.process.pojo.webhook.WebhookTriggerParams
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -55,7 +56,7 @@ class PipelineEventTargetInvoker @Autowired constructor(
                     userId = userId,
                     projectId = projectId,
                     pipelineId = pipelineId,
-                    params = values.plus(runtimeVariables),
+                    params = WebhookTriggerParams(params = values.plus(runtimeVariables)),
                     channelCode = channelCode
                 ).data
                 logger.info("$projectId|$pipelineId|$buildId|Success to invoke [pipeline] event target")
