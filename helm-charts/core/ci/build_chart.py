@@ -47,7 +47,8 @@ default_value_dict = {
     'bkCiStreamScmType': 'CODE_GIT',
     'bkCiStreamUrl': 'devops.example.com',
     'bkCiStreamGitUrl': 'www.github.com',
-    'bkCiClusterTag': 'devops'
+    'bkCiClusterTag': 'devops',
+    'bkCiRepositoryGithubServer':'repository',
 }
 
 if os.path.isfile(default_value_json):
@@ -58,7 +59,7 @@ include_dict = {
     '__BK_CI_MYSQL_ADDR__': '{{ include "bkci.mysqlAddr" . }}',
     '__BK_CI_MYSQL_USER__': '{{ include "bkci.mysqlUsername" . }}',
     '__BK_CI_MYSQL_PASSWORD__': '{{ include "bkci.mysqlPassword" . }}',
-    '__BK_CI_REDIS_HOST__': '{{ printf "%s.%s.%s" (include "bkci.redisHost" .) .Release.Namespace "svc.cluster.local" | quote}}',
+    '__BK_CI_REDIS_HOST__': '{{ if eq .Values.redis.enabled true }}{{ printf "%s.%s.%s" (include "bkci.redisHost" .) .Release.Namespace "svc.cluster.local" | quote}}{{ else }}{{ include "bkci.redisHost" . }}{{ end }}',
     '__BK_CI_REDIS_PASSWORD__': '{{ include "bkci.redisPassword" . }}',
     '__BK_CI_REDIS_PORT__': '{{ include "bkci.redisPort" . }}',
     '__BK_CI_ES_PASSWORD__': '{{ include "bkci.elasticsearchPassword" . }}',
@@ -69,7 +70,7 @@ include_dict = {
     '__BK_CI_RABBITMQ_PASSWORD__': '{{ include "bkci.rabbitmqPassword" . }}',
     '__BK_CI_RABBITMQ_USER__': '{{ include "bkci.rabbitmqUser" . }}',
     '__BK_CI_RABBITMQ_VHOST__': '{{ include "bkci.rabbitmqVhost" . }}',
-    '__BK_CI_INFLUXDB_HOST__': '{{ printf "%s.%s.%s" (include "bkci.influxdbHost" .) .Release.Namespace "svc.cluster.local" | quote}}',
+    '__BK_CI_INFLUXDB_HOST__': '{{ if eq .Values.influxdb.enabled true }}{{ printf "%s.%s.%s" (include "bkci.influxdbHost" .) .Release.Namespace "svc.cluster.local" | quote}}{{ else }}{{ include "bkci.influxdbHost" . }}{{ end }}',
     '__BK_CI_INFLUXDB_PORT__': '{{ include "bkci.influxdbPort" . }}',
     '__BK_CI_INFLUXDB_USER__': '{{ include "bkci.influxdbUsername" . }}',
     '__BK_CI_INFLUXDB_PASSWORD__': '{{ include "bkci.influxdbPassword" . }}',
@@ -115,6 +116,8 @@ value_file.close()
 # 生成服务tpl
 config_re = re.compile(r'-[a-z\-]*|common')
 for config_name in os.listdir(config_parent):
+    if "turbo" in config_name:
+        continue
     if config_name.endswith('yaml') or config_name.endswith('yml'):
         config_file = open(config_parent + config_name, 'r')
         the_name = config_re.findall(config_name)[0].replace('-', '', 1)
