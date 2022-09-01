@@ -25,26 +25,38 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.api.enums
+package com.tencent.devops.process.pojo.pipeline
 
-enum class OSArch(
-    val osTypeList: List<OSType>,
-    val archStr: String // 编译插件的参数
-) {
-    AMD_64(
-        osTypeList = listOf(OSType.LINUX, OSType.MAC_OS, OSType.WINDOWS),
-        archStr = "amd64"
-    ),
-    ARM_64(
-        osTypeList = listOf(OSType.LINUX, OSType.MAC_OS),
-        archStr = "arm64"
-    ),
-    MIPS_64(
-        osTypeList = listOf(OSType.LINUX),
-        archStr = "mips64"
-    ),
-    I_386(
-        osTypeList = listOf(OSType.WINDOWS),
-        archStr = "386"
-    );
-}
+import io.swagger.annotations.ApiModel
+import com.fasterxml.jackson.annotation.JsonProperty
+
+@ApiModel("DynamicParameter模型-ID")
+data class DynamicParameterInfo(
+    @JsonProperty("id")
+    val id: String, // 该行的唯一标识，必填
+    @JsonProperty("paramModels")
+    val paramModels: List<DynamicParameterInfoParam>
+)
+
+data class DynamicParameterInfoParam(
+    @JsonProperty("value")
+    val value: String? = null, // 值，可做为初始化的默认值
+    @JsonProperty("disabled")
+    val disabled: Boolean, // 控制是否可编辑
+    @JsonProperty("id")
+    val id: String, // 该模型的唯一标识，必填
+    @JsonProperty("isMultiple")
+    val isMultiple: Boolean? = null, // select是否多选
+    @JsonProperty("label")
+    val label: String? = null, // testLabel
+    @JsonProperty("list")
+    val list: List<StartUpInfo>? = null, // type是select起作用，需要有id和name字段
+    @JsonProperty("listType")
+    val listType: String? = null, // 获取列表方式，可以是url或者list
+    @JsonProperty("type")
+    val type: String, // 可以是input或者select
+    @JsonProperty("url")
+    val url: String? = null, // type是select且listType是url起作用
+    @JsonProperty("dataPath")
+    val dataPath: String? = null // 接口返回值，取数的路径，默认为 data.records
+)

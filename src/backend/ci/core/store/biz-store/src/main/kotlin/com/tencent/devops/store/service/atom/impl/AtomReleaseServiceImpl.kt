@@ -111,7 +111,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import java.time.LocalDateTime
 
 @Suppress("ALL")
@@ -159,9 +158,6 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
     companion object {
         private val logger = LoggerFactory.getLogger(AtomReleaseServiceImpl::class.java)
     }
-
-    @Value("\${store.atomDetailBaseUrl}")
-    protected lateinit var atomDetailBaseUrl: String
 
     private fun validateAddMarketAtomReq(
         marketAtomCreateRequest: MarketAtomCreateRequest
@@ -219,7 +215,7 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
                 id = id,
                 repositoryHashId = handleAtomPackageMap?.get(KEY_REPOSITORY_HASH_ID) ?: "",
                 codeSrc = handleAtomPackageMap?.get(KEY_CODE_SRC) ?: "",
-                docsLink = atomDetailBaseUrl + atomCode,
+                docsLink = storeCommonService.getStoreDetailUrl(StoreTypeEnum.ATOM, atomCode),
                 marketAtomCreateRequest = marketAtomCreateRequest
             )
             // 添加插件与项目关联关系，type为0代表新增插件时关联的初始化项目
@@ -274,7 +270,7 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
         atomCode: String
     ): Result<Map<String, String>?>
 
-    abstract fun getAtomPackageSourceType(atomCode: String): AtomPackageSourceTypeEnum
+    abstract fun getAtomPackageSourceType(): AtomPackageSourceTypeEnum
 
     @Suppress("UNCHECKED_CAST")
     @BkTimed(extraTags = ["publish", "updateMarketAtom"], value = "store_publish_pipeline_atom")
@@ -285,7 +281,7 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
     ): Result<String?> {
         logger.info("updateMarketAtom userId is :$userId,marketAtomUpdateRequest is :$marketAtomUpdateRequest")
         val atomCode = marketAtomUpdateRequest.atomCode
-        val atomPackageSourceType = getAtomPackageSourceType(atomCode)
+        val atomPackageSourceType = getAtomPackageSourceType()
         logger.info("updateMarketAtom atomPackageSourceType is :$atomPackageSourceType")
         val version = marketAtomUpdateRequest.version
         // 判断插件是不是首次创建版本
@@ -507,8 +503,9 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
             releaseType = releaseType,
             versionContent = marketAtomUpdateRequest.versionContent
         )
-        atomEnvRequests.forEach { atomEnvRequest ->
-            marketAtomEnvInfoDao.updateMarketAtomEnvInfo(context, atomId, atomEnvRequest)
+        val atomPackageSourceType = getAtomPackageSourceType()
+        if (atomPackageSourceType != AtomPackageSourceTypeEnum.UPLOAD) {
+            marketAtomEnvInfoDao.addMarketAtomEnvInfo(context, atomId, atomEnvRequests)
         }
         // 通过websocket推送状态变更消息
         storeWebsocketService.sendWebsocketMessage(userId, atomId)
@@ -780,7 +777,7 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
             atomRecord = atomRecord,
             atomRequest = marketAtomUpdateRequest
         )
-        val atomPackageSourceType = getAtomPackageSourceType(atomRecord.atomCode)
+        val atomPackageSourceType = getAtomPackageSourceType()
         if (atomPackageSourceType != AtomPackageSourceTypeEnum.UPLOAD) {
             marketAtomEnvInfoDao.addMarketAtomEnvInfo(context, atomId, atomEnvRequests)
         }
