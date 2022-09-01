@@ -47,7 +47,8 @@ default_value_dict = {
     'bkCiStreamScmType': 'CODE_GIT',
     'bkCiStreamUrl': 'devops.example.com',
     'bkCiStreamGitUrl': 'www.github.com',
-    'bkCiClusterTag':'devops'
+    'bkCiClusterTag': 'devops',
+    'bkCiRepositoryGithubServer':'repository',
 }
 
 if os.path.isfile(default_value_json):
@@ -58,7 +59,7 @@ include_dict = {
     '__BK_CI_MYSQL_ADDR__': '{{ include "bkci.mysqlAddr" . }}',
     '__BK_CI_MYSQL_USER__': '{{ include "bkci.mysqlUsername" . }}',
     '__BK_CI_MYSQL_PASSWORD__': '{{ include "bkci.mysqlPassword" . }}',
-    '__BK_CI_REDIS_HOST__': '{{ printf "%s.%s.%s" (include "bkci.redisHost" .) .Release.Namespace "svc.cluster.local" | quote}}',
+    '__BK_CI_REDIS_HOST__': '{{ if eq .Values.redis.enabled true }}{{ printf "%s.%s.%s" (include "bkci.redisHost" .) .Release.Namespace "svc.cluster.local" | quote}}{{ else }}{{ include "bkci.redisHost" . }}{{ end }}',
     '__BK_CI_REDIS_PASSWORD__': '{{ include "bkci.redisPassword" . }}',
     '__BK_CI_REDIS_PORT__': '{{ include "bkci.redisPort" . }}',
     '__BK_CI_ES_PASSWORD__': '{{ include "bkci.elasticsearchPassword" . }}',
@@ -69,7 +70,7 @@ include_dict = {
     '__BK_CI_RABBITMQ_PASSWORD__': '{{ include "bkci.rabbitmqPassword" . }}',
     '__BK_CI_RABBITMQ_USER__': '{{ include "bkci.rabbitmqUser" . }}',
     '__BK_CI_RABBITMQ_VHOST__': '{{ include "bkci.rabbitmqVhost" . }}',
-    '__BK_CI_INFLUXDB_HOST__': '{{ printf "%s.%s.%s" (include "bkci.influxdbHost" .) .Release.Namespace "svc.cluster.local" | quote}}',
+    '__BK_CI_INFLUXDB_HOST__': '{{ if eq .Values.influxdb.enabled true }}{{ printf "%s.%s.%s" (include "bkci.influxdbHost" .) .Release.Namespace "svc.cluster.local" | quote}}{{ else }}{{ include "bkci.influxdbHost" . }}{{ end }}',
     '__BK_CI_INFLUXDB_PORT__': '{{ include "bkci.influxdbPort" . }}',
     '__BK_CI_INFLUXDB_USER__': '{{ include "bkci.influxdbUsername" . }}',
     '__BK_CI_INFLUXDB_PASSWORD__': '{{ include "bkci.influxdbPassword" . }}',
@@ -93,10 +94,12 @@ for line in env_file:
 env_file.close()
 
 # 生成value.yaml
-image_gateway_tag = sys.argv[1]
-image_backend_tag = sys.argv[2]
+image_registry = sys.argv[1]
+image_gateway_tag = sys.argv[2]
+image_backend_tag = sys.argv[3]
 value_file = open(output_value_yaml, 'w')
 for line in open(default_value_yaml, 'r'):
+    line = line.replace("__image_registry__", image_registry)
     line = line.replace("__image_gateway_tag__", image_gateway_tag)
     line = line.replace("__image_backend_tag__", image_backend_tag)
     value_file.write(line)
@@ -113,6 +116,8 @@ value_file.close()
 # 生成服务tpl
 config_re = re.compile(r'-[a-z\-]*|common')
 for config_name in os.listdir(config_parent):
+    if "turbo" in config_name:
+        continue
     if config_name.endswith('yaml') or config_name.endswith('yml'):
         config_file = open(config_parent + config_name, 'r')
         the_name = config_re.findall(config_name)[0].replace('-', '', 1)
@@ -134,7 +139,7 @@ for config_name in os.listdir(config_parent):
 
 # 生成网关的configmap
 gateway_envs = set(["__BK_CI_PUBLIC_URL__", "__BK_CI_DOCS_URL__",
-                   "__BK_CI_PAAS_LOGIN_URL__", "__BK_CI_VERSION__", "__BK_CI_BADGE_URL__"])  # frondend需要的变量
+                    "__BK_CI_PAAS_LOGIN_URL__", "__BK_CI_VERSION__", "__BK_CI_BADGE_URL__"])  # frondend需要的变量
 for file in os.listdir(config_parent):
     if file.startswith('gateway'):
         for line in open(config_parent+file, 'r'):
@@ -156,12 +161,3 @@ gateway_config_file.write('CHART_NAME: {{ include "bkci.names.fullname" . }}\n')
 gateway_config_file.write('{{- end -}}')
 gateway_config_file.flush()
 gateway_config_file.close()
-
-# 上传chart
-# if len(sys.argv) < 5:
-#     exit(0)
-# charts_version = sys.argv[3]
-# app_version = sys.argv[4]
-# os.system("helm package . --version " + charts_version + " --app-version "+app_version)
-# os.system('curl -F "chart=@bk-ci-' + charts_version +
-#           '.tgz" -u ${bkrepo_helm_bkce}:${bkrepo_helm_pass} ${bkrepo_helm_url}')

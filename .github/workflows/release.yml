@@ -75,7 +75,7 @@ jobs:
       - name: Gradle Build Backend Service
         working-directory: src/backend/ci
         run: |
-          ./gradlew clean test build :core:worker:worker-agent:shadowJar \
+          ./gradlew clean test build -x test :core:worker:worker-agent:shadowJar \
           -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root
 
       - name: Gradle Build Turbo Service
@@ -131,35 +131,95 @@ jobs:
           asset_name: bkci-slim.tar.gz
           asset_content_type: application/gzip
 
-      - name: download codecc
-        uses: actions/download-artifact@v1
-        with:
-          name: codecc
-          path: ./
+      # - name: download codecc
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: codecc
+      #     path: ./
 
-      - name: Upload Release Asset
+      # - name: Upload Release Asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./bkcodecc-slim.tar.gz
+      #     asset_name: bkcodecc-slim.tar.gz
+      #     asset_content_type: application/gzip
+      # - name: download bkrepo
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: bkrepo
+      #     path: ./
+
+      # - name: Upload Release Asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./bkrepo-slim.tar.gz
+      #     asset_name: bkrepo-slim.tar.gz
+      #     asset_content_type: application/gzip
+
+      ############################## 以下为云原生相关 ################################
+      - name: Gradle Build Backend Service -- CLOUD NATIVE
+        working-directory: src/backend/ci
+        run: |
+          ./gradlew clean test build -x test :core:worker:worker-agent:shadowJar -Ddevops.assemblyMode=K8S \
+          -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root
+
+      - name: Create artifact - CLOUD NATIVE
+        run: |
+          version="$(basename $GITHUB_REF)"
+          echo "::set-output name=version::$version"
+          ci_ms_wip="sign,monitoring" ci_pkg_dir=/dev/shm/ci-docker ./scripts/packager-ci.sh "$version" bkci-docker.tar.gz
+
+      - name: Setup Docker -- CLOUD NATIVE
+        uses: docker-practice/actions-setup-docker@master
+        
+      - name: Create Docker Image -- CLOUD NATIVE
+        working-directory: docker-images/core/ci
+        run: |
+          version="$(basename $GITHUB_REF)"
+          docker login --username=${{ secrets.DOCKER_USER }} --password=${{ secrets.DOCKER_PASS }} ${{ secrets.DOCKER_HOST }}
+          ./0.get_release.sh
+          ./1.build_gateway_image.sh ${{ secrets.DOCKER_IMAGE_REGISTRY }} $version
+          ./2.build_backend_bkci_image.sh ${{ secrets.DOCKER_IMAGE_REGISTRY }} $version
+
+      - name: Setup Python -- CLOUD NATIVE
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.6.8'
+
+      - name: Generate Helm Chart -- CLOUD NATIVE
+        working-directory: helm-charts/core/ci
+        run: |
+          version="$(basename $GITHUB_REF)"
+          echo 'python build'
+          pip install pyhumps
+          python build_chart.py ${{ secrets.DOCKER_IMAGE_REGISTRY }} $version $version
+
+      - name: Install Helm -- CLOUD NATIVE
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.8.1
+      
+      - name: Package Helm Chart -- CLOUD NATIVE
+        working-directory: helm-charts/core/ci
+        run: |
+          version="$(basename $GITHUB_REF)"
+          helm package . --version $version --app-version $version
+          mv bk-ci-$version.tgz bk-ci-charts.tgz
+
+      - name: Upload Helm Chart -- CLOUD NATIVE
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bkcodecc-slim.tar.gz
-          asset_name: bkcodecc-slim.tar.gz
-          asset_content_type: application/gzip
-      - name: download bkrepo
-        uses: actions/download-artifact@v1
-        with:
-          name: bkrepo
-          path: ./
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bkrepo-slim.tar.gz
-          asset_name: bkrepo-slim.tar.gz
+          asset_path: helm-charts/core/ci/bk-ci-charts.tgz
+          asset_name: bk-ci-charts.tgz
           asset_content_type: application/gzip
 
   codecc:
