@@ -31,17 +31,20 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-class ExtServiceBcsNameSpaceConfig {
+class ExtServiceKubernetesLimitRangeConfig {
 
-    @Value("\${store.extService.bcs.namespace.namespaceName}")
-    val namespaceName: String = ""
+    @Value("\${store.extService.kubernetes.limitRange.default.cpu}")
+    val defaultCpu: String = ""
 
-    @Value("\${store.extService.bcs.namespace.grayNamespaceName}")
-    val grayNamespaceName: String = ""
+    @Value("\${store.extService.kubernetes.limitRange.default.memory}")
+    val defaultMemory: String = ""
 
-    @Value("\${store.extService.bcs.namespace.labelKey}")
-    val labelKey: String = ""
+    @Value("\${store.extService.kubernetes.limitRange.defaultRequest.cpu}")
+    val defaultRequestCpu: String = ""
 
-    @Value("\${store.extService.bcs.namespace.labelValue}")
-    val labelValue: String = ""
+    @Value("\${store.extService.kubernetes.limitRange.defaultRequest.memory}")
+    val defaultRequestMemory: String = ""
+
+    @Value("\${store.extService.kubernetes.limitRange.type}")
+    val limitType: String = ""
 }

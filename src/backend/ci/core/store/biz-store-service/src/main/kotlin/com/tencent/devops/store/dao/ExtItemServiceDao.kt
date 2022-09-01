@@ -221,16 +221,16 @@ class ExtItemServiceDao {
         tesf: TExtensionServiceFeature
     ): SelectOnConditionStep<Record10<String, String, String, String, String, String?, String, String?, Int, Boolean?>> {
         return dslContext.select(
-            tes.ID.`as`("serviceId"),
-            tes.SERVICE_CODE.`as`("serviceCode"),
-            tes.SERVICE_NAME.`as`("serviceName"),
-            tes.LOGO_URL.`as`("logoUrl"),
-            tes.VERSION.`as`("version"),
-            tes.SUMMARY.`as`("summary"),
-            tes.PUBLISHER.`as`("publisher"),
-            tesir.PROPS.`as`("props"),
-            tesf.WEIGHT.`as`("weight"),
-            tesf.KILL_GRAY_APP_FLAG.`as`("killGrayAppFlag")
+            tes.ID,
+            tes.SERVICE_CODE,
+            tes.SERVICE_NAME,
+            tes.LOGO_URL,
+            tes.VERSION,
+            tes.SUMMARY,
+            tes.PUBLISHER,
+            tesir.PROPS,
+            tesf.WEIGHT,
+            tesf.KILL_GRAY_APP_FLAG
         )
             .from(tes)
             .join(tesir)

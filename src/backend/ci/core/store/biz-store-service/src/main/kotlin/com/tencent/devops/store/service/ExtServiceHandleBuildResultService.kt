@@ -48,7 +48,7 @@ class ExtServiceHandleBuildResultService @Autowired constructor(
     private val dslContext: DSLContext,
     private val extServiceDao: ExtServiceDao,
     private val extServiceFeatureDao: ExtServiceFeatureDao,
-    private val extServiceBcsService: ExtServiceBcsService
+    private val extServiceKubernetesService: ExtServiceKubernetesService
 ) : AbstractStoreHandleBuildResultService() {
 
     private val logger = LoggerFactory.getLogger(ExtServiceHandleBuildResultService::class.java)
@@ -67,7 +67,7 @@ class ExtServiceHandleBuildResultService @Autowired constructor(
             if (serviceRecord.serviceStatus == ExtServiceStatusEnum.GROUNDING_SUSPENSION.status.toByte()) {
                 // 停止bcs灰度命名空间的应用
                 val serviceCode = serviceRecord.serviceCode
-                val bcsStopAppResult = extServiceBcsService.stopExtService(
+                val bcsStopAppResult = extServiceKubernetesService.stopExtService(
                     userId = serviceRecord.modifier,
                     serviceCode = serviceCode,
                     deploymentName = serviceCode,

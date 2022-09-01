@@ -32,14 +32,14 @@ import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.service.utils.MessageCodeUtil
-import com.tencent.devops.dispatch.api.ServiceBcsResource
-import com.tencent.devops.dispatch.pojo.AppDeployment
-import com.tencent.devops.dispatch.pojo.AppIngress
-import com.tencent.devops.dispatch.pojo.AppService
-import com.tencent.devops.dispatch.pojo.DeployApp
-import com.tencent.devops.dispatch.pojo.StopApp
-import com.tencent.devops.store.config.ExtServiceBcsConfig
-import com.tencent.devops.store.config.ExtServiceBcsNameSpaceConfig
+import com.tencent.devops.dispatch.kubernetes.api.service.ServiceKubernetesResource
+import com.tencent.devops.dispatch.kubernetes.pojo.AppDeployment
+import com.tencent.devops.dispatch.kubernetes.pojo.AppIngress
+import com.tencent.devops.dispatch.kubernetes.pojo.AppService
+import com.tencent.devops.dispatch.kubernetes.pojo.DeployApp
+import com.tencent.devops.dispatch.kubernetes.pojo.StopApp
+import com.tencent.devops.store.config.ExtServiceKubernetesConfig
+import com.tencent.devops.store.config.ExtServiceKubernetesNameSpaceConfig
 import com.tencent.devops.store.config.ExtServiceDeploymentConfig
 import com.tencent.devops.store.config.ExtServiceImageSecretConfig
 import com.tencent.devops.store.config.ExtServiceIngressConfig
@@ -59,9 +59,9 @@ import java.text.MessageFormat
 import java.time.LocalDateTime
 
 @Service
-class ExtServiceBcsService {
+class ExtServiceKubernetesService {
 
-    private val logger = LoggerFactory.getLogger(ExtServiceBcsService::class.java)
+    private val logger = LoggerFactory.getLogger(ExtServiceKubernetesService::class.java)
 
     @Autowired
     private lateinit var client: Client
@@ -70,10 +70,10 @@ class ExtServiceBcsService {
     private lateinit var dslContext: DSLContext
 
     @Autowired
-    private lateinit var extServiceBcsConfig: ExtServiceBcsConfig
+    private lateinit var extServiceKubernetesConfig: ExtServiceKubernetesConfig
 
     @Autowired
-    private lateinit var extServiceBcsNameSpaceConfig: ExtServiceBcsNameSpaceConfig
+    private lateinit var extServiceKubernetesNameSpaceConfig: ExtServiceKubernetesNameSpaceConfig
 
     @Autowired
     private lateinit var extServiceImageSecretConfig: ExtServiceImageSecretConfig
@@ -104,7 +104,7 @@ class ExtServiceBcsService {
         checkPermissionFlag: Boolean = true
     ): DeployApp {
         val imageName = "${extServiceImageSecretConfig.imageNamePrefix}$serviceCode"
-        val grayFlag = namespaceName == extServiceBcsNameSpaceConfig.grayNamespaceName
+        val grayFlag = namespaceName == extServiceKubernetesNameSpaceConfig.grayNamespaceName
         val host = if (grayFlag) extServiceIngressConfig.grayHost else extServiceIngressConfig.host
         val scopes = "ALL," + if (grayFlag) "TEST" else "PRD"
         val storeEnvVarInfoListResult = storeEnvVarService.getLatestEnvVarList(
@@ -127,8 +127,8 @@ class ExtServiceBcsService {
             }
         }
         return DeployApp(
-            bcsUrl = extServiceBcsConfig.masterUrl,
-            token = extServiceBcsConfig.token,
+            apiUrl = extServiceKubernetesConfig.masterUrl,
+            token = extServiceKubernetesConfig.token,
             namespaceName = namespaceName,
             appCode = serviceCode,
             appDeployment = AppDeployment(
@@ -161,7 +161,7 @@ class ExtServiceBcsService {
                     }
                 )
             ),
-            deployTimeOut = extServiceBcsConfig.deployTimeOut.toInt()
+            deployTimeOut = extServiceKubernetesConfig.deployTimeOut.toInt()
         )
     }
 
@@ -190,9 +190,9 @@ class ExtServiceBcsService {
             return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.PERMISSION_DENIED)
         }
         val namespaceName = if (!grayFlag) {
-            extServiceBcsNameSpaceConfig.namespaceName
+            extServiceKubernetesNameSpaceConfig.namespaceName
         } else {
-            extServiceBcsNameSpaceConfig.grayNamespaceName
+            extServiceKubernetesNameSpaceConfig.grayNamespaceName
         }
         val deployApp = generateDeployApp(
             userId = userId,
@@ -201,7 +201,7 @@ class ExtServiceBcsService {
             version = version,
             checkPermissionFlag = checkPermissionFlag
         )
-        val bcsDeployAppResult = client.get(ServiceBcsResource::class).bcsDeployApp(
+        val bcsDeployAppResult = client.get(ServiceKubernetesResource::class).deployApp(
             userId = userId,
             deployApp = deployApp
         )
@@ -254,26 +254,26 @@ class ExtServiceBcsService {
         var host = ""
         when {
             grayFlag == null -> {
-                grayNamespaceName = extServiceBcsNameSpaceConfig.grayNamespaceName
+                grayNamespaceName = extServiceKubernetesNameSpaceConfig.grayNamespaceName
                 grayHost = extServiceIngressConfig.grayHost
-                namespaceName = extServiceBcsNameSpaceConfig.namespaceName
+                namespaceName = extServiceKubernetesNameSpaceConfig.namespaceName
                 host = extServiceIngressConfig.host
             }
             grayFlag -> {
-                grayNamespaceName = extServiceBcsNameSpaceConfig.grayNamespaceName
+                grayNamespaceName = extServiceKubernetesNameSpaceConfig.grayNamespaceName
                 grayHost = extServiceIngressConfig.grayHost
             }
             else -> {
-                namespaceName = extServiceBcsNameSpaceConfig.namespaceName
+                namespaceName = extServiceKubernetesNameSpaceConfig.namespaceName
                 host = extServiceIngressConfig.host
             }
         }
         // 停止微扩展部署
-        val bcsStopAppResult = client.get(ServiceBcsResource::class).bcsStopApp(
+        val bcsStopAppResult = client.get(ServiceKubernetesResource::class).stopApp(
             userId = userId,
             stopApp = StopApp(
-                bcsUrl = extServiceBcsConfig.masterUrl,
-                token = extServiceBcsConfig.token,
+                apiUrl = extServiceKubernetesConfig.masterUrl,
+                token = extServiceKubernetesConfig.token,
                 grayNamespaceName = grayNamespaceName,
                 grayHost = grayHost,
                 namespaceName = namespaceName,
@@ -301,15 +301,15 @@ class ExtServiceBcsService {
         ) {
             return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.PERMISSION_DENIED)
         }
-        val deployment = client.get(ServiceBcsResource::class).getBcsDeploymentInfo(
+        val deployment = client.get(ServiceKubernetesResource::class).getDeploymentInfo(
             namespaceName = if (grayFlag == null || !grayFlag) {
-                extServiceBcsNameSpaceConfig.namespaceName
+                extServiceKubernetesNameSpaceConfig.namespaceName
             } else {
-                extServiceBcsNameSpaceConfig.grayNamespaceName
+                extServiceKubernetesNameSpaceConfig.grayNamespaceName
             },
             deploymentName = serviceCode,
-            bcsUrl = extServiceBcsConfig.masterUrl,
-            token = extServiceBcsConfig.token
+            apiUrl = extServiceKubernetesConfig.masterUrl,
+            token = extServiceKubernetesConfig.token
         ).data
         logger.info("getExtServiceDeployStatus deployment is:$deployment")
         return Result(deployment?.status)

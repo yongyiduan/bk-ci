@@ -30,13 +30,13 @@ package com.tencent.devops.store.resources
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.store.api.UserExtServiceDeployResource
-import com.tencent.devops.store.service.ExtServiceBcsService
+import com.tencent.devops.store.service.ExtServiceKubernetesService
 import io.fabric8.kubernetes.api.model.apps.DeploymentStatus
 import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
 class UserExtServiceDeployResourceImpl @Autowired constructor(
-    val extServiceBcsService: ExtServiceBcsService
+    val extServiceKubernetesService: ExtServiceKubernetesService
 ) : UserExtServiceDeployResource {
 
     override fun getExtServiceDeployStatus(
@@ -44,7 +44,7 @@ class UserExtServiceDeployResourceImpl @Autowired constructor(
         serviceCode: String,
         grayFlag: Boolean?
     ): Result<DeploymentStatus?> {
-        return extServiceBcsService.getExtServiceDeployStatus(userId, serviceCode, grayFlag)
+        return extServiceKubernetesService.getExtServiceDeployStatus(userId, serviceCode, grayFlag)
     }
 
     override fun deployExtService(
@@ -53,7 +53,7 @@ class UserExtServiceDeployResourceImpl @Autowired constructor(
         version: String,
         grayFlag: Boolean?
     ): Result<Boolean> {
-        return extServiceBcsService.deployExtService(
+        return extServiceKubernetesService.deployExtService(
             userId = userId,
             grayFlag = grayFlag ?: true,
             serviceCode = serviceCode,

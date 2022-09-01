@@ -29,6 +29,9 @@ package com.tencent.devops.store.service
 
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.model.store.tables.TExtensionService
+import com.tencent.devops.model.store.tables.TExtensionServiceFeature
+import com.tencent.devops.model.store.tables.TExtensionServiceItemRel
 import com.tencent.devops.store.config.ExtServiceIngressConfig
 import com.tencent.devops.store.dao.ExtItemServiceDao
 import com.tencent.devops.store.dao.common.StoreProjectRelDao
@@ -60,20 +63,23 @@ class ExtItemServiceService @Autowired constructor(
         logger.info("getExtItemServiceList userId is :$userId,itemIds is :$itemIds,projectCode is :$projectCode")
         val extServiceList = mutableListOf<ExtItemServiceVO>()
         val itemIdList = itemIds.split(",")
-        itemIdList.forEach { it ->
+        itemIdList.forEach { itemId ->
             val serviceRecords = extItemServiceDao.getExtItemServiceList(
                 dslContext = dslContext,
                 userId = userId,
-                itemId = it,
+                itemId = itemId,
                 projectCode = projectCode,
                 page = null,
                 pageSize = null
             )
             val serviceList = mutableListOf<ExtServiceVO>()
+            val tExtensionServiceItemRel = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL
+            val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+            val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
             serviceRecords?.forEach { service ->
-                val props = service["props"] as? String
-                val serviceCode = service["serviceCode"] as String
-                val killGrayAppFlag = service["killGrayAppFlag"] as? Boolean
+                val props = service[tExtensionServiceItemRel.PROPS]
+                val serviceCode = service[tExtensionService.SERVICE_CODE]
+                val killGrayAppFlag = service[tExtensionServiceFeature.KILL_GRAY_APP_FLAG]
                 // 判断用户的项目是否是调试项目
                 val testProjectFlag = storeProjectRelDao.isTestProjectCode(
                     dslContext = dslContext,
@@ -81,7 +87,10 @@ class ExtItemServiceService @Autowired constructor(
                     storeType = StoreTypeEnum.SERVICE,
                     projectCode = projectCode
                 )
-                // 获取微扩展对应的域名(微扩展如果有测试或审核中的版本，在其正式发布前killGrayAppFlag为false；全部是处于已发布这种终态的版本则所有项目都访问正式环境)
+                /**
+                 * 获取微扩展对应的域名(微扩展如果有测试或审核中的版本，
+                 * 在其正式发布前killGrayAppFlag为false；全部是处于已发布这种终态的版本则所有项目都访问正式环境)
+                 */
                 val hostConfig = if (testProjectFlag && (killGrayAppFlag != null && !killGrayAppFlag)) {
                     extServiceIngressConfig.grayHost
                 } else {
@@ -90,20 +99,20 @@ class ExtItemServiceService @Autowired constructor(
                 val host = MessageFormat(hostConfig).format(arrayOf(serviceCode))
                 serviceList.add(
                     ExtServiceVO(
-                        serviceId = service["serviceId"] as String,
-                        serviceName = service["serviceName"] as String,
-                        serviceCode = service["serviceCode"] as String,
-                        version = service["version"] as String,
-                        summary = service["summary"] as? String,
+                        serviceId = service[tExtensionService.ID],
+                        serviceName = service[tExtensionService.SERVICE_NAME],
+                        serviceCode = serviceCode,
+                        version = service[tExtensionService.VERSION],
+                        summary = service[tExtensionService.SUMMARY],
                         vendor = ExtServiceVendorVO(
-                            name = service["publisher"] as String
+                            name = service[tExtensionService.PUBLISHER] as String
                         ),
                         baseUrl = "//$host",
-                        props = if (!props.isNullOrBlank()) JsonUtil.toMap(props!!) else null
+                        props = if (!props.isNullOrBlank()) JsonUtil.toMap(props) else null
                     )
                 )
             }
-            extServiceList.add(ExtItemServiceVO(itemId = it, extServiceList = serviceList))
+            extServiceList.add(ExtItemServiceVO(itemId = itemId, extServiceList = serviceList))
         }
         return Result(extServiceList)
     }

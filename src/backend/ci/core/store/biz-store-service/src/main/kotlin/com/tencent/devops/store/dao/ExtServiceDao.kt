@@ -128,17 +128,6 @@ class ExtServiceDao {
         }
     }
 
-    fun deleteExtService(
-        dslContext: DSLContext,
-        userId: String,
-        serviceId: String
-    ) {
-        with(TExtensionService.T_EXTENSION_SERVICE) {
-            dslContext.update(this).set(DELETE_FLAG, true).set(MODIFIER, userId).set(UPDATE_TIME, LocalDateTime.now())
-                .where(ID.eq(serviceId)).execute()
-        }
-    }
-
     fun deleteExtServiceData(
         dslContext: DSLContext,
         serviceCode: String
@@ -150,7 +139,7 @@ class ExtServiceDao {
 
     fun getExtServiceIds(dslContext: DSLContext, serviceCode: String): Result<Record2<String, Boolean>> {
         with(TExtensionService.T_EXTENSION_SERVICE) {
-            return dslContext.select(ID.`as`("id"), LATEST_FLAG.`as`("latestFlag")).from(this)
+            return dslContext.select(ID, LATEST_FLAG).from(this)
                 .where(SERVICE_CODE.eq(serviceCode))
                 .and(LATEST_FLAG.eq(true))
                 .fetch()

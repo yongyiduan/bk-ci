@@ -25,17 +25,23 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.pojo
+package com.tencent.devops.store.config
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 
-@ApiModel("微扩展扩展点--该对象可能会要调整")
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class ExtsionInfoReq(
-    @ApiModelProperty("页面服务模块")
-    val serviceModel: String,
-    @ApiModelProperty("页面动作")
-    val serviceEvent: String
-)
+@Component
+class ExtServiceKubernetesConfig {
+
+    @Value("\${store.extService.kubernetes.masterUrl}")
+    val masterUrl: String = ""
+
+    @Value("\${store.extService.kubernetes.token}")
+    val token: String = ""
+
+    @Value("\${store.extService.kubernetes.deployTimeOut}")
+    val deployTimeOut: String = ""
+
+    @Value("\${store.extService.kubernetes.killGrayAppIntervalTime}")
+    val killGrayAppIntervalTime: String = ""
+}

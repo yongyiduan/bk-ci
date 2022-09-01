@@ -31,8 +31,8 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.redis.RedisLock
 import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.dispatch.api.ServiceBcsResource
-import com.tencent.devops.store.config.ExtServiceBcsConfig
-import com.tencent.devops.store.config.ExtServiceBcsNameSpaceConfig
+import com.tencent.devops.store.config.ExtServiceKubernetesConfig
+import com.tencent.devops.store.config.ExtServiceKubernetesNameSpaceConfig
 import com.tencent.devops.store.dao.ExtServiceDao
 import com.tencent.devops.store.dao.ExtServiceFeatureDao
 import com.tencent.devops.store.dao.common.StoreReleaseDao
@@ -56,11 +56,11 @@ class ExtServiceCronService @Autowired constructor(
     private val redisOperation: RedisOperation,
     private val extServiceDao: ExtServiceDao,
     private val extServiceFeatureDao: ExtServiceFeatureDao,
-    private val extServiceBcsConfig: ExtServiceBcsConfig,
+    private val extServiceKubernetesConfig: ExtServiceKubernetesConfig,
     private val serviceNotifyService: ExtServiceNotifyService,
-    private val extServiceBcsService: ExtServiceBcsService,
+    private val extServiceKubernetesService: ExtServiceKubernetesService,
     private val storeReleaseDao: StoreReleaseDao,
-    private val extServiceBcsNameSpaceConfig: ExtServiceBcsNameSpaceConfig
+    private val extServiceKubernetesNameSpaceConfig: ExtServiceKubernetesNameSpaceConfig
 ) {
 
     private val logger = LoggerFactory.getLogger(ExtServiceCronService::class.java)
@@ -92,16 +92,16 @@ class ExtServiceCronService @Autowired constructor(
                 val serviceCodes = serviceRecords.map { it.serviceCode }.toSet().joinToString(",")
                 // 批量获取微扩展部署信息
                 val serviceDeploymentMap = client.get(ServiceBcsResource::class).getBcsDeploymentInfos(
-                    namespaceName = extServiceBcsNameSpaceConfig.namespaceName,
+                    namespaceName = extServiceKubernetesNameSpaceConfig.namespaceName,
                     deploymentNames = serviceCodes,
-                    bcsUrl = extServiceBcsConfig.masterUrl,
-                    token = extServiceBcsConfig.token
+                    bcsUrl = extServiceKubernetesConfig.masterUrl,
+                    token = extServiceKubernetesConfig.token
                 ).data
                 logger.info("serviceDeploymentMap:$serviceDeploymentMap")
                 if (serviceDeploymentMap == null) {
                     return
                 }
-                val deployTimeOut = extServiceBcsConfig.deployTimeOut.toInt()
+                val deployTimeOut = extServiceKubernetesConfig.deployTimeOut.toInt()
                 serviceRecords.forEach {
                     val serviceCode = it.serviceCode
                     val deployment = serviceDeploymentMap[serviceCode]
@@ -187,7 +187,7 @@ class ExtServiceCronService @Autowired constructor(
                     queryServiceFeatureParam = QueryServiceFeatureParam(
                         deleteFlag = false,
                         killGrayAppFlag = true,
-                        killGrayAppIntervalTime = extServiceBcsConfig.killGrayAppIntervalTime.toLong(),
+                        killGrayAppIntervalTime = extServiceKubernetesConfig.killGrayAppIntervalTime.toLong(),
                         page = 1,
                         pageSize = 20
                     )
@@ -198,7 +198,7 @@ class ExtServiceCronService @Autowired constructor(
                 serviceFeatureRecords.forEach {
                     val serviceCode = it.serviceCode
                     // 停止bcs灰度命名空间的应用
-                    val bcsStopAppResult = extServiceBcsService.stopExtService(
+                    val bcsStopAppResult = extServiceKubernetesService.stopExtService(
                         userId = it.modifier,
                         serviceCode = serviceCode,
                         deploymentName = serviceCode,

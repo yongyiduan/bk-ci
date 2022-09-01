@@ -35,7 +35,7 @@ import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.process.api.service.ServiceBuildResource
 import com.tencent.devops.process.api.service.ServiceExtServiceBuildPipelineInitResource
 import com.tencent.devops.process.pojo.pipeline.ExtServiceBuildInitPipelineReq
-import com.tencent.devops.project.api.service.service.ServiceItemResource
+import com.tencent.devops.project.api.service.ServiceItemResource
 import com.tencent.devops.repository.api.ServiceGitRepositoryResource
 import com.tencent.devops.repository.pojo.Repository
 import com.tencent.devops.repository.pojo.RepositoryInfo
@@ -43,7 +43,6 @@ import com.tencent.devops.repository.pojo.enums.TokenTypeEnum
 import com.tencent.devops.repository.pojo.enums.VisibilityLevelEnum
 import com.tencent.devops.store.config.ExtServiceImageSecretConfig
 import com.tencent.devops.store.constant.StoreMessageCode
-import com.tencent.devops.store.dao.ExtServiceBuildAppRelDao
 import com.tencent.devops.store.dao.ExtServiceBuildInfoDao
 import com.tencent.devops.store.dao.common.StorePipelineBuildRelDao
 import com.tencent.devops.store.dao.common.StorePipelineRelDao
@@ -74,9 +73,6 @@ class TxExtServiceBaseService : ExtServiceBaseService() {
 
     @Autowired
     private lateinit var extServiceBuildInfoDao: ExtServiceBuildInfoDao
-
-    @Autowired
-    private lateinit var extServiceBuildAppRelDao: ExtServiceBuildAppRelDao
 
     @Autowired
     private lateinit var storePipelineBuildRelDao: StorePipelineBuildRelDao
@@ -192,9 +188,9 @@ class TxExtServiceBaseService : ExtServiceBaseService() {
             password = extServiceImageSecretConfig.repoPassword
         )
         // 未正式发布的微扩展先部署到bcs灰度环境
-        val deployApp = extServiceBcsService.generateDeployApp(
+        val deployApp = extServiceKubernetesService.generateDeployApp(
             userId = userId,
-            namespaceName = extServiceBcsNameSpaceConfig.grayNamespaceName,
+            namespaceName = extServiceKubernetesNameSpaceConfig.grayNamespaceName,
             serviceCode = serviceCode,
             version = version
         )
@@ -207,11 +203,7 @@ class TxExtServiceBaseService : ExtServiceBaseService() {
                 extServiceImageInfo = extServiceImageInfo,
                 extServiceDeployInfo = deployApp
             )
-            val serviceBuildAppInfoRecords = extServiceBuildAppRelDao.getExtServiceBuildAppInfo(context, serviceId)
             val buildEnv = mutableMapOf<String, String>()
-            serviceBuildAppInfoRecords?.forEach {
-                buildEnv[it["appName"] as String] = it["appVersion"] as String
-            }
             val extServiceFeature = extFeatureDao.getServiceByCode(context, serviceCode)!!
             val extServiceBuildInitPipelineReq = ExtServiceBuildInitPipelineReq(
                 repositoryHashId = extServiceFeature.repositoryHashId,

@@ -38,15 +38,19 @@ import org.springframework.stereotype.Repository
 class ExtServiceBuildInfoDao {
 
     fun getServiceBuildInfo(dslContext: DSLContext, serviceId: String): Record2<String, String> {
-        val a = TExtensionServiceEnvInfo.T_EXTENSION_SERVICE_ENV_INFO.`as`("a")
-        val b = TStoreBuildInfo.T_STORE_BUILD_INFO.`as`("b")
+        val tExtensionServiceEnvInfo = TExtensionServiceEnvInfo.T_EXTENSION_SERVICE_ENV_INFO
+        val tStoreBuildInfo = TStoreBuildInfo.T_STORE_BUILD_INFO
         return dslContext.select(
-            b.SCRIPT.`as`("script"),
-            b.REPOSITORY_PATH.`as`("repositoryPath")
-        ).from(a)
-            .join(b)
-            .on(a.LANGUAGE.eq(b.LANGUAGE))
-            .where(a.SERVICE_ID.eq(serviceId)).and(b.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
+            tStoreBuildInfo.SCRIPT,
+            tStoreBuildInfo.REPOSITORY_PATH
+        ).from(tExtensionServiceEnvInfo)
+            .join(tStoreBuildInfo)
+            .on(tExtensionServiceEnvInfo.LANGUAGE.eq(tStoreBuildInfo.LANGUAGE))
+            .where(
+                tExtensionServiceEnvInfo.SERVICE_ID.eq(serviceId)
+                    .and(tStoreBuildInfo.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
+            )
+            .limit(1)
             .fetchOne()!!
     }
 }

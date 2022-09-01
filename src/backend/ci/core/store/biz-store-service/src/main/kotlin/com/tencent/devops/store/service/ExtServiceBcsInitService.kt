@@ -34,9 +34,9 @@ import com.tencent.devops.dispatch.pojo.CreateImagePullSecretRequest
 import com.tencent.devops.dispatch.pojo.KubernetesLabel
 import com.tencent.devops.dispatch.pojo.KubernetesLimitRange
 import com.tencent.devops.dispatch.pojo.KubernetesRepo
-import com.tencent.devops.store.config.ExtServiceBcsConfig
-import com.tencent.devops.store.config.ExtServiceBcsLimitRangeConfig
-import com.tencent.devops.store.config.ExtServiceBcsNameSpaceConfig
+import com.tencent.devops.store.config.ExtServiceKubernetesConfig
+import com.tencent.devops.store.config.ExtServiceKubernetesLimitRangeConfig
+import com.tencent.devops.store.config.ExtServiceKubernetesNameSpaceConfig
 import com.tencent.devops.store.config.ExtServiceImageSecretConfig
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,9 +48,9 @@ import javax.annotation.PostConstruct
 @DependsOn("springContextUtil")
 class ExtServiceBcsInitService @Autowired constructor(
     private val client: Client,
-    private val extServiceBcsConfig: ExtServiceBcsConfig,
-    private val extServiceBcsNameSpaceConfig: ExtServiceBcsNameSpaceConfig,
-    private val extServiceBcsLimitRangeConfig: ExtServiceBcsLimitRangeConfig,
+    private val extServiceKubernetesConfig: ExtServiceKubernetesConfig,
+    private val extServiceKubernetesNameSpaceConfig: ExtServiceKubernetesNameSpaceConfig,
+    private val extServiceKubernetesLimitRangeConfig: ExtServiceKubernetesLimitRangeConfig,
     private val extServiceImageSecretConfig: ExtServiceImageSecretConfig
 ) {
 
@@ -60,27 +60,27 @@ class ExtServiceBcsInitService @Autowired constructor(
     fun initBcsNamespace() {
         logger.info("begin execute initBcsNamespace")
         // 初始化bcs命名空间（包括已发布微扩展版本的命名空间和处于测试中微扩展版本的命名空间）
-        val namespaceName = extServiceBcsNameSpaceConfig.namespaceName
+        val namespaceName = extServiceKubernetesNameSpaceConfig.namespaceName
         val createBcsNameSpaceRequest = CreateBcsNameSpaceRequest(
-            bcsUrl = extServiceBcsConfig.masterUrl,
-            token = extServiceBcsConfig.token,
+            bcsUrl = extServiceKubernetesConfig.masterUrl,
+            token = extServiceKubernetesConfig.token,
             kubernetesLabel = KubernetesLabel(
-                labelKey = extServiceBcsNameSpaceConfig.labelKey,
-                labelValue = extServiceBcsNameSpaceConfig.labelValue
+                labelKey = extServiceKubernetesNameSpaceConfig.labelKey,
+                labelValue = extServiceKubernetesNameSpaceConfig.labelValue
             ),
             limitRangeInfo = KubernetesLimitRange(
-                defaultCpu = extServiceBcsLimitRangeConfig.defaultCpu,
-                defaultMemory = extServiceBcsLimitRangeConfig.defaultMemory,
-                defaultRequestCpu = extServiceBcsLimitRangeConfig.defaultRequestCpu,
-                defaultRequestMemory = extServiceBcsLimitRangeConfig.defaultRequestMemory,
-                limitType = extServiceBcsLimitRangeConfig.limitType
+                defaultCpu = extServiceKubernetesLimitRangeConfig.defaultCpu,
+                defaultMemory = extServiceKubernetesLimitRangeConfig.defaultMemory,
+                defaultRequestCpu = extServiceKubernetesLimitRangeConfig.defaultRequestCpu,
+                defaultRequestMemory = extServiceKubernetesLimitRangeConfig.defaultRequestMemory,
+                limitType = extServiceKubernetesLimitRangeConfig.limitType
             )
         )
         // 创建已发布微扩展版本的命名空间
         val releaseNamespaceResult =
             client.get(ServiceBcsResource::class).createNamespace(namespaceName, createBcsNameSpaceRequest)
         logger.info("create namespace:$namespaceName result is:$releaseNamespaceResult")
-        val grayNamespaceName = extServiceBcsNameSpaceConfig.grayNamespaceName
+        val grayNamespaceName = extServiceKubernetesNameSpaceConfig.grayNamespaceName
         // 创建测试中微扩展版本的命名空间
         val grayNamespaceResult =
             client.get(ServiceBcsResource::class).createNamespace(grayNamespaceName, createBcsNameSpaceRequest)
@@ -93,8 +93,8 @@ class ExtServiceBcsInitService @Autowired constructor(
         logger.info("begin execute initBcsImagePullSecret")
         val secretName = extServiceImageSecretConfig.secretName
         val createImagePullSecretRequest = CreateImagePullSecretRequest(
-            bcsUrl = extServiceBcsConfig.masterUrl,
-            token = extServiceBcsConfig.token,
+            bcsUrl = extServiceKubernetesConfig.masterUrl,
+            token = extServiceKubernetesConfig.token,
             kubernetesRepo = KubernetesRepo(
                 registryUrl = extServiceImageSecretConfig.repoRegistryUrl,
                 username = extServiceImageSecretConfig.repoUsername,
@@ -104,7 +104,7 @@ class ExtServiceBcsInitService @Autowired constructor(
         )
         // 创建已发布微扩展版本的命名空间拉取镜像secret
         val createReleaseNsImagePullSecretResult = client.get(ServiceBcsResource::class).createImagePullSecretTest(
-            namespaceName = extServiceBcsNameSpaceConfig.namespaceName,
+            namespaceName = extServiceKubernetesNameSpaceConfig.namespaceName,
             secretName = secretName,
             createImagePullSecretRequest = createImagePullSecretRequest
         )
@@ -112,7 +112,7 @@ class ExtServiceBcsInitService @Autowired constructor(
         // 创建已发布微扩展版本的命名空间拉取镜像secret
         val graySecretName = extServiceImageSecretConfig.graySecretName
         val createGrayNsImagePullSecretResult = client.get(ServiceBcsResource::class).createImagePullSecretTest(
-            namespaceName = extServiceBcsNameSpaceConfig.grayNamespaceName,
+            namespaceName = extServiceKubernetesNameSpaceConfig.grayNamespaceName,
             secretName = graySecretName,
             createImagePullSecretRequest = createImagePullSecretRequest
         )
