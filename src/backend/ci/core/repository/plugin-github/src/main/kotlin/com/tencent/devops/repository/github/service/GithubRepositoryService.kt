@@ -46,7 +46,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class GithubRepositoryService @Autowired constructor(
-    private val defaultGithubClient: DefaultGithubClient,
+    private val defaultGithubClient: DefaultGithubClient
 ) {
     fun createOrUpdateFile(
         request: CreateOrUpdateFileContentsRequest,
