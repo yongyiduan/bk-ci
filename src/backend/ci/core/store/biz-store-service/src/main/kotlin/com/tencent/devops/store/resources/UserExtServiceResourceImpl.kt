@@ -41,14 +41,14 @@ import com.tencent.devops.store.pojo.vo.ExtServiceMainItemVo
 import com.tencent.devops.store.pojo.vo.SearchExtServiceVO
 import com.tencent.devops.store.pojo.vo.ServiceVersionListItem
 import com.tencent.devops.store.pojo.vo.ServiceVersionVO
-import com.tencent.devops.store.service.ExtServiceBaseService
+import com.tencent.devops.store.service.ExtServiceReleaseService
 import com.tencent.devops.store.service.ExtServiceSearchService
 import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
 class UserExtServiceResourceImpl @Autowired constructor(
     val extServiceSearchService: ExtServiceSearchService,
-    val extServiceBaseService: ExtServiceBaseService
+    val extServiceReleaseService: ExtServiceReleaseService
 ) : UserExtServiceResource {
     override fun mainPageList(userId: String, page: Int?, pageSize: Int?): Result<List<ExtServiceMainItemVo>> {
         return extServiceSearchService.mainPageList(userId, page, pageSize)
@@ -81,7 +81,7 @@ class UserExtServiceResourceImpl @Autowired constructor(
     }
 
     override fun getServiceByCode(userId: String, bk_ticket: String, serviceCode: String): Result<ServiceVersionVO?> {
-        return extServiceBaseService.getServiceByCode(
+        return extServiceReleaseService.getServiceByCode(
             userId = userId,
             serviceCode = serviceCode
         )
@@ -93,15 +93,15 @@ class UserExtServiceResourceImpl @Autowired constructor(
         page: Int,
         pageSize: Int
     ): Result<Page<ServiceVersionListItem>> {
-        return extServiceBaseService.getServiceVersionListByCode(userId, serviceCode, page, pageSize)
+        return extServiceReleaseService.getServiceVersionListByCode(userId, serviceCode, page, pageSize)
     }
 
     override fun createMediaAndVisible(userId: String, serviceId: String, submitInfo: ExtSubmitDTO): Result<Boolean> {
-        return extServiceBaseService.createMediaAndVisible(userId, serviceId, submitInfo)
+        return extServiceReleaseService.createMediaAndVisible(userId, serviceId, submitInfo)
     }
 
     override fun createMediaAndVisible(userId: String, serviceId: String): Result<Boolean> {
-        return extServiceBaseService.backToTest(userId, serviceId)
+        return extServiceReleaseService.backToTest(userId, serviceId)
     }
 
     override fun updateServiceBaseInfo(
@@ -126,6 +126,6 @@ class UserExtServiceResourceImpl @Autowired constructor(
             mediaInfo = serviceBaseInfoUpdateRequest.mediaList,
             settingInfo = null
         )
-        return extServiceBaseService.updateExtInfo(userId, serviceId, serviceCode, editInfo)
+        return extServiceReleaseService.updateExtInfo(userId, serviceId, serviceCode, editInfo)
     }
 }

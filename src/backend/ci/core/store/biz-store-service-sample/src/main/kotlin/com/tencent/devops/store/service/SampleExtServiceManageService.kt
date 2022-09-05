@@ -25,34 +25,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.pojo.dto
+package com.tencent.devops.store.service
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.tencent.devops.common.web.annotation.BkField
-import com.tencent.devops.common.web.constant.BkStyleEnum
-import com.tencent.devops.repository.pojo.enums.TokenTypeEnum
-import com.tencent.devops.repository.pojo.enums.VisibilityLevelEnum
-import io.swagger.annotations.ApiModelProperty
+import org.springframework.stereotype.Service
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class InitExtServiceDTO(
-    @ApiModelProperty("微扩展code")
-    @field:BkField(patternStyle = BkStyleEnum.CODE_STYLE)
-    val serviceCode: String,
-    @ApiModelProperty("微扩展Name")
-    @field:BkField(patternStyle = BkStyleEnum.NAME_STYLE)
-    val serviceName: String,
-    @ApiModelProperty("调试项目Code")
-    val projectCode: String,
-    @ApiModelProperty("服务语言")
-    @field:BkField(patternStyle = BkStyleEnum.LANGUAGE_STYLE)
-    val language: String? = "java",
-    @ApiModelProperty("认证方式", required = false)
-    val authType: String? = TokenTypeEnum.OAUTH.toString(),
-    @ApiModelProperty(value = "插件代码库不开源原因", required = false)
-    val privateReason: String? = null,
-    @ApiModelProperty("扩展点列表")
-    val extensionItemList: Set<String>,
-    @ApiModelProperty(value = "项目可视范围", required = false)
-    val visibilityLevel: VisibilityLevelEnum? = VisibilityLevelEnum.LOGIN_PUBLIC
-)
+@Service
+class SampleExtServiceManageService : ExtServiceManageService() {
+
+    override fun doServiceDeleteBus(
+        userId: String,
+        serviceId: String,
+        serviceCode: String,
+        initProjectCode: String
+    ) = Unit
+}

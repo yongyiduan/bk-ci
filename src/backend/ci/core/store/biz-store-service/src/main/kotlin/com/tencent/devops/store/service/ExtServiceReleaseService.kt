@@ -29,7 +29,6 @@ package com.tencent.devops.store.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.tencent.devops.artifactory.api.ServiceArchiveStoreFileResource
 import com.tencent.devops.common.api.constant.APPROVE
 import com.tencent.devops.common.api.constant.BEGIN
 import com.tencent.devops.common.api.constant.COMMIT
@@ -38,7 +37,7 @@ import com.tencent.devops.common.api.constant.DOING
 import com.tencent.devops.common.api.constant.EDIT
 import com.tencent.devops.common.api.constant.END
 import com.tencent.devops.common.api.constant.FAIL
-import com.tencent.devops.common.api.constant.ONLINE
+import com.tencent.devops.common.api.constant.KEY_REPOSITORY_HASH_ID
 import com.tencent.devops.common.api.constant.NUM_FIVE
 import com.tencent.devops.common.api.constant.NUM_FOUR
 import com.tencent.devops.common.api.constant.NUM_ONE
@@ -46,32 +45,25 @@ import com.tencent.devops.common.api.constant.NUM_SEVEN
 import com.tencent.devops.common.api.constant.NUM_SIX
 import com.tencent.devops.common.api.constant.NUM_THREE
 import com.tencent.devops.common.api.constant.NUM_TWO
+import com.tencent.devops.common.api.constant.ONLINE
 import com.tencent.devops.common.api.constant.SUCCESS
 import com.tencent.devops.common.api.constant.TEST
 import com.tencent.devops.common.api.constant.TEST_ENV_PREPARE
 import com.tencent.devops.common.api.constant.UNDO
 import com.tencent.devops.common.api.exception.ErrorCodeException
-import com.tencent.devops.common.api.exception.RemoteServiceException
-import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.api.util.JsonUtil
-import com.tencent.devops.common.api.util.OkhttpUtils
 import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.auth.api.AuthPermission
 import com.tencent.devops.common.auth.api.AuthPermissionApi
 import com.tencent.devops.common.auth.api.AuthResourceType
-import com.tencent.devops.common.auth.code.BSProjectServiceCodec
+import com.tencent.devops.common.auth.code.PipelineAuthServiceCode
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.common.service.utils.MessageCodeUtil
-import com.tencent.devops.project.pojo.ServiceItem
+import com.tencent.devops.project.api.service.ServiceItemResource
 import com.tencent.devops.project.api.service.ServiceProjectResource
-import com.tencent.devops.project.pojo.ITEM_BK_SERVICE_REDIS_KEY
-import com.tencent.devops.repository.api.ServiceGitRepositoryResource
-import com.tencent.devops.repository.pojo.Repository
-import com.tencent.devops.repository.pojo.enums.TokenTypeEnum
-import com.tencent.devops.repository.pojo.enums.VisibilityLevelEnum
+import com.tencent.devops.project.constant.ProjectConstant.ITEM_BK_SERVICE_REDIS_KEY
 import com.tencent.devops.store.config.ExtServiceKubernetesNameSpaceConfig
 import com.tencent.devops.store.constant.StoreMessageCode
 import com.tencent.devops.store.dao.ExtServiceDao
@@ -79,12 +71,9 @@ import com.tencent.devops.store.dao.ExtServiceEnvDao
 import com.tencent.devops.store.dao.ExtServiceFeatureDao
 import com.tencent.devops.store.dao.ExtServiceItemRelDao
 import com.tencent.devops.store.dao.ExtServiceLabelRelDao
-import com.tencent.devops.store.dao.ExtItemServiceDao
 import com.tencent.devops.store.dao.ExtServiceVersionLogDao
 import com.tencent.devops.store.dao.common.StoreBuildInfoDao
 import com.tencent.devops.store.dao.common.StoreMediaInfoDao
-import com.tencent.devops.common.archive.config.BkRepoConfig
-import com.tencent.devops.project.api.service.ServiceItemResource
 import com.tencent.devops.store.dao.common.StoreMemberDao
 import com.tencent.devops.store.dao.common.StoreProjectRelDao
 import com.tencent.devops.store.dao.common.StoreStatisticTotalDao
@@ -98,12 +87,9 @@ import com.tencent.devops.store.pojo.ExtServiceUpdateInfo
 import com.tencent.devops.store.pojo.ExtServiceVersionLogCreateInfo
 import com.tencent.devops.store.pojo.ExtensionJson
 import com.tencent.devops.store.pojo.ItemPropCreateInfo
+import com.tencent.devops.store.pojo.common.DeptInfo
 import com.tencent.devops.store.pojo.common.EXTENSION_JSON_NAME
-import com.tencent.devops.store.pojo.common.KEY_LABEL_CODE
-import com.tencent.devops.store.pojo.common.KEY_LABEL_ID
-import com.tencent.devops.store.pojo.common.KEY_LABEL_NAME
-import com.tencent.devops.store.pojo.common.KEY_LABEL_TYPE
-import com.tencent.devops.store.pojo.common.Label
+import com.tencent.devops.store.pojo.common.KEY_CODE_SRC
 import com.tencent.devops.store.pojo.common.ReleaseProcessItem
 import com.tencent.devops.store.pojo.common.StoreMediaInfoRequest
 import com.tencent.devops.store.pojo.common.StoreProcessInfo
@@ -119,28 +105,17 @@ import com.tencent.devops.store.pojo.dto.SubmitDTO
 import com.tencent.devops.store.pojo.enums.DescInputTypeEnum
 import com.tencent.devops.store.pojo.enums.ExtServicePackageSourceTypeEnum
 import com.tencent.devops.store.pojo.enums.ExtServiceStatusEnum
-import com.tencent.devops.store.pojo.vo.ExtServiceRespItem
-import com.tencent.devops.store.pojo.vo.MyServiceVO
-import com.tencent.devops.store.pojo.vo.ServiceVersionListItem
-import com.tencent.devops.store.pojo.vo.ServiceVersionVO
-import com.tencent.devops.store.service.common.StoreCommentService
 import com.tencent.devops.store.service.common.StoreCommonService
 import com.tencent.devops.store.service.common.StoreMediaService
-import com.tencent.devops.store.service.common.StoreUserService
-import com.tencent.devops.store.service.common.StoreVisibleDeptService
 import com.tencent.devops.store.utils.VersionUtils
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.springframework.util.StringUtils
-import java.time.LocalDateTime
-import java.util.regex.Pattern
-import okhttp3.Request
 
 @Service
-abstract class ExtServiceBaseService @Autowired constructor() {
+abstract class ExtServiceReleaseService @Autowired constructor() {
 
     @Autowired
     lateinit var dslContext: DSLContext
@@ -169,13 +144,7 @@ abstract class ExtServiceBaseService @Autowired constructor() {
     @Autowired
     lateinit var client: Client
     @Autowired
-    lateinit var storeUserService: StoreUserService
-    @Autowired
-    lateinit var storeCommentService: StoreCommentService
-    @Autowired
     lateinit var mediaService: StoreMediaService
-    @Autowired
-    lateinit var deptService: StoreVisibleDeptService
     @Autowired
     lateinit var objectMapper: ObjectMapper
     @Autowired
@@ -189,7 +158,7 @@ abstract class ExtServiceBaseService @Autowired constructor() {
     @Autowired
     lateinit var storeStatisticTotalDao: StoreStatisticTotalDao
     @Autowired
-    lateinit var bsProjectServiceCodec: BSProjectServiceCodec
+    lateinit var pipelineAuthServiceCode: PipelineAuthServiceCode
     @Autowired
     lateinit var redisOperation: RedisOperation
 
@@ -200,7 +169,7 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         val serviceCode = extensionInfo.serviceCode
         logger.info("addExtService user[$userId], serviceCode[$serviceCode], info[$extensionInfo]")
         // 校验信息
-        validateAddServiceReq(userId, extensionInfo)
+        validateAddServiceReq(extensionInfo)
         checkProjectInfo(userId, extensionInfo.projectCode)
         val handleServicePackageResult = handleServicePackage(extensionInfo, userId, serviceCode)
         logger.info("addExtService the handleServicePackage is :$handleServicePackageResult")
@@ -271,8 +240,8 @@ abstract class ExtServiceBaseService @Autowired constructor() {
                 userId = userId,
                 extServiceFeatureCreateInfo = ExtServiceFeatureCreateInfo(
                     serviceCode = serviceCode,
-                    repositoryHashId = handleServicePackageMap?.get("repositoryHashId") ?: "",
-                    codeSrc = handleServicePackageMap?.get("codeSrc") ?: "",
+                    repositoryHashId = handleServicePackageMap?.get(KEY_REPOSITORY_HASH_ID) ?: "",
+                    codeSrc = handleServicePackageMap?.get(KEY_CODE_SRC) ?: "",
                     creatorUser = userId,
                     modifierUser = userId,
                     visibilityLevel = extensionInfo.visibilityLevel!!.level
@@ -386,13 +355,16 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         }
 
         var serviceId = UUIDUtil.generate()
-        val serviceStatus =
-            if (extPackageSourceType == ExtServicePackageSourceTypeEnum.REPO) ExtServiceStatusEnum.COMMITTING else ExtServiceStatusEnum.TESTING
+        val serviceStatus = if (extPackageSourceType == ExtServicePackageSourceTypeEnum.REPO) {
+            ExtServiceStatusEnum.COMMITTING
+        } else {
+            ExtServiceStatusEnum.TESTING
+        }
 
         dslContext.transaction { t ->
             val context = DSL.using(t)
-            logger.info("updateExtService cancelFlag[$cancelFlag] releaseType[$releaseType] version[${serviceRecord.version}]")
-            if (StringUtils.isEmpty(serviceRecord.version) || (cancelFlag && releaseType == ReleaseTypeEnum.CANCEL_RE_RELEASE)) {
+            if (serviceRecord.version.isNullOrBlank() ||
+                (cancelFlag && releaseType == ReleaseTypeEnum.CANCEL_RE_RELEASE)) {
                 // 首次创建版本或者取消发布后不变更版本号重新上架，则在该版本的记录上做更新操作
                 serviceId = serviceRecord.id
                 val finalReleaseType = if (releaseType == ReleaseTypeEnum.CANCEL_RE_RELEASE) {
@@ -509,7 +481,7 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         userId: String
     )
 
-    fun getExtensionServiceInfo(userId: String, serviceId: String): Result<StoreProcessInfo> {
+    fun getExtensionServiceProcessInfo(userId: String, serviceId: String): Result<StoreProcessInfo> {
         logger.info("getProcessInfo userId is $userId,serviceId is $serviceId")
         val record = extServiceDao.getServiceById(dslContext, serviceId)
         return if (null == record) {
@@ -534,110 +506,8 @@ abstract class ExtServiceBaseService @Autowired constructor() {
                 creator = record.creator,
                 processInfo = processInfo
             )
-            logger.info("getProcessInfo storeProcessInfo is $storeProcessInfo")
             Result(storeProcessInfo)
         }
-    }
-
-    fun getMyService(
-        userId: String,
-        serviceName: String?,
-        page: Int?,
-        pageSize: Int?
-    ): Result<MyServiceVO> {
-        logger.info("the getMyService userId is :$userId,serviceName is :$serviceName")
-        // 获取有权限的微扩展列表
-        val records = extServiceDao.getMyService(dslContext, userId, serviceName, page, pageSize)
-        val count = extServiceDao.countByUser(dslContext, userId, serviceName)
-        logger.info("the getMyService userId is :$userId,records is :$records,count is :$count")
-        // 获取项目ID对应的名称
-        val projectCodeList = mutableListOf<String>()
-        val serviceItemIdMap = mutableMapOf<String, Set<String>>()
-        val itemIdList = mutableSetOf<String>()
-        records?.forEach {
-            val testProjectCode = storeProjectRelDao.getUserStoreTestProjectCode(
-                dslContext,
-                userId,
-                it["serviceCode"] as String,
-                StoreTypeEnum.SERVICE
-            )
-            if (null != testProjectCode) projectCodeList.add(testProjectCode)
-
-            val serviceItemRecords = extServiceItemRelDao.getItemByServiceId(
-                dslContext,
-                it["serviceId"] as String
-            )
-            val itemIds = mutableSetOf<String>()
-            serviceItemRecords?.forEach { itemInfo ->
-                itemIds.add(itemInfo.itemId)
-                itemIdList.add(itemInfo.itemId)
-            }
-            serviceItemIdMap[it["serviceId"] as String] = itemIds
-        }
-        logger.info("the getMyService serviceItemIdMap is :$serviceItemIdMap")
-
-        logger.info("the getMyService userId is :$userId,projectCodeList is :$projectCodeList")
-        val projectMap = client.get(ServiceProjectResource::class).getNameByCode(projectCodeList.joinToString(",")).data
-        logger.info("the getMyService userId is :$userId,projectMap is :$projectMap")
-
-        val itemRecordList = client.get(ServiceItemResource::class).getItemInfoByIds(itemIdList).data
-        val itemInfoMap = mutableMapOf<String, ServiceItem>()
-        itemRecordList?.forEach {
-            itemInfoMap[it.itemId] = it
-        }
-        logger.info("the getMyService userId is :$userId,itemRecordList is :$itemRecordList, itemInfoMap is :$itemInfoMap")
-
-        val myService = mutableListOf<ExtServiceRespItem?>()
-        records?.forEach {
-            val serviceCode = it["serviceCode"] as String
-            val serviceId = it["serviceId"] as String
-            var releaseFlag = false // 是否有处于上架状态的微扩展版本
-            val releaseServiceNum = extServiceDao.countReleaseServiceByCode(dslContext, serviceCode)
-            if (releaseServiceNum > 0) {
-                releaseFlag = true
-            }
-            val language = extServiceEnvDao.getMarketServiceEnvInfoByServiceId(dslContext, serviceId)?.language
-            val serviceItemList = serviceItemIdMap[serviceId]
-            logger.info("the getMyService serviceId is :$serviceId, itemList is :$serviceItemList")
-            val itemNameList = mutableListOf<String>()
-            serviceItemList?.forEach { itId ->
-                val itemInfo = itemInfoMap[itId]
-                if (itemInfo != null) {
-                    itemNameList.add("${itemInfo.parentName}-${itemInfo.itemName}")
-                }
-            }
-            logger.info("the getMyService serviceId is :$serviceId, itemName is :${JsonUtil.toJson(itemNameList)}")
-            myService.add(
-                ExtServiceRespItem(
-                    serviceId = serviceId,
-                    serviceName = it["serviceName"] as String,
-                    serviceCode = serviceCode,
-                    version = it["version"] as String,
-                    category = it["category"] as String,
-                    logoUrl = it["logoUrl"] as String?,
-                    serviceStatus = ExtServiceStatusEnum.getServiceStatus((it["serviceStatus"] as Byte).toInt()),
-                    publisher = it["publisher"] as String,
-                    publishTime = DateTimeUtil.toDateTime(it["pubTime"] as LocalDateTime),
-                    creator = it["creator"] as String,
-                    createTime = DateTimeUtil.toDateTime(it["createTime"] as LocalDateTime),
-                    modifier = it["modifier"] as String,
-                    updateTime = DateTimeUtil.toDateTime(it["updateTime"] as LocalDateTime),
-                    projectName = projectMap?.get(
-                        storeProjectRelDao.getUserStoreTestProjectCode(
-                            dslContext,
-                            userId,
-                            it["serviceCode"] as String,
-                            StoreTypeEnum.SERVICE
-                        )
-                    ) ?: "",
-                    language = language ?: "",
-                    itemName = itemNameList,
-                    itemIds = serviceItemList ?: emptySet(),
-                    releaseFlag = releaseFlag
-                )
-            )
-        }
-        return Result(MyServiceVO(count, page, pageSize, myService))
     }
 
     fun offlineService(userId: String, serviceCode: String, serviceOfflineDTO: ServiceOfflineDTO): Result<Boolean> {
@@ -658,12 +528,13 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         }
         // 设置微扩展状态为下架中
         extServiceDao.setServiceStatusByCode(
-            dslContext, serviceCode, ExtServiceStatusEnum.RELEASED.status.toByte(),
-            ExtServiceStatusEnum.UNDERCARRIAGED.status.toByte(), userId, serviceOfflineDTO.reason
+            dslContext = dslContext,
+            serviceCode = serviceCode,
+            serviceOldStatus = ExtServiceStatusEnum.RELEASED.status.toByte(),
+            serviceNewStatus = ExtServiceStatusEnum.UNDERCARRIAGED.status.toByte(),
+            userId = userId,
+            msg = serviceOfflineDTO.reason
         )
-        // 通过websocket推送状态变更消息
-//        storeWebsocketService.sendWebsocketMessageByAtomCodeAndUserId(serviceCode, userId)
-
         return Result(true)
     }
 
@@ -676,59 +547,6 @@ abstract class ExtServiceBaseService @Autowired constructor() {
             )
         }
         return ret
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun getServiceById(serviceId: String, userId: String): Result<ServiceVersionVO?> {
-        return getServiceVersion(serviceId, userId)
-    }
-
-    fun getServiceByCode(userId: String, serviceCode: String): Result<ServiceVersionVO?> {
-        val record = extServiceDao.getServiceLatestByCode(dslContext, serviceCode)
-        return (if (null == record) {
-            Result(data = null)
-        } else {
-            getServiceVersion(record.id, userId)
-        })
-    }
-
-    fun getServiceVersionListByCode(
-        userId: String,
-        serviceCode: String,
-        page: Int,
-        pageSize: Int
-    ): Result<Page<ServiceVersionListItem>> {
-        logger.info("getServiceVersionListByCode params[$userId|$serviceCode|$page|$pageSize]")
-        val totalCount = extServiceDao.countByCode(dslContext, serviceCode)
-        val records = extServiceDao.listServiceByCode(dslContext, serviceCode)
-        val atomVersions = mutableListOf<ServiceVersionListItem>()
-        if (records != null) {
-            val serviceIds = records.map { it.id }
-            // 批量获取版本内容
-            val versionRecords = extServiceVersionLogDao.getVersionLogsByServiceIds(
-                dslContext = dslContext,
-                serviceIds = serviceIds
-            )
-            val versionMap = mutableMapOf<String, String>()
-            versionRecords?.forEach { versionRecord ->
-                versionMap[versionRecord.serviceId] = versionRecord.content
-            }
-            records.forEach {
-                atomVersions.add(
-                    ServiceVersionListItem(
-                        serviceId = it.id,
-                        serviceCode = it.serviceCode,
-                        serviceName = it.serviceName,
-                        version = it.version,
-                        versionContent = versionMap[it.id].toString(),
-                        serviceStatus = ExtServiceStatusEnum.getServiceStatus((it.serviceStatus as Byte).toInt()),
-                        creator = it.creator,
-                        createTime = DateTimeUtil.toDateTime(it.createTime)
-                    )
-                )
-            }
-        }
-        return Result(Page(page, pageSize, totalCount.toLong(), atomVersions))
     }
 
     /**
@@ -788,7 +606,7 @@ abstract class ExtServiceBaseService @Autowired constructor() {
      */
     fun passTest(userId: String, serviceId: String): Result<Boolean> {
         logger.info("passTest, userId=$userId, serviceId=$serviceId")
-        val serviceRecord = extServiceDao.getServiceById(dslContext, serviceId)
+        extServiceDao.getServiceById(dslContext, serviceId)
             ?: return MessageCodeUtil.generateResponseDataObject(
                 messageCode = CommonMessageCode.PARAMETER_IS_INVALID,
                 params = arrayOf(serviceId),
@@ -796,92 +614,30 @@ abstract class ExtServiceBaseService @Autowired constructor() {
             )
         // 查看当前版本之前的版本是否有已发布的，如果有已发布的版本则只是普通的升级操作而不需要审核
         val serviceStatus = ExtServiceStatusEnum.EDIT.status.toByte()
-
-        extServiceDao.setServiceStatusById(dslContext, serviceId, serviceStatus, userId, "")
-//            // 通过websocket推送状态变更消息
-//            storeWebsocketService.sendWebsocketMessage(userId, serviceId)
-
-        return Result(true)
-    }
-
-    fun rebuild(projectCode: String, userId: String, serviceId: String): Result<Boolean> {
-        logger.info("rebuild, projectCode=$projectCode, userId=$userId, serviceId=$serviceId")
-        // 判断是否可以启动构建
-        val status = ExtServiceStatusEnum.BUILDING.status.toByte()
-        val (checkResult, code) = checkServiceVersionOptRight(userId, serviceId, status)
-        if (!checkResult) {
-            return MessageCodeUtil.generateResponseDataObject(code)
-        }
-        // 拉取extension.json，检查格式，更新入库
-        val serviceRecord =
-            extServiceDao.getServiceById(dslContext, serviceId) ?: return MessageCodeUtil.generateResponseDataObject(
-                CommonMessageCode.PARAMETER_IS_INVALID,
-                arrayOf(serviceId)
-            )
-        val serviceCode = serviceRecord.serviceCode
-        val extServiceFeature = extFeatureDao.getServiceByCode(dslContext, serviceCode)!!
-        // 从工蜂拉取文件
-        val fileStr = client.get(ServiceGitRepositoryResource::class).getFileContent(
-            extServiceFeature.repositoryHashId,
-            EXTENSION_JSON_NAME, null, null, null
-        ).data
-        logger.info("get serviceCode[$serviceCode] file($EXTENSION_JSON_NAME) fileStr is:$fileStr")
-        dslContext.transaction { t ->
-            val context = DSL.using(t)
-            if (!fileStr.isNullOrEmpty()) {
-                val extensionJson = JsonUtil.to(fileStr, ExtensionJson::class.java)
-                logger.info("extensionJson is:$extensionJson")
-                val fileServiceCode = extensionJson.serviceCode
-                val fileItemList = extensionJson.itemList
-                if (fileServiceCode != serviceCode) {
-                    logger.warn("input serviceCode[$serviceCode], $EXTENSION_JSON_NAME serviceCode[$fileServiceCode] ")
-                }
-                if (fileItemList != null) {
-                    val itemCodeList = mutableSetOf<String>()
-                    val filePropMap = mutableMapOf<String, String>()
-                    fileItemList.forEach {
-                        itemCodeList.add(it.itemCode)
-                        filePropMap[it.itemCode] = JsonUtil.toJson(it.props ?: "{}")
-                    }
-                    // 用配置文件最新的配置替换数据库中相关记录的配置
-                    val serviceItemList = client.get(ServiceItemResource::class).getItemByCodes(itemCodeList).data
-                    logger.info("get serviceCode[$serviceCode] serviceItemList is:$serviceItemList")
-                    serviceItemList?.forEach {
-                        val props = filePropMap[it.itemCode]
-                        filePropMap[it.itemId] = props!!
-                        filePropMap.remove(it.itemCode)
-                    }
-                    logger.info("get serviceCode[$serviceCode] filePropMap is:$filePropMap")
-                    val serviceItemRelList = extServiceItemRelDao.getItemByServiceId(context, serviceId)
-                    if (serviceItemRelList != null && serviceItemRelList.isNotEmpty) {
-                        serviceItemRelList.forEach {
-                            // 如果json配置文件配了该扩展点，就将数据库扩展点记录的props字段替换成最新的
-                            val props = filePropMap[it.itemId]
-                            if (props != null) {
-                                it.props = props
-                            }
-                        }
-                        // 批量更新微扩展和扩展点关联关系记录
-                        extServiceItemRelDao.batchUpdateServiceItemRel(context, serviceItemRelList)
-                    }
-                }
-            }
-            asyncHandleUpdateService(context, serviceId, userId)
-        }
+        extServiceDao.setServiceStatusById(
+            dslContext = dslContext,
+            serviceId = serviceId,
+            serviceStatus = serviceStatus,
+            userId = userId,
+            msg = ""
+        )
         return Result(true)
     }
 
     fun getCompleteEditStatus(isNormalUpgrade: Boolean): Byte {
-        return if (isNormalUpgrade) ExtServiceStatusEnum.RELEASE_DEPLOYING.status.toByte() else ExtServiceStatusEnum.AUDITING.status.toByte()
+        return if (isNormalUpgrade) {
+            ExtServiceStatusEnum.RELEASE_DEPLOYING.status.toByte()
+        } else {
+            ExtServiceStatusEnum.AUDITING.status.toByte()
+        }
     }
 
     fun createMediaAndVisible(userId: String, serviceId: String, submitInfo: ExtSubmitDTO): Result<Boolean> {
         val mediaList = submitInfo.mediaInfoList
         val deptList = submitInfo.deptInfoList
-
-        val serviceInfo = extServiceDao.getServiceById(dslContext, serviceId) ?: throw ErrorCodeException(errorCode = StoreMessageCode.USER_SERVICE_NOT_EXIST)
+        val serviceInfo = extServiceDao.getServiceById(dslContext, serviceId) ?:
+        throw ErrorCodeException(errorCode = StoreMessageCode.USER_SERVICE_NOT_EXIST)
         val serviceCode = serviceInfo.serviceCode
-
         val oldStatus = serviceInfo.serviceStatus
         val isNormalUpgrade = getNormalUpgradeFlag(serviceCode, oldStatus.toInt())
         val newStatus = getCompleteEditStatus(isNormalUpgrade)
@@ -904,12 +660,7 @@ abstract class ExtServiceBaseService @Autowired constructor() {
                 )
             )
         }
-        deptService.addVisibleDept(
-            userId = userId,
-            storeType = StoreTypeEnum.SERVICE,
-            storeCode = serviceCode,
-            deptInfos = deptList
-        )
+        doServiceVisibleBus(userId, serviceCode, deptList)
         if (isNormalUpgrade) {
             // 正式发布最新的微扩展版本
             val deployExtServiceResult = extServiceKubernetesService.deployExtService(
@@ -934,6 +685,8 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         return Result(true)
     }
 
+    abstract fun doServiceVisibleBus(userId: String, serviceCode: String, deptList: List<DeptInfo>)
+
     fun backToTest(userId: String, serviceId: String): Result<Boolean> {
         logger.info("back to test： serviceId[$serviceId], userId[$serviceId]")
         val newStatus = ExtServiceStatusEnum.TESTING
@@ -952,99 +705,6 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         )
         return Result(true)
     }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun getServiceVersion(serviceId: String, userId: String): Result<ServiceVersionVO?> {
-        logger.info("getServiceVersion serviceID[$serviceId], userID[$userId]")
-        val record = extServiceDao.getServiceById(dslContext, serviceId)
-        return if (null == record) {
-            Result(data = null)
-        } else {
-            logger.info("getServiceVersion ServiceRecord: $record")
-            val serviceCode = record.serviceCode
-            val defaultFlag = record.deleteFlag
-            val projectCode = storeProjectRelDao.getInitProjectCodeByStoreCode(
-                dslContext,
-                serviceCode,
-                StoreTypeEnum.SERVICE.type.toByte()
-            )
-            logger.info("getServiceVersion projectCode: $projectCode")
-            val featureInfoRecord = extFeatureDao.getLatestServiceByCode(dslContext, serviceCode)
-
-            val flag =
-                storeUserService.isCanInstallStoreComponent(defaultFlag, userId, serviceCode, StoreTypeEnum.SERVICE)
-            val userCommentInfo =
-                storeCommentService.getStoreUserCommentInfo(userId, serviceCode, StoreTypeEnum.SERVICE)
-            val serviceEnv = extServiceEnvDao.getMarketServiceEnvInfoByServiceId(dslContext, serviceId)
-            logger.info("getServiceVersion serviceEnv: $serviceEnv")
-            val itemList = getItemByItems(serviceId)
-            val mediaList = mediaService.getByCode(serviceCode, StoreTypeEnum.SERVICE).data
-            val labelRecords = extServiceLabelDao.getLabelsByServiceId(dslContext, serviceId)
-            val lableList = mutableListOf<Label>()
-            labelRecords?.forEach {
-                lableList.add(
-                    Label(
-                        id = it[KEY_LABEL_ID] as String,
-                        labelCode = it[KEY_LABEL_CODE] as String,
-                        labelName = it[KEY_LABEL_NAME] as String,
-                        labelType = StoreTypeEnum.getStoreType((it[KEY_LABEL_TYPE] as Byte).toInt())
-                    )
-                )
-            }
-            val extensionName = getAllItemName(itemList.toSet())
-            val serviceVersion = extServiceVersionLogDao.getVersionLogByServiceId(dslContext, serviceId)
-
-            Result(
-                ServiceVersionVO(
-                    serviceId = serviceId,
-                    serviceCode = serviceCode,
-                    serviceName = record.serviceName,
-                    logoUrl = record.logoUrl,
-                    summary = record.summary ?: "",
-                    description = record.description ?: "",
-                    version = record.version,
-                    serviceStatus = ExtServiceStatusEnum.getServiceStatus((record.serviceStatus).toInt()),
-                    language = serviceEnv!!.language,
-                    codeSrc = featureInfoRecord!!.codeSrc ?: "",
-                    publisher = record.publisher,
-                    modifier = record.modifier,
-                    creator = record.creator,
-                    createTime = DateTimeUtil.toDateTime(record.createTime as LocalDateTime),
-                    updateTime = DateTimeUtil.toDateTime(record.updateTime as LocalDateTime),
-                    flag = flag,
-                    repositoryAuthorizer = record.publisher,
-                    defaultFlag = defaultFlag,
-                    projectCode = storeProjectRelDao.getUserStoreTestProjectCode(
-                        dslContext,
-                        userId,
-                        serviceCode,
-                        StoreTypeEnum.SERVICE
-                    ),
-                    labelList = lableList,
-                    labelIdList = lableList.map { it.id },
-                    userCommentInfo = userCommentInfo,
-                    visibilityLevel = VisibilityLevelEnum.getVisibilityLevel(featureInfoRecord.visibilityLevel),
-                    recommendFlag = featureInfoRecord.recommendFlag,
-                    publicFlag = featureInfoRecord.publicFlag,
-                    certificationFlag = featureInfoRecord.certificationFlag,
-                    descInputType = featureInfoRecord.descInputType,
-                    weight = featureInfoRecord.weight,
-                    serviceType = featureInfoRecord.serviceType.toInt(),
-                    extensionItemList = itemList,
-                    mediaList = mediaList,
-                    itemName = extensionName,
-                    bkServiceId = getBkServiceByItems(serviceId),
-                    versionContent = serviceVersion?.content ?: "",
-                    releaseType = ReleaseTypeEnum.getReleaseType(
-                        serviceVersion?.releaseType?.toInt() ?: ReleaseTypeEnum.NEW.releaseType
-                    ),
-                    editFlag = extServiceCommonService.checkEditCondition(serviceCode)
-                )
-            )
-        }
-    }
-
-    abstract fun getRepositoryInfo(projectCode: String?, repositoryHashId: String?): Result<Repository?>
 
     abstract fun handleServicePackage(
         extensionInfo: InitExtServiceDTO,
@@ -1080,37 +740,6 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         )
     }
 
-    private fun getItemByItems(serviceId: String): List<String> {
-        val serviceItems = extServiceItemRelDao.getItemByServiceId(dslContext, serviceId)
-        val itemIds = mutableListOf<String>()
-        serviceItems?.forEach { it ->
-            itemIds.add(it.itemId)
-        }
-        logger.info("getItemByItems serviceId[$serviceId] items[$itemIds]")
-        return itemIds
-    }
-
-    private fun getBkServiceByItems(serviceId: String): Set<Long> {
-        val serviceItems = extServiceItemRelDao.getItemByServiceId(dslContext, serviceId)
-        val bkServiceIds = mutableSetOf<Long>()
-        serviceItems?.forEach { it ->
-            bkServiceIds.add(it.bkServiceId)
-        }
-        logger.info("getItemByItems serviceId[$serviceId] bkServiceIds[$bkServiceIds]")
-        return bkServiceIds
-    }
-
-    private fun getAllItemName(itemList: Set<String>): String {
-        val itemRecords = client.get(ServiceItemResource::class).getItemInfoByIds(itemList).data
-        var itemNames = ""
-        itemRecords?.forEach {
-            itemNames = itemNames + it.parentName + "-" + it.itemName + ","
-        }
-        itemNames = itemNames.substringBeforeLast(",")
-
-        return itemNames
-    }
-
     private fun upgradeMarketExtService(
         context: DSLContext,
         userId: String,
@@ -1144,15 +773,8 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         )
     }
 
-    private fun validateAddServiceReq(
-        userId: String,
-        extensionInfo: InitExtServiceDTO
-    ) {
-        logger.info("validateExtServiceReq userId is :$userId,info[$extensionInfo]")
+    private fun validateAddServiceReq(extensionInfo: InitExtServiceDTO) {
         val serviceCode = extensionInfo.serviceCode
-        if (!Pattern.matches("^[a-z]([-a-z-0-9]*[a-z|0-9])?\$", serviceCode)) {
-            throw ErrorCodeException(errorCode = CommonMessageCode.PARAMETER_IS_INVALID, params = arrayOf(serviceCode))
-        }
         // 判断微扩展是否存在
         val codeInfo = extServiceDao.getServiceLatestByCode(dslContext, serviceCode)
         if (codeInfo != null) {
@@ -1172,7 +794,8 @@ abstract class ExtServiceBaseService @Autowired constructor() {
             ExtServiceStatusEnum.INIT.status -> {
                 storeCommonService.setProcessInfo(processInfo, totalStep, NUM_ONE, DOING)
             }
-            ExtServiceStatusEnum.BUILDING.status, ExtServiceStatusEnum.COMMITTING.status, ExtServiceStatusEnum.DEPLOYING.status -> {
+            ExtServiceStatusEnum.BUILDING.status, ExtServiceStatusEnum.COMMITTING.status,
+            ExtServiceStatusEnum.DEPLOYING.status -> {
                 storeCommonService.setProcessInfo(processInfo, totalStep, NUM_TWO, DOING)
             }
             ExtServiceStatusEnum.BUILD_FAIL.status, ExtServiceStatusEnum.DEPLOY_FAIL.status -> {
@@ -1191,10 +814,17 @@ abstract class ExtServiceBaseService @Autowired constructor() {
                 storeCommonService.setProcessInfo(processInfo, totalStep, NUM_FIVE, FAIL)
             }
             ExtServiceStatusEnum.RELEASE_DEPLOYING.status -> {
-                storeCommonService.setProcessInfo(processInfo, totalStep, if (isNormalUpgrade) NUM_FIVE else NUM_SIX, DOING)
+                storeCommonService.setProcessInfo(
+                    processInfo = processInfo,
+                    totalStep = totalStep,
+                    currStep = if (isNormalUpgrade) NUM_FIVE else NUM_SIX, status = DOING
+                )
             }
             ExtServiceStatusEnum.RELEASE_DEPLOY_FAIL.status -> {
-                storeCommonService.setProcessInfo(processInfo, totalStep, if (isNormalUpgrade) NUM_FIVE else NUM_SIX, FAIL)
+                storeCommonService.setProcessInfo(
+                    processInfo = processInfo,
+                    totalStep = totalStep,
+                    currStep = if (isNormalUpgrade) NUM_FIVE else NUM_SIX, status = FAIL)
             }
 
             ExtServiceStatusEnum.RELEASED.status -> {
@@ -1208,7 +838,14 @@ abstract class ExtServiceBaseService @Autowired constructor() {
     private fun initProcessInfo(isNormalUpgrade: Boolean): List<ReleaseProcessItem> {
         val processInfo = mutableListOf<ReleaseProcessItem>()
         processInfo.add(ReleaseProcessItem(MessageCodeUtil.getCodeLanMessage(BEGIN), BEGIN, NUM_ONE, SUCCESS))
-        processInfo.add(ReleaseProcessItem(MessageCodeUtil.getCodeLanMessage(TEST_ENV_PREPARE), TEST_ENV_PREPARE, NUM_TWO, UNDO))
+        processInfo.add(
+            ReleaseProcessItem(
+                name = MessageCodeUtil.getCodeLanMessage(TEST_ENV_PREPARE),
+                code = TEST_ENV_PREPARE,
+                step = NUM_TWO,
+                status = UNDO
+            )
+        )
         processInfo.add(ReleaseProcessItem(MessageCodeUtil.getCodeLanMessage(TEST), TEST, NUM_THREE, UNDO))
         processInfo.add(ReleaseProcessItem(MessageCodeUtil.getCodeLanMessage(EDIT), COMMIT, NUM_FOUR, UNDO))
         if (isNormalUpgrade) {
@@ -1254,15 +891,12 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         }
 
         // 从工蜂拉取文件
-        val fileStr = client.get(ServiceGitRepositoryResource::class).getFileContent(
-            repositoryHashId,
-            fileName, null, null, null
-        ).data
+        val fileStr = getFileStr(serviceCode,"",fileName, repositoryHashId)
         if (fileStr.isNullOrEmpty()) {
             // 文件数据为空，直接返回输入数据
             return returnInputData(inputItemList)
         }
-        val taskDataMap = objectMapper.readValue<ExtensionJson>(fileStr!!)
+        val taskDataMap = objectMapper.readValue<ExtensionJson>(fileStr)
         logger.info("getServiceProps taskDataMap[$taskDataMap]")
         val fileServiceCode = taskDataMap.serviceCode
         val fileItemList = taskDataMap.itemList
@@ -1303,6 +937,16 @@ abstract class ExtServiceBaseService @Autowired constructor() {
 
         return itemCreateList
     }
+
+    /**
+     * 获取文件信息
+     */
+    abstract fun getFileStr(
+        serviceCode: String,
+        version: String,
+        fileName: String,
+        repositoryHashId: String? = null
+    ): String?
 
     private fun returnInputData(inputItem: Set<String>): List<ItemPropCreateInfo> {
         // 默认添加页面选中的扩展点, props给空
@@ -1460,7 +1104,10 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         }
         // 查询扩展的最新记录
         val newestServiceRecord = extServiceDao.getNewestServiceByCode(dslContext, serviceCode)
-            ?: throw ErrorCodeException(errorCode = CommonMessageCode.PARAMETER_IS_INVALID, params = arrayOf(serviceCode))
+            ?: throw ErrorCodeException(
+                errorCode = CommonMessageCode.PARAMETER_IS_INVALID,
+                params = arrayOf(serviceCode)
+            )
         val editFlag = extServiceCommonService.checkEditCondition(serviceCode)
         if (!editFlag) {
             throw ErrorCodeException(
@@ -1497,8 +1144,12 @@ abstract class ExtServiceBaseService @Autowired constructor() {
             val itemIds = baseInfo.itemIds
             if (itemIds != null) {
                 val featureInfoRecord = extFeatureDao.getLatestServiceByCode(dslContext, serviceCode)
-                val itemCreateInfoList =
-                    getFileServiceProps(serviceCode, featureInfoRecord!!.repositoryHashId, EXTENSION_JSON_NAME, itemIds)
+                val itemCreateInfoList = getFileServiceProps(
+                    serviceCode = serviceCode,
+                    repositoryHashId = featureInfoRecord!!.repositoryHashId,
+                    fileName = EXTENSION_JSON_NAME,
+                    inputItemList = itemIds
+                )
                 extServiceItemRelDao.deleteByServiceId(dslContext, serviceId)
                 extServiceItemRelDao.batchAdd(
                     dslContext = dslContext,
@@ -1506,7 +1157,6 @@ abstract class ExtServiceBaseService @Autowired constructor() {
                     serviceId = serviceId,
                     itemPropList = itemCreateInfoList
                 )
-
                 // 添加扩展点使用记录
                 client.get(ServiceItemResource::class).addServiceNum(itemIds)
             }
@@ -1552,7 +1202,7 @@ abstract class ExtServiceBaseService @Autowired constructor() {
         val permissionCheck = permissionApi.validateUserResourcePermission(
             user = userId,
             projectCode = projectCode,
-            serviceCode = bsProjectServiceCodec,
+            serviceCode = pipelineAuthServiceCode,
             resourceType = AuthResourceType.PIPELINE_DEFAULT,
             resourceCode = "*",
             permission = AuthPermission.CREATE
@@ -1571,6 +1221,6 @@ abstract class ExtServiceBaseService @Autowired constructor() {
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(ExtServiceBaseService::class.java)
+        private val logger = LoggerFactory.getLogger(ExtServiceReleaseService::class.java)
     }
 }

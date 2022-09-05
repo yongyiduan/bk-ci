@@ -38,8 +38,6 @@ data class ExtServiceRespItem(
     val serviceCode: String,
     @ApiModelProperty("开发语言", required = true)
     val language: String?,
-    @ApiModelProperty("微扩展所属范畴，TRIGGER：触发器类微扩展 TASK：任务类微扩展", required = true)
-    val category: String,
     @ApiModelProperty("logo链接")
     val logoUrl: String? = null,
     @ApiModelProperty("版本号", required = true)

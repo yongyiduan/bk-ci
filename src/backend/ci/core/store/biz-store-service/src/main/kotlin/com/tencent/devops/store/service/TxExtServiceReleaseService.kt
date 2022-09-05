@@ -61,9 +61,9 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
-class TxExtServiceBaseService : ExtServiceBaseService() {
+class TxExtServiceReleaseService : ExtServiceReleaseService() {
 
-    private val logger = LoggerFactory.getLogger(TxExtServiceBaseService::class.java)
+    private val logger = LoggerFactory.getLogger(TxExtServiceReleaseService::class.java)
 
     @Value("\${git.service.nameSpaceId}")
     private lateinit var serviceNameSpaceId: String
@@ -142,19 +142,12 @@ class TxExtServiceBaseService : ExtServiceBaseService() {
             logger.error("service[$serviceCode] createGitCodeRepository fail!", ignored)
             return MessageCodeUtil.generateResponseDataObject(StoreMessageCode.USER_CREATE_REPOSITORY_FAIL)
         }
-        if (null == repositoryInfo) {
-            return MessageCodeUtil.generateResponseDataObject(StoreMessageCode.USER_CREATE_REPOSITORY_FAIL)
-        }
         return Result(mapOf("repositoryHashId" to repositoryInfo.repositoryHashId!!, "codeSrc" to repositoryInfo.url))
     }
 
     override fun getExtServicePackageSourceType(serviceCode: String): ExtServicePackageSourceTypeEnum {
         // 内部版暂时只支持代码库打包的方式，后续支持用户传可执行包的方式
         return ExtServicePackageSourceTypeEnum.REPO
-    }
-
-    override fun getRepositoryInfo(projectCode: String?, repositoryHashId: String?): Result<Repository?> {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun asyncHandleUpdateService(context: DSLContext, serviceId: String, userId: String) {

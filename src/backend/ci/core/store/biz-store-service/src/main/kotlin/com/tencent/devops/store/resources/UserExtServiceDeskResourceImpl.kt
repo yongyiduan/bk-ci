@@ -27,6 +27,7 @@
 
 package com.tencent.devops.store.resources
 
+import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.store.api.UserExtServiceDeskResource
@@ -34,20 +35,23 @@ import com.tencent.devops.store.pojo.common.StoreProcessInfo
 import com.tencent.devops.store.pojo.dto.InitExtServiceDTO
 import com.tencent.devops.store.pojo.dto.ServiceOfflineDTO
 import com.tencent.devops.store.pojo.dto.SubmitDTO
-import com.tencent.devops.store.pojo.vo.MyServiceVO
+import com.tencent.devops.store.pojo.vo.ExtServiceRespItem
 import com.tencent.devops.store.pojo.vo.ServiceVersionVO
-import com.tencent.devops.store.service.ExtServiceBaseService
+import com.tencent.devops.store.service.ExtServiceReleaseService
+import com.tencent.devops.store.service.ExtServiceManageService
 import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
 class UserExtServiceDeskResourceImpl @Autowired constructor(
-    private val extServiceBaseService: ExtServiceBaseService
+    private val extServiceReleaseService: ExtServiceReleaseService,
+    private val extServiceManageService: ExtServiceManageService
 ) : UserExtServiceDeskResource {
+
     override fun initExtensionService(
         userId: String,
         extensionInfo: InitExtServiceDTO
     ): Result<Boolean> {
-        return extServiceBaseService.addExtService(
+        return extServiceReleaseService.addExtService(
             userId = userId,
             extensionInfo = extensionInfo
         )
@@ -57,18 +61,22 @@ class UserExtServiceDeskResourceImpl @Autowired constructor(
         userId: String,
         extensionInfo: SubmitDTO
     ): Result<String> {
-        return extServiceBaseService.submitExtService(
+        return extServiceReleaseService.submitExtService(
             userId = userId,
             submitDTO = extensionInfo
         )
     }
 
-    override fun getExtensionServiceInfo(userId: String, serviceId: String): Result<StoreProcessInfo> {
-        return extServiceBaseService.getExtensionServiceInfo(userId, serviceId)
+    override fun getExtensionServiceProcessInfo(userId: String, serviceId: String): Result<StoreProcessInfo> {
+        return extServiceReleaseService.getExtensionServiceProcessInfo(userId, serviceId)
     }
 
-    override fun offlineService(userId: String, serviceCode: String, serviceOffline: ServiceOfflineDTO): Result<Boolean> {
-        return extServiceBaseService.offlineService(
+    override fun offlineService(
+        userId: String,
+        serviceCode: String,
+        serviceOffline: ServiceOfflineDTO
+    ): Result<Boolean> {
+        return extServiceReleaseService.offlineService(
             userId = userId,
             serviceCode = serviceCode,
             serviceOfflineDTO = serviceOffline
@@ -79,10 +87,10 @@ class UserExtServiceDeskResourceImpl @Autowired constructor(
         accessToken: String,
         userId: String,
         serviceName: String?,
-        page: Int?,
-        pageSize: Int?
-    ): Result<MyServiceVO> {
-        return extServiceBaseService.getMyService(
+        page: Int,
+        pageSize: Int
+    ): Result<Page<ExtServiceRespItem>> {
+        return extServiceManageService.getMyService(
             userId = userId,
             serviceName = serviceName,
             page = page,
@@ -91,26 +99,22 @@ class UserExtServiceDeskResourceImpl @Autowired constructor(
     }
 
     override fun deleteExtensionService(userId: String, serviceCode: String): Result<Boolean> {
-        return extServiceBaseService.deleteExtensionService(userId, serviceCode)
+        return extServiceManageService.deleteExtensionService(userId, serviceCode)
     }
 
     override fun getServiceDetails(userId: String, serviceId: String): Result<ServiceVersionVO?> {
-        return extServiceBaseService.getServiceById(serviceId, userId)
+        return extServiceManageService.getServiceById(serviceId, userId)
     }
 
     override fun listLanguage(): Result<List<String?>> {
-        return Result(extServiceBaseService.listLanguage())
+        return Result(extServiceReleaseService.listLanguage())
     }
 
     override fun cancelRelease(userId: String, serviceId: String): Result<Boolean> {
-        return extServiceBaseService.cancelRelease(userId, serviceId)
+        return extServiceReleaseService.cancelRelease(userId, serviceId)
     }
 
     override fun passTest(userId: String, serviceId: String): Result<Boolean> {
-        return extServiceBaseService.passTest(userId, serviceId)
-    }
-
-    override fun rebuild(userId: String, projectCode: String, serviceId: String): Result<Boolean> {
-        return extServiceBaseService.rebuild(projectCode, userId, serviceId)
+        return extServiceReleaseService.passTest(userId, serviceId)
     }
 }

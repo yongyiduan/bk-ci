@@ -25,34 +25,38 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.pojo.dto
+package com.tencent.devops.store.service
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.tencent.devops.common.web.annotation.BkField
-import com.tencent.devops.common.web.constant.BkStyleEnum
-import com.tencent.devops.repository.pojo.enums.TokenTypeEnum
-import com.tencent.devops.repository.pojo.enums.VisibilityLevelEnum
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.store.pojo.common.DeptInfo
+import com.tencent.devops.store.pojo.dto.InitExtServiceDTO
+import com.tencent.devops.store.pojo.enums.ExtServicePackageSourceTypeEnum
+import org.jooq.DSLContext
+import org.springframework.stereotype.Service
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class InitExtServiceDTO(
-    @ApiModelProperty("微扩展code")
-    @field:BkField(patternStyle = BkStyleEnum.CODE_STYLE)
-    val serviceCode: String,
-    @ApiModelProperty("微扩展Name")
-    @field:BkField(patternStyle = BkStyleEnum.NAME_STYLE)
-    val serviceName: String,
-    @ApiModelProperty("调试项目Code")
-    val projectCode: String,
-    @ApiModelProperty("服务语言")
-    @field:BkField(patternStyle = BkStyleEnum.LANGUAGE_STYLE)
-    val language: String? = "java",
-    @ApiModelProperty("认证方式", required = false)
-    val authType: String? = TokenTypeEnum.OAUTH.toString(),
-    @ApiModelProperty(value = "插件代码库不开源原因", required = false)
-    val privateReason: String? = null,
-    @ApiModelProperty("扩展点列表")
-    val extensionItemList: Set<String>,
-    @ApiModelProperty(value = "项目可视范围", required = false)
-    val visibilityLevel: VisibilityLevelEnum? = VisibilityLevelEnum.LOGIN_PUBLIC
-)
+@Service
+class SampleExtServiceReleaseService : ExtServiceReleaseService() {
+
+    override fun asyncHandleUpdateService(context: DSLContext, serviceId: String, userId: String) = Unit
+
+    override fun doServiceVisibleBus(userId: String, serviceCode: String, deptList: List<DeptInfo>) = Unit
+
+    override fun handleServicePackage(
+        extensionInfo: InitExtServiceDTO,
+        userId: String,
+        serviceCode: String
+    ): Result<Map<String, String>?> {
+        return Result(data = null)
+    }
+
+    override fun getExtServicePackageSourceType(serviceCode: String): ExtServicePackageSourceTypeEnum {
+        return ExtServicePackageSourceTypeEnum.UPLOAD
+    }
+
+    override fun getFileStr(
+        serviceCode: String,
+        version: String,
+        fileName: String, repositoryHashId: String?): String? {
+        TODO("Not yet implemented")
+    }
+}

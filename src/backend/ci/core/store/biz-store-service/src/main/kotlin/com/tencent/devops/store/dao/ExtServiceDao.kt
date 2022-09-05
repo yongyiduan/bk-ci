@@ -29,6 +29,7 @@ package com.tencent.devops.store.dao
 
 import com.tencent.devops.model.store.tables.TClassify
 import com.tencent.devops.model.store.tables.TExtensionService
+import com.tencent.devops.model.store.tables.TExtensionServiceEnvInfo
 import com.tencent.devops.model.store.tables.TExtensionServiceFeature
 import com.tencent.devops.model.store.tables.TExtensionServiceItemRel
 import com.tencent.devops.model.store.tables.TExtensionServiceLabelRel
@@ -39,6 +40,8 @@ import com.tencent.devops.model.store.tables.TStoreStatisticsTotal
 import com.tencent.devops.model.store.tables.records.TExtensionServiceRecord
 import com.tencent.devops.store.pojo.ExtServiceCreateInfo
 import com.tencent.devops.store.pojo.ExtServiceUpdateInfo
+import com.tencent.devops.store.pojo.common.KEY_CREATE_TIME
+import com.tencent.devops.store.pojo.common.KEY_SERVICE_CODE
 import com.tencent.devops.store.pojo.common.enums.StoreProjectTypeEnum
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import com.tencent.devops.store.pojo.dto.ServiceApproveReq
@@ -208,16 +211,16 @@ class ExtServiceDao {
         dslContext: DSLContext,
         userId: String,
         serviceName: String?
-    ): Int {
-        val a = TExtensionService.T_EXTENSION_SERVICE.`as`("a")
-        val b = TStoreMember.T_STORE_MEMBER.`as`("b")
-        val conditions = generateGetMemberConditions(a, userId, b, serviceName)
-        return dslContext.select(a.SERVICE_CODE.countDistinct())
-            .from(a)
-            .leftJoin(b)
-            .on(a.SERVICE_CODE.eq(b.STORE_CODE))
+    ): Long {
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tStoreMember = TStoreMember.T_STORE_MEMBER
+        val conditions = generateGetMemberConditions(tExtensionService, userId, tStoreMember, serviceName)
+        return dslContext.select(DSL.countDistinct(tExtensionService.SERVICE_CODE))
+            .from(tExtensionService)
+            .leftJoin(tStoreMember)
+            .on(tExtensionService.SERVICE_CODE.eq(tStoreMember.STORE_CODE))
             .where(conditions)
-            .fetchOne(0, Int::class.java)!!
+            .fetchOne(0, Long::class.java)!!
     }
 
     fun countReleaseServiceByCode(dslContext: DSLContext, serviceCode: String): Int {
@@ -234,51 +237,55 @@ class ExtServiceDao {
         dslContext: DSLContext,
         userId: String,
         serviceName: String?,
-        page: Int?,
-        pageSize: Int?
+        page: Int,
+        pageSize: Int
     ): Result<out Record>? {
-        val a = TExtensionService.T_EXTENSION_SERVICE.`as`("a")
-        val b = TStoreMember.T_STORE_MEMBER.`as`("b")
-        val t = dslContext.select(a.SERVICE_CODE.`as`("serviceCode"), a.CREATE_TIME.max().`as`("createTime")).from(a)
-            .groupBy(a.SERVICE_CODE) // 查找每组serviceCode最新的记录
-        val conditions = generateGetMemberConditions(a, userId, b, serviceName)
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tStoreMember = TStoreMember.T_STORE_MEMBER
+        val tExtensionServiceEnvInfo = TExtensionServiceEnvInfo.T_EXTENSION_SERVICE_ENV_INFO
+        // 查找每组serviceCode最新的记录
+        val t = dslContext.select(
+            tExtensionService.SERVICE_CODE.`as`(KEY_SERVICE_CODE),
+            DSL.max(tExtensionService.CREATE_TIME).`as`(KEY_CREATE_TIME)
+        ).from(tExtensionService)
+            .groupBy(tExtensionService.SERVICE_CODE)
+        val conditions = generateGetMemberConditions(tExtensionService, userId, tStoreMember, serviceName)
         val baseStep = dslContext.select(
-            a.ID.`as`("serviceId"),
-            a.SERVICE_CODE.`as`("serviceCode"),
-            a.SERVICE_NAME.`as`("serviceName"),
-            a.CLASSIFY_ID.`as`("category"),
-            a.LOGO_URL.`as`("logoUrl"),
-            a.VERSION.`as`("version"),
-            a.SERVICE_STATUS.`as`("serviceStatus"),
-            a.PUBLISHER.`as`("publisher"),
-            a.PUB_TIME.`as`("pubTime"),
-            a.CREATOR.`as`("creator"),
-            a.CREATE_TIME.`as`("createTime"),
-            a.MODIFIER.`as`("modifier"),
-            a.UPDATE_TIME.`as`("updateTime")
+            tExtensionService.ID,
+            tExtensionService.SERVICE_CODE,
+            tExtensionService.SERVICE_NAME,
+            tExtensionService.CLASSIFY_ID,
+            tExtensionService.LOGO_URL,
+            tExtensionService.VERSION,
+            tExtensionService.SERVICE_STATUS,
+            tExtensionService.PUBLISHER,
+            tExtensionService.PUB_TIME,
+            tExtensionService.CREATOR,
+            tExtensionService.CREATE_TIME,
+            tExtensionService.MODIFIER,
+            tExtensionService.UPDATE_TIME,
+            tExtensionServiceEnvInfo.LANGUAGE
         )
-            .from(a)
+            .from(tExtensionService)
             .join(t)
             .on(
-                a.SERVICE_CODE.eq(t.field("serviceCode", String::class.java)).and(
-                    a.CREATE_TIME.eq(
+                tExtensionService.SERVICE_CODE.eq(t.field(KEY_SERVICE_CODE, String::class.java)).and(
+                    tExtensionService.CREATE_TIME.eq(
                         t.field(
-                            "createTime",
+                            KEY_CREATE_TIME,
                             LocalDateTime::class.java
                         )
                     )
                 )
             )
-            .join(b)
-            .on(a.SERVICE_CODE.eq(b.STORE_CODE))
+            .join(tStoreMember)
+            .on(tExtensionService.SERVICE_CODE.eq(tStoreMember.STORE_CODE))
+            .leftJoin(tExtensionServiceEnvInfo)
+            .on(tExtensionService.ID.eq(tExtensionServiceEnvInfo.SERVICE_ID))
             .where(conditions)
-            .groupBy(a.SERVICE_CODE)
-            .orderBy(a.UPDATE_TIME.desc())
-        return if (null != page && null != pageSize) {
-            baseStep.limit((page - 1) * pageSize, pageSize).fetch()
-        } else {
-            baseStep.fetch()
-        }
+            .groupBy(tExtensionService.SERVICE_CODE)
+            .orderBy(tExtensionService.UPDATE_TIME.desc())
+        return baseStep.limit((page - 1) * pageSize, pageSize).fetch()
     }
 
     fun getServiceById(dslContext: DSLContext, serviceId: String): TExtensionServiceRecord? {
@@ -825,7 +832,7 @@ class ExtServiceDao {
         serviceName: String?
     ): MutableList<Condition> {
         val conditions = mutableListOf<Condition>()
-        conditions.add(a.DELETE_FLAG.eq(false)) // 只查没有被删除的插件
+        conditions.add(a.DELETE_FLAG.eq(false))
         conditions.add(b.USERNAME.eq(userId))
         conditions.add(b.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
         if (null != serviceName) {

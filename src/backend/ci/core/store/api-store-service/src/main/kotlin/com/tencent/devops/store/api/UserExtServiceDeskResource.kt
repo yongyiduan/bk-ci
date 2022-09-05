@@ -29,16 +29,20 @@ package com.tencent.devops.store.api
 
 import com.tencent.devops.common.api.auth.AUTH_HEADER_DEVOPS_ACCESS_TOKEN
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
+import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.annotation.BkField
+import com.tencent.devops.common.web.constant.BkStyleEnum
 import com.tencent.devops.store.pojo.common.StoreProcessInfo
 import com.tencent.devops.store.pojo.dto.InitExtServiceDTO
 import com.tencent.devops.store.pojo.dto.ServiceOfflineDTO
 import com.tencent.devops.store.pojo.dto.SubmitDTO
-import com.tencent.devops.store.pojo.vo.MyServiceVO
+import com.tencent.devops.store.pojo.vo.ExtServiceRespItem
 import com.tencent.devops.store.pojo.vo.ServiceVersionVO
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import javax.validation.Valid
 import javax.ws.rs.Consumes
 import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
@@ -65,6 +69,7 @@ interface UserExtServiceDeskResource {
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
         @ApiParam("微扩展信息")
+        @Valid
         extensionInfo: InitExtServiceDTO
     ): Result<Boolean>
 
@@ -82,7 +87,7 @@ interface UserExtServiceDeskResource {
     @GET
     @ApiOperation(value = "根据扩展ID获取扩展版本进度")
     @Path("/release/process/{serviceId}")
-    fun getExtensionServiceInfo(
+    fun getExtensionServiceProcessInfo(
         @ApiParam("userId", required = true)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
@@ -118,13 +123,14 @@ interface UserExtServiceDeskResource {
         @ApiParam("微扩展name", required = false)
         @QueryParam("serviceName")
         serviceName: String?,
-        @ApiParam("页码", required = false)
+        @ApiParam("页码", required = true)
         @QueryParam("page")
-        page: Int?,
-        @ApiParam("每页数量", required = false)
+        page: Int = 1,
+        @ApiParam("每页数量", required = true)
         @QueryParam("pageSize")
-        pageSize: Int?
-    ): Result<MyServiceVO>
+        @BkField(patternStyle = BkStyleEnum.PAGE_SIZE_STYLE, required = true)
+        pageSize: Int = 10
+    ): Result<Page<ExtServiceRespItem>>
 
     @ApiOperation("工作台--删除微扩展")
     @DELETE
@@ -176,22 +182,6 @@ interface UserExtServiceDeskResource {
         @ApiParam("userId", required = true)
         @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
-        @ApiParam("serviceId", required = true)
-        @PathParam("serviceId")
-        serviceId: String
-    ): Result<Boolean>
-
-    @ApiOperation("重新构建")
-    @PathParam("serviceId")
-    @PUT
-    @Path("/release/rebuild/{serviceId}")
-    fun rebuild(
-        @ApiParam("userId", required = true)
-        @HeaderParam(AUTH_HEADER_USER_ID)
-        userId: String,
-        @ApiParam("项目代码", required = true)
-        @QueryParam("projectCode")
-        projectCode: String,
         @ApiParam("serviceId", required = true)
         @PathParam("serviceId")
         serviceId: String
