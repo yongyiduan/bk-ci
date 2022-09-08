@@ -77,7 +77,7 @@ jobs:
       - name: Gradle Build Backend Service
         working-directory: src/backend/ci
         run: |
-          ./gradlew clean test build :core:worker:worker-agent:shadowJar \
+          ./gradlew clean build -x test :core:worker:worker-agent:shadowJar \
           -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
       - name: Gradle Build Turbo Service
         working-directory: src/backend/turbo
