@@ -28,15 +28,20 @@
 package com.tencent.devops.store.service
 
 import com.tencent.devops.common.api.constant.CommonMessageCode
+import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Page
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.DateTimeUtil
+import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.client.Client
+import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.model.store.tables.TExtensionService
 import com.tencent.devops.model.store.tables.TExtensionServiceEnvInfo
 import com.tencent.devops.project.api.service.ServiceItemResource
 import com.tencent.devops.project.api.service.ServiceProjectResource
+import com.tencent.devops.project.constant.ProjectConstant
 import com.tencent.devops.project.pojo.ServiceItem
 import com.tencent.devops.repository.pojo.enums.VisibilityLevelEnum
 import com.tencent.devops.store.constant.StoreMessageCode
@@ -47,15 +52,24 @@ import com.tencent.devops.store.dao.ExtServiceFeatureDao
 import com.tencent.devops.store.dao.ExtServiceItemRelDao
 import com.tencent.devops.store.dao.ExtServiceLabelRelDao
 import com.tencent.devops.store.dao.ExtServiceVersionLogDao
+import com.tencent.devops.store.dao.common.StoreMediaInfoDao
 import com.tencent.devops.store.dao.common.StoreMemberDao
 import com.tencent.devops.store.dao.common.StoreProjectRelDao
+import com.tencent.devops.store.pojo.EditInfoDTO
+import com.tencent.devops.store.pojo.ExtServiceFeatureUpdateInfo
+import com.tencent.devops.store.pojo.ExtServiceUpdateInfo
+import com.tencent.devops.store.pojo.ExtensionJson
+import com.tencent.devops.store.pojo.ItemPropCreateInfo
+import com.tencent.devops.store.pojo.common.EXTENSION_JSON_NAME
 import com.tencent.devops.store.pojo.common.KEY_LABEL_CODE
 import com.tencent.devops.store.pojo.common.KEY_LABEL_ID
 import com.tencent.devops.store.pojo.common.KEY_LABEL_NAME
 import com.tencent.devops.store.pojo.common.KEY_LABEL_TYPE
 import com.tencent.devops.store.pojo.common.Label
+import com.tencent.devops.store.pojo.common.StoreMediaInfoRequest
 import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
+import com.tencent.devops.store.pojo.enums.DescInputTypeEnum
 import com.tencent.devops.store.pojo.enums.ExtServiceStatusEnum
 import com.tencent.devops.store.pojo.vo.ExtServiceRespItem
 import com.tencent.devops.store.pojo.vo.ServiceVersionListItem
@@ -79,6 +93,9 @@ abstract class ExtServiceManageService {
 
     @Autowired
     lateinit var client: Client
+
+    @Autowired
+    lateinit var redisOperation: RedisOperation
 
     @Autowired
     lateinit var extServiceDao: ExtServiceDao
@@ -106,6 +123,9 @@ abstract class ExtServiceManageService {
 
     @Autowired
     lateinit var storeProjectRelDao: StoreProjectRelDao
+
+    @Autowired
+    lateinit var storeMediaInfoDao: StoreMediaInfoDao
 
     @Autowired
     lateinit var storeUserService: StoreUserService
@@ -321,9 +341,9 @@ abstract class ExtServiceManageService {
             val serviceCode = record.serviceCode
             val defaultFlag = record.deleteFlag
             val projectCode = storeProjectRelDao.getInitProjectCodeByStoreCode(
-                dslContext,
-                serviceCode,
-                StoreTypeEnum.SERVICE.type.toByte()
+                dslContext = dslContext,
+                storeCode = serviceCode,
+                storeType = StoreTypeEnum.SERVICE.type.toByte()
             )
             logger.info("getServiceVersion projectCode: $projectCode")
             val featureInfoRecord = extServiceFeatureDao.getLatestServiceByCode(dslContext, serviceCode)
@@ -334,7 +354,7 @@ abstract class ExtServiceManageService {
                 storeCommentService.getStoreUserCommentInfo(userId, serviceCode, StoreTypeEnum.SERVICE)
             val serviceEnv = extServiceEnvDao.getMarketServiceEnvInfoByServiceId(dslContext, serviceId)
             val itemList = getItemsByServiceId(serviceId)
-            val mediaList = storeMediaService.getByCode(serviceCode, StoreTypeEnum.SERVICE).data
+            val mediaList = this.storeMediaService.getByCode(serviceCode, StoreTypeEnum.SERVICE).data
             val labelRecords = extServiceLabelRelDao.getLabelsByServiceId(dslContext, serviceId)
             val labelList = mutableListOf<Label>()
             labelRecords?.forEach {
@@ -465,5 +485,236 @@ abstract class ExtServiceManageService {
             }
         }
         return Result(Page(page, pageSize, totalCount.toLong(), atomVersions))
+    }
+
+    fun updateExtInfo(
+        userId: String,
+        serviceId: String,
+        serviceCode: String,
+        infoResp: EditInfoDTO,
+        checkPermissionFlag: Boolean = true
+    ): Result<Boolean> {
+        logger.info("updateExtInfo params[$userId|$serviceId|$serviceCode|$infoResp|$checkPermissionFlag]")
+        // 判断当前用户是否是该扩展的成员
+        if (checkPermissionFlag && !storeMemberDao.isStoreMember(
+                dslContext = dslContext,
+                userId = userId,
+                storeCode = serviceCode,
+                storeType = StoreTypeEnum.SERVICE.type.toByte()
+            )
+        ) {
+            return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.PERMISSION_DENIED)
+        }
+        // 查询扩展的最新记录
+        val newestServiceRecord = extServiceDao.getNewestServiceByCode(dslContext, serviceCode)
+            ?: throw ErrorCodeException(
+                errorCode = CommonMessageCode.PARAMETER_IS_INVALID,
+                params = arrayOf(serviceCode)
+            )
+        val editFlag = extServiceCommonService.checkEditCondition(serviceCode)
+        val version = newestServiceRecord.version
+        if (!editFlag) {
+            throw ErrorCodeException(
+                errorCode = StoreMessageCode.USER_ATOM_VERSION_IS_NOT_FINISH,
+                params = arrayOf(newestServiceRecord.serviceName, version)
+            )
+        }
+        val baseInfo = infoResp.baseInfo
+        val settingInfo = infoResp.settingInfo
+        if (baseInfo != null) {
+            extServiceDao.updateExtServiceBaseInfo(
+                dslContext = dslContext,
+                userId = userId,
+                serviceId = serviceId,
+                extServiceUpdateInfo = ExtServiceUpdateInfo(
+                    serviceName = baseInfo.serviceName,
+                    logoUrl = baseInfo.logoUrl,
+                    iconData = baseInfo.iconData,
+                    summary = baseInfo.summary,
+                    description = baseInfo.description,
+                    modifierUser = userId,
+                    status = null,
+                    latestFlag = null
+                )
+            )
+
+            // 更新标签信息
+            val labelIdList = baseInfo.labels
+            if (null != labelIdList) {
+                extServiceLabelRelDao.deleteByServiceId(dslContext, serviceId)
+                if (labelIdList.isNotEmpty())
+                    extServiceLabelRelDao.batchAdd(dslContext, userId, serviceId, labelIdList)
+            }
+            val itemIds = baseInfo.itemIds
+            if (itemIds != null) {
+                addServiceItem(
+                    userId = userId,
+                    serviceId = serviceId,
+                    serviceCode = serviceCode,
+                    version = version,
+                    itemIds = itemIds
+                )
+            }
+        }
+
+        this.storeMediaService.deleteByStoreCode(userId, serviceCode, StoreTypeEnum.SERVICE)
+        infoResp.mediaInfo?.forEach {
+            storeMediaInfoDao.add(
+                dslContext = dslContext,
+                userId = userId,
+                type = StoreTypeEnum.SERVICE.type.toByte(),
+                id = UUIDUtil.generate(),
+                storeMediaInfoReq = StoreMediaInfoRequest(
+                    storeCode = serviceCode,
+                    mediaUrl = it.mediaUrl,
+                    mediaType = it.mediaType.name,
+                    modifier = userId
+                )
+            )
+        }
+
+        if (settingInfo != null) {
+            extServiceFeatureDao.updateExtServiceFeatureBaseInfo(
+                dslContext = dslContext,
+                userId = userId,
+                serviceCode = serviceCode,
+                extServiceFeatureUpdateInfo = ExtServiceFeatureUpdateInfo(
+                    publicFlag = settingInfo.publicFlag,
+                    recommentFlag = settingInfo.recommendFlag,
+                    certificationFlag = settingInfo.certificationFlag,
+                    weight = settingInfo.weight,
+                    modifierUser = userId,
+                    serviceTypeEnum = settingInfo.type,
+                    descInputType = baseInfo?.descInputType ?: DescInputTypeEnum.MANUAL
+                )
+            )
+        }
+        return Result(true)
+    }
+
+   fun addServiceItem(
+        userId: String,
+        serviceId: String,
+        serviceCode: String,
+        version: String,
+        itemIds: Set<String>
+    ) {
+        val featureInfoRecord = extServiceFeatureDao.getLatestServiceByCode(dslContext, serviceCode)
+        val itemCreateInfoList = getFileServiceProps(
+            serviceCode = serviceCode,
+            version = version,
+            repositoryHashId = featureInfoRecord!!.repositoryHashId,
+            inputItemList = itemIds
+        )
+        extServiceItemRelDao.deleteByServiceId(dslContext, serviceId)
+        extServiceItemRelDao.batchAdd(
+            dslContext = dslContext,
+            userId = userId,
+            serviceId = serviceId,
+            itemPropList = itemCreateInfoList
+        )
+        // 添加扩展点使用记录
+        client.get(ServiceItemResource::class).addServiceNum(itemIds)
+    }
+
+    private fun getFileServiceProps(
+        serviceCode: String,
+        version: String,
+        repositoryHashId: String,
+        inputItemList: Set<String>
+    ): List<ItemPropCreateInfo> {
+        val itemCreateList = mutableListOf<ItemPropCreateInfo>()
+        val inputItemMap = mutableMapOf<String, ItemPropCreateInfo>()
+        // 匹配页面输入的itemId，是否在json文件内有对应的props，若没有则为空。有则替换。  json文件内多余的itemCode无视
+        inputItemList.forEach {
+            inputItemMap[it] = ItemPropCreateInfo(
+                itemId = it,
+                props = "",
+                bkServiceId = getItemBkServiceId(it)
+            )
+        }
+
+        val fileStr = getFileStr(serviceCode, version, EXTENSION_JSON_NAME, repositoryHashId)
+        if (fileStr.isNullOrEmpty()) {
+            // 文件数据为空，直接返回输入数据
+            return getInputData(inputItemList)
+        }
+        val taskDataMap = JsonUtil.to(fileStr, ExtensionJson::class.java)
+        logger.info("getServiceProps taskDataMap[$taskDataMap]")
+        val fileServiceCode = taskDataMap.serviceCode
+        val fileItemList = taskDataMap.itemList
+        if (fileServiceCode != serviceCode) {
+            logger.warn("getServiceProps input serviceCode[$serviceCode], extension.json serviceCode[$fileServiceCode]")
+            throw ErrorCodeException(errorCode = StoreMessageCode.USER_SERVICE_CODE_DIFF)
+        }
+
+        if (fileItemList == null) {
+            // 文件数据为空，直接返回输入数据
+            return getInputData(inputItemList)
+        }
+
+        // 文件与输入itemCode取交集，若文件内有props，以文件props为准
+        val filePropMap = mutableMapOf<String, String>()
+        fileItemList.forEach {
+            filePropMap[it.itemCode] = JsonUtil.toJson(it.props ?: "")
+        }
+        val itemRecords = client.get(ServiceItemResource::class).getItemInfoByIds(inputItemList).data
+        itemRecords?.forEach {
+            val itemCode = it.itemCode
+            val itemId = it.itemId
+            if (filePropMap.keys.contains(itemCode)) {
+                val propsInfo = filePropMap[itemCode]
+                inputItemMap[itemId] = ItemPropCreateInfo(
+                    itemId = itemId,
+                    props = propsInfo ?: "",
+                    bkServiceId = getItemBkServiceId(itemId)
+                )
+            }
+        }
+
+        // 返回取完交集后的数据
+        inputItemMap.forEach { (_, u) ->
+            itemCreateList.add(u)
+        }
+        return itemCreateList
+    }
+
+    fun getItemBkServiceId(itemId: String): Long {
+        var bkServiceId = redisOperation.hget(ProjectConstant.ITEM_BK_SERVICE_REDIS_KEY, itemId)
+        // redis中没有取到蓝盾服务id，则去数据库中取
+        if (null == bkServiceId) {
+            val serviceItem = client.get(ServiceItemResource::class).getItemById(itemId).data
+            if (null == serviceItem) {
+                throw ErrorCodeException(errorCode = CommonMessageCode.PARAMETER_IS_INVALID, params = arrayOf(itemId))
+            } else {
+                bkServiceId = serviceItem.parentId
+            }
+        }
+        return bkServiceId.toLong()
+    }
+
+    /**
+     * 获取文件信息
+     */
+    abstract fun getFileStr(
+        serviceCode: String,
+        version: String,
+        fileName: String,
+        repositoryHashId: String? = null
+    ): String?
+
+    private fun getInputData(inputItem: Set<String>): List<ItemPropCreateInfo> {
+        // 默认添加页面选中的扩展点, props给空
+        val itemCreateList = mutableListOf<ItemPropCreateInfo>()
+        inputItem.forEach {
+            itemCreateList.add(
+                ItemPropCreateInfo(
+                    itemId = it,
+                    props = "",
+                    bkServiceId = getItemBkServiceId(it)
+                )
+            )
+        }
+        return itemCreateList
     }
 }

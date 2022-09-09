@@ -28,6 +28,7 @@
 package com.tencent.devops.store.api
 
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -36,6 +37,7 @@ import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
 
 @Api(tags = ["SERVICE_MARKET_SERVICE"], description = "微扩展市场-微扩展")
@@ -46,13 +48,19 @@ interface ServiceExtServiceArchiveResource {
 
     @ApiOperation("校验用户上传的微扩展包是否合法")
     @GET
-    @Path("/users/{userId}/services/{serviceCode}/package/verify")
+    @Path("/users/{userId}/services/{serviceCode}/versions/{version}/package/verify")
     fun verifyExtServicePackageByUserId(
         @ApiParam("用户ID", required = true)
         @PathParam("userId")
         userId: String,
         @ApiParam("微扩展代码", required = true)
         @PathParam("serviceCode")
-        serviceCode: String
+        serviceCode: String,
+        @ApiParam("版本号", required = true)
+        @PathParam("version")
+        version: String,
+        @ApiParam("发布类型", required = false)
+        @QueryParam("releaseType")
+        releaseType: ReleaseTypeEnum?
     ): Result<Boolean>
 }

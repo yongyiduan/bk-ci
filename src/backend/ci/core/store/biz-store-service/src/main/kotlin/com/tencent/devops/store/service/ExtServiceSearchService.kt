@@ -31,11 +31,14 @@ import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.service.utils.MessageCodeUtil
-import com.tencent.devops.project.api.service.service.ServiceInfoResource
+import com.tencent.devops.model.store.tables.TExtensionService
+import com.tencent.devops.model.store.tables.TExtensionServiceFeature
+import com.tencent.devops.project.api.service.ServiceInfoResource
 import com.tencent.devops.store.dao.ExtServiceDao
 import com.tencent.devops.store.dao.ExtServiceItemRelDao
 import com.tencent.devops.store.pojo.ExtServiceItem
 import com.tencent.devops.store.pojo.common.HOTTEST
+import com.tencent.devops.store.pojo.common.KEY_SERVICE_CODE
 import com.tencent.devops.store.pojo.common.LATEST
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import com.tencent.devops.store.pojo.enums.ExtServiceSortTypeEnum
@@ -46,7 +49,6 @@ import com.tencent.devops.store.service.common.ClassifyService
 import com.tencent.devops.store.service.common.StoreCommonService
 import com.tencent.devops.store.service.common.StoreTotalStatisticService
 import com.tencent.devops.store.service.common.StoreUserService
-import com.tencent.devops.store.service.common.StoreVisibleDeptService
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -60,7 +62,6 @@ class ExtServiceSearchService @Autowired constructor(
     val extServiceDao: ExtServiceDao,
     val extServiceItemRelDao: ExtServiceItemRelDao,
     val storeUserService: StoreUserService,
-    val storeVisibleDeptService: StoreVisibleDeptService,
     val storeMemberService: TxExtServiceMemberImpl,
     val classifyService: ClassifyService,
     val storeCommonService: StoreCommonService,
@@ -69,8 +70,8 @@ class ExtServiceSearchService @Autowired constructor(
 
     fun mainPageList(
         userId: String,
-        page: Int?,
-        pageSize: Int?
+        page: Int,
+        pageSize: Int
     ): Result<List<ExtServiceMainItemVo>> {
         val result = mutableListOf<ExtServiceMainItemVo>()
         // 获取用户组织架构
@@ -160,13 +161,11 @@ class ExtServiceSearchService @Autowired constructor(
         score: Int?,
         rdType: ServiceTypeEnum? = null,
         sortType: ExtServiceSortTypeEnum?,
-        page: Int?,
-        pageSize: Int?
+        page: Int,
+        pageSize: Int
     ): SearchExtServiceVO {
         // 获取用户组织架构
         val userDeptList = storeUserService.getUserDeptList(userId)
-        logger.info("[list]get userDeptList:$userDeptList")
-
         return doList(
             userId = userId,
             userDeptList = userDeptList,
@@ -195,12 +194,16 @@ class ExtServiceSearchService @Autowired constructor(
         rdType: ServiceTypeEnum? = null,
         sortType: ExtServiceSortTypeEnum?,
         desc: Boolean?,
-        page: Int?,
-        pageSize: Int?
+        page: Int,
+        pageSize: Int
     ): SearchExtServiceVO {
         val results = mutableListOf<ExtServiceItem>()
         // 获取微扩展
-        val labelCodeList = if (labelCode.isNullOrEmpty()) listOf() else labelCode?.split(",")
+        val labelCodeList = if (labelCode.isNullOrEmpty()) {
+            emptyList()
+        } else {
+            labelCode.split(",")
+        }
         val count =
             extServiceDao.count(dslContext, keyword, classifyCode, bkServiceId, rdType, labelCodeList, score)
         logger.info("doList userId[$userId],userDeptList[$userDeptList],keyword[$keyword], rdType[$rdType]," +
@@ -219,16 +222,10 @@ class ExtServiceSearchService @Autowired constructor(
             page = page,
             pageSize = pageSize
         ) ?: return SearchExtServiceVO(0, page, pageSize, results)
-        logger.info("[list] userId[$userId],userDeptList[$userDeptList],keyword[$keyword],rdType[$rdType]," +
-            "bkService[$bkServiceId],labelCode[$labelCode] sortType[$sortType] get services: $services")
-
-        val serviceCodeList = services.map {
-            it["SERVICE_CODE"] as String
-        }.toList()
+        val serviceCodeList = services.map { it[KEY_SERVICE_CODE] as String }.toList()
         // 获取可见范围
         val storeType = StoreTypeEnum.SERVICE
-        val serviceVisibleData =
-            storeVisibleDeptService.batchGetVisibleDept(serviceCodeList, storeType).data
+        val serviceVisibleData = storeCommonService.generateStoreVisibleData(serviceCodeList, storeType)
         val statisticData = storeTotalStatisticService.getStatisticByCodeList(
             storeType = storeType.type.toByte(),
             storeCodeList = serviceCodeList
@@ -242,31 +239,32 @@ class ExtServiceSearchService @Autowired constructor(
         classifyList?.forEach {
             classifyMap[it.id] = it.classifyCode
         }
-
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
         services.forEach {
-            val serviceCode = it["SERVICE_CODE"] as String
+            val serviceCode = it[tExtensionService.SERVICE_CODE] as String
             val visibleList = serviceVisibleData?.get(serviceCode)
             val statistic = statisticData[serviceCode]
-            val publicFlag = it["PUBLIC_FLAG"] as Boolean
+            val publicFlag = it[tExtensionServiceFeature.PUBLIC_FLAG] as Boolean
             val members = memberData?.get(serviceCode)
             val flag = storeCommonService.generateInstallFlag(publicFlag, members, userId, visibleList, userDeptList)
-            val classifyId = it["CLASSIFY_ID"] as String
+            val classifyId = it[tExtensionService.CLASSIFY_ID] as String
             results.add(
                 ExtServiceItem(
-                    id = it["SERVICE_ID"] as String,
-                    name = it["SERVICE_NAME"] as String,
+                    id = it[tExtensionService.ID] as String,
+                    name = it[tExtensionService.SERVICE_NAME] as String,
                     code = serviceCode,
                     classifyCode = if (classifyMap.containsKey(classifyId)) classifyMap[classifyId] else "",
-                    logoUrl = it["LOGO_URL"] as? String,
-                    publisher = it["PUBLISHER"] as String,
+                    logoUrl = it[tExtensionService.LOGO_URL],
+                    publisher = it[tExtensionService.PUBLISHER] as String,
                     downloads = statistic?.downloads ?: 0,
                     score = statistic?.score ?: 0.toDouble(),
-                    summary = it["SUMMARY"] as? String,
+                    summary = it[tExtensionService.SUMMARY],
                     flag = flag,
-                    publicFlag = it["PUBLIC_FLAG"] as Boolean,
-                    modifier = it["MODIFIER"] as String,
-                    updateTime = DateTimeUtil.toDateTime(it["UPDATE_TIME"] as LocalDateTime),
-                    recommendFlag = it["RECOMMEND_FLAG"] as? Boolean
+                    publicFlag = it[tExtensionServiceFeature.PUBLIC_FLAG] as Boolean,
+                    modifier = it[tExtensionService.MODIFIER] as String,
+                    updateTime = DateTimeUtil.toDateTime(it[tExtensionService.UPDATE_TIME] as LocalDateTime),
+                    recommendFlag = it[tExtensionServiceFeature.RECOMMEND_FLAG]
                 )
             )
         }

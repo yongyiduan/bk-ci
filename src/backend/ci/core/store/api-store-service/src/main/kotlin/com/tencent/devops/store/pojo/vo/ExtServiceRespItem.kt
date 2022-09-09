@@ -37,7 +37,7 @@ data class ExtServiceRespItem(
     @ApiModelProperty("微扩展代码", required = true)
     val serviceCode: String,
     @ApiModelProperty("开发语言", required = true)
-    val language: String?,
+    val language: String? = null,
     @ApiModelProperty("logo链接")
     val logoUrl: String? = null,
     @ApiModelProperty("版本号", required = true)

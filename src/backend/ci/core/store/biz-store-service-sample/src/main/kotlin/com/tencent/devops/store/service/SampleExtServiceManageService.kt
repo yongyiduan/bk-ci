@@ -27,7 +27,9 @@
 
 package com.tencent.devops.store.service
 
+import com.tencent.devops.artifactory.api.ServiceArchiveServicePkgResource
 import org.springframework.stereotype.Service
+import java.net.URLEncoder
 
 @Service
 class SampleExtServiceManageService : ExtServiceManageService() {
@@ -38,4 +40,14 @@ class SampleExtServiceManageService : ExtServiceManageService() {
         serviceCode: String,
         initProjectCode: String
     ) = Unit
+
+    override fun getFileStr(
+        serviceCode: String,
+        version: String,
+        fileName: String,
+        repositoryHashId: String?
+    ): String? {
+        val filePath = URLEncoder.encode("$serviceCode/$version/$fileName", Charsets.UTF_8.name())
+        return client.get(ServiceArchiveServicePkgResource::class).getServiceFileContent(filePath).data
+    }
 }

@@ -25,31 +25,25 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.artifactory.resources
 
+import com.tencent.devops.artifactory.api.ServiceArchiveServicePkgResource
+import com.tencent.devops.artifactory.service.ArchiveServicePkgService
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.BuildExtServiceEnvResource
-import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
-import com.tencent.devops.store.service.ExtServiceEnvService
 import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
-class BuildExtServiceEnvResourceImpl @Autowired constructor(
-    private val extServiceEnvService: ExtServiceEnvService
-) : BuildExtServiceEnvResource {
+class ServiceArchiveServicePkgResourceImpl @Autowired constructor(
+    private val archiveServicePkgService: ArchiveServicePkgService
+) : ServiceArchiveServicePkgResource {
 
-    override fun updateExtServiceEnv(
-        projectCode: String,
-        serviceCode: String,
-        version: String,
-        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
-    ): Result<Boolean> {
-        return extServiceEnvService.updateExtServiceEnvInfo(
-            projectCode = projectCode,
-            serviceCode = serviceCode,
-            version = version,
-            updateExtServiceEnvInfo = updateExtServiceEnvInfo
-        )
+    override fun getServiceFileContent(filePath: String): Result<String> {
+        return Result(archiveServicePkgService.getServiceFileContent(filePath))
+    }
+
+    override fun deleteServiceFile(userId: String, serviceCode: String): Result<Boolean> {
+        archiveServicePkgService.deleteServicePkg(userId, serviceCode)
+        return Result(true)
     }
 }

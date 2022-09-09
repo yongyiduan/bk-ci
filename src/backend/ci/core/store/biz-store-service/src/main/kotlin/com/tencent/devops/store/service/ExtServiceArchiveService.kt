@@ -28,32 +28,61 @@
 package com.tencent.devops.store.service
 
 import com.tencent.devops.common.api.constant.CommonMessageCode
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.store.dao.ExtServiceDao
 import com.tencent.devops.store.dao.common.StoreMemberDao
+import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import org.jooq.DSLContext
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class ExtServiceArchiveService {
+class ExtServiceArchiveService @Autowired constructor(
+    private val dslContext: DSLContext,
+    private val storeMemberDao: StoreMemberDao,
+    private val extServiceDao: ExtServiceDao,
+    private val extServiceCommonService: ExtServiceCommonService
+) {
 
-    @Autowired
-    private lateinit var dslContext: DSLContext
-    @Autowired
-    private lateinit var storeMemberDao: StoreMemberDao
-
-    private val logger = LoggerFactory.getLogger(ExtServiceArchiveService::class.java)
-
-    fun verifyExtServicePackageByUserId(userId: String, serviceCode: String): Result<Boolean> {
-        logger.info("verifyExtServicePackageByUserId userId is:$userId,serviceCode is :$serviceCode")
+    fun verifyExtServicePackageByUserId(
+        userId: String,
+        serviceCode: String,
+        version: String,
+        releaseType: ReleaseTypeEnum? = null
+    ): Boolean {
         // 校验用户是否是该微扩展的开发成员
-        val flag = storeMemberDao.isStoreMember(dslContext, userId, serviceCode, StoreTypeEnum.SERVICE.type.toByte())
+        val flag = storeMemberDao.isStoreMember(
+            dslContext = dslContext,
+            userId = userId,
+            storeCode = serviceCode,
+            storeType = StoreTypeEnum.SERVICE.type.toByte()
+        )
         if (!flag) {
-            return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.PERMISSION_DENIED)
+            throw ErrorCodeException(
+                errorCode = CommonMessageCode.PERMISSION_DENIED,
+                params = arrayOf(serviceCode)
+            )
         }
-        return Result(true)
+        val serviceCount = extServiceDao.countByCode(dslContext, serviceCode)
+        if (serviceCount < 0) {
+            throw ErrorCodeException(
+                errorCode = CommonMessageCode.PARAMETER_IS_INVALID,
+                params = arrayOf(serviceCode)
+            )
+        }
+        val serviceRecord = extServiceDao.getNewestServiceByCode(dslContext, serviceCode)!!
+        // 不是重新上传的包才需要校验版本号
+        if (null != releaseType) {
+            extServiceCommonService.validateServiceVersion(
+                releaseType = releaseType,
+                serviceCode = serviceCode,
+                serviceName = serviceRecord.serviceName,
+                serviceStatus = serviceRecord.serviceStatus,
+                dbVersion = serviceRecord.version,
+                requestVersion = version
+            )
+        }
+        return true
     }
 }

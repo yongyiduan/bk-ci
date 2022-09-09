@@ -31,18 +31,19 @@ import com.tencent.devops.model.store.tables.TExtensionServiceEnvInfo
 import com.tencent.devops.model.store.tables.TStoreBuildInfo
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import org.jooq.DSLContext
-import org.jooq.Record2
+import org.jooq.Record3
 import org.springframework.stereotype.Repository
 
 @Repository
 class ExtServiceBuildInfoDao {
 
-    fun getServiceBuildInfo(dslContext: DSLContext, serviceId: String): Record2<String, String> {
+    fun getServiceBuildInfo(dslContext: DSLContext, serviceId: String): Record3<String, String, String> {
         val tExtensionServiceEnvInfo = TExtensionServiceEnvInfo.T_EXTENSION_SERVICE_ENV_INFO
         val tStoreBuildInfo = TStoreBuildInfo.T_STORE_BUILD_INFO
         return dslContext.select(
             tStoreBuildInfo.SCRIPT,
-            tStoreBuildInfo.REPOSITORY_PATH
+            tStoreBuildInfo.REPOSITORY_PATH,
+            tStoreBuildInfo.LANGUAGE
         ).from(tExtensionServiceEnvInfo)
             .join(tStoreBuildInfo)
             .on(tExtensionServiceEnvInfo.LANGUAGE.eq(tStoreBuildInfo.LANGUAGE))

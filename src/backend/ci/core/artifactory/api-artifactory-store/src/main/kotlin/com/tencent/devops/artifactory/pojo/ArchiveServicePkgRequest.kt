@@ -25,31 +25,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.artifactory.pojo
 
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.BuildExtServiceEnvResource
-import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
-import com.tencent.devops.store.service.ExtServiceEnvService
-import org.springframework.beans.factory.annotation.Autowired
+import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-@RestResource
-class BuildExtServiceEnvResourceImpl @Autowired constructor(
-    private val extServiceEnvService: ExtServiceEnvService
-) : BuildExtServiceEnvResource {
-
-    override fun updateExtServiceEnv(
-        projectCode: String,
-        serviceCode: String,
-        version: String,
-        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
-    ): Result<Boolean> {
-        return extServiceEnvService.updateExtServiceEnvInfo(
-            projectCode = projectCode,
-            serviceCode = serviceCode,
-            version = version,
-            updateExtServiceEnvInfo = updateExtServiceEnvInfo
-        )
-    }
-}
+@ApiModel("归档微扩展包请求报文体")
+data class ArchiveServicePkgRequest(
+    @ApiModelProperty("微扩展ID", required = true)
+    val serviceId: String,
+    @ApiModelProperty("微扩展标识", required = true)
+    val serviceCode: String,
+    @ApiModelProperty("微扩展版本号", required = true)
+    val version: String,
+    @ApiModelProperty("发布类型", required = false)
+    val releaseType: ReleaseTypeEnum? = null
+)

@@ -25,31 +25,46 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.artifactory.api
 
+import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.BuildExtServiceEnvResource
-import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
-import com.tencent.devops.store.service.ExtServiceEnvService
-import org.springframework.beans.factory.annotation.Autowired
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import javax.ws.rs.Consumes
+import javax.ws.rs.DELETE
+import javax.ws.rs.GET
+import javax.ws.rs.HeaderParam
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.QueryParam
+import javax.ws.rs.core.MediaType
 
-@RestResource
-class BuildExtServiceEnvResourceImpl @Autowired constructor(
-    private val extServiceEnvService: ExtServiceEnvService
-) : BuildExtServiceEnvResource {
+@Api(tags = ["SERVICE_ARTIFACTORY"], description = "仓库-微扩展")
+@Path("/service/artifactories/ext/service")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface ServiceArchiveServicePkgResource {
 
-    override fun updateExtServiceEnv(
-        projectCode: String,
-        serviceCode: String,
-        version: String,
-        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
-    ): Result<Boolean> {
-        return extServiceEnvService.updateExtServiceEnvInfo(
-            projectCode = projectCode,
-            serviceCode = serviceCode,
-            version = version,
-            updateExtServiceEnvInfo = updateExtServiceEnvInfo
-        )
-    }
+    @ApiOperation("获取微扩展包文件内容")
+    @GET
+    @Path("/file/content")
+    fun getServiceFileContent(
+        @ApiParam("文件路径", required = true)
+        @QueryParam("filePath")
+        filePath: String
+    ): Result<String>
+
+    @ApiOperation("删除微扩展包文件")
+    @DELETE
+    @Path("/file/delete")
+    fun deleteServiceFile(
+        @ApiParam("用户ID", required = true)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("微扩展代码", required = true)
+        @QueryParam("serviceCode")
+        serviceCode: String
+    ): Result<Boolean>
 }

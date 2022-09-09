@@ -64,6 +64,7 @@ const val ATOM_INPUT = "input" // 插件输入
 const val ATOM_OUTPUT = "output" // 插件输出
 const val ATOM_NAMESPACE = "namespace" // 插件命名空间
 const val ATOM_UPLOAD_ID_KEY_PREFIX = "ATOM_UPLOAD_ID" // 插件包上传ID值Key前缀
+const val SERVICE_UPLOAD_ID_KEY_PREFIX = "SERVICE_UPLOAD_ID" // 微扩展包上传ID值Key前缀
 const val STORE_PUBLIC_FLAG_KEY_PREFIX = "STORE_PUBLIC_FLAG_KEY" // 公共组件Key前缀
 const val STORE_NORMAL_PROJECT_RUN_INFO_KEY_PREFIX = "STORE_NORMAL_PROJECT_RUN_INFO_KEY" // 组件对应普通项目的运行时信息Key前缀
 
@@ -134,3 +135,5 @@ const val KEY_RUNTIME_VERSION = "runtimeVersion"
 const val KEY_PROJECT_CODE = "projectCode"
 const val KEY_CODE_SRC = "codeSrc"
 const val KEY_SERVICE_CODE = "serviceCode"
+const val KEY_EXT_SERVICE_IMAGE_INFO = "extServiceImageInfo"
+const val KEY_EXT_SERVICE_DEPLOY_INFO = "extServiceDeployInfo"

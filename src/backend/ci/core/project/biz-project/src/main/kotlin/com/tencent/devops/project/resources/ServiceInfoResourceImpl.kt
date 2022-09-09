@@ -25,31 +25,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.project.resources
 
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.BuildExtServiceEnvResource
-import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
-import com.tencent.devops.store.service.ExtServiceEnvService
+import com.tencent.devops.project.api.service.ServiceInfoResource
+import com.tencent.devops.project.pojo.service.ServiceVO
+import com.tencent.devops.project.service.ServiceProjectService
 import org.springframework.beans.factory.annotation.Autowired
 
 @RestResource
-class BuildExtServiceEnvResourceImpl @Autowired constructor(
-    private val extServiceEnvService: ExtServiceEnvService
-) : BuildExtServiceEnvResource {
-
-    override fun updateExtServiceEnv(
-        projectCode: String,
-        serviceCode: String,
-        version: String,
-        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
-    ): Result<Boolean> {
-        return extServiceEnvService.updateExtServiceEnvInfo(
-            projectCode = projectCode,
-            serviceCode = serviceCode,
-            version = version,
-            updateExtServiceEnvInfo = updateExtServiceEnvInfo
-        )
+class ServiceInfoResourceImpl @Autowired constructor(
+    private val serviceProjectService: ServiceProjectService
+) : ServiceInfoResource {
+    override fun getServiceList(userId: String): Result<List<ServiceVO>?> {
+        return serviceProjectService.getServiceList()
     }
 }

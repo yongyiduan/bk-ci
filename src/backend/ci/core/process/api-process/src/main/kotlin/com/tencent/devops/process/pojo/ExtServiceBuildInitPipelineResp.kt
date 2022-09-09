@@ -25,31 +25,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.process.pojo
 
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.BuildExtServiceEnvResource
-import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
-import com.tencent.devops.store.service.ExtServiceEnvService
-import org.springframework.beans.factory.annotation.Autowired
+import com.tencent.devops.store.pojo.enums.ExtServiceStatusEnum
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-@RestResource
-class BuildExtServiceEnvResourceImpl @Autowired constructor(
-    private val extServiceEnvService: ExtServiceEnvService
-) : BuildExtServiceEnvResource {
-
-    override fun updateExtServiceEnv(
-        projectCode: String,
-        serviceCode: String,
-        version: String,
-        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
-    ): Result<Boolean> {
-        return extServiceEnvService.updateExtServiceEnvInfo(
-            projectCode = projectCode,
-            serviceCode = serviceCode,
-            version = version,
-            updateExtServiceEnvInfo = updateExtServiceEnvInfo
-        )
-    }
-}
+@ApiModel("微扩展初始化构建流水线报文响应体")
+data class ExtServiceBuildInitPipelineResp(
+    @ApiModelProperty("流水线ID", required = true)
+    val pipelineId: String,
+    @ApiModelProperty("构建ID", required = false)
+    val buildId: String?,
+    @ApiModelProperty("构建状态", required = true)
+    val extServiceStatus: ExtServiceStatusEnum
+)

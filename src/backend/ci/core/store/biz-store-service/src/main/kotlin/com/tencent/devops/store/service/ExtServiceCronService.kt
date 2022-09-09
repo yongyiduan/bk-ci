@@ -30,7 +30,7 @@ package com.tencent.devops.store.service
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.redis.RedisLock
 import com.tencent.devops.common.redis.RedisOperation
-import com.tencent.devops.dispatch.api.ServiceBcsResource
+import com.tencent.devops.dispatch.kubernetes.api.service.ServiceKubernetesResource
 import com.tencent.devops.store.config.ExtServiceKubernetesConfig
 import com.tencent.devops.store.config.ExtServiceKubernetesNameSpaceConfig
 import com.tencent.devops.store.dao.ExtServiceDao
@@ -63,13 +63,12 @@ class ExtServiceCronService @Autowired constructor(
     private val extServiceKubernetesNameSpaceConfig: ExtServiceKubernetesNameSpaceConfig
 ) {
 
-    private val logger = LoggerFactory.getLogger(ExtServiceCronService::class.java)
-
-    private val EXTENSION_RELEASE_SUCCESS_TEMPLATE = "EXTENSION_RELEASE_SUCCESS_TEMPLATE" // 微扩展发布成功消息通知模板
-
-    private val EXTENSION_RELEASE_FAIL_TEMPLATE = "EXTENSION_RELEASE_FAIL_TEMPLATE" // 微扩展发布失败消息通知模板
-
-    private final val bcsDeployRedisPrefixKey = "ext:service:deploy"
+    companion object {
+        private val logger = LoggerFactory.getLogger(ExtServiceCronService::class.java)
+        private const val EXTENSION_RELEASE_SUCCESS_TEMPLATE = "EXTENSION_RELEASE_SUCCESS_TEMPLATE"
+        private const val EXTENSION_RELEASE_FAIL_TEMPLATE = "EXTENSION_RELEASE_FAIL_TEMPLATE"
+        private const val kubernetesDeployRedisPrefixKey = "ext:service:deploy"
+    }
 
     @Scheduled(cron = "0 */1 * * * ?")
     fun updateReleaseDeployStatus() {
@@ -91,10 +90,10 @@ class ExtServiceCronService @Autowired constructor(
                 }
                 val serviceCodes = serviceRecords.map { it.serviceCode }.toSet().joinToString(",")
                 // 批量获取微扩展部署信息
-                val serviceDeploymentMap = client.get(ServiceBcsResource::class).getBcsDeploymentInfos(
+                val serviceDeploymentMap = client.get(ServiceKubernetesResource::class).getDeploymentInfos(
                     namespaceName = extServiceKubernetesNameSpaceConfig.namespaceName,
                     deploymentNames = serviceCodes,
-                    bcsUrl = extServiceKubernetesConfig.masterUrl,
+                    apiUrl = extServiceKubernetesConfig.masterUrl,
                     token = extServiceKubernetesConfig.token
                 ).data
                 logger.info("serviceDeploymentMap:$serviceDeploymentMap")
@@ -105,13 +104,13 @@ class ExtServiceCronService @Autowired constructor(
                 serviceRecords.forEach {
                     val serviceCode = it.serviceCode
                     val deployment = serviceDeploymentMap[serviceCode]
-                    val bcsDeployRedisKey = "$bcsDeployRedisPrefixKey:$serviceCode"
+                    val kubernetesDeployRedisKey = "$kubernetesDeployRedisPrefixKey:$serviceCode"
                     if (Readiness.isDeploymentReady(deployment)) {
                         it.serviceStatus = ExtServiceStatusEnum.RELEASED.status.toByte()
                         // 发布相关逻辑
                         deployService(serviceCode, it.modifier)
                         it.latestFlag = true
-                        redisOperation.delete(bcsDeployRedisKey)
+                        redisOperation.delete(kubernetesDeployRedisKey)
                         // 发送版本发布通知消息
                         serviceNotifyService.sendServiceReleaseNotifyMessage(
                             serviceId = it.id,
@@ -119,12 +118,13 @@ class ExtServiceCronService @Autowired constructor(
                             templateCode = EXTENSION_RELEASE_SUCCESS_TEMPLATE
                         )
                     } else {
-                        val bcsFirstDeployTime = redisOperation.get(bcsDeployRedisKey)
-                        if (bcsFirstDeployTime != null) {
+                        val kubernetesFirstDeployTime = redisOperation.get(kubernetesDeployRedisKey)
+                        if (kubernetesFirstDeployTime != null) {
                             // 轮询超时则把状态置为部署失败
-                            if ((System.currentTimeMillis() - bcsFirstDeployTime.toLong()) > deployTimeOut * 60 * 1000) {
+                            val costTime = System.currentTimeMillis() - kubernetesFirstDeployTime.toLong()
+                            if (costTime > deployTimeOut * 60 * 1000) {
                                 it.serviceStatus = ExtServiceStatusEnum.RELEASE_DEPLOY_FAIL.status.toByte()
-                                redisOperation.delete(bcsDeployRedisKey)
+                                redisOperation.delete(kubernetesDeployRedisKey)
                                 // 发送版本发布邮件
                                 serviceNotifyService.sendServiceReleaseNotifyMessage(
                                     serviceId = it.id,
@@ -135,7 +135,7 @@ class ExtServiceCronService @Autowired constructor(
                         } else {
                             // 首次部署的时间存入redis
                             redisOperation.set(
-                                key = bcsDeployRedisKey,
+                                key = kubernetesDeployRedisKey,
                                 value = System.currentTimeMillis().toString(),
                                 expiredInSecond = 3600
                             )

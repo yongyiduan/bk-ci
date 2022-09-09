@@ -25,31 +25,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.process.pojo
 
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.BuildExtServiceEnvResource
-import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
-import com.tencent.devops.store.service.ExtServiceEnvService
-import org.springframework.beans.factory.annotation.Autowired
+import com.tencent.devops.store.pojo.dto.ExtServiceBaseInfoDTO
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-@RestResource
-class BuildExtServiceEnvResourceImpl @Autowired constructor(
-    private val extServiceEnvService: ExtServiceEnvService
-) : BuildExtServiceEnvResource {
-
-    override fun updateExtServiceEnv(
-        projectCode: String,
-        serviceCode: String,
-        version: String,
-        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
-    ): Result<Boolean> {
-        return extServiceEnvService.updateExtServiceEnvInfo(
-            projectCode = projectCode,
-            serviceCode = serviceCode,
-            version = version,
-            updateExtServiceEnvInfo = updateExtServiceEnvInfo
-        )
-    }
-}
+@ApiModel("微扩展构建初始化流水线请求报文体")
+data class ExtServiceBuildInitPipelineReq(
+    @ApiModelProperty("流水线模型", required = true)
+    val pipelineModel: String,
+    @ApiModelProperty("代码仓库hashId", required = true)
+    val repositoryHashId: String,
+    @ApiModelProperty("代码仓库路径", required = false)
+    val repositoryPath: String?,
+    @ApiModelProperty("脚本任务插件Shell执行脚本", required = true)
+    val script: String,
+    @ApiModelProperty("微扩展基本信息", required = true)
+    val extServiceBaseInfo: ExtServiceBaseInfoDTO
+)

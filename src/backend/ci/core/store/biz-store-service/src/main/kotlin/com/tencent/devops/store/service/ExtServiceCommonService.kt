@@ -29,8 +29,12 @@ package com.tencent.devops.store.service
 
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.exception.ErrorCodeException
+import com.tencent.devops.store.constant.StoreMessageCode
 import com.tencent.devops.store.dao.ExtServiceDao
+import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import com.tencent.devops.store.pojo.enums.ExtServiceStatusEnum
+import com.tencent.devops.store.service.common.StoreCommonService
+import com.tencent.devops.store.utils.VersionUtils
 import org.jooq.DSLContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -38,7 +42,8 @@ import org.springframework.stereotype.Service
 @Service
 class ExtServiceCommonService @Autowired constructor(
     private val dslContext: DSLContext,
-    private val extServiceDao: ExtServiceDao
+    private val extServiceDao: ExtServiceDao,
+    private val storeCommonService: StoreCommonService
 ) {
 
     fun checkEditCondition(serviceCode: String): Boolean {
@@ -56,5 +61,58 @@ class ExtServiceCommonService @Autowired constructor(
         )
         // 判断最近一个微扩展版本的状态，只有处于审核驳回、已发布、上架中止和已下架的状态才允许修改基本信息
         return serviceFinalStatusList.contains(newestServiceRecord.serviceStatus)
+    }
+
+    fun validateServiceVersion(
+        releaseType: ReleaseTypeEnum,
+        serviceCode: String,
+        serviceName: String,
+        serviceStatus: Byte,
+        dbVersion: String,
+        requestVersion: String
+    ) {
+        // 最近的版本处于上架中止状态，重新升级版本号不变
+        val cancelFlag = serviceStatus == ExtServiceStatusEnum.GROUNDING_SUSPENSION.status.toByte()
+        val requireVersionList =
+            if (cancelFlag && releaseType == ReleaseTypeEnum.CANCEL_RE_RELEASE) {
+                listOf(dbVersion)
+            } else {
+                // 历史大版本下的小版本更新模式需获取要更新大版本下的最新版本
+                val reqVersion = if (releaseType == ReleaseTypeEnum.HIS_VERSION_UPGRADE) {
+                    extServiceDao.getExtService(
+                        dslContext = dslContext,
+                        serviceCode = serviceCode,
+                        version = VersionUtils.convertLatestVersion(requestVersion)
+                    )?.version
+                } else {
+                    null
+                }
+                storeCommonService.getRequireVersion(
+                    reqVersion = reqVersion,
+                    dbVersion = dbVersion,
+                    releaseType = releaseType
+                )
+            }
+        if (!requireVersionList.contains(requestVersion)) {
+            throw ErrorCodeException(
+                errorCode = StoreMessageCode.USER_SERVICE_VERSION_IS_INVALID,
+                params = arrayOf(requestVersion, requireVersionList.toString())
+            )
+        }
+        if (dbVersion.isNotBlank() && releaseType != ReleaseTypeEnum.NEW) {
+            // 判断最近一个微扩展版本的状态，只有处于审核驳回、已发布、上架中止和已下架的状态才允许添加新的版本
+            val serviceFinalStatusList = mutableListOf(
+                ExtServiceStatusEnum.AUDIT_REJECT.status.toByte(),
+                ExtServiceStatusEnum.RELEASED.status.toByte(),
+                ExtServiceStatusEnum.GROUNDING_SUSPENSION.status.toByte(),
+                ExtServiceStatusEnum.UNDERCARRIAGED.status.toByte()
+            )
+            if (!serviceFinalStatusList.contains(serviceStatus)) {
+                throw ErrorCodeException(
+                    errorCode = StoreMessageCode.USER_SERVICE_VERSION_IS_NOT_FINISH,
+                    params = arrayOf(serviceName, dbVersion)
+                )
+            }
+        }
     }
 }

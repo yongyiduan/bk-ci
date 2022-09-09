@@ -35,6 +35,9 @@ import com.tencent.devops.common.api.util.timestampmilli
 import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.model.store.tables.TExtensionService
+import com.tencent.devops.model.store.tables.TExtensionServiceFeature
+import com.tencent.devops.model.store.tables.TStoreProjectRel
 import com.tencent.devops.project.api.service.ServiceProjectResource
 import com.tencent.devops.store.dao.ExtItemServiceDao
 import com.tencent.devops.store.dao.ExtServiceDao
@@ -150,12 +153,14 @@ class ExtServiceProjectService @Autowired constructor(
 
     fun getServiceByProjectCode(projectCode: String): Result<List<ExtServiceRespItem>> {
         logger.info("getServiceByProjectCode projectCode[$projectCode]")
-        val projectRelRecords = extServiceDao.getProjectServiceBy(dslContext, projectCode)
+        val projectRelRecords = extServiceDao.getServiceByProjectCode(dslContext, projectCode)
         if (projectRelRecords == null || projectRelRecords.size == 0) {
-            return Result(emptyList<ExtServiceRespItem>())
+            return Result(emptyList())
         }
-
-        val serviceIds = projectRelRecords.map { it["serviceId"] as String }
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tStoreProjectRel = TStoreProjectRel.T_STORE_PROJECT_REL
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
+        val serviceIds = projectRelRecords.map { it[tExtensionService.ID] as String }
 
         val serviceItemMap = mutableMapOf<String, Set<String>>()
         extItemServiceDao.getItemByServiceId(dslContext, serviceIds)?.forEach {
@@ -176,38 +181,36 @@ class ExtServiceProjectService @Autowired constructor(
 
         val serviceRecords = mutableListOf<ExtServiceRespItem>()
         projectRelRecords.forEach {
-            val publicFlag = it["publicFlag"] as Boolean
-            val projectType = it["projectType"] as Byte
+            val publicFlag = it[tExtensionServiceFeature.PUBLIC_FLAG] as Boolean
+            val projectType = it[tStoreProjectRel.TYPE] as Byte
             val installUser: String
             val installTime: String
             if (projectType == StoreProjectTypeEnum.INIT.type.toByte()) {
-                installUser = it["publisher"] as String
-                installTime = (it["pubTime"] as LocalDateTime).timestampmilli().toString()
+                installUser = it[tExtensionService.PUBLISHER] as String
+                installTime = (it[tExtensionService.PUB_TIME] as LocalDateTime).timestampmilli().toString()
             } else {
-                installUser = it["projectInstallUser"] as String
-                installTime = (it["projectInstallTime"] as LocalDateTime).timestampmilli().toString()
+                installUser = it[tStoreProjectRel.CREATOR] as String
+                installTime = (it[tStoreProjectRel.CREATE_TIME] as LocalDateTime).timestampmilli().toString()
             }
             serviceRecords.add(
                 ExtServiceRespItem(
-                    serviceId = it["serviceId"] as String,
-                    serviceName = it["serviceName"] as String,
-                    serviceCode = it["serviceCode"] as String,
-                    language = "",
-                    category = "",
-                    version = it["version"] as String,
-                    logoUrl = "",
-                    serviceStatus = ExtServiceStatusEnum.getServiceStatus((it["serviceStatus"] as Byte).toInt()),
+                    serviceId = it[tExtensionService.ID] as String,
+                    serviceName = it[tExtensionService.SERVICE_NAME] as String,
+                    serviceCode = it[tExtensionService.SERVICE_CODE] as String,
+                    version = it[tExtensionService.VERSION] as String,
+                    logoUrl = it[tExtensionService.LOGO_URL],
+                    serviceStatus = ExtServiceStatusEnum.getServiceStatus((it[tExtensionService.SERVICE_STATUS]).toInt()),
                     projectName = projectCode,
-                    creator = it["creator"] as String,
+                    creator = it[tExtensionService.CREATOR] as String,
                     releaseFlag = true,
-                    modifier = it["modifier"] as String,
+                    modifier = it[tExtensionService.MODIFIER] as String,
                     itemName = emptyList(),
                     isUninstall = canUninstall(publicFlag, projectType),
                     publisher = installUser,
                     publishTime = installTime,
-                    createTime = (it["createTime"] as LocalDateTime).timestampmilli().toString(),
-                    updateTime = (it["updateTime"] as LocalDateTime).timestampmilli().toString(),
-                    itemIds = serviceItemMap[it["serviceId"] as String] ?: emptySet()
+                    createTime = (it[tExtensionService.CREATE_TIME] as LocalDateTime).timestampmilli().toString(),
+                    updateTime = (it[tExtensionService.UPDATE_TIME] as LocalDateTime).timestampmilli().toString(),
+                    itemIds = serviceItemMap[it[tExtensionService.ID] as String] ?: emptySet()
                 )
             )
         }

@@ -28,10 +28,14 @@
 package com.tencent.devops.store.dao
 
 import com.tencent.devops.common.api.constant.JS
+import com.tencent.devops.common.api.constant.KEY_REPOSITORY_HASH_ID
+import com.tencent.devops.common.api.constant.KEY_VERSION
 import com.tencent.devops.model.store.tables.TExtensionService
 import com.tencent.devops.model.store.tables.TExtensionServiceEnvInfo
 import com.tencent.devops.model.store.tables.TExtensionServiceFeature
 import com.tencent.devops.store.dao.common.AbstractStoreCommonDao
+import com.tencent.devops.store.pojo.common.KEY_CODE_SRC
+import com.tencent.devops.store.pojo.common.KEY_STORE_CODE
 import com.tencent.devops.store.pojo.common.StoreBaseInfo
 import org.jooq.Condition
 import org.jooq.DSLContext
@@ -62,7 +66,7 @@ class ServiceCommonDao : AbstractStoreCommonDao() {
 
     override fun getStoreCodeListByName(dslContext: DSLContext, storeName: String): Result<out Record>? {
         return with(TExtensionService.T_EXTENSION_SERVICE) {
-            dslContext.select(SERVICE_CODE.`as`("storeCode")).from(this)
+            dslContext.select(SERVICE_CODE.`as`(KEY_STORE_CODE)).from(this)
                 .where(SERVICE_NAME.contains(storeName))
                 .groupBy(SERVICE_CODE)
                 .fetch()
@@ -71,7 +75,9 @@ class ServiceCommonDao : AbstractStoreCommonDao() {
 
     override fun getStoreNameById(dslContext: DSLContext, storeId: String): String? {
         return with(TExtensionService.T_EXTENSION_SERVICE) {
-            dslContext.select(SERVICE_NAME).from(this).where(ID.eq(storeId)).fetchOne(0, String::class.java)
+            dslContext.select(SERVICE_NAME).from(this)
+                .where(ID.eq(storeId))
+                .fetchOne(0, String::class.java)
         }
     }
 
@@ -79,23 +85,27 @@ class ServiceCommonDao : AbstractStoreCommonDao() {
         dslContext: DSLContext,
         storeCodeList: List<String>
     ): Result<out Record>? {
-        val tes = TExtensionService.T_EXTENSION_SERVICE.`as`("tes")
-        val tesf = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE.`as`("tesf")
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
         return dslContext.select(
-            tes.SERVICE_CODE.`as`("storeCode"),
-            tes.VERSION.`as`("version"),
-            tesf.REPOSITORY_HASH_ID.`as`("repositoryHashId"),
-            tesf.CODE_SRC.`as`("codeSrc")
-        ).from(tes).join(tesf).on(tes.SERVICE_CODE.eq(tesf.SERVICE_CODE))
-            .where(tes.SERVICE_CODE.`in`(storeCodeList))
-            .and(tes.LATEST_FLAG.eq(true))
+            tExtensionService.SERVICE_CODE.`as`(KEY_STORE_CODE),
+            tExtensionService.VERSION.`as`(KEY_VERSION),
+            tExtensionServiceFeature.REPOSITORY_HASH_ID.`as`(KEY_REPOSITORY_HASH_ID),
+            tExtensionServiceFeature.CODE_SRC.`as`(KEY_CODE_SRC)
+        ).from(tExtensionService)
+            .join(tExtensionServiceFeature)
+            .on(tExtensionService.SERVICE_CODE.eq(tExtensionServiceFeature.SERVICE_CODE))
+            .where(tExtensionService.SERVICE_CODE.`in`(storeCodeList))
+            .and(tExtensionService.LATEST_FLAG.eq(true))
             .fetch()
     }
 
     override fun getStoreDevLanguages(dslContext: DSLContext, storeCode: String): List<String>? {
-        val tes = TExtensionService.T_EXTENSION_SERVICE.`as`("tes")
-        val tesei = TExtensionServiceEnvInfo.T_EXTENSION_SERVICE_ENV_INFO.`as`("tesei")
-        val language = dslContext.select(tesei.LANGUAGE).from(tes).join(tesei).on(tes.ID.eq(tesei.SERVICE_ID))
+        val tes = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceEnvInfo = TExtensionServiceEnvInfo.T_EXTENSION_SERVICE_ENV_INFO
+        val language = dslContext.select(tExtensionServiceEnvInfo.LANGUAGE).from(tes)
+            .join(tExtensionServiceEnvInfo)
+            .on(tes.ID.eq(tExtensionServiceEnvInfo.SERVICE_ID))
             .where(tes.SERVICE_CODE.eq(storeCode).and(tes.LATEST_FLAG.eq(true)))
             .fetchOne(0, String()::class.java)!!
         return arrayListOf(language, JS)
@@ -106,21 +116,21 @@ class ServiceCommonDao : AbstractStoreCommonDao() {
         storeCode: String,
         storeStatus: Byte?
     ): StoreBaseInfo? {
-        val tes = TExtensionService.T_EXTENSION_SERVICE.`as`("tes")
-        val tesf = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE.`as`("tesf")
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
         val conditions = mutableListOf<Condition>()
-        conditions.add(tes.SERVICE_CODE.eq(storeCode))
+        conditions.add(tExtensionService.SERVICE_CODE.eq(storeCode))
         if (storeStatus != null) {
-            conditions.add(tes.SERVICE_STATUS.eq(storeStatus))
+            conditions.add(tExtensionService.SERVICE_STATUS.eq(storeStatus))
         }
-        val serviceRecord = dslContext.selectFrom(tes)
+        val serviceRecord = dslContext.selectFrom(tExtensionService)
             .where(conditions)
-            .orderBy(tes.CREATE_TIME.desc())
+            .orderBy(tExtensionService.CREATE_TIME.desc())
             .limit(1)
             .fetchOne()
         return if (serviceRecord != null) {
-            val publicFlag = dslContext.select(tesf.PUBLIC_FLAG).from(tesf)
-                .where(tesf.SERVICE_CODE.eq(storeCode))
+            val publicFlag = dslContext.select(tExtensionServiceFeature.PUBLIC_FLAG).from(tExtensionServiceFeature)
+                .where(tExtensionServiceFeature.SERVICE_CODE.eq(storeCode))
                 .fetchOne(0, Boolean::class.java)!!
             StoreBaseInfo(
                 storeId = serviceRecord.id,

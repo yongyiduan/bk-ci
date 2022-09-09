@@ -25,32 +25,65 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.artifactory.resources
 
+import com.tencent.devops.artifactory.api.UserArchiveServicePkgResource
+import com.tencent.devops.artifactory.pojo.ArchiveServicePkgRequest
+import com.tencent.devops.artifactory.service.ArchiveServicePkgService
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.ServiceExtServiceArchiveResource
 import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
-import com.tencent.devops.store.service.ExtServiceArchiveService
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.springframework.beans.factory.annotation.Autowired
+import java.io.InputStream
 
 @RestResource
-class ServiceExtServiceArchiveResourceImpl @Autowired constructor(
-    private val extServiceArchiveService: ExtServiceArchiveService
-) : ServiceExtServiceArchiveResource {
+class UserArchiveServicePkgResourceImpl @Autowired constructor(
+    private val archiveServicePkgService: ArchiveServicePkgService
+) : UserArchiveServicePkgResource {
 
-    override fun verifyExtServicePackageByUserId(
+    override fun archiveServicePkg(
         userId: String,
+        serviceId: String,
         serviceCode: String,
         version: String,
-        releaseType: ReleaseTypeEnum?
+        releaseType: ReleaseTypeEnum,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition
     ): Result<Boolean> {
         return Result(
-            extServiceArchiveService.verifyExtServicePackageByUserId(
+            archiveServicePkgService.archiveServicePkg(
                 userId = userId,
-                serviceCode = serviceCode,
-                version = version,
-                releaseType = releaseType
+                inputStream = inputStream,
+                disposition = disposition,
+                archiveServicePkgRequest = ArchiveServicePkgRequest(
+                    serviceId = serviceId,
+                    serviceCode = serviceCode,
+                    version = version,
+                    releaseType = releaseType
+                )
+            )
+        )
+    }
+
+    override fun reArchiveServicePkg(
+        userId: String,
+        serviceId: String,
+        serviceCode: String,
+        version: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition
+    ): Result<Boolean> {
+        return Result(
+            archiveServicePkgService.archiveServicePkg(
+                userId = userId,
+                inputStream = inputStream,
+                disposition = disposition,
+                archiveServicePkgRequest = ArchiveServicePkgRequest(
+                    serviceId = serviceId,
+                    serviceCode = serviceCode,
+                    version = version
+                )
             )
         )
     }

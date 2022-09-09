@@ -25,31 +25,41 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.artifactory.service
 
-import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.BuildExtServiceEnvResource
-import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
-import com.tencent.devops.store.service.ExtServiceEnvService
-import org.springframework.beans.factory.annotation.Autowired
+import com.tencent.devops.artifactory.pojo.ArchiveServicePkgRequest
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
+import java.io.InputStream
 
-@RestResource
-class BuildExtServiceEnvResourceImpl @Autowired constructor(
-    private val extServiceEnvService: ExtServiceEnvService
-) : BuildExtServiceEnvResource {
+interface ArchiveServicePkgService {
 
-    override fun updateExtServiceEnv(
-        projectCode: String,
-        serviceCode: String,
-        version: String,
-        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
-    ): Result<Boolean> {
-        return extServiceEnvService.updateExtServiceEnvInfo(
-            projectCode = projectCode,
-            serviceCode = serviceCode,
-            version = version,
-            updateExtServiceEnvInfo = updateExtServiceEnvInfo
-        )
-    }
+    /**
+     * 归档微扩展
+     */
+    fun archiveServicePkg(
+        userId: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition,
+        archiveServicePkgRequest: ArchiveServicePkgRequest
+    ): Boolean
+
+    /**
+     * 重新归档微扩展
+     */
+    fun reArchiveServicePkg(
+        userId: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition,
+        archiveServicePkgRequest: ArchiveServicePkgRequest
+    ): Boolean
+
+    /**
+     * 获取微扩展相关文件内容
+     */
+    fun getServiceFileContent(filePath: String): String
+
+    /**
+     * 删除微扩展
+     */
+    fun deleteServicePkg(userId: String, serviceCode: String)
 }

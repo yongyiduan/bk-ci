@@ -54,8 +54,8 @@ import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.Record2
 import org.jooq.Result
+import org.jooq.SelectOnConditionStep
 import org.jooq.impl.DSL
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -368,13 +368,6 @@ class ExtServiceDao {
         }
     }
 
-    fun listServiceByName(dslContext: DSLContext, serviceName: String): Result<TExtensionServiceRecord>? {
-        return with(TExtensionService.T_EXTENSION_SERVICE) {
-            dslContext.selectFrom(this).where(DELETE_FLAG.eq(false)).and(SERVICE_NAME.eq(serviceName))
-                .orderBy(CREATE_TIME.desc()).fetch()
-        }
-    }
-
     fun listServiceByStatus(
         dslContext: DSLContext,
         serviceStatus: ExtServiceStatusEnum,
@@ -444,22 +437,6 @@ class ExtServiceDao {
         }
     }
 
-    fun getAllServiceClassify(dslContext: DSLContext): Result<out Record>? {
-        val a = TExtensionService.T_EXTENSION_SERVICE.`as`("a")
-        val b = TClassify.T_CLASSIFY.`as`("b")
-        val conditions = setExtServiceVisibleCondition(a)
-        conditions.add(0, a.CLASSIFY_ID.eq(b.ID))
-        val serviceNum = dslContext.selectCount().from(a).where(conditions).asField<Int>("serviceNum")
-        return dslContext.select(
-            b.ID.`as`("id"),
-            b.CLASSIFY_CODE.`as`("classifyCode"),
-            b.CLASSIFY_NAME.`as`("classifyName"),
-            serviceNum,
-            b.CREATE_TIME.`as`("createTime"),
-            b.UPDATE_TIME.`as`("updateTime")
-        ).from(b).where(b.TYPE.eq(StoreTypeEnum.SERVICE.type.toByte())).orderBy(b.WEIGHT.desc()).fetch()
-    }
-
     /**
      * 微扩展商店搜索结果，总数
      */
@@ -472,48 +449,89 @@ class ExtServiceDao {
         labelCodeList: List<String>?,
         score: Int?
     ): Int {
-        val (ta, conditions) = formatConditions(keyword, classifyCode, dslContext)
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
+        val baseStep = dslContext.select(DSL.countDistinct(tExtensionService.ID)).from(tExtensionService)
+            .join(tExtensionServiceFeature).on(tExtensionService.SERVICE_CODE.eq(tExtensionServiceFeature.SERVICE_CODE))
+        val conditions = handleMainListBaseStep(
+            tExtensionService = tExtensionService,
+            dslContext = dslContext,
+            baseStep = baseStep,
+            keyword = keyword,
+            classifyCode = classifyCode,
+            rdType = rdType,
+            labelCodeList = labelCodeList,
+            bkService = bkService,
+            score = score
+        )
+        return baseStep.where(conditions).fetchOne(0, Int::class.java)!!
+    }
 
-        val baseStep = dslContext.select(ta.ID.countDistinct()).from(ta)
+    private fun handleMainListBaseStep(
+        tExtensionService: TExtensionService,
+        dslContext: DSLContext,
+        baseStep: SelectOnConditionStep<out Record>,
+        keyword: String?,
+        classifyCode: String?,
+        rdType: ServiceTypeEnum?,
+        labelCodeList: List<String>?,
+        bkService: Long?,
+        score: Int?
+    ): MutableList<Condition> {
+        val storeType = StoreTypeEnum.SERVICE.type.toByte()
+        val conditions = setExtServiceVisibleCondition(tExtensionService)
+        if (!keyword.isNullOrEmpty()) {
+            conditions.add(
+                tExtensionService.SERVICE_NAME.contains(keyword)
+                    .or(tExtensionService.SUMMARY.contains(keyword))
+            )
+        }
+        if (!classifyCode.isNullOrEmpty()) {
+            val tClassify = TClassify.T_CLASSIFY
+            val classifyId = dslContext.select(tClassify.ID)
+                .from(tClassify)
+                .where(tClassify.CLASSIFY_CODE.eq(classifyCode).and(tClassify.TYPE.eq(storeType)))
+                .fetchOne(0, String::class.java)
+            conditions.add(tExtensionService.CLASSIFY_ID.eq(classifyId))
+        }
 
         if (rdType != null) {
-            val taf = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE.`as`("taf")
-            baseStep.leftJoin(taf).on(ta.SERVICE_CODE.eq(taf.SERVICE_CODE))
-            conditions.add(taf.SERVICE_TYPE.eq(rdType.type.toByte()))
+            val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
+            baseStep.leftJoin(tExtensionServiceFeature)
+                .on(tExtensionService.SERVICE_CODE.eq(tExtensionServiceFeature.SERVICE_CODE))
+            conditions.add(tExtensionServiceFeature.SERVICE_TYPE.eq(rdType.type.toByte()))
         }
-
-        val storeType = StoreTypeEnum.SERVICE.type.toByte()
         if (labelCodeList != null && labelCodeList.isNotEmpty()) {
-            val c = TLabel.T_LABEL.`as`("c")
-            val labelIdList = dslContext.select(c.ID)
-                .from(c)
-                .where(c.LABEL_CODE.`in`(labelCodeList)).and(c.TYPE.eq(storeType))
-                .fetch().map { it["ID"] as String }
-            val talr = TExtensionServiceLabelRel.T_EXTENSION_SERVICE_LABEL_REL.`as`("talr")
-            baseStep.leftJoin(talr).on(ta.ID.eq(talr.SERVICE_ID))
-            conditions.add(talr.LABEL_ID.`in`(labelIdList))
+            val tLabel = TLabel.T_LABEL
+            val labelIdList = dslContext.select(tLabel.ID)
+                .from(tLabel)
+                .where(tLabel.LABEL_CODE.`in`(labelCodeList)).and(tLabel.TYPE.eq(storeType))
+                .fetch().map { it.value1() }
+            val tExtensionServiceLabelRel = TExtensionServiceLabelRel.T_EXTENSION_SERVICE_LABEL_REL
+            baseStep.leftJoin(tExtensionServiceLabelRel)
+                .on(tExtensionService.ID.eq(tExtensionServiceLabelRel.SERVICE_ID))
+            conditions.add(tExtensionServiceLabelRel.LABEL_ID.`in`(labelIdList))
         }
         if (bkService != null) {
-            val tir = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL.`as`("tir")
-            val serviceIdList = dslContext.select(tir.SERVICE_ID).from(tir)
-                .where(tir.BK_SERVICE_ID.eq(bkService)).fetch().map { it["SERVICE_ID"] as String }
-            conditions.add(ta.ID.`in`(serviceIdList))
+            val tExtensionServiceItemRel = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL
+            val serviceIdList = dslContext.select(tExtensionServiceItemRel.SERVICE_ID).from(tExtensionServiceItemRel)
+                .where(tExtensionServiceItemRel.BK_SERVICE_ID.eq(bkService)).fetch().map { it.value1() }
+            conditions.add(tExtensionService.ID.`in`(serviceIdList))
         }
 
         if (score != null) {
-            val tas = TStoreStatisticsTotal.T_STORE_STATISTICS_TOTAL.`as`("tas")
+            val tStoreStatisticsTotal = TStoreStatisticsTotal.T_STORE_STATISTICS_TOTAL
             val t = dslContext.select(
-                tas.STORE_CODE,
-                tas.STORE_TYPE,
-//                tas.DOWNLOADS.`as`(ExtServiceSortTypeEnum.DOWNLOAD_COUNT.name),
-                tas.SCORE_AVERAGE
-            ).from(tas).asTable("t")
-            baseStep.leftJoin(t).on(ta.SERVICE_CODE.eq(t.field("STORE_CODE", String::class.java)))
-            conditions.add(t.field("SCORE_AVERAGE", BigDecimal::class.java)!!.ge(BigDecimal.valueOf(score.toLong())))
+                tStoreStatisticsTotal.STORE_CODE,
+                tStoreStatisticsTotal.STORE_TYPE,
+                tStoreStatisticsTotal.SCORE_AVERAGE
+            ).from(tStoreStatisticsTotal).asTable("t")
+            baseStep.leftJoin(t).on(tExtensionService.SERVICE_CODE.eq(t.field("STORE_CODE", String::class.java)))
+            val convertScore = BigDecimal.valueOf(score.toLong())
+            conditions.add(t.field("SCORE_AVERAGE", BigDecimal::class.java)!!.ge(convertScore))
             conditions.add(t.field("STORE_TYPE", Byte::class.java)!!.eq(storeType))
         }
-
-        return baseStep.where(conditions).fetchOne(0, Int::class.java)!!
+        return conditions
     }
 
     /**
@@ -545,82 +563,103 @@ class ExtServiceDao {
         itemId: String?,
         isRecommend: Boolean?,
         isPublic: Boolean?,
-        lableId: String?,
+        labelId: String?,
         isApprove: Boolean?,
         sortType: String?,
         desc: Boolean?,
-        page: Int?,
-        pageSize: Int?
-    ): Result<Record> {
-        val a = TExtensionService.T_EXTENSION_SERVICE.`as`("a")
-        val b = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE.`as`("b")
-        val c = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL.`as`("c")
-        val d = TStoreProjectRel.T_STORE_PROJECT_REL.`as`("d")
+        page: Int,
+        pageSize: Int
+    ): Result<out Record> {
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
+        val tExtensionServiceItemRel = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL
+        val tStoreProjectRel = TStoreProjectRel.T_STORE_PROJECT_REL
         // 查找每组serviceCode最新的记录
         val tmp = dslContext.select(
-            a.SERVICE_CODE.`as`("serviceCode"),
-            a.CREATE_TIME.max().`as`("createTime")
-        ).from(a).groupBy(a.SERVICE_CODE)
-        val ta = dslContext.select(a.SERVICE_CODE.`as`("serviceCode"), a.SERVICE_STATUS.`as`("serviceStatus")).from(a).join(tmp)
-            .on(a.SERVICE_CODE.eq(tmp.field("serviceCode", String::class.java)).and(a.CREATE_TIME.eq(tmp.field("createTime", LocalDateTime::class.java))))
-        val selectField = dslContext.select(
-            a.ID.`as`("itemId"),
-            a.SERVICE_STATUS.`as`("serviceStatus"),
-            a.SERVICE_NAME.`as`("serviceName"),
-            a.SERVICE_CODE.`as`("serviceCode"),
-            a.VERSION.`as`("version"),
-            a.PUB_TIME.`as`("pubTime"),
-            a.PUBLISHER.`as`("publisher"),
-            a.UPDATE_TIME.`as`("updateTime"),
-            d.PROJECT_CODE.`as`("projectCode")
-        ).from(a)
-            .join(b)
-            .on(a.SERVICE_CODE.eq(b.SERVICE_CODE))
-            .join(d)
-            .on(a.SERVICE_CODE.eq(d.STORE_CODE))
-            .join(ta)
-            .on(a.SERVICE_CODE.eq(ta.field("serviceCode", String::class.java)))
-        val conditions = mutableListOf<Condition>()
-        conditions.add(d.TYPE.eq(StoreProjectTypeEnum.INIT.type.toByte()))
-        conditions.add(d.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
-        conditions.add(a.DELETE_FLAG.eq(false))
-        conditions.add(a.LATEST_FLAG.eq(true))
-        if (null != serviceName) {
-            conditions.add(a.SERVICE_NAME.like("%$serviceName%"))
-        }
-        if (null != itemId) {
-            conditions.add(c.ITEM_ID.eq(itemId))
-            selectField.join(c).on(a.ID.eq(c.SERVICE_ID))
-        }
-
-        if (null != isPublic) {
-            conditions.add(b.PUBLIC_FLAG.eq(isPublic))
-        }
-
-        if (null != isRecommend) {
-            conditions.add(b.RECOMMEND_FLAG.eq(isRecommend))
-        }
-
-        if (null != isApprove) {
-            if (isApprove) {
-                conditions.add(a.SERVICE_STATUS.eq(ExtServiceStatusEnum.AUDITING.status.toByte()))
-            } else {
-                conditions.add(a.SERVICE_STATUS.notEqual(ExtServiceStatusEnum.AUDITING.status.toByte()))
-            }
-        }
-        val realSortType = a.field(sortType)
+            tExtensionService.SERVICE_CODE.`as`(KEY_SERVICE_CODE),
+            DSL.max(tExtensionService.CREATE_TIME).`as`(KEY_CREATE_TIME)
+        ).from(tExtensionService).groupBy(tExtensionService.SERVICE_CODE)
+        val baseStep = dslContext.select(
+            tExtensionService.ID,
+            tExtensionService.SERVICE_STATUS,
+            tExtensionService.SERVICE_NAME,
+            tExtensionService.SERVICE_CODE,
+            tExtensionService.VERSION,
+            tExtensionService.PUB_TIME,
+            tExtensionService.PUBLISHER,
+            tExtensionService.UPDATE_TIME,
+            tStoreProjectRel.PROJECT_CODE
+        ).from(tExtensionService)
+            .join(tExtensionServiceFeature)
+            .on(tExtensionService.SERVICE_CODE.eq(tExtensionServiceFeature.SERVICE_CODE))
+            .join(tStoreProjectRel)
+            .on(tExtensionService.SERVICE_CODE.eq(tStoreProjectRel.STORE_CODE))
+            .join(tmp)
+            .on(tExtensionService.SERVICE_CODE.eq(tmp.field(KEY_SERVICE_CODE, String::class.java)).and(
+                tExtensionService.CREATE_TIME.eq(tmp.field(KEY_CREATE_TIME, LocalDateTime::class.java))
+            ))
+        val conditions = getOpServiceCondition(
+            tStoreProjectRel = tStoreProjectRel,
+            tExtensionService = tExtensionService,
+            tExtensionServiceItemRel = tExtensionServiceItemRel,
+            tExtensionServiceFeature = tExtensionServiceFeature,
+            baseStep = baseStep,
+            serviceName = serviceName,
+            itemId = itemId,
+            isPublic = isPublic,
+            isRecommend = isRecommend,
+            isApprove = isApprove
+        )
+        val realSortType = tExtensionService.field(sortType)
         val orderByStep = if (desc != null && desc) {
             realSortType!!.desc()
         } else {
             realSortType!!.asc()
         }
-        val t = selectField.where(conditions).orderBy(orderByStep)
-        val baseStep = dslContext.select().from(t)
-        return if (null != page && null != pageSize) {
-            baseStep.limit((page - 1) * pageSize, pageSize).fetch()
-        } else {
-            baseStep.fetch()
+        return baseStep.where(conditions).orderBy(orderByStep).limit((page - 1) * pageSize, pageSize).fetch()
+    }
+
+    private fun getOpServiceCondition(
+        tStoreProjectRel: TStoreProjectRel,
+        tExtensionService: TExtensionService,
+        tExtensionServiceItemRel: TExtensionServiceItemRel,
+        tExtensionServiceFeature: TExtensionServiceFeature,
+        baseStep: SelectOnConditionStep<out Record>,
+        serviceName: String?,
+        itemId: String?,
+        isPublic: Boolean?,
+        isRecommend: Boolean?,
+        isApprove: Boolean?
+    ): MutableList<Condition> {
+        val conditions = mutableListOf<Condition>()
+        conditions.add(tStoreProjectRel.TYPE.eq(StoreProjectTypeEnum.INIT.type.toByte()))
+        conditions.add(tStoreProjectRel.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
+        conditions.add(tExtensionService.DELETE_FLAG.eq(false))
+        conditions.add(tExtensionService.LATEST_FLAG.eq(true))
+        if (null != serviceName) {
+            conditions.add(tExtensionService.SERVICE_NAME.like("%$serviceName%"))
         }
+        if (null != itemId) {
+            conditions.add(tExtensionServiceItemRel.ITEM_ID.eq(itemId))
+            baseStep.join(tExtensionServiceItemRel).on(tExtensionService.ID.eq(tExtensionServiceItemRel.SERVICE_ID))
+        }
+
+        if (null != isPublic) {
+            conditions.add(tExtensionServiceFeature.PUBLIC_FLAG.eq(isPublic))
+        }
+
+        if (null != isRecommend) {
+            conditions.add(tExtensionServiceFeature.RECOMMEND_FLAG.eq(isRecommend))
+        }
+
+        if (null != isApprove) {
+            if (isApprove) {
+                conditions.add(tExtensionService.SERVICE_STATUS.eq(ExtServiceStatusEnum.AUDITING.status.toByte()))
+            } else {
+                conditions.add(tExtensionService.SERVICE_STATUS.notEqual(ExtServiceStatusEnum.AUDITING.status.toByte()))
+            }
+        }
+        return conditions
     }
 
     fun queryCountFromOp(
@@ -631,56 +670,41 @@ class ExtServiceDao {
         isPublic: Boolean?,
         isApprove: Boolean?
     ): Int {
-        val a = TExtensionService.T_EXTENSION_SERVICE.`as`("a")
-        val b = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE.`as`("b")
-        val c = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL.`as`("c")
-        val d = TStoreProjectRel.T_STORE_PROJECT_REL.`as`("d")
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
+        val tExtensionServiceItemRel = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL
+        val tStoreProjectRel = TStoreProjectRel.T_STORE_PROJECT_REL
 
-        var selectFeild = dslContext.select(
-            a.ID.countDistinct()
-        ).from(a).join(b).on(a.SERVICE_CODE.eq(b.SERVICE_CODE)).join(d).on(a.SERVICE_CODE.eq(d.STORE_CODE))
-
-        val conditions = mutableListOf<Condition>()
-        conditions.add(d.TYPE.eq(StoreProjectTypeEnum.INIT.type.toByte()))
-        conditions.add(d.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
-        conditions.add(a.DELETE_FLAG.eq(false))
-        conditions.add(a.LATEST_FLAG.eq(true))
-
-        if (null != serviceName) {
-            conditions.add(a.SERVICE_NAME.like("%$serviceName%"))
-        }
-        if (null != itemId) {
-            conditions.add(c.ITEM_ID.eq(itemId))
-            selectFeild.join(c).on(a.ID.eq(c.SERVICE_ID))
-        }
-
-        if (null != isPublic) {
-            conditions.add(b.PUBLIC_FLAG.eq(isPublic))
-        }
-
-        if (null != isRecommend) {
-            conditions.add(b.RECOMMEND_FLAG.eq(isRecommend))
-        }
-
-        if (null != isApprove) {
-            if (isApprove) {
-                conditions.add(a.SERVICE_STATUS.eq(ExtServiceStatusEnum.AUDITING.status.toByte()))
-            } else {
-                conditions.add(a.SERVICE_STATUS.notEqual(ExtServiceStatusEnum.AUDITING.status.toByte()))
-            }
-        }
-        return selectFeild.where(conditions).fetchOne(0, Int::class.java)!!
+        val baseStep = dslContext.select(
+           DSL.countDistinct(tExtensionService.ID)
+        ).from(tExtensionService)
+            .join(tExtensionServiceFeature)
+            .on(tExtensionService.SERVICE_CODE.eq(tExtensionServiceFeature.SERVICE_CODE))
+            .join(tStoreProjectRel)
+            .on(tExtensionService.SERVICE_CODE.eq(tStoreProjectRel.STORE_CODE))
+        val conditions = getOpServiceCondition(
+            tStoreProjectRel = tStoreProjectRel,
+            tExtensionService = tExtensionService,
+            tExtensionServiceItemRel = tExtensionServiceItemRel,
+            tExtensionServiceFeature = tExtensionServiceFeature,
+            baseStep = baseStep,
+            serviceName = serviceName,
+            itemId = itemId,
+            isPublic = isPublic,
+            isRecommend = isRecommend,
+            isApprove = isApprove
+        )
+        return baseStep.where(conditions).fetchOne(0, Int::class.java)!!
     }
 
     fun getLatestFlag(dslContext: DSLContext, serviceCode: String): Boolean {
         with(TExtensionService.T_EXTENSION_SERVICE) {
-            val count = dslContext.selectCount().from(this).where(SERVICE_CODE.eq(serviceCode).and(SERVICE_STATUS.eq(ExtServiceStatusEnum.RELEASED.status.toByte())))
-                .fetchOne(0, Int::class.java)!!
-            if (count > 0) {
-                return false
-            }
+            return dslContext.selectCount().from(this)
+                .where(SERVICE_CODE.eq(serviceCode)
+                    .and(SERVICE_STATUS.eq(ExtServiceStatusEnum.RELEASED.status.toByte()))
+                )
+                .fetchOne(0, Int::class.java)!! < 1
         }
-        return true
     }
 
     /**
@@ -696,75 +720,53 @@ class ExtServiceDao {
         rdType: ServiceTypeEnum?,
         sortType: ExtServiceSortTypeEnum?,
         desc: Boolean?,
-        page: Int?,
-        pageSize: Int?
+        page: Int,
+        pageSize: Int
     ): Result<out Record>? {
-        val (ta, conditions) = formatConditions(keyword, classifyCode, dslContext)
-        val taf = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE.`as`("taf")
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
         val baseStep = dslContext.select(
-            ta.ID.`as`("SERVICE_ID"),
-            ta.SERVICE_NAME,
-            ta.CLASSIFY_ID,
-            ta.SERVICE_CODE.`as`("SERVICE_CODE"),
-            ta.LOGO_URL,
-            ta.PUBLISHER,
-            ta.SUMMARY,
-            ta.MODIFIER,
-            ta.UPDATE_TIME,
-            taf.RECOMMEND_FLAG,
-            taf.PUBLIC_FLAG
-        ).from(ta)
-            .leftJoin(taf)
-            .on(ta.SERVICE_CODE.eq(taf.SERVICE_CODE))
+            tExtensionService.ID,
+            tExtensionService.SERVICE_NAME,
+            tExtensionService.CLASSIFY_ID,
+            tExtensionService.SERVICE_CODE,
+            tExtensionService.LOGO_URL,
+            tExtensionService.PUBLISHER,
+            tExtensionService.SUMMARY,
+            tExtensionService.MODIFIER,
+            tExtensionService.UPDATE_TIME,
+            tExtensionServiceFeature.RECOMMEND_FLAG,
+            tExtensionServiceFeature.PUBLIC_FLAG
+        ).from(tExtensionService)
+            .leftJoin(tExtensionServiceFeature)
+            .on(tExtensionService.SERVICE_CODE.eq(tExtensionServiceFeature.SERVICE_CODE))
 
-        val storeType = StoreTypeEnum.SERVICE.type.toByte()
-        if (labelCodeList != null && labelCodeList.isNotEmpty()) {
-            val c = TLabel.T_LABEL.`as`("c")
-            val labelIdList = dslContext.select(c.ID)
-                .from(c)
-                .where(c.LABEL_CODE.`in`(labelCodeList)).and(c.TYPE.eq(storeType))
-                .fetch().map { it["ID"] as String }
-            val talr = TExtensionServiceLabelRel.T_EXTENSION_SERVICE_LABEL_REL.`as`("talr")
-            baseStep.leftJoin(talr).on(ta.ID.eq(talr.SERVICE_ID))
-            conditions.add(talr.LABEL_ID.`in`(labelIdList))
-        }
-
-        if (rdType != null) {
-            conditions.add(taf.SERVICE_TYPE.eq(rdType.type.toByte()))
-        }
-
-        if (bkService != null) {
-            val tir = TExtensionServiceItemRel.T_EXTENSION_SERVICE_ITEM_REL.`as`("tir")
-            val serviceIdList = dslContext.select(tir.SERVICE_ID).from(tir)
-                .where(tir.BK_SERVICE_ID.eq(bkService)).fetch().map { it["SERVICE_ID"] as String }
-            conditions.add(ta.ID.`in`(serviceIdList))
-        }
-        if (score != null) {
-            val tas = TStoreStatisticsTotal.T_STORE_STATISTICS_TOTAL.`as`("tas")
-            val t = dslContext.select(
-                tas.STORE_CODE,
-                tas.STORE_TYPE,
-                tas.DOWNLOADS.`as`(ExtServiceSortTypeEnum.DOWNLOAD_COUNT.name),
-                tas.SCORE_AVERAGE
-            ).from(tas).asTable("t")
-            baseStep.leftJoin(t).on(ta.SERVICE_CODE.eq(t.field("STORE_CODE", String::class.java)))
-            conditions.add(t.field("SCORE_AVERAGE", BigDecimal::class.java)!!.ge(BigDecimal.valueOf(score.toLong())))
-            conditions.add(t.field("STORE_TYPE", Byte::class.java)!!.eq(storeType))
-        }
+        val conditions = handleMainListBaseStep(
+            tExtensionService = tExtensionService,
+            dslContext = dslContext,
+            baseStep = baseStep,
+            keyword = keyword,
+            classifyCode = classifyCode,
+            rdType = rdType,
+            labelCodeList = labelCodeList,
+            bkService = bkService,
+            score = score
+        )
 
         if (null != sortType) {
             if (sortType == ExtServiceSortTypeEnum.DOWNLOAD_COUNT && score == null) {
-                val tas = TStoreStatisticsTotal.T_STORE_STATISTICS_TOTAL.`as`("tas")
+                val tas = TStoreStatisticsTotal.T_STORE_STATISTICS_TOTAL
                 val t =
                     dslContext.select(tas.STORE_CODE, tas.DOWNLOADS.`as`(ExtServiceSortTypeEnum.DOWNLOAD_COUNT.name))
-                        .from(tas).where(tas.STORE_TYPE.eq(storeType)).asTable("t")
-                baseStep.leftJoin(t).on(ta.SERVICE_CODE.eq(t.field("STORE_CODE", String::class.java)))
+                        .from(tas).where(tas.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte())).asTable("t")
+                baseStep.leftJoin(t)
+                    .on(tExtensionService.SERVICE_CODE.eq(t.field("STORE_CODE", String::class.java)))
             }
             val sortTypeField = ExtServiceSortTypeEnum.getSortType(sortType.name)
             val realSortType = if (sortType == ExtServiceSortTypeEnum.DOWNLOAD_COUNT) {
                 DSL.field(sortTypeField)
             } else {
-                ta.field(sortTypeField)
+                tExtensionService.field(sortTypeField)
             }
 
             if (desc != null && desc) {
@@ -775,43 +777,42 @@ class ExtServiceDao {
         } else {
             baseStep.where(conditions)
         }
-        logger.info(baseStep.getSQL(true))
-        return if (null != page && null != pageSize) {
-            baseStep.limit((page - 1) * pageSize, pageSize).fetch()
-        } else {
-            baseStep.fetch()
-        }
+        return baseStep.limit((page - 1) * pageSize, pageSize).fetch()
     }
 
-    fun getProjectServiceBy(dslContext: DSLContext, projectCode: String): Result<out Record>? {
-        val sa = TExtensionService.T_EXTENSION_SERVICE.`as`("sa")
-        val sp = TStoreProjectRel.T_STORE_PROJECT_REL.`as`("sp")
-        val sf = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE.`as`("sf")
+    fun getServiceByProjectCode(dslContext: DSLContext, projectCode: String): Result<out Record>? {
+        val tExtensionService = TExtensionService.T_EXTENSION_SERVICE
+        val tStoreProjectRel = TStoreProjectRel.T_STORE_PROJECT_REL
+        val tExtensionServiceFeature = TExtensionServiceFeature.T_EXTENSION_SERVICE_FEATURE
         val baseStep = dslContext.select(
-            sa.ID.`as`("serviceId"),
-            sa.SERVICE_NAME.`as`("serviceName"),
-            sa.SERVICE_CODE.`as`("serviceCode"),
-            sa.PUBLISHER.`as`("publisher"),
-            sa.PUB_TIME.`as`("pubTime"),
-            sa.VERSION.`as`("version"),
-            sa.CREATOR.`as`("creator"),
-            sa.CREATE_TIME.`as`("createTime"),
-            sa.MODIFIER.`as`("modifier"),
-            sa.UPDATE_TIME.`as`("updateTime"),
-            sa.SERVICE_STATUS.`as`("serviceStatus"),
-            sf.PUBLIC_FLAG.`as`("publicFlag"),
-            sp.CREATE_TIME.`as`("projectInstallTime"),
-            sp.CREATOR.`as`("projectInstallUser"),
-            sp.TYPE.`as`("projectType")
-        ).from(sa).leftOuterJoin(sp).on(sa.SERVICE_CODE.eq(sp.STORE_CODE)).leftJoin(sf).on(sa.SERVICE_CODE.eq(sf.SERVICE_CODE))
+            tExtensionService.ID,
+            tExtensionService.SERVICE_NAME,
+            tExtensionService.SERVICE_CODE,
+            tExtensionService.LOGO_URL,
+            tExtensionService.PUBLISHER,
+            tExtensionService.PUB_TIME,
+            tExtensionService.VERSION,
+            tExtensionService.CREATOR,
+            tExtensionService.CREATE_TIME,
+            tExtensionService.MODIFIER,
+            tExtensionService.UPDATE_TIME,
+            tExtensionService.SERVICE_STATUS,
+            tExtensionServiceFeature.PUBLIC_FLAG,
+            tStoreProjectRel.CREATE_TIME,
+            tStoreProjectRel.CREATOR,
+            tStoreProjectRel.TYPE
+        ).from(tExtensionService)
+            .leftOuterJoin(tStoreProjectRel)
+            .on(tExtensionService.SERVICE_CODE.eq(tStoreProjectRel.STORE_CODE))
+            .leftJoin(tExtensionServiceFeature)
+            .on(tExtensionService.SERVICE_CODE.eq(tExtensionServiceFeature.SERVICE_CODE))
         val condition = mutableListOf<Condition>()
-        condition.add(sa.LATEST_FLAG.eq(true))
-        condition.add(sp.PROJECT_CODE.eq(projectCode))
-        condition.add(sp.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
-        condition.add(sa.DELETE_FLAG.eq(false))
-        condition.add(sp.TYPE.notEqual(StoreProjectTypeEnum.TEST.type.toByte()))
-
-        return baseStep.where(condition).groupBy(sa.SERVICE_CODE).orderBy(sa.UPDATE_TIME.desc()).fetch()
+        condition.add(tExtensionService.LATEST_FLAG.eq(true))
+        condition.add(tStoreProjectRel.PROJECT_CODE.eq(projectCode))
+        condition.add(tStoreProjectRel.STORE_TYPE.eq(StoreTypeEnum.SERVICE.type.toByte()))
+        condition.add(tExtensionService.DELETE_FLAG.eq(false))
+        condition.add(tStoreProjectRel.TYPE.notEqual(StoreProjectTypeEnum.TEST.type.toByte()))
+        return baseStep.where(condition).groupBy(tExtensionService.SERVICE_CODE).orderBy(tExtensionService.UPDATE_TIME.desc()).fetch()
     }
 
     /**
@@ -841,34 +842,10 @@ class ExtServiceDao {
         return conditions
     }
 
-    private fun formatConditions(
-        keyword: String?,
-        classifyCode: String?,
-        dslContext: DSLContext
-    ): Pair<TExtensionService, MutableList<Condition>> {
-        val ta = TExtensionService.T_EXTENSION_SERVICE.`as`("ta")
-        val storeType = StoreTypeEnum.SERVICE.type.toByte()
-        val conditions = setExtServiceVisibleCondition(ta)
-        if (!keyword.isNullOrEmpty()) {
-            conditions.add(ta.SERVICE_NAME.contains(keyword).or(ta.SUMMARY.contains(keyword)))
-        }
-        if (!classifyCode.isNullOrEmpty()) {
-            val a = TClassify.T_CLASSIFY.`as`("a")
-            val classifyId = dslContext.select(a.ID)
-                .from(a)
-                .where(a.CLASSIFY_CODE.eq(classifyCode).and(a.TYPE.eq(storeType)))
-                .fetchOne(0, String::class.java)
-            conditions.add(ta.CLASSIFY_ID.eq(classifyId))
-        }
-        return Pair(ta, conditions)
-    }
-
     fun batchUpdateService(dslContext: DSLContext, serviceRecords: List<TExtensionServiceRecord>) {
         if (serviceRecords.isEmpty()) {
             return
         }
         dslContext.batchUpdate(serviceRecords).execute()
     }
-
-    private val logger = LoggerFactory.getLogger(ExtServiceDao::class.java)
 }

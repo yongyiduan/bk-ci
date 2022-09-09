@@ -74,28 +74,6 @@ class ExtServiceVersionLogDao {
         }
     }
 
-    fun updateExtServiceFeatureBaseInfo(
-        dslContext: DSLContext,
-        userId: String,
-        serviceId: String,
-        extServiceVersionLogUpdateInfo: ExtServiceVersionLogUpdateInfo
-    ) {
-        with(TExtensionServiceVersionLog.T_EXTENSION_SERVICE_VERSION_LOG) {
-            val baseStep = dslContext.update(this)
-            val content = extServiceVersionLogUpdateInfo.content
-            if (null != content) {
-                baseStep.set(CONTENT, content)
-            }
-            val releaseType = extServiceVersionLogUpdateInfo.releaseType
-            if (null != releaseType) {
-                baseStep.set(RELEASE_TYPE, releaseType.toByte())
-            }
-            baseStep.set(MODIFIER, userId).set(UPDATE_TIME, LocalDateTime.now())
-                .where(SERVICE_ID.eq(serviceId))
-                .execute()
-        }
-    }
-
     fun getVersionLogById(
         dslContext: DSLContext,
         logId: String
@@ -141,7 +119,9 @@ class ExtServiceVersionLogDao {
         serviceId: String
     ): Int {
         with(TExtensionServiceVersionLog.T_EXTENSION_SERVICE_VERSION_LOG) {
-            return dslContext.selectCount().from(this).where(SERVICE_ID.eq(serviceId)).fetchOne(0, Int::class.java)!!
+            return dslContext.selectCount().from(this)
+                .where(SERVICE_ID.eq(serviceId))
+                .fetchOne(0, Int::class.java)!!
         }
     }
 

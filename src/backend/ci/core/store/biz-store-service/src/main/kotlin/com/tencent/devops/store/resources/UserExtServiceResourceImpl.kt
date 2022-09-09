@@ -41,6 +41,7 @@ import com.tencent.devops.store.pojo.vo.ExtServiceMainItemVo
 import com.tencent.devops.store.pojo.vo.SearchExtServiceVO
 import com.tencent.devops.store.pojo.vo.ServiceVersionListItem
 import com.tencent.devops.store.pojo.vo.ServiceVersionVO
+import com.tencent.devops.store.service.ExtServiceManageService
 import com.tencent.devops.store.service.ExtServiceReleaseService
 import com.tencent.devops.store.service.ExtServiceSearchService
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,9 +49,11 @@ import org.springframework.beans.factory.annotation.Autowired
 @RestResource
 class UserExtServiceResourceImpl @Autowired constructor(
     val extServiceSearchService: ExtServiceSearchService,
-    val extServiceReleaseService: ExtServiceReleaseService
+    val extServiceReleaseService: ExtServiceReleaseService,
+    val extServiceManageService: ExtServiceManageService
 ) : UserExtServiceResource {
-    override fun mainPageList(userId: String, page: Int?, pageSize: Int?): Result<List<ExtServiceMainItemVo>> {
+
+    override fun mainPageList(userId: String, page: Int, pageSize: Int): Result<List<ExtServiceMainItemVo>> {
         return extServiceSearchService.mainPageList(userId, page, pageSize)
     }
 
@@ -63,8 +66,8 @@ class UserExtServiceResourceImpl @Autowired constructor(
         score: Int?,
         rdType: ServiceTypeEnum?,
         sortType: ExtServiceSortTypeEnum?,
-        page: Int?,
-        pageSize: Int?
+        page: Int,
+        pageSize: Int
     ): Result<SearchExtServiceVO> {
         return Result(extServiceSearchService.list(
             userId = userId,
@@ -81,7 +84,7 @@ class UserExtServiceResourceImpl @Autowired constructor(
     }
 
     override fun getServiceByCode(userId: String, bk_ticket: String, serviceCode: String): Result<ServiceVersionVO?> {
-        return extServiceReleaseService.getServiceByCode(
+        return extServiceManageService.getServiceByCode(
             userId = userId,
             serviceCode = serviceCode
         )
@@ -93,14 +96,14 @@ class UserExtServiceResourceImpl @Autowired constructor(
         page: Int,
         pageSize: Int
     ): Result<Page<ServiceVersionListItem>> {
-        return extServiceReleaseService.getServiceVersionListByCode(userId, serviceCode, page, pageSize)
+        return extServiceManageService.getServiceVersionListByCode(userId, serviceCode, page, pageSize)
     }
 
-    override fun createMediaAndVisible(userId: String, serviceId: String, submitInfo: ExtSubmitDTO): Result<Boolean> {
+    override fun backToTest(userId: String, serviceId: String, submitInfo: ExtSubmitDTO): Result<Boolean> {
         return extServiceReleaseService.createMediaAndVisible(userId, serviceId, submitInfo)
     }
 
-    override fun createMediaAndVisible(userId: String, serviceId: String): Result<Boolean> {
+    override fun backToTest(userId: String, serviceId: String): Result<Boolean> {
         return extServiceReleaseService.backToTest(userId, serviceId)
     }
 
@@ -126,6 +129,6 @@ class UserExtServiceResourceImpl @Autowired constructor(
             mediaInfo = serviceBaseInfoUpdateRequest.mediaList,
             settingInfo = null
         )
-        return extServiceReleaseService.updateExtInfo(userId, serviceId, serviceCode, editInfo)
+        return extServiceManageService.updateExtInfo(userId, serviceId, serviceCode, editInfo)
     }
 }

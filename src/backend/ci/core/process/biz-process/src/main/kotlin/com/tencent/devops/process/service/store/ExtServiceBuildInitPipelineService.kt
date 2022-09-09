@@ -25,12 +25,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.process.service
+package com.tencent.devops.process.service.store
 
-import com.tencent.devops.common.api.constant.KEY_BRANCH
-import com.tencent.devops.common.api.constant.KEY_COMMIT_ID
-import com.tencent.devops.common.api.constant.KEY_OS_ARCH
-import com.tencent.devops.common.api.constant.KEY_OS_NAME
 import com.tencent.devops.common.api.constant.KEY_SCRIPT
 import com.tencent.devops.common.api.constant.KEY_VERSION
 import com.tencent.devops.common.api.pojo.Result
@@ -38,13 +34,14 @@ import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.pipeline.Model
 import com.tencent.devops.common.pipeline.enums.ChannelCode
 import com.tencent.devops.common.pipeline.enums.StartType
-import com.tencent.devops.common.pipeline.pojo.AtomMarketInitPipelineReq
-import com.tencent.devops.process.pojo.AtomMarketInitPipelineResp
+import com.tencent.devops.process.pojo.ExtServiceBuildInitPipelineReq
+import com.tencent.devops.process.pojo.ExtServiceBuildInitPipelineResp
+import com.tencent.devops.process.service.PipelineInfoFacadeService
 import com.tencent.devops.process.service.builds.PipelineBuildFacadeService
-import com.tencent.devops.store.pojo.atom.enums.AtomStatusEnum
-import com.tencent.devops.store.pojo.common.KEY_ATOM_CODE
-import com.tencent.devops.store.pojo.common.KEY_LANGUAGE
-import com.tencent.devops.store.pojo.common.KEY_RUNTIME_VERSION
+import com.tencent.devops.store.pojo.common.KEY_EXT_SERVICE_DEPLOY_INFO
+import com.tencent.devops.store.pojo.common.KEY_EXT_SERVICE_IMAGE_INFO
+import com.tencent.devops.store.pojo.common.KEY_SERVICE_CODE
+import com.tencent.devops.store.pojo.enums.ExtServiceStatusEnum
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -53,13 +50,12 @@ import org.springframework.stereotype.Service
  * 初始化流水线进行打包归档
  * since: 2019-01-08
  */
-@Suppress("ALL")
 @Service
-class AtomMarketInitPipelineService @Autowired constructor(
+class ExtServiceBuildInitPipelineService @Autowired constructor(
     private val pipelineInfoFacadeService: PipelineInfoFacadeService,
     private val pipelineBuildFacadeService: PipelineBuildFacadeService
 ) {
-    private val logger = LoggerFactory.getLogger(AtomMarketInitPipelineService::class.java)
+    private val logger = LoggerFactory.getLogger(ExtServiceBuildInitPipelineService::class.java)
 
     /**
      * 初始化流水线进行打包归档
@@ -67,43 +63,21 @@ class AtomMarketInitPipelineService @Autowired constructor(
     fun initPipeline(
         userId: String,
         projectCode: String,
-        atomMarketInitPipelineReq: AtomMarketInitPipelineReq
-    ): Result<AtomMarketInitPipelineResp> {
-        val model = JsonUtil.to(atomMarketInitPipelineReq.pipelineModel, Model::class.java)
+        extServiceBuildInitPipelineReq: ExtServiceBuildInitPipelineReq
+    ): Result<ExtServiceBuildInitPipelineResp> {
+        val model = JsonUtil.to(extServiceBuildInitPipelineReq.pipelineModel, Model::class.java)
         // 保存流水线信息
         val pipelineId = pipelineInfoFacadeService.createPipeline(userId, projectCode, model, ChannelCode.AM)
         logger.info("createPipeline result is:$pipelineId")
         // 异步启动流水线
         val startParams = mutableMapOf<String, String>() // 启动参数
-        val atomBaseInfo = atomMarketInitPipelineReq.atomBaseInfo
-        startParams[KEY_ATOM_CODE] = atomBaseInfo.atomCode
-        startParams[KEY_VERSION] = atomBaseInfo.version
-        val language = atomBaseInfo.language
-        if (!language.isNullOrBlank()) {
-            startParams[KEY_LANGUAGE] = language
-        }
-        startParams[KEY_SCRIPT] = atomMarketInitPipelineReq.script
-        val branch = atomBaseInfo.branch
-        if (!branch.isNullOrBlank()) {
-            startParams[KEY_BRANCH] = branch
-        }
-        val commitId = atomBaseInfo.commitId
-        if (!commitId.isNullOrBlank()) {
-            startParams[KEY_COMMIT_ID] = commitId
-        }
-        val osName = atomBaseInfo.osName
-        if (!osName.isNullOrBlank()) {
-            startParams[KEY_OS_NAME] = osName
-        }
-        val osArch = atomBaseInfo.osArch
-        if (!osArch.isNullOrBlank()) {
-            startParams[KEY_OS_ARCH] = osArch
-        }
-        val runtimeVersion = atomBaseInfo.runtimeVersion
-        if (!runtimeVersion.isNullOrBlank()) {
-            startParams[KEY_RUNTIME_VERSION] = runtimeVersion
-        }
-        var atomBuildStatus = AtomStatusEnum.BUILDING
+        val extServiceBaseInfo = extServiceBuildInitPipelineReq.extServiceBaseInfo
+        startParams[KEY_SERVICE_CODE] = extServiceBaseInfo.serviceCode
+        startParams[KEY_VERSION] = extServiceBaseInfo.version
+        startParams[KEY_EXT_SERVICE_IMAGE_INFO] = JsonUtil.toJson(extServiceBaseInfo.extServiceImageInfo)
+        startParams[KEY_EXT_SERVICE_DEPLOY_INFO] = JsonUtil.toJson(extServiceBaseInfo.extServiceDeployInfo)
+        startParams[KEY_SCRIPT] = extServiceBuildInitPipelineReq.script
+        var extServiceStatus = ExtServiceStatusEnum.BUILDING
         var buildId: String? = null
         try {
             buildId = pipelineBuildFacadeService.buildManualStartup(
@@ -117,11 +91,10 @@ class AtomMarketInitPipelineService @Autowired constructor(
                 isMobile = false,
                 startByMessage = null
             )
-            logger.info("atomMarketBuildManualStartup result is:$buildId")
-        } catch (e: Exception) {
-            logger.error("buildManualStartup error is :${e.message}", e)
-            atomBuildStatus = AtomStatusEnum.BUILD_FAIL
+        } catch (ignored: Throwable) {
+            logger.error("BKSystemErrorMonitor|buildManualStartup|$pipelineId|error=${ignored.message}", ignored)
+            extServiceStatus = ExtServiceStatusEnum.BUILD_FAIL
         }
-        return Result(AtomMarketInitPipelineResp(pipelineId, buildId, atomBuildStatus))
+        return Result(ExtServiceBuildInitPipelineResp(pipelineId, buildId, extServiceStatus))
     }
 }

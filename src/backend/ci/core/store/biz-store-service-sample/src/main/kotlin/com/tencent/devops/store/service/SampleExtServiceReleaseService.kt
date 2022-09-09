@@ -31,13 +31,10 @@ import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.store.pojo.common.DeptInfo
 import com.tencent.devops.store.pojo.dto.InitExtServiceDTO
 import com.tencent.devops.store.pojo.enums.ExtServicePackageSourceTypeEnum
-import org.jooq.DSLContext
 import org.springframework.stereotype.Service
 
 @Service
 class SampleExtServiceReleaseService : ExtServiceReleaseService() {
-
-    override fun asyncHandleUpdateService(context: DSLContext, serviceId: String, userId: String) = Unit
 
     override fun doServiceVisibleBus(userId: String, serviceCode: String, deptList: List<DeptInfo>) = Unit
 
@@ -51,12 +48,5 @@ class SampleExtServiceReleaseService : ExtServiceReleaseService() {
 
     override fun getExtServicePackageSourceType(serviceCode: String): ExtServicePackageSourceTypeEnum {
         return ExtServicePackageSourceTypeEnum.UPLOAD
-    }
-
-    override fun getFileStr(
-        serviceCode: String,
-        version: String,
-        fileName: String, repositoryHashId: String?): String? {
-        TODO("Not yet implemented")
     }
 }

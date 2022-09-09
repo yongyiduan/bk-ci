@@ -27,8 +27,6 @@
 
 package com.tencent.devops.store.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.tencent.devops.common.api.constant.APPROVE
 import com.tencent.devops.common.api.constant.BEGIN
 import com.tencent.devops.common.api.constant.COMMIT
@@ -52,7 +50,6 @@ import com.tencent.devops.common.api.constant.TEST_ENV_PREPARE
 import com.tencent.devops.common.api.constant.UNDO
 import com.tencent.devops.common.api.exception.ErrorCodeException
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.auth.api.AuthPermission
 import com.tencent.devops.common.auth.api.AuthPermissionApi
@@ -63,8 +60,6 @@ import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.project.api.service.ServiceItemResource
 import com.tencent.devops.project.api.service.ServiceProjectResource
-import com.tencent.devops.project.constant.ProjectConstant.ITEM_BK_SERVICE_REDIS_KEY
-import com.tencent.devops.store.config.ExtServiceKubernetesNameSpaceConfig
 import com.tencent.devops.store.constant.StoreMessageCode
 import com.tencent.devops.store.dao.ExtServiceDao
 import com.tencent.devops.store.dao.ExtServiceEnvDao
@@ -73,11 +68,9 @@ import com.tencent.devops.store.dao.ExtServiceItemRelDao
 import com.tencent.devops.store.dao.ExtServiceLabelRelDao
 import com.tencent.devops.store.dao.ExtServiceVersionLogDao
 import com.tencent.devops.store.dao.common.StoreBuildInfoDao
-import com.tencent.devops.store.dao.common.StoreMediaInfoDao
 import com.tencent.devops.store.dao.common.StoreMemberDao
 import com.tencent.devops.store.dao.common.StoreProjectRelDao
 import com.tencent.devops.store.dao.common.StoreStatisticTotalDao
-import com.tencent.devops.store.pojo.EditInfoDTO
 import com.tencent.devops.store.pojo.ExtServiceCreateInfo
 import com.tencent.devops.store.pojo.ExtServiceEnvCreateInfo
 import com.tencent.devops.store.pojo.ExtServiceFeatureCreateInfo
@@ -85,12 +78,10 @@ import com.tencent.devops.store.pojo.ExtServiceFeatureUpdateInfo
 import com.tencent.devops.store.pojo.ExtServiceItemRelCreateInfo
 import com.tencent.devops.store.pojo.ExtServiceUpdateInfo
 import com.tencent.devops.store.pojo.ExtServiceVersionLogCreateInfo
-import com.tencent.devops.store.pojo.ExtensionJson
-import com.tencent.devops.store.pojo.ItemPropCreateInfo
 import com.tencent.devops.store.pojo.common.DeptInfo
-import com.tencent.devops.store.pojo.common.EXTENSION_JSON_NAME
 import com.tencent.devops.store.pojo.common.KEY_CODE_SRC
 import com.tencent.devops.store.pojo.common.ReleaseProcessItem
+import com.tencent.devops.store.pojo.common.SERVICE_UPLOAD_ID_KEY_PREFIX
 import com.tencent.devops.store.pojo.common.StoreMediaInfoRequest
 import com.tencent.devops.store.pojo.common.StoreProcessInfo
 import com.tencent.devops.store.pojo.common.UN_RELEASE
@@ -102,12 +93,10 @@ import com.tencent.devops.store.pojo.dto.ExtSubmitDTO
 import com.tencent.devops.store.pojo.dto.InitExtServiceDTO
 import com.tencent.devops.store.pojo.dto.ServiceOfflineDTO
 import com.tencent.devops.store.pojo.dto.SubmitDTO
-import com.tencent.devops.store.pojo.enums.DescInputTypeEnum
 import com.tencent.devops.store.pojo.enums.ExtServicePackageSourceTypeEnum
 import com.tencent.devops.store.pojo.enums.ExtServiceStatusEnum
 import com.tencent.devops.store.service.common.StoreCommonService
 import com.tencent.devops.store.service.common.StoreMediaService
-import com.tencent.devops.store.utils.VersionUtils
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.slf4j.LoggerFactory
@@ -130,7 +119,7 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
     @Autowired
     lateinit var storeMemberDao: StoreMemberDao
     @Autowired
-    lateinit var extFeatureDao: ExtServiceFeatureDao
+    lateinit var extServiceFeatureDao: ExtServiceFeatureDao
     @Autowired
     lateinit var extServiceItemRelDao: ExtServiceItemRelDao
     @Autowired
@@ -140,21 +129,19 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
     @Autowired
     lateinit var extServiceVersionLogDao: ExtServiceVersionLogDao
     @Autowired
-    lateinit var extServiceLabelDao: ExtServiceLabelRelDao
+    lateinit var extServiceLabelRelDao: ExtServiceLabelRelDao
     @Autowired
     lateinit var client: Client
     @Autowired
-    lateinit var mediaService: StoreMediaService
-    @Autowired
-    lateinit var objectMapper: ObjectMapper
+    lateinit var storeMediaService: StoreMediaService
     @Autowired
     lateinit var extServiceKubernetesService: ExtServiceKubernetesService
     @Autowired
-    lateinit var extServiceKubernetesNameSpaceConfig: ExtServiceKubernetesNameSpaceConfig
+    lateinit var extServicePipelineService: ExtServicePipelineService
+    @Autowired
+    lateinit var extServiceManageService: ExtServiceManageService
     @Autowired
     lateinit var permissionApi: AuthPermissionApi
-    @Autowired
-    lateinit var storeMediaInfoDao: StoreMediaInfoDao
     @Autowired
     lateinit var storeStatisticTotalDao: StoreStatisticTotalDao
     @Autowired
@@ -235,7 +222,7 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
                 storeType = StoreTypeEnum.SERVICE.type.toByte()
             )
             // 添加微扩展特性信息
-            extFeatureDao.create(
+            extServiceFeatureDao.create(
                 dslContext = context,
                 userId = userId,
                 extServiceFeatureCreateInfo = ExtServiceFeatureCreateInfo(
@@ -263,7 +250,7 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
                         itemId = it,
                         creatorUser = userId,
                         modifierUser = userId,
-                        bkServiceId = getItemBkServiceId(it)
+                        bkServiceId = extServiceManageService.getItemBkServiceId(it)
                     )
                 )
             }
@@ -302,59 +289,22 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
             arrayOf(submitDTO.serviceName)
         )
         // 校验前端传的版本号是否正确
-        val releaseType = submitDTO.releaseType
-        val dbVersion = serviceRecord.version
-        // 最近的版本处于上架中止状态，重新升级版本号不变
+        val releaseType = submitDTO.releaseType!!
         val cancelFlag = serviceRecord.serviceStatus == ExtServiceStatusEnum.GROUNDING_SUSPENSION.status.toByte()
-        val requireVersionList =
-            if (cancelFlag && releaseType == ReleaseTypeEnum.CANCEL_RE_RELEASE) {
-                listOf(dbVersion)
-            } else {
-                // 历史大版本下的小版本更新模式需获取要更新大版本下的最新版本
-                val reqVersion = if (releaseType == ReleaseTypeEnum.HIS_VERSION_UPGRADE) {
-                    extServiceDao.getExtService(
-                        dslContext = dslContext,
-                        serviceCode = serviceCode,
-                        version = VersionUtils.convertLatestVersion(version)
-                    )?.version
-                } else {
-                    null
-                }
-                storeCommonService.getRequireVersion(
-                    reqVersion = reqVersion,
-                    dbVersion = dbVersion,
-                    releaseType = releaseType!!
-                )
-            }
-
-        if (!requireVersionList.contains(version)) {
-            return MessageCodeUtil.generateResponseDataObject(
-                StoreMessageCode.USER_SERVICE_VERSION_IS_INVALID,
-                arrayOf(version, requireVersionList.toString())
-            )
-        }
-
-        // 判断最近一个微扩展版本的状态，只有处于审核驳回、已发布、上架中止和已下架的状态才允许添加新的版本
-        val serviceFinalStatusList = mutableListOf(
-            ExtServiceStatusEnum.AUDIT_REJECT.status.toByte(),
-            ExtServiceStatusEnum.RELEASED.status.toByte(),
-            ExtServiceStatusEnum.GROUNDING_SUSPENSION.status.toByte(),
-            ExtServiceStatusEnum.UNDERCARRIAGED.status.toByte()
+        extServiceCommonService.validateServiceVersion(
+            releaseType = releaseType,
+            serviceCode = serviceCode,
+            serviceName = submitDTO.serviceName,
+            serviceStatus = serviceRecord.serviceStatus,
+            dbVersion = serviceRecord.version,
+            requestVersion = version
         )
-
-        if (serviceCount == 1) {
-            // 如果是首次发布，处于初始化的微扩展状态也允许添加新的版本
-            serviceFinalStatusList.add(ExtServiceStatusEnum.INIT.status.toByte())
+        var serviceId = if (extPackageSourceType == ExtServicePackageSourceTypeEnum.UPLOAD) {
+            redisOperation.get("$SERVICE_UPLOAD_ID_KEY_PREFIX:$serviceCode:$version")
+                ?: throw ErrorCodeException(errorCode = StoreMessageCode.USER_UPLOAD_PACKAGE_INVALID)
+        } else {
+            UUIDUtil.generate()
         }
-
-        if (!serviceFinalStatusList.contains(serviceRecord.serviceStatus)) {
-            return MessageCodeUtil.generateResponseDataObject(
-                StoreMessageCode.USER_SERVICE_VERSION_IS_NOT_FINISH,
-                arrayOf(serviceRecord.serviceName, serviceRecord.version)
-            )
-        }
-
-        var serviceId = UUIDUtil.generate()
         val serviceStatus = if (extPackageSourceType == ExtServicePackageSourceTypeEnum.REPO) {
             ExtServiceStatusEnum.COMMITTING
         } else {
@@ -436,50 +386,35 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
                 val extServiceFeatureUpdateInfo = ExtServiceFeatureUpdateInfo(
                     descInputType = submitDTO.descInputType
                 )
-                extFeatureDao.updateExtServiceFeatureBaseInfo(
-                    dslContext,
-                    userId,
-                    serviceCode,
-                    extServiceFeatureUpdateInfo
+                extServiceFeatureDao.updateExtServiceFeatureBaseInfo(
+                    dslContext = dslContext,
+                    userId = userId,
+                    serviceCode = serviceCode,
+                    extServiceFeatureUpdateInfo = extServiceFeatureUpdateInfo
                 )
             }
 
             // 更新标签信息
             val labelIdList = submitDTO.labelIdList
             if (null != labelIdList) {
-                extServiceLabelDao.deleteByServiceId(context, serviceId)
+                extServiceLabelRelDao.deleteByServiceId(context, serviceId)
                 if (labelIdList.isNotEmpty())
-                    extServiceLabelDao.batchAdd(context, userId, serviceId, labelIdList)
+                    extServiceLabelRelDao.batchAdd(context, userId, serviceId, labelIdList)
             }
 
             // 添加扩展点
-            val featureInfoRecord = extFeatureDao.getLatestServiceByCode(dslContext, serviceCode)
-            val itemIdList = submitDTO.extensionItemList
-            val itemCreateInfoList =
-                getFileServiceProps(serviceCode, featureInfoRecord!!.repositoryHashId, EXTENSION_JSON_NAME, itemIdList)
-            extServiceItemRelDao.deleteByServiceId(context, serviceId)
-            extServiceItemRelDao.batchAdd(
-                dslContext = dslContext,
+            extServiceManageService.addServiceItem(
                 userId = userId,
                 serviceId = serviceId,
-                itemPropList = itemCreateInfoList
+                serviceCode = serviceCode,
+                version = version,
+                itemIds = submitDTO.extensionItemList
             )
-            // 添加扩展点使用记录
-            client.get(ServiceItemResource::class).addServiceNum(itemIdList)
 
-            asyncHandleUpdateService(context, serviceId, userId)
+            extServicePipelineService.runPipeline(context, serviceId, userId)
         }
         return Result(serviceId)
     }
-
-    /**
-     * 异步处理上架微扩展
-     */
-    abstract fun asyncHandleUpdateService(
-        context: DSLContext,
-        serviceId: String,
-        userId: String
-    )
 
     fun getExtensionServiceProcessInfo(userId: String, serviceId: String): Result<StoreProcessInfo> {
         logger.info("getProcessInfo userId is $userId,serviceId is $serviceId")
@@ -581,7 +516,7 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
         }
         dslContext.transaction { t ->
             val context = DSL.using(t)
-            extFeatureDao.updateExtServiceFeatureBaseInfo(
+            extServiceFeatureDao.updateExtServiceFeatureBaseInfo(
                 dslContext = context,
                 serviceCode = serviceCode,
                 userId = userId,
@@ -647,9 +582,9 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
             return MessageCodeUtil.generateResponseDataObject(code)
         }
         // 先集中删除，再添加媒体信息
-        mediaService.deleteByStoreCode(userId, serviceCode, StoreTypeEnum.SERVICE)
+        storeMediaService.deleteByStoreCode(userId, serviceCode, StoreTypeEnum.SERVICE)
         mediaList.forEach {
-            mediaService.add(
+            storeMediaService.add(
                 userId = userId,
                 type = StoreTypeEnum.SERVICE,
                 storeMediaInfo = StoreMediaInfoRequest(
@@ -873,96 +808,6 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
         return flag
     }
 
-    private fun getFileServiceProps(
-        serviceCode: String,
-        repositoryHashId: String,
-        fileName: String,
-        inputItemList: Set<String>
-    ): List<ItemPropCreateInfo> {
-        val itemCreateList = mutableListOf<ItemPropCreateInfo>()
-        val inputItemMap = mutableMapOf<String, ItemPropCreateInfo>()
-        // 匹配页面输入的itemId，是否在json文件内有对应的props，若没有则为空。有则替换。  json文件内多余的itemCode无视
-        inputItemList.forEach {
-            inputItemMap[it] = ItemPropCreateInfo(
-                itemId = it,
-                props = "",
-                bkServiceId = getItemBkServiceId(it)
-            )
-        }
-
-        // 从工蜂拉取文件
-        val fileStr = getFileStr(serviceCode,"",fileName, repositoryHashId)
-        if (fileStr.isNullOrEmpty()) {
-            // 文件数据为空，直接返回输入数据
-            return returnInputData(inputItemList)
-        }
-        val taskDataMap = objectMapper.readValue<ExtensionJson>(fileStr)
-        logger.info("getServiceProps taskDataMap[$taskDataMap]")
-        val fileServiceCode = taskDataMap.serviceCode
-        val fileItemList = taskDataMap.itemList
-        if (fileServiceCode != serviceCode) {
-            logger.warn("getServiceProps input serviceCode[$serviceCode], extension.json serviceCode[$fileServiceCode] ")
-            throw ErrorCodeException(errorCode = StoreMessageCode.USER_SERVICE_CODE_DIFF)
-        }
-
-        if (fileItemList == null) {
-            // 文件数据为空，直接返回输入数据
-            return returnInputData(inputItemList)
-        }
-
-        // 文件与输入itemCode取交集，若文件内有props，以文件props为准
-        val filePropMap = mutableMapOf<String, String>()
-        fileItemList.forEach {
-            filePropMap[it.itemCode] = JsonUtil.toJson(it.props ?: "")
-        }
-        val itemRecords = client.get(ServiceItemResource::class).getItemInfoByIds(inputItemList).data
-        itemRecords?.forEach {
-            val itemCode = it.itemCode
-            val itemId = it.itemId
-            if (filePropMap.keys.contains(itemCode)) {
-                val propsInfo = filePropMap[itemCode]
-                inputItemMap[itemId] = ItemPropCreateInfo(
-                    itemId = itemId,
-                    props = propsInfo ?: "",
-                    bkServiceId = getItemBkServiceId(itemId)
-                )
-            }
-        }
-
-        // 返回取完交集后的数据
-        inputItemMap.forEach { (_, u) ->
-            itemCreateList.add(u)
-        }
-        logger.info("getServiceProps itemCreateList[$itemCreateList], filePropMap[$filePropMap]")
-
-        return itemCreateList
-    }
-
-    /**
-     * 获取文件信息
-     */
-    abstract fun getFileStr(
-        serviceCode: String,
-        version: String,
-        fileName: String,
-        repositoryHashId: String? = null
-    ): String?
-
-    private fun returnInputData(inputItem: Set<String>): List<ItemPropCreateInfo> {
-        // 默认添加页面选中的扩展点, props给空
-        val itemCreateList = mutableListOf<ItemPropCreateInfo>()
-        inputItem.forEach {
-            itemCreateList.add(
-                ItemPropCreateInfo(
-                    itemId = it,
-                    props = "",
-                    bkServiceId = getItemBkServiceId(it)
-                )
-            )
-        }
-        return itemCreateList
-    }
-
     /**
      * 检查版本发布过程中的操作权限
      */
@@ -1068,134 +913,6 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
             validateFlag = false
         }
         return if (validateFlag) Pair(true, "") else Pair(false, StoreMessageCode.USER_SERVICE_RELEASE_STEPS_ERROR)
-    }
-
-    fun getItemBkServiceId(itemId: String): Long {
-        var bkServiceId = redisOperation.hget(ITEM_BK_SERVICE_REDIS_KEY, itemId)
-        // redis中没有取到蓝盾服务id，则去数据库中取
-        if (null == bkServiceId) {
-            val serviceItem = client.get(ServiceItemResource::class).getItemById(itemId).data
-            if (null == serviceItem) {
-                throw ErrorCodeException(errorCode = CommonMessageCode.PARAMETER_IS_INVALID, params = arrayOf(itemId))
-            } else {
-                bkServiceId = serviceItem.parentId
-            }
-        }
-        return bkServiceId.toLong()
-    }
-
-    fun updateExtInfo(
-        userId: String,
-        serviceId: String,
-        serviceCode: String,
-        infoResp: EditInfoDTO,
-        checkPermissionFlag: Boolean = true
-    ): Result<Boolean> {
-        logger.info("updateExtInfo: serviceId[$serviceId], serviceCode[$serviceCode] infoResp[$infoResp]")
-        // 判断当前用户是否是该扩展的成员
-        if (checkPermissionFlag && !storeMemberDao.isStoreMember(
-                dslContext = dslContext,
-                userId = userId,
-                storeCode = serviceCode,
-                storeType = StoreTypeEnum.SERVICE.type.toByte()
-            )
-        ) {
-            return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.PERMISSION_DENIED)
-        }
-        // 查询扩展的最新记录
-        val newestServiceRecord = extServiceDao.getNewestServiceByCode(dslContext, serviceCode)
-            ?: throw ErrorCodeException(
-                errorCode = CommonMessageCode.PARAMETER_IS_INVALID,
-                params = arrayOf(serviceCode)
-            )
-        val editFlag = extServiceCommonService.checkEditCondition(serviceCode)
-        if (!editFlag) {
-            throw ErrorCodeException(
-                errorCode = StoreMessageCode.USER_ATOM_VERSION_IS_NOT_FINISH,
-                params = arrayOf(newestServiceRecord.serviceName, newestServiceRecord.version)
-            )
-        }
-        val baseInfo = infoResp.baseInfo
-        val settingInfo = infoResp.settingInfo
-        if (baseInfo != null) {
-            extServiceDao.updateExtServiceBaseInfo(
-                dslContext = dslContext,
-                userId = userId,
-                serviceId = serviceId,
-                extServiceUpdateInfo = ExtServiceUpdateInfo(
-                    serviceName = baseInfo.serviceName,
-                    logoUrl = baseInfo.logoUrl,
-                    iconData = baseInfo.iconData,
-                    summary = baseInfo.summary,
-                    description = baseInfo.description,
-                    modifierUser = userId,
-                    status = null,
-                    latestFlag = null
-                )
-            )
-
-            // 更新标签信息
-            val labelIdList = baseInfo.labels
-            if (null != labelIdList) {
-                extServiceLabelDao.deleteByServiceId(dslContext, serviceId)
-                if (labelIdList.isNotEmpty())
-                    extServiceLabelDao.batchAdd(dslContext, userId, serviceId, labelIdList)
-            }
-            val itemIds = baseInfo.itemIds
-            if (itemIds != null) {
-                val featureInfoRecord = extFeatureDao.getLatestServiceByCode(dslContext, serviceCode)
-                val itemCreateInfoList = getFileServiceProps(
-                    serviceCode = serviceCode,
-                    repositoryHashId = featureInfoRecord!!.repositoryHashId,
-                    fileName = EXTENSION_JSON_NAME,
-                    inputItemList = itemIds
-                )
-                extServiceItemRelDao.deleteByServiceId(dslContext, serviceId)
-                extServiceItemRelDao.batchAdd(
-                    dslContext = dslContext,
-                    userId = userId,
-                    serviceId = serviceId,
-                    itemPropList = itemCreateInfoList
-                )
-                // 添加扩展点使用记录
-                client.get(ServiceItemResource::class).addServiceNum(itemIds)
-            }
-        }
-
-        mediaService.deleteByStoreCode(userId, serviceCode, StoreTypeEnum.SERVICE)
-        infoResp.mediaInfo?.forEach {
-            storeMediaInfoDao.add(
-                dslContext = dslContext,
-                userId = userId,
-                type = StoreTypeEnum.SERVICE.type.toByte(),
-                id = UUIDUtil.generate(),
-                storeMediaInfoReq = StoreMediaInfoRequest(
-                    storeCode = serviceCode,
-                    mediaUrl = it.mediaUrl,
-                    mediaType = it.mediaType.name,
-                    modifier = userId
-                )
-            )
-        }
-
-        if (settingInfo != null) {
-            extFeatureDao.updateExtServiceFeatureBaseInfo(
-                dslContext = dslContext,
-                userId = userId,
-                serviceCode = serviceCode,
-                extServiceFeatureUpdateInfo = ExtServiceFeatureUpdateInfo(
-                    publicFlag = settingInfo.publicFlag,
-                    recommentFlag = settingInfo.recommendFlag,
-                    certificationFlag = settingInfo.certificationFlag,
-                    weight = settingInfo.weight,
-                    modifierUser = userId,
-                    serviceTypeEnum = settingInfo.type,
-                    descInputType = baseInfo?.descInputType ?: DescInputTypeEnum.MANUAL
-                )
-            )
-        }
-
-        return Result(true)
     }
 
     private fun checkProjectInfo(userId: String, projectCode: String) {
