@@ -162,7 +162,6 @@ interface BaseAction {
      * 启动类型
      */
     fun getStartType(): StartType
-
     /**
      *  fork 库触发需要审核，提供审核人
      *  返回空表示不属于fork库触发或是有权限触发
