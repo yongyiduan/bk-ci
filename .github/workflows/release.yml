@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'yarn'
+          cache: "yarn"
       - run: yarn install && yarn start && yarn public
         working-directory: src/frontend
       - uses: actions/upload-artifact@v1
@@ -58,9 +58,9 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '8'
-          cache: 'gradle'
+          distribution: "adopt"
+          java-version: "8"
+          cache: "gradle"
       - name: Gradle Build Backend Service
         working-directory: src/backend/ci
         run: |
@@ -120,9 +120,9 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
-          java-version: '8'
-          cache: 'gradle'
+          distribution: "adopt"
+          java-version: "8"
+          cache: "gradle"
       - name: Gradle Build Backend Service -- CLOUD NATIVE
         working-directory: src/backend/ci
         run: |
