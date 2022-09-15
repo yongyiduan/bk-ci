@@ -58,7 +58,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          distribution: "adopt"
+          distribution: "temurin"
           java-version: "8"
           cache: "gradle"
       - name: Gradle Build Backend Service
@@ -120,7 +120,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          distribution: "adopt"
+          distribution: "temurin"
           java-version: "8"
           cache: "gradle"
       - name: Gradle Build Backend Service -- CLOUD NATIVE
