@@ -13,7 +13,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "yarn"
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: src/frontend/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
       - run: yarn install && yarn start && yarn public
         working-directory: src/frontend
       - uses: actions/upload-artifact@v1
@@ -22,7 +30,7 @@ jobs:
           path: src/frontend/frontend/
 
   agent:
-    name: Build agent on ${{ matrix.os }}
+    name: Build agent
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
