@@ -60,7 +60,7 @@ interface UserExtServiceVersionLogResource {
         serviceId: String
     ): Result<VersionLogVO?>
 
-    @Path("/ids/{logId}")
+    @Path("ids/{logId}")
     @GET
     @ApiOperation("获取单条版本日志")
     fun getVersionLog(

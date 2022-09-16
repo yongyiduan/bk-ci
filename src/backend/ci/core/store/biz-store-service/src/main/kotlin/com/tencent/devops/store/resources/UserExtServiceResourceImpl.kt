@@ -131,4 +131,8 @@ class UserExtServiceResourceImpl @Autowired constructor(
         )
         return extServiceManageService.updateExtInfo(userId, serviceId, serviceCode, editInfo)
     }
+
+    override fun getReadme(userId: String, serviceCode: String): Result<String?> {
+        return Result(extServiceManageService.getReadMeFile(userId, serviceCode))
+    }
 }

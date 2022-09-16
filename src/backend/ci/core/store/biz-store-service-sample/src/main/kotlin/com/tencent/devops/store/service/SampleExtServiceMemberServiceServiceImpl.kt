@@ -25,21 +25,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.resources
+package com.tencent.devops.store.service
 
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.api.UserExtServiceStatResource
-import com.tencent.devops.store.pojo.ExtServiceInstallTrendReq
-import com.tencent.devops.store.service.StatisticService
-import org.springframework.beans.factory.annotation.Autowired
+import com.tencent.devops.store.pojo.common.StoreMemberReq
+import org.springframework.stereotype.Service
 
-@RestResource
-class UserExtServiceStatResourceImpl @Autowired constructor(
-    val statisticService: StatisticService
-) : UserExtServiceStatResource {
+@Service
+class SampleExtServiceMemberServiceServiceImpl : ExtServiceMemberServiceImpl() {
 
-    override fun getInstallTrend(serviceCode: String, days: Int): Result<List<ExtServiceInstallTrendReq>> {
-        return statisticService.getInstallTrend(serviceCode, days.toLong())
+    override fun addRepoMember(
+        storeMemberReq: StoreMemberReq,
+        userId: String,
+        repositoryHashId: String
+    ): Result<Boolean> {
+        // 开源版暂不支持按代码库打成可执行包的方式
+        return Result(true)
+    }
+
+    override fun deleteRepoMember(userId: String, username: String, repositoryHashId: String): Result<Boolean> {
+        // 开源版暂不支持按代码库打成可执行包的方式
+        return Result(true)
     }
 }

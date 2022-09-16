@@ -38,17 +38,16 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class ExtServiceVersionLogService @Autowired constructor() {
-    @Autowired
-    lateinit var extServiceVersionDao: ExtServiceVersionLogDao
-    @Autowired
-    lateinit var dslContext: DSLContext
+class ExtServiceVersionLogService @Autowired constructor(
+    private val extServiceLogVersionDao: ExtServiceVersionLogDao,
+    private val dslContext: DSLContext
+) {
 
     fun listVersionLog(
         serviceId: String
     ): Result<VersionLogVO?> {
-        val logRecords = extServiceVersionDao.listVersionLogByServiceId(dslContext, serviceId)
-        val count = extServiceVersionDao.countVersionLogByServiceId(dslContext, serviceId)
+        val logRecords = extServiceLogVersionDao.listVersionLogByServiceId(dslContext, serviceId)
+        val count = extServiceLogVersionDao.countVersionLogByServiceId(dslContext, serviceId)
         val logList = mutableListOf<VersionLog>()
         if (logRecords != null) {
             for (logRecord in logRecords) {
@@ -73,7 +72,7 @@ class ExtServiceVersionLogService @Autowired constructor() {
     fun getVersionLog(
         logId: String
     ): Result<VersionLog> {
-        val logRecord = extServiceVersionDao.getVersionLogById(
+        val logRecord = extServiceLogVersionDao.getVersionLogById(
             dslContext, logId
         )
         val result = VersionLog(

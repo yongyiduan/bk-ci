@@ -62,7 +62,7 @@ class ExtServiceSearchService @Autowired constructor(
     val extServiceDao: ExtServiceDao,
     val extServiceItemRelDao: ExtServiceItemRelDao,
     val storeUserService: StoreUserService,
-    val storeMemberService: TxExtServiceMemberImpl,
+    val extServiceMemberService: ExtServiceMemberServiceImpl,
     val classifyService: ClassifyService,
     val storeCommonService: StoreCommonService,
     val storeTotalStatisticService: StoreTotalStatisticService
@@ -231,7 +231,7 @@ class ExtServiceSearchService @Autowired constructor(
             storeCodeList = serviceCodeList
         )
         // 获取用户
-        val memberData = storeMemberService.batchListMember(serviceCodeList, storeType).data
+        val memberData = extServiceMemberService.batchListMember(serviceCodeList, storeType).data
 
         // 获取分类
         val classifyList = classifyService.getAllClassify(storeType.type.toByte()).data

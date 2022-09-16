@@ -66,6 +66,7 @@ import com.tencent.devops.store.pojo.common.KEY_LABEL_ID
 import com.tencent.devops.store.pojo.common.KEY_LABEL_NAME
 import com.tencent.devops.store.pojo.common.KEY_LABEL_TYPE
 import com.tencent.devops.store.pojo.common.Label
+import com.tencent.devops.store.pojo.common.README
 import com.tencent.devops.store.pojo.common.StoreMediaInfoRequest
 import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
@@ -691,6 +692,25 @@ abstract class ExtServiceManageService {
             }
         }
         return bkServiceId.toLong()
+    }
+
+    fun getReadMeFile(userId: String, serviceCode: String): String? {
+        val serviceRecord = extServiceDao.getNewestServiceByCode(dslContext, serviceCode)
+            ?: throw RuntimeException(MessageCodeUtil.getCodeMessage(
+                messageCode = StoreMessageCode.USER_SERVICE_NOT_EXIST,
+                params = arrayOf(serviceCode))
+            )
+        val featureRecord = extServiceFeatureDao.getLatestServiceByCode(dslContext, serviceCode)
+            ?: throw RuntimeException(MessageCodeUtil.getCodeMessage(
+                messageCode = StoreMessageCode.USER_SERVICE_NOT_EXIST,
+                params = arrayOf(serviceCode))
+            )
+        return getFileStr(
+            serviceCode = serviceCode,
+            version = serviceRecord.version,
+            fileName = README,
+            repositoryHashId = featureRecord.repositoryHashId
+        )
     }
 
     /**

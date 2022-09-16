@@ -191,4 +191,16 @@ interface UserExtServiceResource {
         @ApiParam(value = "微扩展基本信息修改请求报文体", required = true)
         serviceBaseInfoUpdateRequest: ServiceBaseInfoUpdateRequest
     ): Result<Boolean>
+
+    @ApiOperation("自动获取Readme.md信息")
+    @GET
+    @Path("/services/{serviceCode}/readme")
+    fun getReadme(
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("微扩展标识", required = true)
+        @PathParam("serviceCode")
+        serviceCode: String
+    ): Result<String?>
 }

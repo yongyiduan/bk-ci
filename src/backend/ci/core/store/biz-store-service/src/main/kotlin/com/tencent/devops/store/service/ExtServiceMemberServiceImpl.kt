@@ -38,7 +38,7 @@ import com.tencent.devops.store.service.common.impl.StoreMemberServiceImpl
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class ExtServiceMemberImpl : StoreMemberServiceImpl() {
+abstract class ExtServiceMemberServiceImpl : StoreMemberServiceImpl() {
 
     @Autowired
     lateinit var extServiceDao: ExtServiceDao
@@ -144,6 +144,6 @@ abstract class ExtServiceMemberImpl : StoreMemberServiceImpl() {
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(ExtServiceMemberImpl::class.java)
+        private val logger = LoggerFactory.getLogger(ExtServiceMemberServiceImpl::class.java)
     }
 }
