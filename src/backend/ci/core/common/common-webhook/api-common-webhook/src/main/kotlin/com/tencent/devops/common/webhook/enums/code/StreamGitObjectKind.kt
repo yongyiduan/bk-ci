@@ -25,33 +25,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.stream.pojo
+package com.tencent.devops.common.webhook.enums.code
 
-import com.tencent.devops.common.pipeline.enums.BuildStatus
-import com.tencent.devops.common.webhook.enums.code.StreamGitObjectKind
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+enum class StreamGitObjectKind(val value: String) {
+    PUSH("push"),
+    TAG_PUSH("tag_push"),
+    MERGE_REQUEST("merge_request"),
+    PULL_REQUEST("pull_request"),
+    MANUAL("manual"),
+    SCHEDULE("schedule"),
+    DELETE("delete"),
+    OPENAPI("openApi"),
+    ISSUE("issue"),
+    REVIEW("review"),
+    NOTE("note");
 
-@ApiModel("V2版本多选搜索过滤历史参数")
-data class StreamBuildHistorySearch(
-    @ApiModelProperty("第几页", required = false)
-    val page: Int?,
-    @ApiModelProperty("每页多少条", required = false)
-    val pageSize: Int?,
-    @ApiModelProperty("分支", required = false)
-    val branch: Set<String>?,
-    @ApiModelProperty("fork库分支", required = false)
-    val sourceGitProjectId: Set<String>?,
-    @ApiModelProperty("触发人", required = false)
-    val triggerUser: Set<String>?,
-    @ApiModelProperty("流水线ID", required = false)
-    val pipelineId: String?,
-    @ApiModelProperty("Commit Msg", required = false)
-    val commitMsg: String?,
-    @ApiModelProperty("Event", required = false)
-    val event: Set<StreamGitObjectKind>?,
-    @ApiModelProperty("构建状态", required = false)
-    val status: Set<BuildStatus>?,
-    @ApiModelProperty("流水线列表", required = false)
-    val pipelineIds: Set<String>?
-)
+    // 方便Json初始化使用常量保存，需要同步维护
+    companion object {
+        const val OBJECT_KIND_MANUAL = "manual"
+        const val OBJECT_KIND_PUSH = "push"
+        const val OBJECT_KIND_TAG_PUSH = "tag_push"
+        const val OBJECT_KIND_MERGE_REQUEST = "merge_request"
+        const val OBJECT_KIND_PULL_REQUEST = "pull_request"
+        const val OBJECT_KIND_SCHEDULE = "schedule"
+        const val OBJECT_KIND_DELETE = "delete"
+        const val OBJECT_KIND_OPENAPI = "openApi"
+        const val OBJECT_KIND_ISSUE = "issue"
+        const val OBJECT_KIND_REVIEW = "review"
+        const val OBJECT_KIND_NOTE = "note"
+    }
+}

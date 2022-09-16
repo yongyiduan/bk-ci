@@ -25,33 +25,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.common.webhook.enums.code.tgit
+package com.tencent.devops.repository.resources
 
-enum class StreamGitObjectKind(val value: String) {
-    PUSH("push"),
-    TAG_PUSH("tag_push"),
-    MERGE_REQUEST("merge_request"),
-    PULL_REQUEST("pull_request"),
-    MANUAL("manual"),
-    SCHEDULE("schedule"),
-    DELETE("delete"),
-    OPENAPI("openApi"),
-    ISSUE("issue"),
-    REVIEW("review"),
-    NOTE("note");
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.repository.api.OPRepositoryResource
+import com.tencent.devops.repository.service.OPRepositoryService
+import org.springframework.beans.factory.annotation.Autowired
 
-    // 方便Json初始化使用常量保存，需要同步维护
-    companion object {
-        const val OBJECT_KIND_MANUAL = "manual"
-        const val OBJECT_KIND_PUSH = "push"
-        const val OBJECT_KIND_TAG_PUSH = "tag_push"
-        const val OBJECT_KIND_MERGE_REQUEST = "merge_request"
-        const val OBJECT_KIND_PULL_REQUEST = "pull_request"
-        const val OBJECT_KIND_SCHEDULE = "schedule"
-        const val OBJECT_KIND_DELETE = "delete"
-        const val OBJECT_KIND_OPENAPI = "openApi"
-        const val OBJECT_KIND_ISSUE = "issue"
-        const val OBJECT_KIND_REVIEW = "review"
-        const val OBJECT_KIND_NOTE = "note"
+@RestResource
+class OPRepositoryResourceImpl @Autowired constructor(
+    private val opRepositoryService: OPRepositoryService
+) : OPRepositoryResource {
+    override fun addHashId() {
+        opRepositoryService.addHashId()
     }
 }
