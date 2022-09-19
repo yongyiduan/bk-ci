@@ -242,7 +242,7 @@ class OpAtomResourceImpl @Autowired constructor(
             return Result(data = false, message = archiveAtomResult.message)
         }
 
-        descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
+        val description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
 
 
         atomReleaseService.updateMarketAtom(
@@ -255,14 +255,14 @@ class OpAtomResourceImpl @Autowired constructor(
                 jobType = releaseInfo.jobType,
                 os = releaseInfo.os,
                 summary = releaseInfo.summary,
-                description =
+                description = description
             )
         )
 
 
     }
 
-    fun descriptionAnalysis(userId: String,description: String, atomPath: String) {
+    fun descriptionAnalysis(userId: String,description: String, atomPath: String): String {
         if (description.startsWith("http") && description.endsWith(".md")) {
             val inputStream = URL(description).openStream()
             val file = File("$atomPath/file/description.md")
@@ -273,14 +273,25 @@ class OpAtomResourceImpl @Autowired constructor(
                     outputStream.write(bytes, 0, read)
                 }
             }
-            var descriptionText = StringBuffer(file.readText())
+            var descriptionText = file.readText()
             val analysisResult = regexAnalysis(
                 userId = userId,
-                input = descriptionText.toString(),
+                input = descriptionText,
                 atomPath
             )
-            //替换资源路径 ![](https://0705737.png)
+            return replaceResourcePath(descriptionText, analysisResult)
         }
+    }
+
+    private fun replaceResourcePath(descriptionText: String, analysisResult: Map<String, String>): String {
+        analysisResult.forEach {
+            val pattern: Pattern = Pattern.compile("\\$\\{\\{indexFile(\\\"${it.key}\\\")\\}\\}")
+            val matcher: Matcher = pattern.matcher(descriptionText)
+            if (matcher.find()) {
+                matcher.replaceAll("![](${it.value})")
+            }
+        }
+        return descriptionText
     }
 
     private fun getAtomBasePath(): String {
