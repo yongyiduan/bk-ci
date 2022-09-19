@@ -33,6 +33,8 @@ import com.tencent.devops.store.pojo.atom.AtomReleaseRequest
 import com.tencent.devops.store.pojo.common.StoreProcessInfo
 import com.tencent.devops.store.pojo.atom.MarketAtomCreateRequest
 import com.tencent.devops.store.pojo.atom.MarketAtomUpdateRequest
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
+import java.io.InputStream
 
 @Suppress("ALL")
 interface AtomReleaseService {
@@ -40,7 +42,7 @@ interface AtomReleaseService {
     /**
      * 添加插件
      */
-    fun addMarketAtom(userId: String, marketAtomCreateRequest: MarketAtomCreateRequest): Result<Boolean>
+    fun addMarketAtom(userId: String, marketAtomCreateRequest: MarketAtomCreateRequest): Result<String>
 
     /**
      * 升级插件
@@ -83,5 +85,15 @@ interface AtomReleaseService {
         userId: String,
         releaseFlag: Boolean,
         atomReleaseRequest: AtomReleaseRequest
+    ): Result<Boolean>
+
+    /**
+     * 一键部署发布插件
+     */
+    fun releaseAtom(
+        userId: String,
+        atomCode: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition
     ): Result<Boolean>
 }

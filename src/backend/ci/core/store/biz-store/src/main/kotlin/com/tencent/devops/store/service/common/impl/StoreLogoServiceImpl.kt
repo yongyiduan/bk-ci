@@ -91,9 +91,8 @@ abstract class StoreLogoServiceImpl @Autowired constructor() : StoreLogoService 
         contentLength: Long,
         sizeLimitiFlag: Boolean?,
         inputStream: InputStream,
-        disposition: FormDataContentDisposition
+        fileName: String
     ): Result<StoreLogoInfo?> {
-        val fileName = disposition.fileName
         logger.info("uploadStoreLogo upload file fileName is:$fileName,contentLength is:$contentLength")
         val index = fileName.lastIndexOf(".")
         val fileType = fileName.substring(index + 1).toLowerCase()
