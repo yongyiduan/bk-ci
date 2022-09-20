@@ -49,7 +49,7 @@ interface StoreLogoService {
         contentLength: Long,
         sizeLimitiFlag: Boolean? = true,
         inputStream: InputStream,
-        fileName: String
+        disposition: FormDataContentDisposition
     ): Result<StoreLogoInfo?>
 
     /**

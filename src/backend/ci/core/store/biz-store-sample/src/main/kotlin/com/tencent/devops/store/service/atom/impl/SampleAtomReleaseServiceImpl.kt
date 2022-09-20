@@ -49,6 +49,7 @@ import com.tencent.devops.common.service.utils.CommonUtils
 import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.model.store.tables.records.TAtomRecord
+import com.tencent.devops.store.api.common.OpStoreLogoResource
 import com.tencent.devops.store.constant.StoreMessageCode
 import com.tencent.devops.store.pojo.atom.AtomReleaseRequest
 import com.tencent.devops.store.pojo.atom.MarketAtomCreateRequest
@@ -60,11 +61,9 @@ import com.tencent.devops.store.pojo.common.ReleaseProcessItem
 import com.tencent.devops.store.pojo.common.TASK_JSON_NAME
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import com.tencent.devops.store.service.atom.SampleAtomReleaseService
-import com.tencent.devops.store.service.common.StoreLogoService
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.FileOutputStream
@@ -76,9 +75,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 @Service
-class SampleAtomReleaseServiceImpl@Autowired constructor(
-    private val storeLogoService: StoreLogoService
-) : SampleAtomReleaseService, AtomReleaseServiceImpl() {
+class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServiceImpl() {
 
     override fun handleAtomPackage(
         marketAtomCreateRequest: MarketAtomCreateRequest,
@@ -349,11 +346,13 @@ class SampleAtomReleaseServiceImpl@Autowired constructor(
             val logoFile = File("$atomPath/file/${relativePath.removePrefix("/")}")
             try {
                 if (logoFile.exists()) {
-                    val uploadStoreLogoResult = storeLogoService.uploadStoreLogo(
+                    val uploadStoreLogoResult = client.get(OpStoreLogoResource::class).uploadStoreLogo(
                         userId = userId,
                         contentLength = logoFile.length(),
                         inputStream = logoFile.inputStream(),
-                        fileName = logoFile.name
+                        disposition = FormDataContentDisposition(
+                            "form-data; name=\"logo\"; filename=\"${logoFile.name}\""
+                        )
                     )
                     if (uploadStoreLogoResult.isOk()) {
                         result = uploadStoreLogoResult.data!!.logoUrl!!
