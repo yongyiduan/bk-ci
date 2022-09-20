@@ -155,6 +155,7 @@ class OpAtomResourceImpl @Autowired constructor(
         inputStream: InputStream,
         disposition: FormDataContentDisposition
     ): Result<Boolean> {
+        // 解压插件包到临时目录
         val atomPath = unzipFile(
             userId = userId,
             atomCode = atomCode,
@@ -168,8 +169,9 @@ class OpAtomResourceImpl @Autowired constructor(
                 arrayOf(TASK_JSON_NAME)
             )
         }
-        var taskJsonMap: Map<String, Any>
-        var releaseInfo: ReleaseInfo
+        val taskJsonMap: Map<String, Any>
+        val releaseInfo: ReleaseInfo
+        // 解析task.json文件
         try {
             val taskJsonStr = taskJsonFile.readText(Charset.forName("UTF-8"))
             taskJsonMap = JsonUtil.toMap(taskJsonStr).toMutableMap()
@@ -195,38 +197,13 @@ class OpAtomResourceImpl @Autowired constructor(
             return Result(data = false, message = addMarketAtomResult.message)
         }
         val atomId = addMarketAtomResult.data!!
-        var logoUrl = releaseInfo.logoUrl
-        if (!logoUrl.startsWith("http")) {
-            val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
-            val matcher: Matcher = pattern.matcher(logoUrl)
-            val relativePath = if (matcher.find()) {
-                matcher.group(2)
-            } else null
-            if (relativePath.isNullOrBlank()) {
-                return MessageCodeUtil.generateResponseDataObject(
-                    USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID,
-                    arrayOf("releaseInfo.logoUrl")
-                )
-            }
-            val logoFile = File("$atomPath/${relativePath.removePrefix("/")}")
-            try {
-                if (logoFile.exists()) {
-                    val uploadStoreLogoResult = storeLogoService.uploadStoreLogo(
-                        userId = userId,
-                        contentLength = logoFile.length(),
-                        inputStream = logoFile.inputStream(),
-                        fileName = logoFile.name
-                    )
-                    if (uploadStoreLogoResult.isOk()) {
-                        releaseInfo.logoUrl = uploadStoreLogoResult.data!!.logoUrl!!
-                    } else {
-                        return Result(data = false, message = uploadStoreLogoResult.message)
-                    }
-                }
-            } finally {
-                logoFile.delete()
-            }
+        // 解析logoUrl
+        val logoUrlAnalysisResult = logoUrlAnalysis(userId, releaseInfo.logoUrl, atomPath)
+        if (logoUrlAnalysisResult.isNotOk()) {
+            return Result(data = false, message = logoUrlAnalysisResult.message)
         }
+        releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
+        // 归档插件包
         val archiveAtomResult = client.get(UserArchiveAtomResource::class).archiveAtom(
             userId = userId,
             projectCode = releaseInfo.projectCode,
@@ -239,13 +216,16 @@ class OpAtomResourceImpl @Autowired constructor(
             os = JsonUtil.toJson(releaseInfo.os)
         )
         if (archiveAtomResult.isNotOk()) {
-            return Result(data = false, message = archiveAtomResult.message)
+            return Result(
+                data = false,
+                status = archiveAtomResult.status,
+                message = archiveAtomResult.message
+            )
         }
-
+        // 解析description
         val description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
-
-
-        atomReleaseService.updateMarketAtom(
+        // 升级插件
+        val updateMarketAtomResult = atomReleaseService.updateMarketAtom(
             userId,
             releaseInfo.projectCode,
             MarketAtomUpdateRequest(
@@ -255,40 +235,90 @@ class OpAtomResourceImpl @Autowired constructor(
                 jobType = releaseInfo.jobType,
                 os = releaseInfo.os,
                 summary = releaseInfo.summary,
-                description = description
+                description = description,
+                version = releaseInfo.version,
+                releaseType = releaseInfo.releaseType,
+                versionContent = releaseInfo.versionContent,
+                publisher = releaseInfo.publisher,
+                labelIdList = releaseInfo.labelIdList,
+                frontendType = releaseInfo.frontendType,
+                logoUrl = releaseInfo.logoUrl,
+                classifyCode = releaseInfo.classifyCode
             )
         )
-
-
+        if (updateMarketAtomResult.isNotOk()) {
+            return Result(
+                data = false,
+                status = updateMarketAtomResult.status,
+                message = updateMarketAtomResult.message
+            )
+        }
+        // 确认测试通过
+        return atomReleaseService.passTest(userId, atomId)
     }
 
-    fun descriptionAnalysis(userId: String,description: String, atomPath: String): String {
-        if (description.startsWith("http") && description.endsWith(".md")) {
+    private fun logoUrlAnalysis(userId: String, logoUrl: String, atomPath: String): Result<String> {
+        var result = logoUrl
+        if (!logoUrl.startsWith("http")) {
+            val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
+            val matcher: Matcher = pattern.matcher(logoUrl)
+            val relativePath = if (matcher.find()) {
+                matcher.group(2)
+            } else null
+            if (relativePath.isNullOrBlank()) {
+                return MessageCodeUtil.generateResponseDataObject(
+                    USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID,
+                    arrayOf("releaseInfo.logoUrl")
+                )
+            }
+            val logoFile = File("$atomPath/file/${relativePath.removePrefix("/")}")
+            try {
+                if (logoFile.exists()) {
+                    val uploadStoreLogoResult = storeLogoService.uploadStoreLogo(
+                        userId = userId,
+                        contentLength = logoFile.length(),
+                        inputStream = logoFile.inputStream(),
+                        fileName = logoFile.name
+                    )
+                    if (uploadStoreLogoResult.isOk()) {
+                        result = uploadStoreLogoResult.data!!.logoUrl!!
+                    } else {
+                        return Result(data = logoUrl, message = uploadStoreLogoResult.message)
+                    }
+                }
+            } finally {
+                logoFile.delete()
+            }
+        }
+        return Result(result)
+    }
+
+    private fun descriptionAnalysis(userId: String, description: String, atomPath: String): String {
+        var descriptionText =
+            if (description.startsWith("http") && description.endsWith(".md")) {
             val inputStream = URL(description).openStream()
             val file = File("$atomPath/file/description.md")
             FileOutputStream(file).use { outputStream ->
                 var read: Int
-                val bytes = ByteArray(4096)
+                val bytes = ByteArray(1024)
                 while (inputStream.read(bytes).also { read = it } != -1) {
                     outputStream.write(bytes, 0, read)
                 }
             }
-            var descriptionText = file.readText()
-            val analysisResult = regexAnalysis(
-                userId = userId,
-                input = descriptionText,
-                atomPath
-            )
-            return replaceResourcePath(descriptionText, analysisResult)
+            file.readText()
+        } else {
+            description
         }
-    }
-
-    private fun replaceResourcePath(descriptionText: String, analysisResult: Map<String, String>): String {
+        val analysisResult = regexAnalysis(
+            userId = userId,
+            input = descriptionText,
+            atomPath
+        )
         analysisResult.forEach {
-            val pattern: Pattern = Pattern.compile("\\$\\{\\{indexFile(\\\"${it.key}\\\")\\}\\}")
+            val pattern: Pattern = Pattern.compile("(\\$\\{\\{indexFile\\()\\\"${it.key}\\\"\\)}}")
             val matcher: Matcher = pattern.matcher(descriptionText)
             if (matcher.find()) {
-                matcher.replaceAll("![](${it.value})")
+                descriptionText = matcher.replaceFirst("![](${it.value})")
             }
         }
         return descriptionText
@@ -304,6 +334,13 @@ class OpAtomResourceImpl @Autowired constructor(
         val pathList = mutableListOf<String>()
         val result = mutableMapOf<String, String>()
         while (matcher.find()) {
+            val path = matcher.group(2).removePrefix("/")
+            if (path.endsWith(".md")) {
+                val file = File("$atomPath/file/$path")
+                if (file.exists()) {
+                    return regexAnalysis(userId, file.readText(), atomPath)
+                }
+            }
             pathList.add(matcher.group(2).removePrefix("/"))
         }
         pathList.forEach {
