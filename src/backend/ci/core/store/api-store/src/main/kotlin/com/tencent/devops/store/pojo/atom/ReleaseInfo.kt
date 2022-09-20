@@ -22,7 +22,7 @@ data class ReleaseInfo(
     @field:BkField(patternStyle = BkStyleEnum.LANGUAGE_STYLE)
     var language: String,
     @ApiModelProperty("插件logo地址", required = true)
-    @field:BkField(minLength = 1, maxLength = 1024)
+    @field:BkField(maxLength = 1024)
     var logoUrl: String,
     @ApiModelProperty("插件版本", required = true)
     val version: String,
@@ -44,12 +44,12 @@ data class ReleaseInfo(
     @ApiModelProperty("发布者", required = true)
     val publisher: String,
     @ApiModelProperty("版本日志内容", required = true)
-    @field:BkField(minLength = 1, maxLength = 1024)
+    @field:BkField(maxLength = 1024)
     val versionContent: String,
     @ApiModelProperty("插件简介", required = true)
-    @field:BkField(minLength = 1, maxLength = 1024)
+    @field:BkField(maxLength = 1024)
     val summary: String,
     @ApiModelProperty("插件描述", required = true)
-    @field:BkField(minLength = 1, maxLength = 1024)
+    @field:BkField(maxLength = 1024)
     val description: String
 )
