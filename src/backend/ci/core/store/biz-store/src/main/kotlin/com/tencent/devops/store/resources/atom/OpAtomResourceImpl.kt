@@ -27,60 +27,32 @@
 
 package com.tencent.devops.store.resources.atom
 
-import com.tencent.devops.artifactory.api.UserArchiveAtomResource
-import com.tencent.devops.artifactory.api.service.ServiceFileResource
-import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.api.util.JsonUtil
-import com.tencent.devops.common.api.util.UUIDUtil
-import com.tencent.devops.common.service.utils.MessageCodeUtil
-import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.store.api.atom.OpAtomResource
-import com.tencent.devops.store.constant.StoreMessageCode.USER_ATOM_CONF_INVALID
-import com.tencent.devops.store.constant.StoreMessageCode.USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID
 import com.tencent.devops.store.pojo.atom.ApproveReq
 import com.tencent.devops.store.pojo.atom.Atom
 import com.tencent.devops.store.pojo.atom.AtomCreateRequest
 import com.tencent.devops.store.pojo.atom.AtomOfflineReq
 import com.tencent.devops.store.pojo.atom.AtomResp
 import com.tencent.devops.store.pojo.atom.AtomUpdateRequest
-import com.tencent.devops.store.pojo.atom.MarketAtomCreateRequest
-import com.tencent.devops.store.pojo.atom.ReleaseInfo
 import com.tencent.devops.store.pojo.atom.enums.AtomStatusEnum
 import com.tencent.devops.store.pojo.atom.enums.AtomTypeEnum
 import com.tencent.devops.store.pojo.atom.enums.OpSortTypeEnum
-import com.tencent.devops.store.pojo.common.TASK_JSON_NAME
 import com.tencent.devops.store.service.atom.AtomReleaseService
 import com.tencent.devops.store.service.atom.AtomService
 import com.tencent.devops.store.service.atom.MarketAtomService
 import com.tencent.devops.store.service.atom.OpAtomService
-import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.service.utils.CommonUtils
-import com.tencent.devops.store.pojo.atom.MarketAtomUpdateRequest
-import com.tencent.devops.store.service.common.StoreLogoService
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.InputStream
-import java.net.URL
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-import javax.imageio.ImageIO
 
 @RestResource
 class OpAtomResourceImpl @Autowired constructor(
     private val atomService: AtomService,
     private val opAtomService: OpAtomService,
     private val marketAtomService: MarketAtomService,
-    private val atomReleaseService: AtomReleaseService,
-    private val storeLogoService: StoreLogoService,
-    private val client: Client
+    private val atomReleaseService: AtomReleaseService
 ) : OpAtomResource {
 
     override fun add(userId: String, atomCreateRequest: AtomCreateRequest): Result<Boolean> {
@@ -155,254 +127,11 @@ class OpAtomResourceImpl @Autowired constructor(
         inputStream: InputStream,
         disposition: FormDataContentDisposition
     ): Result<Boolean> {
-        // 解压插件包到临时目录
-        val atomPath = unzipFile(
+        return atomReleaseService.releaseAtom(
             userId = userId,
             atomCode = atomCode,
             inputStream = inputStream,
             disposition = disposition
         )
-        val taskJsonFile = File("$atomPath", TASK_JSON_NAME)
-        if (!taskJsonFile.exists()) {
-            return MessageCodeUtil.generateResponseDataObject(
-                USER_ATOM_CONF_INVALID,
-                arrayOf(TASK_JSON_NAME)
-            )
-        }
-        val taskJsonMap: Map<String, Any>
-        val releaseInfo: ReleaseInfo
-        // 解析task.json文件
-        try {
-            val taskJsonStr = taskJsonFile.readText(Charset.forName("UTF-8"))
-            taskJsonMap = JsonUtil.toMap(taskJsonStr).toMutableMap()
-            releaseInfo = JsonUtil.to(taskJsonMap["releaseInfo"] as String, ReleaseInfo::class.java)
-        } catch (e: Exception) {
-            return MessageCodeUtil.generateResponseDataObject(
-                USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID
-            )
-        } finally {
-            taskJsonFile.delete()
-        }
-        // 新增插件
-        val addMarketAtomResult = atomReleaseService.addMarketAtom(
-            userId,
-            MarketAtomCreateRequest(
-                projectCode = releaseInfo.projectCode,
-                atomCode = releaseInfo.atomCode,
-                name = releaseInfo.name,
-                language = releaseInfo.language
-            )
-        )
-        if (addMarketAtomResult.isNotOk()) {
-            return Result(data = false, message = addMarketAtomResult.message)
-        }
-        val atomId = addMarketAtomResult.data!!
-        // 解析logoUrl
-        val logoUrlAnalysisResult = logoUrlAnalysis(userId, releaseInfo.logoUrl, atomPath)
-        if (logoUrlAnalysisResult.isNotOk()) {
-            return Result(data = false, message = logoUrlAnalysisResult.message)
-        }
-        releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
-        // 归档插件包
-        val archiveAtomResult = client.get(UserArchiveAtomResource::class).archiveAtom(
-            userId = userId,
-            projectCode = releaseInfo.projectCode,
-            atomId = atomId,
-            atomCode = releaseInfo.atomCode,
-            version = releaseInfo.version,
-            releaseType = releaseInfo.releaseType,
-            inputStream = inputStream,
-            disposition = disposition,
-            os = JsonUtil.toJson(releaseInfo.os)
-        )
-        if (archiveAtomResult.isNotOk()) {
-            return Result(
-                data = false,
-                status = archiveAtomResult.status,
-                message = archiveAtomResult.message
-            )
-        }
-        // 解析description
-        val description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
-        // 升级插件
-        val updateMarketAtomResult = atomReleaseService.updateMarketAtom(
-            userId,
-            releaseInfo.projectCode,
-            MarketAtomUpdateRequest(
-                atomCode = releaseInfo.atomCode,
-                name = releaseInfo.name,
-                category = releaseInfo.category,
-                jobType = releaseInfo.jobType,
-                os = releaseInfo.os,
-                summary = releaseInfo.summary,
-                description = description,
-                version = releaseInfo.version,
-                releaseType = releaseInfo.releaseType,
-                versionContent = releaseInfo.versionContent,
-                publisher = releaseInfo.publisher,
-                labelIdList = releaseInfo.labelIdList,
-                frontendType = releaseInfo.frontendType,
-                logoUrl = releaseInfo.logoUrl,
-                classifyCode = releaseInfo.classifyCode
-            )
-        )
-        if (updateMarketAtomResult.isNotOk()) {
-            return Result(
-                data = false,
-                status = updateMarketAtomResult.status,
-                message = updateMarketAtomResult.message
-            )
-        }
-        // 确认测试通过
-        return atomReleaseService.passTest(userId, atomId)
-    }
-
-    private fun logoUrlAnalysis(userId: String, logoUrl: String, atomPath: String): Result<String> {
-        var result = logoUrl
-        if (!logoUrl.startsWith("http")) {
-            val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
-            val matcher: Matcher = pattern.matcher(logoUrl)
-            val relativePath = if (matcher.find()) {
-                matcher.group(2)
-            } else null
-            if (relativePath.isNullOrBlank()) {
-                return MessageCodeUtil.generateResponseDataObject(
-                    USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID,
-                    arrayOf("releaseInfo.logoUrl")
-                )
-            }
-            val logoFile = File("$atomPath/file/${relativePath.removePrefix("/")}")
-            try {
-                if (logoFile.exists()) {
-                    val uploadStoreLogoResult = storeLogoService.uploadStoreLogo(
-                        userId = userId,
-                        contentLength = logoFile.length(),
-                        inputStream = logoFile.inputStream(),
-                        fileName = logoFile.name
-                    )
-                    if (uploadStoreLogoResult.isOk()) {
-                        result = uploadStoreLogoResult.data!!.logoUrl!!
-                    } else {
-                        return Result(data = logoUrl, message = uploadStoreLogoResult.message)
-                    }
-                }
-            } finally {
-                logoFile.delete()
-            }
-        }
-        return Result(result)
-    }
-
-    private fun descriptionAnalysis(userId: String, description: String, atomPath: String): String {
-        var descriptionText =
-            if (description.startsWith("http") && description.endsWith(".md")) {
-            val inputStream = URL(description).openStream()
-            val file = File("$atomPath/file/description.md")
-            FileOutputStream(file).use { outputStream ->
-                var read: Int
-                val bytes = ByteArray(1024)
-                while (inputStream.read(bytes).also { read = it } != -1) {
-                    outputStream.write(bytes, 0, read)
-                }
-            }
-            file.readText()
-        } else {
-            description
-        }
-        val analysisResult = regexAnalysis(
-            userId = userId,
-            input = descriptionText,
-            atomPath
-        )
-        analysisResult.forEach {
-            val pattern: Pattern = Pattern.compile("(\\$\\{\\{indexFile\\()\\\"${it.key}\\\"\\)}}")
-            val matcher: Matcher = pattern.matcher(descriptionText)
-            if (matcher.find()) {
-                descriptionText = matcher.replaceFirst("![](${it.value})")
-            }
-        }
-        return descriptionText
-    }
-
-    private fun getAtomBasePath(): String {
-        return System.getProperty("java.io.tmpdir").removeSuffix("/")
-    }
-
-    private fun regexAnalysis(userId: String, input: String, atomPath: String): Map<String, String> {
-        val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
-        val matcher: Matcher = pattern.matcher(input)
-        val pathList = mutableListOf<String>()
-        val result = mutableMapOf<String, String>()
-        while (matcher.find()) {
-            val path = matcher.group(2).removePrefix("/")
-            if (path.endsWith(".md")) {
-                val file = File("$atomPath/file/$path")
-                if (file.exists()) {
-                    return regexAnalysis(userId, file.readText(), atomPath)
-                }
-            }
-            pathList.add(matcher.group(2).removePrefix("/"))
-        }
-        pathList.forEach {
-            val file = File("$atomPath/file/$it")
-            val serviceUrlPrefix = client.getServiceUrl(ServiceFileResource::class)
-            try {
-                if (file.exists()) {
-                    val uploadFileResult = CommonUtils.serviceUploadFile(
-                        userId = userId,
-                        serviceUrlPrefix = serviceUrlPrefix,
-                        file = file,
-                        fileChannelType = FileChannelTypeEnum.WEB_SHOW.name,
-                        logo = false
-                    )
-                    if (uploadFileResult.isOk()) {
-                        result[it] = uploadFileResult.data!!
-                    } else {
-                        logger.error("uploadFileResult is fail, file path:$it")
-                    }
-                }
-            } finally {
-                file.delete()
-            }
-        }
-        return result
-    }
-
-    private fun buildAtomArchivePath(userId: String, atomCode: String) =
-        "${getAtomBasePath()}/$BK_CI_ATOM_DIR/$userId/$atomCode"
-
-    private fun unzipFile(
-        disposition: FormDataContentDisposition,
-        inputStream: InputStream,
-        userId: String,
-        atomCode: String
-    ): String {
-        val fileName = disposition.fileName
-        val index = fileName.lastIndexOf(".")
-        val fileType = fileName.substring(index + 1)
-        val file = Files.createTempFile(UUIDUtil.generate(), ".$fileType").toFile()
-        file.outputStream().use {
-            inputStream.copyTo(it)
-        }
-        // 解压到指定目录
-        val atomPath = buildAtomArchivePath(userId, atomCode)
-        if (!File(atomPath).exists()) {
-            val file = Files.createTempFile(UUIDUtil.generate(), ".$fileType").toFile()
-            file.outputStream().use {
-                inputStream.copyTo(it)
-            }
-            try {
-                ZipUtil.unZipFile(file, atomPath, false)
-            } finally {
-                file.delete() // 删除临时文件
-            }
-        }
-        return atomPath
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(OpAtomResourceImpl::class.java)
-        private const val BK_CI_ATOM_DIR = "bk-atom"
-        private const val BK_CI_PATH_REGEX = "(\\$\\{\\{indexFile\\()\\\"([^\\\"]*)\\\""
     }
 }
