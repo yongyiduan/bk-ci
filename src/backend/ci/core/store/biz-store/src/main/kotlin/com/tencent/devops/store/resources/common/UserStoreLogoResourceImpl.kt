@@ -53,7 +53,7 @@ class UserStoreLogoResourceImpl @Autowired constructor(
             userId = userId,
             contentLength = contentLength,
             inputStream = inputStream,
-            disposition = disposition
+            fileName = disposition.fileName
         )
     }
 

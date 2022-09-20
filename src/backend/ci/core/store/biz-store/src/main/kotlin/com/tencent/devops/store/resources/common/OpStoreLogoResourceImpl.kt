@@ -56,7 +56,7 @@ class OpStoreLogoResourceImpl @Autowired constructor(
             sizeLimitFlag = sizeLimitFlag,
             contentLength = contentLength,
             inputStream = inputStream,
-            disposition = disposition
+            fileName = disposition.fileName
         )
     }
 
