@@ -241,7 +241,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             inputStream = inputStream,
             disposition = disposition
         )
-        val taskJsonFile = File("$atomPath/file", TASK_JSON_NAME)
+        val taskJsonFile = File("$atomPath${File.separator}file", TASK_JSON_NAME)
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_ATOM_CONF_INVALID,
@@ -337,6 +337,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun logoUrlAnalysis(userId: String, logoUrl: String, atomPath: String): Result<String> {
+        val separator = File.separator
         var result = logoUrl
         if (!logoUrl.startsWith("http")) {
             val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
@@ -350,7 +351,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     arrayOf("releaseInfo.logoUrl")
                 )
             }
-            val logoFile = File("$atomPath/file/${relativePath.removePrefix("/")}")
+            val logoFile = File("$atomPath${separator}file${separator}${relativePath.removePrefix(separator)}")
             try {
                 if (logoFile.exists()) {
                     val uploadStoreLogoResult = client.get(OpStoreLogoResource::class).uploadStoreLogo(
@@ -375,10 +376,11 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun descriptionAnalysis(userId: String, description: String, atomPath: String): String {
+        val separator = File.separator
         var descriptionText =
             if (description.startsWith("http") && description.endsWith(".md")) {
                 val inputStream = URL(description).openStream()
-                val file = File("$atomPath/file/description.md")
+                val file = File("$atomPath${separator}file${separator}description.md")
                 FileOutputStream(file).use { outputStream ->
                     var read: Int
                     val bytes = ByteArray(1024)
@@ -406,26 +408,27 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun getAtomBasePath(): String {
-        return System.getProperty("java.io.tmpdir").removeSuffix("/")
+        return System.getProperty("java.io.tmpdir").removeSuffix(File.separator)
     }
 
     private fun regexAnalysis(userId: String, input: String, atomPath: String): Map<String, String> {
+        val separator = File.separator
         val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
         val matcher: Matcher = pattern.matcher(input)
         val pathList = mutableListOf<String>()
         val result = mutableMapOf<String, String>()
         while (matcher.find()) {
-            val path = matcher.group(2).removePrefix("/")
+            val path = matcher.group(2).removePrefix("$separator")
             if (path.endsWith(".md")) {
-                val file = File("$atomPath/file/$path")
+                val file = File("$atomPath${separator}file${separator}$path")
                 if (file.exists()) {
                     return regexAnalysis(userId, file.readText(), atomPath)
                 }
             }
-            pathList.add(matcher.group(2).removePrefix("/"))
+            pathList.add(matcher.group(2).removePrefix(separator))
         }
         pathList.forEach {
-            val file = File("$atomPath/file/$it")
+            val file = File("$atomPath${separator}file${separator}$it")
             val serviceUrlPrefix = client.getServiceUrl(ServiceFileResource::class)
             try {
                 if (file.exists()) {
@@ -450,7 +453,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun buildAtomArchivePath(userId: String, atomCode: String) =
-        "${getAtomBasePath()}/$BK_CI_ATOM_DIR/$userId/$atomCode"
+        "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$userId${File.separator}$atomCode"
 
     private fun unzipFile(
         disposition: FormDataContentDisposition,
