@@ -6,12 +6,13 @@ import com.tencent.devops.common.web.annotation.BkField
 import com.tencent.devops.common.web.constant.BkStyleEnum
 import com.tencent.devops.store.pojo.atom.enums.AtomCategoryEnum
 import com.tencent.devops.store.pojo.atom.enums.JobTypeEnum
-import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
+import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 
+@ApiModel("插件发布部署模型")
 data class ReleaseInfo(
     @ApiModelProperty("项目编码", required = true)
-    var projectCode: String,
+    var projectId: String,
     @ApiModelProperty("插件代码", required = true)
     @field:BkField(patternStyle = BkStyleEnum.CODE_STYLE)
     var atomCode: String,
@@ -24,10 +25,6 @@ data class ReleaseInfo(
     @ApiModelProperty("插件logo地址", required = true)
     @field:BkField(maxLength = 1024)
     var logoUrl: String,
-    @ApiModelProperty("插件版本", required = true)
-    val version: String,
-    @ApiModelProperty("发布类型", required = true)
-    val releaseType: ReleaseTypeEnum,
     @ApiModelProperty("支持的操作系统", required = true)
     val os: ArrayList<String>,
     @ApiModelProperty(value = "前端UI渲染方式", required = true)
@@ -41,11 +38,8 @@ data class ReleaseInfo(
     @JsonProperty(value = "labelIdList", required = false)
     @ApiModelProperty("标签id集合", name = "labelIdList")
     val labelIdList: ArrayList<String>? = null,
-    @ApiModelProperty("发布者", required = true)
-    val publisher: String,
-    @ApiModelProperty("版本日志内容", required = true)
-    @field:BkField(maxLength = 1024)
-    val versionContent: String,
+    @ApiModelProperty("版本信息", required = true)
+    val versionInfo: VersionInfo,
     @ApiModelProperty("插件简介", required = true)
     @field:BkField(maxLength = 1024)
     val summary: String,

@@ -254,7 +254,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         try {
             val taskJsonStr = taskJsonFile.readText(Charset.forName("UTF-8"))
             taskJsonMap = JsonUtil.toMap(taskJsonStr).toMutableMap()
-            releaseInfo = JsonUtil.to(taskJsonMap["releaseInfo"] as String, ReleaseInfo::class.java)
+            val releaseInfoMap = taskJsonMap["releaseInfo"]
+            releaseInfo = JsonUtil.mapTo(releaseInfoMap as Map<String, Any>, ReleaseInfo::class.java)
         } catch (e: Exception) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID
@@ -266,7 +267,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         val addMarketAtomResult = addMarketAtom(
             userId,
             MarketAtomCreateRequest(
-                projectCode = releaseInfo.projectCode,
+                projectCode = releaseInfo.projectId,
                 atomCode = releaseInfo.atomCode,
                 name = releaseInfo.name,
                 language = releaseInfo.language
@@ -285,11 +286,11 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         // 归档插件包
         val archiveAtomResult = client.get(UserArchiveAtomResource::class).archiveAtom(
             userId = userId,
-            projectCode = releaseInfo.projectCode,
+            projectCode = releaseInfo.projectId,
             atomId = atomId,
             atomCode = releaseInfo.atomCode,
-            version = releaseInfo.version,
-            releaseType = releaseInfo.releaseType,
+            version = releaseInfo.versionInfo.version,
+            releaseType = releaseInfo.versionInfo.releaseType,
             inputStream = inputStream,
             disposition = disposition,
             os = JsonUtil.toJson(releaseInfo.os)
@@ -306,7 +307,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         // 升级插件
         val updateMarketAtomResult = updateMarketAtom(
             userId,
-            releaseInfo.projectCode,
+            releaseInfo.projectId,
             MarketAtomUpdateRequest(
                 atomCode = releaseInfo.atomCode,
                 name = releaseInfo.name,
@@ -315,10 +316,10 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 os = releaseInfo.os,
                 summary = releaseInfo.summary,
                 description = description,
-                version = releaseInfo.version,
-                releaseType = releaseInfo.releaseType,
-                versionContent = releaseInfo.versionContent,
-                publisher = releaseInfo.publisher,
+                version = releaseInfo.versionInfo.version,
+                releaseType = releaseInfo.versionInfo.releaseType,
+                versionContent = releaseInfo.versionInfo.versionContent,
+                publisher = releaseInfo.versionInfo.publisher,
                 labelIdList = releaseInfo.labelIdList,
                 frontendType = releaseInfo.frontendType,
                 logoUrl = releaseInfo.logoUrl,
