@@ -27,7 +27,7 @@
 
 package com.tencent.devops.store.service.atom.impl
 
-import com.tencent.devops.artifactory.api.ServiceArchiveAtomResource
+import com.tencent.devops.artifactory.api.UserArchiveAtomResource
 import com.tencent.devops.artifactory.api.service.ServiceFileResource
 import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
 import com.tencent.devops.common.api.constant.BEGIN
@@ -277,23 +277,27 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
         // 归档插件包
-        val archiveAtomResult = client.get(ServiceArchiveAtomResource::class).archiveAtom(
-            userId = userId,
-            projectCode = releaseInfo.projectId,
-            atomId = atomId,
-            atomCode = releaseInfo.atomCode,
-            version = releaseInfo.versionInfo.version,
-            releaseType = releaseInfo.versionInfo.releaseType,
-            inputStream = inputStream,
-            disposition = disposition,
-            os = JsonUtil.toJson(releaseInfo.os)
-        )
-        if (archiveAtomResult.isNotOk()) {
-            return Result(
-                data = false,
-                status = archiveAtomResult.status,
-                message = archiveAtomResult.message
+        try {
+            val archiveAtomResult = client.get(UserArchiveAtomResource::class).archiveAtom(
+                userId = userId,
+                projectCode = releaseInfo.projectId,
+                atomId = atomId,
+                atomCode = releaseInfo.atomCode,
+                version = releaseInfo.versionInfo.version,
+                releaseType = releaseInfo.versionInfo.releaseType,
+                inputStream = inputStream,
+                disposition = disposition,
+                os = JsonUtil.toJson(releaseInfo.os)
             )
+            if (archiveAtomResult.isNotOk()) {
+                return Result(
+                    data = false,
+                    status = archiveAtomResult.status,
+                    message = archiveAtomResult.message
+                )
+            }
+        } catch (e: Exception) {
+            logger.error("archiveAtomResult is fail ${e.message}")
         }
         // 解析description
         val description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
