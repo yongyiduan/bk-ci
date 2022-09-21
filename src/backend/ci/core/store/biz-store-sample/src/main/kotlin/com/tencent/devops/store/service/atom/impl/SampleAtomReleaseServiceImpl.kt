@@ -234,7 +234,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             inputStream = inputStream,
             disposition = disposition
         )
-        val taskJsonFile = File("$atomPath${File.separator}file", TASK_JSON_NAME)
+        val taskJsonFile = File("$atomPath", TASK_JSON_NAME)
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_ATOM_CONF_INVALID,
