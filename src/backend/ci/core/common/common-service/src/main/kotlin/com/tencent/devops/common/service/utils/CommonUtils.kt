@@ -45,6 +45,7 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 import java.io.File
+import java.io.InputStream
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -146,6 +147,31 @@ object CommonUtils {
     ): Result<String?> {
         val serviceUrl = "$serviceUrlPrefix/service/artifactories/file/upload" +
                 "?userId=$userId&fileChannelType=$fileChannelType&logo=$logo"
+        logger.info("the serviceUrl is:$serviceUrl")
+        OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
+            val responseContent = response.body()!!.string()
+            logger.error("uploadFile responseContent is: $responseContent")
+            if (!response.isSuccessful) {
+                return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.SYSTEM_ERROR)
+            }
+            return JsonUtil.to(responseContent, object : TypeReference<Result<String?>>() {})
+        }
+    }
+
+    fun serviceArchiveAtomFile(
+        userId: String,
+        projectCode: String,
+        atomId: String,
+        atomCode: String,
+        serviceUrlPrefix: String,
+        releaseType: String,
+        version: String,
+        file: File,
+        os: String
+    ): Result<String?> {
+        val serviceUrl = "$serviceUrlPrefix/service/artifactories/projects/$projectCode/ids/$atomId" +
+                "/$atomCode/types/$releaseType/${version}/os/archiveAtom"
+
         logger.info("the serviceUrl is:$serviceUrl")
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
             val responseContent = response.body()!!.string()

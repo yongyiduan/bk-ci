@@ -80,7 +80,7 @@ interface ServiceArchiveAtomResource {
 
     @ApiOperation("归档插件包资源")
     @POST
-    @Path("/projects/{projectCode}/ids/{atomId}/codes/{atomCode}/types/{releaseType}/versions/{version}/archiveAtom")
+    @Path("/projects/{projectCode}/ids/{atomId}/{atomCode}/types/{releaseType}/{version}/{os}/archiveAtom")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     fun archiveAtomFile(
         @ApiParam("userId", required = true)
@@ -107,7 +107,7 @@ interface ServiceArchiveAtomResource {
         @FormDataParam("file")
         disposition: FormDataContentDisposition,
         @ApiParam("支持的操作系统", required = true)
-        @FormDataParam("os")
+        @PathParam("os")
         os: String
     ): Result<ArchiveAtomResponse?>
 }

@@ -245,7 +245,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             inputStream = inputStream,
             disposition = disposition
         )
-        val taskJsonFile = File(atomPath, TASK_JSON_NAME)
+        val taskJsonFile = File("$atomPath${File.separator}$TASK_JSON_NAME")
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_ATOM_CONF_INVALID,
@@ -291,15 +291,15 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         try {
             val zipFile = File(zipFiles(userId, atomCode, atomPath))
             if (zipFile.exists()) {
-                val archiveAtomResult = client.get(ServiceArchiveAtomResource::class).archiveAtomFile(
+                val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
                     userId = userId,
                     projectCode = releaseInfo.projectId,
                     atomId = atomId,
                     atomCode = releaseInfo.atomCode,
                     version = releaseInfo.versionInfo.version,
-                    releaseType = releaseInfo.versionInfo.releaseType,
-                    inputStream = zipFile.inputStream(),
-                    disposition = disposition,
+                    serviceUrlPrefix = client.getServiceUrl(ServiceArchiveAtomResource::class),
+                    releaseType = releaseInfo.versionInfo.releaseType.name,
+                    file = zipFile,
                     os = JsonUtil.toJson(releaseInfo.os)
                 )
                 if (archiveAtomResult.isNotOk()) {
