@@ -27,7 +27,6 @@
 
 package com.tencent.devops.store.service.atom.impl
 
-import com.tencent.devops.artifactory.api.UserArchiveAtomResource
 import com.tencent.devops.artifactory.api.service.ServiceFileResource
 import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
 import com.tencent.devops.common.api.constant.BEGIN
@@ -281,31 +280,31 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
         // 归档插件包
-        try {
-            val zipFile = File(zipFiles(userId, atomCode, atomPath))
-            if (zipFile.exists()) {
-                val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
-                    userId = userId,
-                    projectCode = releaseInfo.projectId,
-                    atomId = atomId,
-                    atomCode = releaseInfo.atomCode,
-                    version = releaseInfo.versionInfo.version,
-                    serviceUrlPrefix = client.getServiceUrl(UserArchiveAtomResource::class),
-                    releaseType = releaseInfo.versionInfo.releaseType.name,
-                    file = zipFile,
-                    os = JsonUtil.toJson(releaseInfo.os)
-                )
-                if (archiveAtomResult.isNotOk()) {
-                    return Result(
-                        data = false,
-                        status = archiveAtomResult.status,
-                        message = archiveAtomResult.message
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            logger.error("archiveAtomResult is fail ${e.message}")
-        }
+//        try {
+//            val zipFile = File(zipFiles(userId, atomCode, atomPath))
+//            if (zipFile.exists()) {
+//                val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
+//                    userId = userId,
+//                    projectCode = releaseInfo.projectId,
+//                    atomId = atomId,
+//                    atomCode = releaseInfo.atomCode,
+//                    version = releaseInfo.versionInfo.version,
+//                    serviceUrlPrefix = ,
+//                    releaseType = releaseInfo.versionInfo.releaseType.name,
+//                    file = zipFile,
+//                    os = JsonUtil.toJson(releaseInfo.os)
+//                )
+//                if (archiveAtomResult.isNotOk()) {
+//                    return Result(
+//                        data = false,
+//                        status = archiveAtomResult.status,
+//                        message = archiveAtomResult.message
+//                    )
+//                }
+//            }
+//        } catch (e: Exception) {
+//            logger.error("archiveAtomResult is fail ${e.message}")
+//        }
         // 解析description
         val description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
         // 升级插件
