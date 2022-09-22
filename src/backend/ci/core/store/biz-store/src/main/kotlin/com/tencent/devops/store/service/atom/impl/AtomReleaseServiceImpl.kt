@@ -731,6 +731,7 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
             )
         }
         if (null == taskJsonStr || !JsonSchemaUtil.validateJson(taskJsonStr)) {
+            logger.info("BKSystemErrorMonitor|getTaskJsonContent:$taskJsonStr")
             throw ErrorCodeException(
                 errorCode = StoreMessageCode.USER_REPOSITORY_PULL_TASK_JSON_FILE_FAIL,
                 params = arrayOf(branch ?: MASTER, TASK_JSON_NAME)
