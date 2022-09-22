@@ -43,7 +43,6 @@ import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
 import javax.ws.rs.POST
 import javax.ws.rs.Path
-import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
@@ -77,4 +76,37 @@ interface ServiceArchiveAtomResource {
         @QueryParam("atomCode")
         atomCode: String
     ): Result<Boolean>
+
+    @ApiOperation("归档插件包资源")
+    @POST
+    @Path("/archiveAtom")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    fun archiveAtomFile(
+        @ApiParam("userId", required = true)
+        @QueryParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("项目编码", required = true)
+        @QueryParam("projectCode")
+        projectCode: String,
+        @ApiParam("插件ID", required = true)
+        @QueryParam("atomId")
+        atomId: String,
+        @ApiParam("插件代码", required = true)
+        @QueryParam("atomCode")
+        atomCode: String,
+        @ApiParam("插件版本号", required = true)
+        @QueryParam("version")
+        version: String,
+        @ApiParam("发布类型", required = true)
+        @QueryParam("releaseType")
+        releaseType: ReleaseTypeEnum,
+        @ApiParam("文件", required = true)
+        @FormDataParam("file")
+        inputStream: InputStream,
+        @FormDataParam("file")
+        disposition: FormDataContentDisposition,
+        @ApiParam("支持的操作系统", required = true)
+        @QueryParam("os")
+        os: String
+    ): Result<ArchiveAtomResponse?>
 }
