@@ -242,7 +242,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_ATOM_CONF_INVALID,
-                arrayOf(TASK_JSON_NAME+"decompress")
+                arrayOf("$TASK_JSON_NAME is decompress")
             )
         }
         val taskJsonMap: Map<String, Any>
@@ -514,7 +514,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 file.delete() // 删除临时文件
             }
         }
-        logger.info("releaseAtom unzipFile atomPath:$atomPath")
+        logger.info("releaseAtom unzipFile atomPath:$atomPath exists:${File(atomPath).exists()}")
         return atomPath
     }
 
