@@ -242,7 +242,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_ATOM_CONF_INVALID,
-                arrayOf(TASK_JSON_NAME)
+                arrayOf(TASK_JSON_NAME+"decompress")
             )
         }
         val taskJsonMap: Map<String, Any>
