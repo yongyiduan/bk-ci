@@ -245,11 +245,11 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             inputStream = inputStream,
             disposition = disposition
         )
-        val taskJsonFile = File("$atomPath", TASK_JSON_NAME)
+        val taskJsonFile = File(atomPath, TASK_JSON_NAME)
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_ATOM_CONF_INVALID,
-                arrayOf(TASK_JSON_NAME)
+                arrayOf(TASK_JSON_NAME+"decompress")
             )
         }
         val taskJsonMap: Map<String, Any>
@@ -521,6 +521,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 file.delete() // 删除临时文件
             }
         }
+        logger.info("releaseAtom unzipFile atomPath:$atomPath")
         return atomPath
     }
 
