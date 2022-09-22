@@ -51,4 +51,30 @@ class ServiceArchiveAtomResourceImpl @Autowired constructor(
         archiveAtomService.deleteAtom(userId, projectCode, atomCode)
         return Result(true)
     }
+
+    override fun archiveAtomFile(
+        userId: String,
+        projectCode: String,
+        atomId: String,
+        atomCode: String,
+        version: String,
+        releaseType: ReleaseTypeEnum,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition,
+        os: String
+    ): Result<ArchiveAtomResponse?> {
+        return archiveAtomService.archiveAtom(
+            userId = userId,
+            inputStream = inputStream,
+            disposition = disposition,
+            atomId = atomId,
+            archiveAtomRequest = ArchiveAtomRequest(
+                projectCode = projectCode,
+                atomCode = atomCode,
+                version = version,
+                releaseType = releaseType,
+                os = os
+            )
+        )
+    }
 }

@@ -169,8 +169,9 @@ object CommonUtils {
         file: File,
         os: String
     ): Result<String?> {
-        val serviceUrl = "$serviceUrlPrefix/service/artifactories/projects/$projectCode/ids/$atomId" +
-                "/$atomCode/types/$releaseType/${version}/os/archiveAtom"
+        val serviceUrl = "$serviceUrlPrefix/service/artifactories/archiveAtom" +
+                "??userId=$userId&projectCode=$projectCode&atomId=$atomId&atomCode=$atomCode" +
+                "&version=$version&releaseType=$releaseType&os=$os"
 
         logger.info("the serviceUrl is:$serviceUrl")
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
