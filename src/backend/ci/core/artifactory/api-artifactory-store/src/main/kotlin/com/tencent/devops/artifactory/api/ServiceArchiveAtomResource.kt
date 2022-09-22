@@ -77,37 +77,4 @@ interface ServiceArchiveAtomResource {
         @QueryParam("atomCode")
         atomCode: String
     ): Result<Boolean>
-
-    @ApiOperation("归档插件包资源")
-    @POST
-    @Path("/projects/{projectCode}/ids/{atomId}/{atomCode}/types/{releaseType}/{version}/{os}/archiveAtom")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    fun archiveAtomFile(
-        @ApiParam("userId", required = true)
-        @HeaderParam(AUTH_HEADER_USER_ID)
-        userId: String,
-        @ApiParam("项目编码", required = true)
-        @PathParam("projectCode")
-        projectCode: String,
-        @ApiParam("插件ID", required = true)
-        @PathParam("atomId")
-        atomId: String,
-        @ApiParam("插件代码", required = true)
-        @PathParam("atomCode")
-        atomCode: String,
-        @ApiParam("插件版本号", required = true)
-        @PathParam("version")
-        version: String,
-        @ApiParam("发布类型", required = true)
-        @PathParam("releaseType")
-        releaseType: ReleaseTypeEnum,
-        @ApiParam("文件", required = true)
-        @FormDataParam("file")
-        inputStream: InputStream,
-        @FormDataParam("file")
-        disposition: FormDataContentDisposition,
-        @ApiParam("支持的操作系统", required = true)
-        @PathParam("os")
-        os: String
-    ): Result<ArchiveAtomResponse?>
 }
