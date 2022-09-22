@@ -66,13 +66,17 @@ import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 @Service
 class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServiceImpl() {
@@ -285,23 +289,26 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
         // 归档插件包
         try {
-            val archiveAtomResult = client.get(ServiceArchiveAtomResource::class).archiveAtomFile(
-                userId = userId,
-                projectCode = releaseInfo.projectId,
-                atomId = atomId,
-                atomCode = releaseInfo.atomCode,
-                version = releaseInfo.versionInfo.version,
-                releaseType = releaseInfo.versionInfo.releaseType,
-                inputStream = inputStream,
-                disposition = disposition,
-                os = JsonUtil.toJson(releaseInfo.os)
-            )
-            if (archiveAtomResult.isNotOk()) {
-                return Result(
-                    data = false,
-                    status = archiveAtomResult.status,
-                    message = archiveAtomResult.message
+            val zipFile = File(zipFiles(userId, atomCode, atomPath))
+            if (zipFile.exists()) {
+                val archiveAtomResult = client.get(ServiceArchiveAtomResource::class).archiveAtomFile(
+                    userId = userId,
+                    projectCode = releaseInfo.projectId,
+                    atomId = atomId,
+                    atomCode = releaseInfo.atomCode,
+                    version = releaseInfo.versionInfo.version,
+                    releaseType = releaseInfo.versionInfo.releaseType,
+                    inputStream = zipFile.inputStream(),
+                    disposition = disposition,
+                    os = JsonUtil.toJson(releaseInfo.os)
                 )
+                if (archiveAtomResult.isNotOk()) {
+                    return Result(
+                        data = false,
+                        status = archiveAtomResult.status,
+                        message = archiveAtomResult.message
+                    )
+                }
             }
         } catch (e: Exception) {
             logger.error("archiveAtomResult is fail ${e.message}")
@@ -339,6 +346,38 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         // 确认测试通过
         return passTest(userId, atomId)
+    }
+
+    private fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
+        val zipPath = "${buildAtomArchivePath(userId, atomCode)}.zip"
+        val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
+                val files = File(atomPath).listFiles()
+        try {
+            files?.forEach { file ->
+                if (!file.isDirectory) {
+                    zipOutputStream.putNextEntry(ZipEntry(file.name))
+                    try {
+                        val input = FileInputStream(file)
+                        val byteArray = ByteArray(1024)
+                        var len: Int
+                        len = input.read(byteArray)
+                        println(len)
+                        while (len != -1) {
+                            while (len != -1) {
+                                zipOutputStream.write(byteArray, 0, len)
+                                len = input.read(byteArray)
+                            }
+                        }
+                    } catch (ex: IOException) {
+                        ex.printStackTrace()
+                    }
+                    zipOutputStream.closeEntry()
+                }
+            }
+            return zipPath
+        } finally {
+            files?.clone()
+        }
     }
 
     private fun logoUrlAnalysis(userId: String, logoUrl: String, atomPath: String): Result<String> {
