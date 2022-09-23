@@ -78,7 +78,7 @@ interface ServiceArchiveAtomResource {
         atomCode: String
     ): Result<Boolean>
 
-    @ApiOperation("归档插件包资源")
+/*    @ApiOperation("归档插件包资源")
     @POST
     @Path("/projects/{projectCode}/ids/{atomId}/codes/{atomCode}/versions/{version}/types/{releaseType}/archive")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -109,5 +109,5 @@ interface ServiceArchiveAtomResource {
         @ApiParam("支持的操作系统", required = true)
         @FormDataParam("os")
         os: String
-    ): Result<ArchiveAtomResponse?>
+    ): Result<ArchiveAtomResponse?>*/
 }
