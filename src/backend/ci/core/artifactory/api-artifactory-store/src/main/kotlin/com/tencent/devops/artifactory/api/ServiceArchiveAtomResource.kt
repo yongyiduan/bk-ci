@@ -34,9 +34,7 @@ import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition
-import org.glassfish.jersey.media.multipart.FormDataParam
-import java.io.InputStream
+import java.io.File
 import javax.ws.rs.Consumes
 import javax.ws.rs.DELETE
 import javax.ws.rs.GET
@@ -83,7 +81,7 @@ interface ServiceArchiveAtomResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     fun archiveAtomFile(
         @ApiParam("userId", required = true)
-        @QueryParam(AUTH_HEADER_USER_ID)
+        @QueryParam("userId")
         userId: String,
         @ApiParam("项目编码", required = true)
         @QueryParam("projectCode")
@@ -101,10 +99,7 @@ interface ServiceArchiveAtomResource {
         @QueryParam("releaseType")
         releaseType: ReleaseTypeEnum,
         @ApiParam("文件", required = true)
-        @FormDataParam("file")
-        inputStream: InputStream,
-        @FormDataParam("file")
-        disposition: FormDataContentDisposition,
+        file: File,
         @ApiParam("支持的操作系统", required = true)
         @QueryParam("os")
         os: String
