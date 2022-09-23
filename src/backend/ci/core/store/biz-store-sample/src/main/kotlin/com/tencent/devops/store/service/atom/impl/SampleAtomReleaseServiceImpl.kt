@@ -28,7 +28,6 @@
 package com.tencent.devops.store.service.atom.impl
 
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomResource
-import com.tencent.devops.artifactory.api.UserArchiveAtomResource
 import com.tencent.devops.artifactory.api.service.ServiceFileResource
 import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
 import com.tencent.devops.common.api.constant.BEGIN
@@ -298,7 +297,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     atomId = atomId,
                     atomCode = releaseInfo.atomCode,
                     version = releaseInfo.versionInfo.version,
-                    serviceUrlPrefix = client.getServiceUrl(UserArchiveAtomResource::class),
+                    serviceUrlPrefix = client.getServiceUrl(ServiceArchiveAtomResource::class),
                     releaseType = releaseInfo.versionInfo.releaseType.name,
                     file = zipFile,
                     os = JsonUtil.toJson(releaseInfo.os)
