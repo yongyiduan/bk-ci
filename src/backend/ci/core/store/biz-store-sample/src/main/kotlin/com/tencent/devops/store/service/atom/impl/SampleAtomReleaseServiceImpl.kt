@@ -264,8 +264,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_REPOSITORY_TASK_JSON_FIELD_IS_INVALID
             )
-        } finally {
-            taskJsonFile.delete()
         }
         // 新增插件
         val addMarketAtomResult = addMarketAtom(
