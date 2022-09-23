@@ -52,7 +52,7 @@ class ServiceArchiveAtomResourceImpl @Autowired constructor(
         return Result(true)
     }
 
-    override fun archiveAtomFile(
+/*    override fun archiveAtomFile(
         userId: String,
         projectCode: String,
         atomId: String,
@@ -76,5 +76,5 @@ class ServiceArchiveAtomResourceImpl @Autowired constructor(
                 os = os
             )
         )
-    }
+    }*/
 }
