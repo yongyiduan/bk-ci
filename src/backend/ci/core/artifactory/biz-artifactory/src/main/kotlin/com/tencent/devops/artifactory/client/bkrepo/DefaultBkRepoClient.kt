@@ -357,7 +357,7 @@ class DefaultBkRepoClient constructor(
         metadata.forEach {
             header["$METADATA_PREFIX${it.key}"] = urlEncode(it.value)
         }
-
+        logger.info("BKREPO_uploadLocalFile $userId|$repoName|${file.name}|$url")
         val requestBuilder = Request.Builder()
             .url(url)
             .headers(Headers.of(header))
