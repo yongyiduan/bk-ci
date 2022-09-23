@@ -286,8 +286,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
         // 归档插件包
+        val zipFile = File(zipFiles(userId, atomCode, atomPath))
         try {
-            val zipFile = File(zipFiles(userId, atomCode, atomPath))
             if (zipFile.exists()) {
                 val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
                     userId = userId,
@@ -311,6 +311,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         } catch (e: Exception) {
             logger.error("archiveAtomResult is fail ${e.message}")
         } finally {
+            zipFile.deleteOnExit()
             File(buildAtomArchivePath(userId, atomCode)).deleteOnExit()
         }
         // 解析description
@@ -349,36 +350,33 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
-        val zipPath = "${buildAtomArchivePath(userId, atomCode)}${File.separator}$atomCode.zip"
+        val zipPath =
+            "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}${File.separator}$atomCode.zip"
         val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
                 val files = File(atomPath).listFiles()
-        try {
-            files?.forEach { file ->
-                logger.info("releaseAtom zipFile is ${file.name}")
-                if (!file.isDirectory) {
-                    zipOutputStream.putNextEntry(ZipEntry(file.name))
-                    try {
-                        val input = FileInputStream(file)
-                        val byteArray = ByteArray(1024)
-                        var len: Int
-                        len = input.read(byteArray)
-                        println(len)
+        files?.forEach { file ->
+            logger.info("releaseAtom zipFile is ${file.name}")
+            if (!file.isDirectory) {
+                zipOutputStream.putNextEntry(ZipEntry(file.name))
+                try {
+                    val input = FileInputStream(file)
+                    val byteArray = ByteArray(1024)
+                    var len: Int
+                    len = input.read(byteArray)
+                    println(len)
+                    while (len != -1) {
                         while (len != -1) {
-                            while (len != -1) {
-                                zipOutputStream.write(byteArray, 0, len)
-                                len = input.read(byteArray)
-                            }
+                            zipOutputStream.write(byteArray, 0, len)
+                            len = input.read(byteArray)
                         }
-                    } catch (ex: IOException) {
-                        ex.printStackTrace()
                     }
-                    zipOutputStream.closeEntry()
+                } catch (ex: IOException) {
+                    ex.printStackTrace()
                 }
+                zipOutputStream.closeEntry()
             }
-            return zipPath
-        } finally {
-            files?.clone()
         }
+        return zipPath
     }
 
     private fun logoUrlAnalysis(userId: String, logoUrl: String, atomPath: String): Result<String> {
