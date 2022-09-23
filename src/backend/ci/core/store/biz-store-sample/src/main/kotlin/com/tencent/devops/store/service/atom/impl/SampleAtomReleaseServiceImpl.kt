@@ -310,6 +310,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             }
         } catch (e: Exception) {
             logger.error("archiveAtomResult is fail ${e.message}")
+        } finally {
+            File(buildAtomArchivePath(userId, atomCode)).deleteOnExit()
         }
         // 解析description
         val description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
@@ -347,7 +349,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
-        val zipPath = "${buildAtomArchivePath(userId, atomCode)}.zip"
+        val zipPath = "${buildAtomArchivePath(userId, atomCode)}${File.separator}$atomCode.zip"
         val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
                 val files = File(atomPath).listFiles()
         try {
@@ -526,7 +528,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
 
     companion object {
         private val logger = LoggerFactory.getLogger(SampleAtomReleaseServiceImpl::class.java)
-        private const val BK_CI_ATOM_DIR = "bk-atom"
+        private const val BK_CI_ATOM_DIR = "bk-atom-test"
         private const val BK_CI_PATH_REGEX = "(\\$\\{\\{indexFile\\()\\\"([^\\\"]*)\\\""
     }
 }
