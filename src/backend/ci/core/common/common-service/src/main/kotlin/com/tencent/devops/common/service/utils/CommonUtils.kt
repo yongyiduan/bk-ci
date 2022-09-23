@@ -170,7 +170,7 @@ object CommonUtils {
         os: String
     ): Result<String?> {
         val serviceUrl = "$serviceUrlPrefix/service/artifactories/archiveAtom" +
-                "??userId=$userId&projectCode=$projectCode&atomId=$atomId&atomCode=$atomCode" +
+                "?userId=$userId&projectCode=$projectCode&atomId=$atomId&atomCode=$atomCode" +
                 "&version=$version&releaseType=$releaseType&os=$os"
 
         logger.info("the serviceUrl is:$serviceUrl")

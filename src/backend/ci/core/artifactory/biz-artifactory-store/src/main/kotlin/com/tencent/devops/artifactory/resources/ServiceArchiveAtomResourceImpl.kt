@@ -36,7 +36,6 @@ import com.tencent.devops.common.web.RestResource
 import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.springframework.beans.factory.annotation.Autowired
-import java.io.File
 import java.io.InputStream
 
 @RestResource
@@ -60,13 +59,14 @@ class ServiceArchiveAtomResourceImpl @Autowired constructor(
         atomCode: String,
         version: String,
         releaseType: ReleaseTypeEnum,
-        file: File,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition,
         os: String
     ): Result<ArchiveAtomResponse?> {
         return archiveAtomService.archiveAtom(
             userId = userId,
-            inputStream = file.inputStream(),
-            disposition = FormDataContentDisposition("form-data; name=\"logo\"; filename=\"${file.name}\""),
+            inputStream = inputStream,
+            disposition = disposition,
             atomId = atomId,
             archiveAtomRequest = ArchiveAtomRequest(
                 projectCode = projectCode,
