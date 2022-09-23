@@ -45,10 +45,10 @@ class ArchiveAtomToBkRepoServiceImpl(
         )
         val atomArchivePath = buildAtomArchivePath(projectCode, atomCode, version)
         val frontendDir = buildAtomFrontendPath(atomCode, version)
-        logger.info("atom plugin: $atomArchivePath, $frontendDir")
+        logger.info("atom plugin: $atomArchivePath, $frontendDir ex:${File(atomArchivePath).exists()}")
         File(atomArchivePath).walk().filter { it.path != atomArchivePath }.forEach {
             val path = it.path.removePrefix("${getAtomArchiveBasePath()}/$BK_CI_ATOM_DIR")
-            logger.info("uploadLocalFile fileName=${it.name}|path=$path")
+            logger.debug("uploadLocalFile fileName=${it.name}|path=$path")
             bkRepoClient.uploadLocalFile(
                 userId = BKREPO_DEFAULT_USER,
                 projectId = BKREPO_STORE_PROJECT_ID,
