@@ -28,15 +28,10 @@
 package com.tencent.devops.artifactory.resources
 
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomResource
-import com.tencent.devops.artifactory.pojo.ArchiveAtomRequest
-import com.tencent.devops.artifactory.pojo.ArchiveAtomResponse
 import com.tencent.devops.artifactory.service.ArchiveAtomService
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.web.RestResource
-import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.springframework.beans.factory.annotation.Autowired
-import java.io.InputStream
 
 @RestResource
 class ServiceArchiveAtomResourceImpl @Autowired constructor(
@@ -51,30 +46,4 @@ class ServiceArchiveAtomResourceImpl @Autowired constructor(
         archiveAtomService.deleteAtom(userId, projectCode, atomCode)
         return Result(true)
     }
-
-/*    override fun archiveAtomFile(
-        userId: String,
-        projectCode: String,
-        atomId: String,
-        atomCode: String,
-        version: String,
-        releaseType: ReleaseTypeEnum,
-        inputStream: InputStream,
-        disposition: FormDataContentDisposition,
-        os: String
-    ): Result<ArchiveAtomResponse?> {
-        return archiveAtomService.archiveAtom(
-            userId = userId,
-            inputStream = inputStream,
-            disposition = disposition,
-            atomId = atomId,
-            archiveAtomRequest = ArchiveAtomRequest(
-                projectCode = projectCode,
-                atomCode = atomCode,
-                version = version,
-                releaseType = releaseType,
-                os = os
-            )
-        )
-    }*/
 }
