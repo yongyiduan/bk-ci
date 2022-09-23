@@ -43,6 +43,7 @@ import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
 import javax.ws.rs.POST
 import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
 import javax.ws.rs.core.MediaType
@@ -77,28 +78,28 @@ interface ServiceArchiveAtomResource {
         atomCode: String
     ): Result<Boolean>
 
-    @ApiOperation("归档插件包资源")
+    @ApiOperation("归档插件包")
     @POST
-    @Path("/archiveAtom")
+    @Path("/projects/{projectCode}/ids/{atomId}/codes/{atomCode}/versions/{version}/types/{releaseType}/archive")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    fun archiveAtomFile(
+    fun archiveAtom(
         @ApiParam("userId", required = true)
-        @QueryParam("userId")
+        @HeaderParam(AUTH_HEADER_USER_ID)
         userId: String,
         @ApiParam("项目编码", required = true)
-        @QueryParam("projectCode")
+        @PathParam("projectCode")
         projectCode: String,
         @ApiParam("插件ID", required = true)
-        @QueryParam("atomId")
+        @PathParam("atomId")
         atomId: String,
         @ApiParam("插件代码", required = true)
-        @QueryParam("atomCode")
+        @PathParam("atomCode")
         atomCode: String,
         @ApiParam("插件版本号", required = true)
-        @QueryParam("version")
+        @PathParam("version")
         version: String,
         @ApiParam("发布类型", required = true)
-        @QueryParam("releaseType")
+        @PathParam("releaseType")
         releaseType: ReleaseTypeEnum,
         @ApiParam("文件", required = true)
         @FormDataParam("file")
@@ -106,7 +107,7 @@ interface ServiceArchiveAtomResource {
         @FormDataParam("file")
         disposition: FormDataContentDisposition,
         @ApiParam("支持的操作系统", required = true)
-        @QueryParam("os")
+        @FormDataParam("os")
         os: String
     ): Result<ArchiveAtomResponse?>
 }
