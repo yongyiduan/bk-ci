@@ -58,12 +58,14 @@ object ZipUtil {
         var zipFile: ZipFile? = null
         var inputStream: InputStream? = null
         var fos: OutputStream? = null
+        val fileNames = mutableListOf<String>()
         try {
             zipFile = ZipFile(srcFile, Charset.forName("UTF-8"))
             val entries = zipFile.entries()
             while (entries.hasMoreElements()) {
                 val entry = entries.nextElement() as ZipEntry
                 var entryName = entry.name
+                fileNames.add(entryName)
                 if (null != createRootDirFlag && !createRootDirFlag) {
                     entryName = entryName.substring(entryName.indexOf("/") + 1) // 去掉根目录
                 }
@@ -73,7 +75,7 @@ object ZipUtil {
                 inputStream = pair.second
             }
         } catch (e: IOException) {
-            logger.error("UNZIP file[${srcFile.canonicalPath}] with error: ", e)
+            logger.error("UNZIP file[${srcFile.canonicalPath}] fileNames:$fileNames with error: ", e)
         } finally {
             closeUnzipFileStream(fos, inputStream, zipFile)
         }
