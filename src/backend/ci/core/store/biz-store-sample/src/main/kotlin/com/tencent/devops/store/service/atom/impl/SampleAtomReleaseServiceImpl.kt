@@ -355,9 +355,9 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
 
     private fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
         val zipPath =
-            "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}${File.separator}$atomCode.zip"
+            "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$atomCode.zip"
         val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
-                val files = File(atomPath).listFiles()
+        val files = File(atomPath).listFiles()
         files?.forEach { file ->
             if (!file.isDirectory) {
                 logger.info("releaseAtom zipFile is ${file.name}")
