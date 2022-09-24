@@ -399,7 +399,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     arrayOf("releaseInfo.logoUrl")
                 )
             }
-            val logoFile = File("$atomPath${separator}${relativePath.removePrefix(separator)}")
+            val logoFile = File("$atomPath${separator}file$separator${relativePath.removePrefix(separator)}")
             try {
                 if (logoFile.exists()) {
                     val uploadStoreLogoResult = client.get(OpStoreLogoResource::class).uploadStoreLogo(
@@ -432,7 +432,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         var descriptionText =
             if (description.startsWith("http") && description.endsWith(".md")) {
                 val inputStream = URL(description).openStream()
-                val file = File("$atomPath${separator}description.md")
+                val file = File("$atomPath${separator}file${separator}description.md")
                 FileOutputStream(file).use { outputStream ->
                     var read: Int
                     val bytes = ByteArray(1024)
