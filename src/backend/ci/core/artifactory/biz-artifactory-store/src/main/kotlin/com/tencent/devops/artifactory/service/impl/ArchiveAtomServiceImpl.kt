@@ -257,7 +257,7 @@ abstract class ArchiveAtomServiceImpl : ArchiveAtomService {
         }
         // 解压到指定目录
         val atomArchivePath = buildAtomArchivePath(projectCode, atomCode, version)
-        logger.info("unzipFile atomArchivePath is $atomArchivePath")
+        logger.info("unzipFile atomArchivePath is $atomArchivePath  filePath:${file.path}|${file.exists()}")
         val zipFile = ZipFile(file)
         zipFile.entries().toList().forEach { logger.info("unzipFile atomArchiveFileName is ${it.name}") }
         try {
