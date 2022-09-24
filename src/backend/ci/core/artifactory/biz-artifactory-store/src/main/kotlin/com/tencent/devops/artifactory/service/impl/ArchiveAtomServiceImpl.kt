@@ -58,6 +58,7 @@ import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
 import java.util.concurrent.TimeUnit
+import java.util.zip.ZipFile
 
 @Suppress("ALL")
 abstract class ArchiveAtomServiceImpl : ArchiveAtomService {
@@ -257,6 +258,8 @@ abstract class ArchiveAtomServiceImpl : ArchiveAtomService {
         // 解压到指定目录
         val atomArchivePath = buildAtomArchivePath(projectCode, atomCode, version)
         logger.info("unzipFile atomArchivePath is $atomArchivePath")
+        val zipFile = ZipFile(file)
+        zipFile.entries().toList().forEach { logger.info("unzipFile atomArchiveFileName is ${it.name}") }
         try {
             ZipUtil.unZipFile(file, atomArchivePath, false)
             // 判断解压目录下面是否有自定义UI前端文件
