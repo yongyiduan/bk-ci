@@ -61,6 +61,7 @@ import com.tencent.devops.store.pojo.common.ReleaseProcessItem
 import com.tencent.devops.store.pojo.common.TASK_JSON_NAME
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import com.tencent.devops.store.service.atom.SampleAtomReleaseService
+import java.util.zip.ZipFile
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
@@ -287,6 +288,9 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
         // 归档插件包
         val zipFile = File(zipFiles(userId, atomCode, atomPath))
+        val zipInfo = ZipFile(zipFile)
+        zipInfo.entries().toList().forEach { logger.info("test - zipFile  is ${it.name}") }
+        logger.info("serviceArchiveAtomFile zipFile ${zipFile.exists()}")
         try {
             if (zipFile.exists()) {
                 val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
