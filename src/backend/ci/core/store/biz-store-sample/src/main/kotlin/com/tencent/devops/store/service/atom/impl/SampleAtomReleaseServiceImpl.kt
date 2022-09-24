@@ -288,9 +288,9 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
         // 归档插件包
         val zipFile = File(zipFiles(userId, atomCode, atomPath))
+        logger.info("serviceArchiveAtomFile zipFile exists:${zipFile.exists()} path:${zipFile.path}")
         val zipInfo = ZipFile(zipFile)
         zipInfo.entries().toList().forEach { logger.info("test - zipFile  is ${it.name}") }
-        logger.info("serviceArchiveAtomFile zipFile ${zipFile.exists()}")
         try {
             if (zipFile.exists()) {
                 val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
@@ -377,9 +377,10 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                 }
-                zipOutputStream.closeEntry()
             }
         }
+        zipOutputStream.finish()
+        zipOutputStream.closeEntry()
         return zipPath
     }
 
