@@ -355,8 +355,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
                 val files = File(atomPath).listFiles()
         files?.forEach { file ->
-            logger.info("releaseAtom zipFile is ${file.name}")
             if (!file.isDirectory) {
+                logger.info("releaseAtom zipFile is ${file.name}")
                 zipOutputStream.putNextEntry(ZipEntry(file.name))
                 try {
                     val input = FileInputStream(file)

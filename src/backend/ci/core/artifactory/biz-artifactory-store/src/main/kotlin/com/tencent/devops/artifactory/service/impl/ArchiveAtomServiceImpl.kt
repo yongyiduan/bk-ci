@@ -256,6 +256,7 @@ abstract class ArchiveAtomServiceImpl : ArchiveAtomService {
         }
         // 解压到指定目录
         val atomArchivePath = buildAtomArchivePath(projectCode, atomCode, version)
+        logger.info("unzipFile atomArchivePath is $atomArchivePath")
         try {
             ZipUtil.unZipFile(file, atomArchivePath, false)
             // 判断解压目录下面是否有自定义UI前端文件
