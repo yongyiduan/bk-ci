@@ -289,7 +289,11 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
         // 解析description
-        releaseInfo.description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
+        releaseInfo.description = descriptionAnalysis(
+            description = releaseInfo.description,
+            atomPath = atomPath,
+            userId = userId
+        )
         taskJsonMap["releaseInfo"] = releaseInfo.toJsonString()
         val taskJson = taskJsonMap.toJsonString()
         val fileOutputStream = taskJsonFile.outputStream()
@@ -462,7 +466,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         return regexAnalysis(
             userId = userId,
             input = descriptionText,
-            atomPath
+            atomPath = atomPath
         )
     }
 
@@ -476,7 +480,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         val matcher: Matcher = pattern.matcher(input)
         val pathList = mutableListOf<String>()
         val result = mutableMapOf<String, String>()
-        logger.debug("regexAnalysis descriptionContent:$descriptionContent")
         while (matcher.find()) {
             val path = matcher.group(2).replace("\"", "").removePrefix("$fileSeparator")
             if (path.endsWith(".md")) {
@@ -501,7 +504,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     )
                     if (uploadFileResult.isOk()) {
                         result[it] = uploadFileResult.data!!
-                        logger.debug("regexAnalysis uploadFileResult:${uploadFileResult.data}")
                     } else {
                         logger.error("uploadFileResult is fail, file path:$it")
                     }
