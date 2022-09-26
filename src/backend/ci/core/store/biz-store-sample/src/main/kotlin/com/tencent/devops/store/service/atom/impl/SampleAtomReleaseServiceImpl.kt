@@ -68,6 +68,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.util.FileSystemUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -327,7 +328,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             logger.error("BKSystemErrorMonitor|getQualityJsonContent|$atomCode|error=${ignored.message}", ignored)
         } finally {
             zipFile.delete()
-            File(atomPath).delete()
+            FileSystemUtils.deleteRecursively(File(atomPath).parentFile)
         }
         // 升级插件
         val updateMarketAtomResult = updateMarketAtom(
@@ -412,30 +413,26 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             }
             val logoFile =
                 File("$atomPath${fileSeparator}file$fileSeparator${relativePath.removePrefix(fileSeparator)}")
-            try {
-                if (logoFile.exists()) {
-                    val uploadStoreLogoResult = client.get(OpStoreLogoResource::class).uploadStoreLogo(
-                        userId = userId,
-                        contentLength = logoFile.length(),
-                        inputStream = logoFile.inputStream(),
-                        disposition = FormDataContentDisposition(
-                            "form-data; name=\"logo\"; filename=\"${logoFile.name}\""
-                        )
+            if (logoFile.exists()) {
+                val uploadStoreLogoResult = client.get(OpStoreLogoResource::class).uploadStoreLogo(
+                    userId = userId,
+                    contentLength = logoFile.length(),
+                    inputStream = logoFile.inputStream(),
+                    disposition = FormDataContentDisposition(
+                        "form-data; name=\"logo\"; filename=\"${logoFile.name}\""
                     )
-                    if (uploadStoreLogoResult.isOk()) {
-                        result = uploadStoreLogoResult.data!!.logoUrl!!
-                    } else {
-                        return Result(
-                            data = logoUrl,
-                            status = uploadStoreLogoResult.status,
-                            message = uploadStoreLogoResult.message
-                        )
-                    }
+                )
+                if (uploadStoreLogoResult.isOk()) {
+                    result = uploadStoreLogoResult.data!!.logoUrl!!
                 } else {
-                    logger.error("uploadStoreLogo fail logoName:${logoFile.name}")
+                    return Result(
+                        data = logoUrl,
+                        status = uploadStoreLogoResult.status,
+                        message = uploadStoreLogoResult.message
+                    )
                 }
-            } finally {
-                logoFile.delete()
+            } else {
+                logger.error("uploadStoreLogo fail logoName:${logoFile.name}")
             }
         }
         return Result(data = result)
@@ -507,6 +504,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     } else {
                         logger.error("uploadFileResult is fail, file path:$it")
                     }
+                } else {
+                    logger.error("Resource file does not exist:${file.path}")
                 }
             } finally {
                 file.delete()
@@ -518,7 +517,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             val matcher: Matcher = pattern.matcher(descriptionContent)
             descriptionContent = matcher.replaceFirst("![](${it.value})")
         }
-        logger.debug("regexAnalysis descriptionContent:$descriptionContent")
         return descriptionContent
     }
 
