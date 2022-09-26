@@ -27,6 +27,7 @@
 
 package com.tencent.devops.store.service.atom.impl
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bkrepo.common.api.util.toJsonString
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomFileResource
 import com.tencent.devops.artifactory.api.service.ServiceFileResource
@@ -45,6 +46,7 @@ import com.tencent.devops.common.api.constant.TEST
 import com.tencent.devops.common.api.constant.UNDO
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.api.util.OkhttpUtils
 import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.service.utils.CommonUtils
 import com.tencent.devops.common.service.utils.MessageCodeUtil
@@ -298,7 +300,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         val zipFile = File(zipFiles(userId, atomCode, atomPath))
         try {
             if (zipFile.exists()) {
-                val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
+                val archiveAtomResult = serviceArchiveAtomFile(
                     userId = userId,
                     projectCode = releaseInfo.projectId,
                     atomId = atomId,
@@ -317,8 +319,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     )
                 }
             }
-        } catch (e: Exception) {
-            logger.error("archiveAtomResult is fail ${e.message}")
+        } catch (ignored: Throwable) {
+            logger.error("BKSystemErrorMonitor|getQualityJsonContent|$atomCode|error=${ignored.message}", ignored)
         } finally {
             zipFile.delete()
             File(atomPath).delete()
@@ -356,6 +358,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         return passTest(userId, atomId)
     }
 
+    // 生成压缩文件
     private fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
         val zipPath =
             "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$userId${File.separator}$atomCode" +
@@ -364,7 +367,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         val files = File(atomPath).listFiles()
         files?.forEach { file ->
             if (!file.isDirectory) {
-                logger.info("releaseAtom zipFile is ${file.name}")
                 zipOutputStream.putNextEntry(ZipEntry(file.name))
                 try {
                     val input = FileInputStream(file)
@@ -439,6 +441,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         val separator = File.separator
         var descriptionText =
             if (description.startsWith("http") && description.endsWith(".md")) {
+                // 读取远程文件
                 val inputStream = URL(description).openStream()
                 val file = File("$atomPath${separator}file${separator}description.md")
                 FileOutputStream(file).use { outputStream ->
@@ -452,26 +455,19 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             } else {
                 description
             }
-        val analysisResult = regexAnalysis(
+        return regexAnalysis(
             userId = userId,
             input = descriptionText,
             atomPath
         )
-        analysisResult.forEach {
-            val pattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"$it\"\\)}})")
-            val matcher: Matcher = pattern.matcher(descriptionText)
-            if (matcher.find()) {
-                descriptionText = matcher.replaceFirst("![](${it.value})")
-            }
-        }
-        return descriptionText
     }
 
     private fun getAtomBasePath(): String {
         return System.getProperty("java.io.tmpdir").removeSuffix(File.separator)
     }
 
-    private fun regexAnalysis(userId: String, input: String, atomPath: String): Map<String, String> {
+    private fun regexAnalysis(userId: String, input: String, atomPath: String): String {
+        var descriptionContent = input
         val separator = File.separator
         val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
         val matcher: Matcher = pattern.matcher(input)
@@ -509,7 +505,13 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 file.delete()
             }
         }
-        return result
+        // 替换资源路径
+        result.forEach {
+            val pattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"$it\"\\)}})")
+            val matcher: Matcher = pattern.matcher(descriptionContent)
+            descriptionContent = matcher.replaceFirst("![](${it.value})")
+        }
+        return descriptionContent
     }
 
     private fun buildAtomArchivePath(userId: String, atomCode: String) =
@@ -540,6 +542,31 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         logger.info("releaseAtom unzipFile atomPath:$atomPath exists:${File(atomPath).exists()}")
         return atomPath
+    }
+
+    private fun serviceArchiveAtomFile(
+        userId: String,
+        projectCode: String,
+        atomId: String,
+        atomCode: String,
+        serviceUrlPrefix: String,
+        releaseType: String,
+        version: String,
+        file: File,
+        os: String
+    ): Result<String?> {
+        val serviceUrl = "$serviceUrlPrefix/service/artifactories/archiveAtom" +
+                "?userId=$userId&projectCode=$projectCode&atomId=$atomId&atomCode=$atomCode" +
+                "&version=$version&releaseType=$releaseType&os=$os"
+
+        OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
+            val responseContent = response.body()!!.string()
+            logger.error("uploadFile responseContent is: $responseContent")
+            if (!response.isSuccessful) {
+                return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.SYSTEM_ERROR)
+            }
+            return JsonUtil.to(responseContent, object : TypeReference<Result<String?>>() {})
+        }
     }
 
     companion object {
