@@ -387,11 +387,13 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     private fun logoUrlAnalysis(userId: String, logoUrl: String, atomPath: String): Result<String> {
         val separator = File.separator
         var result = logoUrl
+        // 远程资源不做处理
         if (!logoUrl.startsWith("http")) {
+            // 正则解析
             val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
             val matcher: Matcher = pattern.matcher(logoUrl)
             val relativePath = if (matcher.find()) {
-                matcher.group(2)
+                matcher.group(2).replace("\"", "")
             } else null
             if (relativePath.isNullOrBlank()) {
                 return MessageCodeUtil.generateResponseDataObject(
@@ -419,6 +421,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                             message = uploadStoreLogoResult.message
                         )
                     }
+                } else {
+                    logger.error("uploadStoreLogo fail logoName:${logoFile.name}")
                 }
             } finally {
                 logoFile.delete()
@@ -450,7 +454,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             atomPath
         )
         analysisResult.forEach {
-            val pattern: Pattern = Pattern.compile("(\\$\\{\\{indexFile\\()\\\"${it.key}\\\"\\)}}")
+            val pattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"$it\"\\)}})")
             val matcher: Matcher = pattern.matcher(descriptionText)
             if (matcher.find()) {
                 descriptionText = matcher.replaceFirst("![](${it.value})")
@@ -470,18 +474,18 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         val pathList = mutableListOf<String>()
         val result = mutableMapOf<String, String>()
         while (matcher.find()) {
-            val path = matcher.group(2).removePrefix("$separator")
+            val path = matcher.group(2).replace("\"", "").removePrefix("$separator")
             if (path.endsWith(".md")) {
                 val file = File("$atomPath${separator}file${separator}$path")
                 if (file.exists()) {
                     return regexAnalysis(userId, file.readText(), atomPath)
                 }
             }
-            pathList.add(matcher.group(2).removePrefix(separator))
+            pathList.add(path)
         }
+        val serviceUrlPrefix = client.getServiceUrl(ServiceFileResource::class)
         pathList.forEach {
             val file = File("$atomPath${separator}file${separator}$it")
-            val serviceUrlPrefix = client.getServiceUrl(ServiceFileResource::class)
             try {
                 if (file.exists()) {
                     val uploadFileResult = CommonUtils.serviceUploadFile(
@@ -536,6 +540,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     companion object {
         private val logger = LoggerFactory.getLogger(SampleAtomReleaseServiceImpl::class.java)
         private const val BK_CI_ATOM_DIR = "bk-atom-test"
-        private const val BK_CI_PATH_REGEX = "(\\$\\{\\{indexFile\\()\\\"([^\\\"]*)\\\""
+        private const val BK_CI_PATH_REGEX = "(\\\$\\{\\{indexFile\\()(\"[^\"]*\")"
     }
 }
