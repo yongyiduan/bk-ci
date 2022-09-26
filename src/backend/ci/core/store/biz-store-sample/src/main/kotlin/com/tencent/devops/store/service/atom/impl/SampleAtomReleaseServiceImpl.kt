@@ -248,7 +248,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             inputStream = inputStream,
             disposition = disposition
         )
-        val taskJsonFile = File("$atomPath${File.separator}$TASK_JSON_NAME")
+        val taskJsonFile = File("$atomPath$fileSeparator$TASK_JSON_NAME")
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
                 StoreMessageCode.USER_ATOM_CONF_INVALID,
@@ -293,8 +293,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         taskJsonMap["releaseInfo"] = releaseInfo.toJsonString()
         val taskJson = taskJsonMap.toJsonString()
         val fileOutputStream = taskJsonFile.outputStream()
-        fileOutputStream.use { fileOutputStream ->
-            fileOutputStream.write(taskJson.toByteArray(charset("utf-8")))
+        fileOutputStream.use {
+            it.write(taskJson.toByteArray(charset("utf-8")))
         }
         // 归档插件包
         val zipFile = File(zipFiles(userId, atomCode, atomPath))
@@ -361,8 +361,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     // 生成压缩文件
     private fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
         val zipPath =
-            "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$userId${File.separator}$atomCode" +
-                    "${File.separator}$atomCode.zip"
+            "${getAtomBasePath()}$fileSeparator$BK_CI_ATOM_DIR$fileSeparator$userId$fileSeparator$atomCode" +
+                    "$fileSeparator$atomCode.zip"
         val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
         val files = File(atomPath).listFiles()
         files?.forEach { file ->
@@ -391,7 +391,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun logoUrlAnalysis(userId: String, logoUrl: String, atomPath: String): Result<String> {
-        val separator = File.separator
         var result = logoUrl
         // 远程资源不做处理
         if (!logoUrl.startsWith("http")) {
@@ -407,7 +406,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     arrayOf("releaseInfo.logoUrl")
                 )
             }
-            val logoFile = File("$atomPath${separator}file$separator${relativePath.removePrefix(separator)}")
+            val logoFile =
+                File("$atomPath${fileSeparator}file$fileSeparator${relativePath.removePrefix(fileSeparator)}")
             try {
                 if (logoFile.exists()) {
                     val uploadStoreLogoResult = client.get(OpStoreLogoResource::class).uploadStoreLogo(
@@ -438,20 +438,24 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun descriptionAnalysis(userId: String, description: String, atomPath: String): String {
-        val separator = File.separator
-        var descriptionText =
+        val descriptionText =
             if (description.startsWith("http") && description.endsWith(".md")) {
                 // 读取远程文件
                 val inputStream = URL(description).openStream()
-                val file = File("$atomPath${separator}file${separator}description.md")
-                FileOutputStream(file).use { outputStream ->
-                    var read: Int
-                    val bytes = ByteArray(1024)
-                    while (inputStream.read(bytes).also { read = it } != -1) {
-                        outputStream.write(bytes, 0, read)
+                val file = File("$atomPath${fileSeparator}file${fileSeparator}description.md")
+                try {
+                    FileOutputStream(file).use { outputStream ->
+                        var read: Int
+                        val bytes = ByteArray(1024)
+                        while (inputStream.read(bytes).also { read = it } != -1) {
+                            outputStream.write(bytes, 0, read)
+                        }
                     }
+                    file.readText()
+                } finally {
+                    inputStream.close()
+                    file.delete()
                 }
-                file.readText()
             } else {
                 description
             }
@@ -463,20 +467,20 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun getAtomBasePath(): String {
-        return System.getProperty("java.io.tmpdir").removeSuffix(File.separator)
+        return System.getProperty("java.io.tmpdir").removeSuffix(fileSeparator)
     }
 
     private fun regexAnalysis(userId: String, input: String, atomPath: String): String {
         var descriptionContent = input
-        val separator = File.separator
         val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
         val matcher: Matcher = pattern.matcher(input)
         val pathList = mutableListOf<String>()
         val result = mutableMapOf<String, String>()
+        logger.debug("regexAnalysis descriptionContent:$descriptionContent")
         while (matcher.find()) {
-            val path = matcher.group(2).replace("\"", "").removePrefix("$separator")
+            val path = matcher.group(2).replace("\"", "").removePrefix("$fileSeparator")
             if (path.endsWith(".md")) {
-                val file = File("$atomPath${separator}file${separator}$path")
+                val file = File("$atomPath${fileSeparator}file${fileSeparator}$path")
                 if (file.exists()) {
                     return regexAnalysis(userId, file.readText(), atomPath)
                 }
@@ -485,7 +489,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         val serviceUrlPrefix = client.getServiceUrl(ServiceFileResource::class)
         pathList.forEach {
-            val file = File("$atomPath${separator}file${separator}$it")
+            val file = File("$atomPath${fileSeparator}file${fileSeparator}$it")
             try {
                 if (file.exists()) {
                     val uploadFileResult = CommonUtils.serviceUploadFile(
@@ -497,6 +501,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     )
                     if (uploadFileResult.isOk()) {
                         result[it] = uploadFileResult.data!!
+                        logger.debug("regexAnalysis uploadFileResult:${uploadFileResult.data}")
                     } else {
                         logger.error("uploadFileResult is fail, file path:$it")
                     }
@@ -511,12 +516,13 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             val matcher: Matcher = pattern.matcher(descriptionContent)
             descriptionContent = matcher.replaceFirst("![](${it.value})")
         }
+        logger.debug("regexAnalysis descriptionContent:$descriptionContent")
         return descriptionContent
     }
 
     private fun buildAtomArchivePath(userId: String, atomCode: String) =
-        "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$userId${File.separator}$atomCode" +
-                "${File.separator}${UUIDUtil.generate()}"
+        "${getAtomBasePath()}$fileSeparator$BK_CI_ATOM_DIR$fileSeparator$userId$fileSeparator$atomCode" +
+                "$fileSeparator${UUIDUtil.generate()}"
 
     private fun unzipFile(
         disposition: FormDataContentDisposition,
@@ -573,5 +579,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         private val logger = LoggerFactory.getLogger(SampleAtomReleaseServiceImpl::class.java)
         private const val BK_CI_ATOM_DIR = "bk-atom-test"
         private const val BK_CI_PATH_REGEX = "(\\\$\\{\\{indexFile\\()(\"[^\"]*\")"
+        protected val fileSeparator: String = System.getProperty("file.separator")
     }
 }
