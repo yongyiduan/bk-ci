@@ -45,5 +45,5 @@ data class ReleaseInfo(
     val summary: String,
     @ApiModelProperty("插件描述", required = true)
     @field:BkField(maxLength = 1024)
-    val description: String
+    var description: String
 )

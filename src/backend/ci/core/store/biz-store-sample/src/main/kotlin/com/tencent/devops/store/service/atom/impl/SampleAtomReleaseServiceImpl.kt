@@ -27,6 +27,7 @@
 
 package com.tencent.devops.store.service.atom.impl
 
+import com.tencent.bkrepo.common.api.util.toJsonString
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomFileResource
 import com.tencent.devops.artifactory.api.service.ServiceFileResource
 import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
@@ -61,7 +62,6 @@ import com.tencent.devops.store.pojo.common.ReleaseProcessItem
 import com.tencent.devops.store.pojo.common.TASK_JSON_NAME
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import com.tencent.devops.store.service.atom.SampleAtomReleaseService
-import java.util.zip.ZipFile
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
@@ -286,11 +286,16 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             return Result(data = false, message = logoUrlAnalysisResult.message)
         }
         releaseInfo.logoUrl = logoUrlAnalysisResult.data!!
+        // 解析description
+        releaseInfo.description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
+        taskJsonMap["releaseInfo"] = releaseInfo.toJsonString()
+        val taskJson = taskJsonMap.toJsonString()
+        val fileOutputStream = taskJsonFile.outputStream()
+        fileOutputStream.use { fileOutputStream ->
+            fileOutputStream.write(taskJson.toByteArray(charset("utf-8")))
+        }
         // 归档插件包
         val zipFile = File(zipFiles(userId, atomCode, atomPath))
-        logger.info("serviceArchiveAtomFile zipFile exists:${zipFile.exists()} path:${zipFile.path}")
-        val zipInfo = ZipFile(zipFile)
-        zipInfo.entries().toList().forEach { logger.info("test - zipFile  is ${it.name}") }
         try {
             if (zipFile.exists()) {
                 val archiveAtomResult = CommonUtils.serviceArchiveAtomFile(
@@ -315,11 +320,9 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         } catch (e: Exception) {
             logger.error("archiveAtomResult is fail ${e.message}")
         } finally {
-            zipFile.deleteOnExit()
-            File(buildAtomArchivePath(userId, atomCode)).deleteOnExit()
+            zipFile.delete()
+            File(atomPath).delete()
         }
-        // 解析description
-        val description = descriptionAnalysis(releaseInfo.description, atomCode, atomPath)
         // 升级插件
         val updateMarketAtomResult = updateMarketAtom(
             userId,
@@ -331,7 +334,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 jobType = releaseInfo.jobType,
                 os = releaseInfo.os,
                 summary = releaseInfo.summary,
-                description = description,
+                description = releaseInfo.description,
                 version = releaseInfo.versionInfo.version,
                 releaseType = releaseInfo.versionInfo.releaseType,
                 versionContent = releaseInfo.versionInfo.versionContent,
@@ -355,7 +358,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
 
     private fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
         val zipPath =
-            "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$atomCode.zip"
+            "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$userId${File.separator}$atomCode" +
+                    "${File.separator}$atomCode.zip"
         val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
         val files = File(atomPath).listFiles()
         files?.forEach { file ->
@@ -428,7 +432,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 logoFile.delete()
             }
         }
-        return Result(result)
+        return Result(data = result)
     }
 
     private fun descriptionAnalysis(userId: String, description: String, atomPath: String): String {
@@ -509,7 +513,8 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
     }
 
     private fun buildAtomArchivePath(userId: String, atomCode: String) =
-        "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$userId${File.separator}$atomCode"
+        "${getAtomBasePath()}${File.separator}$BK_CI_ATOM_DIR${File.separator}$userId${File.separator}$atomCode" +
+                "${File.separator}${UUIDUtil.generate()}"
 
     private fun unzipFile(
         disposition: FormDataContentDisposition,

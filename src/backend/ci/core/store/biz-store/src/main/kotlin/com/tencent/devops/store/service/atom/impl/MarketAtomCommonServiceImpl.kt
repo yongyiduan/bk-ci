@@ -338,7 +338,7 @@ class MarketAtomCommonServiceImpl : MarketAtomCommonService {
             logger.debug("parseBaseTaskJson fail $e | $taskJsonStr")
             throw ErrorCodeException(
                 errorCode = StoreMessageCode.USER_ATOM_CONF_INVALID,
-                params = arrayOf("$TASK_JSON_NAME is parseBaseTaskJson")
+                params = arrayOf("$TASK_JSON_NAME")
             )
         }
         val taskAtomCode = taskDataMap[KEY_ATOM_CODE] as? String
