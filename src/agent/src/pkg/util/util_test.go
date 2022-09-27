@@ -25,40 +25,73 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.plugin.worker.task.scm
+package util
 
-import com.tencent.devops.common.api.enums.RepositoryConfig
-import com.tencent.devops.common.pipeline.enums.CodePullStrategy
-import com.tencent.devops.plugin.worker.task.scm.util.RepositoryUtils
-import com.tencent.devops.worker.common.utils.CredentialUtils
-import java.io.File
+import (
+	"reflect"
+	"testing"
+)
 
-interface IPullCodeSetting {
-    val pipelineId: String
-    val buildId: String
-    val repositoryConfig: RepositoryConfig
-    val branchName: String?
-    val revision: String?
-    val strategy: CodePullStrategy?
-    val workspace: File
-    val path: String?
-    val enableSubmodule: Boolean
-    val taskParams: Map<String, String>
+func TestSplitAndTrimSpace(t *testing.T) {
+	type args struct {
+		s   string
+		sep string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "测试分隔字符串并去除空格",
+			args: args{
+				s:   "aaa,bbb , ccc, ddd ",
+				sep: ",",
+			},
+			want: []string{"aaa", "bbb", "ccc", "ddd"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SplitAndTrimSpace(tt.args.s, tt.args.sep); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SplitAndTrimSpace() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
-    fun pullCode(): Map<String, String>?
-
-    fun getRepository() = RepositoryUtils.getRepository(repositoryConfig)
-
-    fun getCredential(id: String) =
-        CredentialUtils.getCredential(credentialId = id)
-
-    fun getCredentialWithType(id: String) =
-        CredentialUtils.getCredentialWithType(id)
-
-    fun getCodeSourceDir(path: String?): File {
-        if (path.isNullOrBlank()) return workspace
-        return File(workspace, path)
-    }
-
-    fun getRemoteBranch(): String
+func TestContains(t *testing.T) {
+	type args struct {
+		s    []string
+		subs string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "测试寻找列表中字符串",
+			args: args{
+				s:    []string{"aaa", "bbb", "ccc"},
+				subs: "aaa",
+			},
+			want: true,
+		},
+		{
+			name: "测试寻找列表中字符串-未找到",
+			args: args{
+				s:    []string{"aaa", "bbb", "ccc"},
+				subs: " aaa",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Contains(tt.args.s, tt.args.subs); got != tt.want {
+				t.Errorf("Contains() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
