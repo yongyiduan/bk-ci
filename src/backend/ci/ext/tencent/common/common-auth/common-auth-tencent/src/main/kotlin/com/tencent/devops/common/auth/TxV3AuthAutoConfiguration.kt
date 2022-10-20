@@ -96,7 +96,7 @@ class TxV3AuthAutoConfiguration {
 
     @Bean
     @Primary
-    fun bsAuthResourceApi(
+    fun authResourceApi(
         bkAuthProperties: BkAuthProperties,
         objectMapper: ObjectMapper,
         bsAuthTokenApi: BSAuthTokenApi
