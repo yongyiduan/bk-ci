@@ -34,7 +34,7 @@ abstract class ExtServiceNotifyService {
 
     /**
      * 发送微扩展发布审核结果通知消息
-     * @param serviceId 插件ID
+     * @param serviceId 微扩展ID
      * @param sendAllAdminFlag 是否发送给所有管理员
      * @param templateCode 通知模板代码
      */

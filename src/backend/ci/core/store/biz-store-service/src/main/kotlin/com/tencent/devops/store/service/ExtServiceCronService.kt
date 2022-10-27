@@ -197,8 +197,8 @@ class ExtServiceCronService @Autowired constructor(
                 }
                 serviceFeatureRecords.forEach {
                     val serviceCode = it.serviceCode
-                    // 停止bcs灰度命名空间的应用
-                    val bcsStopAppResult = extServiceKubernetesService.stopExtService(
+                    // 停止kubernetes灰度命名空间的应用
+                    val kubernetesStopAppResult = extServiceKubernetesService.stopExtService(
                         userId = it.modifier,
                         serviceCode = serviceCode,
                         deploymentName = serviceCode,
@@ -206,8 +206,8 @@ class ExtServiceCronService @Autowired constructor(
                         checkPermissionFlag = false,
                         grayFlag = true
                     )
-                    logger.info("service[$serviceCode] bcsStopAppResult is :$bcsStopAppResult")
-                    if (bcsStopAppResult.isOk()) {
+                    logger.info("service[$serviceCode] kubernetesStopAppResult is :$kubernetesStopAppResult")
+                    if (kubernetesStopAppResult.isOk()) {
                         // 灰度环境应用停止部署成功，则把灰度环境停止部署标志更新为null
                         it.killGrayAppFlag = null
                         it.killGrayAppMarkTime = null

@@ -1,6 +1,5 @@
 package com.tencent.devops.artifactory.service.impl
 
-import com.tencent.devops.artifactory.client.bkrepo.DefaultBkRepoClient
 import com.tencent.devops.artifactory.constant.BK_CI_SERVICE_DIR
 import com.tencent.devops.artifactory.constant.REALM_BK_REPO
 import com.tencent.devops.artifactory.util.BkRepoUtils.BKREPO_DEFAULT_USER
@@ -9,6 +8,7 @@ import com.tencent.devops.artifactory.util.BkRepoUtils.REPO_NAME_PLUGIN
 import com.tencent.devops.artifactory.util.BkRepoUtils.REPO_NAME_SERVICE
 import com.tencent.devops.artifactory.util.DefaultPathUtils
 import com.tencent.devops.common.api.exception.RemoteServiceException
+import com.tencent.devops.common.archive.client.BkRepoClient
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -20,7 +20,7 @@ import javax.ws.rs.NotFoundException
 @Service
 @ConditionalOnProperty(prefix = "artifactory", name = ["realm"], havingValue = REALM_BK_REPO)
 class ArchiveServiceToBkRepoServiceImpl(
-    private val bkRepoClient: DefaultBkRepoClient
+    private val bkRepoClient: BkRepoClient
 ) : ArchiveServicePkgServiceImpl() {
 
     override fun getServiceArchiveBasePath(): String {

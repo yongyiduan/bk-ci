@@ -450,16 +450,16 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
         if (!storeMemberDao.isStoreAdmin(dslContext, userId, serviceCode, StoreTypeEnum.SERVICE.type.toByte())) {
             return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.PERMISSION_DENIED)
         }
-        // 停止bcs灰度命名空间和正式命名空间的应用
-        val bcsStopAppResult = extServiceKubernetesService.stopExtService(
+        // 停止kubernetes灰度命名空间和正式命名空间的应用
+        val kubernetesStopAppResult = extServiceKubernetesService.stopExtService(
             userId = userId,
             serviceCode = serviceCode,
             deploymentName = serviceCode,
             serviceName = "$serviceCode-service"
         )
-        logger.info("the bcsStopAppResult is :$bcsStopAppResult")
-        if (bcsStopAppResult.isNotOk()) {
-            return bcsStopAppResult
+        logger.info("kubernetesStopAppResult is :$kubernetesStopAppResult")
+        if (kubernetesStopAppResult.isNotOk()) {
+            return kubernetesStopAppResult
         }
         // 设置微扩展状态为下架中
         extServiceDao.setServiceStatusByCode(
@@ -502,7 +502,7 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
         }
         // 如果该版本的状态已处于测试中及其后面的状态，取消发布则需要停掉灰度命名空间的应用
         val serviceCode = serviceRecord.serviceCode
-        val bcsStopAppResult = extServiceKubernetesService.stopExtService(
+        val kubernetesStopAppResult = extServiceKubernetesService.stopExtService(
             userId = userId,
             serviceCode = serviceCode,
             deploymentName = serviceCode,
@@ -510,9 +510,9 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
             checkPermissionFlag = true,
             grayFlag = true
         )
-        logger.info("$serviceCode bcsStopAppResult is :$bcsStopAppResult")
-        if (bcsStopAppResult.isNotOk()) {
-            return bcsStopAppResult
+        logger.info("$serviceCode kubernetesStopAppResult is :$kubernetesStopAppResult")
+        if (kubernetesStopAppResult.isNotOk()) {
+            return kubernetesStopAppResult
         }
         dslContext.transaction { t ->
             val context = DSL.using(t)

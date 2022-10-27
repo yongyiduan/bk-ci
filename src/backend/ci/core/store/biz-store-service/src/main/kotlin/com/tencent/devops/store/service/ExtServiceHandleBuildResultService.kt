@@ -67,7 +67,7 @@ class ExtServiceHandleBuildResultService @Autowired constructor(
             if (serviceRecord.serviceStatus == ExtServiceStatusEnum.GROUNDING_SUSPENSION.status.toByte()) {
                 // 停止bcs灰度命名空间的应用
                 val serviceCode = serviceRecord.serviceCode
-                val bcsStopAppResult = extServiceKubernetesService.stopExtService(
+                val kubernetesStopAppResult = extServiceKubernetesService.stopExtService(
                     userId = serviceRecord.modifier,
                     serviceCode = serviceCode,
                     deploymentName = serviceCode,
@@ -75,9 +75,9 @@ class ExtServiceHandleBuildResultService @Autowired constructor(
                     checkPermissionFlag = false,
                     grayFlag = true
                 )
-                logger.info("service[$serviceCode] bcsStopAppResult is :$bcsStopAppResult")
-                if (bcsStopAppResult.isNotOk()) {
-                    return bcsStopAppResult
+                logger.info("service[$serviceCode] kubernetesStopAppResult is :$kubernetesStopAppResult")
+                if (kubernetesStopAppResult.isNotOk()) {
+                    return kubernetesStopAppResult
                 }
                 extServiceFeatureDao.updateExtServiceFeatureBaseInfo(
                     dslContext = dslContext,
