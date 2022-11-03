@@ -174,7 +174,7 @@ object AtomReleaseTxtAnalysisUtil {
         }
         // 替换资源路径
         result.forEach {
-            val analysisPattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"$it\"\\)}})")
+            val analysisPattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"${it.key}\"\\)}})")
             val analysisMatcher: Matcher = analysisPattern.matcher(content)
             content = analysisMatcher.replaceFirst(
                 "![](${it.value.replace(fileSeparator, "\\$fileSeparator")})"
