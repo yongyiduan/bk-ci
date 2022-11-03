@@ -110,7 +110,6 @@ object AtomReleaseTxtAnalysisUtil {
         atomPath: String,
         client: Client
     ): String {
-        var descriptionContent = input
         val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
         val matcher: Matcher = pattern.matcher(input)
         val pathList = mutableListOf<String>()
@@ -136,7 +135,7 @@ object AtomReleaseTxtAnalysisUtil {
             atomPath = atomPath,
             userId = userId,
             result = result,
-            descriptionContent = descriptionContent
+            descriptionContent = input
         )
     }
 
@@ -158,7 +157,7 @@ object AtomReleaseTxtAnalysisUtil {
                         userId = userId,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
-                        fileChannelType = FileTypeEnum.BK_CUSTOM.name,
+                        fileChannelType = FileChannelTypeEnum.WEB_SHOW.name,
                         logo = true
                     )
                     if (uploadFileResult.isOk()) {
@@ -208,6 +207,7 @@ object AtomReleaseTxtAnalysisUtil {
             }
             val logoFile =
                 File("$atomPath${fileSeparator}file$fileSeparator${relativePath?.removePrefix(fileSeparator)}")
+            logger.warn("uploadStoreLogo logoFilePath:${logoFile.path}")
             if (logoFile.exists()) {
                 val uploadStoreLogoResult = client.get(OpStoreLogoResource::class).uploadStoreLogo(
                     userId = userId,
