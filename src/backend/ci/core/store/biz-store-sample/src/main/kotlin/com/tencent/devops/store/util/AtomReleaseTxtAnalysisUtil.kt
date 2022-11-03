@@ -158,7 +158,7 @@ object AtomReleaseTxtAnalysisUtil {
                         userId = userId,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
-                        fileChannelType = FileTypeEnum.BK_PLUGIN_FE.name,
+                        fileChannelType = FileTypeEnum.BK_CUSTOM.name,
                         logo = false
                     )
                     if (uploadFileResult.isOk()) {
