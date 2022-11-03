@@ -42,6 +42,7 @@ import com.tencent.devops.store.constant.StoreMessageCode
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import com.tencent.devops.artifactory.api.service.ServiceFileResource
 import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
+import com.tencent.devops.artifactory.pojo.enums.FileTypeEnum
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
@@ -157,7 +158,7 @@ object AtomReleaseTxtAnalysisUtil {
                         userId = userId,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
-                        fileChannelType = FileChannelTypeEnum.WEB_SHOW.name,
+                        fileChannelType = FileTypeEnum.BK_PLUGIN_FE.name,
                         logo = false
                     )
                     if (uploadFileResult.isOk()) {
