@@ -28,6 +28,7 @@
 package com.tencent.devops.store.util
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.tencent.devops.artifactory.api.service.ServiceBkRepoResource
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.JsonUtil
@@ -148,20 +149,18 @@ object AtomReleaseTxtAnalysisUtil {
         descriptionContent: String
     ): String {
         var content = descriptionContent
-        val serviceUrlPrefix = client.getServiceUrl(ServiceFileResource::class)
+        client.getServiceUrl(ServiceFileResource::class)
         pathList.forEach {
             val file = File("$atomPath${fileSeparator}file${fileSeparator}$it")
             try {
                 if (file.exists()) {
-                    val uploadFileResult = CommonUtils.serviceUploadFile(
-                        userId = userId,
-                        serviceUrlPrefix = serviceUrlPrefix,
+                    val uploadFileResult = uploadFile(
+                        client = client,
                         file = file,
-                        fileChannelType = FileChannelTypeEnum.WEB_SHOW.name,
-                        logo = true
+                        userId = userId
                     )
-                    if (uploadFileResult.isOk()) {
-                        result[it] = uploadFileResult.data!!
+                    if (!uploadFileResult.isNullOrBlank()) {
+                        result[it] = uploadFileResult
                     } else {
                         logger.error("upload file result is fail, file path:$it")
                     }
@@ -181,6 +180,36 @@ object AtomReleaseTxtAnalysisUtil {
             )
         }
         return content
+    }
+
+    private fun getFileType(fileUrl: String): String {
+        val paramIndex = fileUrl.lastIndexOf("?")
+        val url = if (paramIndex > 0) fileUrl.substring(0, paramIndex) else fileUrl
+        val index = url.lastIndexOf(".")
+        return url.substring(index + 1).toLowerCase()
+    }
+
+    private fun uploadFile(client: Client, file: File, userId: String): String? {
+        val fileName = file.name
+        val fileType = getFileType(file.path)
+        try {
+            val serviceUrlPrefix = client.getServiceUrl(ServiceBkRepoResource::class)
+            val destPath = "file/$fileType/$fileName"
+            val serviceUrl =
+                "$serviceUrlPrefix/service/bkrepo/statics/file/upload?userId=$userId&destPath=$destPath"
+            OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
+                val responseContent = response.body()!!.string()
+                if (!response.isSuccessful) {
+                    logger.warn("$userId upload file:$fileName fail,responseContent:$responseContent")
+                }
+                val result = JsonUtil.to(responseContent, object : TypeReference<Result<String?>>() {})
+                logger.info("requestUrl:$serviceUrl,result:$result")
+                return result.data
+            }
+        } catch (ignore: Throwable) {
+            logger.warn("$userId upload file:$fileName fail, error is:", ignore)
+        }
+        return null
     }
 
     fun logoUrlAnalysis(
