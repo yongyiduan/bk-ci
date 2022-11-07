@@ -58,6 +58,7 @@ import java.util.zip.ZipOutputStream
 object AtomReleaseTxtAnalysisUtil {
 
     private const val BK_CI_ATOM_DIR = "bk-atom-test"
+    private const val BKREPO_DEFAULT_USER = "admin"
     private const val BKREPO_STORE_PROJECT_ID = "bk-store"
     private const val BK_CI_PATH_REGEX = "(\\\$\\{\\{indexFile\\()(\"[^\"]*\")"
     private val fileSeparator: String = System.getProperty("file.separator")
@@ -154,7 +155,7 @@ object AtomReleaseTxtAnalysisUtil {
             try {
                 if (file.exists()) {
                     val uploadFileResult = CommonUtils.serviceUploadFileToPath(
-                        userId = userId,
+                        userId = BKREPO_DEFAULT_USER,
                         projectId = BKREPO_STORE_PROJECT_ID,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
