@@ -136,6 +136,7 @@ object CommonUtils {
 
     fun serviceUploadFile(
         userId: String,
+        projectCode: String? = null,
         serviceUrlPrefix: String,
         file: File,
         fileChannelType: String,
@@ -143,8 +144,9 @@ object CommonUtils {
         logo: Boolean = false
     ): Result<String?> {
         val fileTypeParameter = if (fileType.isNullOrBlank()) "" else "&fileType=$fileType"
+        val projectCodeParameter = if (projectCode.isNullOrBlank()) "" else "&projectCode=$projectCode"
         val serviceUrl = "$serviceUrlPrefix/service/artifactories/file/upload" +
-                "?userId=$userId&fileChannelType=$fileChannelType$fileTypeParameter&logo=$logo"
+                "?userId=$userId&fileChannelType=$fileChannelType$projectCodeParameter$fileTypeParameter&logo=$logo"
         logger.info("the serviceUrl is:$serviceUrl")
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
             val responseContent = response.body()!!.string()
