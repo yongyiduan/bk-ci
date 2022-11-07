@@ -99,6 +99,7 @@ class BkRepoArchiveFileServiceImpl @Autowired constructor(
         fileChannelType: FileChannelTypeEnum,
         logo: Boolean?
     ): String {
+        val destPath = filePath ?: DefaultPathUtils.randomFileName()
         val metadata = mutableMapOf<String, String>()
         metadata["shaContent"] = file.inputStream().use { ShaUtils.sha1InputStream(it) }
         props?.forEach {
@@ -111,7 +112,6 @@ class BkRepoArchiveFileServiceImpl @Autowired constructor(
         }
         val repoName = BkRepoUtils.getRepoName(fileType)
         return if (logo == true) {
-            val destPath = filePath ?: DefaultPathUtils.randomFileName()
             bkRepoClient.uploadLocalFile(
                 userId = BKREPO_DEFAULT_USER,
                 projectId = BKREPO_STORE_PROJECT_ID,
@@ -122,9 +122,6 @@ class BkRepoArchiveFileServiceImpl @Autowired constructor(
             )
             generateFileDownloadUrl(fileChannelType, destPath).plus("?logo=true")
         } else {
-            val destPath = filePath ?: DefaultPathUtils.randomFileName(
-                file.name.substring(file.name.indexOf(".") + 1)
-            )
             bkRepoClient.uploadLocalFile(userId, repoProjectId, repoName, destPath, file, properties = metadata)
             generateFileDownloadUrl(fileChannelType, "$repoProjectId/$repoName/$destPath")
         }
