@@ -80,6 +80,7 @@ class ServiceArchiveAtomFileResourceImpl @Autowired constructor(
         userId: String,
         projectId: String,
         path: String,
+        fileType: String,
         inputStream: InputStream,
         disposition: FormDataContentDisposition
     ): Result<String?> {
@@ -90,7 +91,7 @@ class ServiceArchiveAtomFileResourceImpl @Autowired constructor(
             disposition = disposition,
             projectId = projectId,
             filePath = path,
-            fileType = FileTypeEnum.BK_CUSTOM,
+            fileType = FileTypeEnum.valueOf(fileType),
             fileChannelType = FileChannelTypeEnum.WEB_SHOW
         )
         return Result(url)

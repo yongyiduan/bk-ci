@@ -28,6 +28,7 @@
 package com.tencent.devops.store.util
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.tencent.devops.artifactory.api.ServiceArchiveAtomFileResource
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.JsonUtil
@@ -40,9 +41,6 @@ import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.store.api.common.OpStoreLogoResource
 import com.tencent.devops.store.constant.StoreMessageCode
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
-import com.tencent.devops.artifactory.api.service.ServiceFileResource
-import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
-import com.tencent.devops.artifactory.pojo.enums.FileTypeEnum
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
@@ -60,6 +58,7 @@ object AtomReleaseTxtAnalysisUtil {
 
     private const val BK_CI_ATOM_DIR = "bk-atom-test"
     private const val BKREPO_STORE_PROJECT_ID = "bk-store"
+    private const val BK_STATIC = "bk-static"
     private const val BK_CI_PATH_REGEX = "(\\\$\\{\\{indexFile\\()(\"[^\"]*\")"
     private val fileSeparator: String = System.getProperty("file.separator")
     private val logger = LoggerFactory.getLogger(AtomReleaseTxtAnalysisUtil::class.java)
@@ -149,7 +148,7 @@ object AtomReleaseTxtAnalysisUtil {
         descriptionContent: String
     ): String {
         var content = descriptionContent
-        val serviceUrlPrefix = client.getServiceUrl(ServiceFileResource::class)
+        val serviceUrlPrefix = client.getServiceUrl(ServiceArchiveAtomFileResource::class)
         pathList.forEach {
             val file = File("$atomPath${fileSeparator}file${fileSeparator}$it")
             try {
@@ -159,6 +158,7 @@ object AtomReleaseTxtAnalysisUtil {
                         projectId = BKREPO_STORE_PROJECT_ID,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
+                        fileType = BK_STATIC,
                         path = "${UUIDUtil.generate()}${file.name.substring(file.name.indexOf("."))}"
                     )
                     if (uploadFileResult.isOk()) {
