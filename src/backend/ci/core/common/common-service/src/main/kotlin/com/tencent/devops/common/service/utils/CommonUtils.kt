@@ -142,8 +142,9 @@ object CommonUtils {
         fileType: String? = null,
         logo: Boolean = false
     ): Result<String?> {
+        val fileTypeParameter = if (fileType.isNullOrBlank()) "" else "&fileType=$fileType"
         val serviceUrl = "$serviceUrlPrefix/service/artifactories/file/upload" +
-                "?userId=$userId&fileChannelType=$fileChannelType&fileType=$fileType&logo=$logo"
+                "?userId=$userId&fileChannelType=$fileChannelType$fileTypeParameter&logo=$logo"
         logger.info("the serviceUrl is:$serviceUrl")
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
             val responseContent = response.body()!!.string()
