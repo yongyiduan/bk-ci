@@ -29,6 +29,7 @@ package com.tencent.devops.store.util
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomFileResource
+import com.tencent.devops.artifactory.pojo.enums.FileTypeEnum
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.JsonUtil
@@ -58,7 +59,6 @@ object AtomReleaseTxtAnalysisUtil {
 
     private const val BK_CI_ATOM_DIR = "bk-atom-test"
     private const val BKREPO_STORE_PROJECT_ID = "bk-store"
-    private const val BK_STATIC = "bk-static"
     private const val BK_CI_PATH_REGEX = "(\\\$\\{\\{indexFile\\()(\"[^\"]*\")"
     private val fileSeparator: String = System.getProperty("file.separator")
     private val logger = LoggerFactory.getLogger(AtomReleaseTxtAnalysisUtil::class.java)
@@ -158,7 +158,7 @@ object AtomReleaseTxtAnalysisUtil {
                         projectId = BKREPO_STORE_PROJECT_ID,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
-                        fileType = BK_STATIC,
+                        fileType = FileTypeEnum.BK_STATIC.name,
                         path = "${UUIDUtil.generate()}${file.name.substring(file.name.indexOf("."))}"
                     )
                     if (uploadFileResult.isOk()) {
