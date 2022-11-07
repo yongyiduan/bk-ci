@@ -81,6 +81,7 @@ import com.tencent.devops.process.engine.service.PipelineStageService
 import com.tencent.devops.process.engine.service.PipelineTaskService
 import com.tencent.devops.process.engine.service.WebhookBuildParameterService
 import com.tencent.devops.process.engine.utils.BuildUtils
+import com.tencent.devops.process.engine.utils.PipelineUtils
 import com.tencent.devops.process.jmx.api.ProcessJmxApi
 import com.tencent.devops.process.permission.PipelinePermissionService
 import com.tencent.devops.process.pojo.BuildBasicInfo
@@ -969,6 +970,8 @@ class PipelineBuildFacadeService(
                 params = arrayOf(stageId)
             )
         }
+        PipelineUtils.checkStageReviewParam(reviewRequest?.reviewParams)
+
         val setting = pipelineRepositoryService.getSetting(projectId, pipelineId)
         val runLock = PipelineBuildRunLock(redisOperation, pipelineId)
         try {
@@ -978,7 +981,8 @@ class PipelineBuildFacadeService(
                     pipelineInfo = pipelineInfo,
                     model = null,
                     startType = StartType.MANUAL,
-                    setting = setting
+                    setting = setting,
+                    buildId = buildId
                 )
             )
 
@@ -1465,11 +1469,11 @@ class PipelineBuildFacadeService(
         updateTimeDesc: Boolean? = null
     ): BuildHistoryPage<BuildHistory> {
         val pageNotNull = page ?: 0
-        val pageSizeNotNull = pageSize ?: 1000
+        val pageSizeNotNull = pageSize ?: 50
         val sqlLimit =
-            if (pageSizeNotNull != -1) PageUtil.convertPageSizeToSQLLimit(pageNotNull, pageSizeNotNull) else null
+            if (pageSizeNotNull != -1) PageUtil.convertPageSizeToSQLLimitMaxSize(pageNotNull, pageSizeNotNull) else null
         val offset = sqlLimit?.offset ?: 0
-        val limit = sqlLimit?.limit ?: 1000
+        val limit = sqlLimit?.limit ?: 50
 
         val pipelineInfo = pipelineRepositoryService.getPipelineInfo(projectId, pipelineId, channelCode)
             ?: throw ErrorCodeException(
@@ -1515,7 +1519,7 @@ class PipelineBuildFacadeService(
             )
             return BuildHistoryPage(
                 page = pageNotNull,
-                pageSize = pageSizeNotNull,
+                pageSize = limit,
                 count = result.history.count,
                 records = result.history.records,
                 hasDownloadPermission = result.hasDownloadPermission,
@@ -1556,14 +1560,11 @@ class PipelineBuildFacadeService(
         updateTimeDesc: Boolean? = null
     ): BuildHistoryPage<BuildHistory> {
         val pageNotNull = page ?: 0
-        var pageSizeNotNull = pageSize ?: 50
-        if (pageNotNull > 50) {
-            pageSizeNotNull = 50
-        }
+        val pageSizeNotNull = pageSize ?: 50
         val sqlLimit =
             if (pageSizeNotNull != -1) PageUtil.convertPageSizeToSQLLimit(pageNotNull, pageSizeNotNull) else null
         val offset = sqlLimit?.offset ?: 0
-        val limit = sqlLimit?.limit ?: 50
+        val limit = sqlLimit?.limit ?: 1000
 
         val channelCode = if (projectId.startsWith("git_")) ChannelCode.GIT else ChannelCode.BS
 
@@ -1654,7 +1655,7 @@ class PipelineBuildFacadeService(
             )
             return BuildHistoryPage(
                 page = pageNotNull,
-                pageSize = pageSizeNotNull,
+                pageSize = limit,
                 count = result.history.count,
                 records = result.history.records,
                 hasDownloadPermission = result.hasDownloadPermission,
