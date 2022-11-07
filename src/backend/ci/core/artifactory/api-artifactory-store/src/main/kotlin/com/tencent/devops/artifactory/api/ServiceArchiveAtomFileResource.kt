@@ -90,7 +90,7 @@ interface ServiceArchiveAtomFileResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     fun uploadToPath(
         @ApiParam("userId", required = true)
-        @HeaderParam(AUTH_HEADER_USER_ID)
+        @QueryParam(AUTH_HEADER_USER_ID)
         userId: String,
         @ApiParam("项目代码", required = true)
         @FormDataParam("projectId")
