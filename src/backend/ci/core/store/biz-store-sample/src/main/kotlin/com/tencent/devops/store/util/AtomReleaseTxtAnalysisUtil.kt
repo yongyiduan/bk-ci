@@ -157,7 +157,7 @@ object AtomReleaseTxtAnalysisUtil {
                         userId = userId,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
-                        fileChannelType = "bk-store",
+                        fileChannelType = FileChannelTypeEnum.WEB_SHOW.name,
                         logo = false
                     )
                     if (uploadFileResult.isOk()) {
