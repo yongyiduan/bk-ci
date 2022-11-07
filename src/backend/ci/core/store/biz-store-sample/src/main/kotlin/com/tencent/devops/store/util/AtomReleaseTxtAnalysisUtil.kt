@@ -154,14 +154,12 @@ object AtomReleaseTxtAnalysisUtil {
             val file = File("$atomPath${fileSeparator}file${fileSeparator}$it")
             try {
                 if (file.exists()) {
-                    val uploadFileResult = CommonUtils.serviceUploadFile(
+                    val uploadFileResult = CommonUtils.serviceUploadFileToPath(
                         userId = userId,
-                        projectCode = BKREPO_STORE_PROJECT_ID,
+                        projectId = BKREPO_STORE_PROJECT_ID,
                         serviceUrlPrefix = serviceUrlPrefix,
                         file = file,
-                        fileChannelType = FileChannelTypeEnum.WEB_SHOW.name,
-                        fileType = FileTypeEnum.BK_STATIC.name,
-                        logo = false
+                        path = "${UUIDUtil.generate()}${file.name.substring(file.name.indexOf("."))}"
                     )
                     if (uploadFileResult.isOk()) {
                         result[it] = uploadFileResult.data!!
