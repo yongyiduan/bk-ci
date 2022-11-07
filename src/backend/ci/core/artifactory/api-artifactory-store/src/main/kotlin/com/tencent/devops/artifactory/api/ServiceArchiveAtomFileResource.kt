@@ -28,6 +28,7 @@
 package com.tencent.devops.artifactory.api
 
 import com.tencent.devops.artifactory.pojo.ArchiveAtomResponse
+import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
 import io.swagger.annotations.Api
@@ -37,6 +38,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.glassfish.jersey.media.multipart.FormDataParam
 import java.io.InputStream
 import javax.ws.rs.Consumes
+import javax.ws.rs.HeaderParam
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
@@ -81,4 +83,24 @@ interface ServiceArchiveAtomFileResource {
         @QueryParam("os")
         os: String
     ): Result<ArchiveAtomResponse?>
+
+    @ApiOperation("上传插件资源文件到指定自定义仓库路径")
+    @POST
+    @Path("/file/uploadToPath")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    fun uploadToPath(
+        @ApiParam("userId", required = true)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("项目代码", required = true)
+        @FormDataParam("projectId")
+        projectId: String,
+        @FormDataParam("path")
+        path: String,
+        @ApiParam("文件", required = true)
+        @FormDataParam("file")
+        inputStream: InputStream,
+        @FormDataParam("file")
+        disposition: FormDataContentDisposition
+    ): Result<String?>
 }
