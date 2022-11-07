@@ -28,6 +28,7 @@
 package com.tencent.devops.artifactory.api.service
 
 import com.tencent.devops.artifactory.pojo.enums.FileChannelTypeEnum
+import com.tencent.devops.artifactory.pojo.enums.FileTypeEnum
 import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
 import com.tencent.devops.common.api.pojo.Result
 import io.swagger.annotations.Api
@@ -73,6 +74,9 @@ interface ServiceFileResource {
         @ApiParam("项目代码", required = false)
         @QueryParam("projectCode")
         projectCode: String? = null,
+        @ApiParam("文件类型", required = false)
+        @QueryParam("fileType")
+        fileType: FileTypeEnum? = null,
         @ApiParam("渠道类型", required = true)
         @QueryParam("fileChannelType")
         fileChannelType: FileChannelTypeEnum = FileChannelTypeEnum.SERVICE,
