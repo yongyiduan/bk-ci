@@ -93,9 +93,9 @@ interface ServiceArchiveAtomFileResource {
         @QueryParam("userId")
         userId: String,
         @ApiParam("项目代码", required = true)
-        @FormDataParam("projectId")
+        @QueryParam("projectId")
         projectId: String,
-        @FormDataParam("path")
+        @QueryParam("path")
         path: String,
         @ApiParam("文件", required = true)
         @FormDataParam("file")
