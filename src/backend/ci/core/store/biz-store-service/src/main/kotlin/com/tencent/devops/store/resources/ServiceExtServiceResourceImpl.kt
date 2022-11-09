@@ -25,42 +25,44 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.api
+package com.tencent.devops.store.resources
 
 import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.common.web.RestResource
+import com.tencent.devops.store.api.ServiceExtServiceResource
 import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import javax.ws.rs.Consumes
-import javax.ws.rs.GET
-import javax.ws.rs.Path
-import javax.ws.rs.PathParam
-import javax.ws.rs.Produces
-import javax.ws.rs.QueryParam
-import javax.ws.rs.core.MediaType
+import com.tencent.devops.store.pojo.dto.UpdateExtServiceEnvInfoDTO
+import com.tencent.devops.store.service.ExtServiceArchiveService
+import com.tencent.devops.store.service.ExtServiceEnvService
+import org.springframework.beans.factory.annotation.Autowired
 
-@Api(tags = ["SERVICE_MARKET_SERVICE"], description = "微扩展市场-微扩展")
-@Path("/service/market/services/")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-interface ServiceExtServiceArchiveResource {
+@RestResource
+class ServiceExtServiceResourceImpl @Autowired constructor(
+    private val extServiceArchiveService: ExtServiceArchiveService,
+    private val extServiceEnvService: ExtServiceEnvService
+) : ServiceExtServiceResource {
 
-    @ApiOperation("校验用户上传的微扩展包是否合法")
-    @GET
-    @Path("/users/{userId}/services/{serviceCode}/versions/{version}/package/verify")
-    fun verifyExtServicePackageByUserId(
-        @ApiParam("用户ID", required = true)
-        @PathParam("userId")
+    override fun verifyExtServicePackageByUserId(
         userId: String,
-        @ApiParam("微扩展代码", required = true)
-        @PathParam("serviceCode")
         serviceCode: String,
-        @ApiParam("版本号", required = true)
-        @PathParam("version")
         version: String,
-        @ApiParam("发布类型", required = false)
-        @QueryParam("releaseType")
         releaseType: ReleaseTypeEnum?
-    ): Result<Boolean>
+    ): Result<Boolean> {
+        return Result(
+            extServiceArchiveService.verifyExtServicePackageByUserId(
+                userId = userId,
+                serviceCode = serviceCode,
+                version = version,
+                releaseType = releaseType
+            )
+        )
+    }
+
+    override fun updateExtServiceEnv(
+        serviceCode: String,
+        version: String,
+        updateExtServiceEnvInfo: UpdateExtServiceEnvInfoDTO
+    ): Result<Boolean> {
+        return extServiceEnvService.updateExtServiceEnvInfo(serviceCode, version, updateExtServiceEnvInfo)
+    }
 }
