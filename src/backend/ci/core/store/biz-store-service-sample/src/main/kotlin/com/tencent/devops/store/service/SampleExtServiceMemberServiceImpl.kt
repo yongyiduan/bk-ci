@@ -32,7 +32,7 @@ import com.tencent.devops.store.pojo.common.StoreMemberReq
 import org.springframework.stereotype.Service
 
 @Service
-class SampleExtServiceMemberServiceServiceImpl : ExtServiceMemberServiceImpl() {
+class SampleExtServiceMemberServiceImpl : ExtServiceMemberServiceImpl() {
 
     override fun addRepoMember(
         storeMemberReq: StoreMemberReq,
