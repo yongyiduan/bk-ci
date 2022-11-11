@@ -279,17 +279,17 @@ object AtomReleaseTxtAnalysisUtil {
         version: String,
         file: File,
         os: String
-    ): Result<String?> {
+    ): Result<Boolean?> {
         val serviceUrl = "$serviceUrlPrefix/service/artifactories/archiveAtom" +
                 "?userId=$userId&projectCode=$projectCode&atomId=$atomId&atomCode=$atomCode" +
                 "&version=$version&releaseType=$releaseType&os=$os"
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
             val responseContent = response.body()!!.string()
-            logger.error("uploadFile responseContent is: $responseContent")
             if (!response.isSuccessful) {
+                logger.warn("uploadFile responseContent is: $responseContent")
                 return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.SYSTEM_ERROR)
             }
-            return JsonUtil.to(responseContent, object : TypeReference<Result<String?>>() {})
+            return Result(true)
         }
     }
 
