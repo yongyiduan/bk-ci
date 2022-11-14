@@ -90,6 +90,10 @@ object StoreMessageCode {
     const val USER_ATOM_OUTPUT_NUM_IS_TOO_MANY = "2120033" // 研发商店：插件出参数量太多，系统规定的数量最大为：{0}
     // 研发商店：插件配置文件[task.json]{0}操作系统默认环境配置数量为{1}个，默认环境配置数量有且只能为1个
     const val USER_REPOSITORY_TASK_JSON_OS_DEFAULT_ENV_IS_INVALID = "2120034"
+    const val USER_REPOSITORY_PULL_ERROR_JSON_FILE_FAIL = "2120035"
+    // 研发商店：从[{0}]分支拉取插件配置文件[error.json]失败,请确认是否OAUTH授权、文件是否正确上传代码库等
+    const val USER_REPOSITORY_ERROR_JSON_ERROR_CODE_EXIST_DUPLICATE = "2120036" // 研发商店：插件配置文件[error.json]errorCode字段数据重复，请检查{0}
+    const val USER_REPOSITORY_ERROR_JSON_FIELD_IS_INVALID = "2120037" // 研发商店：插件配置文件[error.json]errorCode格式不正确，请检查
 
     // 模板相关的错误提示
     const val USER_TEMPLATE_VERSION_IS_NOT_FINISH = "2120201" // 研发商店：模板{0}的{1}版本发布未结束，请稍后再试
@@ -101,6 +105,7 @@ object StoreMessageCode {
     const val USER_TEMPLATE_ATOM_IS_INVALID = "2120207" // 研发商店：模版下的插件{0}不可用，请联系模板发布者
     const val USER_TEMPLATE_IMAGE_VISIBLE_DEPT_IS_INVALID = "2120208" // 研发商店：模板的可见范围不在镜像[{0}]的可见范围之内，如有需要请联系镜像的发布者
     const val USER_TEMPLATE_IMAGE_IS_INVALID = "2120209" // 研发商店：模版下的镜像{0}不可用，请联系模板发布者
+    const val USER_INSTALL_TEMPLATE_CODE_IS_INVALID = "2120210" // 研发商店： 商店模板{0}安装到项目[{1}]失败，模板已安装或项目下存在与模板{0}同名的自定义模板，若有同名的自定义模板请修改模板名称后再安装商店模版。
 
     const val USER_IMAGE_VERSION_IS_NOT_FINISH = "2120301" // 研发商店：镜像{0}的{1}版本发布未结束，请稍后再试
     const val USER_IMAGE_VERSION_IS_INVALID = "2120302" // 研发商店：镜像升级的版本号{0}错误，应为{1}
@@ -114,17 +119,17 @@ object StoreMessageCode {
     const val USER_IMAGE_VERSION_NOT_EXIST = "2120310" // 标识为{0}版本号为{1}的镜像不存在
     const val USER_IMAGE_PROJECT_IS_INVALID = "2120311" // 研发商店：容器镜像[{0}]在项目[{1}]下不可用，请联系镜像发布者调整可见范围，调整后手动安装镜像
 
-    // 扩展服务相关的错误提示
-    const val USER_SERVICE_RELEASED_IS_NOT_ALLOW_DELETE = "2120401" // 研发商店：扩展服务{0}已发布到商店，请先下架再删除
-    const val USER_SERVICE_USED_IS_NOT_ALLOW_DELETE = "2120402" // 研发商店：扩展服务{0}已安装到其他项目下使用，请勿移除
-    const val USER_SERVICE_VERSION_IS_INVALID = "2120403" // 研发商店：扩展服务升级的版本号{0}错误，应为{1}
-    const val USER_SERVICE_VERSION_IS_NOT_FINISH = "2120404" // 研发商店：扩展服务{0}的{1}版本发布未结束，请稍后再试
+    // 微扩展相关的错误提示
+    const val USER_SERVICE_RELEASED_IS_NOT_ALLOW_DELETE = "2120401" // 研发商店：微扩展{0}已发布到商店，请先下架再删除
+    const val USER_SERVICE_USED_IS_NOT_ALLOW_DELETE = "2120402" // 研发商店：微扩展{0}已安装到其他项目下使用，请勿移除
+    const val USER_SERVICE_VERSION_IS_INVALID = "2120403" // 研发商店：微扩展升级的版本号{0}错误，应为{1}
+    const val USER_SERVICE_VERSION_IS_NOT_FINISH = "2120404" // 研发商店：微扩展{0}的{1}版本发布未结束，请稍后再试
     const val USER_SERVICE_CODE_DIFF = "2120405" // 研发商店：扩展编码与extension.json文件内编码不一致
-    const val USER_SERVICE_RELEASE_STEPS_ERROR = "2120406" // 研发商店：扩展服务发布流程状态变更顺序不正确
+    const val USER_SERVICE_RELEASE_STEPS_ERROR = "2120406" // 研发商店：微扩展发布流程状态变更顺序不正确
     const val USER_SERVICE_PROJECT_UNENABLE = "2120407" // 研发商店：选中调试项目已被禁用
     const val USER_SERVICE_PROJECT_NOT_PERMISSION = "2120408" // 研发商店：选中调试项目无创建流水线权限
-    const val USER_SERVICE_NOT_EXIST = "2120409" // 研发商店：扩展服务不存在{0}
-    const val USER_ITEM_SERVICE_USED_IS_NOT_ALLOW_DELETE = "2120410" // 研发商店：扩展点下还有可用的扩展服务，不能删除
+    const val USER_SERVICE_NOT_EXIST = "2120409" // 研发商店：微扩展不存在{0}
+    const val USER_ITEM_SERVICE_USED_IS_NOT_ALLOW_DELETE = "2120410" // 研发商店：扩展点下还有可用的微扩展，不能删除
 
     // store公共业务相关的错误提示
     const val USER_PRAISE_IS_INVALID = "2120901" // 研发商店：你已点赞过
