@@ -147,6 +147,7 @@ object SdkHttpUtil {
         params.putAll(request.getUdfParams())
 
         val finalUrl = "${apiUrl.removeSuffix("/")}/${request.getApiPath().removePrefix("/")}"
+        logger.debug("github api execute|params=$params|headers=$headers|finalUrl=$finalUrl")
         val httpRequest = when (request.getHttpMethod()) {
             HttpMethod.GET ->
                 buildGet(url = finalUrl, headers = headers, params = params)

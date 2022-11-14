@@ -25,15 +25,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.ticket
+package com.tencent.devops.store.pojo.atom
 
-import com.tencent.devops.common.service.MicroService
-import com.tencent.devops.common.service.MicroServiceApplication
-import org.springframework.context.annotation.ComponentScan
+import com.tencent.devops.common.api.enums.FrontendTypeEnum
+import com.tencent.devops.common.web.annotation.BkField
+import com.tencent.devops.common.web.constant.BkStyleEnum
+import com.tencent.devops.repository.pojo.enums.VisibilityLevelEnum
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 
-@MicroService
-class TicketApplication
-
-fun main(args: Array<String>) {
-    MicroServiceApplication.run(TicketApplication::class, args)
-}
+@ApiModel("插件配置信息")
+data class AtomConfigInfo(
+    @ApiModelProperty(value = "前端UI渲染方式", required = true)
+    val frontendType: FrontendTypeEnum = FrontendTypeEnum.NORMAL
+)

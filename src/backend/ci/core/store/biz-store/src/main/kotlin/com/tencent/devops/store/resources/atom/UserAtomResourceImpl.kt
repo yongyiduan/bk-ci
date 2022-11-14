@@ -38,12 +38,17 @@ import com.tencent.devops.store.pojo.atom.InstalledAtom
 import com.tencent.devops.store.pojo.atom.PipelineAtom
 import com.tencent.devops.store.pojo.common.VersionInfo
 import com.tencent.devops.store.pojo.common.UnInstallReq
+import com.tencent.devops.store.service.atom.AtomReleaseService
 import com.tencent.devops.store.service.atom.AtomService
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.springframework.beans.factory.annotation.Autowired
+import java.io.InputStream
 
 @RestResource
-class UserAtomResourceImpl @Autowired constructor(private val atomService: AtomService) :
-    UserAtomResource {
+class UserAtomResourceImpl @Autowired constructor(
+    private val atomService: AtomService,
+    private val atomReleaseService: AtomReleaseService
+    ) : UserAtomResource {
 
     override fun getPipelineAtom(
         projectCode: String,
@@ -134,5 +139,19 @@ class UserAtomResourceImpl @Autowired constructor(private val atomService: AtomS
         unInstallReq: UnInstallReq
     ): Result<Boolean> {
         return atomService.uninstallAtom(userId, projectCode, atomCode, unInstallReq)
+    }
+
+    override fun releaseAtom(
+        userId: String,
+        atomCode: String,
+        inputStream: InputStream,
+        disposition: FormDataContentDisposition
+    ): Result<Boolean> {
+        return atomReleaseService.releaseAtom(
+            userId = userId,
+            atomCode = atomCode,
+            inputStream = inputStream,
+            disposition = disposition
+        )
     }
 }

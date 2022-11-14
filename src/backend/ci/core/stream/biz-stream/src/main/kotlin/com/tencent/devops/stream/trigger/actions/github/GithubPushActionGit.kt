@@ -283,7 +283,7 @@ class GithubPushActionGit(
                 break
             }
         }
-
+        logger.info("pr from=$from|to=$to|changeset=$changeSet")
         this.data.context.changeSet = changeSet
         return this.data.context.changeSet
     }

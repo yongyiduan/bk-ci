@@ -45,10 +45,14 @@ import com.tencent.devops.store.pojo.common.VersionInfo
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
+import org.glassfish.jersey.media.multipart.FormDataParam
+import java.io.InputStream
 import javax.ws.rs.Consumes
 import javax.ws.rs.DELETE
 import javax.ws.rs.GET
 import javax.ws.rs.HeaderParam
+import javax.ws.rs.POST
 import javax.ws.rs.PUT
 import javax.ws.rs.Path
 import javax.ws.rs.PathParam
@@ -199,5 +203,23 @@ interface UserAtomResource {
         atomCode: String,
         @ApiParam("卸载插件请求包体", required = true)
         unInstallReq: UnInstallReq
+    ): Result<Boolean>
+
+    @ApiOperation("根据插件包一键部署插件")
+    @POST
+    @Path("/deployment")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    fun releaseAtom(
+        @ApiParam(value = "用户ID", required = true, defaultValue = AUTH_HEADER_USER_ID_DEFAULT_VALUE)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("atomCode", required = true)
+        @FormDataParam("atomCode")
+        atomCode: String,
+        @ApiParam("文件", required = true)
+        @FormDataParam("file")
+        inputStream: InputStream,
+        @FormDataParam("file")
+        disposition: FormDataContentDisposition
     ): Result<Boolean>
 }

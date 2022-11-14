@@ -199,6 +199,7 @@ class MarketAtomArchiveServiceImpl : MarketAtomArchiveService {
         atomId: String,
         atomPkgInfoUpdateRequest: AtomPkgInfoUpdateRequest
     ): Result<Boolean> {
+        logger.info("updateAtomPkgInfo atomId:$atomId, atomPkgInfoUpdateRequest:${JsonUtil.toJson(atomPkgInfoUpdateRequest, false)}")
         val taskDataMap = atomPkgInfoUpdateRequest.taskDataMap
         val propsMap = mutableMapOf<String, Any?>()
         propsMap[KEY_INPUT_GROUPS] = taskDataMap[KEY_INPUT_GROUPS]

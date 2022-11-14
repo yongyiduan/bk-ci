@@ -150,9 +150,7 @@ abstract class StoreLogoServiceImpl @Autowired constructor() : StoreLogoService 
                 output.close()
             }
         }
-        val logoUrl = uploadStoreLogo(userId, file).data
-        logger.info("uploadStoreLogo logoUrl is:$logoUrl")
-        return Result(StoreLogoInfo(logoUrl))
+        return Result(StoreLogoInfo(uploadStoreLogo(userId, file).data))
     }
 
     abstract fun uploadStoreLogo(userId: String, file: File): Result<String?>

@@ -344,7 +344,7 @@ class GithubPRActionGit(
             ref = event.pullRequest.base.ref,
             retry = ApiRequestRetryInfo(true)
         )
-
+        logger.debug("targetFile=$targetFile")
         if (!getChangeSet()!!.contains(fileName)) {
             return if (targetFile?.content.isNullOrBlank()) {
                 logger.warn(
@@ -473,6 +473,7 @@ class GithubPRActionGit(
         retry: ApiRequestRetryInfo
     ): GithubFileInfo? {
         return try {
+            logger.info("getFileInfo|[$gitProjectId][$fileName][$ref]")
             apiService.getFileInfo(
                 cred = cred,
                 gitProjectId = gitProjectId,

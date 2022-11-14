@@ -90,6 +90,7 @@ interface StreamMrAction : BaseAction {
                     page = page,
                     pageSize = 100
                 )
+                logger.info("getProjectMember|$res")
                 reviewers.addAll(res.filter { it.accessLevel >= 40 }.map { it.userId })
                 if (res.size != 100) {
                     break

@@ -74,15 +74,14 @@ class StreamGithubTransferService @Autowired constructor(
     private val client: Client,
     private val streamBasicSettingDao: StreamBasicSettingDao
 ) : StreamGitTransferService {
-
-    // github 组织白名单列表
-    @Value("\${github.orgWhite:}")
-    private var githubOrgWhite: String = ""
-
     companion object {
         private val logger = LoggerFactory.getLogger(StreamGithubTransferService::class.java)
         private const val DEFAULT_GITHUB_PER_PAGE = 100
     }
+
+    // github 组织白名单列表
+    @Value("\${github.orgWhite:}")
+    private var githubOrgWhite: String = ""
 
     // gitProjectId在github中必须为项目名字
     override fun getGitProjectCache(
@@ -289,7 +288,7 @@ class StreamGithubTransferService @Autowired constructor(
                     content = Base64.getEncoder().encodeToString(content.toByteArray()),
                     path = filePath,
                     branch = branch
-                )
+                ).also { logger.info("createNewFile|userId=$userId|gitProjectId=$gitProjectId|request=$streamCreateFile|") }
             },
             token = getAndCheckOauthToken(userId).accessToken
         )

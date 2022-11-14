@@ -50,11 +50,8 @@ import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.util.Enumeration
-import kotlin.collections.HashMap
-import kotlin.collections.Map
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.listOf
 import kotlin.collections.set
 
 object CommonUtils {
@@ -146,6 +143,27 @@ object CommonUtils {
     ): Result<String?> {
         val serviceUrl = "$serviceUrlPrefix/service/artifactories/file/upload" +
                 "?userId=$userId&fileChannelType=$fileChannelType&logo=$logo"
+        logger.info("the serviceUrl is:$serviceUrl")
+        OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
+            val responseContent = response.body()!!.string()
+            logger.error("uploadFile responseContent is: $responseContent")
+            if (!response.isSuccessful) {
+                return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.SYSTEM_ERROR)
+            }
+            return JsonUtil.to(responseContent, object : TypeReference<Result<String?>>() {})
+        }
+    }
+
+    fun serviceUploadFileToPath(
+        userId: String,
+        serviceUrlPrefix: String,
+        file: File,
+        fileType: String,
+        projectId: String,
+        path: String
+    ): Result<String?> {
+        val serviceUrl = "$serviceUrlPrefix/service/artifactories/file/uploadToPath" +
+                "?userId=$userId&projectId=$projectId&path=$path&fileType=$fileType"
         logger.info("the serviceUrl is:$serviceUrl")
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
             val responseContent = response.body()!!.string()

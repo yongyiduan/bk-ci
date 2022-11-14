@@ -57,6 +57,7 @@ class DefaultGithubClient(
             "Authorization" to "token  $oauthToken",
             "Accept" to "application/vnd.github.v3+json"
         )
+        logger.debug("oauthToken=$oauthToken")
         return if (request.getHttpMethod() == HttpMethod.GET) {
             SdkRetryHelper(maxAttempts = maxAttempts, retryWaitTime = retryWaitTime).execute {
                 SdkHttpUtil.execute(
