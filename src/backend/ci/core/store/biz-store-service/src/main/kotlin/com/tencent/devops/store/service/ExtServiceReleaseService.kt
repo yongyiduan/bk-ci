@@ -161,13 +161,15 @@ abstract class ExtServiceReleaseService @Autowired constructor() {
         // 校验信息
         validateAddServiceReq(extensionInfo)
         checkProjectInfo(userId, extensionInfo.projectCode)
-        val handleServicePackageResult = handleServicePackage(extensionInfo, userId, serviceCode)
-        logger.info("addExtService the handleServicePackage is :$handleServicePackageResult")
+        val handleServicePackageMap = if (extensionInfo.configInfo == null) {
+            val handleServicePackageResult = handleServicePackage(extensionInfo, userId, serviceCode)
+            logger.info("addExtService the handleServicePackage is :$handleServicePackageResult")
 
-        if (handleServicePackageResult.isNotOk()) {
-            return Result(handleServicePackageResult.status, handleServicePackageResult.message, null)
-        }
-        val handleServicePackageMap = handleServicePackageResult.data
+            if (handleServicePackageResult.isNotOk()) {
+                return Result(handleServicePackageResult.status, handleServicePackageResult.message, null)
+            }
+            handleServicePackageResult.data
+        } else extensionInfo.configInfo
         dslContext.transaction { t ->
             val context = DSL.using(t)
             val id = UUIDUtil.generate()

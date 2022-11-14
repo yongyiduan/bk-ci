@@ -54,5 +54,7 @@ data class InitExtServiceDTO(
     @ApiModelProperty("扩展点列表")
     val extensionItemList: Set<String>,
     @ApiModelProperty(value = "项目可视范围", required = false)
-    val visibilityLevel: VisibilityLevelEnum? = VisibilityLevelEnum.LOGIN_PUBLIC
+    val visibilityLevel: VisibilityLevelEnum? = VisibilityLevelEnum.LOGIN_PUBLIC,
+    @ApiModelProperty(value = "微扩展配置信息", required = false)
+    val configInfo: Map<String, String>? = null
 )
