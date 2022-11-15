@@ -29,4 +29,5 @@ dependencies {
     api(project(":core:store:biz-store"))
     api(project(":core:store:api-store-service"))
     api(project(":core:common:common-archive"))
+    api(project(":core:common:common-auth:common-auth-mock"))
 }
