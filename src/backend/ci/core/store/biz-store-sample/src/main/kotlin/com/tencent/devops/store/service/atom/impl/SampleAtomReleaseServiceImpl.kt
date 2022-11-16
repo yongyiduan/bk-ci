@@ -46,7 +46,7 @@ import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.model.store.tables.records.TAtomRecord
-import com.tencent.devops.store.api.common.OpStoreLogoResource
+import com.tencent.devops.store.api.common.ServiceStoreLogoResource
 import com.tencent.devops.store.constant.StoreMessageCode
 import com.tencent.devops.store.pojo.atom.AtomReleaseRequest
 import com.tencent.devops.store.pojo.atom.MarketAtomCreateRequest
@@ -286,7 +286,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         logger.info("uploadStoreLogo logoFilePath:${logoFile.path}")
         var uploadStoreLogoResult = Result(data = true, status = 0)
         if (logoFile.exists()) {
-            val result = client.get(OpStoreLogoResource::class).uploadStoreLogo(
+            val result = client.get(ServiceStoreLogoResource::class).uploadStoreLogo(
                 userId = userId,
                 contentLength = logoFile.length(),
                 inputStream = logoFile.inputStream(),
@@ -312,7 +312,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         releaseInfo.description = AtomReleaseTxtAnalysisUtil.descriptionAnalysis(
             description = releaseInfo.description,
             atomPath = atomPath,
-            userId = userId,
             client = client
         )
         taskJsonMap["releaseInfo"] = releaseInfo.toJsonString()
@@ -371,7 +370,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 releaseType = releaseInfo.versionInfo.releaseType,
                 versionContent = releaseInfo.versionInfo.versionContent,
                 publisher = releaseInfo.versionInfo.publisher,
-                labelIdList = releaseInfo.labelIdList,
+                labelIdList = releaseInfo.labelCodes,
                 frontendType = releaseInfo.configInfo.frontendType,
                 logoUrl = releaseInfo.logoUrl,
                 classifyCode = releaseInfo.classifyCode

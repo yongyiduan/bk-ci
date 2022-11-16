@@ -25,21 +25,45 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.pojo.atom
+package com.tencent.devops.store.api.common
 
-import com.tencent.devops.common.web.annotation.BkField
-import com.tencent.devops.store.pojo.common.enums.ReleaseTypeEnum
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.common.api.auth.AUTH_HEADER_USER_ID
+import com.tencent.devops.common.api.pojo.Result
+import com.tencent.devops.store.pojo.common.StoreLogoInfo
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition
+import org.glassfish.jersey.media.multipart.FormDataParam
+import java.io.InputStream
+import javax.ws.rs.Consumes
+import javax.ws.rs.HeaderParam
+import javax.ws.rs.POST
+import javax.ws.rs.Path
+import javax.ws.rs.Produces
+import javax.ws.rs.core.MediaType
 
-@ApiModel("版本信息")
-data class VersionInfo(
-    @ApiModelProperty("发布者", required = true)
-    val publisher: String,
-    @ApiModelProperty("发布类型", required = true)
-    val releaseType: ReleaseTypeEnum,
-    @ApiModelProperty("插件版本", required = true)
-    val version: String,
-    @ApiModelProperty("版本日志内容", required = true)
-    val versionContent: String
-)
+@Api(tags = ["SERVICE_STORE_LOGO"], description = "STORE-LOGO")
+@Path("/service/store/logo")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+interface ServiceStoreLogoResource {
+
+    @ApiOperation("上传logo")
+    @POST
+    @Path("/upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    fun uploadStoreLogo(
+        @ApiParam("userId", required = true)
+        @HeaderParam(AUTH_HEADER_USER_ID)
+        userId: String,
+        @ApiParam("contentLength", required = true)
+        @HeaderParam("content-length")
+        contentLength: Long,
+        @ApiParam("logo", required = true)
+        @FormDataParam("logo")
+        inputStream: InputStream,
+        @FormDataParam("logo")
+        disposition: FormDataContentDisposition
+    ): Result<StoreLogoInfo?>
+}
