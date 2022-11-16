@@ -27,12 +27,10 @@
 
 package com.tencent.devops.store.util
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomFileResource
 import com.tencent.devops.artifactory.pojo.enums.FileTypeEnum
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.pojo.Result
-import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.api.util.OkhttpUtils
 import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.client.Client
@@ -62,7 +60,6 @@ object AtomReleaseTxtAnalysisUtil {
     private const val FILE_DEFAULT_SIZE = 1024
 
     fun descriptionAnalysis(
-        userId: String,
         description: String,
         atomPath: String,
         client: Client
@@ -92,12 +89,9 @@ object AtomReleaseTxtAnalysisUtil {
                 }
             }
         regexAnalysis(
-            userId = userId,
             input = descriptionText,
             atomPath = atomPath,
-            client = client,
-            pathList = pathList,
-            result = result
+            pathList = pathList
         )
         val uploadFileToPathResult = uploadFileToPath(
             pathList = pathList,
@@ -112,28 +106,22 @@ object AtomReleaseTxtAnalysisUtil {
         return System.getProperty("java.io.tmpdir").removeSuffix(fileSeparator)
     }
 
-    private fun regexAnalysis(
-        userId: String,
+    fun regexAnalysis(
         input: String,
         atomPath: String,
-        client: Client,
-        pathList: MutableList<String>,
-        result: MutableMap<String, String>
+        pathList: MutableList<String>
     ) {
         val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
         val matcher: Matcher = pattern.matcher(input)
         while (matcher.find()) {
             val path = matcher.group(2).replace("\"", "").removePrefix(fileSeparator)
             if (path.endsWith(".md")) {
-                val file = File("$atomPath${fileSeparator}file${fileSeparator}$path")
+                val file = File("$atomPath${fileSeparator}file$fileSeparator$path")
                 if (file.exists()) {
                     return regexAnalysis(
-                        userId = userId,
                         input = file.readText(),
                         atomPath = atomPath,
-                        client = client,
-                        pathList = pathList,
-                        result = result
+                        pathList = pathList
                     )
                 }
             }
@@ -141,7 +129,7 @@ object AtomReleaseTxtAnalysisUtil {
         }
     }
 
-    private fun filePathReplace(
+    fun filePathReplace(
         result: MutableMap<String, String>,
         descriptionContent: String
     ): String {
@@ -165,7 +153,7 @@ object AtomReleaseTxtAnalysisUtil {
     ): Map<String, String> {
         val serviceUrlPrefix = client.getServiceUrl(ServiceArchiveAtomFileResource::class)
         pathList.forEach {
-            val file = File("$atomPath${fileSeparator}file${fileSeparator}$it")
+            val file = File("$atomPath${fileSeparator}file$fileSeparator$it")
             try {
                 if (file.exists()) {
                     val uploadFileResult = CommonUtils.serviceUploadFileToPath(
@@ -179,10 +167,10 @@ object AtomReleaseTxtAnalysisUtil {
                     if (uploadFileResult.isOk()) {
                         result[it] = uploadFileResult.data!!
                     } else {
-                        logger.error("upload file result is fail, file path:$it")
+                        logger.warn("upload file result is fail, file path:$it")
                     }
                 } else {
-                    logger.error("Resource file does not exist:${file.path}")
+                    logger.warn("Resource file does not exist:${file.path}")
                 }
             } finally {
                 file.delete()
@@ -218,28 +206,6 @@ object AtomReleaseTxtAnalysisUtil {
                 "$fileSeparator$BK_CI_ATOM_DIR$fileSeparator$userId$fileSeparator$atomCode" +
                 "$fileSeparator$atomCode.zip"
         ZipUtil.zipDir(File(atomPath), zipPath)
-//        val zipOutputStream = ZipOutputStream(FileOutputStream(zipPath))
-//        val files = File(atomPath).listFiles()
-//        files?.forEach { file ->
-//            if (!file.isDirectory) {
-//                zipOutputStream.putNextEntry(ZipEntry(file.name))
-//                try {
-//                    val input = FileInputStream(file)
-//                    val byteArray = ByteArray(FILE_DEFAULT_SIZE)
-//                    var len = input.read(byteArray)
-//                    while (len != -1) {
-//                        while (len != -1) {
-//                            zipOutputStream.write(byteArray, 0, len)
-//                            len = input.read(byteArray)
-//                        }
-//                    }
-//                } catch (e: IOException) {
-//                    e.printStackTrace()
-//                }
-//            }
-//        }
-//        zipOutputStream.finish()
-//        zipOutputStream.closeEntry()
         return zipPath
     }
 
@@ -265,7 +231,6 @@ object AtomReleaseTxtAnalysisUtil {
                 file.delete() // 删除临时文件
             }
         }
-        logger.info("releaseAtom unzipFile atomPath:$atomPath exists:${File(atomPath).exists()}")
         return atomPath
     }
 
@@ -286,7 +251,6 @@ object AtomReleaseTxtAnalysisUtil {
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
             val responseContent = response.body()!!.string()
             if (!response.isSuccessful) {
-                logger.warn("uploadFile responseContent is: $responseContent")
                 return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.SYSTEM_ERROR)
             }
             return Result(true)
