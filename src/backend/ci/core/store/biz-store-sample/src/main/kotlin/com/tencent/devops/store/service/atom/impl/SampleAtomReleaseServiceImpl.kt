@@ -310,6 +310,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         if (uploadStoreLogoResult.isNotOk()) return uploadStoreLogoResult
         // 解析description
         releaseInfo.description = AtomReleaseTxtAnalysisUtil.descriptionAnalysis(
+            userId = userId,
             description = releaseInfo.description,
             atomPath = atomPath,
             client = client
