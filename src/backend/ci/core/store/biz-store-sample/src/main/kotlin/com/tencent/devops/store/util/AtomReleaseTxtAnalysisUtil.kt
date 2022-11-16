@@ -28,13 +28,11 @@
 package com.tencent.devops.store.util
 
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomFileResource
-import com.tencent.devops.artifactory.pojo.enums.FileTypeEnum
 import com.tencent.devops.common.api.constant.CommonMessageCode
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.OkhttpUtils
 import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.service.utils.CommonUtils
 import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.store.api.common.ServiceStoreLogoResource
@@ -95,14 +93,16 @@ object AtomReleaseTxtAnalysisUtil {
             atomPath = atomPath,
             pathList = pathList
         )
+        val filePath = mutableMapOf<String, String>()
         val uploadFileToPathResult = uploadFileToPath(
             userId = userId,
             pathList = pathList,
             client = client,
             atomPath = atomPath,
-            result = result
+            result = result,
+            filePath = filePath
         )
-        return filePathReplace(uploadFileToPathResult.toMutableMap(), description)
+        return filePathReplace(uploadFileToPathResult.toMutableMap(), description, filePath)
     }
 
     private fun getAtomBasePath(): String {
@@ -134,7 +134,8 @@ object AtomReleaseTxtAnalysisUtil {
 
     fun filePathReplace(
         result: MutableMap<String, String>,
-        descriptionContent: String
+        descriptionContent: String,
+        filePath: Map<String, String>
     ): String {
         var content = descriptionContent
         // 替换资源路径
@@ -142,7 +143,7 @@ object AtomReleaseTxtAnalysisUtil {
             val analysisPattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"${it.key}\"\\)}})")
             val analysisMatcher: Matcher = analysisPattern.matcher(content)
             content = analysisMatcher.replaceFirst(
-                "![](${it.value.replace(fileSeparator, "\\$fileSeparator")})"
+                "![${filePath[it.key]}](${it.value.replace(fileSeparator, "\\$fileSeparator")})"
             )
         }
         return content
@@ -153,9 +154,10 @@ object AtomReleaseTxtAnalysisUtil {
         pathList: List<String>,
         client: Client,
         atomPath: String,
-        result: MutableMap<String, String>
+        result: MutableMap<String, String>,
+        filePath: MutableMap<String, String>
     ): Map<String, String> {
-        val serviceUrlPrefix = client.getServiceUrl(ServiceArchiveAtomFileResource::class)
+        client.getServiceUrl(ServiceArchiveAtomFileResource::class)
         pathList.forEach {
             val file = File("$atomPath${fileSeparator}file$fileSeparator$it")
             try {
@@ -179,6 +181,7 @@ object AtomReleaseTxtAnalysisUtil {
 //                    )
                     if (uploadFileResult.isOk()) {
                         result[it] = uploadFileResult.data!!.logoUrl!!
+                        filePath[it] = file.name
                     } else {
                         logger.warn("upload file result is fail, file path:$it")
                     }
