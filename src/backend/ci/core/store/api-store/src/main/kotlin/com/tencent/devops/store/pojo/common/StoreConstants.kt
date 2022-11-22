@@ -34,6 +34,7 @@ const val HOTTEST = "hottest"
 const val UN_RELEASE = "unRelease"
 const val TASK_JSON_NAME = "task.json"
 const val QUALITY_JSON_NAME = "quality.json"
+const val ERROR_JSON_NAME = "error.json"
 const val EXTENSION_JSON_NAME = "extension.json"
 const val README = "README.md"
 const val STORE_ATOM_STATUS = "STORE_ATOM_STATUS" // 插件状态
@@ -64,13 +65,14 @@ const val ATOM_INPUT = "input" // 插件输入
 const val ATOM_OUTPUT = "output" // 插件输出
 const val ATOM_NAMESPACE = "namespace" // 插件命名空间
 const val ATOM_UPLOAD_ID_KEY_PREFIX = "ATOM_UPLOAD_ID" // 插件包上传ID值Key前缀
+const val SERVICE_UPLOAD_ID_KEY_PREFIX = "SERVICE_UPLOAD_ID" // 微扩展包上传ID值Key前缀
 const val STORE_PUBLIC_FLAG_KEY_PREFIX = "STORE_PUBLIC_FLAG_KEY" // 公共组件Key前缀
 const val STORE_NORMAL_PROJECT_RUN_INFO_KEY_PREFIX = "STORE_NORMAL_PROJECT_RUN_INFO_KEY" // 组件对应普通项目的运行时信息Key前缀
 
-const val SERVICE_COLLABORATOR_APPLY_MOA_TEMPLATE = "SERIVCE_COLLABORATOR_APPLY_MOA_TEMPLATE" //  扩展服务协作开发申请MOA审批消息通知模板
-const val SERVICE_COLLABORATOR_APPLY_REFUSE_TEMPLATE = "SERIVCE_COLLABORATOR_APPLY_REFUSE" // 扩展服务协作开发申请被拒的消息通知模板
-const val EXTENSION_RELEASE_AUDIT_PASS_TEMPLATE = "EXTENSION_RELEASE_AUDIT_PASS_TEMPLATE" // 扩展服务发布审核通过消息通知模板
-const val EXTENSION_RELEASE_AUDIT_REFUSE_TEMPLATE = "EXTENSION_RELEASE_AUDIT_REFUSE_TEMPLATE" // 扩展服务发布审核被拒消息通知模板
+const val SERVICE_COLLABORATOR_APPLY_MOA_TEMPLATE = "SERIVCE_COLLABORATOR_APPLY_MOA_TEMPLATE" //  微扩展协作开发申请MOA审批消息通知模板
+const val SERVICE_COLLABORATOR_APPLY_REFUSE_TEMPLATE = "SERIVCE_COLLABORATOR_APPLY_REFUSE" // 微扩展协作开发申请被拒的消息通知模板
+const val EXTENSION_RELEASE_AUDIT_PASS_TEMPLATE = "EXTENSION_RELEASE_AUDIT_PASS_TEMPLATE" // 微扩展发布审核通过消息通知模板
+const val EXTENSION_RELEASE_AUDIT_REFUSE_TEMPLATE = "EXTENSION_RELEASE_AUDIT_REFUSE_TEMPLATE" // 微扩展发布审核被拒消息通知模板
 
 const val PIPELINE_TASK_PAUSE_NOTIFY = "PIPELINE_TASK_PAUSE_NOTIFY" // 插件暂停推送消息
 
@@ -133,4 +135,7 @@ const val KEY_INSTALL_TYPE = "installType"
 const val KEY_RUNTIME_VERSION = "runtimeVersion"
 const val KEY_PROJECT_CODE = "projectCode"
 const val KEY_CODE_SRC = "codeSrc"
+const val KEY_SERVICE_CODE = "serviceCode"
+const val KEY_EXT_SERVICE_IMAGE_INFO = "extServiceImageInfo"
+const val KEY_EXT_SERVICE_DEPLOY_INFO = "extServiceDeployInfo"
 const val KEY_FINISH_KILL_FLAG = "finishKillFlag"
