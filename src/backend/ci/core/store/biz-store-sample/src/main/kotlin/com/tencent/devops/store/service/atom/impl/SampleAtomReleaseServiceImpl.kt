@@ -48,6 +48,7 @@ import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.model.store.tables.records.TAtomRecord
 import com.tencent.devops.store.api.common.ServiceStoreLogoResource
 import com.tencent.devops.store.constant.StoreMessageCode
+import com.tencent.devops.store.dao.common.LabelDao
 import com.tencent.devops.store.pojo.atom.AtomReleaseRequest
 import com.tencent.devops.store.pojo.atom.MarketAtomCreateRequest
 import com.tencent.devops.store.pojo.atom.MarketAtomUpdateRequest
@@ -58,7 +59,7 @@ import com.tencent.devops.store.pojo.common.ReleaseProcessItem
 import com.tencent.devops.store.pojo.common.TASK_JSON_NAME
 import com.tencent.devops.store.pojo.common.enums.StoreTypeEnum
 import com.tencent.devops.store.service.atom.SampleAtomReleaseService
-import com.tencent.devops.store.util.AtomReleaseTxtAnalysisUtil
+import com.tencent.devops.store.utils.AtomReleaseTxtAnalysisUtil
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
@@ -67,9 +68,13 @@ import org.springframework.util.FileSystemUtils
 import java.io.File
 import java.io.InputStream
 import java.nio.charset.Charset
+import java.util.ArrayList
 
 @Service
-class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServiceImpl() {
+class SampleAtomReleaseServiceImpl constructor(
+    private val serviceStoreLogoResource: ServiceStoreLogoResource,
+    private val labelDao: LabelDao
+) : SampleAtomReleaseService, AtomReleaseServiceImpl() {
 
     override fun handleAtomPackage(
         marketAtomCreateRequest: MarketAtomCreateRequest,
@@ -261,7 +266,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             userId,
             MarketAtomCreateRequest(
                 projectCode = releaseInfo.projectId,
-                atomCode = releaseInfo.atomCode,
+                atomCode = atomCode,
                 name = releaseInfo.name,
                 language = releaseInfo.language,
                 frontendType = releaseInfo.configInfo.frontendType
@@ -286,7 +291,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         logger.info("uploadStoreLogo logoFilePath:${logoFile.path}")
         var uploadStoreLogoResult = Result(data = true, status = 0)
         if (logoFile.exists()) {
-            val result = client.get(ServiceStoreLogoResource::class).uploadStoreLogo(
+            val result = serviceStoreLogoResource.uploadStoreLogo(
                 userId = userId,
                 contentLength = logoFile.length(),
                 inputStream = logoFile.inputStream(),
@@ -330,7 +335,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     userId = userId,
                     projectCode = releaseInfo.projectId,
                     atomId = atomId,
-                    atomCode = releaseInfo.atomCode,
+                    atomCode = atomCode,
                     version = releaseInfo.versionInfo.version,
                     serviceUrlPrefix = client.getServiceUrl(ServiceArchiveAtomFileResource::class),
                     releaseType = releaseInfo.versionInfo.releaseType.name,
@@ -355,12 +360,16 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             zipFile.delete()
             FileSystemUtils.deleteRecursively(File(atomPath).parentFile)
         }
+        val labelIds = if (releaseInfo.labelCodes != null) {
+            labelDao.getIdsByCodes(dslContext, releaseInfo.labelCodes!!, 0)
+        } else emptyList()
+
         // 升级插件
         val updateMarketAtomResult = updateMarketAtom(
             userId,
             releaseInfo.projectId,
             MarketAtomUpdateRequest(
-                atomCode = releaseInfo.atomCode,
+                atomCode = atomCode,
                 name = releaseInfo.name,
                 category = releaseInfo.category,
                 jobType = releaseInfo.jobType,
@@ -371,7 +380,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 releaseType = releaseInfo.versionInfo.releaseType,
                 versionContent = releaseInfo.versionInfo.versionContent,
                 publisher = releaseInfo.versionInfo.publisher,
-                labelIdList = releaseInfo.labelCodes,
+                labelIdList = ArrayList(labelIds),
                 frontendType = releaseInfo.configInfo.frontendType,
                 logoUrl = releaseInfo.logoUrl,
                 classifyCode = releaseInfo.classifyCode
