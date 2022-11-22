@@ -71,10 +71,7 @@ import java.nio.charset.Charset
 import java.util.ArrayList
 
 @Service
-class SampleAtomReleaseServiceImpl constructor(
-    private val serviceStoreLogoResource: ServiceStoreLogoResource,
-    private val labelDao: LabelDao
-) : SampleAtomReleaseService, AtomReleaseServiceImpl() {
+class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServiceImpl() {
 
     override fun handleAtomPackage(
         marketAtomCreateRequest: MarketAtomCreateRequest,

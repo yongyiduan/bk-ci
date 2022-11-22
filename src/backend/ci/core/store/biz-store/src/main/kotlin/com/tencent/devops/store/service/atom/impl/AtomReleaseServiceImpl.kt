@@ -56,6 +56,7 @@ import com.tencent.devops.quality.api.v2.pojo.QualityControlPoint
 import com.tencent.devops.quality.api.v2.pojo.enums.IndicatorType
 import com.tencent.devops.quality.api.v2.pojo.op.IndicatorUpdate
 import com.tencent.devops.quality.api.v2.pojo.op.QualityMetaData
+import com.tencent.devops.store.api.common.ServiceStoreLogoResource
 import com.tencent.devops.store.constant.StoreMessageCode
 import com.tencent.devops.store.constant.StoreMessageCode.USER_UPLOAD_PACKAGE_INVALID
 import com.tencent.devops.store.dao.atom.AtomDao
@@ -64,6 +65,7 @@ import com.tencent.devops.store.dao.atom.MarketAtomDao
 import com.tencent.devops.store.dao.atom.MarketAtomEnvInfoDao
 import com.tencent.devops.store.dao.atom.MarketAtomFeatureDao
 import com.tencent.devops.store.dao.atom.MarketAtomVersionLogDao
+import com.tencent.devops.store.dao.common.LabelDao
 import com.tencent.devops.store.dao.common.StoreMemberDao
 import com.tencent.devops.store.dao.common.StoreProjectRelDao
 import com.tencent.devops.store.dao.common.StoreReleaseDao
@@ -150,6 +152,10 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
     lateinit var storeCommonService: StoreCommonService
     @Autowired
     lateinit var redisOperation: RedisOperation
+    @Autowired
+    lateinit var serviceStoreLogoResource: ServiceStoreLogoResource
+    @Autowired
+    lateinit var labelDao: LabelDao
     @Autowired
     lateinit var client: Client
     @Autowired
