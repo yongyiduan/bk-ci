@@ -93,6 +93,7 @@ object AtomReleaseTxtAnalysisUtil {
             atomPath = atomPath,
             pathList = pathList
         )
+        logger.debug("descriptionAnalysis regexAnalysis pathList:$pathList")
         val uploadFileToPathResult = uploadFileToPath(
             userId = userId,
             pathList = pathList,
