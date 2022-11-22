@@ -25,7 +25,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.store.util
+package com.tencent.devops.store.utils
 
 import com.tencent.devops.artifactory.api.ServiceArchiveAtomFileResource
 import com.tencent.devops.common.api.constant.CommonMessageCode
@@ -50,7 +50,7 @@ import java.util.regex.Pattern
 
 object AtomReleaseTxtAnalysisUtil {
 
-    private const val BK_CI_ATOM_DIR = "bk-atom-test"
+    private const val BK_CI_ATOM_DIR = "bk-atom"
     private const val BKREPO_DEFAULT_USER = "admin"
     private const val BKREPO_STORE_PROJECT_ID = "bk-store"
     private const val BK_CI_PATH_REGEX = "(\\\$\\{\\{indexFile\\()(\"[^\"]*\")"
@@ -67,42 +67,40 @@ object AtomReleaseTxtAnalysisUtil {
         val pathList = mutableListOf<String>()
         val result = mutableMapOf<String, String>()
         var descriptionText = description
-            if (description.startsWith("http") && description.endsWith(".md")) {
-                // 读取远程文件
-                var inputStream: InputStream? = null
-                val file = File("$atomPath${fileSeparator}file${fileSeparator}description.md")
-                try {
-                    inputStream = URL(description).openStream()
-                    FileOutputStream(file).use { outputStream ->
-                        var read: Int
-                        val bytes = ByteArray(FILE_DEFAULT_SIZE)
-                        while (inputStream.read(bytes).also { read = it } != -1) {
-                            outputStream.write(bytes, 0, read)
-                        }
+        if (description.startsWith("http") && description.endsWith(".md")) {
+            // 读取远程文件
+            var inputStream: InputStream? = null
+            val file = File("$atomPath${fileSeparator}file${fileSeparator}description.md")
+            try {
+                inputStream = URL(description).openStream()
+                FileOutputStream(file).use { outputStream ->
+                    var read: Int
+                    val bytes = ByteArray(FILE_DEFAULT_SIZE)
+                    while (inputStream.read(bytes).also { read = it } != -1) {
+                        outputStream.write(bytes, 0, read)
                     }
-                    descriptionText = file.readText()
-                } catch (e: IOException) {
-                    logger.warn("get remote file fail:${e.message}")
-                } finally {
-                    inputStream?.close()
-                    file.delete()
                 }
+                descriptionText = file.readText()
+            } catch (e: IOException) {
+                logger.warn("get remote file fail:${e.message}")
+            } finally {
+                inputStream?.close()
+                file.delete()
             }
-        regexAnalysis(
+        }
+        descriptionText = regexAnalysis(
             input = descriptionText,
             atomPath = atomPath,
             pathList = pathList
         )
-        val filePath = mutableMapOf<String, String>()
         val uploadFileToPathResult = uploadFileToPath(
             userId = userId,
             pathList = pathList,
             client = client,
             atomPath = atomPath,
-            result = result,
-            filePath = filePath
+            result = result
         )
-        return filePathReplace(uploadFileToPathResult.toMutableMap(), description, filePath)
+        return filePathReplace(uploadFileToPathResult.toMutableMap(), descriptionText)
     }
 
     private fun getAtomBasePath(): String {
@@ -113,16 +111,18 @@ object AtomReleaseTxtAnalysisUtil {
         input: String,
         atomPath: String,
         pathList: MutableList<String>
-    ) {
+    ): String {
+        var descriptionContent = input
         val pattern: Pattern = Pattern.compile(BK_CI_PATH_REGEX)
-        val matcher: Matcher = pattern.matcher(input)
+        val matcher: Matcher = pattern.matcher(descriptionContent)
         while (matcher.find()) {
             val path = matcher.group(2).replace("\"", "").removePrefix(fileSeparator)
             if (path.endsWith(".md")) {
                 val file = File("$atomPath${fileSeparator}file$fileSeparator$path")
+                descriptionContent = file.readText()
                 if (file.exists()) {
                     return regexAnalysis(
-                        input = file.readText(),
+                        input = descriptionContent,
                         atomPath = atomPath,
                         pathList = pathList
                     )
@@ -130,12 +130,12 @@ object AtomReleaseTxtAnalysisUtil {
             }
             pathList.add(path)
         }
+        return descriptionContent
     }
 
     fun filePathReplace(
         result: MutableMap<String, String>,
-        descriptionContent: String,
-        filePath: Map<String, String>
+        descriptionContent: String
     ): String {
         var content = descriptionContent
         // 替换资源路径
@@ -143,7 +143,7 @@ object AtomReleaseTxtAnalysisUtil {
             val analysisPattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"${it.key}\"\\)}})")
             val analysisMatcher: Matcher = analysisPattern.matcher(content)
             content = analysisMatcher.replaceFirst(
-                "![${filePath[it.key]}](${it.value.replace(fileSeparator, "\\$fileSeparator")})"
+                "![](${it.value.replace(fileSeparator, "\\$fileSeparator")})"
             )
         }
         return content
@@ -154,43 +154,27 @@ object AtomReleaseTxtAnalysisUtil {
         pathList: List<String>,
         client: Client,
         atomPath: String,
-        result: MutableMap<String, String>,
-        filePath: MutableMap<String, String>
+        result: MutableMap<String, String>
     ): Map<String, String> {
         client.getServiceUrl(ServiceArchiveAtomFileResource::class)
-        pathList.forEach {
-            val file = File("$atomPath${fileSeparator}file$fileSeparator$it")
-            try {
-                if (file.exists()) {
-                    val uploadFileResult = client.get(ServiceStoreLogoResource::class).uploadStoreLogo(
-                        userId = userId,
-                        contentLength = file.length(),
-                        inputStream = file.inputStream(),
-                        disposition = FormDataContentDisposition(
-                            "form-data; name=\"logo\"; filename=\"${file.name}\""
-                        )
+        pathList.forEach { path ->
+            val file = File("$atomPath${fileSeparator}file$fileSeparator$path")
+            if (file.exists()) {
+                val uploadFileResult = client.get(ServiceStoreLogoResource::class).uploadStoreLogo(
+                    userId = userId,
+                    contentLength = file.length(),
+                    inputStream = file.inputStream(),
+                    disposition = FormDataContentDisposition(
+                        "form-data; name=\"logo\"; filename=\"${file.name}\""
                     )
-
-//                        CommonUtils.serviceUploadFileToPath(
-//                        userId = BKREPO_DEFAULT_USER,
-//                        projectId = BKREPO_STORE_PROJECT_ID,
-//                        serviceUrlPrefix = serviceUrlPrefix,
-//                        file = file,
-//                        fileType = FileTypeEnum.BK_STATIC.name,
-//                        path = "${UUIDUtil.generate()}${file.name.substring(file.name.indexOf("."))}"
-//                    )
-                    if (uploadFileResult.isOk()) {
-                        result[it] = uploadFileResult.data!!.logoUrl!!
-                        filePath[it] = file.name
-                    } else {
-                        logger.warn("upload file result is fail, file path:$it")
-                    }
-                } else {
-                    logger.warn("Resource file does not exist:${file.path}")
+                ).data
+                uploadFileResult?.let { storeLogoInfo ->
+                    result[path] = storeLogoInfo.logoUrl!!
                 }
-            } finally {
-                file.delete()
+            } else {
+                logger.warn("Resource file does not exist:${file.path}")
             }
+            file.delete()
         }
         return result
     }

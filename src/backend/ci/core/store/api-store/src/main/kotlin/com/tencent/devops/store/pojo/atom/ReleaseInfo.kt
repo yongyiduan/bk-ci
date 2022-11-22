@@ -39,9 +39,6 @@ import io.swagger.annotations.ApiModelProperty
 data class ReleaseInfo(
     @ApiModelProperty("项目编码", required = true)
     var projectId: String,
-    @ApiModelProperty("插件代码", required = true)
-    @field:BkField(patternStyle = BkStyleEnum.CODE_STYLE)
-    var atomCode: String,
     @ApiModelProperty("插件名称", required = true)
     @field:BkField(patternStyle = BkStyleEnum.NAME_STYLE)
     var name: String,
@@ -61,7 +58,7 @@ data class ReleaseInfo(
     val classifyCode: String,
     @ApiModelProperty("适用Job类型", required = true)
     val jobType: JobTypeEnum,
-    @JsonProperty(value = "labelIdList", required = false)
+    @JsonProperty(value = "labelCodes", required = false)
     @ApiModelProperty("标签id集合", name = "labelCodes")
     val labelCodes: ArrayList<String>? = null,
     @ApiModelProperty("版本信息", required = true)
@@ -70,5 +67,6 @@ data class ReleaseInfo(
     @field:BkField(maxLength = 256)
     val summary: String,
     @ApiModelProperty("插件描述", required = true)
+    @field:BkField(maxLength = 65535)
     var description: String
 )
