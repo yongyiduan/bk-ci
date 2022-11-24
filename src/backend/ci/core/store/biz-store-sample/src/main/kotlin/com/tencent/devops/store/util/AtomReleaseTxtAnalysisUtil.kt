@@ -144,7 +144,7 @@ object AtomReleaseTxtAnalysisUtil {
             val analysisPattern: Pattern = Pattern.compile("(\\\$\\{\\{indexFile\\(\"${it.key}\"\\)}})")
             val analysisMatcher: Matcher = analysisPattern.matcher(content)
             content = analysisMatcher.replaceFirst(
-                "![](${it.value.replace(fileSeparator, "\\$fileSeparator")})"
+                "![${it.key}](${it.value.replace(fileSeparator, "\\$fileSeparator")})"
             )
         }
         return content
@@ -175,6 +175,7 @@ object AtomReleaseTxtAnalysisUtil {
             }
             file.delete()
         }
+        logger.warn("uploadFileToPath #$result")
         return result
     }
 
