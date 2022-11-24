@@ -208,36 +208,6 @@ object AtomReleaseTxtAnalysisUtil {
         return zipPath
     }
 
-    fun unzipFile(
-        disposition: FormDataContentDisposition,
-        inputStream: InputStream,
-        userId: String,
-        atomCode: String
-    ): String {
-        val fileName = disposition.fileName
-        val index = fileName.lastIndexOf(".")
-        val fileType = fileName.substring(index + 1)
-        // 解压到指定目录
-        val atomPath = buildAtomArchivePath(userId, atomCode)
-        if (!File(atomPath).exists()) {
-            val file = Files.createTempFile(UUIDUtil.generate(), ".$fileType").toFile()
-            file.outputStream().use {
-                inputStream.copyTo(it)
-            }
-            try {
-                ZipUtil.unZipFile(file, atomPath, false)
-            } finally {
-                file.delete() // 删除临时文件
-            }
-        }
-        return atomPath
-    }
-
-    fun randomFile(fileExtension: String): File {
-        val suffix = if (fileExtension.isBlank()) "" else ".$fileExtension"
-        return Files.createTempFile(UUIDUtil.generate(), suffix).toFile()
-    }
-
     fun serviceArchiveAtomFile(
         userId: String,
         projectCode: String,
@@ -262,7 +232,7 @@ object AtomReleaseTxtAnalysisUtil {
         }
     }
 
-    private fun buildAtomArchivePath(userId: String, atomCode: String) =
+    fun buildAtomArchivePath(userId: String, atomCode: String) =
         "${getAtomBasePath()}$fileSeparator$BK_CI_ATOM_DIR$fileSeparator$userId$fileSeparator$atomCode" +
                 "$fileSeparator${UUIDUtil.generate()}"
 }
