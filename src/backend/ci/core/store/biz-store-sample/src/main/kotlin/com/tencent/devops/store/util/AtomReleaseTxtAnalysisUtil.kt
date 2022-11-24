@@ -169,7 +169,7 @@ object AtomReleaseTxtAnalysisUtil {
                     fileChannelType = FileChannelTypeEnum.WEB_SHOW.name,
                     logo = true
                 ).data
-                fileUrl?.let { result[path] = fileUrl }
+                fileUrl?.let { result[path] = StoreUtils.removeUrlHost(fileUrl) }
             } else {
                 logger.warn("Resource file does not exist:${file.path}")
             }
