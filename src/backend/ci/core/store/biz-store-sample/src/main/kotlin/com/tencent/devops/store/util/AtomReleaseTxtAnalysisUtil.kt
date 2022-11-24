@@ -254,6 +254,7 @@ object AtomReleaseTxtAnalysisUtil {
                 "&version=$version&releaseType=$releaseType&os=$os"
         OkhttpUtils.uploadFile(serviceUrl, file).use { response ->
             val responseContent = response.body()!!.string()
+            logger.info("serviceArchiveAtomFile responseContent:$responseContent")
             if (!response.isSuccessful) {
                 return MessageCodeUtil.generateResponseDataObject(CommonMessageCode.SYSTEM_ERROR)
             }
