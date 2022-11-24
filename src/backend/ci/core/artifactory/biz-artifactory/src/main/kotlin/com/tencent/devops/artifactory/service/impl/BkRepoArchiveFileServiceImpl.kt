@@ -101,6 +101,7 @@ class BkRepoArchiveFileServiceImpl @Autowired constructor(
     ): String {
         val fileTypeName = file.name
         val destPath = filePath ?: DefaultPathUtils.randomFileName(fileTypeName.substring(fileTypeName.indexOf(".") + 1))
+        logger.debug("BkRepoArchiveFileServiceImpl destPath$destPath")
         val metadata = mutableMapOf<String, String>()
         metadata["shaContent"] = file.inputStream().use { ShaUtils.sha1InputStream(it) }
         props?.forEach {
