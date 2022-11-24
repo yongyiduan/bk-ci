@@ -325,9 +325,16 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
             it.write(taskJson.toByteArray(charset("utf-8")))
         }
         // 归档插件包
-        val zipFile = File(AtomReleaseTxtAnalysisUtil.zipFiles(userId, atomCode, atomPath))
+//        val zipFile = File(AtomReleaseTxtAnalysisUtil.zipFiles(userId, atomCode, atomPath))
+        val fileName = String(
+            disposition.fileName.toByteArray(
+                Charset.forName("ISO8859-1")),
+            Charset.forName("UTF-8")
+        )
+        val file = AtomReleaseTxtAnalysisUtil.randomFile(fileName)
+        file.outputStream().use { inputStream.copyTo(it) }
         try {
-            if (zipFile.exists()) {
+            if (file.exists()) {
                 val archiveAtomResult = AtomReleaseTxtAnalysisUtil.serviceArchiveAtomFile(
                     userId = userId,
                     projectCode = releaseInfo.projectId,
@@ -336,7 +343,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                     version = releaseInfo.versionInfo.version,
                     serviceUrlPrefix = client.getServiceUrl(ServiceArchiveAtomFileResource::class),
                     releaseType = releaseInfo.versionInfo.releaseType.name,
-                    file = zipFile,
+                    file = file,
                     os = JsonUtil.toJson(releaseInfo.os)
                 )
                 if (archiveAtomResult.isNotOk()) {
@@ -354,7 +361,7 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
                 message = ignored.message
             )
         } finally {
-            zipFile.delete()
+            file.delete()
             FileSystemUtils.deleteRecursively(File(atomPath).parentFile)
         }
         val labelIds = if (releaseInfo.labelCodes != null) {
