@@ -200,15 +200,6 @@ object AtomReleaseTxtAnalysisUtil {
         return Result(logoUrl)
     }
 
-    // 生成压缩文件
-    fun zipFiles(userId: String, atomCode: String, atomPath: String): String {
-        val zipPath = getAtomBasePath() +
-                "$fileSeparator$BK_CI_ATOM_DIR$fileSeparator$userId$fileSeparator$atomCode" +
-                "$fileSeparator$atomCode.zip"
-        ZipUtil.zipDir(File(atomPath), zipPath)
-        return zipPath
-    }
-
     fun serviceArchiveAtomFile(
         userId: String,
         projectCode: String,
