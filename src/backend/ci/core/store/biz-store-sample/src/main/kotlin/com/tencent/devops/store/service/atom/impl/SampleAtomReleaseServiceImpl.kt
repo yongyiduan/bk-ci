@@ -44,11 +44,11 @@ import com.tencent.devops.common.api.constant.TEST
 import com.tencent.devops.common.api.constant.UNDO
 import com.tencent.devops.common.api.pojo.Result
 import com.tencent.devops.common.api.util.JsonUtil
+import com.tencent.devops.common.api.util.UUIDUtil
 import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.common.service.utils.ZipUtil
 import com.tencent.devops.model.store.tables.records.TAtomRecord
-import com.tencent.devops.store.api.common.ServiceStoreLogoResource
 import com.tencent.devops.store.constant.StoreMessageCode
-import com.tencent.devops.store.dao.common.LabelDao
 import com.tencent.devops.store.pojo.atom.AtomReleaseRequest
 import com.tencent.devops.store.pojo.atom.MarketAtomCreateRequest
 import com.tencent.devops.store.pojo.atom.MarketAtomUpdateRequest
@@ -68,6 +68,7 @@ import org.springframework.util.FileSystemUtils
 import java.io.File
 import java.io.InputStream
 import java.nio.charset.Charset
+import java.nio.file.Files
 import java.util.ArrayList
 
 @Service
@@ -231,12 +232,17 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         disposition: FormDataContentDisposition
     ): Result<Boolean> {
         // 解压插件包到临时目录
-        val atomPath = AtomReleaseTxtAnalysisUtil.unzipFile(
-            userId = userId,
-            atomCode = atomCode,
-            inputStream = inputStream,
-            disposition = disposition
-        )
+        val fileName = disposition.fileName
+        val index = fileName.lastIndexOf(".")
+        val fileType = fileName.substring(index + 1)
+        val file = Files.createTempFile(UUIDUtil.generate(), ".$fileType").toFile()
+        file.outputStream().use {
+            inputStream.copyTo(it)
+        }
+        val atomPath = AtomReleaseTxtAnalysisUtil.buildAtomArchivePath(userId, atomCode)
+        if (!File(atomPath).exists()) {
+            ZipUtil.unZipFile(file, atomPath, false)
+        }
         val taskJsonFile = File("$atomPath$fileSeparator$TASK_JSON_NAME")
         if (!taskJsonFile.exists()) {
             return MessageCodeUtil.generateResponseDataObject(
@@ -326,13 +332,6 @@ class SampleAtomReleaseServiceImpl : SampleAtomReleaseService, AtomReleaseServic
         }
         // 归档插件包
 //        val zipFile = File(AtomReleaseTxtAnalysisUtil.zipFiles(userId, atomCode, atomPath))
-        val fileName = String(
-            disposition.fileName.toByteArray(
-                Charset.forName("ISO8859-1")),
-            Charset.forName("UTF-8")
-        )
-        val file = AtomReleaseTxtAnalysisUtil.randomFile(fileName)
-        file.outputStream().use { inputStream.copyTo(it) }
         try {
             if (file.exists()) {
                 val archiveAtomResult = AtomReleaseTxtAnalysisUtil.serviceArchiveAtomFile(

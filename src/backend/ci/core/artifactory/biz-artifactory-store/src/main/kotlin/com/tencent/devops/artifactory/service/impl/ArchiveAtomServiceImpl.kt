@@ -264,8 +264,6 @@ abstract class ArchiveAtomServiceImpl : ArchiveAtomService {
         // 解压到指定目录
         val atomArchivePath = buildAtomArchivePath(projectCode, atomCode, version)
         logger.info("unzipFile atomArchivePath is $atomArchivePath  filePath:${file.path}|${file.exists()}")
-        val zipFile = ZipFile(file)
-        zipFile.entries().toList().forEach { logger.info("unzipFile atomArchiveFileName is ${it.name}") }
         try {
             ZipUtil.unZipFile(file, atomArchivePath, false)
             // 判断解压目录下面是否有自定义UI前端文件
@@ -278,6 +276,8 @@ abstract class ArchiveAtomServiceImpl : ArchiveAtomService {
                 )
                 FileSystemUtils.deleteRecursively(frontendFileDir)
             }
+        } catch (e: Exception) {
+            logger.error("UNZIP file[${file.canonicalPath}] fileNames:$fileName with error: ", e)
         } finally {
             file.delete() // 删除临时文件
         }
