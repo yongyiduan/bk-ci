@@ -53,8 +53,6 @@ import java.util.regex.Pattern
 object AtomReleaseTxtAnalysisUtil {
 
     private const val BK_CI_ATOM_DIR = "bk-atom"
-    private const val BKREPO_DEFAULT_USER = "admin"
-    private const val BKREPO_STORE_PROJECT_ID = "bk-store"
     private const val BK_CI_PATH_REGEX = "(\\\$\\{\\{indexFile\\()(\"[^\"]*\")"
     private val fileSeparator: String = System.getProperty("file.separator")
     private val logger = LoggerFactory.getLogger(AtomReleaseTxtAnalysisUtil::class.java)
@@ -233,6 +231,11 @@ object AtomReleaseTxtAnalysisUtil {
             }
         }
         return atomPath
+    }
+
+    fun randomFile(fileExtension: String): File {
+        val suffix = if (fileExtension.isBlank()) "" else ".$fileExtension"
+        return Files.createTempFile(UUIDUtil.generate(), suffix).toFile()
     }
 
     fun serviceArchiveAtomFile(
