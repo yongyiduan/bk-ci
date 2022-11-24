@@ -276,6 +276,8 @@ abstract class ArchiveAtomServiceImpl : ArchiveAtomService {
                 )
                 FileSystemUtils.deleteRecursively(frontendFileDir)
             }
+        } catch (e: Exception) {
+            logger.error("UNZIP file[${file.canonicalPath}] fileNames:$fileName with error: ", e)
         } finally {
             file.delete() // 删除临时文件
         }
