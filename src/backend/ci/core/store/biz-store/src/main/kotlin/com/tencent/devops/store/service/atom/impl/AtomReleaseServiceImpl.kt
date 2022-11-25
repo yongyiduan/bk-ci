@@ -160,6 +160,8 @@ abstract class AtomReleaseServiceImpl @Autowired constructor() : AtomReleaseServ
     @Autowired
     lateinit var atomQualityService: AtomQualityService
     @Autowired
+    lateinit var storeLogoService: StoreLogoService
+    @Autowired
     lateinit var storeCommonService: StoreCommonService
     @Autowired
     lateinit var redisOperation: RedisOperation
