@@ -459,7 +459,8 @@ class BkRepoArchiveFileServiceImpl @Autowired constructor(
         includeFolder: Boolean?,
         deep: Boolean?,
         page: Int?,
-        pageSize: Int?
+        pageSize: Int?,
+        modifiedTimeDesc: Boolean?
     ): Page<FileInfo> {
         val data = bkRepoClient.listFilePage(
             userId = userId,
@@ -469,7 +470,8 @@ class BkRepoArchiveFileServiceImpl @Autowired constructor(
             includeFolders = includeFolder ?: true,
             deep = deep ?: false,
             page = page ?: 1,
-            pageSize = pageSize ?: 20
+            pageSize = pageSize ?: 20,
+            modifiedTimeDesc = modifiedTimeDesc ?: false
         )
         val fileInfoList = data.records.map { it.toFileInfo() }
         return Page(data.pageNumber, data.pageSize, data.totalRecords, fileInfoList)
