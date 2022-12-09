@@ -29,6 +29,7 @@ java_argv+=(
   "-Dservice-suffix="
   "-Dspring.profiles.active=local,dev"
   "-Dspring.application.name=$MS_NAME"
+  "-Dspring.jmx.enabled=false"
 )
 
 echo "run java"
