@@ -191,7 +191,7 @@ influxdb:
   influxdb:
     initdbScripts: 
       creata_db.sh: |
-        influx -host 127.0.0.1 -port "$INFLUXDB_HTTP_PORT_NUMBER" -username "${INFLUXDB_ADMIN_USER}" -password "${INFLUXDB_ADMIN_USER_PASSWORD}" -execute "create database agentMetrix;"
+        influx -host localhost -port "$INFLUXDB_HTTP_PORT_NUMBER" -username "${INFLUXDB_ADMIN_USER}" -password "${INFLUXDB_ADMIN_USER_PASSWORD}" -execute "create database agentMetrix;"
 mongodb:
   # 是否部署mongodb
   # 如果需要使用外部数据库，设置为false并配置external.mongodb
@@ -208,7 +208,7 @@ mongodb:
     size: 10Gi
   initdbScripts:
     create_admin_user.sh: |
-      $MONGODB_BIN_DIR/mongo admin --host 127.0.0.1 --port $MONGODB_PORT_NUMBER -u root -p $MONGODB_ROOT_PASSWORD << EOF
+      $MONGODB_BIN_DIR/mongo admin --host localhost --port $MONGODB_PORT_NUMBER -u root -p $MONGODB_ROOT_PASSWORD << EOF
       use db_turbo
       db.createUser({ user: "$MONGODB_USERNAME" , pwd: "$MONGODB_PASSWORD" , roles: [{role: "dbOwner" , db:"db_turbo"}]})
       use db_quartz
