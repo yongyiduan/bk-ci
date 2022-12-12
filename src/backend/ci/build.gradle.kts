@@ -14,10 +14,6 @@ allprojects {
     version = (System.getProperty("ci_version") ?: "1.9.0") +
             if (System.getProperty("snapshot") == "true") "-SNAPSHOT" else "-RELEASE"
 
-    // TODO bkrepo依赖到 , 后续加到framework后可以删掉
-    repositories {
-        maven(url = "https://repo.spring.io/milestone")
-    }
     // 版本管理
     dependencyManagement {
         setApplyMavenExclusions(false)
@@ -103,15 +99,13 @@ allprojects {
                 entry("pinyin-plus")
             }
             dependency("com.perforce:p4java:${Versions.p4}")
-            dependency("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.JacksonDatatypeJsr}")
             dependencySet("io.github.resilience4j:${Versions.Resilience4j}") {
                 entry("resilience4j-circuitbreaker")
             }
-            // TODO 修复all-namespace无效的问题, 等后面spring cloud版本升级上来就可以去掉
-            dependency(
-                "org.springframework.cloud:spring-cloud-kubernetes-client-discovery:" +
-                        "${Versions.KubernetesDiscovery}"
-            )
+            dependencySet("org.eclipse.jgit:${Versions.jgit}") {
+                entry("org.eclipse.jgit")
+                entry("org.eclipse.jgit.ssh.jsch")
+            }
             // TODO 修复IPv6单栈环境报错问题, 等后面Okhttp3版本升级上来就可以去掉
             dependencySet("com.squareup.okhttp3:${Versions.Okhttp}") {
                 entry("logging-interceptor")
