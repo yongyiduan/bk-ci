@@ -26,7 +26,7 @@ stages:
         checkout: "https://git.woa.com/bkdevops/devops-config.git"
         with:
           pullType: "BRANCH"
-          refName: "integration"
+          refName: "develop"
           localPath: "devops-config"
       - uses: calculatehash@1.*
         id: calculate
