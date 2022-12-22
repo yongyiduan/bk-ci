@@ -26,7 +26,7 @@ stages:
         checkout: "https://git.woa.com/bkdevops/devops-config.git"
         with:
           pullType: "BRANCH"
-          refName: "integration"
+          refName: "develop"
           localPath: "devops-config"
       - uses: calculatehash@1.*
         id: calculate
@@ -75,8 +75,8 @@ stages:
           cp -r ./* ${{ ci.workspace }}/ci/frontend/
           cp ./console/frontend#console#index.html ${{ ci.workspace }}/support-files/templates/ || echo "no console module"
           cp ./pipeline/frontend#pipeline#index.html ${{ ci.workspace }}/support-files/templates/ || echo "no pipeline module"
-          cp ./manage/index.html ${{ ci.workspace }}/support-files/templates/ || echo "no manage module"
-          cp ./permission/index.html ${{ ci.workspace }}/support-files/templates/ || echo "no permission module"
+          cp ./manage/frontend#manage#index.html ${{ ci.workspace }}/support-files/templates/ || echo "no manage module"
+          cp ./permission/frontend#permission#index.html ${{ ci.workspace }}/support-files/templates/ || echo "no permission module"
 
           cd ${{ ci.workspace }}/scripts/
           cp -rf ci_env_dev.properties ci_env.properties
