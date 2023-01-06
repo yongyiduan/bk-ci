@@ -53,12 +53,18 @@
       "devops-vs",
       "bk-pipeline",
       "devops-stream",
-      "devops-metrics"
+      "devops-metrics",
+      "devops-manage",
+      "devops-permission"
     ],
     "nohoist": [
       "devops-stream",
       "devops-metrics",
-      "devops-metrics/**"
+      "devops-metrics/**",
+      "devops-manage",
+      "devops-manage/**",
+      "devops-permission",
+      "devops-permission/**"
     ]
   },
   "dependencies": {

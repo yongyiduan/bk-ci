@@ -13,12 +13,16 @@
                 <template v-if="hasProjectList">
                     <empty-tips
                         v-if="!hasProject"
-                        :show-lock="true"
                         :title="$t('accessDeny.title')"
                         :desc="$t('accessDeny.desc')"
                     >
                         <bk-button
                             theme="primary"
+                            @click="handleApplyJoin"
+                        >
+                            {{ $t('accessDeny.applyJoin') }}
+                        </bk-button>
+                        <bk-button
                             @click="switchProject"
                         >
                             {{ $t('accessDeny.switchProject') }}
@@ -31,7 +35,6 @@
                             <bk-button theme="success">{{ $t('apply') }}</bk-button>
                         </a>
                     </empty-tips>
-
                     <empty-tips
                         v-else-if="isDisableProject"
                         :title="$t('accessDeny.projectBan')"
@@ -61,6 +64,7 @@
         <ask-permission-dialog />
         <extension-aside-panel />
         <extension-dialog />
+        <apply-project-dialog ref="applyProjectDialog" :project-code="curProjectCode" />
     </div>
 </template>
 
@@ -70,6 +74,7 @@
     import AskPermissionDialog from '../components/AskPermissionDialog/AskPermissionDialog.vue'
     import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
     import ExtensionDialog from '../components/ExtensionDialog/index.vue'
+    import ApplyProjectDialog from '../components/ApplyProjectDialog/index.vue'
     import { Component } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
     import eventBus from '../utils/eventBus'
@@ -85,7 +90,8 @@
             Header,
             AskPermissionDialog,
             ExtensionAsidePanel,
-            ExtensionDialog
+            ExtensionDialog,
+            ApplyProjectDialog
         }
     })
     export default class Index extends Vue {
@@ -106,28 +112,36 @@
         }
 
         get hasProject (): boolean {
-            return this.projectList.some(project => project.projectCode === this.$route.params.projectId)
+            return this.projectList.some(project => project.projectCode === this.curProjectCode)
         }
 
         get isDisableProject (): boolean {
-            const project = this.disableProjectList.find(project => project.projectCode === this.$route.params.projectId)
+            const project = this.disableProjectList.find(project => project.projectCode === this.curProjectCode)
             return project ? !project.enabled : false
         }
 
         get isApprovalingProject (): boolean {
-            return !!this.approvalingProjectList.find(project => project.projectCode === this.$route.params.projectId)
+            return !!this.approvalingProjectList.find(project => project.projectCode === this.curProjectCode)
         }
 
         get isOnlineProject (): boolean {
-            return !!this.enableProjectList.find(project => project.projectCode === this.$route.params.projectId)
+            return !!this.enableProjectList.find(project => project.projectCode === this.curProjectCode)
         }
 
         get hasProjectList (): boolean {
             return this.headerConfig.showProjectList
         }
 
+        get curProjectCode (): string {
+            return this.$route.params.projectId
+        }
+
         switchProject () {
             this.iframeUtil.toggleProjectMenu(true)
+        }
+
+        handleApplyJoin () {
+            this.$refs.applyProjectDialog.isShow = true
         }
 
         created () {

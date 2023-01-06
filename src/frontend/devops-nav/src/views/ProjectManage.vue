@@ -3,7 +3,10 @@
         v-bkloading="{ isLoading: isDataLoading }"
         style="width: 100%"
     >
-        <div class="biz-pm biz-pm-index biz-create-pm">
+        <div class="manage-header">
+            {{ $t('projectManage') }}
+        </div>
+        <section class="biz-pm biz-pm-index biz-create-pm">
             <template v-if="projectList.length || isDataLoading">
                 <div class="biz-pm-header">
                     <div class="title">
@@ -35,10 +38,10 @@
                 </div>
                 <bk-table
                     v-if="curProjectList.length"
-                    class="biz-table"
+                    class="biz-table mt20"
                     size="medium"
-                    :data="formatPageData"
-                    :pagination="pageConf"
+                    :data="curProjectList"
+                    :pagination="pagination"
                     @page-change="pageChange"
                     @page-limit-change="limitChange"
                 >
@@ -47,27 +50,23 @@
                         prop="logoAddr"
                         width="300"
                     >
-                        <template slot-scope="props">
+                        <template slot-scope="{ row }">
                             <div class="project-name-cell">
                                 <span
-                                    v-if="props.row.logoAddr"
+                                    v-if="row.logoAddr"
                                     class="avatar"
-                                    @click="modifyLogo(props.row)"
                                 >
                                     <img
                                         class="avatar-addr"
-                                        :src="props.row.logoAddr"
+                                        :src="row.logoAddr"
                                     >
-                                    <span class="bg-avatar">{{ $t('editLabel') }}</span>
                                 </span>
                                 <span
                                     v-else
                                     class="avatar"
-                                    :class="['project-avatar', `match-color-${matchForCode(props.row.projectCode)}`]"
-                                    @click="modifyLogo(props.row)"
+                                    :class="['project-avatar', `match-color-${matchForCode(row.projectCode)}`]"
                                 >
-                                    {{ props.row.projectName.substr(0, 1) }}
-                                    <span class="bg-avatar">{{ $t('editLabel') }}</span>
+                                    {{ row.projectName.substr(0, 1) }}
                                 </span>
                                 <div class="info">
                                     <p class="title">
@@ -92,16 +91,56 @@
                         label="关联CC业务"
                         prop="ccAppName"
                         :formatter="(row, column, cellValue, index) => cellValue || '--'"
-                    >
-                    </bk-table-column>
+                    />
+                    <bk-table-column
+                        :label="$t('projectId')"
+                        prop="englishName"
+                    />
                     <bk-table-column
                         :label="$t('projectDesc')"
                         prop="description"
                     />
                     <bk-table-column
-                        :label="$t('projectCreator')"
+                        :label="$t('administrator')"
                         prop="creator"
                     />
+                    <bk-table-column
+                        :label="$t('projectStatus')"
+                        prop="creator"
+                    >
+                        <template slot-scope="{ row }">
+                            <span class="project-status">
+                                <LoadingIcon v-if="row.approvalStatus === 1" />
+                                <icon
+                                    v-else-if="!row.enabled"
+                                    class="devops-icon status-icon"
+                                    :size="20"
+                                    name="unknown"
+                                />
+                                <icon
+                                    v-else-if="row.enabled"
+                                    class="devops-icon status-icon"
+                                    :size="20"
+                                    name="normal"
+                                />
+                                {{ approvalStatusMap[row.approvalStatus] }}
+                                <icon
+                                    v-bk-tooltips="{ content: statusTips[row.approvalStatus] }"
+                                    v-if="[3, 6].includes(row.approvalStatus)"
+                                    class="devops-icon status-icon"
+                                    :size="20"
+                                    name="warning-circle"
+                                />
+                                <icon
+                                    v-bk-tooltips="{ content: statusTips[row.approvalStatus] }"
+                                    v-if="[1, 4].includes(row.approvalStatus)"
+                                    class="devops-icon status-icon"
+                                    :size="20"
+                                    name="wait"
+                                />
+                            </span>
+                        </template>
+                    </bk-table-column>
                     <bk-table-column
                         :label="$t('projectOperation')"
                         width="250"
@@ -185,25 +224,6 @@
                         </template>
                     </bk-table-column>
                 </bk-table>
-                <template v-else>
-                    <div
-                        v-show="!isDataLoading"
-                        class="biz-guide-box"
-                    >
-                        <p
-                            v-if="!isFilterByOffline && disableProjectNum"
-                            class="title"
-                        >
-                            {{ $t('disableProjectTips', { disableProjectNum }) }}
-                        </p>
-                        <p
-                            v-else
-                            class="title"
-                        >
-                            {{ $t("emptyData") }}
-                        </p>
-                    </div>
-                </template>
             </template>
             <empty-tips
                 v-else
@@ -214,39 +234,121 @@
                 <bk-button
                     icon-left="icon-plus"
                     theme="primary"
-                    @click="togglePMDialog(true)"
+                    @click="handleNewProject()"
                 >
                     {{ $t('newProject') }}
                 </bk-button>
-                <a
-                    class="empty-btns-item"
-                    href="javascript:;"
-                    @click="toApplyPermission"
+                
+                <bk-button
+                    theme="success"
+                    @click="handleApplyProject"
                 >
-                    <bk-button theme="success">{{ $t('applyProject') }}</bk-button>
-                </a>
+                    {{ $t('applyProject') }}
+                </bk-button>
             </empty-tips>
-        </div>
-        <logo-dialog
-            :show-dialog="showlogoDialog"
-            :to-confirm-logo="toConfirmLogo"
-            :to-close-dialog="toCloseDialog"
-            :file-change="fileChange"
-            :selected-url="selectedUrl"
-            :is-uploading="isUploading"
-        />
+            <apply-project-dialog ref="applyProjectDialog"></apply-project-dialog>
+        </section>
     </div>
 </template>
 
-<script lang="ts">
-    import Vue from 'vue'
-    import { Component, Watch } from 'vue-property-decorator'
-    import { State, Action, Getter } from 'vuex-class'
-    import logoDialog from '../components/logoDialog/index.vue'
-
-    @Component({
+<script>
+    import { mapActions } from 'vuex'
+    import ApplyProjectDialog from '../components/ApplyProjectDialog/index.vue'
+    import LoadingIcon from '../components/LoadingIcon/index.vue'
+    export default ({
+        name: 'ProjectManage',
         components: {
-            logoDialog
+            ApplyProjectDialog,
+            LoadingIcon
+        },
+        data () {
+            return {
+                isDataLoading: false,
+                projectList: [],
+                pagination: {
+                    current: 1,
+                    count: 0,
+                    limit: 10
+                },
+                matchColorList: [
+                    'green',
+                    'yellow',
+                    'red',
+                    'blue'
+                ],
+                inputValue: '',
+                approvalStatusMap: {
+                    1: this.$t('创建中'),
+                    2: this.$t('启用中'),
+                    3: this.$t('启用中'),
+                    4: this.$t('启用中'),
+                    5: this.$t('启用中'),
+                    6: this.$t('启用中')
+                },
+                statusTips: {
+                    1: this.$t('新建项目申请审批中'),
+                    4: this.$t('项目信息修改审批中'),
+                    3: this.$t('新建项目申请已拒绝'),
+                    6: this.$t('项目信息修改已拒绝')
+                }
+            }
+        },
+        computed: {
+            curProjectList () {
+                const { limit, current } = this.pagination
+                const list = this.projectList.filter(i => i.projectName.includes(this.inputValue)) || []
+                this.pagination.count = list.length
+                return list.slice(limit * (current - 1), limit * current)
+            }
+        },
+        created () {
+            this.fetchProjects()
+        },
+        methods: {
+            ...mapActions(['fetchProjectList']),
+            async fetchProjects () {
+                this.isDataLoading = true
+                await this.fetchProjectList().then(res => {
+                    this.projectList = res
+                }).catch(() => [])
+                this.isDataLoading = false
+            },
+
+            matchForCode (projectCode) {
+                const event = projectCode.substr(0, 1)
+                const key = event.charCodeAt() % 4
+                return this.matchColorList[key]
+            },
+
+            handleNewProject () {
+                const { origin } = window.location
+                window.location.href = `${origin}/console/manage/apply`
+            },
+
+            handleApplyProject () {
+                this.$refs.applyProjectDialog.isShow = true
+            },
+
+            handleGoUserGroup (row) {
+                const { origin } = window.location
+                const { englishName } = row
+                window.open(`${origin}/console/manage/${englishName}/group`, '_blank')
+            },
+
+            handleGoExtend (row) {
+                const { origin } = window.location
+                const { englishName } = row
+                window.open(`${origin}/console/manage/${englishName}/expand`, '_blank')
+            },
+
+            pageChange (page) {
+                this.pagination.current = page
+            },
+
+            limitChange (limit) {
+                this.pagination.current = 1
+                this.pagination.limit = limit
+            }
         }
     })
     export default class ProjectManage extends Vue {
@@ -581,9 +683,30 @@
 
 <style lang="scss" scoped>
     @import '../assets/scss/mixins/ellipsis';
+    .manage-header {
+        width: 100%;
+        height: 60px;
+        padding: 0 30px;
+        border-bottom: 1px solid #dde4eb;
+        box-shadow: 0 2px 5px rgb(0 0 0 / 3%);
+        display: flex;
+        background: #fff;
+        align-items: center;
+        font-size: 16px;
+        color: #313238;
+    }
     .biz-pm-index {
-        width: 1180px;
-        margin: 0 auto 0 auto;
+        width: 100%;
+        height: calc(100% - 60px);
+        overflow-y: scroll;
+        padding: 24px;
+    }
+    .action-layout {
+        display: flex;
+        justify-content: space-between;
+        .search-input {
+            width: 320px;
+        }
     }
     .biz-order {
         padding: 0;
@@ -593,9 +716,6 @@
     .biz-pm-page {
         text-align: center;
         margin-top: 30px;
-    }
-    .biz-pm-index {
-        padding-bottom: 75px;
     }
     .biz-pm-header {
         margin: 30px 0 25px 0;
@@ -653,24 +773,8 @@
         }
         .project-name-cell {
             display: flex;
-            .info {
-                flex: 1;
-                overflow: hidden;
-                > .title {
-                    @include ellipsis();
-                    display: block;
-                }
-                .title-text {
-                    color: #333948;
-                }
-                .is-disabled {
-                    color: #e6e6e6 !important;
-                    cursor: not-allowed;
-                }
-            }
-
-            .avatar,
-            .bg-avatar {
+            align-items: center;
+            .avatar {
                 display: inline-block;
                 position: relative;
                 margin-right: 10px;
@@ -681,26 +785,12 @@
                 text-align: center;
                 color: #fff;
                 font-size: 16px;
-                cursor: pointer;
-                &:hover {
-                    .bg-avatar {
-                        display: block;
-                    }
-                }
             }
             .avatar-addr {
                 width: 100%;
                 height: 100%;
                 border-radius: 16px;
                 object-fit: cover;
-            }
-            .bg-avatar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                background: rgba(0, 0, 0, 0.4);
-                font-size: 12px;
-                display: none;
             }
             .match-color-green {
                 background-color: #30D878;
@@ -758,6 +848,12 @@
             color: #333;
         }
     }
+    .project-status {
+        display: flex;
+    }
+    .status-icon {
+        margin-right: 5px;
+    }
 </style>
 
 <style lang="scss">
@@ -767,7 +863,7 @@
     @media screen and (max-width: $mediaWidth) {
         .biz-create-pm .bk-dialog-body {
             max-height: 440px;
-            overflow: auto;
+            // overflow: auto;
             @include scroller(#9e9e9e);
         }
     }
