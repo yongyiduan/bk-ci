@@ -59,7 +59,6 @@
     ],
     "nohoist": [
       "devops-stream",
-      "devops-stream/**",
       "devops-metrics",
       "devops-metrics/**",
       "devops-manage",
