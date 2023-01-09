@@ -60,6 +60,7 @@
     "nohoist": [
       "bkui-pipeline",
       "bkui-pipeline/**",
+      "bkui-pipeline/**/**",
       "devops-stream",
       "devops-stream/**",
       "devops-metrics",
