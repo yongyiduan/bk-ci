@@ -16,6 +16,10 @@ stages:
     job_1:
       name: "构建环境-LINUX"
       runs-on: docker
+      container:
+        image: mirrors.tencent.com/ci/tlinux3_ci:1.5.0
+      needs:
+        nodejs: 14.19.1
       steps:
       - checkout: "https://git.woa.com/bkdevops/bk-ci.git"
         name: Checkout
