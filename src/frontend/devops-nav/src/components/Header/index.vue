@@ -37,7 +37,7 @@
                         <div class="extension-wrapper">
                             <span
                                 class="bk-selector-create-item"
-                                @click.stop.prevent="popProjectDialog()"
+                                @click.stop.prevent="popProjectDialog"
                             >
                                 <i class="devops-icon icon-plus-circle" />
                                 <span class="text">{{ $t('newProject') }}</span>
@@ -243,10 +243,8 @@
             }
 
             reload
-              ? location.href = path
-              : this.$router.replace({
-                path
-            })
+                ? location.href = path
+                : this.$router.replace({ path })
         }
 
         handleProjectChange (id: string) {
@@ -284,10 +282,7 @@
         }
 
         popProjectDialog (project: object): void {
-            this.toggleProjectDialog({
-                showProjectDialog: true,
-                project
-            })
+            this.to('/console/manage/apply')
             if (this.$refs.projectDropdown && typeof this.$refs.projectDropdown.close === 'function') {
                 this.$refs.projectDropdown.close()
             }
