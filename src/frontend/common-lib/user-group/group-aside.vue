@@ -126,7 +126,7 @@
     }
 </script>
 
-<style lang="postcss" scoped>
+<style lang="scss" scoped>
   .group-aside {
     width: 240px;
     height: 100%;

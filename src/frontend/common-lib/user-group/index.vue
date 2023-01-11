@@ -139,7 +139,7 @@
     }
 </script>
 
-<style lang="postcss" scoped>
+<style lang="scss" scoped>
   .group-wrapper {
     display: flex;
     flex: 1;

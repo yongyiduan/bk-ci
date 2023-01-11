@@ -62,7 +62,7 @@
     }
 </script>
 
-<style lang="postcss" scoped>
+<style lang="scss" scoped>
   .group-table {
     padding: 25px;
   }
