@@ -30,7 +30,7 @@
     import GroupAside from './group-aside.vue'
     import GroupTable from './group-table.vue'
     import NotOpenManage from './not-open-manage.vue'
-    import IamIframe from '../IAM-Iframe'
+    import IamIframe from './iam-Iframe.vue'
   
     export default {
         components: {
