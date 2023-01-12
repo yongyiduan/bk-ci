@@ -59,7 +59,8 @@
                 'enableGroupPermission',
                 'disableGroupPermission',
                 'fetchUserGroupList',
-                'fetchGroupMember'
+                'fetchGroupMember',
+                'deleteGroup'
             ]),
             /**
              * 是否为资源的管理员
@@ -192,6 +193,24 @@
                     .then((res) => {
                         this.memberGroupList = res.data
                     })
+            },
+            
+            /**
+             * 删除用户组
+             */
+            handleDeleteGroup (group) {
+                const {
+                    resourceType,
+                    projectCode
+                } = this
+
+                return this
+                    .deleteGroup({
+                        resourceType,
+                        projectCode,
+                        groupId: group.id
+                    })
+                    .then(() => this.fetchMemberGroupList())
             }
         }
     }
