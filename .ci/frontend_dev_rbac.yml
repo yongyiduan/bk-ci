@@ -58,6 +58,8 @@ stages:
           restoreKeys: "bk_ci_frontend_dev_linux_"
       - name: "Bash"
         run: |
+          node -v
+          echo '------------node'
           cd src/frontend
           if [ ${{ steps.cache.outputs.cacheHit }} == 'false' ]
           then
