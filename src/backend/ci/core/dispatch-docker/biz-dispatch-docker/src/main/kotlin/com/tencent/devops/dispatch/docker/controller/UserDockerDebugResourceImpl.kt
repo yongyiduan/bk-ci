@@ -137,6 +137,7 @@ class UserDockerDebugResourceImpl @Autowired constructor(
             DockerRoutingType.VM -> Pair(BuildType.DOCKER, DockerRoutingType.VM)
             DockerRoutingType.BCS -> Pair(BuildType.KUBERNETES, DockerRoutingType.BCS)
             DockerRoutingType.KUBERNETES -> Pair(BuildType.KUBERNETES, DockerRoutingType.KUBERNETES)
+            DockerRoutingType.DEVCLOUD -> Pair(BuildType.PUBLIC_DEVCLOUD, DockerRoutingType.DEVCLOUD)
             else -> Pair(BuildType.DOCKER, DockerRoutingType.VM)
         }
     }

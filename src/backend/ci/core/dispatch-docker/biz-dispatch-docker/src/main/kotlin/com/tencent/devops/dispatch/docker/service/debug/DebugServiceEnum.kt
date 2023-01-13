@@ -28,17 +28,20 @@
 package com.tencent.devops.dispatch.docker.service.debug
 
 import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.dispatch.docker.service.debug.impl.DevcloudDebugServiceImpl
 import com.tencent.devops.dispatch.docker.service.debug.impl.KubernetesDebugServiceImpl
 import com.tencent.devops.dispatch.docker.service.debug.impl.DockerHostDebugServiceImpl
 
 enum class DebugServiceEnum {
     DOCKER,
+    PUBLIC_DEVCLOUD,
     KUBERNETES;
 
     open fun instance(): DebugInterface {
         return when (this) {
             DOCKER -> SpringContextUtil.getBean(DockerHostDebugServiceImpl::class.java)
             KUBERNETES -> SpringContextUtil.getBean(KubernetesDebugServiceImpl::class.java)
+            PUBLIC_DEVCLOUD -> SpringContextUtil.getBean(DevcloudDebugServiceImpl::class.java)
         }
     }
 }

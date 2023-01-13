@@ -38,6 +38,7 @@ import com.tencent.devops.common.event.dispatcher.pipeline.PipelineEventDispatch
 import com.tencent.devops.common.log.utils.BuildLogPrinter
 import com.tencent.devops.common.pipeline.enums.DockerVersion
 import com.tencent.devops.common.pipeline.type.DispatchRouteKeySuffix
+import com.tencent.devops.common.pipeline.type.devcloud.PublicDevCloudDispathcType
 import com.tencent.devops.common.pipeline.type.docker.DockerDispatchType
 import com.tencent.devops.common.pipeline.type.docker.ImageType
 import com.tencent.devops.common.pipeline.type.kubernetes.KubernetesDispatchType
@@ -115,14 +116,28 @@ class DockerVMListener @Autowired constructor(
     override fun onShutdown(event: PipelineAgentShutdownEvent) {
         logger.info("On shutdown - ($event)")
 
-        val dockerRoutingType = dockerRoutingSdkService.getDockerRoutingType(event.projectId)
-        if (dockerRoutingType == DockerRoutingType.VM) {
-            dockerHostBuildService.finishDockerBuild(event)
-        } else {
-            pipelineEventDispatcher.dispatch(event.copy(
-                routeKeySuffix = DispatchRouteKeySuffix.KUBERNETES.routeKeySuffix,
-                dockerRoutingType = dockerRoutingType.name
-            ))
+        when (val dockerRoutingType = dockerRoutingSdkService.getDockerRoutingType(event.projectId)) {
+            DockerRoutingType.VM -> {
+                dockerHostBuildService.finishDockerBuild(event)
+            }
+            DockerRoutingType.KUBERNETES -> {
+                pipelineEventDispatcher.dispatch(event.copy(
+                    routeKeySuffix = DispatchRouteKeySuffix.KUBERNETES.routeKeySuffix,
+                    dockerRoutingType = dockerRoutingType.name
+                ))
+            }
+            DockerRoutingType.DEVCLOUD -> {
+                pipelineEventDispatcher.dispatch(event.copy(
+                    routeKeySuffix = DispatchRouteKeySuffix.DEVCLOUD.routeKeySuffix,
+                    dockerRoutingType = dockerRoutingType.name
+                ))
+            }
+            else -> {
+                pipelineEventDispatcher.dispatch(event.copy(
+                    routeKeySuffix = DispatchRouteKeySuffix.KUBERNETES.routeKeySuffix,
+                    dockerRoutingType = dockerRoutingType.name
+                ))
+            }
         }
     }
 
@@ -175,11 +190,19 @@ class DockerVMListener @Autowired constructor(
             imageType = dispatchType.imageType?.type
         )
 
-        val dockerRoutingType = dockerRoutingSdkService.getDockerRoutingType(dispatchMessage.projectId)
-        if (dockerRoutingType == DockerRoutingType.VM) {
-            startup(dispatchMessage, containerPool)
-        } else {
-            startKubernetesDocker(dispatchMessage, containerPool, dockerRoutingType, demoteFlag)
+        when (val dockerRoutingType = dockerRoutingSdkService.getDockerRoutingType(dispatchMessage.projectId)) {
+            DockerRoutingType.VM -> {
+                startup(dispatchMessage, containerPool)
+            }
+            DockerRoutingType.KUBERNETES -> {
+                startKubernetesDocker(dispatchMessage, containerPool, dockerRoutingType, demoteFlag)
+            }
+            DockerRoutingType.DEVCLOUD -> {
+                startDevcloud(containerPool, dispatchMessage, demoteFlag)
+            }
+            else -> {
+                startKubernetesDocker(dispatchMessage, containerPool, dockerRoutingType, demoteFlag)
+            }
         }
     }
 
@@ -221,6 +244,49 @@ class DockerVMListener @Autowired constructor(
                     containerType = containerType,
                     customBuildEnv = customBuildEnv,
                     dockerRoutingType = dockerRoutingType.name
+                )
+            )
+        }
+    }
+
+    private fun startDevcloud(
+        containerPool: Pool,
+        dispatchMessage: DispatchMessage,
+        demoteFlag: Boolean
+    ) {
+        with(dispatchMessage) {
+            logger.warn("===========Start devCloud ============")
+
+            pipelineEventDispatcher.dispatch(
+                PipelineAgentStartupEvent(
+                    source = "vmStartupTaskAtom",
+                    projectId = projectId,
+                    pipelineId = pipelineId,
+                    pipelineName = "",
+                    userId = userId,
+                    buildId = buildId,
+                    buildNo = 0,
+                    vmSeqId = containerId,
+                    taskName = "",
+                    os = "",
+                    vmNames = vmNames,
+                    startTime = System.currentTimeMillis(),
+                    channelCode = channelCode,
+                    dispatchType = PublicDevCloudDispathcType(
+                        image = JsonUtil.toJson(containerPool),
+                        imageType = ImageType.THIRD,
+                        performanceConfigId = "0"
+                    ),
+                    zone = zone,
+                    atoms = atoms,
+                    executeCount = executeCount,
+                    routeKeySuffix = if (!demoteFlag) DispatchRouteKeySuffix.DEVCLOUD.routeKeySuffix
+                    else ".devcloud.public.demote",
+                    stageId = stageId,
+                    containerId = containerId,
+                    containerHashId = containerHashId,
+                    containerType = containerType,
+                    customBuildEnv = customBuildEnv
                 )
             )
         }
