@@ -36,6 +36,7 @@ import com.tencent.devops.common.pipeline.type.agent.ThirdPartyAgentIDDispatchTy
 import com.tencent.devops.common.pipeline.type.agent.ThirdPartyDevCloudDispatchType
 import com.tencent.devops.common.pipeline.type.bcs.PublicBcsDispatchType
 import com.tencent.devops.common.pipeline.type.codecc.CodeCCDispatchType
+import com.tencent.devops.common.pipeline.type.devcloud.PublicDevCloudDispathcType
 import com.tencent.devops.common.pipeline.type.docker.DockerDispatchType
 import com.tencent.devops.common.pipeline.type.exsi.ESXiDispatchType
 import com.tencent.devops.common.pipeline.type.kubernetes.KubernetesDispatchType
@@ -50,7 +51,8 @@ import com.tencent.devops.common.pipeline.type.kubernetes.KubernetesDispatchType
     JsonSubTypes.Type(value = ThirdPartyDevCloudDispatchType::class, name = "THIRD_PARTY_DEVCLOUD"),
     JsonSubTypes.Type(value = CodeCCDispatchType::class, name = "CODECC"),
     JsonSubTypes.Type(value = CodeCCDispatchType::class, name = "MACOS"),
-    JsonSubTypes.Type(value = PublicBcsDispatchType::class, name = "PUBLIC_BCS")
+    JsonSubTypes.Type(value = PublicBcsDispatchType::class, name = "PUBLIC_BCS"),
+    JsonSubTypes.Type(value = PublicDevCloudDispathcType::class, name = "PUBLIC_DEVCLOUD")
 )
 abstract class DispatchType(
     open var value: String,
