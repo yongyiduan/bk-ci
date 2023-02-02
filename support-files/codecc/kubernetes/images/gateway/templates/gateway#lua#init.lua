@@ -52,6 +52,7 @@ config = {
     app_secret = "__BK_CI_APP_TOKEN__"
   },
   bkci = {host = "__BK_CI_FQDN__", port = 80},
+  tokenWithoutWhiteIp = "__BK_CI_TOKEN_WITHOUT_WHITE_IP__"
 }
   
 require("init_common")
