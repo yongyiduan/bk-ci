@@ -24,12 +24,7 @@ local isInServiceWhitelist = false
 if next(service_ip_whitelist) ~= nil then
   isInServiceWhitelist, err = ipUtil:isInWhiteList(service_ip_whitelist)
 else 
-    -- 白名单为空的时候
-    if config.tokenWithoutWhiteIp == nil or config.tokenWithoutWhiteIp == "" then
-      isInServiceWhitelist = true
-    else
-      isInServiceWhitelist = ngx.var.http_x_devops_token_without_white_ip == config.tokenWithoutWhiteIp
-    end
+  isInServiceWhitelist = true
 end
 if not isInServiceWhitelist then
   ngx.log(ngx.STDERR, "client ip do not in service_ip_whitelist: ", err)

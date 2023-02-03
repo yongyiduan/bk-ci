@@ -31,11 +31,7 @@ if next(config.service_ip_whitelist) ~= nil then
   end
 else
   -- 白名单为空的时候
-  if config.tokenWithoutWhiteIp == nil or config.tokenWithoutWhiteIp == "" then
-    isInServiceWhitelist = true
-  else
-    isInServiceWhitelist = ngx.var.http_x_devops_token_without_white_ip == config.tokenWithoutWhiteIp
-  end
+  isInServiceWhitelist = true
 end
 
 if not isInServiceWhitelist then
