@@ -90,7 +90,6 @@ class WechatWorkService @Autowired constructor(
             wechatWorkConfiguration.serviceId
         )
     }
-
     private val objectMapper = JacksonUtil.createObjectMapper()
     private val sendMessageApiURL = "$wechatWorkApiURL/cgi-bin/tencent/chat/send"
     private val uploadMediaApiURL = "$wechatWorkApiURL/cgi-bin/media/upload"
