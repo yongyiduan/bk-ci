@@ -326,12 +326,12 @@ onBeforeUnmount(() => {
         v-model="projectData.authSecrecy"
         @change="handleChangeForm"
       >
-        <bk-radio class="mr10" :label="false">
+        <bk-radio class="mr10" :label="0">
           <Popover :content="t('非项目成员可通过`申请加入项目`申请加入')">
             <span class="authSecrecy-item">{{ t('私有项目') }}</span>
           </Popover>
         </bk-radio>
-        <bk-radio :label="true">
+        <bk-radio :label="1">
           <Popover :content="t('非项目成员不可通过`申请加入项目`申请加入')">
             <span class="authSecrecy-item">{{ t('保密项目') }}</span>
           </Popover>
