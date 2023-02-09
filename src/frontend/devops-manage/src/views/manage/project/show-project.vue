@@ -124,6 +124,34 @@ const handleCancelUpdate = () => {
   });
 }
 /**
+ * 取消更新项目 
+ */
+const handleCancelUpdate = () => {
+  const onConfirm = async () => {
+    const result = await http.cancelUpdateProject({
+      projectId: projectData.value.project_id,
+    });
+    if (result) {
+      Message({
+        theme: 'success',
+        message: t('取消更新成功'),
+      });
+      const { origin } = window.location;
+      window.location.reload();
+    }
+  };
+
+  InfoBox({
+    infoType: 'warning',
+    title: t('确定取消更新项目'),
+    contentAlign: 'center',
+    headerAlign: 'center',
+    footerAlign: 'center',
+    onConfirm,
+  });
+}
+
+/**
  * 取消创建项目
  */
 const handleCancelCreation = () => {
