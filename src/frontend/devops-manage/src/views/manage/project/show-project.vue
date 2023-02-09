@@ -97,32 +97,7 @@ const handleEdit = () => {
 const handleToApprovalDetails = () => {
   window.open(`/console/permission/${projectData.value.englishName}/approval`, '_blank')
 };
-/**
- * 取消更新项目 
- */
-const handleCancelUpdate = () => {
-  const onConfirm = async () => {
-    const result = await http.cancelUpdateProject({
-      projectId: projectData.value.project_id,
-    });
-    if (result) {
-      Message({
-        theme: 'success',
-        message: t('撤销更新成功'),
-      });
-      const { origin } = window.location;
-      window.location.reload();
-    }
-  };
-  InfoBox({
-    infoType: 'warning',
-    title: t('确定撤销更新项目'),
-    contentAlign: 'center',
-    headerAlign: 'center',
-    footerAlign: 'center',
-    onConfirm,
-  });
-}
+
 /**
  * 取消更新项目 
  */
