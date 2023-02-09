@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   ref,
+  watch,
   onBeforeUnmount,
   computed,
   onMounted,
@@ -15,7 +16,7 @@ import http from '@/http/api';
 const {
   t,
 } = useI18n();
-const emits = defineEmits(['change']);
+const emits = defineEmits(['change', 'approvedChange']);
 
 const props = defineProps({
   data: Object,
@@ -216,6 +217,12 @@ const handleMessage = (event: any) => {
     }
   }
 };
+
+watch(() => [projectData.value.authSecrecy, projectData.value.subjectScopes], () =>{
+  emits('approvedChange', true);
+}, {
+  deep: true,
+})
 
 onMounted(() => {
   fetchDepartmentList();
