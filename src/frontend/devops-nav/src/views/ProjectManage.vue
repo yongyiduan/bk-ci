@@ -198,11 +198,10 @@
                 ],
                 inputValue: '',
                 approvalStatusMap: {
-                    0: this.$t('启用中'),
                     1: this.$t('创建中'),
-                    2: this.$t('创建中'),
-                    4: this.$t('启用中'),
-                    5: this.$t('启用中')
+                    2: this.$t('启用中'),
+                    3: this.$t('创建中'),
+                    4: this.$t('启用中')
                 },
                 statusTips: {
                     1: this.$t('新建项目申请审批中'),
