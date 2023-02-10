@@ -283,12 +283,12 @@ onMounted(async () => {
             -->
             <Popover
               :content="statusDisabledTips[projectData.approvalStatus]"
-              :disabled="[0, 2].includes(projectData.approvalStatus)">
+              :disabled="projectData.approvalStatus === 2">
               <span>
                 <bk-button
                   class="btn mr10"
                   theme="primary"
-                  :disabled="![0, 2].includes(projectData.approvalStatus)"
+                  :disabled="projectData.approvalStatus !== 2"
                   @click="handleEdit"
                 >
                   {{ t('编辑') }}
@@ -320,7 +320,7 @@ onMounted(async () => {
             </bk-button>
             
             <bk-button
-              v-if="projectData.approvalStatus === 0"
+              v-if="projectData.approvalStatus === 2"
               class="btn"
               theme="default"
             >
