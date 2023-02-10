@@ -90,7 +90,7 @@
                     >
                         <template slot-scope="{ row }">
                             <span class="project-status">
-                                <LoadingIcon v-if="[1, 2].includes(row.approvalStatus)" />
+                                <LoadingIcon v-if="[1, 3].includes(row.approvalStatus)" />
                                 <icon
                                     v-else-if="!row.enabled"
                                     class="devops-icon status-icon"
@@ -108,7 +108,7 @@
                                 </span>
                                 <icon
                                     v-bk-tooltips="{ content: statusTips[row.approvalStatus] }"
-                                    v-if="row.approvalStatus === 2"
+                                    v-if="row.approvalStatus === 3"
                                     class="devops-icon status-icon"
                                     :size="20"
                                     name="warning-circle"
@@ -198,11 +198,10 @@
                 ],
                 inputValue: '',
                 approvalStatusMap: {
-                    0: this.$t('启用中'),
                     1: this.$t('创建中'),
-                    2: this.$t('创建中'),
-                    4: this.$t('启用中'),
-                    5: this.$t('启用中')
+                    2: this.$t('启用中'),
+                    3: this.$t('创建中'),
+                    4: this.$t('启用中')
                 },
                 statusTips: {
                     1: this.$t('新建项目申请审批中'),
