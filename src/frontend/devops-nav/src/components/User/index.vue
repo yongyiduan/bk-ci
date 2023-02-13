@@ -116,8 +116,8 @@
                         label: this.$t('projectManage')
                     },
                     {
-                        to: `/console/perm/my-perm?project_code=${projectId || ''}`,
-                        label: this.$t('accessCenter')
+                        to: '/console/permission/my-permission',
+                        label: this.$t('myPermission')
                     },
                     {
                         to: '/console/preci/',
