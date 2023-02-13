@@ -109,7 +109,6 @@
 
         get menu (): object[] {
             try {
-                const { projectId } = this.$route.params
                 return [
                     {
                         to: '/console/pm',
