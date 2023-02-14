@@ -37,9 +37,12 @@ import createLocale from '../../locale'
 import '@icon-cool/bk-icon-devops/src/index'
 import '@icon-cool/bk-icon-devops'
 
-import { actionMap, resourceMap, resourceTypeMap } from '../../common-lib/permission-conf'
 import bkMagic from 'bk-magic-vue'
 import BkPipeline from 'bkui-pipeline'
+import {
+    handlePipelineNoPermission,
+    RESOURCE_ACTION
+} from '@/utils/permission'
 
 // 全量引入 bk-magic-vue 样式
 require('bk-magic-vue/dist/bk-magic-vue.min.css')
@@ -66,10 +69,8 @@ Vue.use(BkPipeline, {
 })
 
 Vue.prototype.$setLocale = setLocale
-Vue.prototype.$permissionActionMap = actionMap
-Vue.prototype.$permissionResourceMap = resourceMap
-Vue.prototype.$permissionResourceTypeMap = resourceTypeMap
 Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
+Vue.prototype.$permissionResourceAction = RESOURCE_ACTION
 Vue.prototype.$bkMessage = function (config) {
     config.ellipsisLine = config.ellipsisLine || 3
     bkMagic.bkMessage(config)
@@ -97,13 +98,9 @@ Vue.mixin({
             const permUrl = this.isExtendTx ? url : PERM_URL_PREFIX
             window.open(permUrl, '_blank')
         },
-        // handleError (e, permissionAction, instance, projectId, resourceMap = this.$permissionResourceMap.pipeline) {
-        handleError (e, noPermissionList, applyPermissionUrl) {
+        handleError (e, data) {
             if (e.code === 403) { // 没有权限编辑
-                this.$showAskPermissionDialog({
-                    noPermissionList,
-                    applyPermissionUrl
-                })
+                handlePipelineNoPermission(data)
             } else {
                 this.$showTips({
                     message: e.message || e,
