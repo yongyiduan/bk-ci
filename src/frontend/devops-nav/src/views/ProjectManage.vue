@@ -8,26 +8,21 @@
         </div>
         <section class="biz-pm biz-pm-index biz-create-pm">
             <template v-if="projectList.length || isDataLoading">
-                <div class="biz-pm-header">
-                    <div class="title">
-                        {{ $t('projectManage') }}
-                    </div>
-                    <div class="action">
-                        <bk-button
-                            theme="primary"
-                            icon="plus"
-                            class="mr10"
-                            @click="handleNewProject"
-                        >
-                            {{ $t('newProject') }}
-                        </bk-button>
-                        <bk-input
-                            v-model="inputValue"
-                            class="search-input"
-                            right-icon="bk-icon icon-search"
-                            :placeholder="$t('searchProject')"
-                        ></bk-input>
-                    </div>
+                <div class="action-layout">
+                    <bk-button
+                        theme="primary"
+                        icon="plus"
+                        class="mr10"
+                        @click="handleNewProject"
+                    >
+                        {{ $t('newProject') }}
+                    </bk-button>
+                    <bk-input
+                        v-model="inputValue"
+                        class="search-input"
+                        right-icon="bk-icon icon-search"
+                        :placeholder="$t('searchProject')"
+                    ></bk-input>
                 </div>
                 <bk-table
                     v-if="curProjectList.length"
@@ -68,11 +63,6 @@
                         </template>
                     </bk-table-column>
                     <bk-table-column
-                        label="关联CC业务"
-                        prop="ccAppName"
-                        :formatter="(row, column, cellValue, index) => cellValue || '--'"
-                    />
-                    <bk-table-column
                         :label="$t('projectId')"
                         prop="englishName"
                     />
@@ -90,7 +80,7 @@
                     >
                         <template slot-scope="{ row }">
                             <span class="project-status">
-                                <LoadingIcon v-if="[1, 3].includes(row.approvalStatus)" />
+                                <LoadingIcon v-if="row.approvalStatus === 1" />
                                 <icon
                                     v-else-if="!row.enabled"
                                     class="devops-icon status-icon"
@@ -107,15 +97,15 @@
                                     {{ row.enabled ? approvalStatusMap[row.approvalStatus] : $t('已停用') }}
                                 </span>
                                 <icon
-                                    v-bk-tooltips="{ content: statusTips[row.approvalStatus] }"
+                                    v-bk-tooltips="{ content: $t('新建项目申请已拒绝') }"
                                     v-if="row.approvalStatus === 3"
                                     class="devops-icon status-icon"
                                     :size="20"
                                     name="warning-circle"
                                 />
                                 <icon
-                                    v-bk-tooltips="{ content: statusTips[row.approvalStatus] }"
-                                    v-if="[1, 4].includes(row.approvalStatus)"
+                                    v-bk-tooltips="{ content: $t('项目信息修改申请审批中') }"
+                                    v-if="row.approvalStatus = 4"
                                     class="devops-icon status-icon"
                                     :size="20"
                                     name="wait"
@@ -125,7 +115,7 @@
                     </bk-table-column>
                     <bk-table-column
                         :label="$t('projectOperation')"
-                        width="250"
+                        width="200"
                     >
                         <template slot-scope="{ row }">
                             <bk-button
@@ -202,11 +192,6 @@
                     2: this.$t('启用中'),
                     3: this.$t('创建中'),
                     4: this.$t('启用中')
-                },
-                statusTips: {
-                    1: this.$t('新建项目申请审批中'),
-                    2: this.$t('新建项目申请已拒绝'),
-                    4: this.$t('项目信息修改申请审批中')
                 }
             }
         },
@@ -230,43 +215,35 @@
                 }).catch(() => [])
                 this.isDataLoading = false
             },
-
             matchForCode (projectCode) {
                 const event = projectCode.substr(0, 1)
                 const key = event.charCodeAt() % 4
                 return this.matchColorList[key]
             },
-
             handleNewProject () {
                 const { origin } = window.location
                 window.location.href = `${origin}/console/manage/apply`
             },
-
             handleApplyProject () {
                 this.$refs.applyProjectDialog.isShow = true
             },
-
             handleGoUserGroup (row) {
                 const { origin } = window.location
                 const { englishName } = row
                 window.open(`${origin}/console/manage/${englishName}/group`, '_blank')
             },
-
             handleGoExtend (row) {
                 const { origin } = window.location
                 const { englishName } = row
                 window.open(`${origin}/console/manage/${englishName}/expand`, '_blank')
             },
-
             pageChange (page) {
                 this.pagination.current = page
             },
-
             limitChange (limit) {
                 this.pagination.current = 1
                 this.pagination.limit = limit
             },
-
             goToProjectManage (row) {
                 const { origin } = window.location
                 const { englishName } = row
@@ -417,7 +394,6 @@
         right: 10px;
         font-size: 12px;
     }
-
     .create-project-dialog {
         button.disabled {
             background-color: #fafafa;
@@ -430,7 +406,6 @@
             }
         }
     }
-
     .biz-guide-box {
         background-color: #fff;
         padding: 75px 30px;
@@ -454,7 +429,6 @@
 <style lang="scss">
     @import '../assets/scss/conf.scss';
     @import '../assets/scss/mixins/scroller.scss';
-
     @media screen and (max-width: $mediaWidth) {
         .biz-create-pm .bk-dialog-body {
             max-height: 440px;
