@@ -25,7 +25,6 @@
                     ></bk-input>
                 </div>
                 <bk-table
-                    v-if="curProjectList.length"
                     class="biz-table mt20"
                     size="medium"
                     :data="curProjectList"
