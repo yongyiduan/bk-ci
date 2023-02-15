@@ -29,6 +29,10 @@
     import { PROCESS_API_URL_PREFIX } from '@/store/constants'
     import pipelineConstMixin from '@/mixins/pipelineConstMixin'
     import InfiniteScroll from '@/components/InfiniteScroll'
+    import {
+        handlePipelineNoPermission,
+        RESOURCE_ACTION
+    } from '@/utils/permission'
 
     const LS_COLUMNS_KEYS = 'shownColumns'
     export default {
@@ -228,7 +232,15 @@
             },
 
             async toApplyPermission () {
-                this.tencentPermission(this.getPermUrlByRole(this.$route.params.projectId, this.$route.params.pipelineId, this.roleMap.manager))
+                try {
+                    handlePipelineNoPermission({
+                        projectId: this.$route.params.projectId,
+                        resourceCode: this.pipelineId,
+                        action: RESOURCE_ACTION.VIEW
+                    })
+                } catch (e) {
+                    console.error(e)
+                }
             },
 
             resetQueryCondition () {
