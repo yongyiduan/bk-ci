@@ -2,7 +2,7 @@
     <div class="codelib-content" v-bkloading="{ isLoading, title: $t('codelib.laodingTitle') }">
         <template v-if="hasCodelibs || isSearch">
             <link-code-lib v-if="codelibs.hasCreatePermission" :create-codelib="createCodelib" :is-blue-king="isBlueKing"></link-code-lib>
-            <bk-button theme="primary" v-else @click.stop="goCreatePermission">
+            <bk-button theme="primary" v-else @click.stop="applyPermission">
                 <i class="devops-icon icon-plus"></i>
                 <span>{{ $t('codelib.linkCodelib') }}</span>
             </bk-button>
@@ -26,7 +26,7 @@
         </empty-tips>
         <empty-tips v-else :title="$t('codelib.noCodelibPermission')" :desc="$t('codelib.noPermissionDesc')">
             <bk-button theme="primary" @click="switchProject">{{ $t('codelib.switchProject') }}</bk-button>
-            <bk-button theme="success" @click="toApplyPermission">{{ $t('codelib.applyPermission') }}</bk-button>
+            <bk-button theme="success" @click="applyPermission">{{ $t('codelib.applyPermission') }}</bk-button>
         </empty-tips>
         <code-lib-dialog :refresh-codelib-list="refreshCodelibList" @powersValidate="powerValidate"></code-lib-dialog>
     </div>
@@ -46,6 +46,8 @@
         isTGit,
         isP4
     } from '../config/'
+    import { RESOURCE_ACTION, RESOURCE_TYPE } from '../utils/permission'
+
     export default {
         name: 'codelib-list',
 
@@ -205,21 +207,12 @@
                 this.iframeUtil.toggleProjectMenu(true)
             },
 
-            async toApplyPermission () {
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=code&role_creator=repertory`)
-            },
-
-            goCreatePermission () {
-                this.$showAskPermissionDialog({
-                    noPermissionList: [{
-                        actionId: this.$permissionActionMap.create,
-                        resourceId: this.$permissionResourceMap.code,
-                        instanceId: [],
-                        projectId: this.projectId
-                    }],
-                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${
-                        this.projectId
-                    }&service_code=code&role_creator=repertory`
+            applyPermission () {
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: RESOURCE_TYPE,
+                    resourceCode: this.projectId,
+                    action: RESOURCE_ACTION.CREATE
                 })
             },
 
