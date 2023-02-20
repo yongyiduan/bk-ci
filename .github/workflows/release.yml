@@ -14,7 +14,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: npm
+          cache: yarn
           cache-dependency-path: src/frontend/package.json
       - name: Install project dependencies
         run: yarn --prefer-offline
