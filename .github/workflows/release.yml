@@ -174,7 +174,7 @@ jobs:
           pip install pyhumps
           python build_chart.py ${{ secrets.DOCKER_IMAGE_REGISTRY }} $version $version $version
       - name: Install Helm -- CLOUD NATIVE
-        uses: azure/setup-helm@v1
+        uses: azure/setup-helm@v3
         with:
           version: v3.8.1
       - name: Package Helm Chart -- CLOUD NATIVE
@@ -255,46 +255,29 @@ jobs:
     if: ${{ always() }}
     needs: [backend, cloudNative]
     steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: bk-ci ${{ github.ref }}
-          draft: true
-          prerelease: true
       ## bkci
       - name: download bkci
         uses: actions/download-artifact@v1
         with:
           name: bkci
           path: ./
-      - name: Upload Release Asset -- BKCI
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bkci-slim.tar.gz
-          asset_name: bkci-slim.tar.gz
-          asset_content_type: application/gzip
       ## bkci helm chart
       - name: download bkci-chart
         uses: actions/download-artifact@v1
         with:
           name: bkci-chart
           path: ./
-      - name: Upload Helm Chart -- CLOUD NATIVE
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ## 创建release
+      - name: Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1.12.0
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bk-ci-charts.tgz
-          asset_name: bk-ci-charts.tgz
-          asset_content_type: application/gzip
+          tag: ${{ github.ref }}
+          name: bk-ci ${{ github.ref }}
+          draft: true
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "bkci-slim.tar.gz,bk-ci-charts.tgz"
       # ## codecc
       # - name: download codecc
       #   uses: actions/download-artifact@v1
