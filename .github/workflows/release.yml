@@ -129,6 +129,10 @@ jobs:
           distribution: "temurin"
           java-version: "8"
           cache: "gradle"
+      - name: Avoid same cache key -- CLOUD NATIVE
+        working-directory: src/backend/ci
+        run: |
+          touch avoid-same-cache.gradle.kts
       - name: Gradle Build Backend Service -- CLOUD NATIVE
         working-directory: src/backend/ci
         run: |
