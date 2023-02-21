@@ -20,7 +20,7 @@ stages:
         container:
           image: mirrors.tencent.com/ci/tlinux3_ci:1.5.0
         needs:
-          nodejs: 14.19.1
+          nodejs: 16.13.0
       steps:
       - checkout: "https://git.woa.com/bkdevops/bk-ci.git"
         name: Checkout
