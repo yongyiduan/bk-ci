@@ -41,7 +41,7 @@
             }
         },
         async created () {
-            await this.fetchHasManagerPermission()
+            await this.fetchHasManagerPermissionFromApi()
             await this.fetchEnablePermission()
             // 管理员获取用户组数据
             if (this.isEnablePermission && this.hasPermission) {
@@ -55,7 +55,7 @@
         methods: {
             ...mapActions('pipelines', [
                 'fetchHasManagerPermission',
-                'fetchEnablePermission',
+                'fetchEnablePermissionFromApi',
                 'enableGroupPermission',
                 'disableGroupPermission',
                 'fetchUserGroupList',
@@ -65,7 +65,7 @@
             /**
              * 是否为资源的管理员
              */
-            fetchHasManagerPermission () {
+            fetchHasManagerPermissionFromApi () {
                 const {
                     projectCode,
                     resourceType,
@@ -83,7 +83,7 @@
             /**
              * 是否开启了权限管理
              */
-            fetchEnablePermission () {
+            fetchEnablePermissionFromApi () {
                 const {
                     projectCode,
                     resourceType,
