@@ -39,49 +39,49 @@ const actions = {
     /**
    * 获取是否为资源的管理员
    */
-    async fetchHasManagerPermission (params) {
+    async fetchHasManagerPermission (_, params) {
         const { projectCode, resourceType, resourceCode } = params
         return ajax.get(`${IAM_PERFIX}/${projectCode}/${resourceType}/${resourceCode}/hasManagerPermission`)
     },
     /**
    * 是否启用权限管理
    */
-    async fetchEnablePermission (params) {
+    async fetchEnablePermission (_, params) {
         const { projectCode, resourceType, resourceCode } = params
         return ajax.get(`${IAM_PERFIX}/${projectCode}/${resourceType}/${resourceCode}/isEnablePermission`)
     },
     /**
    * 流水线/流水线组 开启用户组权限管理
    */
-    async enableGroupPermission (params) {
+    async enableGroupPermission (_, params) {
         const { projectCode, resourceType, resourceCode } = params
         return ajax.put(`${IAM_PERFIX}/${projectCode}/${resourceType}/${resourceCode}/enable`)
     },
     /**
    * 流水线/流水线组 关闭用户组权限管理
    */
-    async disableGroupPermission (params) {
+    async disableGroupPermission (_, params) {
         const { projectCode, resourceType, resourceCode } = params
         return ajax.put(`${IAM_PERFIX}/${projectCode}/${resourceType}/${resourceCode}/disable`)
     },
     /**
    * 获取用户组列表
    */
-    async fetchUserGroupList (params) {
+    async fetchUserGroupList (_, params) {
         const { projectCode, resourceType, resourceCode } = params
         return ajax.get(`${IAM_PERFIX}/${projectCode}/${resourceType}/${resourceCode}/listGroup`)
     },
     /**
      * 获取用户所属组
      */
-    async fetchGroupMember (params) {
+    async fetchGroupMember (_, params) {
         const { projectCode, resourceType, resourceCode } = params
         return ajax.get(`${IAM_PERFIX}/${projectCode}/${resourceType}/${resourceCode}/groupMember`)
     },
     /**
      * 删除用户组
      */
-    deleteGroup (params) {
+    deleteGroup (_, params) {
         const { projectCode, resourceType, groupId } = params
         return ajax.delete(`${IAM_PERFIX}/group/group/${projectCode}/${resourceType}/${groupId}`)
     }
