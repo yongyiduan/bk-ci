@@ -26,7 +26,7 @@ stages:
         name: Checkout
         with:
           refName: feature-dev-rbac
-          enableGitCleanIgnore: false
+          enableGitCleanIgnore: true
       - name: "拉取前端占位符"
         checkout: "https://git.woa.com/bkdevops/devops-config.git"
         with:
