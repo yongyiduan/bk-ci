@@ -38,6 +38,7 @@
 <script>
     import { convertTime } from '@/utils/util'
     import emptyTips from '@/components/devops/emptyTips'
+    import { CERT_RESOURCE_ACTION, CERT_RESOURCE_TYPE } from '../utils/permission'
 
     export default {
         components: {
@@ -172,16 +173,11 @@
                         }
                     })
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.edit,
-                            resourceId: this.$permissionResourceMap.cert,
-                            instanceId: [{
-                                id: cert.certId,
-                                name: cert.certId
-                            }],
-                            projectId: this.projectId
-                        }]
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: CERT_RESOURCE_TYPE,
+                        resourceCode: this.projectId,
+                        action: CERT_RESOURCE_ACTION.EDIT
                     })
                 }
             },
@@ -216,17 +212,11 @@
                         }
                     })
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.delete,
-                            resourceId: this.$permissionResourceMap.cert,
-                            instanceId: [{
-                                id: cert.certId,
-                                name: cert.certId
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&role_manager=ticket`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: CERT_RESOURCE_TYPE,
+                        resourceCode: cert.certId,
+                        action: CERT_RESOURCE_ACTION.DELETE
                     })
                 }
             },
