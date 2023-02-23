@@ -42,7 +42,7 @@
         },
         async created () {
             await this.fetchHasManagerPermissionFromApi()
-            await this.fetchEnablePermission()
+            await this.fetchEnablePermissionFromApi()
             // 管理员获取用户组数据
             if (this.isEnablePermission && this.hasPermission) {
                 await this.fetchGroupList()
@@ -55,7 +55,7 @@
         methods: {
             ...mapActions('pipelines', [
                 'fetchHasManagerPermission',
-                'fetchEnablePermissionFromApi',
+                'fetchEnablePermission',
                 'enableGroupPermission',
                 'disableGroupPermission',
                 'fetchUserGroupList',
