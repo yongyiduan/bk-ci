@@ -201,6 +201,7 @@
     import makeMirrorDialog from '@/components/devops/environment/make-mirror-dialog'
     import { getQueryString } from '@/utils/util'
     import webSocketMessage from '../utils/webSocketMessage.js'
+    import { NODE_RESOURCE_ACTION, NODE_RESOURCE_TYPE } from '../utils/permission'
 
     export default {
         components: {
@@ -387,37 +388,31 @@
                 this.$toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                // this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
-                //     id: this.projectId,
-                //     type: this.$permissionResourceTypeMap.PROJECT
-                // }])
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_creator=env_node`)
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: NODE_RESOURCE_TYPE,
+                    resourceCode: this.projectId,
+                    action: NODE_RESOURCE_ACTION.CREATE
+                })
             },
             toNodeApplyPerm (row) {
-                // this.applyPermission(this.$permissionActionMap.view, this.$permissionResourceMap.envNode, [{
-                //     id: this.projectId,
-                //     type: this.$permissionResourceTypeMap.PROJECT
-                // }, {
-                //     id: row.nodeHashId,
-                //     type: this.$permissionResourceTypeMap.ENVIRONMENT_ENV_NODE
-                // }])
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}`)
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: NODE_RESOURCE_TYPE,
+                    resourceCode: row.nodeHashId,
+                    action: NODE_RESOURCE_ACTION.USE
+                })
             },
             toNodeDetail (node) {
                 if (this.canShowDetail(node)) {
                     if (node.canUse) {
                         this.$router.push({ name: 'nodeDetail', params: { nodeHashId: node.nodeHashId } })
                     } else {
-                        this.$showAskPermissionDialog({
-                            noPermissionList: [{
-                                actionId: this.$permissionActionMap.use,
-                                resourceId: this.$permissionResourceMap.envNode,
-                                instanceId: [{
-                                    id: node.nodeHashId,
-                                    name: node.displayName
-                                }],
-                                projectId: this.projectId
-                            }]
+                        this.handleNoPermission({
+                            projectId: this.projectId,
+                            resourceType: NODE_RESOURCE_TYPE,
+                            resourceCode: node.nodeHashId,
+                            action: NODE_RESOURCE_ACTION.USE
                         })
                     }
                 }
@@ -431,17 +426,11 @@
 
                 params.push(id)
                 if (!row.canDelete) {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.delete,
-                            resourceId: this.$permissionResourceMap.envNode,
-                            instanceId: [{
-                                id,
-                                name: row.nodeId
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: NODE_RESOURCE_TYPE,
+                        resourceCode: row.nodeHashId,
+                        action: NODE_RESOURCE_ACTION.DELETE
                     })
                 } else {
                     this.$bkInfo({
@@ -459,29 +448,22 @@
 
                                 message = this.$t('environment.successfullyDeleted')
                                 theme = 'success'
-                            } catch (err) {
-                                if (err.code === 403) {
-                                    this.$showAskPermissionDialog({
-                                        noPermissionList: [{
-                                            actionId: this.$permissionActionMap.delete,
-                                            resourceId: this.$permissionResourceMap.envNode,
-                                            instanceId: [{
-                                                id,
-                                                name: row.nodeId
-                                            }],
-                                            projectId: this.projectId
-                                        }],
-                                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=node&project_code=${this.projectId}&service_code=environment&role_manager=env_node:${row.nodeHashId}`
-                                    })
-                                } else {
-                                    message = err.data ? err.data.message : err
-                                    theme = 'error'
-                                }
-                            } finally {
+                                
                                 message && this.$bkMessage({
                                     message,
                                     theme
                                 })
+                            } catch (e) {
+                                this.handleError(
+                                    e,
+                                    {
+                                        projectId: this.projectId,
+                                        resourceType: NODE_RESOURCE_TYPE,
+                                        resourceCode: row.nodeHashId,
+                                        action: NODE_RESOURCE_ACTION.DELETE
+                                    }
+                                )
+                            } finally {
                                 this.requestList()
                             }
                         }
@@ -724,16 +706,22 @@
 
                         message = this.constructToolConf.importText === `${this.$t('environment.submitting')}...` ? this.$t('environment.successfullySubmited') : this.$t('environment.successfullyImported')
                         theme = 'success'
-                        this.constructToolConf.isShow = false
-                    } catch (err) {
-                        message = err.message ? err.message : err
-                        theme = 'error'
-                    } finally {
                         this.$bkMessage({
                             message,
                             theme
                         })
-
+                        this.constructToolConf.isShow = false
+                    } catch (e) {
+                        this.handleError(
+                            e,
+                            {
+                                projectId: this.projectId,
+                                resourceType: NODE_RESOURCE_TYPE,
+                                resourceCode: this.projectId,
+                                action: NODE_RESOURCE_ACTION.CREATE
+                            }
+                        )
+                    } finally {
                         this.dialogLoading.isLoading = false
                         this.dialogLoading.isShow = false
                         this.constructToolConf.importText = this.$t('environment.import')
@@ -777,29 +765,22 @@
 
                         message = this.$t('environment.successfullyModified')
                         theme = 'success'
-                    } catch (err) {
-                        if (err.code === 403) {
-                            this.$showAskPermissionDialog({
-                                noPermissionList: [{
-                                    actionId: this.$permissionActionMap.edit,
-                                    resourceId: this.$permissionResourceMap.envNode,
-                                    instanceId: [{
-                                        id: node.nodeHashId,
-                                        name: displayName
-                                    }],
-                                    projectId: this.projectId
-                                }]
-                            })
-                        } else {
-                            message = err.message ? err.message : err
-                            theme = 'error'
-                        }
+                    } catch (e) {
+                        this.handleError(
+                            e,
+                            {
+                                projectId: this.projectId,
+                                resourceType: NODE_RESOURCE_TYPE,
+                                resourceCode: node.nodeHashId,
+                                action: NODE_RESOURCE_ACTION.EDIT
+                            }
+                        )
                     } finally {
-                        message && this.$bkMessage({
-                            message,
-                            theme
-                        })
                         if (theme === 'success') {
+                            message && this.$bkMessage({
+                                message,
+                                theme
+                            })
                             this.nodeList.forEach(val => {
                                 if (val.nodeHashId === node.nodeHashId) {
                                     val.isEnableEdit = false

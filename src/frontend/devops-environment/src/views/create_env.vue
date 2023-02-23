@@ -117,7 +117,7 @@
 <script>
     import nodeSelect from '@/components/devops/environment/node-select-dialog'
     import emptyTips from '@/components/devops/emptyTips'
-
+    import { ENV_RESOURCE_ACTION, ENV_RESOURCE_TYPE } from '../utils/permission'
     export default {
         components: {
             'empty-tips': emptyTips,
@@ -202,7 +202,7 @@
                         {
                             type: 'success',
                             size: 'normal',
-                            handler: this.goToApplyPerm,
+                            handler: this.applyPermission,
                             text: this.$t('environment.applyPermission')
                         }
                     ]
@@ -268,8 +268,13 @@
             changeProject () {
                 this.iframeUtil.toggleProjectMenu(true)
             },
-            goToApplyPerm () {
-                this.tencentPermission(`/backend/api/perm/apply/subsystem/?client_id=environment&project_code=${this.projectId}&service_code=environment&role_creator=environment`)
+            applyPermission () {
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: ENV_RESOURCE_TYPE,
+                    resourceCode: this.projectId,
+                    action: ENV_RESOURCE_ACTION.CREATE
+                })
             },
             /**
              * 弹窗全选联动
