@@ -5,7 +5,7 @@ import {
 } from '@/store/constants'
 
 const prefix = `/${PROCESS_API_URL_PREFIX}/user/pipelines/audit`
-const AUTH_PREFIX = `/${AUTH_URL_PREFIX}/user/auth/resource/projects`
+const AUTH_PREFIX = `/${AUTH_URL_PREFIX}/user/auth/resource`
 
 const state = {
 
