@@ -84,7 +84,7 @@
                     resourceType,
                     resourceCode
                 }).then((res) => {
-                    this.hasPermission = res
+                    this.hasPermission = res?.data
                 }).finally(() => {
                     this.isLoading = false
                 })
@@ -107,7 +107,7 @@
                         resourceCode
                     })
                     .then((res) => {
-                        this.isEnablePermission = res
+                        this.isEnablePermission = res?.data
                     }).finally(() => {
                         this.isLoading = false
                     })
@@ -129,12 +129,12 @@
                         projectCode
                     })
                     .then((res) => {
-                        if (res) {
+                        if (res?.data) {
                             this.$bkMessage({
                                 theme: 'success',
                                 message: this.$t('开启成功')
                             })
-                            this.isEnablePermission = res
+                            this.isEnablePermission = true
                         }
                     })
             },
@@ -155,13 +155,13 @@
                         projectCode
                     })
                     .then((res) => {
-                        if (res) {
+                        if (res?.data) {
+                            this.isEnablePermission = false
                             this.$bkMessage({
                                 theme: 'success',
                                 message: this.$t('关闭成功')
                             })
                         }
-                        this.isEnablePermission = res
                     })
             },
 
