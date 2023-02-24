@@ -26,7 +26,6 @@
 
 <style lang="scss" scoped>
     .group-manage {
-        padding: 20px;
         flex: 1;
     }
     .content-wrapper {
