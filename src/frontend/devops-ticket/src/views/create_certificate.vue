@@ -263,7 +263,7 @@
                     theme = 'success'
                     this.$bkMessage({ message, theme })
                 } catch (e) {
-                    const resourceCode = this.isEdit ? formData.certId : this.projectId
+                    const resourceCode = this.isEdit ? this.$route.params.certId : this.projectId
                     this.handleError(
                         e,
                         {
