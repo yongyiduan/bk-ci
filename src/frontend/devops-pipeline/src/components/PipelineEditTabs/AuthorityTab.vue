@@ -13,6 +13,7 @@
         :close-manage="handleCloseManage"
         :delete-group="handleDeleteGroup"
         :fetch-group-list="fetchGroupList"
+        :show-create-group="false"
     />
 </template>
 
