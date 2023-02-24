@@ -146,7 +146,7 @@
                         {
                             type: 'success',
                             size: 'normal',
-                            handler: this.goToApplyPerm,
+                            handler: this.applyPermission,
                             text: this.$t('ticket.applyPermission')
                         }
                     ]
@@ -251,8 +251,7 @@
                 const formData = this.$refs[this.certType].postData
                 const config = { headers: { } }
                 let message = ''
-                let theme = 'success'
-
+                let theme = ''
                 try {
                     if (this.isEdit) {
                         await this.$store.dispatch('ticket/editCert', { url, formData, config })
@@ -261,33 +260,20 @@
                         await this.$store.dispatch('ticket/createCert', { url, formData, config })
                         message = this.$t('ticket.cert.successfullyCreatedCert')
                     }
-                } catch (err) {
-                    if (err.code === 403) {
-                        const actionId = this.isEdit ? this.$permissionActionMap.edit : this.$permissionActionMap.create
-                        const instanceId = this.isEdit
-                            ? [{
-                                id: formData.certId,
-                                type: this.$permissionResourceTypeMap.TICKET_CERT
-                            }]
-                            : []
-                        
-                        this.$showAskPermissionDialog({
-                            noPermissionList: [{
-                                actionId,
-                                resourceId: this.$permissionResourceMap.envNode,
-                                instanceId: [{
-                                    id: this.projectId,
-                                    type: this.$permissionResourceTypeMap.PROJECT
-                                }, ...instanceId],
-                                projectId: this.projectId
-                            }],
-                            applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=ticket&project_code=${this.projectId}&service_code=ticket&${this.isEdit ? 'role_manager' : 'role_creator'}=certificate${this.isEdit ? `:${formData.certId}` : ''}`
-                        })
-                    }
-                    message = err.message ? err.message : err
-                    theme = 'error'
-                } finally {
+                    theme = 'success'
                     this.$bkMessage({ message, theme })
+                } catch (e) {
+                    const resourceCode = this.isEdit ? formData.certId : this.projectId
+                    this.handleError(
+                        e,
+                        {
+                            projectId: this.projectId,
+                            resourceType: CERT_RESOURCE_TYPE,
+                            resourceCode,
+                            action: CERT_RESOURCE_ACTION.EDIT
+                        }
+                    )
+                } finally {
                     if (theme === 'success') this.$router.push({ name: 'certList' })
                 }
             },
