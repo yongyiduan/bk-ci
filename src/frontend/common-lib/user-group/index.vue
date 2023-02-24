@@ -1,28 +1,33 @@
 <template>
     <article class="group-wrapper">
-        <!-- 管理员 -->
-        <template v-if="hasPermission">
-            <div
-                v-if="isEnablePermission"
-                class="group-manage"
-            >
-                <group-aside
-                    v-bind="$props"
-                    :delete-group="handleDeleteGroup"
-                    @choose-group="handleChooseGroup"
-                    @create-group="handleCreateGroup"
-                    @update-enable="handelUpdateEnable"
-                />
-                <iam-iframe
-                    class="group-frame"
-                    :path="path"
-                />
-            </div>
-            <!-- 普通成员 -->
-            <group-table v-else v-bind="$props" />
+        <template v-if="!isLoading">
+            <!-- 管理员 -->
+            <template v-if="isEnablePermission">
+                <div
+                    v-if="hasPermission"
+                    class="group-manage"
+                >
+                    <group-aside
+                        v-bind="$props"
+                        :active-index="activeIndex"
+                        :delete-group="handleDeleteGroup"
+                        @choose-group="handleChooseGroup"
+                        @create-group="handleCreateGroup"
+                        @update-enable="handelUpdateEnable"
+                    />
+                    <iam-iframe
+                        class="group-frame"
+                        :path="path"
+                    />
+                </div>
+                <!-- 项目维度 -> 无权限 -->
+                <no-permission v-else-if="!hasPermission && resourceType === 'project'" :title="$t('无该项目用户组管理权限')"></no-permission>
+                <!-- 普通成员 -->
+                <group-table v-else-if="!hasPermission && resourceType !== 'project'" v-bind="$props" />
+            </template>
+            <!-- 未开启权限管理 -->
+            <not-open-manage v-else-if="!isEnablePermission && resourceType !== 'project'" v-bind="$props" />
         </template>
-        <!-- 未开启权限管理 -->
-        <not-open-manage v-else v-bind="$props" />
     </article>
 </template>
   
@@ -30,6 +35,7 @@
     import GroupAside from './group-aside.vue'
     import GroupTable from './group-table.vue'
     import NotOpenManage from './not-open-manage.vue'
+    import NoPermission from './no-permission.vue'
     import IamIframe from './iam-Iframe.vue'
   
     export default {
@@ -37,7 +43,8 @@
             GroupAside,
             GroupTable,
             NotOpenManage,
-            IamIframe
+            IamIframe,
+            NoPermission
         },
   
         props: {
@@ -87,6 +94,14 @@
             deleteGroup: {
                 type: Function,
                 default: () => {}
+            },
+            isLoading: {
+                type: Boolean,
+                default: false
+            },
+            fetchGroupList: {
+                type: Function,
+                default: () => {}
             }
         },
   
@@ -119,7 +134,21 @@
             },
   
             handleCreateGroup () {
+                this.activeIndex = ''
                 this.path = 'create-user-group'
+            },
+
+            async handleComfigCreate () {
+                await this.fetchGroupList()
+                setTimeout(() => {
+                    this.handleCancelCreate(this.groupList.length - 1)
+                    this.activeIndex = this.groupList.length - 1
+                })
+            },
+
+            handleCancelCreate (index = 0) {
+                this.activeIndex = 0
+                this.path = `user-group-detail/${this.groupList[index].groupId}?role_id=${this.groupList[index].managerId}`
             },
   
             handleMessage (event) {

@@ -5,9 +5,9 @@
                 class="exception-wrap-item exception-part"
                 type="403"
                 scene="part"
-                :description="title"
                 :class="{ 'exception-gray': isGray }"
             >
+                <div>{{ title }}</div>
                 <bk-button
                     class="btn"
                     theme="primary"

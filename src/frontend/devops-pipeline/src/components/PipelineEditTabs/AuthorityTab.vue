@@ -4,12 +4,15 @@
         :resource-code="resourceCode"
         :project-code="projectCode"
         :group-list="groupList"
+        :is-loading="isLoading"
         :member-group-list="memberGroupList"
         :iam-iframe-path="iamIframePath"
         :has-permission="hasPermission"
         :is-enable-permission="isEnablePermission"
         :open-manage="handleOpenManage"
         :close-manage="handleCloseManage"
+        :delete-group="handleDeleteGroup"
+        :fetch-group-list="fetchGroupList"
     />
 </template>
 
@@ -29,7 +32,8 @@
                 iamIframePath: 'user-group-detail/29912',
                 resourceType: 'pipeline',
                 groupList: [],
-                memberGroupList: []
+                memberGroupList: [],
+                isLoading: false
             }
         },
         computed: {
@@ -42,20 +46,21 @@
         },
         async created () {
             await this.fetchHasManagerPermissionFromApi()
-            await this.fetchEnablePermission()
+            await this.fetchEnablePermissionFromApi()
             // 管理员获取用户组数据
             if (this.isEnablePermission && this.hasPermission) {
                 await this.fetchGroupList()
             }
             // 普通成员获取成员数据
-            if (this.isEnablePermission && !this.hasPermission) {
+            if (this.isEnablePermission && !this.hasPermission && this.resourceType !== 'project') {
                 await this.fetchMemberGroupList()
             }
         },
         methods: {
             ...mapActions('pipelines', [
                 'fetchHasManagerPermission',
-                'fetchEnablePermissionFromApi',
+                'fetchEnablePermission',
+                // 'fetchEnablePermissionFromApi',
                 'enableGroupPermission',
                 'disableGroupPermission',
                 'fetchUserGroupList',
@@ -66,6 +71,7 @@
              * 是否为资源的管理员
              */
             fetchHasManagerPermissionFromApi () {
+                this.isLoading = true
                 const {
                     projectCode,
                     resourceType,
@@ -78,12 +84,15 @@
                     resourceCode
                 }).then((res) => {
                     this.hasPermission = res
+                }).finally(() => {
+                    this.isLoading = false
                 })
             },
             /**
              * 是否开启了权限管理
              */
             fetchEnablePermissionFromApi () {
+                this.isLoading = true
                 const {
                     projectCode,
                     resourceType,
@@ -98,6 +107,8 @@
                     })
                     .then((res) => {
                         this.isEnablePermission = res
+                    }).finally(() => {
+                        this.isLoading = false
                     })
             },
             /**
@@ -171,6 +182,7 @@
                     })
                     .then((res) => {
                         this.groupList = res.data
+                        this.iamIframePath = `user-group-detail/${res[0]?.groupId}?role_id=${res[0]?.managerId}`
                     })
             },
 
@@ -210,7 +222,13 @@
                         projectCode,
                         groupId: group.id
                     })
-                    .then(() => this.fetchMemberGroupList())
+                    .then(() => {
+                        this.$bkMessage({
+                            theme: 'success',
+                            message: this.$t('删除成功')
+                        })
+                        this.fetchMemberGroupList()
+                    })
             }
         }
     }

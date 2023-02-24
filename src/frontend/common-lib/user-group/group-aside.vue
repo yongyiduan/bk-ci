@@ -2,10 +2,11 @@
     <article class="group-aside">
         <section class="group-list">
             <div
-                :class="{ 'group-item': true, 'group-active': activeTab === group.name }"
+                :class="{ 'group-item': true, 'group-active': activeTab === group.groupId }"
                 v-for="(group, index) in groupList"
                 :key="index"
-                @click="handleChangeTab(group)">
+                @click="handleChangeTab(group)"
+                v-bkloading="{ isLoading: !groupList.length }">
                 <span class="group-name" :title="group.name">{{ group.name }}</span>
                 <span class="user-num">
                     <i class="manage-icon small-size manage-icon-user-shape"></i>
@@ -93,6 +94,10 @@
             deleteGroup: {
                 type: Function,
                 default: () => {}
+            },
+            activeIndex: {
+                type: Boolean,
+                default: 0
             }
         },
         data () {
@@ -108,9 +113,14 @@
         watch: {
             groupList: {
                 handler () {
-                    this.activeTab = this.groupList[0]?.name
+                    if (this.groupList.length) {
+                        this.handleChangeTab(this.groupList[0])
+                    }
                 },
                 immediate: true
+            },
+            activeIndex (newVal) {
+                this.activeTab = this.groupList[newVal]?.groupId || ''
             }
         },
         methods: {
@@ -132,7 +142,7 @@
                     })
             },
             handleChangeTab (group) {
-                this.activeTab = group.name
+                this.activeTab = group.groupId
                 this.$emit('choose-group', group)
             },
             handleCreateGroup () {
