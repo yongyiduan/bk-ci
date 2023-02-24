@@ -13,6 +13,7 @@
         :close-manage="handleCloseManage"
         :delete-group="handleDeleteGroup"
         :fetch-group-list="fetchGroupList"
+        :show-create-group="false"
     />
 </template>
 
@@ -47,14 +48,7 @@
         async created () {
             await this.fetchHasManagerPermissionFromApi()
             await this.fetchEnablePermissionFromApi()
-            // 管理员获取用户组数据
-            if (this.isEnablePermission && this.hasPermission) {
-                await this.fetchGroupList()
-            }
-            // 普通成员获取成员数据
-            if (this.isEnablePermission && !this.hasPermission && this.resourceType !== 'project') {
-                await this.fetchMemberGroupList()
-            }
+            await this.getUserList()
         },
         methods: {
             ...mapActions('pipelines', [
@@ -67,6 +61,16 @@
                 'fetchGroupMember',
                 'deleteGroup'
             ]),
+            async getUserList () {
+                // 管理员获取用户组数据
+                if (this.isEnablePermission && this.hasPermission) {
+                    await this.fetchGroupList()
+                }
+                // 普通成员获取成员数据
+                if (this.isEnablePermission && !this.hasPermission && this.resourceType !== 'project') {
+                    await this.fetchMemberGroupList()
+                }
+            },
             /**
              * 是否为资源的管理员
              */
@@ -83,7 +87,7 @@
                     resourceType,
                     resourceCode
                 }).then((res) => {
-                    this.hasPermission = res
+                    this.hasPermission = res?.data
                 }).finally(() => {
                     this.isLoading = false
                 })
@@ -106,7 +110,7 @@
                         resourceCode
                     })
                     .then((res) => {
-                        this.isEnablePermission = res
+                        this.isEnablePermission = res?.data
                     }).finally(() => {
                         this.isLoading = false
                     })
@@ -128,12 +132,13 @@
                         projectCode
                     })
                     .then((res) => {
-                        if (res) {
+                        if (res?.data) {
                             this.$bkMessage({
                                 theme: 'success',
                                 message: this.$t('开启成功')
                             })
-                            this.isEnablePermission = res
+                            this.isEnablePermission = true
+                            this.getUserList()
                         }
                     })
             },
@@ -154,13 +159,13 @@
                         projectCode
                     })
                     .then((res) => {
-                        if (res) {
+                        if (res?.data) {
+                            this.isEnablePermission = false
                             this.$bkMessage({
                                 theme: 'success',
                                 message: this.$t('关闭成功')
                             })
                         }
-                        this.isEnablePermission = res
                     })
             },
 
