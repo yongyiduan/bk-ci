@@ -48,14 +48,7 @@
         async created () {
             await this.fetchHasManagerPermissionFromApi()
             await this.fetchEnablePermissionFromApi()
-            // 管理员获取用户组数据
-            if (this.isEnablePermission && this.hasPermission) {
-                await this.fetchGroupList()
-            }
-            // 普通成员获取成员数据
-            if (this.isEnablePermission && !this.hasPermission && this.resourceType !== 'project') {
-                await this.fetchMemberGroupList()
-            }
+            await this.getUserList()
         },
         methods: {
             ...mapActions('pipelines', [
@@ -68,6 +61,16 @@
                 'fetchGroupMember',
                 'deleteGroup'
             ]),
+            async getUserList () {
+                // 管理员获取用户组数据
+                if (this.isEnablePermission && this.hasPermission) {
+                    await this.fetchGroupList()
+                }
+                // 普通成员获取成员数据
+                if (this.isEnablePermission && !this.hasPermission && this.resourceType !== 'project') {
+                    await this.fetchMemberGroupList()
+                }
+            },
             /**
              * 是否为资源的管理员
              */
@@ -135,6 +138,7 @@
                                 message: this.$t('开启成功')
                             })
                             this.isEnablePermission = true
+                            this.getUserList()
                         }
                     })
             },
