@@ -203,7 +203,12 @@
     import versionPackage from './version_package'
     import { convertTime } from '@/utils/util'
     import GroupIdSelector from '@/components/common/groupIdSelector'
-    import { PIPELINE_RESOURCE_ACTION, PIPELINE_RESOURCE_TYPE } from '@/utils/permission'
+    import {
+        PIPELINE_RESOURCE_ACTION,
+        PIPELINE_RESOURCE_TYPE,
+        EXPERIENCE_TASK_RESOURCE_TYPE,
+        EXPERIENCE_TASK_RESOURCE_ACTION
+    } from '@/utils/permission'
 
     export default {
         components: {
@@ -486,14 +491,16 @@
                             }
                         })
                     })
-                } catch (err) {
-                    const message = err.message ? err.message : err
-                    const theme = 'error'
-
-                    this.$bkMessage({
-                        message,
-                        theme
-                    })
+                } catch (e) {
+                    this.handleError(
+                        e,
+                        {
+                            projectId: this.projectId,
+                            resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
+                            resourceCode: this.experienceHashId,
+                            action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
+                        }
+                    )
                 } finally {
                     this.loading.isLoading = false
                 }
