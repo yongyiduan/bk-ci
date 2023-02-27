@@ -78,6 +78,7 @@
     import emptyData from './empty-data'
     import experienceGroup from './create_group'
     import { getQueryString } from '@/utils/util'
+    import { EXPERIENCE_GROUP_RESOURCE_ACTION, EXPERIENCE_GROUP_RESOURCE_TYPE } from '@/utils/permission'
 
     export default {
         components: {
@@ -295,17 +296,11 @@
                         this.dialogLoading.isLoading = false
                     }
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.edit,
-                            resourceId: this.$permissionResourceMap.experienceGroup,
-                            instanceId: [{
-                                id: row.groupHashId,
-                                name: row.name
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=group:${row.groupHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
+                        resourceCode: row.groupHashId,
+                        action: EXPERIENCE_GROUP_RESOURCE_ACTION.EDIT
                     })
                 }
             },
@@ -339,17 +334,11 @@
                         }
                     })
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.delete,
-                            resourceId: this.$permissionResourceMap.experienceGroup,
-                            instanceId: [{
-                                id: row.groupHashId,
-                                name: row.name
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=group:${row.groupHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
+                        resourceCode: row.groupHashId,
+                        action: EXPERIENCE_GROUP_RESOURCE_ACTION.DELETE
                     })
                 }
             }

@@ -45,8 +45,22 @@
                                     </bk-popover>
                                 </template>
                                 <i v-bk-tooltips="{ content: '该体验已过期' }" class="devops-icon icon-qrcode expired-text" v-else></i>
-                                <span class="edit" @click.stop="toEditRow(props.row)">编辑</span>
-                                <span class="drop-off" @click.stop="toDropOff(props.row)" v-if="props.row.online && !props.row.expired">下架</span>
+                                <bk-button
+                                    class="mr5"
+                                    :class="{ 'no-permission-btn disabled': !props.row.permissions.canEdit }"
+                                    text
+                                    @click.stop="toEditRow(props.row)"
+                                >
+                                    编辑
+                                </bk-button>
+                                <bk-button
+                                    v-if="props.row.online && !props.row.expired"
+                                    text
+                                    :class="{ 'no-permission-btn disabled': !props.row.permissions.canEdit }"
+                                    @click.stop="toDropOff(props.row)"
+                                >
+                                    下架
+                                </bk-button>
                                 <span v-bk-tooltips="{ content: '该体验已下架' }" class="expired-text" v-else>下架</span>
                             </div>
                         </template>
@@ -64,6 +78,7 @@
     import { convertTime } from '@/utils/util'
     import qrcode from '@/components/devops/qrcode'
     import emptyData from './empty-data'
+    import { EXPERIENCE_TASK_RESOURCE_TYPE, EXPERIENCE_TASK_RESOURCE_ACTION } from '@/utils/permission'
 
     export default {
         components: {
@@ -235,7 +250,12 @@
                         }
                     })
                 } else {
-                    this.askExpEditPermission(row)
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
+                        resourceCode: row.experienceHashId,
+                        action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
+                    })
                 }
             },
             async toDropOff (row) {
@@ -268,7 +288,12 @@
                         }
                     })
                 } else {
-                    this.askExpEditPermission(row)
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
+                        resourceCode: row.experienceHashId,
+                        action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
+                    })
                 }
             },
             toggleExpired (isExpired) {
@@ -288,21 +313,6 @@
                     params: {
                         projectId: this.projectId
                     }
-                })
-            },
-
-            askExpEditPermission (row) {
-                this.$showAskPermissionDialog({
-                    noPermissionList: [{
-                        actionId: this.$permissionActionMap.edit,
-                        resourceId: this.$permissionResourceMap.experience,
-                        instanceId: [{
-                            id: row.experienceHashId,
-                            name: row.name
-                        }],
-                        projectId: this.projectId
-                    }],
-                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=experience&role_manager=task:${row.experienceHashId}`
                 })
             }
         }
@@ -341,6 +351,15 @@
             .expired-text {
                 cursor: default;
                 color: $fontLighterColor;
+            }
+        }
+        .no-permission-btn {
+            &.disabled {
+                color: #C4C6CC;
+                &:hover {
+                    color: #C4C6CC;
+                }
+                cursor: url(../../images/cursor-lock.png), auto !important;
             }
         }
     }

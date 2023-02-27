@@ -203,6 +203,7 @@
     import versionPackage from './version_package'
     import { convertTime } from '@/utils/util'
     import GroupIdSelector from '@/components/common/groupIdSelector'
+    import { PIPELINE_RESOURCE_ACTION, PIPELINE_RESOURCE_TYPE } from '@/utils/permission'
 
     export default {
         components: {
@@ -794,20 +795,13 @@
                                 message = '新增体验成功'
                                 theme = 'success'
                             } else {
-                                const params = {
-                                    noPermissionList: [{
-                                        actionId: this.$permissionActionMap.execute,
-                                        resourceId: this.$permissionResourceMap.pipeline,
-                                        instanceId: [{
-                                            id: this.curPipelineId,
-                                            name: this.curPipelineName
-                                        }],
-                                        projectId: this.$route.params.projectId
-                                    }],
-                                    applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=pipeline&role_executor=pipeline:${this.curPipelineId}`
-                                }
-            
-                                this.$showAskPermissionDialog(params)
+                                const resourceCode = params.path.split('/')[1] || ''
+                                this.handleNoPermission({
+                                    projectId: this.projectId,
+                                    resourceType: PIPELINE_RESOURCE_TYPE,
+                                    resourceCode,
+                                    action: PIPELINE_RESOURCE_ACTION.EXECUTE
+                                })
                             }
                         }
                     } catch (err) {
