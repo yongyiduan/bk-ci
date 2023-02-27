@@ -82,15 +82,24 @@
                     resourceCode
                 } = this
 
-                return this.fetchHasManagerPermission({
-                    projectCode,
-                    resourceType,
-                    resourceCode
-                }).then((res) => {
-                    this.hasPermission = res?.data
-                }).finally(() => {
-                    this.isLoading = false
-                })
+                return this
+                    .fetchHasManagerPermission({
+                        projectCode,
+                        resourceType,
+                        resourceCode
+                    })
+                    .then((res) => {
+                        this.hasPermission = res?.data
+                    })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    })
+                    .finally(() => {
+                        this.isLoading = false
+                    })
             },
             /**
              * 是否开启了权限管理
@@ -111,7 +120,14 @@
                     })
                     .then((res) => {
                         this.isEnablePermission = res?.data
-                    }).finally(() => {
+                    })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    })
+                    .finally(() => {
                         this.isLoading = false
                     })
             },
@@ -141,6 +157,12 @@
                             this.getUserList()
                         }
                     })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    })
             },
             /**
              * 关闭权限管理
@@ -167,6 +189,12 @@
                             })
                         }
                     })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    })
             },
 
             /**
@@ -189,6 +217,12 @@
                         this.groupList = res.data
                         this.iamIframePath = `user-group-detail/${res[0]?.groupId}?role_id=${res[0]?.managerId}`
                     })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
+                        })
+                    })
             },
 
             /**
@@ -209,6 +243,12 @@
                     })
                     .then((res) => {
                         this.memberGroupList = res.data
+                    })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
+                        })
                     })
             },
             
@@ -233,6 +273,12 @@
                             message: this.$t('删除成功')
                         })
                         this.fetchMemberGroupList()
+                    })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
+                        })
                     })
             }
         }

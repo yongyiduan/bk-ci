@@ -510,12 +510,6 @@ export default {
                     params: paramList
                 }
             })
-        },
-        handleError (err) {
-            this.$showTips({
-                message: err.message,
-                theme: 'error'
-            })
         }
     }
 }
