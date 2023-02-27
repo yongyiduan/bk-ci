@@ -427,6 +427,7 @@
     import createGroup from '@/components/devops/create_group'
     import emptyTips from '@/components/devops/emptyTips'
     import { getQueryString } from '@/utils/util'
+    import { RULE_RESOURCE_ACTION, RULE_RESOURCE_TYPE } from '@/utils/permission.js'
 
     export default {
         components: {
@@ -657,8 +658,12 @@
                 this.iframeUtil.toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_creator=rule` : PERM_URL_PREFIX
-                window.open(url, '_blank')
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: RULE_RESOURCE_TYPE,
+                    resourceCode: this.projectId,
+                    action: RULE_RESOURCE_ACTION.CREATE
+                })
             },
             addLeaveListenr () {
                 window.addEventListener('beforeunload', this.leaveSure)

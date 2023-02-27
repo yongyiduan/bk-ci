@@ -49,8 +49,8 @@
                         </bk-table-column>
                         <bk-table-column label="操作" width="150">
                             <template slot-scope="props">
-                                <span class="handler-btn edit-btn" @click="toEditGroup(props.row)">编辑</span>
-                                <span class="handler-btn delete-btn" @click="toDeleteGruop(props.row)">删除</span>
+                                <bk-button class="mr5" :class="{ 'no-permission-btn disabled': !props.row.permissions.canEdit }" text @click="toEditGroup(props.row)">编辑</bk-button>
+                                <bk-button :class="{ 'no-permission-btn disabled': !props.row.permissions.canDelete }" text @click="toDeleteGruop(props.row)">删除</bk-button>
                             </template>
                         </bk-table-column>
                     </bk-table>
@@ -79,6 +79,7 @@
     import emptyData from './empty_data'
     import createGroup from '@/components/devops/create_group'
     import { getQueryString } from '@/utils/util'
+    import { QUALITY_GROUP_RESOURCE_ACTION, QUALITY_GROUP_RESOURCE_TYPE } from '@/utils/permission.js'
 
     export default {
         components: {
@@ -303,17 +304,11 @@
                         this.dialogLoading.isLoading = false
                     }
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.edit,
-                            resourceId: this.$permissionResourceMap.notifyGroup,
-                            instanceId: [{
-                                id: row.groupHashId,
-                                name: row.name
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=group:${row.groupHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: QUALITY_GROUP_RESOURCE_TYPE,
+                        resourceCode: row.groupHashId,
+                        action: QUALITY_GROUP_RESOURCE_ACTION.EDIT
                     })
                 }
             },
@@ -348,17 +343,11 @@
                         }
                     })
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.delete,
-                            resourceId: this.$permissionResourceMap.notifyGroup,
-                            instanceId: [{
-                                id: row.groupHashId,
-                                name: row.name
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=group:${row.groupHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: QUALITY_GROUP_RESOURCE_TYPE,
+                        resourceCode: row.groupHashId,
+                        action: QUALITY_GROUP_RESOURCE_ACTION.DELETE
                     })
                 }
             }
@@ -433,6 +422,15 @@
             padding: 20px;
             min-height: 320px;
             overflow: auto;
+        }
+        .no-permission-btn {
+            &.disabled {
+                color: #C4C6CC;
+                &:hover {
+                    color: #C4C6CC;
+                }
+                cursor: url(../images/cursor-lock.png), auto !important;
+            }
         }
     }
 </style>

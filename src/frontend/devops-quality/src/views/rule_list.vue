@@ -69,12 +69,9 @@
                             </bk-table-column>
                             <bk-table-column label="操作" min-width="120">
                                 <template slot-scope="props">
-                                    <div class="handler-btn">
-                                        <span class="copy-btn" :data-clipboard-text="props.row.rule" @click="editRule(props.row)">编辑</span>
-                                        <span class="switch-btn" v-if="props.row.enable" @click="switchRule(props.row)">停用</span>
-                                        <span class="switch-btn" v-else @click="switchRule(props.row)">启用</span>
-                                        <span class="delete-btn" @click="toDeleteRule(props.row)">删除</span>
-                                    </div>
+                                    <bk-button class="mr5 no-permission-btn" :class="{ 'disabled': !props.row.permissions.canEdit }" text @click="editRule(props.row)">编辑</bk-button>
+                                    <bk-button class="mr5 no-permission-btn" :class="{ 'disabled': !props.row.permissions.canEnable }" text @click="switchRule(props.row)">{{ props.row.enable ? '停用' : '启用' }}</bk-button>
+                                    <bk-button class="no-permission-btn" :class="{ 'disabled': !props.row.permissions.canDeldete }" text @click="toDeleteRule(props.row)">删除</bk-button>
                                 </template>
                             </bk-table-column>
                         </bk-table>
@@ -238,6 +235,7 @@
     import effectivePipeline from '@/components/devops/effective-pipeline'
     import effectiveRange from '@/components/devops/effective-range'
     import { convertTime, getQueryString } from '@/utils/util'
+    import { RULE_RESOURCE_ACTION, RULE_RESOURCE_TYPE } from '@/utils/permission.js'
 
     export default {
         components: {
@@ -517,17 +515,11 @@
                         }
                     })
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.delete,
-                            resourceId: this.$permissionResourceMap.rule,
-                            instanceId: [{
-                                id: row.ruleHashId,
-                                name: row.name
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: RULE_RESOURCE_TYPE,
+                        resourceCode: row.ruleHashId,
+                        action: RULE_RESOURCE_ACTION.DELETE
                     })
                 }
             },
@@ -662,17 +654,11 @@
                         }
                     })
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.edit,
-                            resourceId: this.$permissionResourceMap.rule,
-                            instanceId: [{
-                                id: row.ruleHashId,
-                                name: row.name
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: RULE_RESOURCE_TYPE,
+                        resourceCode: row.ruleHashId,
+                        action: RULE_RESOURCE_ACTION.EDIT
                     })
                 }
             },
@@ -694,17 +680,11 @@
                         }
                     })
                 } else {
-                    this.$showAskPermissionDialog({
-                        noPermissionList: [{
-                            actionId: this.$permissionActionMap.enable,
-                            resourceId: this.$permissionResourceMap.rule,
-                            instanceId: [{
-                                id: row.ruleHashId,
-                                name: row.name
-                            }],
-                            projectId: this.projectId
-                        }],
-                        applyPermissionUrl: `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_manager=rule:${row.ruleHashId}`
+                    this.handleNoPermission({
+                        projectId: this.projectId,
+                        resourceType: RULE_RESOURCE_TYPE,
+                        resourceCode: row.ruleHashId,
+                        action: RULE_RESOURCE_ACTION.ENABLE
                     })
                 }
             },
@@ -850,6 +830,15 @@
             }
             td.controlPoint-item .cell {
                 -webkit-line-clamp: 3;
+            }
+        }
+        .no-permission-btn {
+            &.disabled {
+                color: #C4C6CC;
+                &:hover {
+                    color: #C4C6CC;
+                }
+                cursor: url(../images/cursor-lock.png), auto !important;
             }
         }
         .bk-sideslider-wrapper {
