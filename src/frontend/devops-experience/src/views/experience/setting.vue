@@ -45,8 +45,21 @@
                             <bk-table-column label="操作" prop="creator">
                                 <template slot-scope="props">
                                     <div class="handler-group">
-                                        <span class="handler-btn edit-btn" @click="toEditGroup(props.row)">编辑</span>
-                                        <span class="handler-btn delete-btn" @click="toDeleteGruop(props.row)">删除</span>
+                                        <bk-button
+                                            class="mr5"
+                                            text
+                                            @click="toEditGroup(props.row)"
+                                            :class="{ 'no-permission-btn disabled': !props.row.permissions.canEdit }"
+                                        >
+                                            编辑
+                                        </bk-button>
+                                        <bk-button
+                                            text
+                                            @click="toDeleteGruop(props.row)"
+                                            :class="{ 'no-permission-btn disabled': !props.row.permissions.canDelete }"
+                                        >
+                                            删除
+                                        </bk-button>
                                     </div>
                                 </template>
                             </bk-table-column>
@@ -376,6 +389,15 @@
         }
         .bk-tab-label-item{
             background-color: transparent !important;
+        }
+        .no-permission-btn {
+            &.disabled {
+                color: #C4C6CC;
+                &:hover {
+                    color: #C4C6CC;
+                }
+                cursor: url(../../images/cursor-lock.png), auto !important;
+            }
         }
     }
 </style>
