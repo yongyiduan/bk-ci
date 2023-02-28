@@ -5,7 +5,7 @@
             <template v-if="isEnablePermission">
                 <div
                     v-if="hasPermission"
-                    class="group-manage"
+                    class="group-manage group-main"
                 >
                     <group-aside
                         v-bind="$props"
@@ -23,23 +23,34 @@
                     />
                 </div>
                 <!-- 项目维度 -> 无权限 -->
-                <no-permission v-else-if="!hasPermission && resourceType === 'project'" :title="$t('无该项目用户组管理权限')"></no-permission>
+                <no-permission
+                    v-else-if="!hasPermission && resourceType === 'project'"
+                    :title="$t('无该项目用户组管理权限')"
+                    class="group-main"
+                />
                 <!-- 普通成员 -->
-                <group-table v-else-if="!hasPermission && resourceType !== 'project'" v-bind="$props" />
+                <group-table
+                    v-else-if="!hasPermission && resourceType !== 'project'"
+                    class="group-main"
+                    v-bind="$props"
+                />
             </template>
             <!-- 未开启权限管理 -->
-            <not-open-manage v-else-if="!isEnablePermission && resourceType !== 'project'" v-bind="$props" />
+            <not-open-manage
+                v-else-if="!isEnablePermission && resourceType !== 'project'"
+                v-bind="$props"
+                class="group-main"
+            />
         </template>
     </article>
 </template>
   
-  <script>
+<script>
     import GroupAside from './group-aside.vue'
     import GroupTable from './group-table.vue'
     import NotOpenManage from './not-open-manage.vue'
     import NoPermission from './no-permission.vue'
     import IamIframe from './iam-Iframe.vue'
-  
     export default {
         components: {
             GroupAside,
@@ -48,7 +59,7 @@
             IamIframe,
             NoPermission
         },
-  
+
         props: {
             // 资源类型
             resourceType: {
@@ -66,10 +77,6 @@
                 default: ''
             },
             groupList: {
-                type: Array,
-                default: () => []
-            },
-            memberGroupList: {
                 type: Array,
                 default: () => []
             },
@@ -110,13 +117,13 @@
                 default: true
             }
         },
-  
+
         data () {
             return {
                 path: ''
             }
         },
-  
+
         watch: {
             iamIframePath: {
                 handler () {
@@ -125,20 +132,20 @@
                 immediate: true
             }
         },
-  
+
         async created () {
             window.addEventListener('message', this.handleMessage)
         },
-  
+
         beforeDestroy () {
             window.removeEventListener('message', this.handleMessage)
         },
-  
+
         methods: {
             handleChooseGroup (payload) {
                 this.path = `user-group-detail/${payload.groupId}?role_id=${payload.managerId}`
             },
-  
+
             handleCreateGroup () {
                 this.activeIndex = ''
                 this.path = 'create-user-group'
@@ -156,7 +163,6 @@
                 this.activeIndex = 0
                 this.path = `user-group-detail/${this.groupList[index].groupId}?role_id=${this.groupList[index].managerId}`
             },
-  
             handleMessage (event) {
                 const { data } = event
                 if (data.type === 'IAM') {
@@ -170,13 +176,13 @@
                     }
                 }
             },
-  
+
             handleDeleteGroup (group) {
                 return this.deleteGroup(group)
             },
-  
+
             handelUpdateEnable () {
-                // this.isEnablePermission = payload;
+            // this.isEnablePermission = payload;
             },
 
             handleCloseManage () {
@@ -184,19 +190,21 @@
             }
         }
     }
-  </script>
+</script>
   
-  <style lang="scss" scoped>
-    .group-wrapper {
-      display: flex;
-      flex: 1;
-    }
-    .group-manage {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-    .group-frame {
-      flex: 1;
-    }
-  </style>
+<style lang="scss" scoped>
+.group-wrapper {
+    display: flex;
+    flex: 1;
+}
+.group-main {
+    flex: 1;
+    overflow: hidden;
+}
+.group-manage {
+    display: flex;
+}
+.group-frame {
+    flex: 1;
+}
+</style>

@@ -35,7 +35,8 @@
             title () {
                 const titleMap = {
                     pipeline: this.$t('尚未开启此流水线权限管理功能'),
-                    project: this.$t('尚未开启此项目权限管理功能')
+                    project: this.$t('尚未开启此项目权限管理功能'),
+                    pipeline_group: this.$t('尚未开启此流水线组权限管理功能')
                 }
                 return titleMap[this.resourceType]
             }
