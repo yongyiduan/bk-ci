@@ -101,7 +101,7 @@
                 default: 0
             },
             showCreateGroup: {
-              type: Boolean
+                type: Boolean
             }
         },
         data () {
