@@ -24,18 +24,18 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package com.tencent.devops.repository.pojo.auth
 
-package com.tencent.devops.plugin.pojo
-
-import com.fasterxml.jackson.annotation.JsonSubTypes
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
+import org.apache.commons.lang3.StringUtils
 
-@ApiModel("任务数据-多态基类")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonSubTypes(
-        JsonSubTypes.Type(value = FileTaskData::class, name = FileTaskData.classType)
+@ApiModel("代码库授权信息")
+data class RepoAuthInfo(
+    @ApiModelProperty("授权类型", required = true)
+    val authType: String,
+    @ApiModelProperty("授权凭证ID", required = true)
+    val credentialId: String,
+    @ApiModelProperty("SVN类型", required = false)
+    val svnType: String? = StringUtils.EMPTY
 )
-interface TaskData {
-    val cost: Int
-}

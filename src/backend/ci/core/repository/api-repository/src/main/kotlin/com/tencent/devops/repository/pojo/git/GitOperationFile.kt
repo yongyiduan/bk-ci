@@ -25,22 +25,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.plugin.pojo.wetest
+package com.tencent.devops.repository.pojo.git
 
-import io.swagger.annotations.ApiModel
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.tencent.devops.repository.pojo.enums.GitCodeFileEncoding
 import io.swagger.annotations.ApiModelProperty
 
-@ApiModel("weTestEmailGroup")
-data class WetestEmailGroupResponse(
-    @ApiModelProperty("总数")
-    val count: String,
-    @ApiModelProperty("当前页数")
-    val page: Int,
-    @ApiModelProperty("每页数量")
-    val pageSize: Int,
-    @ApiModelProperty("配置详情")
-    val records: List<WetestEmailGroup>,
-    @ApiModelProperty("总页数")
-    val totalPages: Int
-
+data class GitOperationFile(
+    @JsonProperty("file_path")
+    @ApiModelProperty(name = "file_path")
+    val filePath: String,
+    @JsonProperty("branch_name")
+    @ApiModelProperty(name = "branch_name")
+    val branch: String,
+    @JsonProperty("encoding")
+    @ApiModelProperty(name = "encoding")
+    val encoding: GitCodeFileEncoding = GitCodeFileEncoding.TEXT,
+    @JsonProperty("content")
+    @ApiModelProperty(name = "content")
+    val content: String,
+    @JsonProperty("commit_message")
+    @ApiModelProperty(name = "commit_message")
+    val commitMessage: String
 )

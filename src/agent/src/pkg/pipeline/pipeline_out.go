@@ -1,3 +1,6 @@
+//go:build out
+// +build out
+
 /*
  * Tencent is pleased to support the open source community by making BK-CI 蓝鲸持续集成平台 available.
  *
@@ -25,26 +28,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.repository.pojo.git
+package pipeline
 
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.tencent.devops.repository.pojo.enums.GitCodeFileEncoding
-import io.swagger.annotations.ApiModelProperty
-
-data class GitCreateFile(
-    @JsonProperty("file_path")
-    @ApiModelProperty(name = "file_path")
-    val filePath: String,
-    @JsonProperty("branch_name")
-    @ApiModelProperty(name = "branch_name")
-    val branch: String,
-    @JsonProperty("encoding")
-    @ApiModelProperty(name = "encoding")
-    val encoding: GitCodeFileEncoding = GitCodeFileEncoding.TEXT,
-    @JsonProperty("content")
-    @ApiModelProperty(name = "content")
-    val content: String,
-    @JsonProperty("commit_message")
-    @ApiModelProperty(name = "commit_message")
-    val commitMessage: String
-)
+func Start() {
+	// 为外部出包使用
+}
