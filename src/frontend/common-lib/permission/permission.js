@@ -336,7 +336,7 @@ export const handleNoPermissionV3 = (ui, params, ajax, h) => {
                         {
                             class: 'mr10',
                             theme: 'primary',
-                            onClick() {
+                            onClick () {
                                 window.open(data.groupInfoList[0].url, '_blank')
                                 handleClickLink()
                             }
@@ -347,7 +347,7 @@ export const handleNoPermissionV3 = (ui, params, ajax, h) => {
                     ui.Button,
                     {
                         class: 'mr25',
-                        onClick() {
+                        onClick () {
                             infoBoxRef?.hide?.()
                         }
                     },
