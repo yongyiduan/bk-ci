@@ -5,7 +5,6 @@
         :project-code="projectCode"
         :group-list="groupList"
         :is-loading="isLoading"
-        :member-group-list="memberGroupList"
         :iam-iframe-path="iamIframePath"
         :has-permission="hasPermission"
         :is-enable-permission="isEnablePermission"
@@ -54,21 +53,15 @@
             ...mapActions('pipelines', [
                 'fetchHasManagerPermission',
                 'fetchEnablePermission',
-                // 'fetchEnablePermissionFromApi',
                 'enableGroupPermission',
                 'disableGroupPermission',
                 'fetchUserGroupList',
-                'fetchGroupMember',
                 'deleteGroup'
             ]),
             async getUserList () {
                 // 管理员获取用户组数据
                 if (this.isEnablePermission && this.hasPermission) {
                     await this.fetchGroupList()
-                }
-                // 普通成员获取成员数据
-                if (this.isEnablePermission && !this.hasPermission && this.resourceType !== 'project') {
-                    await this.fetchMemberGroupList()
                 }
             },
             /**
@@ -224,33 +217,6 @@
                         })
                     })
             },
-
-            /**
-             * 获取用户所属组 (普通成员)
-             */
-            fetchMemberGroupList () {
-                const {
-                    resourceType,
-                    resourceCode,
-                    projectCode
-                } = this
-
-                return this
-                    .fetchGroupMember({
-                        resourceType,
-                        resourceCode,
-                        projectCode
-                    })
-                    .then((res) => {
-                        this.memberGroupList = res.data
-                    })
-                    .catch((err) => {
-                        this.$bkMessage({
-                            theme: 'error',
-                            message: err.message || err
-                        })
-                    })
-            },
             
             /**
              * 删除用户组
@@ -272,7 +238,7 @@
                             theme: 'success',
                             message: this.$t('删除成功')
                         })
-                        this.fetchMemberGroupList()
+                        this.fetchGroupList()
                     })
                     .catch((err) => {
                         this.$bkMessage({

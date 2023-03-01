@@ -95,12 +95,29 @@
     }
     export default {
         name: 'UserTable',
+
+        components: {
+            ApplyDialog
+        },
+
         props: {
-            memberGroupList: {
-                type: Array,
-                default: () => []
+            // 资源类型
+            resourceType: {
+                type: String,
+                default: ''
+            },
+            // 资源ID
+            resourceCode: {
+                type: String,
+                default: ''
+            },
+            // 项目id => englishName
+            projectCode: {
+                type: String,
+                default: ''
             }
         },
+
         data () {
             return {
                 showDetail: false,
@@ -118,9 +135,11 @@
                 groupName: ''
             }
         },
-        mounted () {
 
+        mounted () {
+            this.getMemberList()
         },
+
         methods: {
             handleHidden () {
                 this.showDetail = false
