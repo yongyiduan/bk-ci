@@ -115,6 +115,9 @@
             showCreateGroup: {
                 type: Boolean,
                 default: true
+            },
+            isOpenManageLoading: {
+                type: Boolean
             }
         },
 
