@@ -236,7 +236,7 @@ export const handleNoPermission = (ui, params, ajax, h, data = undefined) => {
  * @param {*} h createElement 方法
  * @param {*} data 弹框需要的数据，不传就通过接口获取
  */
-export const handleNoPermissionV3 = (ui, params, ajax, h, data) => {
+export const handleNoPermissionV3 = (ui, params, ajax, h, data = undefined) => {
     let infoBoxRef = {}
     let refreshBoxRef = {}
 
