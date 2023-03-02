@@ -212,8 +212,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.12.0
         with:
-          tag: ${{ github.ref }}
-          name: bk-ci ${{ github.ref }}
+          name: bk-ci ${{ github.ref_name	 }}
           draft: true
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
