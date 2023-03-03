@@ -63,7 +63,7 @@ object ESConfigUtils {
     ): RestClientBuilder {
         // 初始化 RestClient 配置
         val httpHost = HttpHost(host, port, if (https) "https" else "http")
-        val builder = RestClient.builder(httpHost).setCompressionEnabled()
+        val builder = RestClient.builder(httpHost).setCompressionEnabled(true)
 
         // HTTP连接设置
         return builder.setHttpClientConfigCallback { httpClientBuilder ->
