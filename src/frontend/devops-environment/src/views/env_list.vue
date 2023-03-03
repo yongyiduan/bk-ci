@@ -261,11 +261,12 @@
             }
             .no-env-delete-permission {
                 &.disabled {
-                color: #C4C6CC;
-                &:hover {
                     color: #C4C6CC;
+                    &:hover {
+                        color: #C4C6CC;
+                    }
+                    cursor: url(../images/cursor-lock.png), auto !important;
                 }
-                cursor: url(../images/cursor-lock.png), auto !important;
             }
         }
 
