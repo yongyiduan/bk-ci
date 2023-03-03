@@ -230,7 +230,13 @@
 
 <style lang="scss">
     @import './../scss/conf';
-    .credential-operation-btn[disabled] {
-      cursor: url(../images/cursor-lock.png),auto !important;
+    .credential-operation-btn {
+        &.disabled {
+        color: #C4C6CC;
+            &:hover {
+            color: #C4C6CC;
+            }
+            cursor: url(../images/cursor-lock.png),auto !important;
+        }
     }
 </style>
