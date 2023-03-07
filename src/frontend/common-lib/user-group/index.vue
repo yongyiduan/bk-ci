@@ -199,6 +199,7 @@
 .group-wrapper {
     display: flex;
     flex: 1;
+    width: 100%;
 }
 .group-main {
     flex: 1;
