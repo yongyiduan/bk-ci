@@ -1,11 +1,24 @@
 <template>
     <div class="codelib-content" v-bkloading="{ isLoading, title: $t('codelib.laodingTitle') }">
-        <template v-if="hasCodelibs || isSearch">
-            <link-code-lib v-if="codelibs.hasCreatePermission" :create-codelib="createCodelib" :is-blue-king="isBlueKing"></link-code-lib>
-            <bk-button theme="primary" v-else @click.stop="applyPermission">
+        <template v-if="hasCodelibs">
+            <link-code-lib
+                v-perm="{
+                    hasPermission: codelibs.hasCreatePermission,
+                    disablePermissionApi: true,
+                    permissionData: {
+                        projectId: projectId,
+                        resourceType: RESOURCE_TYPE,
+                        resourceCode: projectId,
+                        action: RESOURCE_ACTION.CREATE
+                    }
+                }"
+                :create-codelib="createCodelib"
+                :is-blue-king="isBlueKing"
+            ></link-code-lib>
+            <!-- <bk-button theme="primary" v-else @click.stop="applyPermission">
                 <i class="devops-icon icon-plus"></i>
                 <span>{{ $t('codelib.linkCodelib') }}</span>
-            </bk-button>
+            </bk-button> -->
             <bk-input :placeholder="$t('codelib.aliasNamePlaceholder')"
                 class="codelib-search"
                 :clearable="true"
@@ -59,6 +72,8 @@
 
         data () {
             return {
+                RESOURCE_ACTION,
+                RESOURCE_TYPE,
                 isLoading: !this.codelibs,
                 isSearch: false,
                 defaultPagesize: 10,
