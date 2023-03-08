@@ -29,6 +29,7 @@ import bsWebSocket from '@/utils/bsWebSocket.js'
 import '@/assets/scss/index.scss'
 import { judgementLsVersion } from './utils/util'
 import '@icon-cool/bk-icon-devops/src/index'
+import { handleProjectNoPermission } from './utils/permission'
 import { handleNoPermission } from '../../common-lib/permission/permission'
 import { AuthorityDirectiveV2 } from '../../common-lib/permission/authority-directive'
 import ajax from './utils/request'
@@ -56,7 +57,7 @@ declare module 'vue/types/vue' {
 }
 
 Vue.use(bkMagic)
-Vue.use(AuthorityDirectiveV2(handleNoPermission, ajax))
+Vue.use(AuthorityDirectiveV2(handleProjectNoPermission, ajax))
 Vue.component('AsideNav', AsideNav)
 Vue.component('ContentHeader', ContentHeader)
 Vue.component('Logo', Logo)
