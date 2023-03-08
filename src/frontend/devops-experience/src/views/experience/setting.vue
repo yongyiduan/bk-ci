@@ -45,21 +45,45 @@
                             <bk-table-column label="操作" prop="creator">
                                 <template slot-scope="props">
                                     <div class="handler-group">
-                                        <bk-button
-                                            class="mr5"
-                                            text
-                                            @click="toEditGroup(props.row)"
-                                            :class="{ 'no-permission-btn disabled': !props.row.permissions.canEdit }"
+                                        <span
+                                            v-perm="{
+                                                hasPermission: props.row.permissions.canEdit,
+                                                disablePermissionApi: true,
+                                                permissionData: {
+                                                    projectId: projectId,
+                                                    resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
+                                                    resourceCode: row.groupHashId,
+                                                    action: EXPERIENCE_GROUP_RESOURCE_ACTION.EDIT
+                                                }
+                                            }"
                                         >
-                                            编辑
-                                        </bk-button>
-                                        <bk-button
-                                            text
-                                            @click="toDeleteGruop(props.row)"
-                                            :class="{ 'no-permission-btn disabled': !props.row.permissions.canDelete }"
+                                            <bk-button
+                                                class="mr5"
+                                                text
+                                                @click="toEditGroup(props.row)"
+                                            >
+                                                编辑
+                                            </bk-button>
+                                        </span>
+                                        <span
+                                            v-perm="{
+                                                hasPermission: props.row.permissions.canDelete,
+                                                disablePermissionApi: true,
+                                                permissionData: {
+                                                    projectId: projectId,
+                                                    resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
+                                                    resourceCode: row.groupHashId,
+                                                    action: EXPERIENCE_GROUP_RESOURCE_ACTION.DELETE
+                                                }
+                                            }"
                                         >
-                                            删除
-                                        </bk-button>
+                                            <bk-button
+                                                text
+                                                @click="toDeleteGruop(props.row)"
+                                            >
+                                                删除
+                                            </bk-button>
+                                        </span>
                                     </div>
                                 </template>
                             </bk-table-column>
@@ -100,6 +124,8 @@
         },
         data () {
             return {
+                EXPERIENCE_GROUP_RESOURCE_ACTION,
+                EXPERIENCE_GROUP_RESOURCE_TYPE,
                 curTab: 'experienceGroup',
                 experienceList: [],
                 showContent: false,
@@ -308,13 +334,6 @@
                     } finally {
                         this.dialogLoading.isLoading = false
                     }
-                } else {
-                    this.handleNoPermission({
-                        projectId: this.projectId,
-                        resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
-                        resourceCode: row.groupHashId,
-                        action: EXPERIENCE_GROUP_RESOURCE_ACTION.EDIT
-                    })
                 }
             },
             toDeleteGruop (row) {
@@ -345,13 +364,6 @@
                                 this.requestList()
                             }
                         }
-                    })
-                } else {
-                    this.handleNoPermission({
-                        projectId: this.projectId,
-                        resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
-                        resourceCode: row.groupHashId,
-                        action: EXPERIENCE_GROUP_RESOURCE_ACTION.DELETE
                     })
                 }
             }
@@ -389,15 +401,6 @@
         }
         .bk-tab-label-item{
             background-color: transparent !important;
-        }
-        .no-permission-btn {
-            &.disabled {
-                color: #C4C6CC;
-                &:hover {
-                    color: #C4C6CC;
-                }
-                cursor: url(../../images/cursor-lock.png), auto !important;
-            }
         }
     }
 </style>

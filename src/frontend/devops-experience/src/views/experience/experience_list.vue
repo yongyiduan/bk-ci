@@ -45,23 +45,48 @@
                                     </bk-popover>
                                 </template>
                                 <i v-bk-tooltips="{ content: '该体验已过期' }" class="devops-icon icon-qrcode expired-text" v-else></i>
-                                <bk-button
-                                    class="mr5"
-                                    :class="{ 'no-permission-btn disabled': !props.row.permissions.canEdit }"
-                                    text
-                                    @click.stop="toEditRow(props.row)"
+                                <span
+                                    v-perm="{
+                                        hasPermission: props.row.permissions.canEdit,
+                                        disablePermissionApi: true,
+                                        permissionData: {
+                                            projectId: projectId,
+                                            resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
+                                            resourceCode: props.row.experienceHashId,
+                                            action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
+                                        }
+                                    }"
                                 >
-                                    编辑
-                                </bk-button>
-                                <bk-button
-                                    v-if="props.row.online && !props.row.expired"
-                                    text
-                                    :class="{ 'no-permission-btn disabled': !props.row.permissions.canEdit }"
-                                    @click.stop="toDropOff(props.row)"
+                                    <bk-button
+                                        class="mr5"
+                                        text
+                                        @click.stop="toEditRow(props.row)"
+                                    >
+                                        编辑
+                                    </bk-button>
+                                </span>
+                                <span
+                                    v-perm="{
+                                        hasPermission: props.row.permissions.canEdit,
+                                        disablePermissionApi: true,
+                                        permissionData: {
+                                            projectId: projectId,
+                                            resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
+                                            resourceCode: props.row.experienceHashId,
+                                            action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
+                                        }
+                                    }"
                                 >
-                                    下架
-                                </bk-button>
-                                <span v-bk-tooltips="{ content: '该体验已下架' }" class="expired-text" v-else>下架</span>
+                                    <bk-button
+                                        v-if="props.row.online && !props.row.expired"
+                                        text
+                                        @click.stop="toDropOff(props.row)"
+                                    >
+                                        下架
+                                    </bk-button>
+                                    <span v-bk-tooltips="{ content: '该体验已下架' }" class="expired-text" v-else>下架</span>
+                                </span>
+                                
                             </div>
                         </template>
                     </bk-table-column>
@@ -104,7 +129,9 @@
                     current: 1,
                     limit: 20,
                     count: 0
-                }
+                },
+                EXPERIENCE_TASK_RESOURCE_TYPE,
+                EXPERIENCE_TASK_RESOURCE_ACTION
             }
         },
         computed: {
@@ -249,13 +276,6 @@
                             experienceId: row.experienceHashId
                         }
                     })
-                } else {
-                    this.handleNoPermission({
-                        projectId: this.projectId,
-                        resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
-                        resourceCode: row.experienceHashId,
-                        action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
-                    })
                 }
             },
             async toDropOff (row) {
@@ -286,13 +306,6 @@
                                 this.requestList(false)
                             }
                         }
-                    })
-                } else {
-                    this.handleNoPermission({
-                        projectId: this.projectId,
-                        resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
-                        resourceCode: row.experienceHashId,
-                        action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
                     })
                 }
             },
@@ -351,15 +364,6 @@
             .expired-text {
                 cursor: default;
                 color: $fontLighterColor;
-            }
-        }
-        .no-permission-btn {
-            &.disabled {
-                color: #C4C6CC;
-                &:hover {
-                    color: #C4C6CC;
-                }
-                cursor: url(../../images/cursor-lock.png), auto !important;
             }
         }
     }

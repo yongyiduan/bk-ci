@@ -164,7 +164,18 @@
                     </template>
                 </bk-form>
                 <div class="submit-btn-bar">
-                    <bk-button theme="primary" @click.prevent="submitFn">{{ submitText }}</bk-button>
+                    <span
+                        v-perm="{
+                            permissionData: {
+                                projectId: projectId,
+                                resourceType: PIPELINE_RESOURCE_TYPE,
+                                resourceCode,
+                                action: PIPELINE_RESOURCE_ACTION.EXECUTE
+                            }
+                        }"
+                    >
+                        <bk-button theme="primary" @click.prevent="submitFn">{{ submitText }}</bk-button>
+                    </span>
                     <bk-button theme="default" @click="cancel">取消</bk-button>
                 </div>
             </template>
@@ -298,7 +309,9 @@
                 errorFormHandler: {
                     nameError: false,
                     dateError: false
-                }
+                },
+                PIPELINE_RESOURCE_ACTION,
+                PIPELINE_RESOURCE_TYPE
             }
         },
         computed: {
