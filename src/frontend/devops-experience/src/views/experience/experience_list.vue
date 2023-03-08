@@ -67,13 +67,13 @@
                                 </span>
                                 <span
                                     v-perm="{
-                                        hasPermission: props.row.permissions.canEdit,
+                                        hasPermission: props.row.permissions.canDelete,
                                         disablePermissionApi: true,
                                         permissionData: {
                                             projectId: projectId,
                                             resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
                                             resourceCode: props.row.experienceHashId,
-                                            action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
+                                            action: EXPERIENCE_TASK_RESOURCE_ACTION.DELETE
                                         }
                                     }"
                                 >
@@ -92,7 +92,11 @@
                     </bk-table-column>
                 </bk-table>
             </div>
-            <empty-data v-if="showContent && !releaseList.length" :empty-info="emptyInfo" :to-create-fn="toCreateFn">
+            <empty-data
+                v-if="showContent && !releaseList.length"
+                :empty-info="emptyInfo"
+                :to-create-fn="toCreateFn"
+            >
             </empty-data>
         </section>
     </div>
@@ -111,6 +115,7 @@
             qrcode
         },
         data () {
+            const { projectId } = this.$route.params
             return {
                 showContent: false,
                 curIndexItemUrl: '',
@@ -123,7 +128,13 @@
                 },
                 emptyInfo: {
                     title: '暂无体验',
-                    desc: '您可以在新增体验中新增一个体验任务'
+                    desc: '您可以在新增体验中新增一个体验任务',
+                    permissionData: {
+                        projectId: projectId,
+                        resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
+                        resourceCode: projectId,
+                        action: EXPERIENCE_TASK_RESOURCE_ACTION.CREATE
+                    }
                 },
                 pagination: {
                     current: 1,

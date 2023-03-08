@@ -168,9 +168,9 @@
                         v-perm="{
                             permissionData: {
                                 projectId: projectId,
-                                resourceType: PIPELINE_RESOURCE_TYPE,
-                                resourceCode,
-                                action: PIPELINE_RESOURCE_ACTION.EXECUTE
+                                resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
+                                resourceCode: projectId,
+                                action: EXPERIENCE_TASK_RESOURCE_ACTION.CREATE
                             }
                         }"
                     >

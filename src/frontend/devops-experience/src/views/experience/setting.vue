@@ -12,7 +12,18 @@
                 >
                     <template v-if="curTab === 'experienceGroup'">
                         <div v-if="showContent && experienceList.length" class="table-operate-bar">
-                            <bk-button theme="primary" @click="toCreateGroup">新增</bk-button>
+                            <span
+                                v-perm="{
+                                    permissionData: {
+                                        projectId: projectId,
+                                        resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
+                                        resourceCode: projectId,
+                                        action: EXPERIENCE_GROUP_RESOURCE_ACTION.CREATE
+                                    }
+                                }"
+                            >
+                                <bk-button theme="primary" @click="toCreateGroup">新增</bk-button>
+                            </span>
                         </div>
                         <bk-table v-if="showContent && experienceList.length" :data="experienceList">
                             <bk-table-column label="名称" prop="name"></bk-table-column>
@@ -123,6 +134,7 @@
             experienceGroup
         },
         data () {
+            const { projectId } = this.$route.params
             return {
                 EXPERIENCE_GROUP_RESOURCE_ACTION,
                 EXPERIENCE_GROUP_RESOURCE_TYPE,
@@ -157,7 +169,13 @@
                 },
                 emptyInfo: {
                     title: '暂无体验组',
-                    desc: '您可以新增一个体验组'
+                    desc: '您可以新增一个体验组',
+                    permissionData: {
+                        projectId: projectId,
+                        resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
+                        resourceCode: projectId,
+                        action: EXPERIENCE_GROUP_RESOURCE_ACTION.CREATE
+                    }
                 },
                 urlParams: getQueryString('groupId') || ''
             }

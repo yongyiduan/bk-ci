@@ -4,8 +4,30 @@
             <div slot="left">{{ $t('environment.node') }}</div>
             <div slot="right" v-if="nodeList.length > 0">
                 <template v-if="isExtendTx">
-                    <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
-                    <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
+                    <span
+                        v-perm="{
+                            permissionData: {
+                                projectId: projectId,
+                                resourceType: NODE_RESOURCE_TYPE,
+                                resourceCode: projectId,
+                                action: NODE_RESOURCE_ACTION.CREATE
+                            }
+                        }"
+                    >
+                        <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
+                    </span>
+                    <span
+                        v-perm="{
+                            permissionData: {
+                                projectId: projectId,
+                                resourceType: NODE_RESOURCE_TYPE,
+                                resourceCode: projectId,
+                                action: NODE_RESOURCE_ACTION.CREATE
+                            }
+                        }"
+                    >
+                        <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
+                    </span>
                 </template>
                 <bk-button v-else theme="primary" class="import-vmbuild-btn" @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
             </div>
@@ -17,7 +39,7 @@
             <bk-table v-if="showContent && nodeList.length"
                 size="medium"
                 class="node-table-wrapper"
-                :row-class-name="getRowCls"
+                row-class-name="node-item-row"
                 :data="nodeList">
                 <bk-table-column :label="$t('environment.nodeInfo.displayName')" prop="displayName">
                     <template slot-scope="props">
@@ -36,12 +58,41 @@
                             </div>
                         </div>
                         <div class="table-node-item node-item-id" v-else>
-                            <span class="node-name"
-                                :class="{ 'pointer': canShowDetail(props.row), 'useless': !canShowDetail(props.row) || !props.row.canUse }"
-                                :title="props.row.displayName"
-                                @click="toNodeDetail(props.row)"
-                            >{{ props.row.displayName || '-' }}</span>
-                            <i class="devops-icon icon-edit" v-if="!isEditNodeStatus && props.row.canEdit" @click="editNodeName(props.row)"></i>
+                            <span
+                                v-perm="{
+                                    hasPermission: props.row.canUse,
+                                    disablePermissionApi: true,
+                                    permissionData: {
+                                        projectId: projectId,
+                                        resourceType: NODE_RESOURCE_TYPE,
+                                        resourceCode: props.row.nodeHashId,
+                                        action: NODE_RESOURCE_ACTION.USE
+                                    }
+                                }"
+                            >
+                                <span
+                                    class="node-name"
+                                    :class="{ 'pointer': canShowDetail(props.row), 'useless': !canShowDetail(props.row) || !props.row.canUse }"
+                                    :title="props.row.displayName"
+                                    @click="toNodeDetail(props.row)"
+                                >
+                                    {{ props.row.displayName || '-' }}
+                                </span>
+                            </span>
+                            <span
+                                v-perm="{
+                                    hasPermission: props.row.canEdit,
+                                    disablePermissionApi: true,
+                                    permissionData: {
+                                        projectId: projectId,
+                                        resourceType: NODE_RESOURCE_TYPE,
+                                        resourceCode: props.row.nodeHashId,
+                                        action: NODE_RESOURCE_ACTION.CREATE
+                                    }
+                                }"
+                            >
+                                <i class="devops-icon icon-edit" v-if="!isEditNodeStatus" @click="editNodeName(props.row)"></i>
+                            </span>
                         </div>
                     </template>
                 </bk-table-column>
@@ -151,10 +202,6 @@
                                     {{ $t('environment.delete') }}
                                 </span>
                             </span>
-                            <span class="node-handle delete-node-text"
-                                v-if="!props.row.canUse && props.row.nodeStatus !== 'CREATING'"
-                                @click.stop="toNodeApplyPerm(props.row)"
-                            >{{ $t('environment.applyPermission') }}</span>
                             <span id="moreHandler" class="node-handle more-handle"
                                 v-if="props.row.canUse && props.row.nodeType === 'DEVCLOUD'">
                                 <bk-popover
@@ -351,9 +398,6 @@
             await this.init()
         },
         methods: {
-            getRowCls ({ row }) {
-                return `node-item-row ${row.canUse ? '' : 'node-row-useless'}`
-            },
             async init () {
                 const {
                     loading
@@ -413,24 +457,14 @@
                     action: NODE_RESOURCE_ACTION.CREATE
                 })
             },
-            toNodeApplyPerm (row) {
-                this.handleNoPermission({
-                    projectId: this.projectId,
-                    resourceType: NODE_RESOURCE_TYPE,
-                    resourceCode: row.nodeHashId,
-                    action: NODE_RESOURCE_ACTION.USE
-                })
-            },
             toNodeDetail (node) {
                 if (this.canShowDetail(node)) {
                     if (node.canUse) {
-                        this.$router.push({ name: 'nodeDetail', params: { nodeHashId: node.nodeHashId } })
-                    } else {
-                        this.handleNoPermission({
-                            projectId: this.projectId,
-                            resourceType: NODE_RESOURCE_TYPE,
-                            resourceCode: node.nodeHashId,
-                            action: NODE_RESOURCE_ACTION.USE
+                        this.$router.push({
+                            name: 'nodeDetail',
+                            params: {
+                                nodeHashId: node.nodeHashId
+                            }
                         })
                     }
                 }
