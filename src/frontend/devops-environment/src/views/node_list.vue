@@ -177,13 +177,10 @@
                                         action: NODE_RESOURCE_ACTION.DELETE
                                     }
                                 }"
+                                class="node-handle delete-node-text"
+                                @click.stop="confirmDelete(props.row, index)"
                             >
-                                <span
-                                    class="node-handle delete-node-text"
-                                    @click.stop="confirmDelete(props.row, index)"
-                                >
-                                    {{ $t('environment.delete') }}
-                                </span>
+                                {{ $t('environment.delete') }}
                             </span>
                             <span id="moreHandler" class="node-handle more-handle"
                                 v-if="props.row.canUse && props.row.nodeType === 'DEVCLOUD'">
@@ -442,14 +439,12 @@
             },
             toNodeDetail (node) {
                 if (this.canShowDetail(node)) {
-                    if (node.canUse) {
-                        this.$router.push({
-                            name: 'nodeDetail',
-                            params: {
-                                nodeHashId: node.nodeHashId
-                            }
-                        })
-                    }
+                    this.$router.push({
+                        name: 'nodeDetail',
+                        params: {
+                            nodeHashId: node.nodeHashId
+                        }
+                    })
                 }
             },
             /**
