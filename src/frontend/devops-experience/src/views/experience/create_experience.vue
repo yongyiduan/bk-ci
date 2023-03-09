@@ -168,7 +168,7 @@
                         v-perm="{
                             permissionData: {
                                 projectId: projectId,
-                                resourceType: 'project',
+                                resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
                                 resourceCode: projectId,
                                 action: EXPERIENCE_TASK_RESOURCE_ACTION.CREATE
                             }

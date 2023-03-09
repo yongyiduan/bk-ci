@@ -16,7 +16,7 @@
                                 v-perm="{
                                     permissionData: {
                                         projectId: projectId,
-                                        resourceType: 'project',
+                                        resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
                                         resourceCode: projectId,
                                         action: EXPERIENCE_GROUP_RESOURCE_ACTION.CREATE
                                     }
@@ -63,7 +63,7 @@
                                                 permissionData: {
                                                     projectId: projectId,
                                                     resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
-                                                    resourceCode: row.groupHashId,
+                                                    resourceCode: props.row.groupHashId,
                                                     action: EXPERIENCE_GROUP_RESOURCE_ACTION.EDIT
                                                 }
                                             }"
@@ -83,7 +83,7 @@
                                                 permissionData: {
                                                     projectId: projectId,
                                                     resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
-                                                    resourceCode: row.groupHashId,
+                                                    resourceCode: props.row.groupHashId,
                                                     action: EXPERIENCE_GROUP_RESOURCE_ACTION.DELETE
                                                 }
                                             }"
