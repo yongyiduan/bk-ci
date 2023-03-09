@@ -4,7 +4,7 @@
             <div slot="left">{{ $t('environment.node') }}</div>
             <div slot="right" v-if="nodeList.length > 0">
                 <template v-if="isExtendTx">
-                    <span
+                    <bk-button
                         v-perm="{
                             permissionData: {
                                 projectId: projectId,
@@ -13,10 +13,8 @@
                                 action: NODE_RESOURCE_ACTION.CREATE
                             }
                         }"
-                    >
-                        <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
-                    </span>
-                    <span
+                        theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
+                    <bk-button
                         v-perm="{
                             permissionData: {
                                 projectId: projectId,
@@ -25,9 +23,7 @@
                                 action: NODE_RESOURCE_ACTION.CREATE
                             }
                         }"
-                    >
-                        <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
-                    </span>
+                        theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
                 </template>
                 <bk-button v-else theme="primary" class="import-vmbuild-btn" @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
             </div>

@@ -45,7 +45,7 @@
                                     </bk-popover>
                                 </template>
                                 <i v-bk-tooltips="{ content: '该体验已过期' }" class="devops-icon icon-qrcode expired-text" v-else></i>
-                                <span
+                                <bk-button
                                     v-perm="{
                                         hasPermission: props.row.permissions.canEdit,
                                         disablePermissionApi: true,
@@ -56,16 +56,14 @@
                                             action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
                                         }
                                     }"
+                                    class="mr5"
+                                    text
+                                    @click.stop="toEditRow(props.row)"
                                 >
-                                    <bk-button
-                                        class="mr5"
-                                        text
-                                        @click.stop="toEditRow(props.row)"
-                                    >
-                                        编辑
-                                    </bk-button>
-                                </span>
-                                <span
+                                    编辑
+                                </bk-button>
+                                <bk-button
+                                    v-if="props.row.online && !props.row.expired"
                                     v-perm="{
                                         hasPermission: props.row.permissions.canDelete,
                                         disablePermissionApi: true,
@@ -76,17 +74,12 @@
                                             action: EXPERIENCE_TASK_RESOURCE_ACTION.DELETE
                                         }
                                     }"
+                                    text
+                                    @click.stop="toDropOff(props.row)"
                                 >
-                                    <bk-button
-                                        v-if="props.row.online && !props.row.expired"
-                                        text
-                                        @click.stop="toDropOff(props.row)"
-                                    >
-                                        下架
-                                    </bk-button>
-                                    <span v-bk-tooltips="{ content: '该体验已下架' }" class="expired-text" v-else>下架</span>
-                                </span>
-                                
+                                    下架
+                                </bk-button>
+                                <span v-bk-tooltips="{ content: '该体验已下架' }" class="expired-text" v-else>下架</span>
                             </div>
                         </template>
                     </bk-table-column>
@@ -117,6 +110,8 @@
         data () {
             const { projectId } = this.$route.params
             return {
+                EXPERIENCE_TASK_RESOURCE_TYPE,
+                EXPERIENCE_TASK_RESOURCE_ACTION,
                 showContent: false,
                 curIndexItemUrl: '',
                 defaultCover: require('@/images/qrcode_app.png'),
@@ -140,9 +135,7 @@
                     current: 1,
                     limit: 20,
                     count: 0
-                },
-                EXPERIENCE_TASK_RESOURCE_TYPE,
-                EXPERIENCE_TASK_RESOURCE_ACTION
+                }
             }
         },
         computed: {

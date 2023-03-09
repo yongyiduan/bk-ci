@@ -56,7 +56,8 @@
                             <bk-table-column label="操作" prop="creator">
                                 <template slot-scope="props">
                                     <div class="handler-group">
-                                        <span
+                                        <bk-button
+                                            class="mr5"
                                             v-perm="{
                                                 hasPermission: props.row.permissions.canEdit,
                                                 disablePermissionApi: true,
@@ -67,16 +68,13 @@
                                                     action: EXPERIENCE_GROUP_RESOURCE_ACTION.EDIT
                                                 }
                                             }"
+                                            text
+                                            @click="toEditGroup(props.row)"
                                         >
-                                            <bk-button
-                                                class="mr5"
-                                                text
-                                                @click="toEditGroup(props.row)"
-                                            >
-                                                编辑
-                                            </bk-button>
-                                        </span>
-                                        <span
+                                            编辑
+                                        </bk-button>
+                                        <bk-button
+                                            text
                                             v-perm="{
                                                 hasPermission: props.row.permissions.canDelete,
                                                 disablePermissionApi: true,
@@ -87,14 +85,10 @@
                                                     action: EXPERIENCE_GROUP_RESOURCE_ACTION.DELETE
                                                 }
                                             }"
+                                            @click="toDeleteGruop(props.row)"
                                         >
-                                            <bk-button
-                                                text
-                                                @click="toDeleteGruop(props.row)"
-                                            >
-                                                删除
-                                            </bk-button>
-                                        </span>
+                                            删除
+                                        </bk-button>
                                     </div>
                                 </template>
                             </bk-table-column>

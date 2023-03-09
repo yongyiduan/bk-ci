@@ -164,7 +164,7 @@
                     </template>
                 </bk-form>
                 <div class="submit-btn-bar">
-                    <span
+                    <bk-button
                         v-perm="{
                             permissionData: {
                                 projectId: projectId,
@@ -173,9 +173,11 @@
                                 action: EXPERIENCE_TASK_RESOURCE_ACTION.CREATE
                             }
                         }"
+                        theme="primary"
+                        @click.prevent="submitFn"
                     >
-                        <bk-button theme="primary" @click.prevent="submitFn">{{ submitText }}</bk-button>
-                    </span>
+                        {{ submitText }}
+                    </bk-button>
                     <bk-button theme="default" @click="cancel">取消</bk-button>
                 </div>
             </template>
@@ -311,7 +313,9 @@
                     dateError: false
                 },
                 PIPELINE_RESOURCE_ACTION,
-                PIPELINE_RESOURCE_TYPE
+                PIPELINE_RESOURCE_TYPE,
+                EXPERIENCE_TASK_RESOURCE_TYPE,
+                EXPERIENCE_TASK_RESOURCE_ACTION
             }
         },
         computed: {
