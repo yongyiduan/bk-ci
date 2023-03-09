@@ -379,6 +379,7 @@ onMounted(async () => {
                     :content="statusDisabledTips[projectData.approvalStatus]"
                     :disabled="projectData.approvalStatus === 2"
                     v-perm="{
+                      tooltips: t('没有权限'),
                       permissionData: {
                         projectId: projectData.projectCode,
                         resourceType: RESOURCE_TYPE,
@@ -424,6 +425,7 @@ onMounted(async () => {
                   
                   <span
                     v-perm="{
+                      tooltips: t('没有权限'),
                       permissionData: {
                         projectId: projectData.projectCode,
                         resourceType: RESOURCE_TYPE,

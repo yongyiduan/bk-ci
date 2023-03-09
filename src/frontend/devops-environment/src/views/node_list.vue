@@ -6,6 +6,7 @@
                 <template v-if="isExtendTx">
                     <bk-button
                         v-perm="{
+                            tooltips: $t('environment.noPermission'),
                             permissionData: {
                                 projectId: projectId,
                                 resourceType: NODE_RESOURCE_TYPE,
@@ -16,6 +17,7 @@
                         theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
                     <bk-button
                         v-perm="{
+                            tooltips: $t('environment.noPermission'),
                             permissionData: {
                                 projectId: projectId,
                                 resourceType: NODE_RESOURCE_TYPE,
@@ -56,13 +58,14 @@
                         <div class="table-node-item node-item-id" v-else>
                             <span
                                 v-perm="{
-                                    hasPermission: props.row.canUse,
+                                    hasPermission: props.row.canView,
                                     disablePermissionApi: true,
+                                    tooltips: $t('environment.noPermission'),
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: NODE_RESOURCE_TYPE,
                                         resourceCode: props.row.nodeHashId,
-                                        action: NODE_RESOURCE_ACTION.USE
+                                        action: NODE_RESOURCE_ACTION.VIEW
                                     }
                                 }"
                                 class="node-name"
@@ -76,6 +79,7 @@
                                 v-perm="{
                                     hasPermission: props.row.canEdit,
                                     disablePermissionApi: true,
+                                    tooltips: $t('environment.noPermission'),
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: NODE_RESOURCE_TYPE,
@@ -180,6 +184,7 @@
                                 v-perm="{
                                     hasPermission: props.row.canDelete,
                                     disablePermissionApi: true,
+                                    tooltips: $t('environment.noPermission'),
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: NODE_RESOURCE_TYPE,

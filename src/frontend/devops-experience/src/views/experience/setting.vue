@@ -14,6 +14,7 @@
                         <div v-if="showContent && experienceList.length" class="table-operate-bar">
                             <span
                                 v-perm="{
+                                    tooltips: '没有权限',
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
@@ -61,6 +62,7 @@
                                             v-perm="{
                                                 hasPermission: props.row.permissions.canEdit,
                                                 disablePermissionApi: true,
+                                                tooltips: '没有权限',
                                                 permissionData: {
                                                     projectId: projectId,
                                                     resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,
@@ -78,6 +80,7 @@
                                             v-perm="{
                                                 hasPermission: props.row.permissions.canDelete,
                                                 disablePermissionApi: true,
+                                                tooltips: '没有权限',
                                                 permissionData: {
                                                     projectId: projectId,
                                                     resourceType: EXPERIENCE_GROUP_RESOURCE_TYPE,

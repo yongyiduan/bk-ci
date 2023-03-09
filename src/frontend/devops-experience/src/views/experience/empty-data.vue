@@ -5,6 +5,7 @@
         <div class="create-node-row">
             <span
                 v-perm="{
+                    tooltips: '没有权限',
                     permissionData: emptyInfo.permissionData
                 }"
             >

@@ -166,6 +166,7 @@
                 <div class="submit-btn-bar">
                     <bk-button
                         v-perm="{
+                            tooltips: '没有权限',
                             permissionData: {
                                 projectId: projectId,
                                 resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
