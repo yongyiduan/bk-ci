@@ -55,6 +55,16 @@
                         </div>
                         <div class="table-node-item node-item-id" v-else>
                             <span
+                                v-perm="{
+                                    hasPermission: props.row.canUse,
+                                    disablePermissionApi: true,
+                                    permissionData: {
+                                        projectId: projectId,
+                                        resourceType: NODE_RESOURCE_TYPE,
+                                        resourceCode: props.row.nodeHashId,
+                                        action: NODE_RESOURCE_ACTION.USE
+                                    }
+                                }"
                                 class="node-name"
                                 :class="{ 'pointer': canShowDetail(props.row), 'useless': !canShowDetail(props.row) || !props.row.canUse }"
                                 :title="props.row.displayName"
@@ -244,7 +254,7 @@
     import makeMirrorDialog from '@/components/devops/environment/make-mirror-dialog'
     import { getQueryString } from '@/utils/util'
     import webSocketMessage from '../utils/webSocketMessage.js'
-    import { NODE_RESOURCE_ACTION, NODE_RESOURCE_TYPE } from '../utils/permission'
+    import { NODE_RESOURCE_ACTION, NODE_RESOURCE_TYPE } from '@/utils/permission'
 
     export default {
         components: {

@@ -3,12 +3,39 @@
         <p class="title">{{ emptyInfo.title }}</p>
         <p class="intro-prompt">{{ emptyInfo.desc }}</p>
         <div class="create-node-row" v-if="isEnv">
-            <bk-button theme="primary" class="create-env-btn" @click="toCreateNode">{{ $t('environment.create') }}</bk-button>
+            <bk-button
+                v-perm="{
+                    permissionData: {
+                        projectId: projectId,
+                        resourceType: ENV_RESOURCE_TYPE,
+                        resourceCode: projectId,
+                        action: ENV_RESOURCE_ACTION.CREATE
+                    }
+                }"
+                theme="primary" class="create-env-btn" @click="toCreateNode">{{ $t('environment.create') }}</bk-button>
         </div>
         <div class="create-node-row" v-else>
             <template v-if="isExtendTx">
-                <bk-button theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
-                <bk-button theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
+                <bk-button
+                    v-perm="{
+                        permissionData: {
+                            projectId: projectId,
+                            resourceType: NODE_RESOURCE_TYPE,
+                            resourceCode: projectId,
+                            action: NODE_RESOURCE_ACTION.CREATE
+                        }
+                    }"
+                    theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
+                <bk-button
+                    v-perm="{
+                        permissionData: {
+                            projectId: projectId,
+                            resourceType: NODE_RESOURCE_TYPE,
+                            resourceCode: projectId,
+                            action: NODE_RESOURCE_ACTION.CREATE
+                        }
+                    }"
+                    theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
             </template>
             <bk-button theme="primary" class="import-node-btn" v-else @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
         </div>
@@ -16,6 +43,12 @@
 </template>
 
 <script>
+    import {
+        NODE_RESOURCE_ACTION,
+        NODE_RESOURCE_TYPE,
+        ENV_RESOURCE_ACTION,
+        ENV_RESOURCE_TYPE
+    } from '@/utils/permission'
     export default {
         props: {
             isEnv: {
@@ -25,6 +58,14 @@
             emptyInfo: Object,
             toCreateNode: Function,
             toImportNode: Function
+        },
+        data () {
+            return {
+                NODE_RESOURCE_ACTION,
+                NODE_RESOURCE_TYPE,
+                ENV_RESOURCE_ACTION,
+                ENV_RESOURCE_TYPE
+            }
         }
     }
 </script>
