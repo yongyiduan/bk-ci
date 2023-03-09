@@ -5,7 +5,6 @@
         <div class="create-node-row" v-if="isEnv">
             <bk-button
                 v-perm="{
-                    tooltips: $t('environment.noPermission'),
                     permissionData: {
                         projectId: projectId,
                         resourceType: ENV_RESOURCE_TYPE,
@@ -19,7 +18,6 @@
             <template v-if="isExtendTx">
                 <bk-button
                     v-perm="{
-                        tooltips: $t('environment.noPermission'),
                         permissionData: {
                             projectId: projectId,
                             resourceType: NODE_RESOURCE_TYPE,
@@ -30,7 +28,6 @@
                     theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
                 <bk-button
                     v-perm="{
-                        tooltips: $t('environment.noPermission'),
                         permissionData: {
                             projectId: projectId,
                             resourceType: NODE_RESOURCE_TYPE,
@@ -68,6 +65,11 @@
                 NODE_RESOURCE_TYPE,
                 ENV_RESOURCE_ACTION,
                 ENV_RESOURCE_TYPE
+            }
+        },
+        computed: {
+            projectId () {
+                return this.$route.params.projectId
             }
         }
     }
