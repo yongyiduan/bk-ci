@@ -230,7 +230,7 @@
                 const projectTag = this.getProjectTag(routerTag)
                 switch (projectTag) {
                     case 'v0':
-                        window.open(`/console/perm/my-project?project_code=${projectCode}?x-devops-project-id=${projectCode}`)
+                        window.open(`/console/perm/my-project?project_code=${projectCode}`)
                         break
                     case 'v3':
                         window.open(`/console/ps/${projectCode}/${relationId}/member?x-devops-project-id=${projectCode}`)
@@ -265,7 +265,7 @@
                 const projectTag = this.getProjectTag(routerTag)
                 switch (projectTag) {
                     case 'v0':
-                        window.open(`/console/perm/my-project?project_code=${projectCode}&x-devops-project-id=${projectCode}`)
+                        window.open(`/console/perm/my-project?project_code=${projectCode}`)
                         break
                     case 'v3':
                         window.open(`/console/ps/${projectCode}/${relationId}/member?x-devops-project-id=${projectCode}`)
