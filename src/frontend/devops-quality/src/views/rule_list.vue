@@ -306,6 +306,8 @@
             'image-empty': imageEmpty
         },
         data () {
+            const { projectId } = this.$route.params
+
             return {
                 RULE_RESOURCE_ACTION,
                 RULE_RESOURCE_TYPE,
@@ -334,7 +336,13 @@
                             type: 'primary',
                             size: 'normal',
                             handler: () => this.toCreateRule(),
-                            text: '创建规则'
+                            text: '创建规则',
+                            permissionData: {
+                                projectId: projectId,
+                                resourceType: RULE_RESOURCE_TYPE,
+                                resourceCode: projectId,
+                                action: RULE_RESOURCE_ACTION.CREATE
+                            }
                         }
                     ]
                 },
