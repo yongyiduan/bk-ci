@@ -1146,6 +1146,5 @@
   "notJoined": "Not joined",
   "normal": "Normal",
   "expired": "Expired",
-  "operation": "Operation",
-  "pipelineGroup": "Pipeline Group"
+  "operation": "Operation"
 }
