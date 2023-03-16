@@ -283,7 +283,7 @@ export default {
   },
   methods: {
     async initApplyQuery() {
-      const { resourceType, action, iamResourceCode, groupId } = this.$route.query;
+      const { resourceType, action, iamResourceCode, groupId, groupName } = this.$route.query;
       if (resourceType && iamResourceCode && action && iamResourceCode) {
         this.resourceType = resourceType;
         if (groupId) {
@@ -291,7 +291,6 @@ export default {
           await this.getActionsList();
           const resourceTypeName = this.resourcesTypeList.find(i => i.resourceType === resourceType).name
           const resourceValue = this.resourceList.find(i => i.iamResourceCode === iamResourceCode);
-          console.log(this.resourceList, 'resourceList')
           resourceValue.name = `${resourceTypeName}/${resourceValue.resourceName}`
           const resourceCodeParams = {
             id: 'resourceCode',
@@ -317,6 +316,15 @@ export default {
             values: [actionValue],
           }
           this.searchSelectValue.push(actionParams);
+        }
+
+        if (groupName) {
+          const nameParams = {
+            id: 'name',
+            name: this.$t('用户组名'),
+            values: [groupName]
+          }
+          this.searchSelectValue.push(nameParams);
         }
       }
     },

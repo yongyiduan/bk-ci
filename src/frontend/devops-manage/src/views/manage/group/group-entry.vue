@@ -1,5 +1,6 @@
 <template>
   <user-group
+    :role-id="roleId"
     :resource-type="resourceType"
     :resource-code="projectCode"
     :project-code="projectCode"
@@ -34,6 +35,7 @@ export default {
       groupList: [],
       memberGroupList: [],
       isLoading: false,
+      roleId: '',
     };
   },
 
@@ -47,9 +49,10 @@ export default {
     await this.fetchHasManagerPermission();
     await this.fetchEnablePermission();
     // 管理员获取用户组数据
-    // if (this.isEnablePermission && this.hasPermission) {
-    //   await this.fetchGroupList();
-    // }
+    if (this.isEnablePermission && this.hasPermission) {
+      // await this.fetchGroupList();
+      await this.fetchResource();
+    }
     // 普通成员获取成员数据
     if (this.isEnablePermission && !this.hasPermission && this.resourceType !== 'project') {
       await this.fetchMemberGroupList();
@@ -57,6 +60,23 @@ export default {
   },
 
   methods: {
+    /**
+     * 获取资源实例信息
+     */
+    fetchResource() {
+      const {
+        projectCode,
+        resourceType,
+        projectCode: resourceCode,
+      } = this;
+      return http.getResource({
+        projectCode,
+        resourceType,
+        resourceCode,
+      }).then(res => {
+        this.roleId = res.relationId
+      })
+    },
     /**
      * 是否为资源的管理员
      */

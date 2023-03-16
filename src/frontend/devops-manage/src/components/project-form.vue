@@ -266,7 +266,6 @@ watch(() => projectData.value.englishName, (val) => {
 
 watch(() => [projectData.value.authSecrecy, projectData.value.subjectScopes], () => {
   projectForm.value.validate();
-  emits('approvedChange', true);
 }, {
   deep: true,
   immediate: false,

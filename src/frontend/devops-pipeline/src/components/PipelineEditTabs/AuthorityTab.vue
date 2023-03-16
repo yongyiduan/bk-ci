@@ -12,6 +12,7 @@
         :open-manage="handleOpenManage"
         :close-manage="handleCloseManage"
         :show-create-group="false"
+        :project-name="projectName"
     />
 </template>
 
@@ -44,6 +45,9 @@
             },
             resourceCode () {
                 return this.$route.params.pipelineId
+            },
+            projectName () {
+                return this.curProject.projectName
             }
         },
         async created () {
