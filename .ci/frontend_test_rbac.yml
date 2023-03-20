@@ -1,5 +1,5 @@
 version: "v2.0"
-name: "bk-ci前端部署【rbac】"
+name: "bk-ci前端部署【rbac-test】"
 variables:
   modules: "nav,pipeline,vs,ticket,codelib,quality,turbo,atomstore,environment,experience,stream,metrics,manage,permission"
   branch: "feature-dev-rbac"
