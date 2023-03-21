@@ -71,6 +71,7 @@ internal class StrToTimeTest {
     fun evaluateCoreTest(format: String) {
         val (exp, expect) = format.split(" => ")
         val res = ExpressionParser.createTree(exp, null, nameValue, null)!!.evaluate(null, ev, null, null).value
+        println("evaluateCore相关测试-$format-$res-$expect-${res == expect.toDouble()}-${res.toString() == expect}")
         Assertions.assertTrue(expect.toDouble() == res)
     }
 
@@ -85,7 +86,6 @@ internal class StrToTimeTest {
     fun eqTest(format: String) {
         val (exp, expect) = format.split(" => ")
         val res = ExpressionParser.createTree(exp, null, nameValue, null)!!.evaluate(null, ev, null, null).value
-        println("evaluateCore相关测试-$format-$res-$expect-${res == expect.toDouble()}-${res.toString() == expect}")
         Assertions.assertEquals(expect, res.toString())
     }
 
