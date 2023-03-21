@@ -166,41 +166,32 @@
              * 关闭权限管理
              */
             handleCloseManage () {
-                const { name } = this.pipeline
                 const {
                     resourceType,
                     resourceCode,
                     projectCode
                 } = this
-                const confirmFn = () => {
-                    this
-                        .disableGroupPermission({
-                            resourceType,
-                            resourceCode,
-                            projectCode
-                        })
-                        .then((res) => {
-                            if (res?.data) {
-                                this.isEnablePermission = false
-                                this.$bkMessage({
-                                    theme: 'success',
-                                    message: this.$t('关闭成功')
-                                })
-                            }
-                        })
-                        .catch((err) => {
+                this
+                    .disableGroupPermission({
+                        resourceType,
+                        resourceCode,
+                        projectCode
+                    })
+                    .then((res) => {
+                        if (res?.data) {
+                            this.isEnablePermission = false
                             this.$bkMessage({
-                                theme: 'error',
-                                message: err.message || err
+                                theme: 'success',
+                                message: this.$t('关闭成功')
                             })
+                        }
+                    })
+                    .catch((err) => {
+                        this.$bkMessage({
+                            theme: 'error',
+                            message: err.message || err
                         })
-                }
-                this.$bkInfo({
-                    extCls: 'close-manage-dialog',
-                    title: this.$t('closeManageTitle', [name]),
-                    subTitle: this.$t('closeManageTips'),
-                    confirmFn
-                })
+                    })
             }
         }
     }

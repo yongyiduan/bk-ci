@@ -2,7 +2,7 @@
   <section
     ref="wrap"
     class="search-select"
-    :class="{ 'is-focus': input.focus }"
+    :class="{ 'is-focus': input.focus, 'disabled': isDisabled }"
     @click="handleWrapClick">
     <div
       class="search-input"
@@ -14,6 +14,7 @@
           :key="tagInfo.id"
           :list="list"
           :tag-info="tagInfo"
+          :is-disabled="isDisabled"
           @handleTagClear="handleTagClear">
         </select-tag>
       </template>
@@ -27,6 +28,12 @@
           placement='bottom-start'
           :boundary="boundary">
           <div
+            class="div-input"
+            v-if="isDisabled"
+          >
+          </div>
+          <div
+            v-else
             ref="input"
             class="div-input"
             :class="{ 'input-before': isShowPlaceholder }"
@@ -192,6 +199,9 @@ export default {
     projectCode: {
       type: String,
       default: '',
+    },
+    isDisabled: {
+      type: Boolean,
     }
   },
   computed: {
@@ -284,7 +294,7 @@ export default {
   methods: {
     async initApplyQuery() {
       const { resourceType, action, iamResourceCode, groupId, groupName } = this.$route.query;
-      if (resourceType && iamResourceCode && action && iamResourceCode) {
+      if (resourceType && iamResourceCode && action) {
         this.resourceType = resourceType;
         if (groupId) {
           await this.getResourceList();
@@ -326,6 +336,19 @@ export default {
           }
           this.searchSelectValue.push(nameParams);
         }
+      } else if (resourceType && iamResourceCode) {
+        this.resourceType = resourceType;
+        await this.getResourceList();
+        await this.getActionsList();
+        const resourceTypeName = this.resourcesTypeList.find(i => i.resourceType === resourceType).name
+        const resourceValue = this.resourceList.find(i => i.iamResourceCode === iamResourceCode);
+        resourceValue.name = `${resourceTypeName}/${resourceValue.resourceName}`
+        const resourceCodeParams = {
+          id: 'resourceCode',
+          name: this.$t('资源实例'),
+          values: [resourceValue],
+        };
+        this.searchSelectValue.push(resourceCodeParams);
       }
     },
     async getActionsList() {
@@ -382,6 +405,7 @@ export default {
     },
     // searchSelect点击事件
     handleWrapClick() {
+      if (this.isDisabled) return
       if (this.shrink) {
         this.setInputFocus();
       }
@@ -409,6 +433,7 @@ export default {
     },
     // 文本框获取焦点
     handleInputFocus() {
+      if (this.isDisabled) return
       this.input.focus = true
       const input = this.$refs.input;
       // 设置文本框焦点显示位置
@@ -511,7 +536,9 @@ export default {
 
     // 快速清空
     handleClear() {
-      this.$refs.input.innerText = '';
+      if (!this.isDisabled) {
+        this.$refs.input.innerText = '';
+      }
       this.setInputFocus();
       this.input.value = '';
       this.selectInfo = {};
@@ -537,6 +564,9 @@ export default {
 
     // 文本框按键事件
     handleInputKeyup (e) {
+      if (this.isDisabled) {
+        return
+      }
       switch (e.code) {
         case 'Enter':
         case 'NumpadEnter':
@@ -709,6 +739,9 @@ export default {
     }
     &.is-focus {
       border-color: #3a84ff;
+    }
+    &.disabled {
+      cursor: not-allowed;
     }
     transition: all .5s;
   }
