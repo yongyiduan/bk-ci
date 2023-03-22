@@ -6,13 +6,7 @@ name: Backend CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
-    paths:
-    - 'src/backend/ci/**'
-  pull_request:
-    branches: [ master, release-* ]
-    paths:
-    - 'src/backend/ci/**'
+    branches: [ issue_8508_action ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -53,4 +47,4 @@ jobs:
       working-directory: src/backend/ci
       run: |
         ./gradlew test clean :boot-assembly:classes \
-        -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root
+        -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --info
