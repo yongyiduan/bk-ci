@@ -51,10 +51,10 @@ const fetchProjectData = async () => {
       if (err.code === 403) {
         hasPermission.value = false
       } else {
-        Message({
-          theme: 'error',
-          message: err.message || err,
-        })
+        // Message({
+        //   theme: 'error',
+        //   message: err.message || err,
+        // })
       }
     });
   isLoading.value = false;
