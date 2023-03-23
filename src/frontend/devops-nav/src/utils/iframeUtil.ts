@@ -75,10 +75,6 @@ function iframeUtil (router: any) {
         }
     }
 
-    utilMap.showAskPermissionDialog = function (params) {
-        eventBus.$showAskPermissionDialog(params)
-    }
-
     utilMap.toggleLoginDialog = function () {
         location.href = window.getLoginUrl()
     }

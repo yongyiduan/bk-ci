@@ -9,7 +9,7 @@
       :page="page"
       :get-data-method="handleGetData"
     >
-      <template v-slot:default="{ data: group, index }">
+      <template v-slot:default="{ data: group }">
         <bk-input
           ref="renameInput"
           v-show="group.groupId === renameGroupId && isRename"
@@ -21,7 +21,7 @@
         </bk-input>
         <div
           :class="{ 'group-item': true, 'group-active': activeTab === group.groupId }"
-          @click="handleChooseGroup(group, index)"
+          @click="handleChooseGroup(group)"
           v-show="group.groupId !== renameGroupId"
         >
           <span class="group-name" :title="group.name">{{ group.name }}</span>
@@ -42,7 +42,7 @@
             :arrow="false"
             offset="15"
             :distance="0">
-            <i class="more-icon manage-icon manage-icon-more-fill"></i>
+            <img src="../../../svg/more.svg?inline" class="more-icon">
             <template #content>
               <div class="menu-content">
                 <bk-button
@@ -190,7 +190,6 @@ export default {
       isRename: false,
       displayGroupName: '',
       renameGroupId: '',
-      curGroupIndex: -1,
       keyWords: '',
     };
   },
@@ -255,9 +254,8 @@ export default {
           this.deleteObj.isLoading = false;
         });
     },
-    handleChooseGroup(group, index) {
+    handleChooseGroup(group) {
       this.activeTab = group.groupId;
-      this.curGroupIndex = index;
       this.$emit('choose-group', group);
     },
     handleCreateGroup() {
@@ -291,12 +289,8 @@ export default {
             this.handleChooseGroup(this.groupList[0]);
             break;
           case 'add_user_confirm':
-            this.groupList[this.curGroupIndex].departmentCount += data.data.departments.length
-            this.groupList[this.curGroupIndex].userCount += data.data.users.length
-            break;
           case 'remove_user_confirm':
-            this.groupList[this.curGroupIndex].departmentCount -= data.data.departments.length
-            this.groupList[this.curGroupIndex].userCount -= data.data.users.length
+            this.refreshList()
             break;
         }
       }
@@ -444,6 +438,12 @@ export default {
 .add-icon {
   margin-right: 10px;
 }
+
+.group-more-option {
+  height: 18px;
+  display: flex;
+  align-items: center;
+}
 .close-btn {
   margin-bottom: 20px;
   text-align: center;
@@ -515,5 +515,11 @@ export default {
     margin-right: 5px;
     color: #FF9C01;
   }
+</style>
+<style lang="scss">
+.group-more-option .bk-tooltip-ref {
+  height: 18px;
+  display: flex;
+  align-items: center;
 }
 </style>

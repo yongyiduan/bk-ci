@@ -39,6 +39,6 @@ app
   .use(createPinia())
   .use(bkui)
   .use(i18n)
-  .use(AuthorityDirectiveV3(handleProjectManageNoPermission, ajax))
+  .use(PermissionDirective(handleProjectManageNoPermission))
   .mount('.app');
 app.directive('bk-tooltips', bkTooltips)
