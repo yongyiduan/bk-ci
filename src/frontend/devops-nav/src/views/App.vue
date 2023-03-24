@@ -12,21 +12,14 @@
             </div>
         </div>
         <router-view />
-        <Announcement-dialog />
     </div>
 </template>
 
 <script lang="ts">
     import Vue from 'vue'
-    import { Component, Watch } from 'vue-property-decorator'
+    import { Watch } from 'vue-property-decorator'
     import { State, Action } from 'vuex-class'
-    import AnnouncementDialog from '../components/AnnouncementDialog/index.vue'
     
-    @Component({
-        components: {
-            AnnouncementDialog
-        }
-    })
     export default class App extends Vue {
         @State('fetchError') fetchError
         @State('moduleLoading') moduleLoading
