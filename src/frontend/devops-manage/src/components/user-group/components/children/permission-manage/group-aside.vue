@@ -515,6 +515,7 @@ export default {
     margin-right: 5px;
     color: #FF9C01;
   }
+}
 </style>
 <style lang="scss">
 .group-more-option .bk-tooltip-ref {
