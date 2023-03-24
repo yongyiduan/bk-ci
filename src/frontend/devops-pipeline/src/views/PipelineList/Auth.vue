@@ -10,10 +10,7 @@
 </template>
 
 <script>
-    import {
-        PermissionComponent
-    } from 'bk-permission'
-    import pipelineOperateMixin from '@/mixins/pipeline-operate-mixin'
+    import { PermissionComponent } from 'bk-permission'
 
     export default {
         name: 'auth-tab',
