@@ -54,7 +54,6 @@
             </main>
         </template>
 
-        <ask-permission-dialog />
         <extension-aside-panel />
         <extension-dialog />
         <apply-project-dialog ref="applyProjectDialog" :project-code="curProjectCode" />
@@ -64,7 +63,6 @@
 <script lang="ts">
     import Vue from 'vue'
     import Header from '../components/Header/index.vue'
-    import AskPermissionDialog from '../components/AskPermissionDialog/AskPermissionDialog.vue'
     import ExtensionAsidePanel from '../components/ExtensionAsidePanel/index.vue'
     import ExtensionDialog from '../components/ExtensionDialog/index.vue'
     import ApplyProjectDialog from '../components/ApplyProjectDialog/index.vue'
@@ -81,7 +79,6 @@
     @Component({
         components: {
             Header,
-            AskPermissionDialog,
             ExtensionAsidePanel,
             ExtensionDialog,
             ApplyProjectDialog
