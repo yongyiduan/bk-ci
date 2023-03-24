@@ -20,10 +20,9 @@
         components: {
             PermissionComponent
         },
-        mixins: [pipelineOperateMixin],
         data () {
             return {
-                resourceType: 'pipeline_group',
+                resourceType: 'pipeline_group'
             }
         },
         computed: {
