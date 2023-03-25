@@ -39,7 +39,7 @@
                                 class="bk-selector-create-item"
                                 @click.stop.prevent="popProjectDialog"
                             >
-                                <i class="devops-icon icon-plus-circle" />
+                                <i class="devops-icon icon-plus-circle mr5" />
                                 <span class="text">{{ $t('newProject') }}</span>
                             </span>
                             <span class="extension-line" />
@@ -47,7 +47,7 @@
                                 class="bk-selector-create-item"
                                 @click.stop.prevent="handleApplyProject"
                             >
-                                <logo name="apply" size="14" />
+                                <icon name="apply" size="14" class="mr5" />
                                 <span class="text">{{ $t('applyProject') }}</span>
                             </span>
                             <span class="extension-line" />
@@ -55,7 +55,7 @@
                                 class="bk-selector-create-item"
                                 @click.stop.prevent="goToPm"
                             >
-                                <i class="devops-icon icon-apps" />
+                                <i class="devops-icon icon-apps mr5" />
                                 <span class="text">{{ $t('projectManage') }}</span>
                             </span>
                         </div>
@@ -413,7 +413,13 @@
         }
     }
     .bk-selector-create-item{
+        display: flex;
+        align-items: center;
         cursor: pointer;
+        font-size: 12px !important;
+        i {
+            font-size: 12px !important;
+        }
         &:hover {
             color: $primaryColor;
             .text {

@@ -130,12 +130,11 @@
             this.iframeUtil.toggleProjectMenu(true)
         }
 
-        @Watch('projectList', {
+        @Watch('hasProject', {
             immediate: true
         })
-        wacthProjectList (val: Array) {
-            const index = val.findIndex(i => i.englishName === this.curProjectCode)
-            if (index === -1) {
+        wacthHasProject (val: boolean) {
+            if (!val) {
                 this.handleApplyJoin()
             }
         }
@@ -146,12 +145,13 @@
             const pipelineId = restPath && restPath.split('/')[0]
             const resourceType = hasPipelineId ? 'pipeline' : 'project'
             const resourceCode = hasPipelineId ? pipelineId : this.curProjectCode
-
-            this.handleNoPermission({
-                projectId: this.curProjectCode,
-                resourceType,
-                resourceCode
-            })
+            if (resourceCode) {
+                this.handleNoPermission({
+                    projectId: this.curProjectCode,
+                    resourceType,
+                    resourceCode
+                })
+            }
         }
 
         created () {
