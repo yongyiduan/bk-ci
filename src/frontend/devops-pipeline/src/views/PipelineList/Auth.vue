@@ -22,9 +22,6 @@
             },
             resourceCode () {
                 return this.$route.params.id
-            },
-            projectName () {
-                return this.curProject.projectName
             }
         }
     }
