@@ -268,7 +268,6 @@ watch(() => [projectData.value.authSecrecy, projectData.value.subjectScopes], ()
   projectForm.value.validate();
 }, {
   deep: true,
-  immediate: false,
 })
 
 onMounted(async () => {
