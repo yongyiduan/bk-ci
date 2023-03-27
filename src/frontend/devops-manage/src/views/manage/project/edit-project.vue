@@ -25,6 +25,7 @@ const { projectCode } = route.params;
 const projectData = ref<any>({});
 const isLoading = ref(false);
 const isChange = ref(false);
+const isToBeApproved = ref(false);
 const btnLoading = ref(false);
 const hasPermission = ref(true)
 const statusDisabledTips = {
@@ -86,6 +87,10 @@ const handleFormChange = (val: boolean) => {
   isChange.value = val;
 };
 
+const handleApprovedChange = (val: boolean) => {
+  isToBeApproved.value = val;
+};
+
 const infoBoxInstance = ref();
 
 const updateProject = async () => {
@@ -139,7 +144,7 @@ const showNeedApprovedTips = () => {
  * 更新项目
  */
 const handleUpdate = async () => {
-  if (window.BK_CI_AUTH_PROJECT_APPROVAL) {
+  if (window.BK_CI_AUTH_PROJECT_APPROVAL && isToBeApproved.value) {
     showNeedApprovedTips();
   } else {
     updateProject();
@@ -168,7 +173,9 @@ onMounted(() => {
         type="edit"
         :is-change="isChange"
         :data="projectData"
-        @change="handleFormChange">
+        @change="handleFormChange"
+        @approvedChange="handleApprovedChange"
+      >
         <bk-form-item>
           <Popover
             :content="statusDisabledTips[projectData.approvalStatus]"
