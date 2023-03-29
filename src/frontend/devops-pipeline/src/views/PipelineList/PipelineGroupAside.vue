@@ -231,7 +231,7 @@
                     id: 'projectViewList',
                     show: this.showClassify.projectViewList,
                     projected: true,
-                    disabled: !this.isManage,
+                    disabled: this.isManage,
                     tooltips: this.projectedGroupDisableTips,
                     stickyTop: '106px',
                     children: this.pipelineGroupDict.projectViewList.map((view) => ({
@@ -319,9 +319,7 @@
                                         this.$router.push({
                                             name: 'PipelineListAuth',
                                             params: {
-                                                id: group.id
-                                            },
-                                            query: {
+                                                id: group.id,
                                                 groupName: group.name
                                             }
                                         })

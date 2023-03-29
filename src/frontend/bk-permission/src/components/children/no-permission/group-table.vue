@@ -300,11 +300,11 @@ export default {
         .title {
             font-size: 14px;
             color: #313238;
-            margin-left: 20px;
+            margin-left: 14px;
             &::before {
                 content: '';
                 position: absolute;
-                left: 30px;
+                left: 20px;
                 top: 22px;
                 width: 4px;
                 height: 16px;
@@ -319,6 +319,20 @@ export default {
             min-width: 150px;
             margin-bottom: 10px;
             cursor: default !important;
+        }
+         .is-disabled {
+            .bk-checkbox-text {
+                color:#d6d7d7 !important;
+            }
+        }
+        .is-checked {
+            .bk-checkbox {
+                background-color: #c2daff !important;
+                border-color: #c2daff !important;
+            }
+            .bk-checkbox-text {
+                color: #63656e !important;
+            }
         }
     }
 </style>

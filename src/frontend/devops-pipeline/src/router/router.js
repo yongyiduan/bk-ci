@@ -101,7 +101,7 @@ const routes = [
                         component: AddPipeline
                     },
                     {
-                        path: 'listAuth/:id',
+                        path: 'listAuth/:id/:groupName',
                         name: 'PipelineListAuth',
                         component: PipelineListAuth
                     },
