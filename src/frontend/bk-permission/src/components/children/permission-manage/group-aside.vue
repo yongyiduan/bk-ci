@@ -61,18 +61,6 @@
     <bk-dialog
       header-align="center"
       theme="danger"
-      quick-close
-      :value="deleteObj.isShow"
-      :title="$t('删除')"
-      :is-loading="deleteObj.isLoading"
-      @cancel="handleHiddenDeleteGroup"
-      @confirm="handleDeleteGroup"
-    >
-      {{ $t('是否删除用户组', [deleteObj.group.name]) }}
-    </bk-dialog>
-    <bk-dialog
-      header-align="center"
-      theme="danger"
       ext-cls="close-manage-dialog"
       width="500"
       :quick-close="false"
