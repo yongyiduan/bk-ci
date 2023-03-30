@@ -27,15 +27,14 @@
                     <li
                         v-for="(item, index) in menu"
                         :key="index"
+                        @click="hideUserInfo(item)"
                     >
-                        <router-link
+                        <a
                             v-if="item.to"
                             class="user-menu-item"
-                            :to="item.to"
-                            @click.native="hideUserInfo(item.to)"
                         >
                             {{ item.label }}
-                        </router-link>
+                        </a>
                         <span
                             v-else-if="item.cb"
                             class="user-menu-item"
@@ -88,11 +87,15 @@
             }
         }
 
-        hideUserInfo (to): void {
+        hideUserInfo (item): void {
             this.show = false
-            if (to === '/console/preci/') {
-                localStorage.setItem(IS_HIDE_HINT, '1')
-                this.isHideHint = Number(localStorage.getItem(IS_HIDE_HINT)) || 1
+            if (item) {
+                if (item.to === this.$route.fullPath) return
+                if (item.to === '/console/preci/') {
+                    localStorage.setItem(IS_HIDE_HINT, '1')
+                    this.isHideHint = Number(localStorage.getItem(IS_HIDE_HINT)) || 1
+                }
+                this.$router.push(item.to)
             }
         }
 
@@ -213,10 +216,17 @@
                 }
             }
             > ul {
-                margin: 20px;
+                margin: 20px 0;
                 > li {
                     margin: 0 0 10px 0;
                     line-height: 24px;
+                    cursor: pointer;
+                    padding: 0 20px;
+                    &:hover {
+                        .user-menu-item {
+                            color: $aHoverColor;
+                        }
+                    }
                     &:last-child {
                         margin-bottom: 0;
                     }

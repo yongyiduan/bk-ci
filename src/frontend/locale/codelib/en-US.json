@@ -48,6 +48,7 @@
   "gitlabSshRule": "start by git@ and end with .git",
   "httpRule": "start by http:// or https:// and the correct one",
   "httpsRule": "start by https:// and end with .git",
+  "httpsGitlabRule": "Only the Blue Whale Gitlab codebase (gitlab-paas.open.oa.com) is supported",
   "httpOrHttpsRule": "start by http:// or https:// and end with .git",
   "paramBeString": "parameter must be string",
   "gitCodeRule": "start by http://git.code.oa.com and end with .git ",

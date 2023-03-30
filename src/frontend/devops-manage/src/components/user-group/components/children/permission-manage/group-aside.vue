@@ -302,8 +302,8 @@ export default {
             this.groupList[this.curGroupIndex].userCount += data.data.users.length
             break;
           case 'remove_user_confirm':
-            const departments = data.data.members.filters(i => i.type === department)
-            const users = data.data.members.filters(i => i.type === user)
+            const departments = data.data.members.filter(i => i.type === 'department')
+            const users = data.data.members.filter(i => i.type === 'user')
             this.groupList[this.curGroupIndex].departmentCount -= departments.length
             this.groupList[this.curGroupIndex].userCount -= users.length
             break;
