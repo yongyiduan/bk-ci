@@ -156,10 +156,10 @@ export default {
       },
       currentActive: 2592000,
       timeFilters: {
-        2592000: this.t('1个月'),
-        7776000: this.t('3个月'),
-        15552000: this.t('6个月'),
-        31104000: this.t('12个月'),
+        2592000: t('1个月'),
+        7776000: t('3个月'),
+        15552000: t('6个月'),
+        31104000: t('12个月'),
       },
       rules: {
         expireTime: [
@@ -170,14 +170,14 @@ export default {
               }
               return this.currentActive !== 'custom';
             },
-            message: this.t('请选择申请期限'),
+            message: t('请选择申请期限'),
             trigger: 'blur',
           },
         ],
         reason: [
           {
             required: true,
-            message: this.t('请填写申请理由'),
+            message: t('请填写申请理由'),
             trigger: 'blur',
           },
         ],
@@ -209,7 +209,7 @@ export default {
     if (this.projectCode) {
       this.formData.englishName = this.projectCode;
     }
-    if (this.type === 'apply') {
+    if (thise === 'apply') {
       this.formData.reason = '';
     }
   },
@@ -219,7 +219,7 @@ export default {
         const timestamp = this.customTime * 24 * 3600;
         this.formData.expireTime = this.formatTimes(timestamp);
       }
-      if (this.type === 'renewal') {
+      if (thise === 'renewal') {
         const timestamp = this.newExpiredDisplay * 24 * 3600;
         const expiredDisplayTime = this.formatTimes(timestamp);
         this.formData.expireTime = expiredDisplayTime;
@@ -277,7 +277,7 @@ export default {
           .then(() => {
             this.$bkMessage({
               theme: 'success',
-              message: this.t('申请成功，请等待审批'),
+              message: t('申请成功，请等待审批'),
             });
           })
           .catch((err) => {
@@ -303,7 +303,7 @@ export default {
         .then(() => {
           this.$bkMessage({
             theme: 'success',
-            message: this.t('申请成功，请等待审批'),
+            message: t('申请成功，请等待审批'),
           });
         })
         .catch((err) => {
