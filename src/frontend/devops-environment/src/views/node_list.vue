@@ -6,7 +6,6 @@
                 <template v-if="isExtendTx">
                     <bk-button
                         v-perm="{
-                            tooltips: $t('environment.noPermission'),
                             permissionData: {
                                 projectId: projectId,
                                 resourceType: NODE_RESOURCE_TYPE,
@@ -17,7 +16,6 @@
                         theme="primary" @click="toImportNode('cmdb')">{{ $t('environment.nodeInfo.idcTestMachine') }}</bk-button>
                     <bk-button
                         v-perm="{
-                            tooltips: $t('environment.noPermission'),
                             permissionData: {
                                 projectId: projectId,
                                 resourceType: NODE_RESOURCE_TYPE,
@@ -60,7 +58,6 @@
                                 v-perm="canShowDetail(props.row) ? {
                                     hasPermission: props.row.canView,
                                     disablePermissionApi: true,
-                                    tooltips: $t('environment.noPermission'),
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: NODE_RESOURCE_TYPE,
@@ -79,7 +76,6 @@
                                 v-perm="{
                                     hasPermission: props.row.canEdit,
                                     disablePermissionApi: true,
-                                    tooltips: $t('environment.noPermission'),
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: NODE_RESOURCE_TYPE,
@@ -184,7 +180,6 @@
                                 v-perm="{
                                     hasPermission: props.row.canDelete,
                                     disablePermissionApi: true,
-                                    tooltips: $t('environment.noPermission'),
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: NODE_RESOURCE_TYPE,
