@@ -49,7 +49,6 @@
                                     v-perm="{
                                         hasPermission: props.row.permissions.canEdit,
                                         disablePermissionApi: true,
-                                        tooltips: '没有权限',
                                         permissionData: {
                                             projectId: projectId,
                                             resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,

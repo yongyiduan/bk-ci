@@ -176,7 +176,7 @@
                             projectId: this.projectId,
                             resourceType: EXPERIENCE_TASK_RESOURCE_TYPE,
                             resourceCode: this.experienceHashId,
-                            action: EXPERIENCE_TASK_RESOURCE_ACTION.EDIT
+                            action: EXPERIENCE_TASK_RESOURCE_ACTION.VIEW
                         }
                     )
                 }
