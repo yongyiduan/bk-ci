@@ -400,8 +400,8 @@ onMounted(async () => {
                     :content="statusDisabledTips[projectData.approvalStatus]"
                     :disabled="![1, 4].includes(projectData.approvalStatus)"
                     v-perm="{
-                      disablePermissionApi: !projectData.projectCode || [1, 4].includes(projectData.approvalStatus),
-                      hasPermission: !projectData.projectCode || [1, 4].includes(projectData.approvalStatus),
+                      disablePermissionApi: !projectData.projectCode || [1, 3, 4].includes(projectData.approvalStatus),
+                      hasPermission: !projectData.projectCode || [1, 3, 4].includes(projectData.approvalStatus),
                       permissionData: {
                         projectId: projectData.projectCode,
                         resourceType: RESOURCE_TYPE,

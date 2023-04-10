@@ -144,7 +144,7 @@ const showNeedApprovedTips = () => {
  * 更新项目
  */
 const handleUpdate = async () => {
-  if (window.BK_CI_AUTH_PROJECT_APPROVAL && isToBeApproved.value) {
+  if (isToBeApproved.value) {
     showNeedApprovedTips();
   } else {
     updateProject();
@@ -181,8 +181,8 @@ onMounted(() => {
             :content="statusDisabledTips[projectData.approvalStatus]"
             :disabled="![1, 4].includes(projectData.approvalStatus)"
             v-perm="{
-              disablePermissionApi: [1, 4].includes(projectData.approvalStatus),
-              hasPermission: [1, 4].includes(projectData.approvalStatus),
+              disablePermissionApi: [1, 3, 4].includes(projectData.approvalStatus),
+              hasPermission: [1, 3, 4].includes(projectData.approvalStatus),
               permissionData: {
                 projectId: projectCode,
                 resourceType: RESOURCE_TYPE,
