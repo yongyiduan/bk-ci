@@ -246,6 +246,8 @@
             const oldProject = this.selectProjectList.find(project => project.projectCode === projectId) || {}
             const project = this.selectProjectList.find(project => project.projectCode === id) || {}
             
+            sessionStorage.removeItem('group-apply-query')
+            
             window.setProjectIdCookie(id)
 
             if (projectId && !oldProject) { // 当前无权限时返回首页
