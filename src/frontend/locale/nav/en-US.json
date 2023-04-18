@@ -97,7 +97,7 @@
     "goApply": "Go apply",
     "name": "Name",
     "emptyData": "No data",
-    "newProject": "Apply for creation project",
+    "newProject": "New Project",
     "selectProjectPlaceholder": "Select project",
     "service": "Service",
     "collection": "My collection",
@@ -204,5 +204,7 @@
     "enableDisableProject": "Disable/Enable Project",
     "createProject": "Create Project",
     "projectCreatingTitle": "Project creating",
-    "projectCreatingDesc": "The {0} project is being created and approved, please wait patiently"
+    "projectCreatingDesc": "The {0} project is being created and approved, please wait patiently",
+    "manageProject": "Manage Project",
+    "joinProject": "Join Project"
 }

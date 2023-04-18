@@ -24,7 +24,7 @@
                     :list="selectProjectList"
                     id-key="projectCode"
                     display-key="projectName"
-                    :popover-width="328"
+                    :popover-width="340"
                 >
                     <bk-option
                         v-for="item in selectProjectList"
@@ -48,7 +48,7 @@
                                 @click.stop.prevent="handleApplyProject"
                             >
                                 <icon name="icon-apply" size="14" class="mr5" />
-                                <span class="text">{{ $t('applyProject') }}</span>
+                                <span class="text">{{ $t('joinProject') }}</span>
                             </span>
                             <span class="extension-line" />
                             <span
@@ -56,7 +56,7 @@
                                 @click.stop.prevent="goToPm"
                             >
                                 <i class="devops-icon icon-apps mr5" />
-                                <span class="text">{{ $t('projectManage') }}</span>
+                                <span class="text">{{ $t('manageProject') }}</span>
                             </span>
                         </div>
                     </template>
@@ -435,6 +435,7 @@
 
     .extension-wrapper {
         display: flex;
+        justify-content: center;
         align-items: center;
     }
     .extension-line {
