@@ -173,38 +173,57 @@
                 </bk-table-column>
                 <bk-table-column :label="$t('environment.operation')" width="160">
                     <template slot-scope="props">
-                        <div class="table-node-item node-item-handler"
-                            :class="{ 'over-handler': isMultipleBtn }">
+                        <template v-if="props.row.canUse">
+                            <div class="table-node-item node-item-handler">
+                                <span
+                                    v-if="!['TSTACK'].includes(props.row.nodeType)"
+                                    v-perm="{
+                                        hasPermission: props.row.canDelete,
+                                        disablePermissionApi: true,
+                                        permissionData: {
+                                            projectId: projectId,
+                                            resourceType: NODE_RESOURCE_TYPE,
+                                            resourceCode: props.row.nodeHashId,
+                                            action: NODE_RESOURCE_ACTION.DELETE
+                                        }
+                                    }"
+                                    class="node-handle delete-node-text"
+                                    @click.stop="confirmDelete(props.row, index)"
+                                >
+                                    {{ $t('environment.delete') }}
+                                </span>
+                                <span id="moreHandler" class="node-handle more-handle"
+                                    v-if="props.row.canUse && props.row.nodeType === 'DEVCLOUD'">
+                                    <bk-popover
+                                        placement="bottom-start"
+                                        size="samll"
+                                        theme="light">
+                                        <span>{{ $t('environment.more') }}</span>
+                                        <div slot="content" class="devcloud-menu-list">
+                                            <dropdown-list :is-show="showTooltip" @handleNode="handleNode" :node="props.row"></dropdown-list>
+                                        </div>
+                                    </bk-popover>
+                                </span>
+                            </div>
+                        </template>
+                        <template v-else>
                             <span
                                 v-if="!['TSTACK'].includes(props.row.nodeType)"
                                 v-perm="{
-                                    hasPermission: props.row.canDelete,
+                                    hasPermission: props.row.canUse,
                                     disablePermissionApi: true,
                                     permissionData: {
                                         projectId: projectId,
                                         resourceType: NODE_RESOURCE_TYPE,
                                         resourceCode: props.row.nodeHashId,
-                                        action: NODE_RESOURCE_ACTION.DELETE
+                                        action: NODE_RESOURCE_ACTION.USE
                                     }
                                 }"
                                 class="node-handle delete-node-text"
-                                @click.stop="confirmDelete(props.row, index)"
                             >
-                                {{ $t('environment.delete') }}
+                                {{ $t('environment.applyPermission') }}
                             </span>
-                            <span id="moreHandler" class="node-handle more-handle"
-                                v-if="props.row.canUse && props.row.nodeType === 'DEVCLOUD'">
-                                <bk-popover
-                                    placement="bottom-start"
-                                    size="samll"
-                                    theme="light">
-                                    <span>{{ $t('environment.more') }}</span>
-                                    <div slot="content" class="devcloud-menu-list">
-                                        <dropdown-list :is-show="showTooltip" @handleNode="handleNode" :node="props.row"></dropdown-list>
-                                    </div>
-                                </bk-popover>
-                            </span>
-                        </div>
+                        </template>
                     </template>
                 </bk-table-column>
             </bk-table>
