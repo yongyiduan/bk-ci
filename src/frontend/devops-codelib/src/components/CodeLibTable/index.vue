@@ -58,17 +58,9 @@
                 </template>
                 <template v-else>
                     <bk-button
-                        theme="default"
-                        v-perm="{
-                            hasPermission: props.row.canUse,
-                            disablePermissionApi: true,
-                            permissionData: {
-                                projectId: projectId,
-                                resourceType: RESOURCE_TYPE,
-                                resourceCode: props.row.repositoryHashId,
-                                action: RESOURCE_ACTION.USE
-                            }
-                        }"
+                        theme="primary"
+                        outline
+                        @click="handleApplyPermission(props.row)"
                     >{{ $t('codelib.applyPermission') }}</bk-button>
                 </template>
             </template>
@@ -213,7 +205,14 @@
                 }
                 this.toggleCodelibDialog(CodelibDialog)
             },
-
+            handleApplyPermission (row) {
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: RESOURCE_TYPE,
+                    resourceCode: row.repositoryHashId,
+                    action: RESOURCE_ACTION.DELETE
+                })
+            },
             deleteCodeLib ({ repositoryHashId, aliasName }) {
                 this.$bkInfo({
                     theme: 'warning',

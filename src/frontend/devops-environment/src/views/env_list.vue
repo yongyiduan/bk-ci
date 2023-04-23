@@ -66,17 +66,9 @@
                         </template>
                         <template v-else>
                             <bk-button
-                                theme="default"
-                                v-perm="{
-                                    hasPermission: props.row.canUse,
-                                    disablePermissionApi: true,
-                                    permissionData: {
-                                        projectId: projectId,
-                                        resourceType: ENV_RESOURCE_TYPE,
-                                        resourceCode: props.row.envHashId,
-                                        action: ENV_RESOURCE_ACTION.USE
-                                    }
-                                }"
+                                theme="primary"
+                                outline
+                                @click="handleApplyPermission(props.row)"
                             >
                                 {{ $t('environment.applyPermission') }}
                             </bk-button>
@@ -180,6 +172,14 @@
             },
             toCreateEnv () {
                 this.$router.push({ name: 'createEnv' })
+            },
+            handleApplyPermission (row) {
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: ENV_RESOURCE_TYPE,
+                    resourceCode: row.envHashId,
+                    action: ENV_RESOURCE_ACTION.USE
+                })
             },
             /**
              * 删除环境
