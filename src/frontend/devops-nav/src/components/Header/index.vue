@@ -367,7 +367,7 @@
                     outline: none;
                 }
                 ::v-deep .bk-select-dropdown .bk-select-name {
-                    color: $fontLigtherColor;
+                    color: $fontLighterColor;
                     height: 36px;
                     line-height: 36px;
                     font-size: 14px;
