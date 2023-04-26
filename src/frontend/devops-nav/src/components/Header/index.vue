@@ -24,7 +24,7 @@
                     :list="selectProjectList"
                     id-key="projectCode"
                     display-key="projectName"
-                    :popover-width="345"
+                    :popover-width="250"
                 >
                     <bk-option
                         v-for="item in selectProjectList"
@@ -32,6 +32,27 @@
                         :id="item.projectCode"
                         :name="item.projectName"
                     >
+                        <template>
+                            <div
+                                class="option-item">
+                                <div class="project-name">
+                                    {{ item.projectName }}
+                                </div>
+                                <span
+                                    class="bk-selector-create-item"
+                                    v-bk-tooltips="$t('userManage')"
+                                    @click.stop.prevent="goToUserManage(item.managePermission)">
+                                    <icon
+                                        :name="item.managePermission ? 'icon-user-manage' : 'icon-user-manage-disabled'"
+                                        size="14"
+                                        :class="{
+                                            'user-manaeg-icon': true,
+                                            'is-selected': projectId === item.projectCode,
+                                            'is-disabled': !item.managePermission
+                                        }" />
+                                </span>
+                            </div>
+                        </template>
                     </bk-option>
                     <template slot="extension">
                         <div class="extension-wrapper">
@@ -49,14 +70,6 @@
                             >
                                 <icon name="icon-apply" size="14" class="mr5" />
                                 <span class="text">{{ $t('joinProject') }}</span>
-                            </span>
-                            <span class="extension-line" />
-                            <span
-                                class="bk-selector-create-item"
-                                @click.stop.prevent="goToPm"
-                            >
-                                <i class="devops-icon icon-apps mr5" />
-                                <span class="text">{{ $t('manageProject') }}</span>
                             </span>
                         </div>
                     </template>
@@ -225,6 +238,12 @@
             }
         }
 
+        goToUserManage (val): void {
+            if (val) {
+                this.to('/console/manage/hw-rbac-6/group')
+            }
+        }
+
         goHomeById (projectId: string, reload: boolean = false): void {
             const hasProjectId = this.currentPage.show_project_list
             let path = urlJoin('/console', this.currentPage.link_new)
@@ -340,22 +359,21 @@
                     color: white !important;
                     box-shadow: none;
                 }
-                .bk-select-angle {
+                ::v-deep .bk-select-angle {
                     color: white;
                     top: 7px;
                 }
-                .bk-tooltip-ref {
+                ::v-deep .bk-tooltip-ref {
                     outline: none;
                 }
-                .bk-select-dropdown .bk-select-name {
-                    color: $fontLighterColor;
+                ::v-deep .bk-select-dropdown .bk-select-name {
+                    color: $fontLigtherColor;
                     height: 36px;
                     line-height: 36px;
                     font-size: 14px;
                     outline: none;
                 }
             }
-
             .service-title {
                 display: flex;
                 align-items: center;
@@ -412,6 +430,35 @@
             > .user-info {
                 margin: 0 10px;
             }
+        }
+    }
+
+    .option-item {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        &:hover {
+            .user-manaeg-icon,
+            .is-selected {
+                display: block;
+            }
+        }
+        .project-name {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .user-manaeg-icon {
+            display: none;
+            cursor: pointer;
+        }
+        
+        .is-selected {
+            display: block;
+        }
+        .is-disabled {
+            cursor: not-allowed;
         }
     }
     .bk-selector-create-item{
