@@ -39,11 +39,12 @@
                                     {{ item.projectName }}
                                 </div>
                                 <span
+                                    v-if="item.showUserManageIcon"
                                     class="bk-selector-create-item"
                                     v-bk-tooltips="$t('userManage')"
                                     @click.stop.prevent="goToUserManage(item.managePermission)">
                                     <icon
-                                        :name="item.managePermission ? 'icon-user-manage' : 'icon-user-manage-disabled'"
+                                        :name="item.managePermission ? 'user-manage' : 'user-manage-disabled'"
                                         size="14"
                                         :class="{
                                             'user-manaeg-icon': true,
