@@ -39,6 +39,7 @@ const timeFilters = ref({
 const formRef = ref();
 const isLoading = ref(false);
 const scrollLoading = ref(false);
+const selectVueKey = ref('');
 const pageInfo = ref({
   page: 1,
   pageSize: 30,
@@ -198,6 +199,7 @@ const getProjectByName = async () => {
     if (res.records.length) {
       projectList.value = [...res.records, ...projectList.value];
       curProject.value = res.records[0];
+      selectVueKey.value = curProject.value.englishName;
       isDisabled.value = curProject.value.permission;
     } else {
       formData.value.projectCode = ''
