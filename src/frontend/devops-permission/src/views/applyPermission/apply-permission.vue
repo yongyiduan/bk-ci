@@ -251,7 +251,7 @@ onMounted(async () => {
               :scroll-loading="scrollLoading"
               @scroll-end="getAllProjectList"
               :remote-method="handleSearchProject"
-              :key="projectList.length"
+              :key="selectVueKey"
             >
               <div v-for="(project, index) in projectList"
                 :key="index">
