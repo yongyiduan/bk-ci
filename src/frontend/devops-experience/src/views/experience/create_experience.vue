@@ -175,6 +175,7 @@
                             }
                         }"
                         theme="primary"
+                        key="submitBtn"
                         @click.prevent="submitFn"
                     >
                         {{ submitText }}
