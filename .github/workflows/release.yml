@@ -66,15 +66,15 @@ jobs:
       run: |
         ./gradlew clean test build :core:worker:worker-agent:shadowJar \
         -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
-    - name: Gradle Build Turbo Service
-      working-directory: src/backend/turbo
-      run: |
-        ./gradlew clean copyToRelease
-        # copy jar to ci release dir
-        cp -vf release/boot-turbo.jar ${{ github.workspace }}/src/backend/ci/release/
-        # copy turbo service config template to ci templates dir
-        cp -vrf support-files/templates/* ${{ github.workspace }}/support-files/templates/
+    #   working-directory: src/backend/turbo
+    #   run: |
+    #     ./gradlew clean copyToRelease
+    #     # copy jar to ci release dir
+    #     cp -vf release/boot-turbo.jar ${{ github.workspace }}/src/backend/ci/release/
+    #     # copy turbo service config template to ci templates dir
+    #     cp -vrf support-files/templates/* ${{ github.workspace }}/support-files/templates/
     - name: Create artifact - Step1:init
+      # - name: Gradle Build Turbo Service
       run: |
         true  # 暂无init需求, 保留此步骤.
     - name: Create artifact - Step2:get Agent
