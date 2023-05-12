@@ -23,6 +23,7 @@ const route = useRoute();
 
 const { projectCode } = route.params;
 const projectData = ref<any>({});
+const projectForm = ref(null);
 const isLoading = ref(false);
 const isChange = ref(false);
 const isToBeApproved = ref(false);
@@ -40,6 +41,7 @@ const fetchProjectData = async () => {
   }).then((res) => {
     projectData.value = res;
     if (projectData.value.centerId === '0') projectData.value.centerId = ''
+    if (projectData.value.projectType === 0) projectData.value.projectType = ''
   }).catch((err) => {
     if (err.code === 403) {
       hasPermission.value = false
@@ -109,6 +111,10 @@ const updateProject = async () => {
           resourceCode: projectCode,
         })
       }
+      Message({
+        theme: 'error',
+        message: err.message || err,
+      })
     })
     .finally(() => {
       btnLoading.value = false;
@@ -147,8 +153,14 @@ const handleUpdate = async () => {
   if (isToBeApproved.value) {
     showNeedApprovedTips();
   } else {
-    updateProject();
+    projectForm.value?.validate().then(async () => {
+      await updateProject();
+    })
   };
+};
+
+const initProjectForm = (value) => {
+  projectForm.value = value;
 };
 
 const handleNoPermission = () => {
@@ -174,8 +186,8 @@ onMounted(() => {
         :is-change="isChange"
         :data="projectData"
         @change="handleFormChange"
-        @approvedChange="handleApprovedChange"
-      >
+        @initProjectForm="initProjectForm"
+        @approvedChange="handleApprovedChange">
         <bk-form-item>
           <Popover
             :content="statusDisabledTips[projectData.approvalStatus]"
