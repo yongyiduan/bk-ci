@@ -485,6 +485,11 @@ externalRabbitmq:
   username: bkci
   password: bkci
   vhost: bkci
+externalPulsar:
+  serviceUrl: bkci
+  namespace: bkci
+  tenant: bkci
+  tokenAuthValue: bkci
 externalInfluxdb:
   host: localhost
   port: 8086
