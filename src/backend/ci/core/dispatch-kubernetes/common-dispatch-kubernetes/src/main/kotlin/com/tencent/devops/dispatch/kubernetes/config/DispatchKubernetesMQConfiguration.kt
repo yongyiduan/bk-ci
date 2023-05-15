@@ -34,6 +34,7 @@ import com.tencent.devops.process.pojo.mq.PipelineAgentShutdownDemoteEvent
 import com.tencent.devops.process.pojo.mq.PipelineAgentShutdownEvent
 import com.tencent.devops.process.pojo.mq.PipelineAgentStartupDemoteEvent
 import com.tencent.devops.process.pojo.mq.PipelineAgentStartupEvent
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.Message
@@ -44,6 +45,7 @@ class DispatchKubernetesMQConfiguration @Autowired constructor() {
 
     companion object {
         const val STREAM_CONSUMER_GROUP = "dispatch-kubernetes-service"
+        private val logger = LoggerFactory.getLogger(DispatchKubernetesMQConfiguration::class.java)
     }
 
     @EventConsumer(StreamBinding.QUEUE_AGENT_STARTUP, STREAM_CONSUMER_GROUP)
@@ -60,7 +62,11 @@ class DispatchKubernetesMQConfiguration @Autowired constructor() {
         @Autowired kubernetesListener: KubernetesListener
     ): Consumer<Message<PipelineAgentShutdownEvent>> {
         return Consumer { event: Message<PipelineAgentShutdownEvent> ->
-            kubernetesListener.handleShutdownMessage(event.payload)
+            try {
+                kubernetesListener.handleShutdownMessage(event.payload)
+            } catch (t: Throwable) {
+                logger.info("handleShutdownMessage with error:", t)
+            }
         }
     }
 
