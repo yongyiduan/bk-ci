@@ -61,11 +61,17 @@ jobs:
       with:
         distribution: "temurin"
         java-version: "8"
-    - name: Gradle Build Backend Service
-      working-directory: src/backend/ci
-      run: |
-        ./gradlew clean test build :core:worker:worker-agent:shadowJar \
-        -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
+    - uses: burrunan/gradle-cache-action@v1
+      name: Gradle Build Backend Service
+      with:
+        job-id: jdk-8-jar
+        arguments: clean test build :core:worker:worker-agent:shadowJar -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
+    # - name: Gradle Build Backend Service
+    #   working-directory: src/backend/ci
+    #   run: |
+    #     ./gradlew clean test build :core:worker:worker-agent:shadowJar \
+    #     -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
+    # - name: Gradle Build Turbo Service
     #   working-directory: src/backend/turbo
     #   run: |
     #     ./gradlew clean copyToRelease
@@ -74,7 +80,6 @@ jobs:
     #     # copy turbo service config template to ci templates dir
     #     cp -vrf support-files/templates/* ${{ github.workspace }}/support-files/templates/
     - name: Create artifact - Step1:init
-      # - name: Gradle Build Turbo Service
       run: |
         true  # 暂无init需求, 保留此步骤.
     - name: Create artifact - Step2:get Agent
@@ -121,11 +126,16 @@ jobs:
       with:
         distribution: "temurin"
         java-version: "8"
-    - name: Gradle Build Backend Service -- CLOUD NATIVE
-      working-directory: src/backend/ci
-      run: |
-        ./gradlew clean test build -x test :core:worker:worker-agent:shadowJar -Ddevops.assemblyMode=KUBERNETES \
-        -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
+    - uses: burrunan/gradle-cache-action@v1
+      name: Gradle Build Backend Service -- CLOUD NATIVE
+      with:
+        job-id: jdk-8-image
+        arguments: clean test build -x test :core:worker:worker-agent:shadowJar -Ddevops.assemblyMode=KUBERNETES -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
+    # - name: Gradle Build Backend Service -- CLOUD NATIVE
+    #   working-directory: src/backend/ci
+    #   run: |
+    #     ./gradlew clean test build -x test :core:worker:worker-agent:shadowJar -Ddevops.assemblyMode=KUBERNETES \
+    #     -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
     - name: Get Agent - CLOUD NATIVE
       uses: actions/download-artifact@v1
       with:
