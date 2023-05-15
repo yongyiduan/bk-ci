@@ -65,6 +65,7 @@ jobs:
       name: Gradle Build Backend Service
       with:
         job-id: jdk-8-jar
+        build-root-directory: src/backend/ci
         arguments: clean test build :core:worker:worker-agent:shadowJar -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
     # - name: Gradle Build Backend Service
     #   working-directory: src/backend/ci
@@ -130,6 +131,7 @@ jobs:
       name: Gradle Build Backend Service -- CLOUD NATIVE
       with:
         job-id: jdk-8-image
+        build-root-directory: src/backend/ci
         arguments: clean test build -x test :core:worker:worker-agent:shadowJar -Ddevops.assemblyMode=KUBERNETES -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
     # - name: Gradle Build Backend Service -- CLOUD NATIVE
     #   working-directory: src/backend/ci
