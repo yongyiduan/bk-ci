@@ -101,15 +101,19 @@ interface BuildListener {
         } catch (t: Throwable) {
             logger.warn("Fail to handle the shutdown message - ($event)", t)
         } finally {
-            val jobQuotaService = getJobQuotaService()
-            jobQuotaService.removeRunningJob(
-                projectId = event.projectId,
-                pipelineId = event.pipelineId,
-                buildId = event.buildId,
-                vmSeqId = event.vmSeqId,
-                executeCount = event.executeCount
-            )
-            DispatchLogRedisUtils.removeRedisExecuteCount(event.buildId)
+            try {
+                val jobQuotaService = getJobQuotaService()
+                jobQuotaService.removeRunningJob(
+                    projectId = event.projectId,
+                    pipelineId = event.pipelineId,
+                    buildId = event.buildId,
+                    vmSeqId = event.vmSeqId,
+                    executeCount = event.executeCount
+                )
+                DispatchLogRedisUtils.removeRedisExecuteCount(event.buildId)
+            } catch (e: Exception) {
+                logger.error("finally catch error.", e)
+            }
         }
     }
 
