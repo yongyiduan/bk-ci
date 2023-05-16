@@ -382,8 +382,8 @@
                 } else {
                     throw Error(String(this.$t('exception.apiError')))
                 }
-            } catch (e: any) {
-                if (e.code === 403) {
+            } catch (err: any) {
+                if (err.code === 403) {
                     const {
                         projectCode,
                         projectName,
@@ -396,19 +396,13 @@
                         {
                             projectId: projectCode,
                             resourceCode: projectCode,
-                            action: RESOURCE_ACTION.CREATE
-                        },
-                        {
-                            actionName: this.$t('createProject'),
-                            groupInfoList: [{ url }],
-                            resourceName: projectName,
-                            resourceTypeName: this.$t('project')
+                            action: RESOURCE_ACTION.EDIT
                         }
                     )
                 } else {
                     this.$bkMessage({
                         theme: 'error',
-                        message: e.message || this.$t('exception.apiError')
+                        message: err.message || this.$t('exception.apiError')
                     })
                 }
             } finally {

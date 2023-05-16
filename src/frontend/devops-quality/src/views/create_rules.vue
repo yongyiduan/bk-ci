@@ -434,6 +434,7 @@
     import UserInput from '@/components/devops/UserInput/index.vue'
     import i18nImages from '@/utils/i18nImages'
     import { getQueryString } from '@/utils/util'
+    import { RULE_RESOURCE_ACTION, RULE_RESOURCE_TYPE } from '@/utils/permission.js'
     import { mapGetters } from 'vuex'
 
     export default {
@@ -665,8 +666,12 @@
                 this.iframeUtil.toggleProjectMenu(true)
             },
             goToApplyPerm () {
-                const url = this.isExtendTx ? `/backend/api/perm/apply/subsystem/?client_id=code&project_code=${this.projectId}&service_code=quality_gate&role_creator=rule` : PERM_URL_PREFIX
-                window.open(url, '_blank')
+                this.handleNoPermission({
+                    projectId: this.projectId,
+                    resourceType: RULE_RESOURCE_TYPE,
+                    resourceCode: this.projectId,
+                    action: RULE_RESOURCE_ACTION.CREATE
+                })
             },
             addLeaveListenr () {
                 window.addEventListener('beforeunload', this.leaveSure)
@@ -1395,16 +1400,45 @@
                                     message = this.$t('quality.创建规则成功')
                                     theme = 'success'
                                 }
-                            } catch (err) {
-                                message = err.message ? err.message : err
-                                theme = 'error'
-                            } finally {
-                                this.isEditing = false
-                                this.loading.isLoading = false
                                 this.$bkMessage({
                                     message,
                                     theme
                                 })
+                            } catch (e) {
+                                if (this.ruleId) {
+                                    this.handleError(
+                                        e,
+                                        {
+                                            projectId: this.projectId,
+                                            resourceType: RULE_RESOURCE_TYPE,
+                                            resourceCode: this.projectId,
+                                            action: RULE_RESOURCE_ACTION.CREATE
+                                        }
+                                    )
+                                } else {
+                                    this.handleError(
+                                        e,
+                                        {
+                                            projectId: this.projectId,
+                                            resourceType: RULE_RESOURCE_TYPE,
+                                            resourceCode: this.ruleId,
+                                            action: RULE_RESOURCE_ACTION.EDIT
+                                        }
+                                    )
+                                }
+                                this.handleError(
+                                    e,
+                                    {
+                                        projectId: this.projectId,
+                                        resourceType: RULE_RESOURCE_TYPE,
+                                        resourceCode: this.ruleId,
+                                        action: RULE_RESOURCE_ACTION.EDIT
+                                    }
+                                )
+                            } finally {
+                                this.isEditing = false
+                                this.loading.isLoading = false
+                                
                                 if (theme === 'success') this.toRuleList()
                             }
                         }

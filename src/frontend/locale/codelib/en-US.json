@@ -11,7 +11,7 @@
   "noCodelibPermission": "no permission for Code Repositories",
   "noPermissionDesc": "you do not have the permission for create, please switch the project or apply for permission accordingly",
   "switchProject": "switch project",
-  "applyPermission": "apply permission",
+  "applyPermission": "Apply permission",
   "index": "Index",
   "create": "create",
   "new": "new",
@@ -50,6 +50,8 @@
   "gitlabSshRule": "start by git@ and end with .git",
   "httpRule": "start by http:// or https:// and the correct one",
   "httpsRule": "start by https:// and end with .git",
+  "httpsGitlabRule": "Only support BlueKing Gitlab code repository (gitlab-paas.open.oa.com).",
+  "gitlabSshFormatError": "Format error, please enter an address beginning with git@ and ending with .git.",
   "httpOrHttpsRule": "start by http:// or https:// and end with .git",
   "paramBeString": "parameter must be string",
   "gitCodeRule": "start by http://git.code.oa.com and end with .git ",
@@ -65,6 +67,7 @@
   "authType": "Authorization method",
   "authIdentity": "Authorized identity",
   "portTips": "The name of the machine hosting the shared version control service, TCP/IP and PORT must be specified.If using SSL to connect to P4, use ssl:host:port",
+  "noPermission": "No permission",
   "sshExampleTips": "eg: svn+ssh://svn.sample.com/test_proj",
   "httpExampleTips": "eg: http://svn.sample.com/test_proj or https://svn.sample.com/test_proj"
 }

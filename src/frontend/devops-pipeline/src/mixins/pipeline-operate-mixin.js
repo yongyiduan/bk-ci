@@ -137,15 +137,14 @@ export default {
                     status: 'known_error'
                 })
             } catch (err) {
-                this.handleError(err, [{
-                    actionId: this.$permissionActionMap.execute,
-                    resourceId: this.$permissionResourceMap.pipeline,
-                    instanceId: [{
-                        id: pipelineId,
-                        name: target.pipelineName
-                    }],
-                    projectId
-                }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.executor))
+                this.handleError(
+                    err,
+                    {
+                        projectId,
+                        resourceCode: pipelineId,
+                        action: this.$permissionResourceAction.EXECUTE
+                    }
+                )
             } finally {
                 feConfig.buttonAllow.terminatePipeline = true
             }
@@ -184,15 +183,14 @@ export default {
             } catch (err) {
                 this.setExecuteStatus(false)
                 this.$store.commit('pipelines/updateCurAtomPrams', null)
-                this.handleError(err, [{
-                    actionId: this.$permissionActionMap.execute,
-                    resourceId: this.$permissionResourceMap.pipeline,
-                    instanceId: [{
-                        id: pipelineId,
-                        name: this.curPipeline.pipelineName
-                    }],
-                    projectId
-                }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.executor))
+                this.handleError(
+                    err,
+                    {
+                        projectId,
+                        resourceCode: pipelineId,
+                        action: this.$permissionResourceAction.EXECUTE
+                    }
+                )
             } finally {
                 message && this.$showTips({
                     message,
@@ -304,15 +302,14 @@ export default {
                     theme = 'error'
                 }
             } catch (err) {
-                this.handleError(err, [{
-                    actionId: this.$permissionActionMap.execute,
-                    resourceId: this.$permissionResourceMap.pipeline,
-                    instanceId: [{
-                        id: pipelineId,
-                        name: this.curPipeline.pipelineName
-                    }],
-                    projectId
-                }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.executor))
+                this.handleError(
+                    err,
+                    {
+                        projectId,
+                        resourceCode: pipelineId,
+                        action: this.$permissionResourceAction.EXECUTE
+                    }
+                )
             } finally {
                 message && this.$showTips({
                     message,
@@ -340,15 +337,14 @@ export default {
                     theme = 'error'
                 }
             } catch (err) {
-                this.handleError(err, [{
-                    actionId: this.$permissionActionMap.execute,
-                    resourceId: this.$permissionResourceMap.pipeline,
-                    instanceId: [{
-                        id: this.curPipeline.pipelineId,
-                        name: this.curPipeline.pipelineName
-                    }],
-                    projectId: this.$route.params.projectId
-                }], this.getPermUrlByRole(this.$route.params.projectId, this.curPipeline.pipelineId, this.roleMap.executor))
+                this.handleError(
+                    err,
+                    {
+                        projectId: this.$route.params.projectId,
+                        resourceCode: this.curPipeline.pipelineId,
+                        action: this.$permissionResourceAction.EXECUTE
+                    }
+                )
             } finally {
                 message && this.$showTips({
                     message,
@@ -425,15 +421,14 @@ export default {
                     data: responses
                 }
             } catch (e) {
-                this.handleError(e, [{
-                    actionId: this.$permissionActionMap.edit,
-                    resourceId: this.$permissionResourceMap.pipeline,
-                    instanceId: [{
-                        id: pipelineId,
-                        name: this.pipeline.name
-                    }],
-                    projectId
-                }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.manager))
+                this.handleError(
+                    e,
+                    {
+                        projectId,
+                        resourceCode: pipelineId,
+                        action: this.$permissionResourceAction.EXECUTE
+                    }
+                )
                 return {
                     code: e.code,
                     message: e.message
@@ -458,15 +453,14 @@ export default {
                     theme: 'success'
                 })
             } catch (e) {
-                this.handleError(e, [{
-                    actionId: this.$permissionActionMap.edit,
-                    resourceId: this.$permissionResourceMap.pipeline,
-                    instanceId: [{
-                        id: pipelineId,
-                        name: this.pipeline ? this.pipeline.name : ''
-                    }],
-                    projectId
-                }], this.getPermUrlByRole(projectId, pipelineId, this.roleMap.manager))
+                this.handleError(
+                    e,
+                    {
+                        projectId,
+                        resourceCode: pipelineId,
+                        action: this.$permissionResourceAction.EDIT
+                    }
+                )
             }
         },
         updateCurPipelineByKeyValue (key, value) {
@@ -517,12 +511,6 @@ export default {
                 newParam: {
                     params: paramList
                 }
-            })
-        },
-        handleError (err) {
-            this.$showTips({
-                message: err.message,
-                theme: 'error'
             })
         }
     }

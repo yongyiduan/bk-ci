@@ -41,8 +41,15 @@ import validDictionary from './utils/validDictionary'
 
 import bkMagic from '@tencent/bk-magic-vue'
 import BkPipeline from 'bkui-pipeline'
+import {
+    handlePipelineNoPermission,
+    RESOURCE_ACTION
+} from '@/utils/permission'
+// 权限指令
+import { PermissionDirective, BkPermission } from 'bk-permission'
+import 'bk-permission/dist/main.css'
+import VueCompositionAPI from '@vue/composition-api'
 import { pipelineDocs } from '../../common-lib/docs'
-import { actionMap, resourceMap, resourceTypeMap } from '../../common-lib/permission-conf'
 
 // 全量引入 bk-magic-vue 样式
 require('@tencent/bk-magic-vue/dist/bk-magic-vue.min.css')
@@ -55,6 +62,11 @@ Vue.use(focus)
 Vue.use(bkMagic)
 Vue.use(PortalVue)
 Vue.use(mavonEditor)
+Vue.use(PermissionDirective(handlePipelineNoPermission))
+Vue.use(BkPermission, {
+    i18n
+})
+Vue.use(VueCompositionAPI)
 
 Vue.use(VeeValidate, {
     i18nRootKey: 'validations', // customize the root path for validation messages.
@@ -72,9 +84,6 @@ Vue.use(BkPipeline, {
 })
 
 Vue.prototype.$setLocale = setLocale
-Vue.prototype.$permissionActionMap = actionMap
-Vue.prototype.$permissionResourceMap = resourceMap
-Vue.prototype.$permissionResourceTypeMap = resourceTypeMap
 Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
 Vue.prototype.$pipelineDocs = pipelineDocs
 Vue.prototype.$bkMessage = function (config) {
@@ -105,13 +114,9 @@ Vue.mixin({
             const permUrl = this.isExtendTx ? url : PERM_URL_PREFIX
             window.open(permUrl, '_blank')
         },
-        // handleError (e, permissionAction, instance, projectId, resourceMap = this.$permissionResourceMap.pipeline) {
-        handleError (e, noPermissionList, applyPermissionUrl) {
+        handleError (e, data) {
             if (e.code === 403) { // 没有权限编辑
-                this.$showAskPermissionDialog({
-                    noPermissionList,
-                    applyPermissionUrl
-                })
+                handlePipelineNoPermission(data)
             } else {
                 this.$showTips({
                     message: e.message || e,
