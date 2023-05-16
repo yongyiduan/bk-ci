@@ -104,8 +104,10 @@
                 </div>
             </div>
         </div>
-
-        <bk-empty v-else></bk-empty>
+        <bk-exception
+            v-else
+            class="exception-wrap-item exception-part" type="empty" scene="part"
+        />
     </div>
 </template>
 
@@ -114,9 +116,6 @@
     import { ENV_RESOURCE_ACTION, ENV_RESOURCE_TYPE } from '@/utils/permission'
     export default {
         name: 'config-tab',
-        components: {
-            'bk-empty': empty
-        },
         props: {
             projectId: {
                 type: String,

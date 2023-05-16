@@ -390,19 +390,13 @@
                         routerTag
                     } = data.data || {}
                     const url = /rbac/.test(routerTag)
-                            ? `/console/permission/apply?project_code=${projectCode}&resourceType=project&resourceName=${projectName}&action=project_create&iamResourceCode=${projectCode}&groupId&x-devops-project-id=${projectCode}`
-                            : `/console/perm/apply-perm?project_code=${projectCode}&x-devops-project-id=${projectCode}`
+                        ? `/console/permission/apply?project_code=${projectCode}&resourceType=project&resourceName=${projectName}&action=project_create&iamResourceCode=${projectCode}&groupId&x-devops-project-id=${projectCode}`
+                        : `/console/perm/apply-perm?project_code=${projectCode}&x-devops-project-id=${projectCode}`
                     handleProjectNoPermission(
                         {
                             projectId: projectCode,
                             resourceCode: projectCode,
                             action: RESOURCE_ACTION.EDIT
-                        },
-                        {
-                            actionName: this.$t('createProject'),
-                            groupInfoList: [{ url }],
-                            resourceName: projectName,
-                            resourceTypeName: this.$t('project')
                         }
                     )
                 } else {
@@ -439,8 +433,8 @@
                         routerTag
                     } = data.data || {}
                     const url = /rbac/.test(routerTag)
-                            ? `/console/permission/apply?project_code=${projectCode}&resourceType=project&resourceName=${projectName}&action=project_enable&iamResourceCode=${projectCode}&groupId&x-devops-project-id=${projectCode}`
-                            : `/console/perm/apply-perm?project_code=${projectCode}&x-devops-project-id=${projectCode}`
+                        ? `/console/permission/apply?project_code=${projectCode}&resourceType=project&resourceName=${projectName}&action=project_enable&iamResourceCode=${projectCode}&groupId&x-devops-project-id=${projectCode}`
+                        : `/console/perm/apply-perm?project_code=${projectCode}&x-devops-project-id=${projectCode}`
                     handleProjectNoPermission(
                         {
                             projectId: projectCode,

@@ -15,6 +15,7 @@ import AsideNav from '@/components/AsideNav/index.vue'
 import ContentHeader from '@/components/ContentHeader/index.vue'
 import BigSelect from '@/components/Select/index.vue'
 import App from '@/views/App.vue'
+import { BkciDocs } from '../../common-lib/docs'
 
 import createLocale from '../../locale'
 
@@ -100,6 +101,7 @@ Vue.prototype.iframeUtil = iframeUtil(router)
 Vue.prototype.$setLocale = setLocale
 Vue.prototype.$localeList = localeList
 Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
+Vue.prototype.BKCI_DOCS = BkciDocs
 Vue.prototype.$bkMessage = function (config) {
     config.ellipsisLine = config.ellipsisLine || 3
     bkMagic.bkMessage(config)

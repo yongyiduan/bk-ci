@@ -232,6 +232,7 @@
                     }
                     .user-menu-item {
                         color: $fontWeightColor;
+                        cursor: pointer;
                         &:hover {
                             color: $aHoverColor;
                         }

@@ -23,21 +23,21 @@
 
 import Vue from 'vue'
 import App from './App'
+import focus from './directives/focus/index.js'
 import createRouter from './router'
 import store from './store'
-import focus from './directives/focus/index.js'
 
+import '@icon-cool/bk-icon-devops'
+import '@icon-cool/bk-icon-devops/src/index'
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+import PortalVue from 'portal-vue'; // eslint-disable-line
 import VeeValidate from 'vee-validate'
 import validationENMessages from 'vee-validate/dist/locale/en'
 import validationCNMessages from 'vee-validate/dist/locale/zh_CN'
+import createLocale from '../../locale'
 import ExtendsCustomRules from './utils/customRules'
 import validDictionary from './utils/validDictionary'
-import mavonEditor from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
-import PortalVue from 'portal-vue' // eslint-disable-line
-import createLocale from '../../locale'
-import '@icon-cool/bk-icon-devops/src/index'
-import '@icon-cool/bk-icon-devops'
 
 import bkMagic from '@tencent/bk-magic-vue'
 import BkPipeline from 'bkui-pipeline'
@@ -49,11 +49,14 @@ import {
 import { PermissionDirective, BkPermission } from 'bk-permission'
 import 'bk-permission/dist/main.css'
 import VueCompositionAPI from '@vue/composition-api'
+import { pipelineDocs } from '../../common-lib/docs'
 
 // 全量引入 bk-magic-vue 样式
 require('@tencent/bk-magic-vue/dist/bk-magic-vue.min.css')
 
-const { i18n, setLocale } = createLocale(require.context('@locale/pipeline/', false, /\.json$/))
+const { i18n, setLocale } = createLocale(
+    require.context('@locale/pipeline/', false, /\.json$/)
+)
 
 Vue.use(focus)
 Vue.use(bkMagic)
@@ -82,7 +85,7 @@ Vue.use(BkPipeline, {
 
 Vue.prototype.$setLocale = setLocale
 Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
-Vue.prototype.$permissionResourceAction = RESOURCE_ACTION
+Vue.prototype.$pipelineDocs = pipelineDocs
 Vue.prototype.$bkMessage = function (config) {
     config.ellipsisLine = config.ellipsisLine || 3
     bkMagic.bkMessage(config)
@@ -90,8 +93,9 @@ Vue.prototype.$bkMessage = function (config) {
 /* eslint-disable */
 // 扩展字符串，判断是否为蓝盾变量格式
 String.prototype.isBkVar = function () {
-    return /\$\{{2}([\w\_\.-]+)\}{2}/g.test(this) || /\$\{([\w\_\.-]+)\}/g.test(this)
+    return /\$\{{2}([\w\_\.\s-]+)\}{2}/g.test(this) || /\$\{([\w\_\.\s-]+)\}/g.test(this)
 }
+
 /* eslint-disable */
 
 Vue.mixin({
@@ -103,7 +107,7 @@ Vue.mixin({
                 viewer: 'role_viewer',
                 creator: 'role_creator'
             }
-        }
+        },
     },
     methods: {
         tencentPermission (url) {
@@ -116,8 +120,8 @@ Vue.mixin({
             } else {
                 this.$showTips({
                     message: e.message || e,
-                    theme: 'error'
-                })
+                    theme: "error",
+                });
             }
         },
         /**
@@ -142,17 +146,18 @@ Vue.mixin({
     }
 })
 
-if (window.top === window.self) { // 只能以iframe形式嵌入
-    location.href = `${WEB_URL_PREFIX}${location.pathname}`
+if (window.top === window.self) {
+    // 只能以iframe形式嵌入
+    location.href = `${WEB_URL_PREFIX}${location.pathname}`;
 }
 
 global.pipelineVue = new Vue({
-    el: '#app',
+    el: "#app",
     router: createRouter(store),
     i18n,
     store,
     components: {
-        App
+        App,
     },
-    template: '<App/>'
-})
+    template: "<App/>",
+});
