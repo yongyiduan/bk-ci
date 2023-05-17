@@ -168,6 +168,7 @@
                 this.activeIndex = 0
                 this.path = `user-group-detail/${this.groupList[index].groupId}?role_id=${this.groupList[index].managerId}`
             },
+
             handleMessage (event) {
                 const { data } = event
                 if (data.type === 'IAM') {

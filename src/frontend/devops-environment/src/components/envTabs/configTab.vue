@@ -112,7 +112,6 @@
 </template>
 
 <script>
-    import empty from '@/components/common/empty'
     import { ENV_RESOURCE_ACTION, ENV_RESOURCE_TYPE } from '@/utils/permission'
     export default {
         name: 'config-tab',
@@ -267,7 +266,7 @@
 
                     message = this.$t('environment.successfullySaved')
                     theme = 'success'
-                    
+
                     this.$bkMessage({
                         message,
                         theme
@@ -314,7 +313,7 @@
 
                                 message = this.$t('environment.successfullyDeleted')
                                 theme = 'success'
-                                
+
                                 this.$bkMessage({
                                     message,
                                     theme

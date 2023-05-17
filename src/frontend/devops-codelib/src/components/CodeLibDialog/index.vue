@@ -603,3 +603,9 @@
         display: list-item !important;
     }
 </style>
+
+<style lang="scss" scoped>
+    .bk-form-control {
+        display: list-item !important;
+    }
+</style>

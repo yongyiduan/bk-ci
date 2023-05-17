@@ -366,6 +366,7 @@
                             accept="application/zip"
                             @uploadSuccess="uploadPackageSuccess"
                             @uploadFail="uploadPackageErr"
+                            :key="atomForm.releaseType"
                         ></bk-file-upload>
                         <div
                             v-if="formErrors.releasePackageError"

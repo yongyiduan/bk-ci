@@ -40,6 +40,7 @@ import ExtendsCustomRules from './utils/customRules'
 import validDictionary from './utils/validDictionary'
 
 import bkMagic from '@tencent/bk-magic-vue'
+import { pipelineDocs } from '../../common-lib/docs'
 import BkPipeline from 'bkui-pipeline'
 import {
     handlePipelineNoPermission,
@@ -85,6 +86,7 @@ Vue.use(BkPipeline, {
 
 Vue.prototype.$setLocale = setLocale
 Vue.prototype.isExtendTx = VERSION_TYPE === 'tencent'
+Vue.prototype.$permissionResourceAction = RESOURCE_ACTION
 Vue.prototype.$pipelineDocs = pipelineDocs
 Vue.prototype.$bkMessage = function (config) {
     config.ellipsisLine = config.ellipsisLine || 3
@@ -95,7 +97,6 @@ Vue.prototype.$bkMessage = function (config) {
 String.prototype.isBkVar = function () {
     return /\$\{{2}([\w\_\.\s-]+)\}{2}/g.test(this) || /\$\{([\w\_\.\s-]+)\}/g.test(this)
 }
-
 /* eslint-disable */
 
 Vue.mixin({
@@ -120,44 +121,24 @@ Vue.mixin({
             } else {
                 this.$showTips({
                     message: e.message || e,
-                    theme: "error",
-                });
+                    theme: 'error'
+                })
             }
         },
-        /**
-         * 设置权限弹窗的参数
-         */
-        setPermissionConfig (resourceId, actionId, instanceId = [], projectId = this.$route.params.projectId, applyPermissionUrl) {
-            this.$showAskPermissionDialog({
-                noPermissionList: [{
-                    actionId,
-                    resourceId,
-                    instanceId,
-                    projectId
-                }],
-                applyPermissionUrl
-            })
-        },
-
-        getPermUrlByRole (projectId, pipelineId, role = this.roleMap.viewer) {
-            return `/backend/api/perm/apply/subsystem/?client_id=pipeline&project_code=${projectId}&service_code=pipeline&${role}=pipeline${pipelineId ? `:${pipelineId}` : ''}`
-        }
-
     }
 })
 
-if (window.top === window.self) {
-    // 只能以iframe形式嵌入
-    location.href = `${WEB_URL_PREFIX}${location.pathname}`;
+if (window.top === window.self) { // 只能以iframe形式嵌入
+    location.href = `${WEB_URL_PREFIX}${location.pathname}`
 }
 
 global.pipelineVue = new Vue({
-    el: "#app",
+    el: '#app',
     router: createRouter(store),
     i18n,
     store,
     components: {
-        App,
+        App
     },
-    template: "<App/>",
-});
+    template: '<App/>'
+})

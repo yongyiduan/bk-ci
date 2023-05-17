@@ -385,13 +385,8 @@
             } catch (err: any) {
                 if (err.code === 403) {
                     const {
-                        projectCode,
-                        projectName,
-                        routerTag
+                        projectCode
                     } = data.data || {}
-                    const url = /rbac/.test(routerTag)
-                        ? `/console/permission/apply?project_code=${projectCode}&resourceType=project&resourceName=${projectName}&action=project_create&iamResourceCode=${projectCode}&groupId&x-devops-project-id=${projectCode}`
-                        : `/console/perm/apply-perm?project_code=${projectCode}&x-devops-project-id=${projectCode}`
                     handleProjectNoPermission(
                         {
                             projectId: projectCode,
@@ -428,24 +423,13 @@
             } catch (e: any) {
                 if (e.code === 403) {
                     const {
-                        projectCode,
-                        projectName,
-                        routerTag
+                        projectCode
                     } = data.data || {}
-                    const url = /rbac/.test(routerTag)
-                        ? `/console/permission/apply?project_code=${projectCode}&resourceType=project&resourceName=${projectName}&action=project_enable&iamResourceCode=${projectCode}&groupId&x-devops-project-id=${projectCode}`
-                        : `/console/perm/apply-perm?project_code=${projectCode}&x-devops-project-id=${projectCode}`
                     handleProjectNoPermission(
                         {
                             projectId: projectCode,
                             resourceCode: projectCode,
                             action: RESOURCE_ACTION.EDIT
-                        },
-                        {
-                            actionName: this.$t('editProject'),
-                            groupInfoList: [{ url }],
-                            resourceName: projectName,
-                            resourceTypeName: this.$t('project')
                         }
                     )
                 } else {

@@ -37,7 +37,20 @@
                     }"
                     theme="primary" @click="toImportNode('construct')">{{ $t('environment.thirdPartyBuildMachine') }}</bk-button>
             </template>
-            <bk-button theme="primary" class="import-node-btn" v-else @click="toImportNode('construct')">{{ $t('environment.nodeInfo.importNode') }}</bk-button>
+            <bk-button
+                v-else
+                v-perm="{
+                    permissionData: {
+                        projectId: projectId,
+                        resourceType: NODE_RESOURCE_TYPE,
+                        resourceCode: projectId,
+                        action: NODE_RESOURCE_ACTION.CREATE
+                    }
+                }"
+                theme="primary"
+                class="import-node-btn"
+                @click="toImportNode('construct')"
+            >{{ $t('environment.nodeInfo.importNode') }}</bk-button>
         </div>
     </div>
 </template>

@@ -9,7 +9,6 @@
   "templateManage": "Templates",
   "pluginManage": "Installed plugins",
   "operatorAudit": "Operational Audit",
-  "apply": "Apply",
   "audit": {
     "operator": "Operator",
     "operateTime": "Operation time",
@@ -1153,8 +1152,8 @@
   "notJoined": "Not joined",
   "normal": "Normal",
   "expired": "Expired",
-  "operation": "Operation",
   "提交后，再次开启权限管理时对应组内的用户将不能恢复，请谨慎操作！": "提交后，再次开启权限管理时对应组内的用户将{0}，请谨慎操作!",
   "关闭权限管理，将执行如下操作：": "关闭{0}权限管理，将执行如下操作：",
-  "确认关闭【】的权限管理？": "确认关闭【{0}】的权限管理？"
+  "确认关闭【】的权限管理？": "确认关闭【{0}】的权限管理？",
+  "operation": "Operation"
 }

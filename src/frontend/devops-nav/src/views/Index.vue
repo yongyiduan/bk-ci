@@ -82,6 +82,7 @@
     import { Component, Watch } from 'vue-property-decorator'
     import { State, Getter, Action } from 'vuex-class'
     import eventBus from '../utils/eventBus'
+    import { mapDocumnetTitle } from '@/utils/constants'
 
     Component.registerHooks([
         'beforeRouteEnter',
@@ -179,6 +180,8 @@
         }
 
         created () {
+            const model = location.href.split('/')[4]
+            document.title = this.$t(mapDocumnetTitle(model)) as string
             eventBus.$on('update-project-id', projectId => {
                 this.$router.replace({
                     params: {

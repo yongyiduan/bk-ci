@@ -124,7 +124,6 @@
                     <!-- 凭据描述 end -->
 
                     <div class="operate-btn">
-                        
                         <bk-button
                             v-perm="{
                                 permissionData: {

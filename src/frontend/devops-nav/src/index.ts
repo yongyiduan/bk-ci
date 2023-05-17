@@ -45,11 +45,6 @@ declare module 'vue/types/vue' {
         $showTips: any
         iframeUtil: any
         isExtendTx: boolean
-        $permissionActionMap: any
-        $permissionResourceMap: any
-        $permissionResourceTypeMap: any
-        tencentPermission: any
-        applyPermission: any
         handleNoPermission: any
     }
 }

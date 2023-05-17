@@ -210,7 +210,7 @@ export default {
     if (this.projectCode) {
       this.formData.englishName = this.projectCode;
     }
-    if (thise === 'apply') {
+    if (this.type === 'apply') {
       this.formData.reason = '';
     }
   },
@@ -220,7 +220,7 @@ export default {
         const timestamp = this.customTime * 24 * 3600;
         this.formData.expireTime = this.formatTimes(timestamp);
       }
-      if (thise === 'renewal') {
+      if (this.type === 'renewal') {
         const timestamp = this.newExpiredDisplay * 24 * 3600;
         const expiredDisplayTime = this.formatTimes(timestamp);
         this.formData.expireTime = expiredDisplayTime;

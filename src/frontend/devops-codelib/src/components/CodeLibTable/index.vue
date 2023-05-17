@@ -205,6 +205,7 @@
                 }
                 this.toggleCodelibDialog(CodelibDialog)
             },
+            
             handleApplyPermission (row) {
                 this.handleNoPermission({
                     projectId: this.projectId,

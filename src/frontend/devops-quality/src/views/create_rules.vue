@@ -1438,7 +1438,6 @@
                             } finally {
                                 this.isEditing = false
                                 this.loading.isLoading = false
-                                
                                 if (theme === 'success') this.toRuleList()
                             }
                         }
