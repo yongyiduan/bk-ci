@@ -40,7 +40,6 @@ import ExtendsCustomRules from './utils/customRules'
 import validDictionary from './utils/validDictionary'
 
 import bkMagic from '@tencent/bk-magic-vue'
-import { pipelineDocs } from '../../common-lib/docs'
 import BkPipeline from 'bkui-pipeline'
 import {
     handlePipelineNoPermission,
