@@ -356,7 +356,7 @@ onBeforeUnmount(() => {
       />
       <span class="logo-upload-tip">{{ t('只允许上传png、jpg，大小不超过 2M')}}</span>
     </bk-form-item>
-    <!-- <bk-form-item :label="t('项目所属组织')" property="bgId" :required="true">
+    <bk-form-item :label="t('项目所属组织')" property="bgId" :required="true">
       <div class="bk-dropdown-box">
         <bk-select
           v-model="projectData.bgId"
@@ -408,22 +408,6 @@ onBeforeUnmount(() => {
           />
         </bk-select>
       </div>
-    </bk-form-item> -->
-    <bk-form-item :label="t('项目类型')" property="projectType" :required="true">
-      <bk-select
-        v-model="projectData.projectType"
-        :placeholder="t('选择项目类型')"
-        name="center"
-        searchable
-        @change="handleChangeForm"
-      >
-        <bk-option
-          v-for="type in projectTypeList"
-          :value="type.id"
-          :key="type.id"
-          :label="type.name"
-        />
-      </bk-select>
     </bk-form-item>
     <bk-form-item :label="t('项目类型')" property="projectType" :required="true">
       <bk-select
