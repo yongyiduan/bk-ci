@@ -42,7 +42,7 @@ import com.tencent.devops.common.api.util.DateTimeUtil
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.auth.api.AuthPermission
 import com.tencent.devops.common.auth.api.AuthResourceType
-import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.common.web.utils.I18nUtil
 import com.tencent.devops.model.auth.tables.records.TAuthStrategyRecord
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
@@ -78,7 +78,12 @@ class StrategyService @Autowired constructor(
         val strategyNameCheck = strategyDao.getByName(dslContext, name)
         if (strategyNameCheck != null) {
             logger.warn("createStrategy: $name is exist")
-            throw OperationException(MessageCodeUtil.getCodeLanMessage(AuthMessageCode.STRATEGT_NAME_EXIST))
+            throw OperationException(
+                I18nUtil.getCodeLanMessage(
+                    messageCode = AuthMessageCode.STRATEGT_NAME_EXIST,
+                    language = I18nUtil.getLanguage(userId)
+                )
+            )
         }
 
         val strategyStr = objectMapper.writeValueAsString(strategy.strategy)
@@ -164,7 +169,7 @@ class StrategyService @Autowired constructor(
                 val actions = strategyMap[it]
                     ?: throw ErrorCodeException(
                         errorCode = AuthMessageCode.STRATEGT_CHECKOUT_FAIL,
-                        defaultMessage = "actions 为空"
+                        defaultMessage = "actions is null"
                     )
                 actions!!.forEach { action ->
                     AuthPermission.get(action)

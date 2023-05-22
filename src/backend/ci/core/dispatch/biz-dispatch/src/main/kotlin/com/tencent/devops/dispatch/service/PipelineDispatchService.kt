@@ -32,7 +32,9 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.event.dispatcher.pipeline.PipelineEventDispatcher
 import com.tencent.devops.common.log.utils.BuildLogPrinter
 import com.tencent.devops.common.service.utils.SpringContextUtil
+import com.tencent.devops.common.web.utils.I18nUtil
 import com.tencent.devops.dispatch.dao.DispatchPipelineBuildDao
+import com.tencent.devops.dispatch.exception.ErrorCodeEnum
 import com.tencent.devops.dispatch.pojo.PipelineBuild
 import com.tencent.devops.dispatch.service.dispatcher.Dispatcher
 import com.tencent.devops.process.engine.common.VMUtils
@@ -84,7 +86,9 @@ class PipelineDispatchService @Autowired constructor(
         if (startupEvent.retryTime == 0) {
             buildLogPrinter.addLine(
                 buildId = startupEvent.buildId,
-                message = "构建环境准备中...",
+                message = ErrorCodeEnum.BUILD_ENV_PREPARATION.getErrorMessage(
+                    language = I18nUtil.getDefaultLocaleLanguage()
+                ),
                 tag = VMUtils.genStartVMTaskId(startupEvent.containerId),
                 jobId = startupEvent.containerHashId,
                 executeCount = startupEvent.executeCount ?: 1

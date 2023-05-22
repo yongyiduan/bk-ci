@@ -27,8 +27,9 @@
 
 package com.tencent.devops.environment.service.slave
 
+import com.tencent.devops.common.api.pojo.Zone
 import com.tencent.devops.common.service.config.CommonConfig
-import com.tencent.devops.common.service.utils.MessageCodeUtil
+import com.tencent.devops.common.web.utils.I18nUtil
 import com.tencent.devops.environment.dao.slave.SlaveGatewayDao
 import com.tencent.devops.environment.pojo.slave.SlaveGateway
 import com.tencent.devops.environment.service.AgentUrlService
@@ -62,7 +63,7 @@ class SlaveGatewayService @Autowired constructor(
                 return it.showName
             }
         }
-        return MessageCodeUtil.getCodeLanMessage("SHENZHEN")
+        return I18nUtil.getCodeLanMessage(Zone.SHENZHEN.name)
     }
 
     fun getFileGateway(zoneName: String?): String? {

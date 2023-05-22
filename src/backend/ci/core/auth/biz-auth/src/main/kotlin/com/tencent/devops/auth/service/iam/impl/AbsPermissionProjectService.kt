@@ -23,7 +23,6 @@ import com.tencent.devops.common.auth.api.pojo.BkAuthGroup
 import com.tencent.devops.common.auth.api.pojo.BkAuthGroupAndUserList
 import com.tencent.devops.common.auth.utils.AuthUtils
 import com.tencent.devops.common.client.Client
-import com.tencent.devops.common.service.utils.MessageCodeUtil
 import com.tencent.devops.project.api.service.ServiceProjectResource
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -208,12 +207,7 @@ abstract class AbsPermissionProjectService @Autowired constructor(
         }
         if (iamProjectId.isNullOrEmpty()) {
             logger.warn("[IAM] $projectCode iamProject is empty")
-            throw ErrorCodeException(
-                errorCode = AuthMessageCode.RELATED_RESOURCE_EMPTY,
-                defaultMessage = MessageCodeUtil.getCodeLanMessage(
-                    messageCode = AuthMessageCode.RELATED_RESOURCE_EMPTY
-                )
-            )
+            throw ErrorCodeException(errorCode = AuthMessageCode.RELATED_RESOURCE_EMPTY)
         }
         return iamProjectId.toInt()
     }

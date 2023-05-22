@@ -42,7 +42,6 @@ import org.jooq.Result
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
-import javax.ws.rs.NotFoundException
 
 @Suppress("ALL")
 @Repository
@@ -298,8 +297,7 @@ class TemplateDao {
                 .where(conditions)
                 .limit(1)
                 .fetchOne() ?: throw ErrorCodeException(
-                errorCode = ProcessMessageCode.ERROR_TEMPLATE_NOT_EXISTS,
-                defaultMessage = "模板不存在"
+                errorCode = ProcessMessageCode.ERROR_TEMPLATE_NOT_EXISTS
             )
         }
     }
@@ -324,8 +322,7 @@ class TemplateDao {
                 .orderBy(CREATED_TIME.desc(), VERSION.desc())
                 .limit(1)
                 .fetchOne() ?: throw ErrorCodeException(
-                errorCode = ProcessMessageCode.ERROR_TEMPLATE_NOT_EXISTS,
-                defaultMessage = "模板不存在"
+                errorCode = ProcessMessageCode.ERROR_TEMPLATE_NOT_EXISTS
             )
         }
     }
@@ -537,7 +534,9 @@ class TemplateDao {
                 .and(ID.eq(templateId))
                 .orderBy(CREATED_TIME.desc(), VERSION.desc())
                 .limit(1)
-                .fetchOne() ?: throw NotFoundException("流水线模板不存在")
+                .fetchOne() ?: throw ErrorCodeException(
+                errorCode = ProcessMessageCode.ERROR_TEMPLATE_NOT_EXISTS
+            )
         }
     }
 
@@ -550,7 +549,9 @@ class TemplateDao {
                 .where(ID.eq(templateId))
                 .orderBy(CREATED_TIME.desc(), VERSION.desc())
                 .limit(1)
-                .fetchOne() ?: throw NotFoundException("流水线模板不存在")
+                .fetchOne() ?: throw ErrorCodeException(
+                errorCode = ProcessMessageCode.ERROR_TEMPLATE_NOT_EXISTS
+            )
         }
     }
 

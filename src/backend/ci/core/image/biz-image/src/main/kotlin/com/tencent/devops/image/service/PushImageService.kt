@@ -36,13 +36,13 @@ import com.github.dockerjava.core.command.PushImageResultCallback
 import com.tencent.devops.common.api.util.SecurityUtil
 import com.tencent.devops.common.api.util.timestamp
 import com.tencent.devops.common.client.Client
+import com.tencent.devops.common.log.utils.BuildLogPrinter
 import com.tencent.devops.common.redis.RedisOperation
 import com.tencent.devops.image.config.DockerConfig
 import com.tencent.devops.image.pojo.PushImageParam
 import com.tencent.devops.image.pojo.PushImageTask
 import com.tencent.devops.image.pojo.enums.TaskStatus
 import com.tencent.devops.image.utils.CommonUtils
-import com.tencent.devops.common.log.utils.BuildLogPrinter
 import com.tencent.devops.ticket.pojo.enums.CredentialType
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -117,7 +117,7 @@ class PushImageService @Autowired constructor(
         val fromImage =
             "${dockerConfig.imagePrefix}/paas/${pushImageParam.projectId}/" +
                 "${pushImageParam.srcImageName}:${pushImageParam.srcImageTag}"
-        logger.info("源镜像：$fromImage")
+        logger.info("Source image：$fromImage")
         val toImageRepo = "${pushImageParam.repoAddress}/${pushImageParam.namespace}/${pushImageParam.targetImageName}"
         try {
             pullImage(fromImage)
@@ -127,7 +127,7 @@ class PushImageService @Autowired constructor(
                 "$toImageRepo:${pushImageParam.targetImageTag}")
             buildLogPrinter.addLine(
                 buildId = pushImageParam.buildId,
-                message = "目标镜像：$toImageRepo:${pushImageParam.targetImageTag}",
+                message = "Target image：$toImageRepo:${pushImageParam.targetImageTag}",
                 tag = pushImageParam.buildId,
                 executeCount = pushImageParam.executeCount ?: 1
             )

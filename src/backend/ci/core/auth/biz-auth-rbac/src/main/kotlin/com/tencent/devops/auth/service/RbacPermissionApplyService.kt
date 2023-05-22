@@ -33,12 +33,12 @@ import com.tencent.devops.common.client.Client
 import com.tencent.devops.common.service.config.CommonConfig
 import com.tencent.devops.process.api.user.UserPipelineViewResource
 import com.tencent.devops.project.api.service.ServiceProjectTagResource
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
 import org.jooq.DSLContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 @Suppress("ALL")
 class RbacPermissionApplyService @Autowired constructor(
@@ -114,8 +114,7 @@ class RbacPermissionApplyService @Autowired constructor(
             logger.info("RbacPermissionApplyService|listGroups: managerRoleGroupVO=$managerRoleGroupVO")
         } catch (e: Exception) {
             throw ErrorCodeException(
-                errorCode = AuthMessageCode.GET_IAM_GROUP_FAIL,
-                defaultMessage = "权限系统：获取用户组失败！"
+                errorCode = AuthMessageCode.GET_IAM_GROUP_FAIL
             )
         }
         val groupInfoList = buildGroupInfoList(
