@@ -1152,11 +1152,10 @@
   "notJoined": "Not joined",
   "normal": "Normal",
   "expired": "Expired",
-  "提交后，再次开启权限管理时对应组内的用户将不能恢复，请谨慎操作！": "提交后，再次开启权限管理时对应组内的用户将{0}，请谨慎操作!",
-  "关闭权限管理，将执行如下操作：": "关闭{0}权限管理，将执行如下操作：",
-  "确认关闭【】的权限管理？": "确认关闭【{0}】的权限管理？",
-  "operation": "Operation"
-  "pipelineManualDisable": "This pipeline is not configured for manual trigger",
+  "提交后，再次开启权限管理时对应组内的用户将不能恢复，请谨慎操作！": "After submission, users in the corresponding group will be {0} when permission management is enabled again, please operate with caution!",
+  "关闭权限管理，将执行如下操作：": "To close {0} permission management, the following operations will be performed:",
+  "确认关闭【】的权限管理？": "Are you sure to close [{0}]'s permission management?",
+  "operation": "Operation",
   "duration": "Duration",
   "outputNameSpaceDescTips": "It is used to solve the problem of output field conflicts when there are multiple instances of the same plugin under the pipeline. \nNo need to add namespace when there is no conflict. \nWhen the namespace is modified, the subsequent use of the corresponding field also needs to be modified synchronously",
   "noReleatedPipeline": "No Related Pipeline"
