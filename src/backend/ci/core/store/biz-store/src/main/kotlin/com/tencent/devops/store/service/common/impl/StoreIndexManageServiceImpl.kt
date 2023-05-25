@@ -60,12 +60,12 @@ import com.tencent.devops.store.pojo.common.index.StoreIndexInfo
 import com.tencent.devops.store.pojo.common.index.StoreIndexPipelineInitRequest
 import com.tencent.devops.store.service.common.StoreIndexManageService
 import com.tencent.devops.store.service.common.StoreIndexPipelineService
-import java.time.LocalDateTime
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class StoreIndexManageServiceImpl @Autowired constructor(
@@ -158,8 +158,8 @@ class StoreIndexManageServiceImpl @Autowired constructor(
                     listOf(pipelineId)
                 ).data?.get(storePipelineRelRecord.pipelineId)
                 pipelineBuildInfo?.let {
-                    if (it.status == BuildStatus.PREPARE_ENV.statusName ||
-                        it.status == BuildStatus.RUNNING.statusName) {
+                    if (it.status == BuildStatus.PREPARE_ENV.name ||
+                        it.status == BuildStatus.RUNNING.name) {
                         client.get(ServiceBuildResource::class).manualShutdown(
                             userId = userId,
                             projectId = initProjectCode,
