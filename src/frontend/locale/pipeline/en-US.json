@@ -9,6 +9,7 @@
   "templateManage": "Templates",
   "pluginManage": "Installed plugins",
   "operatorAudit": "Operational Audit",
+  "apply": "Apply",
   "audit": {
     "operator": "Operator",
     "operateTime": "Operation time",
