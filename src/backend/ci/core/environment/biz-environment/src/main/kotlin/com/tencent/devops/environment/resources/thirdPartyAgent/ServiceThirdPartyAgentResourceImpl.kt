@@ -63,9 +63,9 @@ class ServiceThirdPartyAgentResourceImpl @Autowired constructor(
     private val upgradeService: UpgradeService,
     private val thirdPartyAgentPipelineService: ThirdPartyAgentPipelineService,
     private val agentPipelineService: AgentPipelineService,
+    private val slaveGatewayService: SlaveGatewayService,
     private val permissionService: EnvironmentPermissionService,
-    private val nodeService: NodeService,
-    private val slaveGatewayService: SlaveGatewayService
+    private val nodeService: NodeService
 ) : ServiceThirdPartyAgentResource {
     override fun getAgentById(projectId: String, agentId: String): AgentResult<ThirdPartyAgent?> {
         return thirdPartyAgentService.getAgent(projectId, agentId)

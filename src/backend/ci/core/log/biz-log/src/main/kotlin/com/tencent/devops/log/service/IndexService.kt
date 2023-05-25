@@ -38,7 +38,6 @@ import org.jooq.impl.DSL
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 @Suppress("NestedBlockDepth")
@@ -129,6 +128,10 @@ class IndexService @Autowired constructor(
             }
             return lineNum!! - size
         }
+    }
+
+    fun getBuildIndexName(buildId: String): String? {
+        return indexDao.getBuild(dslContext, buildId)?.indexName
     }
 
     fun getLastLineNum(buildId: String): Long {

@@ -36,9 +36,9 @@
                         }
                     }"
                     theme="primary"
-                    class="import-vmbuild-btn"
-                    @click="toImportNode('construct')"
-                >{{ $t('environment.nodeInfo.importNode') }}</bk-button>
+                    @click="toImportNode('construct')">
+                    {{ $t('environment.nodeInfo.importNode') }}
+                </bk-button>
             </div>
         </content-header>
         <section class="sub-view-port" v-bkloading="{
@@ -499,7 +499,7 @@
                 const id = row.nodeHashId
 
                 params.push(id)
-                
+
                 this.$bkInfo({
                     theme: 'warning',
                     type: 'warning',
@@ -515,7 +515,7 @@
 
                             message = this.$t('environment.successfullyDeleted')
                             theme = 'success'
-                            
+
                             message && this.$bkMessage({
                                 message,
                                 theme
@@ -545,7 +545,7 @@
                     subTitle: this.$t('environment.nodeInfo.modifyOperatorTips'),
                     confirmFn: async () => {
                         let message, theme
-                        
+
                         try {
                             await this.$store.dispatch('environment/changeCreatedUser', {
                                 projectId: this.projectId,
