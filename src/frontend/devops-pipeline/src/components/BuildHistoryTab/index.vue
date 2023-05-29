@@ -21,10 +21,6 @@
     import BuildHistoryTable from '@/components/BuildHistoryTable/'
     import FilterBar from '@/components/BuildHistoryTable/FilterBar'
     import InfiniteScroll from '@/components/InfiniteScroll'
-    import {
-        handlePipelineNoPermission,
-        RESOURCE_ACTION
-    } from '@/utils/permission'
     import emptyTips from '@/components/devops/emptyTips'
     import pipelineConstMixin from '@/mixins/pipelineConstMixin'
     import { PROCESS_API_URL_PREFIX } from '@/store/constants'
@@ -33,6 +29,10 @@
     import { coverStrTimer } from '@/utils/util'
     import webSocketMessage from '@/utils/webSocketMessage'
     import { mapActions, mapGetters, mapState } from 'vuex'
+    import {
+        handlePipelineNoPermission,
+        RESOURCE_ACTION
+    } from '@/utils/permission'
 
     const LS_COLUMNS_KEYS = 'shownColumns'
     export default {

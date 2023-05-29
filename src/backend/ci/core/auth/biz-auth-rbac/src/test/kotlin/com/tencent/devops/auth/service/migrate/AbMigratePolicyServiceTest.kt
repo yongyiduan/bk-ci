@@ -37,16 +37,17 @@ import com.tencent.devops.auth.dao.AuthResourceGroupConfigDao
 import com.tencent.devops.auth.dao.AuthResourceGroupDao
 import com.tencent.devops.auth.pojo.migrate.MigrateTaskDataResult
 import com.tencent.devops.auth.service.AuthResourceCodeConverter
+import com.tencent.devops.auth.service.DeptService
 import com.tencent.devops.auth.service.RbacCacheService
 import com.tencent.devops.auth.service.iam.PermissionService
 import com.tencent.devops.common.api.util.JsonUtil
 import com.tencent.devops.common.test.BkCiAbstractTest
 import io.mockk.every
 import io.mockk.mockk
-import java.nio.charset.Charset
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.core.io.ClassPathResource
+import java.nio.charset.Charset
 
 open class AbMigratePolicyServiceTest : BkCiAbstractTest() {
     val v2ManagerService: V2ManagerService = mockk()
@@ -59,6 +60,7 @@ open class AbMigratePolicyServiceTest : BkCiAbstractTest() {
     val rbacCacheService: RbacCacheService = mockk()
     val migrateResourceCodeConverter: MigrateResourceCodeConverter = mockk()
     val authResourceCodeConverter: AuthResourceCodeConverter = mockk()
+    val deptService: DeptService = mockk()
 
     @BeforeEach
     fun before() {
