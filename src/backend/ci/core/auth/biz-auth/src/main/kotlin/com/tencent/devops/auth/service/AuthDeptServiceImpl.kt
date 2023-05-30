@@ -60,6 +60,7 @@ import okhttp3.RequestBody
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import java.util.Optional
 import java.util.concurrent.TimeUnit
 
 class AuthDeptServiceImpl @Autowired constructor(
@@ -89,7 +90,7 @@ class AuthDeptServiceImpl @Autowired constructor(
     private val userInfoCache = CacheBuilder.newBuilder()
         .maximumSize(10000)
         .expireAfterWrite(1, TimeUnit.HOURS)
-        .build<String/*userId*/, UserAndDeptInfoVo>()
+        .build<String/*userId*/, Optional<UserAndDeptInfoVo>>()
 
     override fun getDeptByLevel(level: Int, accessToken: String?, userId: String): DeptInfoVo {
         val search = SearchUserAndDeptEntity(
@@ -256,7 +257,7 @@ class AuthDeptServiceImpl @Autowired constructor(
     }
 
     override fun getUserInfo(userId: String, name: String): UserAndDeptInfoVo? {
-        return userInfoCache.getIfPresent(name) ?: getUserAndPutInCache(userId, name)
+        return userInfoCache.getIfPresent(name)?.get() ?: getUserAndPutInCache(userId, name)
     }
 
     private fun getUserAndPutInCache(userId: String, name: String): UserAndDeptInfoVo? {
@@ -266,7 +267,7 @@ class AuthDeptServiceImpl @Autowired constructor(
             userId = userId,
             type = ManagerScopesEnum.USER,
             exactLookups = true
-        ).firstOrNull().also { if (it != null) userInfoCache.put(name, it) }
+        ).firstOrNull().also { if (it != null) userInfoCache.put(name, Optional.ofNullable(it)) }
     }
 
     private fun getUserDeptFamily(userId: String): String {
