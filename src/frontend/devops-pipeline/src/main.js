@@ -39,16 +39,13 @@ import createLocale from '../../locale'
 import ExtendsCustomRules from './utils/customRules'
 import validDictionary from './utils/validDictionary'
 
+import { handlePipelineNoPermission, RESOURCE_ACTION } from '@/utils/permission'
 import bkMagic from '@tencent/bk-magic-vue'
 import BkPipeline from 'bkui-pipeline'
-import {
-    handlePipelineNoPermission,
-    RESOURCE_ACTION
-} from '@/utils/permission'
 // 权限指令
-import { PermissionDirective, BkPermission } from 'bk-permission'
-import 'bk-permission/dist/main.css'
 import VueCompositionAPI from '@vue/composition-api'
+import { BkPermission, PermissionDirective } from 'bk-permission'
+import 'bk-permission/dist/main.css'
 import { pipelineDocs } from '../../common-lib/docs'
 
 // 全量引入 bk-magic-vue 样式
@@ -79,6 +76,7 @@ Vue.use(VeeValidate, {
 })
 VeeValidate.Validator.localize(validDictionary)
 ExtendsCustomRules(VeeValidate.Validator.extend)
+console.log(i18n.locale)
 Vue.use(BkPipeline, {
     i18n
 })

@@ -209,8 +209,10 @@
                                     class="error-tips"
                                 > {{ $t('store.项目不能为空') }} </div>
                             </div>
+                            
                             <bk-popover
                                 placement="right"
+                                class="info-circle-icon"
                                 width="400"
                             >
                                 <i class="devops-icon icon-info-circle"></i>

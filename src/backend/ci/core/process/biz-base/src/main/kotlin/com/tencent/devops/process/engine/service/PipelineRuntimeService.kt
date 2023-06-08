@@ -1150,6 +1150,13 @@ class PipelineRuntimeService @Autowired constructor(
                 detail.showBuildResource?.let {
                     containerVar[VMBuildContainer::showBuildResource.name] = it
                 }
+                detail.mutexGroup?.let {
+                    containerVar[VMBuildContainer::mutexGroup.name] = it
+                }
+            } else if (detail is NormalContainer) {
+                detail.mutexGroup?.let {
+                    containerVar[VMBuildContainer::mutexGroup.name] = it
+                }
             }
             containerBuildRecords.add(
                 BuildRecordContainer(
@@ -1546,7 +1553,11 @@ class PipelineRuntimeService @Autowired constructor(
                 pipelineId = latestRunningBuild.pipelineId,
                 startTime = startTime
             )
-            pipelineBuildSummaryDao.startLatestRunningBuild(transactionContext, latestRunningBuild)
+            pipelineBuildSummaryDao.startLatestRunningBuild(
+                dslContext = transactionContext,
+                latestRunningBuild = latestRunningBuild,
+                executeCount = executeCount
+            )
         }
         pipelineEventDispatcher.dispatch(
             PipelineBuildWebSocketPushEvent(
