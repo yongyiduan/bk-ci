@@ -23,22 +23,38 @@
  * NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
-package com.tencent.devops.auth.pojo.vo
+package com.tencent.devops.artifactory.service.impl
 
-import com.tencent.devops.common.api.annotation.BkFieldI18n
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
+import com.tencent.devops.artifactory.config.BkRepoStoreConfig
+import com.tencent.devops.artifactory.constant.REALM_BK_REPO
+import com.tencent.devops.artifactory.pojo.enums.BkRepoEnum
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Service
 
-@ApiModel("组策略")
-data class IamGroupPoliciesVo(
-    @ApiModelProperty("操作")
-    val action: String,
-    @ApiModelProperty("操作名")
-    @BkFieldI18n
-    val actionName: String,
-    @ApiModelProperty("是否该action操作权限")
-    val permission: Boolean
-)
+@Service
+@ConditionalOnProperty(prefix = "artifactory", name = ["realm"], havingValue = REALM_BK_REPO)
+class TxArchiveAtomToBkRepoServiceImpl : ArchiveAtomToBkRepoServiceImpl() {
+
+    @Autowired
+    private lateinit var bkRepoStoreConfig: BkRepoStoreConfig
+
+    override fun getBkRepoProjectId(): String {
+        return bkRepoStoreConfig.bkrepoStoreProjectName
+    }
+
+    override fun getBkRepoName(): String {
+        return BkRepoEnum.PLUGIN.repoName
+    }
+
+    override fun deleteAtom(userId: String, projectCode: String, atomCode: String) {
+        bkRepoClient.delete(
+            userId = bkRepoStoreConfig.bkrepoStoreUserName,
+            projectId = bkRepoStoreConfig.bkrepoStoreProjectName,
+            repoName = BkRepoEnum.PLUGIN.repoName,
+            path = atomCode
+        )
+    }
+}
