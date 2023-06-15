@@ -1129,7 +1129,10 @@ class PipelineRuntimeService @Autowired constructor(
                     stageId = it.stageId, containerId = it.containerId, taskSeq = it.taskSeq,
                     taskId = it.taskId, classType = it.taskType, atomCode = it.atomCode ?: it.taskAtom,
                     executeCount = it.executeCount ?: 1, resourceVersion = resourceVersion,
-                    taskVar = mutableMapOf(), timestamps = mapOf()
+                    taskVar = mutableMapOf(), timestamps = mapOf(),
+                    elementPostInfo = it.additionalOptions?.elementPostInfo?.takeIf { info ->
+                        info.parentElementId != it.taskId
+                    }
                 )
             )
         }
@@ -1157,6 +1160,9 @@ class PipelineRuntimeService @Autowired constructor(
                 detail.mutexGroup?.let {
                     containerVar[VMBuildContainer::mutexGroup.name] = it
                 }
+            }
+            if (detail.matrixGroupFlag == true) {
+                containerVar[Container::elements.name] = detail.elements
             }
             containerBuildRecords.add(
                 BuildRecordContainer(
@@ -1314,7 +1320,7 @@ class PipelineRuntimeService @Autowired constructor(
                 userId = userId,
                 buildId = buildId,
                 // 刷新历史列表和详情页面
-                refreshTypes = RefreshType.DETAIL.binary
+                refreshTypes = RefreshType.DETAIL.binary or RefreshType.RECORD.binary
             ), // 广播构建排队事件
             PipelineBuildQueueBroadCastEvent(
                 source = "startQueue",
@@ -1413,6 +1419,7 @@ class PipelineRuntimeService @Autowired constructor(
                             ManualReviewUserTaskElement::suggest.name to (params.suggest ?: ""),
                             ManualReviewUserTaskElement::params.name to params.params
                         ),
+                        operation = "manualDealReview#$taskId",
                         timestamps = mapOf(
                             BuildTimestampType.TASK_REVIEW_PAUSE_WAITING to
                                 BuildRecordTimeStamp(null, LocalDateTime.now().timestampmilli())
@@ -1567,7 +1574,10 @@ class PipelineRuntimeService @Autowired constructor(
                 userId = latestRunningBuild.userId,
                 buildId = latestRunningBuild.buildId,
                 // 刷新历史列表、详情、状态页面
-                refreshTypes = RefreshType.HISTORY.binary or RefreshType.DETAIL.binary or RefreshType.STATUS.binary
+                refreshTypes = RefreshType.HISTORY.binary or
+                    RefreshType.DETAIL.binary or
+                    RefreshType.STATUS.binary or
+                    RefreshType.RECORD.binary
             )
         )
 
@@ -1633,7 +1643,9 @@ class PipelineRuntimeService @Autowired constructor(
                     buildId = buildId,
                     // 刷新详情、状态页面
                     // #3400 在BuildEnd处会有HISTORY，历史列表此处不需要，减少负载
-                    refreshTypes = RefreshType.DETAIL.binary or RefreshType.STATUS.binary
+                    refreshTypes = RefreshType.DETAIL.binary or
+                        RefreshType.STATUS.binary or
+                        RefreshType.RECORD.binary
                 )
             )
             logger.info("[$pipelineId]|finishLatestRunningBuild-$buildId|status=$status")
@@ -1784,12 +1796,12 @@ class PipelineRuntimeService @Autowired constructor(
         return pipelineBuildDao.getLatestFailedBuild(dslContext, projectId, pipelineId)?.buildId
     }
 
-    fun getBuildIdbyBuildNo(projectId: String, pipelineId: String, buildNo: Int): String? {
-        return pipelineBuildDao.getBuildByBuildNo(
+    fun getBuildIdByBuildNum(projectId: String, pipelineId: String, buildNum: Int): String? {
+        return pipelineBuildDao.getBuildByBuildNum(
             dslContext = dslContext,
             projectId = projectId,
             pipelineId = pipelineId,
-            buildNo = buildNo
+            buildNum = buildNum
         )?.buildId
     }
 
