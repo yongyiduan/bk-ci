@@ -173,7 +173,7 @@
                     {{ $t('apply') }}
                 </bk-button>
                 <template
-                    v-else-if="props.row.permissions.canView  && !props.row.delete"
+                    v-else-if="props.row.permissions.canView && !props.row.delete"
                 >
                     <bk-button
                         text
@@ -183,16 +183,6 @@
                         @click="execPipeline(props.row)"
                     >
                         <span
-                            v-perm="{
-                                hasPermission: props.row.permissions && props.row.permissions.canExecute,
-                                disablePermissionApi: true,
-                                permissionData: {
-                                    projectId: projectId,
-                                    resourceType: 'pipeline',
-                                    resourceCode: props.row.pipelineId,
-                                    action: RESOURCE_ACTION.EXECUTE
-                                }
-                            }"
                             class="exec-btn-span" v-bk-tooltips="props.row.tooltips">
                             <logo v-if="props.row.lock" name="minus-circle"></logo>
                             <logo

@@ -113,7 +113,6 @@
                 </bk-table-column>
             </bk-table>
         </main>
-        
         <bk-sideslider
             class="create-atom-slider g-slide-radio"
             :is-show.sync="createAtomsideConfig.show"
