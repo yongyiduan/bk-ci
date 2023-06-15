@@ -8,7 +8,7 @@
         </pipeline-bread-crumb>
         <aside class="pipeline-detail-right-aside">
             <bk-button
-                :disabled="loading || !canManualStartup"
+                :disabled="loading || (!isRunning && !canManualStartup)"
                 :icon="loading ? 'loading' : ''"
                 outline
                 :theme="isRunning ? 'warning' : 'default'"
