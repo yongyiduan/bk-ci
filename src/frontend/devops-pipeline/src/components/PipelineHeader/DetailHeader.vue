@@ -23,6 +23,14 @@
                 :icon="loading ? 'loading' : ''"
                 outline
                 theme="default"
+                v-perm="{
+                    permissionData: {
+                        projectId: projectId,
+                        resourceType: 'pipeline',
+                        resourceCode: pipelineId,
+                        action: RESOURCE_ACTION.EXECUTE
+                    }
+                }"
                 @click="handleClick"
             >
                 {{ $t("history.reBuild") }}
