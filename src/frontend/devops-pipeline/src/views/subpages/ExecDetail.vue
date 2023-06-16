@@ -53,7 +53,6 @@
             </div>
             <p class="summary-header-shadow" v-show="show"></p>
             <Summary
-                :show-info-row="showSummaryInfoRow"
                 ref="detailSummary"
                 :exec-detail="execDetail"
             ></Summary>
@@ -171,7 +170,6 @@
                 isLoading: true,
                 hasNoPermission: false,
                 linkUrl: WEB_URL_PREFIX + location.pathname,
-                showSummaryInfoRow: true,
                 show: false,
                 noPermissionTipsConfig: {
                     title: this.$t('noPermission'),
@@ -485,7 +483,7 @@
     justify-content: space-between;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 22;
     .exec-detail-build-summary-anchor {
       @include build-status();
       position: absolute;

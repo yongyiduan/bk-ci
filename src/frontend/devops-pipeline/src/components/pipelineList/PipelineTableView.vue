@@ -173,7 +173,7 @@
                     {{ $t('apply') }}
                 </bk-button>
                 <template
-                    v-else-if="props.row.permissions.canView && !props.row.delete"
+                    v-else-if="props.row.hasPermission && !props.row.delete"
                 >
                     <bk-button
                         text
@@ -210,23 +210,23 @@
 </template>
 
 <script>
-    import { mapGetters, mapState } from 'vuex'
-    import piplineActionMixin from '@/mixins/pipeline-action-mixin'
     import Logo from '@/components/Logo'
+    import PipelineStatusIcon from '@/components/PipelineStatusIcon'
     import PipelineListEmpty from '@/components/pipelineList/PipelineListEmpty'
     import ExtMenu from '@/components/pipelineList/extMenu'
-    import PipelineStatusIcon from '@/components/PipelineStatusIcon'
+    import piplineActionMixin from '@/mixins/pipeline-action-mixin'
     import {
+        ALL_PIPELINE_VIEW_ID,
         DELETED_VIEW_ID,
-        RECENT_USED_VIEW_ID,
-        ALL_PIPELINE_VIEW_ID
+        RECENT_USED_VIEW_ID
     } from '@/store/constants'
-    import { convertTime, isShallowEqual } from '@/utils/util'
-    import { ORDER_ENUM, PIPELINE_SORT_FILED } from '@/utils/pipelineConst'
     import {
-        handlePipelineNoPermission,
-        RESOURCE_ACTION
+        RESOURCE_ACTION,
+        handlePipelineNoPermission
     } from '@/utils/permission'
+    import { ORDER_ENUM, PIPELINE_SORT_FILED } from '@/utils/pipelineConst'
+    import { convertTime, isShallowEqual } from '@/utils/util'
+    import { mapGetters, mapState } from 'vuex'
 
     export default {
         components: {
