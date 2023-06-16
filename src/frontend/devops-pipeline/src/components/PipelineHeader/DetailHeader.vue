@@ -8,16 +8,26 @@
         </pipeline-bread-crumb>
         <aside class="pipeline-detail-right-aside">
             <bk-button
-                :disabled="loading || (!isRunning && !canManualStartup)"
+                v-if="isRunning"
+                :disabled="loading"
                 :icon="loading ? 'loading' : ''"
                 outline
-                :theme="isRunning ? 'warning' : 'default'"
+                theme="warning"
                 @click="handleClick"
             >
-                {{ isRunning ? $t("cancel") : $t("history.reBuild") }}
+                {{ $t("cancel") }}
+            </bk-button>
+            <bk-button
+                v-else
+                :disabled="loading || !canManualStartup"
+                :icon="loading ? 'loading' : ''"
+                outline
+                theme="default"
+                @click="handleClick"
+            >
+                {{ $t("history.reBuild") }}
             </bk-button>
             <span class="exec-deatils-operate-divider"></span>
-
             <bk-button
                 v-perm="{
                     permissionData: {
@@ -52,13 +62,13 @@
 </template>
 
 <script>
-    import { mapState, mapGetters, mapActions } from 'vuex'
-    import PipelineBreadCrumb from './PipelineBreadCrumb'
-    import BuildNumSwitcher from './BuildNumSwitcher'
-    import MoreActions from './MoreActions.vue'
     import {
         RESOURCE_ACTION
     } from '@/utils/permission'
+    import { mapActions, mapGetters, mapState } from 'vuex'
+    import BuildNumSwitcher from './BuildNumSwitcher'
+    import MoreActions from './MoreActions.vue'
+    import PipelineBreadCrumb from './PipelineBreadCrumb'
 
     export default {
         components: {
