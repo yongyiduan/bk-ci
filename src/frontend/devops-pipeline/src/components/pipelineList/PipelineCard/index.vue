@@ -17,7 +17,7 @@
                     </span>
                     <span v-if="pipeline.viewNames" class="pipeline-group-names-span">
                         <logo size="16" name="pipeline-group" />
-                        <span v-bk-tooltips="viewNamesStr">
+                        <span v-bk-tooltips="{ content: viewNamesStr, delay: [300, 0], allowHTML: false }">
                             {{viewNamesStr}}
                         </span>
                     </span>
@@ -120,15 +120,15 @@
 </template>
 
 <script>
+    import Logo from '@/components/Logo'
     import ExtMenu from '@/components/pipelineList/extMenu'
     import PipelineStatusIcon from '@/components/PipelineStatusIcon'
-    import Logo from '@/components/Logo'
-    import { statusColorMap } from '@/utils/pipelineStatus'
+    import { RECENT_USED_VIEW_ID } from '@/store/constants'
     import {
         handlePipelineNoPermission,
         RESOURCE_ACTION
     } from '@/utils/permission'
-    import { RECENT_USED_VIEW_ID } from '@/store/constants'
+    import { statusColorMap } from '@/utils/pipelineStatus'
 
     export default {
         components: {

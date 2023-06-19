@@ -160,12 +160,12 @@
 </template>
 
 <script>
-    import { mapActions } from 'vuex'
-    import ApplyProjectDialog from '../components/ApplyProjectDialog/index.vue'
     import {
         handleProjectNoPermission,
         RESOURCE_ACTION
     } from '@/utils/permission'
+    import { mapActions } from 'vuex'
+    import ApplyProjectDialog from '../components/ApplyProjectDialog/index.vue'
 
     export default ({
         name: 'ProjectManage',
