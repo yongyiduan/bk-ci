@@ -45,11 +45,10 @@
 <script>
     import VersionSideslider from '@/components/VersionSideslider'
     import { PROCESS_API_URL_PREFIX } from '@/store/constants'
-    import { HttpError } from '@/utils/util'
     import {
         RESOURCE_ACTION
     } from '@/utils/permission'
-    import cookie from 'js-cookie'
+    import { HttpError } from '@/utils/util'
     import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
     import MoreActions from './MoreActions.vue'
     import PipelineBreadCrumb from './PipelineBreadCrumb.vue'
@@ -65,11 +64,8 @@
             }
         },
         computed: {
-            ...mapState([
-                'curProject'
-            ]),
-            ...mapState('atom', ['pipeline', 'executeStatus', 'saveStatus', 'authSettingEditing']),
-            ...mapState('pipelines', ['pipelineSetting', 'pipelineAuthority']),
+            ...mapState('atom', ['pipeline', 'executeStatus', 'saveStatus']),
+            ...mapState('pipelines', ['pipelineSetting']),
             ...mapGetters({
                 curPipeline: 'pipelines/getCurPipeline',
                 isEditing: 'atom/isEditing',
@@ -163,26 +159,6 @@
                 }
             },
 
-            savePipelineAuthority () {
-                const { role, policy } = this.pipelineAuthority
-                const longProjectId = this.curProject && this.curProject.projectId ? this.curProject.projectId : ''
-                const { pipelineId } = this.$route.params
-                const data = {
-                    project_id: longProjectId,
-                    resource_type_code: 'pipeline',
-                    resource_code: pipelineId,
-                    role: role.map(item => {
-                        item.group_list = item.selected
-                        return item
-                    }),
-                    policy: policy.map(item => {
-                        item.group_list = item.selected
-                        return item
-                    })
-                }
-                return this.$ajax.put('/backend/api/perm/service/pipeline/mgr_resource/permission/', data, { headers: { 'X-CSRFToken': cookie.get('paas_perm_csrftoken') } })
-            },
-
             async savePipelineAndSetting () {
                 const { pipelineSetting, checkPipelineInvalid, pipeline } = this
                 const { inValid, message } = checkPipelineInvalid(pipeline.stages, pipelineSetting)
@@ -237,17 +213,13 @@
                     const saveAction = this.isTemplatePipeline
                         ? this.saveSetting
                         : this.savePipelineAndSetting
-                    const responses = await Promise.all([
-                        saveAction(),
-                        ...(this.authSettingEditing ? [this.savePipelineAuthority()] : [])
-                    ])
+                    const responses = await saveAction()
 
-                    if (responses.some(res => res.code === 403)) {
+                    if (responses.code === 403) {
                         throw new HttpError(403)
                     }
 
                     this.setPipelineEditing(false)
-                    this.setAuthEditing(false)
                     this.$showTips({
                         message: this.$t('saveSuc'),
                         theme: 'success'
