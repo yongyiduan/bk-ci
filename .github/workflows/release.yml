@@ -91,12 +91,12 @@ jobs:
         run: |
           true  # 暂无init需求, 保留此步骤.
       - name: Create artifact - Step2:get Agent
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: agent
           path: src/agent/bin/
       - name: Create artifact - Step3:get Frontend
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: frontend
           path: src/frontend/frontend
@@ -144,12 +144,12 @@ jobs:
           ./gradlew clean test build -x test :core:worker:worker-agent:shadowJar -Ddevops.assemblyMode=K8S \
           -DmysqlURL=127.0.0.1:${{ job.services.mysql.ports['3306'] }} -DmysqlUser=root -DmysqlPasswd=root --no-daemon
       - name: Get Agent - CLOUD NATIVE
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: agent
           path: src/agent/bin/
       - name: Get Frontend - CLOUD NATIVE
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: frontend
           path: src/frontend/frontend
@@ -214,7 +214,7 @@ jobs:
           prerelease: true
       ## bkci
       - name: download bkci
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: bkci
           path: ./
@@ -229,7 +229,7 @@ jobs:
           asset_content_type: application/gzip
       ## bkci helm chart
       - name: download bkci-chart
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: bkci-chart
           path: ./
